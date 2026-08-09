@@ -24,8 +24,4 @@ public class ChunkVectorizer {
         return vector;
     }
 
-    public static boolean isSameChunk(Chunk chunk, int hashedChunk) {
-        return hash(chunk) == hashedChunk;
-    }
-
 }

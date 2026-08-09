@@ -8,12 +8,10 @@ import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class ItemStackSerializer {
@@ -87,43 +85,6 @@ public class ItemStackSerializer {
         }
 
         return ItemStackGenerator.generateItemStack(material, name, lore, customModelID);
-    }
-
-    /**
-     * Used to generate itemstacks from configuration files when they contain placeholders
-     *
-     * @param itemStack
-     * @param placeholderReplacementPairs List of placeholders / replacements. Each placeholder is a key, each key has 1 replacement value.
-     * @return
-     */
-    public static ItemStack itemStackPlaceholderReplacer(ItemStack itemStack, HashMap<String, String> placeholderReplacementPairs) {
-        ItemStack cloneItemStack = itemStack.clone();
-        ItemMeta newMeta = itemStack.getItemMeta();
-
-
-        //Replace placeholders in name
-        if (newMeta.hasDisplayName()) {
-            String newName = newMeta.getDisplayName();
-            for (String placeholder : placeholderReplacementPairs.keySet())
-                if (newMeta.getDisplayName().contains(placeholder))
-                    newName = newName.replace(placeholder, placeholderReplacementPairs.get(placeholder));
-            newMeta.setDisplayName(newName);
-        }
-
-        List<String> newLore = new ArrayList<>();
-        if (newMeta.hasLore()) {
-            for (String loreString : newMeta.getLore()) {
-                String newLoreString = loreString;
-                for (String placeholder : placeholderReplacementPairs.keySet())
-                    if (loreString.contains(placeholder))
-                        newLoreString = newLoreString.replace(placeholder, placeholderReplacementPairs.get(placeholder));
-                newLore.add(newLoreString);
-            }
-            newMeta.setLore(newLore);
-        }
-
-        cloneItemStack.setItemMeta(newMeta);
-        return cloneItemStack;
     }
 
 }

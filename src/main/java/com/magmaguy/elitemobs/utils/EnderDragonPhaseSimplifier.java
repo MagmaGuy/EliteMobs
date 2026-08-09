@@ -29,23 +29,5 @@ public class EnderDragonPhaseSimplifier {
         }
     }
 
-    /**
-     * Returns whether the dragon is currently in a landed phase. This means any phase where the dragon is sitting in the middle of the map.
-     *
-     * @param phase Phase to evaluate
-     * @return Whether the dragon sits in the middle of the map during that phase
-     */
-    public static boolean isLanded(EnderDragon.Phase phase) {
-        switch (phase) {
-            case BREATH_ATTACK:
-            case SEARCH_FOR_BREATH_ATTACK_TARGET:
-            case ROAR_BEFORE_ATTACK:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-
 }
 

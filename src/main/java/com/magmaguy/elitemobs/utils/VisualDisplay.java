@@ -4,13 +4,11 @@ import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.Consumer;
 
 import java.util.Collection;
@@ -29,22 +27,6 @@ public class VisualDisplay {
                 armorStand.setGravity(false);
                 armorStand.setRemoveWhenFarAway(true);
                 armorStand.setPersistent(false);
-            }
-        });
-        EntityTracker.registerVisualEffects(visualArmorStand);
-        return visualArmorStand;
-    }
-
-    public static TextDisplay generateTemporaryTextDisplay(Location location, String customName) {
-        TextDisplay visualArmorStand = location.getWorld().spawn(location, TextDisplay.class, new Consumer<TextDisplay>() {
-            @Override
-            public void accept(TextDisplay textDisplay) {
-                textDisplay.setText(ChatColorConverter.convert(customName));
-                textDisplay.setPersistent(false);
-                textDisplay.setInterpolationDelay(0);
-                textDisplay.setInterpolationDuration(0);
-                textDisplay.setBillboard(Display.Billboard.VERTICAL);
-                textDisplay.setShadowed(false);
             }
         });
         EntityTracker.registerVisualEffects(visualArmorStand);
@@ -127,31 +109,6 @@ public class VisualDisplay {
                 .build(location);
 
         fakeText.displayTo(viewer);
-
-        return fakeText;
-    }
-
-    /**
-     * Creates a packet-based FakeText display visible to all online players.
-     *
-     * @param location The location to spawn the text
-     * @param text     The text to display (supports color codes)
-     * @return The FakeText instance, or null if NMSManager is not available
-     */
-    public static FakeText generateFakeTextGlobal(Location location, String text) {
-        if (NMSManager.getAdapter() == null) return null;
-        if (location == null || location.getWorld() == null) return null;
-
-        FakeText fakeText = NMSManager.getAdapter().fakeTextBuilder()
-                .text(ChatColorConverter.convert(text))
-                .billboard(Display.Billboard.CENTER)
-                .shadow(false)
-                .seeThrough(false)
-                .build(location);
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            fakeText.displayTo(player);
-        }
 
         return fakeText;
     }

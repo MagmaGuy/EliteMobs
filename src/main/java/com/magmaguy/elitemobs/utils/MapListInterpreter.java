@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.utils;
 
 import com.magmaguy.elitemobs.config.LegacyValueConverter;
-import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptDouble;
 import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptFloat;
 import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptInteger;
 import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptVector;
@@ -103,26 +102,6 @@ public class MapListInterpreter {
         return null;
     }
 
-    public static ScriptDouble parseScriptDouble(String key, Object value, String scriptName) {
-        try {
-            if (value instanceof Integer integer)
-                return new ScriptDouble(integer.doubleValue());
-            else if (value instanceof Double dbl)
-                return new ScriptDouble(dbl);
-            else if (value instanceof String string) {
-                if (((String) value).contains("~")) {
-                    String[] strings = ((String) value).split("~");
-                    return new ScriptDouble(Double.parseDouble(strings[0]), Double.parseDouble(strings[1]));
-                }
-                return new ScriptDouble(Double.parseDouble(string));
-            }
-        } catch (Exception ex) {
-            parsingErrorMessage(key, value, scriptName);
-            return null;
-        }
-        Logger.warn("Failed to parse " + value + " as double in " + scriptName + " for key " + key);
-        return null;
-    }
 
     public static Float parseFloat(String key, Object value, String scriptName) {
         try {
