@@ -148,6 +148,10 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     private static String autoclickerThrottleMessage;
     @Getter
     private static int damageIndicatorParticleCap;
+    // Seeded with the shipped default so the cap is still sane if it is read before the config file
+    // has been loaded - otherwise an uninitialized 0.0 would silently disable critical strikes.
+    @Getter
+    private static double maximumCriticalStrikeChance = 0.40;
     private static MobCombatSettingsConfig instance;
 
     public MobCombatSettingsConfig() {
@@ -418,6 +422,13 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
                         "Set to a small positive value (default 16) to collapse the burst into a normal-looking puff. The cap is purely cosmetic: damage, sounds, health bars, and every other game state are unaffected.",
                         "Set to 0 (or any negative value) to disable the cap and let vanilla decide."),
                 fileConfiguration, "damageIndicatorParticleCap", 16);
+
+        maximumCriticalStrikeChance = ConfigurationEngine.setDouble(
+                List.of("Sets the highest critical strike chance a player can reach, from 0.0 to 1.0.",
+                        "Critical strike chance adds up across held and equipped items, so without a cap it is possible to crit on every single hit.",
+                        "Past 0.5 the critical hit becomes the typical hit, so it stops standing out as a critical strike at all while still adding damage.",
+                        "Values above 0.5 are not recommended for that reason."),
+                fileConfiguration, "maximumCriticalStrikeChance", 0.40);
 
         // Push the cap into MagmaCore's netty interceptor. NMSManager is
         // initialized before configs are loaded so the adapter is always

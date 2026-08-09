@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.enchantments.premade.SummonMerchantConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,6 +33,14 @@ public class SummonMerchantEnchantment extends CustomEnchantment implements List
      */
     private static int getEnchantment(ItemMeta itemMeta) {
         return ItemTagger.getEnchantment(itemMeta, key);
+    }
+
+    static ItemStack findEquippedOrHeldSummonItem(Player player) {
+        for (ItemStack itemStack : ElitePlayerInventory.getHeldAndEquippedItems(player.getInventory()))
+            if (itemStack != null && getEnchantment(itemStack.getItemMeta()) > 0)
+                return itemStack;
+
+        return null;
     }
 
     /**
@@ -89,23 +98,27 @@ public class SummonMerchantEnchantment extends CustomEnchantment implements List
         public void onPlayerChat(AsyncPlayerChatEvent event) {
             String merchantMessage = SummonMerchantConfig.message;
             if (merchantMessage == null || merchantMessage.isEmpty()) return;
-            if (event.getMessage().equalsIgnoreCase(merchantMessage)) {
-                UUID playerUUID = event.getPlayer().getUniqueId();
-                if (playerCooldowns.contains(playerUUID)) return;
-                playerCooldowns.add(playerUUID);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        playerCooldowns.remove(playerUUID);
-                    }
-                }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60);
-                for (ItemStack itemStack : event.getPlayer().getInventory())
-                    if (itemStack != null)
-                        if (getEnchantment(itemStack.getItemMeta()) > 0) {
-                            doSummonMerchant(event.getPlayer(), true, itemStack);
-                            return;
+            if (!event.getMessage().equalsIgnoreCase(merchantMessage)) return;
+
+            Player player = event.getPlayer();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    ItemStack itemStack = findEquippedOrHeldSummonItem(player);
+                    if (itemStack == null) return;
+
+                    UUID playerUUID = player.getUniqueId();
+                    if (playerCooldowns.contains(playerUUID)) return;
+                    playerCooldowns.add(playerUUID);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            playerCooldowns.remove(playerUUID);
                         }
-            }
+                    }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60);
+                    doSummonMerchant(player, true, itemStack);
+                }
+            }.runTask(MetadataHandler.PLUGIN);
         }
     }
 

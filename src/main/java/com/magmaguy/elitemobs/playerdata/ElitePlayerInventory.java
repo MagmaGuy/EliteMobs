@@ -1,19 +1,18 @@
 package com.magmaguy.elitemobs.playerdata;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.*;
 
@@ -61,6 +60,17 @@ public class ElitePlayerInventory {
     public static void initialize() {
         for (Player player : Bukkit.getOnlinePlayers())
             playerInventories.put(player.getUniqueId(), new ElitePlayerInventory(player));
+    }
+
+    public static ItemStack[] getHeldAndEquippedItems(PlayerInventory inventory) {
+        return new ItemStack[]{
+                inventory.getItemInMainHand(),
+                inventory.getItemInOffHand(),
+                inventory.getHelmet(),
+                inventory.getChestplate(),
+                inventory.getLeggings(),
+                inventory.getBoots()
+        };
     }
 
     public double getEliteDamage(boolean update) {
@@ -191,31 +201,19 @@ public class ElitePlayerInventory {
 
     public double getCritChance(boolean update) {
         if (isUpdateLock) update = false;
-        double critChance = helmet.getCritChance(player.getInventory().getHelmet(), update) +
-                chestplate.getCritChance(player.getInventory().getChestplate(), update) +
-                leggings.getCritChance(player.getInventory().getLeggings(), update) +
-                boots.getCritChance(player.getInventory().getBoots(), update) +
-                mainhand.getCritChance(player.getInventory().getItemInMainHand(), update) +
-                offhand.getCritChance(player.getInventory().getItemInOffHand(), update) +
-                getStoredInventoryCritChance();
+        ItemStack[] activeItems = getHeldAndEquippedItems(player.getInventory());
+        double critChance = mainhand.getCritChance(activeItems[0], update) +
+                offhand.getCritChance(activeItems[1], update) +
+                helmet.getCritChance(activeItems[2], update) +
+                chestplate.getCritChance(activeItems[3], update) +
+                leggings.getCritChance(activeItems[4], update) +
+                boots.getCritChance(activeItems[5], update);
         updateLock();
-        return Math.min(1D, critChance);
-    }
-
-    private double getStoredInventoryCritChance() {
-        double critChance = 0;
-        ItemStack[] storageContents = player.getInventory().getStorageContents();
-        int heldSlot = player.getInventory().getHeldItemSlot();
-        NamespacedKey criticalStrikesKey = new NamespacedKey(MetadataHandler.PLUGIN, CriticalStrikesEnchantment.key);
-
-        for (int slot = 0; slot < storageContents.length; slot++) {
-            if (slot == heldSlot) continue;
-            ItemStack itemStack = storageContents[slot];
-            if (itemStack == null || !itemStack.hasItemMeta()) continue;
-            critChance += ItemTagger.getEnchantment(itemStack.getItemMeta(), criticalStrikesKey) / 10D;
-        }
-
-        return critChance;
+        // Cap the total. Chance is additive across six slots, so without a ceiling a player can
+        // reach 100% and crit on every swing - at which point the crit IS the typical hit and
+        // stops reading as a critical strike, while still paying out the full 1.5x multiplier.
+        double cap = Math.max(0D, Math.min(1D, MobCombatSettingsConfig.getMaximumCriticalStrikeChance()));
+        return Math.min(cap, critChance);
     }
 
     public double getLightningChance(boolean update) {
