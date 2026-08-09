@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.translations.TranslationCsvParser;
+import com.magmaguy.elitemobs.config.translations.TranslationsConfigFields;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Command to set the language for EliteMobs.
@@ -81,10 +84,18 @@ public class LanguageCommand extends AdvancedCommand {
         CommandSender sender = commandData.getCommandSender();
 
         // Normalize language name
-        language = language.replace(".csv", "").replace(".yml", "");
+        language = language.trim();
+        if (language.toLowerCase(java.util.Locale.ROOT).endsWith(".csv") ||
+                language.toLowerCase(java.util.Locale.ROOT).endsWith(".yml")) {
+            language = language.substring(0, language.length() - 4);
+        }
 
-        String finalLanguage = language;
-        if (!suggestions.stream().anyMatch(s -> s.equalsIgnoreCase(finalLanguage))) {
+        String requestedLanguage = language;
+        language = suggestions.stream()
+                .filter(s -> s.equalsIgnoreCase(requestedLanguage))
+                .findFirst()
+                .orElse(null);
+        if (language == null) {
             Logger.sendMessage(sender, CommandMessagesConfig.getLanguageNotFoundMessage());
             suggestions.forEach(s -> Logger.sendMessage(sender, CommandMessagesConfig.getLanguageListPrefix() + s));
             return;
@@ -112,6 +123,8 @@ public class LanguageCommand extends AdvancedCommand {
                     Logger.sendMessage(sender, CommandMessagesConfig.getLanguageGenerateFailedMessage());
                     return;
                 }
+                //The recorded baselines describe the file that was just replaced, not this one.
+                TranslationsConfigFields.discardBaseline(folder, language);
                 Logger.sendMessage(sender, CommandMessagesConfig.getLanguageGenerateSuccessMessage());
             }
 
@@ -133,6 +146,8 @@ public class LanguageCommand extends AdvancedCommand {
                 Logger.sendMessage(sender, CommandMessagesConfig.getLanguageDownloadFailedMessage().replace("$language", language));
                 return;
             }
+            //The recorded baselines describe the file that was just replaced, not this one.
+            TranslationsConfigFields.discardBaseline(folder, language);
             Logger.sendMessage(sender, CommandMessagesConfig.getLanguageDownloadSuccessMessage().replace("$language", language));
         }
 
@@ -165,9 +180,11 @@ public class LanguageCommand extends AdvancedCommand {
      */
     private boolean downloadRemoteLanguage(String language, Path outPath) {
         String apiUrl = "https://magmaguy.com/api/elitemobs_translations/" + language + ".csv";
+        HttpURLConnection conn = null;
+        Path temporaryPath = null;
         try {
             URL url = new URL(apiUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setConnectTimeout(10_000);
             conn.setReadTimeout(30_000);
@@ -179,20 +196,55 @@ public class LanguageCommand extends AdvancedCommand {
             }
 
             Files.createDirectories(outPath.getParent());
+            temporaryPath = outPath.resolveSibling(
+                    outPath.getFileName() + "." + UUID.randomUUID() + ".download");
             try (InputStream in = conn.getInputStream();
-                 OutputStream out = Files.newOutputStream(outPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+                 OutputStream out = Files.newOutputStream(
+                         temporaryPath,
+                         StandardOpenOption.CREATE_NEW,
+                         StandardOpenOption.WRITE)) {
                 byte[] buf = new byte[8192];
                 int bytesRead;
                 while ((bytesRead = in.read(buf)) != -1) {
                     out.write(buf, 0, bytesRead);
                 }
             }
-            conn.disconnect();
+
+            // A successful HTTP status is not enough: never install HTML, a partial response, or
+            // malformed CSV as the active language file.
+            TranslationCsvParser.parse(temporaryPath);
+            try {
+                Files.move(
+                        temporaryPath,
+                        outPath,
+                        StandardCopyOption.ATOMIC_MOVE,
+                        StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException ignored) {
+                Files.move(
+                        temporaryPath,
+                        outPath,
+                        StandardCopyOption.REPLACE_EXISTING);
+            }
+            temporaryPath = null;
             return true;
 
         } catch (Exception ex) {
             Logger.warn("Error downloading " + language + ".csv: " + ex.getMessage());
             return false;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+            if (temporaryPath != null) {
+                try {
+                    Files.deleteIfExists(temporaryPath);
+                } catch (Exception cleanupFailure) {
+                    Logger.warn(
+                            "Could not remove incomplete translation download " +
+                                    temporaryPath.getFileName() + ": " +
+                                    cleanupFailure.getMessage());
+                }
+            }
         }
     }
 }

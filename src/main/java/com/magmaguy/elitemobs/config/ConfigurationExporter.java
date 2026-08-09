@@ -1,14 +1,16 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.magmacore.util.FileUtils;
 import com.magmaguy.magmacore.util.Logger;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,9 +18,13 @@ import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Stream;
 
 public class ConfigurationExporter {
     private static final String RSP_RESOURCE_PATH = "em_rsp_defaults";
@@ -83,18 +89,50 @@ public class ConfigurationExporter {
             return; // Resource pack is up to date
         }
 
-        // Clear existing contents (but keep the directory itself)
+        // Stage into a sibling tmp directory first, then swap it in, so a crash mid-copy never
+        // leaves a half-written resource pack at the final path.
+        Path stagingPath = exportsPath.resolve(RSP_RESOURCE_PATH + ".tmp");
+        Path backupPath = exportsPath.resolve(RSP_RESOURCE_PATH + ".backup");
+
+        // Recover the only complete copy if the previous process stopped between moving the live
+        // directory aside and installing its staged replacement. If the live directory exists,
+        // any leftover backup is merely from a completed swap and can be discarded.
+        if (!Files.exists(targetPath) && Files.isDirectory(backupPath))
+            Files.move(backupPath, targetPath);
+        else
+            FileUtils.deleteDirectory(backupPath);
+
+        FileUtils.deleteDirectory(stagingPath);
+        Files.createDirectories(stagingPath);
+
+        // Copy resources from jar into the staging directory
+        copyResourceFolder(RSP_RESOURCE_PATH, stagingPath);
+
+        // Swap the staged copy into place while retaining the old complete tree until the new one
+        // is live. A direct delete-then-move leaves no resource pack if the process stops between
+        // those operations.
+        boolean movedExistingPack = false;
         if (Files.exists(targetPath)) {
-            clearDirectoryContents(targetPath);
-        } else {
-            Files.createDirectories(targetPath);
+            Files.move(targetPath, backupPath);
+            movedExistingPack = true;
         }
+        try {
+            Files.move(stagingPath, targetPath);
+        } catch (IOException exception) {
+            if (movedExistingPack && !Files.exists(targetPath) && Files.exists(backupPath))
+                Files.move(backupPath, targetPath);
+            throw exception;
+        }
+        FileUtils.deleteDirectory(backupPath);
 
-        // Copy resources from jar
-        copyResourceFolder(RSP_RESOURCE_PATH, targetPath);
-
-        // Write checksum file
-        Files.writeString(checksumFile, jarChecksum);
+        // Write checksum file via a tmp file so a partial write never masquerades as a valid checksum
+        Path checksumStaging = exportsPath.resolve(CHECKSUM_FILE + ".tmp");
+        Files.writeString(checksumStaging, jarChecksum);
+        try {
+            Files.move(checksumStaging, checksumFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException e) {
+            Files.move(checksumStaging, checksumFile, StandardCopyOption.REPLACE_EXISTING);
+        }
         Logger.info("Resource pack exported to resource_pack folder.");
     }
 
@@ -113,38 +151,24 @@ public class ConfigurationExporter {
             if (resourceUrl.getProtocol().equals("jar")) {
                 JarURLConnection jarConnection = (JarURLConnection) resourceUrl.openConnection();
                 try (JarFile jarFile = jarConnection.getJarFile()) {
-                    Enumeration<JarEntry> entries = jarFile.entries();
-                    while (entries.hasMoreElements()) {
-                        JarEntry entry = entries.nextElement();
-                        if (entry.getName().startsWith(RSP_RESOURCE_PATH) && !entry.isDirectory()) {
-                            // Include file name and size in checksum
-                            digest.update(entry.getName().getBytes());
-                            digest.update(Long.toString(entry.getSize()).getBytes());
+                    List<JarEntry> entries = Collections.list(jarFile.entries()).stream()
+                            .filter(entry -> entry.getName().startsWith(RSP_RESOURCE_PATH) && !entry.isDirectory())
+                            .sorted(Comparator.comparing(JarEntry::getName))
+                            .toList();
+                    for (JarEntry entry : entries) {
+                        digest.update((entry.getName() + "\0").getBytes(StandardCharsets.UTF_8));
+                        try (InputStream inputStream = jarFile.getInputStream(entry)) {
+                            updateDigest(digest, inputStream);
                         }
                     }
                 }
             } else {
                 // Running from IDE - use file system
                 Path resourcePath = Paths.get(resourceUrl.toURI());
-                Files.walk(resourcePath)
-                        .filter(Files::isRegularFile)
-                        .sorted()
-                        .forEach(path -> {
-                            try {
-                                digest.update(path.toString().getBytes());
-                                digest.update(Long.toString(Files.size(path)).getBytes());
-                            } catch (IOException e) {
-                                // Ignore
-                            }
-                        });
+                return calculateDirectoryChecksum(resourcePath);
             }
 
-            byte[] hashBytes = digest.digest();
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
+            return toHex(digest.digest());
         } catch (Exception e) {
             Logger.warn("Error calculating jar resource checksum: " + e.getMessage());
             return null;
@@ -158,8 +182,7 @@ public class ConfigurationExporter {
         URL resourceUrl = MetadataHandler.PLUGIN.getClass().getClassLoader().getResource(resourcePath);
 
         if (resourceUrl == null) {
-            Logger.warn("Resource folder not found: " + resourcePath);
-            return;
+            throw new IOException("Resource folder not found: " + resourcePath);
         }
 
         if (resourceUrl.getProtocol().equals("jar")) {
@@ -195,7 +218,7 @@ public class ConfigurationExporter {
                 Path sourcePath = Paths.get(resourceUrl.toURI());
                 copyDirectory(sourcePath, targetPath);
             } catch (Exception e) {
-                Logger.warn("Failed to copy resource folder from IDE: " + e.getMessage());
+                throw new IOException("Failed to copy resource folder from IDE", e);
             }
         }
     }
@@ -204,47 +227,66 @@ public class ConfigurationExporter {
      * Recursively copies a directory.
      */
     private static void copyDirectory(Path source, Path target) throws IOException {
-        Files.walk(source).forEach(sourcePath -> {
-            try {
-                Path targetFile = target.resolve(source.relativize(sourcePath));
-                if (Files.isDirectory(sourcePath)) {
-                    Files.createDirectories(targetFile);
-                } else {
-                    Files.createDirectories(targetFile.getParent());
-                    Files.copy(sourcePath, targetFile, StandardCopyOption.REPLACE_EXISTING);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        List<Path> sourcePaths;
+        try (Stream<Path> paths = Files.walk(source)) {
+            sourcePaths = paths.toList();
+        }
+        for (Path sourcePath : sourcePaths) {
+            Path targetFile = target.resolve(source.relativize(sourcePath));
+            if (Files.isDirectory(sourcePath)) {
+                Files.createDirectories(targetFile);
+            } else {
+                Files.createDirectories(targetFile.getParent());
+                Files.copy(sourcePath, targetFile, StandardCopyOption.REPLACE_EXISTING);
             }
-        });
-    }
-
-    /**
-     * Clears the contents of a directory without deleting the directory itself.
-     */
-    private static void clearDirectoryContents(Path path) throws IOException {
-        if (Files.exists(path)) {
-            Files.walk(path)
-                    .sorted((a, b) -> b.compareTo(a)) // Reverse order to delete files before directories
-                    .filter(p -> !p.equals(path)) // Don't delete the root directory
-                    .forEach(p -> {
-                        try {
-                            Files.delete(p);
-                        } catch (IOException e) {
-                            // Ignore deletion errors
-                        }
-                    });
         }
     }
 
     public static byte[] sha1CodeByteArray(File file) throws IOException, NoSuchAlgorithmException {
-        FileInputStream fileInputStream = new FileInputStream(file);
         MessageDigest digest = MessageDigest.getInstance("SHA-1");
-        DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, digest);
-        byte[] bytes = new byte[1024];
-        // read all file content
-        while (digestInputStream.read(bytes) > 0) digest = digestInputStream.getMessageDigest();
-        fileInputStream.close();
+        try (InputStream fileInputStream = Files.newInputStream(file.toPath());
+             DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, digest)) {
+            byte[] bytes = new byte[8192];
+            while (digestInputStream.read(bytes) != -1) {
+                // Reading through DigestInputStream updates the digest.
+            }
+        }
         return digest.digest();
+    }
+
+    static String calculateDirectoryChecksum(Path resourcePath) throws IOException, NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        List<Path> files;
+        try (Stream<Path> paths = Files.walk(resourcePath)) {
+            files = paths
+                    .filter(Files::isRegularFile)
+                    .sorted(Comparator.comparing(path -> normalizedRelativePath(resourcePath, path)))
+                    .toList();
+        }
+        for (Path path : files) {
+            digest.update((normalizedRelativePath(resourcePath, path) + "\0").getBytes(StandardCharsets.UTF_8));
+            try (InputStream inputStream = Files.newInputStream(path)) {
+                updateDigest(digest, inputStream);
+            }
+        }
+        return toHex(digest.digest());
+    }
+
+    private static String normalizedRelativePath(Path root, Path path) {
+        return root.relativize(path).toString().replace(File.separatorChar, '/');
+    }
+
+    private static void updateDigest(MessageDigest digest, InputStream inputStream) throws IOException {
+        byte[] buffer = new byte[8192];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1)
+            digest.update(buffer, 0, bytesRead);
+    }
+
+    private static String toHex(byte[] hashBytes) {
+        StringBuilder result = new StringBuilder(hashBytes.length * 2);
+        for (byte hashByte : hashBytes)
+            result.append(String.format("%02x", hashByte));
+        return result.toString();
     }
 }

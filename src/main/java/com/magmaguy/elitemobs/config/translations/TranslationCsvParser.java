@@ -78,6 +78,10 @@ public class TranslationCsvParser {
                     currentRow.append("\n");
                 }
             }
+
+            if (inQuotes) {
+                throw new IOException("CSV contains an unterminated quoted field");
+            }
         }
 
         if (rows.isEmpty()) {
@@ -89,11 +93,21 @@ public class TranslationCsvParser {
         if (header.length < 2) {
             throw new IOException("CSV header must have at least 'key' and one language column");
         }
+        if (!"key".equalsIgnoreCase(header[0].trim())) {
+            throw new IOException("CSV header must start with a 'key' column");
+        }
 
         // Extract languages (skip first column which is "key")
         List<String> languages = new ArrayList<>();
         for (int i = 1; i < header.length; i++) {
-            languages.add(header[i].trim().toLowerCase());
+            String language = header[i].trim().toLowerCase(Locale.ROOT);
+            if (language.isBlank()) {
+                throw new IOException("CSV contains a blank language column");
+            }
+            if (languages.contains(language)) {
+                throw new IOException("CSV contains duplicate language column '" + language + "'");
+            }
+            languages.add(language);
         }
 
         TranslationData data = new TranslationData(languages);
@@ -105,6 +119,10 @@ public class TranslationCsvParser {
         for (int rowIndex = 1; rowIndex < rows.size(); rowIndex++) {
             String[] row = rows.get(rowIndex);
             if (row.length == 0 || row[0].trim().isEmpty()) continue;
+            if (row.length > header.length) {
+                throw new IOException(
+                        "CSV row " + (rowIndex + 1) + " has more columns than the header");
+            }
 
             String rawKey = row[0].trim();
             Matcher matcher = LIST_INDEX_PATTERN.matcher(rawKey);
