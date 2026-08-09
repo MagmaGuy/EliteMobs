@@ -64,7 +64,7 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
 
         WorldOperationQueue.queueOperation(
                 player,
-                () -> cloneWorldFiles(contentPackagesConfigFields, instancedWordName, player) != null,
+                () -> cloneWorldFiles(contentPackagesConfigFields, instancedWordName) != null,
                 () -> {
                     DungeonInstance dungeonInstance = initializeInstancedWorld(contentPackagesConfigFields, instancedWordName, player, (String) contentPackagesConfigFields.getDifficulties().get(0).get("name"));
                     if (dungeonInstance instanceof EnchantmentDungeonInstance enchantmentDungeonInstance) {

@@ -60,7 +60,7 @@ public class DynamicDungeonInstance extends DungeonInstance {
 
         WorldOperationQueue.queueOperation(
                 player,
-                () -> cloneWorldFiles(dynamicDungeonConfigFields, instancedWorldName, player) != null,
+                () -> cloneWorldFiles(dynamicDungeonConfigFields, instancedWorldName) != null,
                 () -> initializeDynamicWorld(dynamicDungeonConfigFields, instancedWorldName, player, difficultyName, selectedLevel),
                 dynamicDungeonConfigFields.getName()
         );

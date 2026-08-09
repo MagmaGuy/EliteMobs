@@ -3,11 +3,11 @@ package com.magmaguy.elitemobs.instanced;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.magmacore.util.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Queue;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -35,10 +35,16 @@ public class WorldOperationQueue {
                                        Supplier<Boolean> asyncOperation,
                                        Runnable syncOperation,
                                        String operationName) {
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN,
+                    () -> queueOperation(player, asyncOperation, syncOperation, operationName));
+            return;
+        }
+
         WorldOperation operation = new WorldOperation(player, asyncOperation, syncOperation, operationName, operationGeneration.get());
         operationQueue.add(operation);
 
-        int queuePosition = operationQueue.size();
+        int queuePosition = operationQueue.size() + (isProcessing.get() ? 1 : 0);
         if (queuePosition > 1) {
             player.sendMessage(DungeonsConfig.getDungeonPreparingQueueMessage().replace("$position", String.valueOf(queuePosition)));
         } else {
@@ -62,16 +68,31 @@ public class WorldOperationQueue {
         // Notify queued players of updated positions
         notifyQueuePositions();
 
-        // Run async operation first
-        CompletableFuture.supplyAsync(() -> {
-            try {
-                return operation.asyncOperation.get();
-            } catch (Exception e) {
-                Logger.warn("World operation failed during async phase: " + e.getMessage());
-                e.printStackTrace();
-                return false;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                boolean success;
+                try {
+                    success = operation.asyncOperation.get();
+                } catch (Exception e) {
+                    Logger.warn("World operation '" + operation.operationName + "' failed during async phase: " + e.getMessage());
+                    e.printStackTrace();
+                    success = false;
+                }
+
+                if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested) return;
+                boolean asyncSuccess = success;
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        completeAsyncPhase(operation, asyncSuccess);
+                    }
+                }.runTask(MetadataHandler.PLUGIN);
             }
-        }).thenAccept(success -> {
+        }.runTaskAsynchronously(MetadataHandler.PLUGIN);
+    }
+
+    private static void completeAsyncPhase(WorldOperation operation, boolean success) {
             if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested) {
                 //Do NOT release isProcessing here: a generation mismatch means this is a stale operation from a
                 //previous plugin lifecycle (a reload bumped the generation). A newer-lifecycle operation may
@@ -82,6 +103,7 @@ public class WorldOperationQueue {
 
             if (!success) {
                 if (operation.player.isOnline()) {
+                    operation.player.sendMessage(DungeonsConfig.getDungeonCopyFailedMessage());
                     operation.player.sendMessage(DungeonsConfig.getDungeonPrepareFailedMessage());
                 }
                 isProcessing.set(false);
@@ -89,40 +111,25 @@ public class WorldOperationQueue {
                 return;
             }
 
-            // Run sync operation on main thread
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested) {
-                        //Stale operation from a previous lifecycle: do not touch isProcessing (a newer operation
-                        //may own it). shutdown() already reset the flag for the old lifecycle.
-                        return;
-                    }
-                    try {
-                        operation.syncOperation.run();
-                    } catch (Exception e) {
-                        Logger.warn("World operation failed during sync phase: " + e.getMessage());
-                        e.printStackTrace();
-                        if (operation.player.isOnline()) {
-                            operation.player.sendMessage(DungeonsConfig.getDungeonLoadFailedMessage());
-                        }
-                    } finally {
-                        isProcessing.set(false);
-                        if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested)
-                            return;
-                        // Process next operation after a short delay to let the server breathe
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested)
-                                    return;
-                                processNextOperation();
-                            }
-                        }.runTaskLater(MetadataHandler.PLUGIN, 10L); // 0.5 second delay between operations
-                    }
+            try {
+                operation.syncOperation.run();
+            } catch (Exception e) {
+                Logger.warn("World operation '" + operation.operationName + "' failed during sync phase: " + e.getMessage());
+                e.printStackTrace();
+                if (operation.player.isOnline()) {
+                    operation.player.sendMessage(DungeonsConfig.getDungeonLoadFailedMessage());
                 }
-            }.runTask(MetadataHandler.PLUGIN);
-        });
+            } finally {
+                isProcessing.set(false);
+                if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested) return;
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (operation.generation != operationGeneration.get() || MetadataHandler.shutdownRequested) return;
+                        processNextOperation();
+                    }
+                }.runTaskLater(MetadataHandler.PLUGIN, 10L);
+            }
     }
 
     private static void notifyQueuePositions() {

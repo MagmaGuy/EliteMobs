@@ -42,6 +42,11 @@ public class InstanceDeathLocation {
     }
 
     private void findBannerLocation(Location location) {
+        // A death below the world (void) passes the isAir check immediately and would
+        // anchor the banner where nobody can punch it — anchor at the instance start instead
+        if (location.getWorld() != null && location.getY() < location.getWorld().getMinHeight() &&
+                matchInstance.startLocation != null)
+            location = matchInstance.startLocation.clone();
         if (location.getBlock().getType().isAir())
             setBannerBlock(location);
         else if (location.getY() < 320)

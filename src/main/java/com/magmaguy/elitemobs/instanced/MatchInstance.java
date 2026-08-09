@@ -43,6 +43,12 @@ public abstract class MatchInstance {
     protected final Map<Player, Location> previousPlayerLocations = new HashMap<>();
     @Getter
     protected HashSet<Player> players = new HashSet<>();
+    // Void-rescue bookkeeping: where each player last stood safely, and how many times in a row we
+    // have had to pull them out without them reaching solid ground in between.
+    private static final int RESCUE_ATTEMPTS_BEFORE_FALLBACK = 3;
+    private static final int RESCUE_LOOP_WARNING_THRESHOLD = 10;
+    private final java.util.Map<java.util.UUID, Location> lastSafeLocation = new java.util.HashMap<>();
+    private final java.util.Map<java.util.UUID, Integer> consecutiveRescues = new java.util.HashMap<>();
     protected HashMap<Player, Integer> playerLives = new HashMap();
     @Getter
     protected HashSet<Player> participants = new HashSet<>();
@@ -121,6 +127,8 @@ public abstract class MatchInstance {
 
     public void removePlayer(Player player) {
         new MatchLeaveEvent(this, player);
+        lastSafeLocation.remove(player.getUniqueId());
+        consecutiveRescues.remove(player.getUniqueId());
         InstancePlayerManager.removePlayer(player, this);
     }
 
@@ -165,11 +173,66 @@ public abstract class MatchInstance {
     private void playerWatchdog() {
         ((HashSet<Player>) players.clone()).forEach(player -> {
             if (!player.isOnline()) removePlayer(player);
-            if (!isInRegion(player.getLocation())) {
-                MatchInstanceEvents.teleportBypass = true;
-                player.teleport(startLocation);
+            Location location = player.getLocation();
+            // The void check matters for dungeon instances, whose isInRegion() spans the
+            // whole world: without it a player falling off e.g. the Binder of Worlds
+            // arena is never rescued and dies to the void.
+            if (isBelowWorld(location) || !isInRegion(location)) {
+                rescuePlayer(player);
+                return;
             }
+            rememberSafeLocation(player, location);
         });
+    }
+
+    private static boolean isBelowWorld(Location location) {
+        return location.getWorld() != null && location.getY() < location.getWorld().getMinHeight();
+    }
+
+    /**
+     * Records where a player last stood on solid ground inside the instance, so a rescue can put
+     * them back roughly where they fell from instead of dragging them to the entrance. The caller
+     * has already verified the location is inside the instance and above the void.
+     */
+    private void rememberSafeLocation(Player player, Location location) {
+        if (!player.isOnGround()) return;
+        java.util.UUID uuid = player.getUniqueId();
+        Location stored = lastSafeLocation.get(uuid);
+        // Only clone and store when the player actually moved to a different block
+        if (stored == null
+                || stored.getBlockX() != location.getBlockX()
+                || stored.getBlockY() != location.getBlockY()
+                || stored.getBlockZ() != location.getBlockZ()
+                || stored.getWorld() != location.getWorld())
+            lastSafeLocation.put(uuid, location.clone());
+        consecutiveRescues.remove(uuid);
+    }
+
+    /**
+     * Pulls a player out of the void. Prefers the spot they last stood on, for two reasons: being
+     * yanked back to the instance entrance mid-fight is punishing, and a FIXED rescue point loops
+     * forever if the ground beneath it is missing - rescue, fall, rescue, fall. Falling back to the
+     * start location only after the remembered spot has failed repeatedly keeps that loop bounded,
+     * and a persistent loop is reported so the broken geometry can actually be found.
+     */
+    private void rescuePlayer(Player player) {
+        int attempts = consecutiveRescues.merge(player.getUniqueId(), 1, Integer::sum);
+        Location destination = lastSafeLocation.get(player.getUniqueId());
+        if (destination == null || attempts > RESCUE_ATTEMPTS_BEFORE_FALLBACK) destination = startLocation;
+
+        if (attempts == RESCUE_LOOP_WARNING_THRESHOLD && destination != null && destination.getWorld() != null)
+            com.magmaguy.magmacore.util.Logger.warn("Player " + player.getName() + " has been rescued from the void "
+                    + attempts + " times in a row in instance world '" + destination.getWorld().getName()
+                    + "'. The ground at the rescue point is probably missing, which would otherwise loop forever. "
+                    + "Check the dungeon's geometry around " + destination.getBlockX() + ","
+                    + destination.getBlockY() + "," + destination.getBlockZ() + ".");
+
+        if (destination == null) return;
+        MatchInstanceEvents.teleportBypass = true;
+        // Without this the fall distance accumulated before the rescue is applied on
+        // landing and the "rescue" kills the player with fall damage.
+        player.setFallDistance(0);
+        player.teleport(destination);
     }
 
     private void spectatorWatchdog() {
@@ -196,10 +259,8 @@ public abstract class MatchInstance {
                     player.setSpectatorTarget(null);
             }
 
-            if (!isInRegion(player.getLocation())) {
-                MatchInstanceEvents.teleportBypass = true;
-                player.teleport(startLocation);
-            }
+            if (!isInRegion(player.getLocation()))
+                rescuePlayer(player);
         });
     }
 
@@ -412,6 +473,19 @@ public abstract class MatchInstance {
                                     + "(on Paper 1.21.6+ border data lives in its own file inside the dimension data folder, "
                                     + "and a stale blueprint clone may not include it). The instance will be torn down by "
                                     + "the lethal-damage path. Fix the blueprint world's border so players spawn inside it.");
+                }
+            }
+
+            // Falling into the void must never kill an instance participant — rescue them
+            // instead. Backup for the per-tick watchdog rescue, which can miss the window
+            // between the world's min height and void-damage depth after a lag spike.
+            if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+                MatchInstance voidMatchInstance = PlayerData.getMatchInstance(player);
+                if (voidMatchInstance != null && voidMatchInstance.players.contains(player) &&
+                        voidMatchInstance.startLocation != null) {
+                    event.setCancelled(true);
+                    voidMatchInstance.rescuePlayer(player);
+                    return;
                 }
             }
 

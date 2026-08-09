@@ -159,7 +159,7 @@ public class DungeonInstance extends MatchInstance {
 
         WorldOperationQueue.queueOperation(
                 player,
-                () -> cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName, player) != null,
+                () -> cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName) != null,
                 () -> initializeInstancedWorld(instancedDungeonsConfigFields, instancedWorldName, player, difficultyName),
                 instancedDungeonsConfigFields.getName()
         );
@@ -178,13 +178,8 @@ public class DungeonInstance extends MatchInstance {
         return true;
     }
 
-    protected static File cloneWorldFiles(ContentPackagesConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
-        File targetFile = WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName, instancedDungeonsConfigFields.getDungeonConfigFolderName());
-        if (targetFile == null) {
-            player.sendMessage(DungeonsConfig.getDungeonCopyFailedMessage());
-            return null;
-        }
-        return targetFile;
+    protected static File cloneWorldFiles(ContentPackagesConfigFields instancedDungeonsConfigFields, String instancedWordName) {
+        return WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName, instancedDungeonsConfigFields.getDungeonConfigFolderName());
     }
 
     protected static DungeonInstance initializeInstancedWorld(ContentPackagesConfigFields instancedDungeonsConfigFields,
