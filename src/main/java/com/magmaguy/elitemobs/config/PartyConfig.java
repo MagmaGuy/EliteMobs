@@ -80,6 +80,20 @@ public class PartyConfig extends ConfigurationFile {
     @Getter
     private static String sidebarQuestLine;
     @Getter
+    private static String sidebarHealthGlyph;
+    @Getter
+    private static String sidebarHealthHealthyColor;
+    @Getter
+    private static String sidebarHealthWoundedColor;
+    @Getter
+    private static String sidebarHealthCriticalColor;
+    @Getter
+    private static String sidebarHealthMissingColor;
+    @Getter
+    private static String sidebarDownedDisplay;
+    @Getter
+    private static String sidebarLivesDisplay;
+    @Getter
     private static String sidebarInviteAction;
     @Getter
     private static String sidebarLeaveAction;
@@ -110,7 +124,10 @@ public class PartyConfig extends ConfigurationFile {
         alreadyInPartyMessage = message("alreadyInPartyMessage", "$prefixYou are already in a party.");
         notInPartyMessage = message("notInPartyMessage", "$prefixYou are not in a party.");
         partyCreatedMessage = message("partyCreatedMessage", "$prefix&aParty created! &7Invite players with &f/em party invite <player>&7.");
-        partyFullMessage = message("partyFullMessage", "$prefixThat party already has six players.");
+        migrateDefault("partyFullMessage",
+                "$prefixThat party already has six players.",
+                "$prefixThat party already has five players.");
+        partyFullMessage = message("partyFullMessage", "$prefixThat party already has five players.");
         playerUnavailableMessage = message("playerUnavailableMessage", "$prefixThat player is not online.");
         playerAlreadyInPartyMessage = message("playerAlreadyInPartyMessage", "$prefixThat player is already in a party.");
         selfInviteMessage = message("selfInviteMessage", "$prefixYou cannot invite yourself.");
@@ -139,14 +156,28 @@ public class PartyConfig extends ConfigurationFile {
                 "$prefixThe party could not enter together, so nobody was moved.");
 
         sidebarTitle = message("sidebarTitle", "&6&lElite Party");
-        sidebarLeaderLine = message("sidebarLeaderLine", "&6♛ &f$player");
-        sidebarMemberLine = message("sidebarMemberLine", "&a● &f$player");
+        migrateDefault("sidebarLeaderLine", "&6♛ &f$player", "&6♛ &f$player$health$lives");
+        migrateDefault("sidebarMemberLine", "&a● &f$player", "&a● &f$player$health$lives");
+        sidebarLeaderLine = message("sidebarLeaderLine", "&6♛ &f$player$health$lives");
+        sidebarMemberLine = message("sidebarMemberLine", "&a● &f$player$health$lives");
         sidebarQuestLine = message("sidebarQuestLine", "&bQuest: &f$quest");
+        sidebarHealthGlyph = message("sidebarHealthGlyph", "❤");
+        sidebarHealthHealthyColor = message("sidebarHealthHealthyColor", "&a");
+        sidebarHealthWoundedColor = message("sidebarHealthWoundedColor", "&e");
+        sidebarHealthCriticalColor = message("sidebarHealthCriticalColor", "&c");
+        sidebarHealthMissingColor = message("sidebarHealthMissingColor", "&8");
+        sidebarDownedDisplay = message("sidebarDownedDisplay", " &c☠");
+        sidebarLivesDisplay = message("sidebarLivesDisplay", " &b✦&f$lives");
         sidebarInviteAction = message("sidebarInviteAction", "&a➕ &f/em party invite <player>");
         sidebarLeaveAction = message("sidebarLeaveAction", "&c✖ &f/em party leave");
     }
 
     private String message(String key, String defaultValue) {
         return ConfigurationEngine.setString(List.of(), file, fileConfiguration, key, defaultValue, true);
+    }
+
+    private void migrateDefault(String key, String previousDefault, String currentDefault) {
+        if (previousDefault.equals(fileConfiguration.getString(key)))
+            fileConfiguration.set(key, currentDefault);
     }
 }

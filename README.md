@@ -55,7 +55,7 @@ of player and admin subcommands. Run `/em help` in-game for the full list, or co
 ### Parties
 
 Parties are enabled by default through `Party.yml` and last only while their members remain logged in. A party contains
-one creator plus up to five invited players. Membership is never written to the player database.
+one creator plus up to four invited players. Membership is never written to the player database.
 
 Entering or creating an instanced dungeon admits the initiating player's entire current party as one atomic group.
 Capacity, package permissions, active-instance state, party membership, and cancellable join events are validated for
@@ -80,9 +80,10 @@ need/greed flow exposed by `/em loot`. Coins and Elite Scrolls remain personal. 
 large pools are paginated, overlapping roll sessions can be cycled by running `/em loot` again, and dungeon boss
 lockouts are applied before a player is admitted to a vote.
 
-The sidebar lists the leader and members, incorporates the currently tracked quest when space permits, and alternates
-between the invite and leave command hints. `sharedProgressRange`, invitation expiry, rotation timing, styling, and
-messages are configurable in `Party.yml`.
+The sidebar lists the leader and members with compact five-segment health bars and marks downed members clearly. While
+the viewer is in an instanced dungeon, each participating member also shows their remaining lives. It incorporates the
+currently tracked quest when space permits and alternates between the invite and leave command hints. Health colors and
+glyphs, `sharedProgressRange`, invitation expiry, rotation timing, styling, and messages are configurable in `Party.yml`.
 
 ## Permissions
 

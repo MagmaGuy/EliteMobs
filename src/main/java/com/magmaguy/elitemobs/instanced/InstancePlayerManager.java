@@ -187,8 +187,10 @@ public class InstancePlayerManager {
                 // Use PlayerTeleportEvent to trigger dungeon music and other listeners
                 PlayerTeleportEvent.teleportPlayer(player, destination);
 
-                //Set the lives that the player has //todo: this needs to become configurable and be expanded upon in the future
-                matchInstance.playerLives.put(player, 3);
+                //With spectator revives disabled, the active run itself is the player's only life.
+                //Otherwise preserve the established three-life dungeon behavior.
+                matchInstance.playerLives.put(player,
+                        DungeonsConfig.isAllowSpectatorsInInstancedContent() ? 3 : 1);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 1);
     }

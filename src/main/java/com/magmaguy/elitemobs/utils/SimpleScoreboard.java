@@ -45,6 +45,12 @@ public class SimpleScoreboard {
         return scoreboard;
     }
 
+    /** Lets periodic UI owners avoid rebuilding an unchanged EliteMobs sidebar objective. */
+    public static boolean hasManagedSidebar(Player player) {
+        if (player == null || !isManagedScoreboard(player.getScoreboard())) return false;
+        return player.getScoreboard().getObjective(SIDEBAR_OBJECTIVE) != null;
+    }
+
     public static Scoreboard temporaryScoreboard(Player player, String displayName, List<String> scoreboardContents, int ticksTimeout) {
         Scoreboard scoreboard = lazyScoreboard(player, displayName, scoreboardContents);
         new BukkitRunnable() {

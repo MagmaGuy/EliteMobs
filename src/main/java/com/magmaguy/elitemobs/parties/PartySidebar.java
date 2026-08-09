@@ -3,9 +3,13 @@ package com.magmaguy.elitemobs.parties;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.instanced.MatchInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
+import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -21,20 +25,27 @@ import java.util.UUID;
 /** Owns the combined party and quest sidebar while a player belongs to a party. */
 public final class PartySidebar {
     private static final int MAX_LINES = 15;
+    private static final int HEALTH_SEGMENTS = 5;
+    private static final long REFRESH_PERIOD_TICKS = 20L;
     private static final Map<UUID, TemporaryQuestView> temporaryQuestViews = new HashMap<>();
+    private static final Map<UUID, SidebarSnapshot> lastRenderedSidebars = new HashMap<>();
     private static BukkitTask refreshTask;
     private static boolean showInviteAction = true;
+    private static int secondsSinceActionRotation = 0;
 
     private PartySidebar() {
     }
 
     static void initialize() {
         if (refreshTask != null) refreshTask.cancel();
-        long period = 20L * PartyConfig.getSidebarRotationSeconds();
+        secondsSinceActionRotation = 0;
         refreshTask = new BukkitRunnable() {
             @Override
             public void run() {
-                showInviteAction = !showInviteAction;
+                if (++secondsSinceActionRotation >= PartyConfig.getSidebarRotationSeconds()) {
+                    showInviteAction = !showInviteAction;
+                    secondsSinceActionRotation = 0;
+                }
                 PartyManager.cleanupExpiredInvites();
                 cleanupExpiredViews();
                 PartyManager.getParties().values().forEach(party -> party.getMembers().forEach(playerId -> {
@@ -42,14 +53,16 @@ public final class PartySidebar {
                     if (player != null) refresh(player);
                 }));
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, period, period);
+        }.runTaskTimer(MetadataHandler.PLUGIN, REFRESH_PERIOD_TICKS, REFRESH_PERIOD_TICKS);
     }
 
     static void shutdown() {
         if (refreshTask != null) refreshTask.cancel();
         refreshTask = null;
         temporaryQuestViews.clear();
+        lastRenderedSidebars.clear();
         showInviteAction = true;
+        secondsSinceActionRotation = 0;
     }
 
     public static void showTemporaryQuest(Player player, String questName, List<String> questLines, int ticksTimeout) {
@@ -76,13 +89,14 @@ public final class PartySidebar {
         if (QuestsConfig.isHideQuestScoreboardDuringQuestDialogue()
                 && QuestDialogueBossBarManager.hasActiveSession(player)) return;
 
+        DungeonInstance dungeonInstance = getDungeonInstance(player);
         List<String> lines = new ArrayList<>();
         for (UUID memberId : party.getMembersInDisplayOrder()) {
             Player member = Bukkit.getPlayer(memberId);
             String template = memberId.equals(party.getLeader())
                     ? PartyConfig.getSidebarLeaderLine()
                     : PartyConfig.getSidebarMemberLine();
-            lines.add(color(template.replace("$player", member == null ? "Unknown" : member.getName())));
+            lines.add(renderMemberLine(template, member, dungeonInstance));
         }
 
         QuestView questView = currentQuestView(player);
@@ -103,11 +117,76 @@ public final class PartySidebar {
         // scores, so reverse this presentation list to keep the leader at the top and action at
         // the bottom without changing the established quest-scoreboard ordering globally.
         java.util.Collections.reverse(lines);
-        SimpleScoreboard.updateScoreboard(player, color(PartyConfig.getSidebarTitle()), lines);
+        String title = color(PartyConfig.getSidebarTitle());
+        SidebarSnapshot snapshot = new SidebarSnapshot(title, List.copyOf(lines));
+        if (snapshot.equals(lastRenderedSidebars.get(player.getUniqueId()))
+                && SimpleScoreboard.hasManagedSidebar(player))
+            return;
+        SimpleScoreboard.updateScoreboard(player, title, lines);
+        lastRenderedSidebars.put(player.getUniqueId(), snapshot);
+    }
+
+    private static String renderMemberLine(String template, Player member, DungeonInstance dungeonInstance) {
+        boolean downed = member != null
+                && dungeonInstance != null
+                && dungeonInstance.isSpectator(member)
+                && dungeonInstance.getRemainingLives(member) != null;
+        String health = downed ? PartyConfig.getSidebarDownedDisplay() : renderHealth(member);
+        String lives = renderLives(member, dungeonInstance);
+        boolean hasHealthPlaceholder = template.contains("$health");
+        boolean hasLivesPlaceholder = template.contains("$lives");
+        String rendered = template
+                .replace("$player", member == null ? "Unknown" : member.getName())
+                .replace("$health", health)
+                .replace("$lives", lives);
+        // Preserve the new information for existing Party.yml files whose customized line
+        // templates predate the placeholders.
+        if (!hasHealthPlaceholder) rendered += health;
+        if (!hasLivesPlaceholder) rendered += lives;
+        return color(rendered);
+    }
+
+    private static String renderHealth(Player member) {
+        double healthFraction = 0D;
+        if (member != null && member.isOnline() && member.isValid()) {
+            double maximumHealth = Math.max(1D,
+                    AttributeManager.getAttributeValue(member, "generic_max_health"));
+            healthFraction = Math.max(0D, Math.min(1D, member.getHealth() / maximumHealth));
+        }
+
+        int filledSegments = healthFraction <= 0D
+                ? 0
+                : Math.max(1, (int) Math.ceil(healthFraction * HEALTH_SEGMENTS));
+        String filledColor = healthFraction > 2D / 3D
+                ? PartyConfig.getSidebarHealthHealthyColor()
+                : healthFraction > 1D / 3D
+                ? PartyConfig.getSidebarHealthWoundedColor()
+                : PartyConfig.getSidebarHealthCriticalColor();
+        String glyph = PartyConfig.getSidebarHealthGlyph();
+        StringBuilder healthBar = new StringBuilder(" ");
+        if (filledSegments > 0)
+            healthBar.append(filledColor).append(glyph.repeat(filledSegments));
+        if (filledSegments < HEALTH_SEGMENTS)
+            healthBar.append(PartyConfig.getSidebarHealthMissingColor())
+                    .append(glyph.repeat(HEALTH_SEGMENTS - filledSegments));
+        return healthBar.toString();
+    }
+
+    private static String renderLives(Player member, DungeonInstance dungeonInstance) {
+        if (member == null || dungeonInstance == null) return "";
+        Integer lives = dungeonInstance.getRemainingLives(member);
+        if (lives == null) return "";
+        return PartyConfig.getSidebarLivesDisplay().replace("$lives", String.valueOf(Math.max(0, lives)));
+    }
+
+    private static DungeonInstance getDungeonInstance(Player viewer) {
+        MatchInstance matchInstance = PlayerData.getMatchInstance(viewer);
+        return matchInstance instanceof DungeonInstance dungeonInstance ? dungeonInstance : null;
     }
 
     static void clearPlayer(Player player) {
         temporaryQuestViews.remove(player.getUniqueId());
+        lastRenderedSidebars.remove(player.getUniqueId());
         SimpleScoreboard.clearScoreboard(player);
         QuestTracking tracking = QuestTracking.getPlayerTrackingQuests().get(player.getUniqueId());
         if (tracking != null) tracking.refreshScoreboard();
@@ -141,5 +220,8 @@ public final class PartySidebar {
     }
 
     private record TemporaryQuestView(UUID token, String name, List<String> lines, long expiresAtNanos) {
+    }
+
+    private record SidebarSnapshot(String title, List<String> lines) {
     }
 }

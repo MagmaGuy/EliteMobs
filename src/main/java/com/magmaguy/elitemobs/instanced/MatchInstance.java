@@ -129,6 +129,16 @@ public abstract class MatchInstance {
         return null;
     }
 
+    /** Returns this participant's remaining dungeon/arena lives, or null when no counter is active. */
+    public Integer getRemainingLives(Player player) {
+        return playerLives.get(player);
+    }
+
+    /** True for a player currently waiting in this match's spectator/downed state. */
+    public boolean isSpectator(Player player) {
+        return spectators.contains(player);
+    }
+
     public boolean addNewPlayer(Player player) {
         return InstancePlayerManager.addNewPlayer(player, this);
     }

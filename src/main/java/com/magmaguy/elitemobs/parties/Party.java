@@ -12,7 +12,7 @@ import java.util.UUID;
  * disconnecting players cannot leave stale Bukkit objects behind.
  */
 public final class Party {
-    public static final int MAX_MEMBERS = 6;
+    public static final int MAX_MEMBERS = 5;
 
     private final UUID id = UUID.randomUUID();
     private final LinkedHashSet<UUID> members = new LinkedHashSet<>();
