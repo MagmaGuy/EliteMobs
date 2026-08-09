@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.commands.ReloadCommand;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
@@ -27,27 +28,29 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class EMPackage extends ContentPackage implements NightbreakManagedContent {
 
     private static final String ELITEMOBS_CONTENT_PAGE = "https://nightbreak.io/plugin/elitemobs/";
 
-    protected static final HashMap<String, EMPackage> content = new HashMap<>();
+    protected static final Map<String, EMPackage> content = new ConcurrentHashMap<>();
     @Getter
-    private static final Map<String, EMPackage> emPackages = new HashMap<>();
+    private static final Map<String, EMPackage> emPackages = new ConcurrentHashMap<>();
     @Getter
     protected final ContentPackagesConfigFields contentPackagesConfigFields;
     @Getter
     @Setter
-    protected boolean isDownloaded;
+    protected volatile boolean isDownloaded;
     @Getter
     @Setter
-    protected boolean isInstalled;
+    protected volatile boolean isInstalled;
     @Setter
-    protected boolean outOfDate = false;
+    protected volatile boolean outOfDate = false;
     @Getter
     @Setter
-    protected NightbreakAccount.AccessInfo cachedAccessInfo = null;
+    protected volatile NightbreakAccount.AccessInfo cachedAccessInfo = null;
     @Getter
     protected List<CustomBossEntity> customBossEntityList = new ArrayList<>();
     protected List<TreasureChest> treasureChestList = new ArrayList<>();
@@ -73,6 +76,34 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
     public static void shutdown() {
         content.clear();
         emPackages.clear();
+    }
+
+    /**
+     * Completes a batch of asynchronous configuration saves without blocking the server thread.
+     * Player feedback and the plugin reload are always handed back to Bukkit's main thread.
+     */
+    protected static void reloadAfterConfigurationSaves(Player player,
+                                                        Collection<? extends CompletableFuture<Void>> saves,
+                                                        String reloadingMessage,
+                                                        String contentType) {
+        CompletableFuture<Void> allSaves = CompletableFuture.allOf(saves.toArray(CompletableFuture[]::new));
+        allSaves.whenComplete((ignored, failure) -> {
+            if (MetadataHandler.shutdownRequested) return;
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                if (MetadataHandler.shutdownRequested) return;
+                if (failure != null) {
+                    Throwable cause = failure.getCause() == null ? failure : failure.getCause();
+                    Logger.warn("Failed to save " + contentType + " content configuration: " + cause.getMessage());
+                    cause.printStackTrace();
+                    if (player.isOnline())
+                        Logger.sendMessage(player, DungeonsConfig.getContentConfigurationSaveFailedMessage());
+                    return;
+                }
+
+                if (player.isOnline()) Logger.sendMessage(player, reloadingMessage);
+                ReloadCommand.reload(player.isOnline() ? player : Bukkit.getConsoleSender());
+            });
+        });
     }
 
     /**

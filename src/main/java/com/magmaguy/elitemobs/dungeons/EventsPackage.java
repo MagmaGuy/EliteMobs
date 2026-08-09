@@ -1,13 +1,10 @@
 package com.magmaguy.elitemobs.dungeons;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.commands.ReloadCommand;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfigFields;
 import com.magmaguy.magmacore.util.Logger;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -70,11 +67,11 @@ public class EventsPackage extends EMPackage {
 
         Logger.sendMessage(player, DungeonsConfig.getEventsSavingMessage().replace("$count", String.valueOf(customEvents.size())));
 
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-        allFutures.thenRun(() -> {
-            Logger.sendMessage(player, DungeonsConfig.getEventsReloadingMessage());
-            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> ReloadCommand.reload(player));
-        }).join(); // This ensures the current thread waits until all futures are complete
+        reloadAfterConfigurationSaves(
+                player,
+                futures,
+                DungeonsConfig.getEventsReloadingMessage(),
+                "event");
     }
 
     @Override
