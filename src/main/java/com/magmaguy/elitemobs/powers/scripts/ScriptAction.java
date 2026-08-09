@@ -43,6 +43,8 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class ScriptAction {
 
+    private static final int DEFAULT_BOSS_BAR_DURATION_TICKS = 100;
+
     /**
      * A thread-safe set of player UUIDs who are currently invulnerable due to scripts.
      */
@@ -58,6 +60,7 @@ public class ScriptAction {
     private final Map<String, ScriptExecutable> eliteScriptMap;
     private final ScriptRuntimeOwner runtimeOwner;
     private final ScriptTargets finalScriptTargets;
+    private final ScriptWorldActionExecutor worldActions;
 
     /**
      * Constructs a new ScriptAction with the given blueprint, script map, and elite script.
@@ -76,6 +79,7 @@ public class ScriptAction {
         this.scriptParticles = new ScriptParticles(blueprint.getScriptParticlesBlueprint());
         this.eliteScriptMap = eliteScriptMap;
         this.runtimeOwner = runtimeOwner;
+        this.worldActions = new ScriptWorldActionExecutor(this);
     }
 
     private static final ThreadLocal<Integer> scriptDamageDepth = ThreadLocal.withInitial(() -> 0);
@@ -258,20 +262,20 @@ public class ScriptAction {
             case PLACE_BLOCK -> runPlaceBlock(scriptActionData);
             case RUN_COMMAND_AS_PLAYER -> runPlayerCommand(scriptActionData);
             case RUN_COMMAND_AS_CONSOLE -> runConsoleCommand(scriptActionData);
-            case STRIKE_LIGHTNING -> runStrikeLightning(scriptActionData);
-            case SPAWN_PARTICLE -> runSpawnParticle(scriptActionData);
-            case SET_MOB_AI -> runSetMobAI(scriptActionData);
-            case SET_MOB_AWARE -> runSetMobAware(scriptActionData);
-            case PLAY_SOUND -> runPlaySound(scriptActionData);
-            case PUSH -> runPush(scriptActionData);
-            case SUMMON_REINFORCEMENT -> runSummonReinforcement(scriptActionData);
+            case STRIKE_LIGHTNING -> worldActions.runStrikeLightning(scriptActionData);
+            case SPAWN_PARTICLE -> worldActions.runSpawnParticle(scriptActionData);
+            case SET_MOB_AI -> worldActions.runSetMobAI(scriptActionData);
+            case SET_MOB_AWARE -> worldActions.runSetMobAware(scriptActionData);
+            case PLAY_SOUND -> worldActions.runPlaySound(scriptActionData);
+            case PUSH -> worldActions.runPush(scriptActionData);
+            case SUMMON_REINFORCEMENT -> worldActions.runSummonReinforcement(scriptActionData);
             case RUN_SCRIPT -> runAdditionalScripts(scriptActionData);
-            case SPAWN_FIREWORKS -> runSpawnFireworks(scriptActionData);
-            case MAKE_INVULNERABLE -> runMakeInvulnerable(scriptActionData);
-            case TAG -> runTag(scriptActionData);
-            case UNTAG -> runUntag(scriptActionData);
-            case SET_TIME -> runSetTime(scriptActionData);
-            case SET_WEATHER -> runSetWeather(scriptActionData);
+            case SPAWN_FIREWORKS -> worldActions.runSpawnFireworks(scriptActionData);
+            case MAKE_INVULNERABLE -> worldActions.runMakeInvulnerable(scriptActionData);
+            case TAG -> worldActions.runTag(scriptActionData);
+            case UNTAG -> worldActions.runUntag(scriptActionData);
+            case SET_TIME -> worldActions.runSetTime(scriptActionData);
+            case SET_WEATHER -> worldActions.runSetWeather(scriptActionData);
             case PLAY_ANIMATION -> runPlayAnimation(scriptActionData);
             case SPAWN_FALLING_BLOCK -> runSpawnFallingBlock(scriptActionData);
             case MODIFY_DAMAGE -> runModifyDamage(scriptActionData);
@@ -337,6 +341,14 @@ public class ScriptAction {
             locationTargets.forEach(Logger::showLocation);
         }
         return locationTargets;
+    }
+
+    ScriptParticles scriptParticles() {
+        return scriptParticles;
+    }
+
+    ScriptRuntimeOwner runtimeOwner() {
+        return runtimeOwner;
     }
 
     /**
@@ -430,16 +442,20 @@ public class ScriptAction {
         }
         String message = ChatColorConverter.convert(parsePlaceholders(scriptActionData, blueprint.getSValue()));
         BossBar bossBar = Bukkit.createBossBar(message, blueprint.getBarColor(), blueprint.getBarStyle());
-        getTargets(scriptActionData).forEach(target -> {
+        boolean hasViewer = false;
+        for (LivingEntity target : getTargets(scriptActionData)) {
             if (target instanceof Player player) {
                 bossBar.addPlayer(player);
-                if (blueprint.getDuration().getValue() > 0) {
-                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, bossBar::removeAll, blueprint.getDuration().getValue());
-                }
+                hasViewer = true;
             } else {
                 Logger.warn("BOSS_BAR_MESSAGE actions must target players! Problematic script: '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
             }
-        });
+        }
+        if (hasViewer) {
+            int configuredDuration = blueprint.getDuration().getValue();
+            int duration = configuredDuration > 0 ? configuredDuration : DEFAULT_BOSS_BAR_DURATION_TICKS;
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, bossBar::removeAll, duration);
+        }
     }
 
     /**
@@ -494,6 +510,7 @@ public class ScriptAction {
      * Resets the state of all invulnerable players by removing their invulnerability.
      */
     public static void shutdown() {
+        TimedScriptStateManager.shutdown();
         invulnerablePlayers.forEach(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) player.setInvulnerable(false);
@@ -662,373 +679,6 @@ public class ScriptAction {
                 .replace("$bossZ", String.valueOf(bossLocation.getZ()))
                 .replace("$bossLevel", String.valueOf(bossLevel))
                 .replace("$bossWorldName", bossWorldName);
-    }
-
-    /**
-     * Strikes lightning at the target locations, ignoring protections.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runStrikeLightning(ScriptActionData scriptActionData) {
-        getLocationTargets(scriptActionData).forEach(LightningSpawnBypass::strikeLightningIgnoreProtections);
-    }
-
-    /**
-     * Spawns particles at the target locations.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runSpawnParticle(ScriptActionData scriptActionData) {
-        boolean needsCentering = switch (scriptActionData.getTargetType()) {
-            case ZONE_FULL, ZONE_BORDER, INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER, LOCATION, LOCATIONS,
-                    LANDING_LOCATION -> true;
-            default -> false;
-        };
-        getLocationTargets(scriptActionData).forEach(location -> {
-            Location targetLocation = needsCentering ? location.clone().add(0.5, 0, 0.5) : location;
-            scriptParticles.visualize(scriptActionData, targetLocation, runtimeOwner);
-        });
-    }
-
-    /**
-     * Sets the AI state of the target entities.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runSetMobAI(ScriptActionData scriptActionData) {
-        boolean aiEnabled = blueprint.getBValue();
-        int duration = blueprint.getDuration().getValue();
-
-        getTargets(scriptActionData).forEach(target -> {
-            target.setAI(aiEnabled);
-            if (duration > 0) {
-                Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> target.setAI(!aiEnabled), duration);
-            }
-        });
-    }
-
-    /**
-     * Sets the awareness state of the target mobs.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runSetMobAware(ScriptActionData scriptActionData) {
-        boolean aware = blueprint.getBValue();
-        int duration = blueprint.getDuration().getValue();
-
-        getTargets(scriptActionData).forEach(target -> {
-            if (target instanceof Mob mob) {
-                mob.setAware(aware);
-                if (duration > 0) {
-                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> mob.setAware(!aware), duration);
-                }
-            } else {
-                Logger.warn("SET_MOB_AWARE action must target mobs! Problematic script: '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
-            }
-        });
-    }
-
-    /**
-     * Plays a sound at the target locations.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runPlaySound(ScriptActionData scriptActionData) {
-        String sound = blueprint.getSValue();
-        float volume = blueprint.getVolume().getValue();
-        float pitch = blueprint.getPitch().getValue();
-        getLocationTargets(scriptActionData).forEach(location -> {
-            try {
-                location.getWorld().playSound(location, sound, volume, pitch);
-            } catch (Exception e) {
-                Logger.warn("Failed to play sound '" + sound + "' at location '" + location + "' in script '" + blueprint.getScriptName() + "': " + e.getMessage());
-            }
-        });
-    }
-
-    /**
-     * Applies a velocity to the target entities.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runPush(ScriptActionData scriptActionData) {
-        Vector velocity = blueprint.getScriptRelativeVectorBlueprint() != null
-                ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, scriptActionData.getEliteEntity().getLocation()).getVector(scriptActionData)
-                : blueprint.getVValue();
-
-        // Ensure velocity is finite, otherwise default to zero vector
-        if (velocity == null || !isFiniteVector(velocity)) {
-            velocity = new Vector(0, 0, 0);
-        }
-
-        boolean additive = blueprint.getBValue() != null && blueprint.getBValue();
-
-        // Delay the push by one tick to avoid interference with other events.
-        Vector localFinalVelocity = velocity;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                Vector finalVelocity = localFinalVelocity;
-                getTargets(scriptActionData).forEach(target -> {
-                    if (additive) {
-                        target.setVelocity(target.getVelocity().add(finalVelocity));
-                    } else {
-                        target.setVelocity(finalVelocity);
-                    }
-                });
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 1);
-    }
-
-    /**
-     * Checks if a vector has only finite values.
-     *
-     * @param vector The vector to check.
-     * @return true if all components are finite, false otherwise.
-     */
-    private boolean isFiniteVector(Vector vector) {
-        return Double.isFinite(vector.getX()) && Double.isFinite(vector.getY()) && Double.isFinite(vector.getZ());
-    }
-
-    /**
-     * Summons reinforcements at the target locations.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runSummonReinforcement(ScriptActionData scriptActionData) {
-        getLocationTargets(scriptActionData).forEach(location -> {
-            CustomBossEntity customBossEntity = CustomSummonPower.summonReinforcement(scriptActionData.getEliteEntity(), location, blueprint.getSValue(), blueprint.getDuration().getValue());
-            if (customBossEntity != null && customBossEntity.getLivingEntity() != null) {
-                Vector velocity = blueprint.getScriptRelativeVectorBlueprint() != null
-                        ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, customBossEntity.getLivingEntity().getLocation()).getVector(scriptActionData)
-                        : blueprint.getVValue();
-                if (velocity != null) {
-                    customBossEntity.getLivingEntity().setVelocity(velocity);
-                }
-            }
-        });
-    }
-
-    /**
-     * Spawns fireworks at the target locations.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runSpawnFireworks(ScriptActionData scriptActionData) {
-        if (blueprint.getFireworkEffects().isEmpty()) {
-            Logger.warn("No colors set for fireworks in script '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
-            return;
-        }
-
-        getLocationTargets(scriptActionData).forEach(location -> {
-            try {
-                Firework firework = location.getWorld().spawn(location, Firework.class);
-                firework.setPersistent(false);
-                FireworkMeta fireworkMeta = firework.getFireworkMeta();
-
-                List<FireworkEffect.Type> types = blueprint.getFireworkEffectTypes();
-                List<List<Color>> colorsList = blueprint.getFireworkEffects().stream()
-                        .map(colors -> colors.stream().map(ScriptActionBlueprint.FireworkColor::getColor).toList())
-                        .toList();
-
-                if (types == null || types.isEmpty()) {
-                    types = List.of(blueprint.getFireworkEffectType());
-                }
-
-                for (int i = 0; i < types.size(); i++) {
-                    FireworkEffect.Type type = types.get(i);
-                    List<Color> colors = i < colorsList.size() ? colorsList.get(i) : colorsList.get(colorsList.size() - 1);
-                    FireworkEffect effect = FireworkEffect.builder()
-                            .with(type)
-                            .withColor(colors)
-                            .flicker(blueprint.isFlicker())
-                            .trail(blueprint.isWithTrail())
-                            .build();
-                    fireworkMeta.addEffect(effect);
-                }
-
-                fireworkMeta.setPower(blueprint.getPower().getValue());
-
-                if (blueprint.getVValue() != null) {
-                    firework.setVelocity(blueprint.getVValue());
-                    firework.setShotAtAngle(true);
-                }
-
-                firework.setFireworkMeta(fireworkMeta);
-            } catch (Exception e) {
-                Logger.warn("Failed to spawn fireworks at location '" + location + "' in script '" + blueprint.getScriptName() + "': " + e.getMessage());
-            }
-        });
-    }
-
-    /**
-     * Makes the target entities invulnerable for a specified duration.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runMakeInvulnerable(ScriptActionData scriptActionData) {
-        boolean invulnerable = blueprint.isInvulnerable();
-        int duration = blueprint.getDuration().getValue();
-
-        getTargets(scriptActionData).forEach(target -> {
-            target.setInvulnerable(invulnerable);
-            if (target instanceof Player player) {
-                if (invulnerable) {
-                    invulnerablePlayers.add(player.getUniqueId());
-                } else {
-                    invulnerablePlayers.remove(player.getUniqueId());
-                }
-            }
-            if (duration > 0) {
-                UUID targetUUID = target.getUniqueId();
-                Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
-                    target.setInvulnerable(!invulnerable);
-                    if (target instanceof Player) {
-                        if (invulnerable) {
-                            invulnerablePlayers.remove(targetUUID);
-                        } else {
-                            invulnerablePlayers.add(targetUUID);
-                        }
-                    }
-                }, duration);
-            }
-        });
-    }
-
-    /**
-     * Adds tags to the target entities and players.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runTag(ScriptActionData scriptActionData) {
-        List<String> tags = blueprint.getTags();
-        int duration = blueprint.getDuration().getValue();
-
-        getTargets(scriptActionData).forEach(target -> {
-            EliteEntity bossEntity = EntityTracker.getEliteMobEntity(target);
-            if (bossEntity != null) {
-                bossEntity.addTags(tags);
-            }
-            if (target instanceof Player player) {
-                ElitePlayerInventory playerInventory = ElitePlayerInventory.getPlayer(player);
-                if (playerInventory != null) {
-                    playerInventory.addTags(tags);
-                }
-            }
-            if (duration > 0) {
-                Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
-                    if (bossEntity != null) {
-                        bossEntity.removeTags(tags);
-                    }
-                    if (target instanceof Player player) {
-                        ElitePlayerInventory playerInventory = ElitePlayerInventory.getPlayer(player);
-                        if (playerInventory != null) {
-                            playerInventory.removeTags(tags);
-                        }
-                    }
-                }, duration);
-            }
-        });
-    }
-
-    /**
-     * Removes tags from the target entities and players.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runUntag(ScriptActionData scriptActionData) {
-        List<String> tags = blueprint.getTags();
-        int duration = blueprint.getDuration().getValue();
-
-        getTargets(scriptActionData).forEach(target -> {
-            EliteEntity bossEntity = EntityTracker.getEliteMobEntity(target);
-            if (bossEntity != null) {
-                bossEntity.removeTags(tags);
-            }
-            if (target instanceof Player player) {
-                ElitePlayerInventory playerInventory = ElitePlayerInventory.getPlayer(player);
-                if (playerInventory != null) {
-                    playerInventory.removeTags(tags);
-                }
-            }
-            if (duration > 0) {
-                Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
-                    if (bossEntity != null) {
-                        bossEntity.addTags(tags);
-                    }
-                    if (target instanceof Player player) {
-                        ElitePlayerInventory playerInventory = ElitePlayerInventory.getPlayer(player);
-                        if (playerInventory != null) {
-                            playerInventory.addTags(tags);
-                        }
-                    }
-                }, duration);
-            }
-        });
-    }
-
-    /**
-     * Sets the time in the worlds of the target locations.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runSetTime(ScriptActionData scriptActionData) {
-        long time = blueprint.getTime().getValue();
-        getLocationTargets(scriptActionData).forEach(location -> {
-            try {
-                location.getWorld().setTime(time);
-            } catch (Exception e) {
-                Logger.warn("Failed to set time in world '" + location.getWorld().getName() + "' in script '" + blueprint.getScriptName() + "': " + e.getMessage());
-            }
-        });
-    }
-
-    /**
-     * Sets the weather in the worlds of the target entities.
-     *
-     * @param scriptActionData The data for the script action.
-     */
-    private void runSetWeather(ScriptActionData scriptActionData) {
-        int duration = blueprint.getDuration().getValue();
-        getTargets(scriptActionData).forEach(target -> {
-            World world = target.getWorld();
-            try {
-                switch (blueprint.getWeatherType()) {
-                    case CLEAR -> {
-                        world.setStorm(false);
-                        world.setThundering(false);
-                        world.setWeatherDuration(duration > 0 ? duration : 6000);
-                    }
-                    case PRECIPITATION -> {
-                        world.setStorm(true);
-                        world.setThundering(false);
-                        world.setWeatherDuration(duration > 0 ? duration : 6000);
-                        if (duration > 0) {
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    world.setStorm(false);
-                                }
-                            }.runTaskLater(MetadataHandler.PLUGIN, duration + 1);
-                        }
-                    }
-                    case THUNDER -> {
-                        world.setStorm(true);
-                        world.setThundering(true);
-                        world.setThunderDuration(duration > 0 ? duration : 6000);
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                world.setStorm(false);
-                                world.setThundering(false);
-                            }
-                        }.runTaskLater(MetadataHandler.PLUGIN, duration + 1);
-                    }
-                }
-            } catch (Exception e) {
-                Logger.warn("Failed to set weather in world '" + world.getName() + "' in script '" + blueprint.getScriptName() + "': " + e.getMessage());
-            }
-        });
     }
 
     /**
@@ -1203,10 +853,9 @@ public class ScriptAction {
         getTargets(scriptActionData).forEach(target -> {
             AttributeInstance attribute = AttributeManager.getAttributeInstance(target, "generic_scale");
             if (attribute != null) {
-                attribute.setBaseValue(scaleValue);
-                if (duration > 0) {
-                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> attribute.setBaseValue(1.0), duration);
-                }
+                TimedScriptStateManager.apply(
+                        target.getUniqueId(), "generic_scale", scaleValue, duration,
+                        attribute::getBaseValue, attribute::setBaseValue);
             }
         });
     }
