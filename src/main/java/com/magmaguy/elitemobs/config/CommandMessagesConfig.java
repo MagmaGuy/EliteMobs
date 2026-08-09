@@ -430,6 +430,8 @@ public class CommandMessagesConfig extends ConfigurationFile {
     private static String lootNeedMessage;
     @Getter
     private static String lootGreedMessage;
+    @Getter
+    private static String lootWinnerMessage;
 
     // QuestCommand messages
     @Getter
@@ -1231,6 +1233,11 @@ public class CommandMessagesConfig extends ConfigurationFile {
                         "$player is the placeholder for the player's display name.",
                         "$item is the placeholder for the item's display name."),
                 file, fileConfiguration, "lootGreedMessage", "$player &2has selected greed for $item!", true);
+        lootWinnerMessage = ConfigurationEngine.setString(
+                List.of("Sets the message shown when a player wins a shared loot item.",
+                        "$player is the placeholder for the winning player's display name.",
+                        "$item is the placeholder for the item's display name."),
+                file, fileConfiguration, "lootWinnerMessage", "$player &areceived $item !", true);
 
         // QuestCommand messages
         questInvalidIdMessage = ConfigurationEngine.setString(

@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -90,6 +91,15 @@ public final class PartySidebar {
     }
 
     public static void refresh(Player player) {
+        try {
+            refreshInternal(player);
+        } catch (RuntimeException exception) {
+            Logger.warn("Failed to refresh the party sidebar for " + player.getName() + ".");
+            exception.printStackTrace();
+        }
+    }
+
+    private static void refreshInternal(Player player) {
         if (!isEnabled()) return;
         Party party = PartyManager.getParty(player.getUniqueId());
         if (party == null || !player.isOnline()) return;
@@ -143,7 +153,7 @@ public final class PartySidebar {
         boolean hasHealthPlaceholder = template.contains("$health");
         boolean hasLivesPlaceholder = template.contains("$lives");
         String rendered = template
-                .replace("$player", member == null ? "Unknown" : member.getName())
+                .replace("$player", member == null ? PartyConfig.getUnknownPlayerName() : member.getName())
                 .replace("$health", health)
                 .replace("$lives", lives);
         // Preserve the new information for existing Party.yml files whose customized line

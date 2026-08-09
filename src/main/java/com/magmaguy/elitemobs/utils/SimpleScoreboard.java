@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.utils;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.magmacore.util.ScoreboardUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Objective;
@@ -184,7 +185,10 @@ public class SimpleScoreboard {
         targetTeam.setDisplayName(sourceTeam.getDisplayName());
         targetTeam.setPrefix(sourceTeam.getPrefix());
         targetTeam.setSuffix(sourceTeam.getSuffix());
-        targetTeam.setColor(sourceTeam.getColor());
+        ChatColor teamColor = sourceTeam.getColor();
+        // RESET is the Bukkit default for teams without an explicit color. CraftBukkit 26.2
+        // cannot translate RESET to an NMS TextColor, so leave the new team's default intact.
+        if (teamColor != null && teamColor.isColor()) targetTeam.setColor(teamColor);
         targetTeam.setAllowFriendlyFire(sourceTeam.allowFriendlyFire());
         targetTeam.setCanSeeFriendlyInvisibles(sourceTeam.canSeeFriendlyInvisibles());
 

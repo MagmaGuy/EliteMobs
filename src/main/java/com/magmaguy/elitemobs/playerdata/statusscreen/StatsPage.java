@@ -15,27 +15,25 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class StatsPage {
     private StatsPage() {
     }
 
     protected static TextComponent statsPage(Player targetPlayer) {
-
         TextComponent textComponent = new TextComponent();
+        StatsSnapshot snapshot = StatsSnapshot.capture(targetPlayer);
 
         for (int i = 0; i < 13; i++) {
             if (PlayerStatusMenuConfig.getStatsTextLines()[i] == null) continue;
-            TextComponent line = new TextComponent(PlayerStatusMenuConfig.getStatsTextLines()[i]
-                    .replace("$money", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(targetPlayer.getUniqueId())))
-                    .replace("$guildtier", "N/A")
-                    .replace("$kills", PlayerData.getKills(targetPlayer.getUniqueId()) + "")
-                    .replace("$highestkill", PlayerData.getHighestLevelKilled(targetPlayer.getUniqueId()) + "")
-                    .replace("$deaths", PlayerData.getDeaths(targetPlayer.getUniqueId()) + "")
-                    .replace("$quests", PlayerData.getQuestsCompleted(targetPlayer.getUniqueId()) + "")
-                    .replace("$score", PlayerData.getScore(targetPlayer.getUniqueId()) + "") + "\n");
+            if (PlayerStatusMenuConfig.getStatsTextLines()[i].contains("$guildtier")) continue;
+            TextComponent line = new TextComponent(snapshot.replacePlaceholders(
+                    PlayerStatusMenuConfig.getStatsTextLines()[i]) + "\n");
 
             if (PlayerStatusMenuConfig.getStatsHoverLines() != null &&
                     PlayerStatusMenuConfig.getStatsHoverLines()[i] != null
@@ -56,36 +54,99 @@ public class StatsPage {
 
     protected static void statsPage(Player targetPlayer, Player requestingPlayer) {
         Inventory inventory = Bukkit.createInventory(requestingPlayer, 27, PlayerStatusMenuConfig.getStatsChestMenuName());
-        inventory.setItem(PlayerStatusMenuConfig.getStatsMoneySlot(),
-                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsMoneyItem().clone(), "$money",
-                        EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(targetPlayer.getUniqueId()))));
-        inventory.setItem(PlayerStatusMenuConfig.getStatsGuildTierSlot(),
-                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsGuildTierItem().clone(), "$tier", "N/A"));
-        inventory.setItem(PlayerStatusMenuConfig.getStatsEliteKillsSlot(),
-                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsEliteKillsItem().clone(), "$kills",
-                        PlayerData.getKills(targetPlayer.getUniqueId()) + ""));
-        inventory.setItem(PlayerStatusMenuConfig.getStatsMaxEliteLevelKilledSlot(),
-                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsMaxEliteLevelKilledItem().clone(), "$maxKill",
-                        PlayerData.getHighestLevelKilled(targetPlayer.getUniqueId()) + ""));
-        inventory.setItem(PlayerStatusMenuConfig.getStatsEliteDeathsSlot(),
-                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsEliteDeathsItem().clone(), "$deaths",
-                        PlayerData.getDeaths(targetPlayer.getUniqueId()) + ""));
-        inventory.setItem(PlayerStatusMenuConfig.getStatsQuestsCompletedSlot(),
-                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsQuestsCompletedItem().clone(), "$questsCompleted",
-                        PlayerData.getQuestsCompleted(targetPlayer.getUniqueId()) + ""));
+        StatsSnapshot snapshot = StatsSnapshot.capture(targetPlayer);
+        inventory.setItem(PlayerStatusMenuConfig.getStatsRankSlot(),
+                snapshot.replacePlaceholders(PlayerStatusMenuConfig.getStatsRankItem()));
         inventory.setItem(PlayerStatusMenuConfig.getStatsScoreSlot(),
-                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getStatsScoreItem().clone(), "$score",
-                        PlayerData.getScore(targetPlayer.getUniqueId()) + ""));
+                snapshot.replacePlaceholders(PlayerStatusMenuConfig.getStatsScoreItem()));
+        inventory.setItem(PlayerStatusMenuConfig.getStatsDungeonsCompletedSlot(),
+                snapshot.replacePlaceholders(PlayerStatusMenuConfig.getStatsDungeonsCompletedItem()));
+        inventory.setItem(PlayerStatusMenuConfig.getStatsCombatLevelSlot(),
+                snapshot.replacePlaceholders(PlayerStatusMenuConfig.getStatsCombatLevelItem()));
+        inventory.setItem(PlayerStatusMenuConfig.getStatsEliteKillsSlot(),
+                snapshot.replacePlaceholders(PlayerStatusMenuConfig.getStatsEliteKillsItem()));
+        inventory.setItem(PlayerStatusMenuConfig.getStatsMaxEliteLevelKilledSlot(),
+                snapshot.replacePlaceholders(PlayerStatusMenuConfig.getStatsMaxEliteLevelKilledItem()));
+        inventory.setItem(PlayerStatusMenuConfig.getStatsQuestsCompletedSlot(),
+                snapshot.replacePlaceholders(PlayerStatusMenuConfig.getStatsQuestsCompletedItem()));
         inventory.setItem(26, PlayerStatusMenuConfig.getBackItem());
-        requestingPlayer.openInventory(inventory);
+        if (requestingPlayer.openInventory(inventory) == null) return;
+        StatusInventorySafety.protect(inventory);
         StatsPageEvents.pageInventories.add(inventory);
     }
 
-    private static ItemStack replaceItemNamePlaceholder(ItemStack itemStack, String placeholder, String replacement) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setDisplayName(itemMeta.getDisplayName().replace(placeholder, replacement));
-        itemStack.setItemMeta(itemMeta);
-        return itemStack;
+    /** Immutable values for one rendering of the Stats page. Reuse this in every UI surface. */
+    public static final class StatsSnapshot {
+        private final String money;
+        private final String kills;
+        private final String highestKill;
+        private final String deaths;
+        private final String questsCompleted;
+        private final String dungeonsCompleted;
+        private final String combatLevel;
+        private final String score;
+        private final String rank;
+        private final String rankTotal;
+
+        private StatsSnapshot(Player player) {
+            UUID playerId = player.getUniqueId();
+            PlayerData.ScoreRank scoreRank = PlayerData.getScoreRank(playerId);
+            money = EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(playerId));
+            kills = String.valueOf(PlayerData.getKills(playerId));
+            highestKill = String.valueOf(PlayerData.getHighestLevelKilled(playerId));
+            deaths = String.valueOf(PlayerData.getDeaths(playerId));
+            questsCompleted = String.valueOf(PlayerData.getQuestsCompleted(playerId));
+            dungeonsCompleted = String.valueOf(PlayerData.getDungeonsCompleted(playerId));
+            combatLevel = String.valueOf(PlayerData.getPlayerLevel(playerId));
+            score = String.valueOf(PlayerData.getScore(playerId));
+            rank = scoreRank.isAvailable()
+                    ? "#" + scoreRank.position()
+                    : PlayerStatusMenuConfig.getStatsRankUnavailableText();
+            rankTotal = scoreRank.isAvailable()
+                    ? String.valueOf(scoreRank.playerCount())
+                    : PlayerStatusMenuConfig.getStatsRankTotalUnavailableText();
+        }
+
+        public static StatsSnapshot capture(Player player) {
+            return new StatsSnapshot(player);
+        }
+
+        public String replacePlaceholders(String value) {
+            if (value == null) return "";
+            return value
+                    .replace("$ranktotal", rankTotal)
+                    .replace("$rank", rank)
+                    .replace("$dungeonsCompleted", dungeonsCompleted)
+                    .replace("$dungeons", dungeonsCompleted)
+                    .replace("$combatLevel", combatLevel)
+                    .replace("$combat", combatLevel)
+                    .replace("$questsCompleted", questsCompleted)
+                    .replace("$highestkill", highestKill)
+                    .replace("$maxKill", highestKill)
+                    .replace("$money", money)
+                    .replace("$kills", kills)
+                    .replace("$deaths", deaths)
+                    .replace("$quests", questsCompleted)
+                    .replace("$score", score);
+        }
+
+        public ItemStack replacePlaceholders(ItemStack template) {
+            ItemStack itemStack = template.clone();
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            if (itemMeta == null) return itemStack;
+            if (itemMeta.hasDisplayName())
+                itemMeta.setDisplayName(replacePlaceholders(itemMeta.getDisplayName()));
+            if (itemMeta.hasLore()) {
+                List<String> lore = itemMeta.getLore();
+                if (lore != null) {
+                    List<String> replacedLore = new ArrayList<>(lore.size());
+                    for (String line : lore) replacedLore.add(replacePlaceholders(line));
+                    itemMeta.setLore(replacedLore);
+                }
+            }
+            itemStack.setItemMeta(itemMeta);
+            return itemStack;
+        }
     }
 
     public static class StatsPageEvents implements Listener {
@@ -100,6 +161,7 @@ public class StatsPage {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.contains(event.getInventory())) return;
             event.setCancelled(true);
+            if (event.getClickedInventory() != event.getView().getTopInventory()) return;
             if (event.getSlot() == 26) {
                 player.closeInventory();
                 CoverPage.coverPage(player);

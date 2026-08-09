@@ -8,6 +8,7 @@ import org.bukkit.Material;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Base configuration fields for skill bonuses.
@@ -211,6 +212,8 @@ public class SkillBonusConfigFields extends CustomConfigFields {
 
     @Override
     public void processConfigFields() {
+        migrateLegacyDisplayDefaults();
+
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.name = translatable(filename, "name", processString("name", name, "Skill", true));
         this.description = translatable(filename, "description", processStringList("description", description, description, true));
@@ -254,10 +257,32 @@ public class SkillBonusConfigFields extends CustomConfigFields {
         this.skillId = filename.replace(".yml", "").toLowerCase(Locale.ROOT);
 
         // Translatable lore and formatted bonus templates
-        this.loreTemplates = translatable(filename, "loreTemplates", processStringList("loreTemplates", loreTemplates, loreTemplates, false));
-        this.formattedBonusTemplate = translatable(filename, "formattedBonusTemplate", processString("formattedBonusTemplate", formattedBonusTemplate, formattedBonusTemplate, false));
+        // Premade skills must write their display templates so server owners can actually customize them.
+        // User-created/orphaned configs retain the old optional behavior when no template was supplied.
+        this.loreTemplates = translatable(filename, "loreTemplates", processStringList(
+                "loreTemplates", loreTemplates, List.of(), !loreTemplates.isEmpty()));
+        this.formattedBonusTemplate = translatable(filename, "formattedBonusTemplate", processString(
+                "formattedBonusTemplate", formattedBonusTemplate, "", !formattedBonusTemplate.isEmpty()));
 
         processAdditionalFields();
+    }
+
+    /**
+     * Gives premade skills a chance to update an untouched shipped display value before it is
+     * registered with the translation system. Implementations must only replace exact legacy
+     * defaults so independently customized fields remain unchanged.
+     */
+    protected void migrateLegacyDisplayDefaults() {
+    }
+
+    protected final void migrateStringIfExact(String path, String legacyValue, String replacement) {
+        if (Objects.equals(fileConfiguration.getString(path), legacyValue))
+            fileConfiguration.set(path, replacement);
+    }
+
+    protected final void migrateStringListIfExact(String path, List<String> legacyValue, List<String> replacement) {
+        if (Objects.equals(fileConfiguration.getStringList(path), legacyValue))
+            fileConfiguration.set(path, replacement);
     }
 
     /**

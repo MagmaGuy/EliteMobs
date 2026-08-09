@@ -95,7 +95,8 @@ public class SkillsPage {
         // Back button
         inventory.setItem(26, PlayerStatusMenuConfig.getBackItem());
 
-        requestingPlayer.openInventory(inventory);
+        if (requestingPlayer.openInventory(inventory) == null) return;
+        StatusInventorySafety.protect(inventory);
         SkillsPageEvents.pageInventories.put(inventory, slotToSkillType);
     }
 
@@ -197,6 +198,7 @@ public class SkillsPage {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.containsKey(event.getInventory())) return;
             event.setCancelled(true);
+            if (event.getClickedInventory() != event.getView().getTopInventory()) return;
 
             // Back button
             if (event.getSlot() == 26) {

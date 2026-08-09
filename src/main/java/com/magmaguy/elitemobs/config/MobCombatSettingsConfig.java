@@ -139,6 +139,10 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     @Getter
     private static String healthDisplaySeparator;
     @Getter
+    private static String invulnerablePopupText;
+    @Getter
+    private static String fallbackBossBarName;
+    @Getter
     private static boolean autoclickerThrottleEnabled;
     @Getter
     private static int autoclickerThrottleMaxHitsPerSecond;
@@ -403,6 +407,12 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         healthDisplaySeparator = ConfigurationEngine.setString(
                 List.of("Separator between current and max health in the numeric health display."),
                 file, fileConfiguration, "healthDisplaySeparator", " &7/ ", true);
+        invulnerablePopupText = ConfigurationEngine.setString(
+                List.of("Text shown when a player tries to damage an elite while leash-return protection is active."),
+                file, fileConfiguration, "invulnerablePopupText", "&9&lINVULNERABLE", true);
+        fallbackBossBarName = ConfigurationEngine.setString(
+                List.of("Fallback boss-bar name used when an elite has no configured display name."),
+                file, fileConfiguration, "fallbackBossBarName", "Elite Boss", true);
         autoclickerThrottleEnabled = ConfigurationEngine.setBoolean(
                 List.of("Sets if EliteMobs will penalize players who hit elites faster than legitimate clicking allows (autoclickers).",
                         "When a player lands more than autoclickerThrottleMaxHitsPerSecond melee hits on elites within one second, they are locked out of dealing damage to elites for autoclickerThrottlePenaltySeconds seconds and warned in chat."),

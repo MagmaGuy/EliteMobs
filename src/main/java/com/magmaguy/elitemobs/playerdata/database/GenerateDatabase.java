@@ -24,6 +24,7 @@ public class GenerateDatabase {
                 "HighestLevelKilled INT, " +
                 "Deaths INT, " +
                 "QuestsCompleted INT, " +
+                "DungeonsCompleted INT, " +
                 "PlayerQuestCooldowns BLOB, " +
                 "BackTeleportLocation TEXT, " +
                 "UseBookMenus TINYINT(1), " +
@@ -56,6 +57,7 @@ public class GenerateDatabase {
         addEntryIfEmpty("HighestLevelKilled", ColumnValues.INT);
         addEntryIfEmpty("Deaths", ColumnValues.INT);
         addEntryIfEmpty("QuestsCompleted", ColumnValues.INT);
+        addEntryIfEmpty("DungeonsCompleted", ColumnValues.INT);
         addEntryIfEmpty("PlayerQuestCooldowns", ColumnValues.BLOB);
         addEntryIfEmpty("BackTeleportLocation", ColumnValues.TEXT);
         addEntryIfEmpty("UseBookMenus", ColumnValues.BOOLEAN);

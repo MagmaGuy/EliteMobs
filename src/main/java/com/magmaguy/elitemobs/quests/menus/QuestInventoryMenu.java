@@ -2,7 +2,9 @@ package com.magmaguy.elitemobs.quests.menus;
 
 import com.magmaguy.elitemobs.commands.quests.QuestCommand;
 import com.magmaguy.elitemobs.config.QuestsConfig;
+import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.playerdata.statusscreen.CoverPage;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -17,6 +19,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -29,6 +32,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class QuestInventoryMenu {
     private static final int trackEntry = 8;
     private static final int acceptEntry = 26;
+    private static final int directoryBackEntry = 26;
+    private static final int questBackEntry = 0;
     private static final HashMap<Inventory, QuestDirectory> questDirectories = new HashMap<>();
     private static final HashMap<Inventory, QuestInventory> questInventories = new HashMap<>();
 
@@ -41,13 +46,23 @@ public class QuestInventoryMenu {
     }
 
     public static void generateInventoryQuestEntries(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
+        generateInventoryQuestEntries(quests, player, npcEntity, false);
+    }
+
+    public static void generateInventoryQuestEntries(List<? extends Quest> quests, Player player, NPCEntity npcEntity,
+                                                     boolean returnToPlayerStatus) {
         if (quests.size() == 1)
-            QuestInventoryMenu.generateInventoryQuestEntry(quests.get(0), player, npcEntity);
+            QuestInventoryMenu.generateInventoryQuestEntry(quests.get(0), player, npcEntity, returnToPlayerStatus);
         else
-            QuestInventoryMenu.generateInventoryQuestDirectory(quests, player, npcEntity);
+            QuestInventoryMenu.generateInventoryQuestDirectory(quests, player, npcEntity, returnToPlayerStatus);
     }
 
     public static void generateInventoryQuestDirectory(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
+        generateInventoryQuestDirectory(quests, player, npcEntity, false);
+    }
+
+    public static void generateInventoryQuestDirectory(List<? extends Quest> quests, Player player, NPCEntity npcEntity,
+                                                       boolean returnToPlayerStatus) {
         String menuTitle = "Quests";
         Inventory questInventory = Bukkit.createInventory(player, 27, menuTitle);
         List<Integer> questSlots = new ArrayList<>(new ArrayList<>(List.of(13, 11, 15, 9, 17, 10, 16, 12, 14, 8)));
@@ -56,7 +71,7 @@ public class QuestInventoryMenu {
         Material completeMaterial = Material.ORANGE_STAINED_GLASS_PANE;
         HashMap<Integer, Quest> questMap = new HashMap<>();
         for (int i = 0; i < quests.size(); i++) {
-            if (i > 10) break;
+            if (i >= questSlots.size()) break;
             questMap.put(questSlots.get(i), quests.get(i));
             QuestMenu.QuestText questText = new QuestMenu.QuestText(quests.get(i), npcEntity, player);
             if (!quests.get(i).isAccepted())
@@ -67,11 +82,21 @@ public class QuestInventoryMenu {
                 questInventory.setItem(questSlots.get(i), ItemStackGenerator.generateItemStack(completeMaterial, questText.getHeader().toPlainText()));
         }
 
-        new QuestDirectory(player, questMap, questInventory, npcEntity);
-        player.openInventory(questInventory);
+        if (returnToPlayerStatus)
+            questInventory.setItem(directoryBackEntry, PlayerStatusMenuConfig.getBackItem());
+
+        QuestDirectory questDirectory = new QuestDirectory(
+                player, questMap, questInventory, npcEntity, returnToPlayerStatus);
+        if (player.openInventory(questInventory) != null)
+            questDirectories.put(questInventory, questDirectory);
     }
 
     public static void generateInventoryQuestEntry(Quest quest, Player player, NPCEntity npcEntity) {
+        generateInventoryQuestEntry(quest, player, npcEntity, false);
+    }
+
+    public static void generateInventoryQuestEntry(Quest quest, Player player, NPCEntity npcEntity,
+                                                   boolean returnToPlayerStatus) {
         QuestMenu.QuestText questText = new QuestMenu.QuestText(quest, npcEntity, player);
         String title = "";
         if (questText.getHeader().toPlainText() != null)
@@ -97,9 +122,13 @@ public class QuestInventoryMenu {
             fillItemSlotLists(questInventory, loreEntries, new TextComponent(" "), questText.getBody(), loreMaterial);
         fillItemSlotLists(questInventory, objectivesEntries, questText.getFixedSummary(), questText.getSummary(), objectivesMaterial);
         fillItemSlotLists(questInventory, rewardEntries, questText.getFixedRewards(), questText.getRewards(), rewardsMaterial);
+        if (returnToPlayerStatus)
+            questInventory.setItem(questBackEntry, PlayerStatusMenuConfig.getBackItem());
 
-        new QuestInventory(player, quest, questInventory, npcEntity);
-        player.openInventory(questInventory);
+        QuestInventory questMenu = new QuestInventory(
+                player, quest, questInventory, npcEntity, returnToPlayerStatus);
+        if (player.openInventory(questInventory) != null)
+            questInventories.put(questInventory, questMenu);
     }
 
     public static void fillItemSlotLists(Inventory inventory, List<Integer> entries, TextComponent title, List<TextComponent> textComponents, Material material) {
@@ -184,13 +213,15 @@ public class QuestInventoryMenu {
         Inventory inventory;
         NPCEntity npcEntity;
         Player player;
+        boolean returnToPlayerStatus;
 
-        private QuestDirectory(Player player, HashMap<Integer, Quest> questMap, Inventory inventory, NPCEntity npcEntity) {
+        private QuestDirectory(Player player, HashMap<Integer, Quest> questMap, Inventory inventory, NPCEntity npcEntity,
+                               boolean returnToPlayerStatus) {
             this.questMap = questMap;
             this.inventory = inventory;
             this.npcEntity = npcEntity;
             this.player = player;
-            questDirectories.put(inventory, this);
+            this.returnToPlayerStatus = returnToPlayerStatus;
         }
     }
 
@@ -199,13 +230,15 @@ public class QuestInventoryMenu {
         Inventory inventory;
         NPCEntity npcEntity;
         Player player;
+        boolean returnToPlayerStatus;
 
-        private QuestInventory(Player player, Quest quest, Inventory inventory, NPCEntity npcEntity) {
+        private QuestInventory(Player player, Quest quest, Inventory inventory, NPCEntity npcEntity,
+                               boolean returnToPlayerStatus) {
             this.quest = quest;
             this.inventory = inventory;
             this.npcEntity = npcEntity;
             this.player = player;
-            questInventories.put(inventory, this);
+            this.returnToPlayerStatus = returnToPlayerStatus;
         }
     }
 
@@ -215,12 +248,26 @@ public class QuestInventoryMenu {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (questDirectories.containsKey(event.getInventory())) {
                 event.setCancelled(true);
+                if (event.getClickedInventory() != event.getView().getTopInventory()) return;
                 QuestDirectory questDirectory = questDirectories.get(event.getInventory());
+                if (questDirectory.returnToPlayerStatus && event.getSlot() == directoryBackEntry) {
+                    player.closeInventory();
+                    CoverPage.coverPage(player);
+                    return;
+                }
                 if (questDirectory.questMap.get(event.getSlot()) == null) return;
                 player.closeInventory();
-                generateInventoryQuestEntry(questDirectory.questMap.get(event.getSlot()), questDirectory.player, questDirectory.npcEntity);
+                generateInventoryQuestEntry(questDirectory.questMap.get(event.getSlot()), questDirectory.player,
+                        questDirectory.npcEntity, questDirectory.returnToPlayerStatus);
             } else if (questInventories.containsKey(event.getInventory())) {
                 event.setCancelled(true);
+                if (event.getClickedInventory() != event.getView().getTopInventory()) return;
+                QuestInventory questInventory = questInventories.get(event.getInventory());
+                if (questInventory.returnToPlayerStatus && event.getSlot() == questBackEntry) {
+                    player.closeInventory();
+                    CoverPage.coverPage(player);
+                    return;
+                }
                 switch (event.getSlot()) {
                     case trackEntry:
                         QuestCommand.trackQuest(questInventories.get(event.getInventory()).quest.getQuestID().toString(), player);
@@ -244,6 +291,14 @@ public class QuestInventoryMenu {
         public void onInventoryClose(InventoryCloseEvent event) {
             questDirectories.remove(event.getInventory());
             questInventories.remove(event.getInventory());
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST)
+        public void onInventoryDrag(InventoryDragEvent event) {
+            Inventory topInventory = event.getView().getTopInventory();
+            if (!questDirectories.containsKey(topInventory) && !questInventories.containsKey(topInventory)) return;
+            if (event.getRawSlots().stream().anyMatch(slot -> slot < topInventory.getSize()))
+                event.setCancelled(true);
         }
 
     }

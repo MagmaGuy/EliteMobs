@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -14,7 +15,7 @@ public class PartyInviteCommand extends AdvancedCommand {
         addLiteral("invite");
         addArgument("player", new PlayerCommandArgument());
         setUsage("/em party invite <player>");
-        setDescription("Invites an online player to your EliteMobs party.");
+        setDescription(PartyConfig.getCommandInviteDescription());
         setPermission("elitemobs.party");
         setSenderType(SenderType.PLAYER);
     }

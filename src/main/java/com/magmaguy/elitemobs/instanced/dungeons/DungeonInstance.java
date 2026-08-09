@@ -436,7 +436,7 @@ public class DungeonInstance extends MatchInstance {
             String memberName = member == null ? Bukkit.getOfflinePlayer(memberId).getName() : member.getName();
             if (member == null || !member.isOnline() || !member.isValid() || !PlayerData.isInMemory(memberId)) {
                 PartyManager.sendConfiguredMessage(initiator, PartyConfig.getDungeonPartyUnavailableMessage()
-                        .replace("$player", memberName == null ? "Unknown" : memberName));
+                        .replace("$player", memberName == null ? PartyConfig.getUnknownPlayerName() : memberName));
                 return List.of();
             }
             MatchInstance currentInstance = PlayerData.getMatchInstance(member);

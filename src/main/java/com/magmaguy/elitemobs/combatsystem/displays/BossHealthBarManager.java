@@ -198,7 +198,7 @@ final class BossHealthBarManager {
                 double progress = maxHealth <= 0 ? 0 :
                         Math.max(0, Math.min(1, eliteEntity.getHealth() / maxHealth));
 
-                bossBar.setTitle(name == null ? "Elite Boss" : name);
+                bossBar.setTitle(name == null ? MobCombatSettingsConfig.getFallbackBossBarName() : name);
                 bossBar.setProgress(progress);
                 bossBar.setColor(colorFor(progress));
 

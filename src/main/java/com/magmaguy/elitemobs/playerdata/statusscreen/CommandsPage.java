@@ -25,15 +25,17 @@ public class CommandsPage {
 
         for (int i = 0; i < 13; i++) {
 
-            if (PlayerStatusMenuConfig.getCommandsHoverLines()[i] == null) continue;
+            if (PlayerStatusMenuConfig.getCommandsTextLines()[i] == null) continue;
 
             TextComponent line = new TextComponent(PlayerStatusMenuConfig.getCommandsTextLines()[i] + "\n");
 
-            if (!PlayerStatusMenuConfig.getCommandsHoverLines()[i].isEmpty())
+            if (PlayerStatusMenuConfig.getCommandsHoverLines()[i] != null &&
+                    !PlayerStatusMenuConfig.getCommandsHoverLines()[i].isEmpty())
                 PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getCommandsHoverLines()[i]);
 
-            if (!PlayerStatusMenuConfig.getCommandsCommandLines()[i].isEmpty())
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getCommandsCommandLines()[i]));
+            String command = normalizeCommand(PlayerStatusMenuConfig.getCommandsCommandLines()[i]);
+            if (command != null && !command.isEmpty())
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
 
             textComponent.addExtra(line);
         }
@@ -43,10 +45,18 @@ public class CommandsPage {
     protected static void commandsPage(Player targetPlayer, Player requestingPlayer) {
         Inventory inventory = Bukkit.createInventory(requestingPlayer, 27, PlayerStatusMenuConfig.getCommandsChestMenuName());
         inventory.setItem(PlayerStatusMenuConfig.getCommandsAGSlot(), PlayerStatusMenuConfig.getCommandsAGItem());
+        inventory.setItem(PlayerStatusMenuConfig.getCommandsSpawnSlot(), PlayerStatusMenuConfig.getCommandsSpawnItem());
         inventory.setItem(PlayerStatusMenuConfig.getCommandsShareItemSlot(), PlayerStatusMenuConfig.getCommandsShareItemItem());
         inventory.setItem(26, PlayerStatusMenuConfig.getBackItem());
+        if (requestingPlayer.openInventory(inventory) == null) return;
+        StatusInventorySafety.protect(inventory);
         CommandsPageEvents.pageInventories.add(inventory);
-        requestingPlayer.openInventory(inventory);
+    }
+
+    static String normalizeCommand(String command) {
+        if (command == null) return null;
+        if (command.equalsIgnoreCase("/shareitem")) return "/em shareitem";
+        return command;
     }
 
     public static class CommandsPageEvents implements Listener {
@@ -61,9 +71,25 @@ public class CommandsPage {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.contains(event.getInventory())) return;
             event.setCancelled(true);
+            if (event.getClickedInventory() != event.getView().getTopInventory()) return;
             if (event.getSlot() == 26) {
                 player.closeInventory();
                 CoverPage.coverPage(player);
+                return;
+            }
+            if (event.getSlot() == PlayerStatusMenuConfig.getCommandsAGSlot()) {
+                player.closeInventory();
+                player.performCommand("ag");
+                return;
+            }
+            if (event.getSlot() == PlayerStatusMenuConfig.getCommandsSpawnSlot()) {
+                player.closeInventory();
+                player.performCommand("em spawntp");
+                return;
+            }
+            if (event.getSlot() == PlayerStatusMenuConfig.getCommandsShareItemSlot()) {
+                player.closeInventory();
+                player.performCommand("em shareitem");
             }
         }
 

@@ -16,7 +16,6 @@ import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.SpigotMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -263,8 +262,11 @@ public class SharedLootTable {
         String itemName = item.hasItemMeta() && item.getItemMeta().hasDisplayName()
                 ? item.getItemMeta().getDisplayName()
                 : item.getType().toString().replace('_', ' ');
+        String winnerMessage = ChatColorConverter.convert(CommandMessagesConfig.getLootWinnerMessage()
+                .replace("$player", winner.getDisplayName())
+                .replace("$item", itemName));
         for (Player participant : activeParticipants(null))
-            participant.sendMessage(winner.getDisplayName() + ChatColor.GREEN + " received " + itemName + " !");
+            participant.sendMessage(winnerMessage);
     }
 
     private List<Player> activeParticipants(Set<UUID> eligiblePlayerIds) {

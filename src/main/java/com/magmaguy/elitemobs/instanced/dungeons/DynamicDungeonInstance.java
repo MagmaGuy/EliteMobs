@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.instanced.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.utility.DungeonUtils;
@@ -100,8 +101,8 @@ public class DynamicDungeonInstance extends DungeonInstance {
         PartyDungeonReadyCheckManager.request(
                 player,
                 entryMemberIds,
-                readyCheckDescription(dynamicDungeonConfigFields, difficultyName)
-                        + " - level " + selectedLevel,
+                readyCheckLevelDescription(
+                        readyCheckDescription(dynamicDungeonConfigFields, difficultyName), selectedLevel),
                 reservation -> launchDynamicDungeon(
                         player,
                         dynamicDungeonConfigFields,
@@ -241,7 +242,13 @@ public class DynamicDungeonInstance extends DungeonInstance {
 
     @Override
     protected String readyCheckDescription() {
-        return super.readyCheckDescription() + " - level " + selectedLevel;
+        return readyCheckLevelDescription(super.readyCheckDescription(), selectedLevel);
+    }
+
+    private static String readyCheckLevelDescription(String dungeonDescription, int level) {
+        return PartyConfig.getDungeonReadyCheckLevelFormat()
+                .replace("$dungeon", dungeonDescription)
+                .replace("$level", String.valueOf(level));
     }
 
     private class SetBossLevelsTask extends BukkitRunnable {

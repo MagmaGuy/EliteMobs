@@ -64,6 +64,9 @@ public class PlayerData {
     private int questsCompleted;
     @Getter
     @Setter
+    private int dungeonsCompleted;
+    @Getter
+    @Setter
     private List<Quest> quests = new ArrayList<>();
     @Getter
     @Setter
@@ -391,6 +394,8 @@ public class PlayerData {
     }
 
     public static void setDatabaseValue(UUID uuid, String key, Object value) {
+        if ("Score".equals(key) && value instanceof Number number)
+            PlayerDataRepository.updateCachedScore(uuid, number.intValue());
         synchronized (PlayerDataRepository.monitor()) {
             if (loadingPlayers.contains(uuid)) {
                 deferredDatabaseValues.computeIfAbsent(uuid, ignored -> new ArrayList<>())
@@ -471,6 +476,38 @@ public class PlayerData {
         setDatabaseValue(uuid, "QuestsCompleted", getQuestsCompleted(uuid) + 1);
         if (playerDataHashMap.containsKey(uuid))
             playerDataHashMap.get(uuid).questsCompleted += 1;
+    }
+
+    public static int getDungeonsCompleted(UUID uuid) {
+        if (!isInMemory(uuid))
+            return getDatabaseInteger(uuid, "DungeonsCompleted");
+        return playerDataHashMap.get(uuid).dungeonsCompleted;
+    }
+
+    public static void incrementDungeonsCompleted(UUID uuid) {
+        setDatabaseValue(uuid, "DungeonsCompleted", getDungeonsCompleted(uuid) + 1);
+        if (playerDataHashMap.containsKey(uuid))
+            playerDataHashMap.get(uuid).dungeonsCompleted += 1;
+    }
+
+    /**
+     * Returns this player's competition rank by EliteMobs score. Equal scores share a rank and the
+     * following position is skipped (for example, 1, 1, 3). This never performs JDBC work on the
+     * caller's thread; {@link ScoreRank#unavailable()} is returned until the asynchronous cache is ready.
+     */
+    public static ScoreRank getScoreRank(UUID uuid) {
+        if (!isDataLoaded(uuid)) return ScoreRank.unavailable();
+        return PlayerDataRepository.getScoreRank(uuid);
+    }
+
+    public record ScoreRank(int position, int playerCount) {
+        public static ScoreRank unavailable() {
+            return new ScoreRank(0, 0);
+        }
+
+        public boolean isAvailable() {
+            return position > 0 && playerCount > 0;
+        }
     }
 
     public static Location getBackTeleportLocation(Player player) {
@@ -759,6 +796,7 @@ public class PlayerData {
             // Legacy import owns one transaction and completes before any asynchronous player load
             // can observe or modify the migrated rows.
             new PortOldData();
+            PlayerDataRepository.loadScoreRankingCacheAsync();
             for (Player player : Bukkit.getOnlinePlayers())
                 new PlayerData(player.getUniqueId());
         } catch (Exception e) {
@@ -785,6 +823,7 @@ public class PlayerData {
         highestLevelKilled = resultSet.getInt("HighestLevelKilled");
         deaths = resultSet.getInt("Deaths");
         questsCompleted = resultSet.getInt("QuestsCompleted");
+        dungeonsCompleted = resultSet.getInt("DungeonsCompleted");
         backTeleportLocation = ConfigurationLocation.serialize(resultSet.getString("BackTeleportLocation"));
 
         if (resultSet.getBytes("QuestStatus") != null) {

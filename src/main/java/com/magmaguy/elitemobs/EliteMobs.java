@@ -137,7 +137,9 @@ public class EliteMobs extends JavaPlugin {
             "elitemobs.setup",
             "elitemobs.setup",
             "https://nightbreak.io/plugin/elitemobs/",
-            "Reloaded EliteMobs.");
+            "Reloaded EliteMobs.",
+            ChangelogsConfig::getMessages,
+            ChangelogsConfig::getLogoutMessages);
 
     public static List<World> validWorldList = new ArrayList<>();
     public static boolean worldGuardIsEnabled = false;
@@ -180,6 +182,7 @@ public class EliteMobs extends JavaPlugin {
         //ModelsConfig.initializeConfig();
         new DungeonsConfig();
         new CommandMessagesConfig();
+        new ChangelogsConfig();
         new InitializeConfig();
         new SoundsConfig();
         new com.magmaguy.elitemobs.config.GamblingConfig();
@@ -587,7 +590,7 @@ public class EliteMobs extends JavaPlugin {
     public void onLoad() {
         //Initializes some core utilities that are shared across MagmaGuy's plugins
         MetadataHandler.PLUGIN = this;
-        MagmaCore.createInstance(this);
+        MagmaCore.createInstance(this, NIGHTBREAK_PLUGIN_SPEC);
 
         //WorldGuard hook
         try {
@@ -724,6 +727,7 @@ public class EliteMobs extends JavaPlugin {
         CommandsPage.CommandsPageEvents.shutdown();
         CoverPage.CoverPageEvents.shutdown();
         SkillsPage.SkillsPageEvents.shutdown();
+        StatusInventorySafety.shutdown();
         SkillSystemMigration.shutdown();
         SkillBonusInitializer.shutdown();
         SkillXPBar.shutdown();

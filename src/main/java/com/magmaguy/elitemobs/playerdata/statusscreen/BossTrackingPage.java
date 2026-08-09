@@ -88,37 +88,40 @@ public class BossTrackingPage {
     protected static void bossTrackingPage(Player targetPlayer, Player requestingPlayer) {
         Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getBossTrackerChestMenuName());
         int counter = 0;
-        BossTrackingPageEvents.bosses.clear();
+        Map<Integer, CustomBossEntity> bosses = new HashMap<>();
         for (CustomBossEntity customBossEntity : CustomBossEntity.getTrackableCustomBosses()) {
-            BossTrackingPageEvents.bosses.add(customBossEntity);
+            if (counter >= 53) break;
+            bosses.put(counter, customBossEntity);
             inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.ZOMBIE_HEAD,
                     customBossEntity.getBossTrackingBar().bossBarMessage(targetPlayer, customBossEntity.getCustomBossesConfigFields().getLocationMessage()),
                     Collections.singletonList(MobCombatSettingsConfig.getBossLocationMessage())));
             counter++;
         }
         inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());
-        requestingPlayer.openInventory(inventory);
-        BossTrackingPageEvents.pageInventories.add(inventory);
+        if (requestingPlayer.openInventory(inventory) == null) return;
+        StatusInventorySafety.protect(inventory);
+        BossTrackingPageEvents.pageInventories.put(inventory, bosses);
     }
 
     public static class BossTrackingPageEvents implements Listener {
-        private static final Set<Inventory> pageInventories = new HashSet<>();
-        private static final List<CustomBossEntity> bosses = new ArrayList<>();
+        private static final Map<Inventory, Map<Integer, CustomBossEntity>> pageInventories = new HashMap<>();
 
         public static void shutdown() {
             pageInventories.clear();
-            bosses.clear();
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             if (event.getSlot() < 0) return;
             Player player = ((Player) event.getWhoClicked()).getPlayer();
-            if (!pageInventories.contains(event.getInventory())) return;
+            Map<Integer, CustomBossEntity> bosses = pageInventories.get(event.getInventory());
+            if (bosses == null) return;
             event.setCancelled(true);
-            if (bosses.size() - 1 >= event.getSlot()) {
+            if (event.getClickedInventory() != event.getView().getTopInventory()) return;
+            CustomBossEntity boss = bosses.get(event.getSlot());
+            if (boss != null) {
                 player.closeInventory();
-                bosses.get(event.getSlot()).getBossTrackingBar().addTrackingPlayer(player);
+                boss.getBossTrackingBar().addTrackingPlayer(player);
                 return;
             }
             if (event.getSlot() == 53) {

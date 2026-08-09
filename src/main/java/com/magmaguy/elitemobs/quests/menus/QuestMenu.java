@@ -44,8 +44,13 @@ public class QuestMenu {
     }
 
     public static void generateQuestMenu(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
+        generateQuestMenu(quests, player, npcEntity, false);
+    }
+
+    public static void generateQuestMenu(List<? extends Quest> quests, Player player, NPCEntity npcEntity,
+                                         boolean returnToPlayerStatus) {
         if (!PlayerData.getUseBookMenus(player.getUniqueId()) || GeyserDetector.bedrockPlayer(player) || DefaultConfig.isOnlyUseBedrockMenus()) {
-            generateInventoryQuestEntries(quests, player, npcEntity);
+            generateInventoryQuestEntries(quests, player, npcEntity, returnToPlayerStatus);
         } else if (VersionChecker.serverVersionOlderThan(21,6)) {
             generateBookQuestEntries(quests, player, npcEntity);
         } else {

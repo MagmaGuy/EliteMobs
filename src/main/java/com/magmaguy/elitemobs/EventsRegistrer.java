@@ -125,7 +125,12 @@ public class EventsRegistrer {
 
         register(new FixPlayerOnLoginOrRespawn());
         register(new PlayerQuitCleanup());
-        if (PartyConfig.isEnabled()) register(new PartyManager());
+        if (PartyConfig.isEnabled()) {
+            register(new PartyManager());
+            register(new com.magmaguy.elitemobs.parties.PartyInventoryMenu());
+            if (PartyConfig.isPlayerInteractionHintsEnabled())
+                register(new com.magmaguy.elitemobs.parties.PartyInteractionHint());
+        }
         register(new com.magmaguy.elitemobs.wormhole.WormholePlayerListener());
 
         //Mob damage
@@ -227,6 +232,7 @@ public class EventsRegistrer {
         }
 
         //player status menu
+        register(new StatusInventorySafety());
         register(new CoverPage.CoverPageEvents());
         register(new StatsPage.StatsPageEvents());
         register(new SkillsPage.SkillsPageEvents());

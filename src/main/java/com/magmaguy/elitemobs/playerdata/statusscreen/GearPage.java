@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
-import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.items.ShareItem;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -24,28 +23,29 @@ public class GearPage {
     protected static TextComponent gearPage(Player targetPlayer) {
 
         TextComponent textComponent = new TextComponent();
+        GearProfile.Snapshot gearProfile = GearProfile.capture(targetPlayer);
 
         for (int i = 0; i < 13; i++) {
 
             TextComponent line;
             if (PlayerStatusMenuConfig.getGearTextLines()[i] == null) continue;
             if (!PlayerStatusMenuConfig.getGearTextLines()[i].contains("{")) {
-                line = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i], targetPlayer) + "\n");
-                gearMultiComponentLine(textComponent, line, i, targetPlayer, false, 0);
+                line = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i], targetPlayer, gearProfile) + "\n");
+                gearMultiComponentLine(textComponent, line, i, targetPlayer, gearProfile, false, 0);
             } else {
-                TextComponent prePlaceholderElements = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i].split("\\{")[0], targetPlayer));
-                gearMultiComponentLine(textComponent, prePlaceholderElements, i, targetPlayer, false, 0);
+                TextComponent prePlaceholderElements = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i].split("\\{")[0], targetPlayer, gearProfile));
+                gearMultiComponentLine(textComponent, prePlaceholderElements, i, targetPlayer, gearProfile, false, 0);
                 for (int j = 0; j < PlayerStatusMenuConfig.getGearTextLines()[i].split("\\{").length; j++) {
-                    TextComponent placeholderString = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i].split("\\{")[j].split("}")[0], targetPlayer));
-                    gearMultiComponentLine(textComponent, placeholderString, i, targetPlayer, true, j);
+                    TextComponent placeholderString = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i].split("\\{")[j].split("}")[0], targetPlayer, gearProfile));
+                    gearMultiComponentLine(textComponent, placeholderString, i, targetPlayer, gearProfile, true, j);
                     if (PlayerStatusMenuConfig.getGearTextLines()[i].split("}").length > j
                             && PlayerStatusMenuConfig.getGearTextLines()[i].split("}")[j].contains("{")) {
-                        TextComponent spaceBetweenPlaceholders = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i].split("}")[j].split("\\{")[0], targetPlayer));
-                        gearMultiComponentLine(textComponent, spaceBetweenPlaceholders, i, targetPlayer, false, 0);
+                        TextComponent spaceBetweenPlaceholders = new TextComponent(parseGearPlaceholders(PlayerStatusMenuConfig.getGearTextLines()[i].split("}")[j].split("\\{")[0], targetPlayer, gearProfile));
+                        gearMultiComponentLine(textComponent, spaceBetweenPlaceholders, i, targetPlayer, gearProfile, false, 0);
                     }
                 }
                 TextComponent spaceAfterPlaceholders = new TextComponent("\n");
-                gearMultiComponentLine(textComponent, spaceAfterPlaceholders, i, targetPlayer, false, 0);
+                gearMultiComponentLine(textComponent, spaceAfterPlaceholders, i, targetPlayer, gearProfile, false, 0);
             }
 
 
@@ -54,7 +54,7 @@ public class GearPage {
         return textComponent;
     }
 
-    private static String parseGearPlaceholders(String string, Player targetPlayer) {
+    private static String parseGearPlaceholders(String string, Player targetPlayer, GearProfile.Snapshot gearProfile) {
 
         if (string.contains("$helmettier"))
             if (targetPlayer.getEquipment().getHelmet() != null)
@@ -96,18 +96,12 @@ public class GearPage {
             return unicodeColorizer(targetPlayer.getEquipment().getItemInOffHand().getType()) +
                     string.replace("$offhandtier",
                             ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).offhand.getTier(targetPlayer.getInventory().getItemInOffHand(), true) + "");
-        if (string.contains("$damage"))
-            return string.replace("$damage", ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).baseDamage() + "");
-        if (string.contains("$armor"))
-            return string.replace("$armor", ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getEliteDefense(false) + "");
-        if (string.contains("$threat"))
-            return string.replace("$threat", ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getNaturalMobSpawnLevel(true) + "");
-
-        return string;
+        return GearProfile.resolve(string, gearProfile);
 
     }
 
-    private static void gearMultiComponentLine(TextComponent textComponent, TextComponent line, int i, Player targetPlayer, boolean brackets, int bracketCount) {
+    private static void gearMultiComponentLine(TextComponent textComponent, TextComponent line, int i, Player targetPlayer,
+                                               GearProfile.Snapshot gearProfile, boolean brackets, int bracketCount) {
 
         if (PlayerStatusMenuConfig.getGearHoverLines()[i] != null && !PlayerStatusMenuConfig.getGearHoverLines()[i].isEmpty()) {
             String hoverLines = PlayerStatusMenuConfig.getGearHoverLines()[i];
@@ -129,10 +123,10 @@ public class GearPage {
                             } else if (parsedLine.contains("$offhand")) {
                                 ShareItem.setItemHoverEvent(line, targetPlayer.getInventory().getItemInOffHand());
                             } else
-                                PlayerStatusScreen.setHoverText(line, parsedLine);
+                                PlayerStatusScreen.setHoverText(line, GearProfile.resolve(parsedLine, gearProfile));
                         }
             } else if (!(hoverLines.contains("{") && hoverLines.contains("}")))
-                PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getGearHoverLines()[i]);
+                PlayerStatusScreen.setHoverText(line, GearProfile.resolve(PlayerStatusMenuConfig.getGearHoverLines()[i], gearProfile));
 
         }
 
@@ -208,40 +202,49 @@ public class GearPage {
 
     protected static void gearPage(Player requestingPlayer, Player targetPlayer) {
         Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getGearChestMenuName());
+        GearProfile.Snapshot gearProfile = GearProfile.capture(targetPlayer);
         //head
-        if (EliteItemManager.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[3]))
+        if (hasItem(targetPlayer.getInventory().getArmorContents()[3]))
             inventory.setItem(11, targetPlayer.getInventory().getArmorContents()[3]);
         //main hand
-        if (EliteItemManager.isEliteMobsItem(targetPlayer.getInventory().getItemInMainHand()))
+        if (hasItem(targetPlayer.getInventory().getItemInMainHand()))
             inventory.setItem(19, targetPlayer.getInventory().getItemInMainHand());
         //chestplate
-        if (EliteItemManager.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[2]))
+        if (hasItem(targetPlayer.getInventory().getArmorContents()[2]))
             inventory.setItem(20, targetPlayer.getInventory().getArmorContents()[2]);
         //shield
-        if (EliteItemManager.isEliteMobsItem(targetPlayer.getInventory().getItemInOffHand()))
+        if (hasItem(targetPlayer.getInventory().getItemInOffHand()))
             inventory.setItem(21, targetPlayer.getInventory().getItemInOffHand());
         //leggings
-        if (EliteItemManager.isEliteMobsItem(targetPlayer.getInventory().getArmorContents()[1]))
+        if (hasItem(targetPlayer.getInventory().getArmorContents()[1]))
             inventory.setItem(29, targetPlayer.getInventory().getArmorContents()[1]);
         //boots
-        inventory.setItem(38, targetPlayer.getInventory().getArmorContents()[0]);
+        if (hasItem(targetPlayer.getInventory().getArmorContents()[0]))
+            inventory.setItem(38, targetPlayer.getInventory().getArmorContents()[0]);
         inventory.setItem(PlayerStatusMenuConfig.getGearDamageSlot(),
-                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getGearDamageItem().clone(), "$damage",
-                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).baseDamage() + ""));
+                resolveItemPlaceholders(PlayerStatusMenuConfig.getGearDamageItem().clone(), gearProfile));
         inventory.setItem(PlayerStatusMenuConfig.getGearArmorSlot(),
-                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getGearArmorItem().clone(), "$defense",
-                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getEliteDefense(false) + ""));
+                resolveItemPlaceholders(PlayerStatusMenuConfig.getGearArmorItem().clone(), gearProfile));
         inventory.setItem(PlayerStatusMenuConfig.getGearThreatSlot(),
-                replaceItemNamePlaceholder(PlayerStatusMenuConfig.getGearThreatItem().clone(), "$threat",
-                        ElitePlayerInventory.playerInventories.get(targetPlayer.getUniqueId()).getNaturalMobSpawnLevel(true) + ""));
+                resolveItemPlaceholders(PlayerStatusMenuConfig.getGearThreatItem().clone(), gearProfile));
         inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());
+        if (requestingPlayer.openInventory(inventory) == null) return;
+        StatusInventorySafety.protect(inventory);
         GearPageEvents.pageInventories.add(inventory);
-        requestingPlayer.openInventory(inventory);
     }
 
-    private static ItemStack replaceItemNamePlaceholder(ItemStack itemStack, String placeholder, String replacement) {
+    private static boolean hasItem(ItemStack itemStack) {
+        return itemStack != null && !itemStack.getType().isAir();
+    }
+
+    private static ItemStack resolveItemPlaceholders(ItemStack itemStack, GearProfile.Snapshot gearProfile) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setDisplayName(itemMeta.getDisplayName().replace(placeholder, replacement));
+        if (itemMeta.hasDisplayName())
+            itemMeta.setDisplayName(GearProfile.resolve(itemMeta.getDisplayName(), gearProfile));
+        if (itemMeta.hasLore())
+            itemMeta.setLore(itemMeta.getLore().stream()
+                    .map(line -> GearProfile.resolve(line, gearProfile))
+                    .toList());
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }

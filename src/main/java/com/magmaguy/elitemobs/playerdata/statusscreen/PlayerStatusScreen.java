@@ -14,22 +14,11 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PlayerStatusScreen implements Listener {
 
     public PlayerStatusScreen(Player requestingPlayer, Player targetPlayer) {
-        ItemStack writtenBook = generateBook(requestingPlayer, targetPlayer);
-        BookMeta bookMeta = (BookMeta) writtenBook.getItemMeta();
-        List<String> pages = bookMeta.getPages();
-        String debugPage = "";
-        debugPage += "Is in memory: " + PlayerData.isInMemory(targetPlayer);
-        ArrayList<String> newPages = new ArrayList<>(pages);
-        newPages.add(debugPage);
-        BookMaker.generateBook(requestingPlayer, newPages);
+        generateBook(requestingPlayer, targetPlayer);
     }
 
     public PlayerStatusScreen(Player player) {
@@ -118,7 +107,8 @@ public class PlayerStatusScreen implements Listener {
             pageCounter++;
         }
 
-        pages[0] = CoverPage.coverPage(statsPage, gearPage, teleportsPage, commandsPage, questsPage, bossTrackingPage, skillsPage);
+        pages[0] = CoverPage.coverPage(requestingPlayer, statsPage, gearPage, teleportsPage,
+                commandsPage, questsPage, bossTrackingPage, skillsPage);
 
         int counter = 0;
         for (TextComponent textComponent : pages) {

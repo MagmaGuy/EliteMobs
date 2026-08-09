@@ -26,8 +26,8 @@ public class TeleportsPage {
     protected static TextComponent[] teleportsPage() {
         TextComponent configTextComponent = new TextComponent();
         //Fills the non-dungeon lines
-        int textLineCounter = 0;
-        for (String string : PlayerStatusMenuConfig.getTeleportTextLines()) {
+        for (int textLineCounter = 0; textLineCounter < PlayerStatusMenuConfig.getTeleportTextLines().length; textLineCounter++) {
+            String string = PlayerStatusMenuConfig.getTeleportTextLines()[textLineCounter];
             if (string == null || string.equals("null"))
                 continue;
             TextComponent line = new TextComponent(string + "\n");
@@ -38,7 +38,6 @@ public class TeleportsPage {
                 line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getTeleportCommandLines()[textLineCounter]));
 
             configTextComponent.addExtra(line);
-            textLineCounter++;
         }
 
         //Fills the minidungeon components
@@ -86,27 +85,45 @@ public class TeleportsPage {
 
     protected static void teleportsPage(Player targetPlayer, Player requestingPlayer) {
         Inventory inventory = Bukkit.createInventory(requestingPlayer, 54, PlayerStatusMenuConfig.getTeleportChestMenuName());
-        int counter = 0;
-        TeleportsPageEvents.orderedDungeons.clear();
+        Map<Integer, String> actions = new HashMap<>();
+        addAction(inventory, actions, PlayerStatusMenuConfig.getTeleportSpawnSlot(),
+                PlayerStatusMenuConfig.getTeleportSpawnItem(), "em spawntp");
+        addAction(inventory, actions, PlayerStatusMenuConfig.getTeleportGuildSlot(),
+                PlayerStatusMenuConfig.getTeleportGuildItem(), "ag");
+
+        Set<Integer> reservedSlots = new HashSet<>(actions.keySet());
+        reservedSlots.add(53);
+        Map<Integer, EMPackage> dungeons = new HashMap<>();
+        int slot = 0;
         for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
             if (!emPackage.isInstalled() ||
                     !(emPackage instanceof CombatContent) ||
                     emPackage.getContentPackagesConfigFields().isEnchantmentChallenge()) continue;
             if (!emPackage.getContentPackagesConfigFields().isListedInTeleports()) continue;
 
-            TeleportsPageEvents.orderedDungeons.add(emPackage);
+            while (slot < 53 && reservedSlots.contains(slot)) slot++;
+            if (slot >= 53) break;
             String chestPlayerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
             String loreText = chestPlayerInfo != null ? chestPlayerInfo
                             .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
                             .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
                             .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "") : "";
-            inventory.setItem(counter, ItemStackGenerator.generateItemStack(Material.PAPER, emPackage.getContentPackagesConfigFields().getName()
+            inventory.setItem(slot, ItemStackGenerator.generateItemStack(Material.PAPER, emPackage.getContentPackagesConfigFields().getName()
                     , Collections.singletonList(loreText)));
-            counter++;
+            dungeons.put(slot, emPackage);
+            slot++;
         }
         inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());
-        requestingPlayer.openInventory(inventory);
-        TeleportsPageEvents.pageInventories.add(inventory);
+        if (requestingPlayer.openInventory(inventory) == null) return;
+        StatusInventorySafety.protect(inventory);
+        TeleportsPageEvents.pageInventories.put(inventory, new TeleportMenuState(dungeons, actions));
+    }
+
+    private static void addAction(Inventory inventory, Map<Integer, String> actions, int slot,
+                                  org.bukkit.inventory.ItemStack item, String command) {
+        if (slot < 0 || slot >= 53 || item == null) return;
+        inventory.setItem(slot, item);
+        actions.put(slot, command);
     }
 
     public static void showTeleportInventory(Player player) {
@@ -114,25 +131,32 @@ public class TeleportsPage {
     }
 
     public static class TeleportsPageEvents implements Listener {
-        private static final Set<Inventory> pageInventories = new HashSet<>();
-        private static final List<EMPackage> orderedDungeons = new ArrayList<>();
+        private static final Map<Inventory, TeleportMenuState> pageInventories = new HashMap<>();
 
         public static void shutdown() {
             pageInventories.clear();
-            orderedDungeons.clear();
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
-            if (!pageInventories.contains(event.getInventory())) return;
+            TeleportMenuState menuState = pageInventories.get(event.getInventory());
+            if (menuState == null) return;
             event.setCancelled(true);
+            if (event.getClickedInventory() != event.getView().getTopInventory()) return;
             if (event.getSlot() < 0) return;
-            if (orderedDungeons.size() - 1 >= event.getSlot()) {
+            EMPackage emPackage = menuState.dungeons().get(event.getSlot());
+            if (emPackage != null) {
                 player.closeInventory();
                 DungeonCommands.teleport(player,
-                        orderedDungeons.get(event.getSlot()).getContentPackagesConfigFields().getFilename(),
+                        emPackage.getContentPackagesConfigFields().getFilename(),
                         DungeonCommands.TeleportMenuSource.INVENTORY);
+                return;
+            }
+            String command = menuState.actions().get(event.getSlot());
+            if (command != null) {
+                player.closeInventory();
+                player.performCommand(command);
                 return;
             }
             if (event.getSlot() == 53) {
@@ -146,6 +170,9 @@ public class TeleportsPage {
             pageInventories.remove(event.getInventory());
         }
 
+    }
+
+    private record TeleportMenuState(Map<Integer, EMPackage> dungeons, Map<Integer, String> actions) {
     }
 
 }

@@ -11,6 +11,6 @@ public class QuestsPage {
     }
 
     protected static void questsPage(Player targetPlayer, Player requestingPlayer) {
-        QuestMenu.generateQuestMenu(PlayerData.getQuests(targetPlayer.getUniqueId()), targetPlayer, null);
+        QuestMenu.generateQuestMenu(PlayerData.getQuests(targetPlayer.getUniqueId()), targetPlayer, null, true);
     }
 }

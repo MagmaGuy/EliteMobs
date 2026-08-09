@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.parties.PartyDungeonReadyCheckManager;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -12,9 +13,9 @@ public class PartyReadyCommand extends AdvancedCommand {
     public PartyReadyCommand() {
         super(List.of("party"));
         addLiteral("ready");
-        addArgument("token", new ListStringCommandArgument("ready check token"));
+        addArgument("token", new ListStringCommandArgument(PartyConfig.getReadyCheckTokenHint()));
         setUsage("/em party ready <token>");
-        setDescription("Accepts an active party dungeon ready check.");
+        setDescription(PartyConfig.getCommandReadyDescription());
         setPermission("elitemobs.party");
         setSenderType(SenderType.PLAYER);
     }

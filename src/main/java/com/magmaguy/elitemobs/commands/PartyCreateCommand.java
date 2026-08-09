@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -12,7 +13,7 @@ public class PartyCreateCommand extends AdvancedCommand {
         super(List.of("party"));
         addLiteral("create");
         setUsage("/em party create");
-        setDescription("Creates a session-scoped EliteMobs party.");
+        setDescription(PartyConfig.getCommandCreateDescription());
         setPermission("elitemobs.party");
         setSenderType(SenderType.PLAYER);
     }

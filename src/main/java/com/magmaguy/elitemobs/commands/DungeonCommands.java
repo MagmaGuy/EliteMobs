@@ -79,7 +79,7 @@ public class DungeonCommands {
             String memberName = member == null ? Bukkit.getOfflinePlayer(memberId).getName() : member.getName();
             if (member == null || !member.isOnline() || !member.isValid() || !PlayerData.isInMemory(memberId)) {
                 PartyManager.sendConfiguredMessage(initiator, PartyConfig.getDungeonPartyUnavailableMessage()
-                        .replace("$player", memberName == null ? "Unknown" : memberName));
+                        .replace("$player", memberName == null ? PartyConfig.getUnknownPlayerName() : memberName));
                 return List.of();
             }
             if (PlayerData.getMatchInstance(member) != null || MatchInstance.getAnyPlayerInstance(member) != null) {

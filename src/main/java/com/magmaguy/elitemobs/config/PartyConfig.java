@@ -23,9 +23,15 @@ public class PartyConfig extends ConfigurationFile {
     private static boolean sidebarEnabled;
     @Getter
     private static int sidebarRotationSeconds;
+    @Getter
+    private static boolean playerInteractionHintsEnabled;
+    @Getter
+    private static int playerInteractionHintCooldownSeconds;
 
     @Getter
     private static String prefix;
+    @Getter
+    private static String unknownPlayerName;
     @Getter
     private static String disabledMessage;
     @Getter
@@ -44,6 +50,10 @@ public class PartyConfig extends ConfigurationFile {
     private static String selfInviteMessage;
     @Getter
     private static String inviteSentMessage;
+    @Getter
+    private static String inviteAlreadyPendingMessage;
+    @Getter
+    private static String playerCannotUsePartiesMessage;
     @Getter
     private static String inviteReceivedMessage;
     @Getter
@@ -106,6 +116,10 @@ public class PartyConfig extends ConfigurationFile {
     private static String dungeonReadyCheckDeclinedMessage;
     @Getter
     private static String dungeonReadyCheckExpiredMessage;
+    @Getter
+    private static String dungeonReadyCheckUnknownDungeonName;
+    @Getter
+    private static String dungeonReadyCheckLevelFormat;
 
     @Getter
     private static String sidebarTitle;
@@ -133,6 +147,62 @@ public class PartyConfig extends ConfigurationFile {
     private static String sidebarInviteAction;
     @Getter
     private static String sidebarLeaveAction;
+    @Getter
+    private static String playerInteractionHintMessage;
+    @Getter
+    private static String playerInteractionHintInviteButton;
+    @Getter
+    private static String playerInteractionHintInviteHover;
+    @Getter
+    private static String playerInteractionHintDisableButton;
+    @Getter
+    private static String playerInteractionHintDisableHover;
+    @Getter
+    private static String playerInteractionHintDisabledMessage;
+    @Getter private static String inventoryControlsTitle;
+    @Getter private static String inventoryInvitePlayersTitle;
+    @Getter private static String inventoryInteractionTitle;
+    @Getter private static String inventoryInvitationTitle;
+    @Getter private static String inventoryReadyCheckTitle;
+    @Getter private static String inventoryInviteName;
+    @Getter private static String inventoryInviteLore;
+    @Getter private static String inventoryLeaveName;
+    @Getter private static String inventoryLeaveLore;
+    @Getter private static String inventoryCreateName;
+    @Getter private static String inventoryCreateLore;
+    @Getter private static String inventoryBackName;
+    @Getter private static String inventoryBackToPartyName;
+    @Getter private static String inventoryPreviousName;
+    @Getter private static String inventoryNextName;
+    @Getter private static String inventoryInvitePlayerName;
+    @Getter private static String inventorySelectInviteLore;
+    @Getter private static String inventoryNoInvitePlayersName;
+    @Getter private static String inventoryNoInvitePlayersLore;
+    @Getter private static String inventoryInteractionInviteName;
+    @Getter private static String inventoryInteractionInviteLore;
+    @Getter private static String inventoryNeverShowName;
+    @Getter private static String inventoryNeverShowLore;
+    @Getter private static String inventoryAcceptInviteName;
+    @Getter private static String inventoryAcceptInviteLore;
+    @Getter private static String inventoryDeclineName;
+    @Getter private static String inventoryDeclineLore;
+    @Getter private static String inventoryReadyDungeonName;
+    @Getter private static String inventoryReadyWaitingLore;
+    @Getter private static String inventoryReadyConfirmLore;
+    @Getter private static String inventoryReadyName;
+    @Getter private static String inventoryReadyLore;
+    @Getter private static String inventoryCancelReadyName;
+    @Getter private static String inventoryCancelReadyLore;
+    @Getter private static String inventoryNoPermissionMessage;
+    @Getter private static String commandCreateDescription;
+    @Getter private static String commandInviteDescription;
+    @Getter private static String commandMenuDescription;
+    @Getter private static String commandAcceptDescription;
+    @Getter private static String commandLeaveDescription;
+    @Getter private static String commandReadyDescription;
+    @Getter private static String commandDeclineDescription;
+    @Getter private static String commandHideInteractionHintDescription;
+    @Getter private static String readyCheckTokenHint;
 
     public PartyConfig() {
         super("Party.yml");
@@ -165,8 +235,20 @@ public class PartyConfig extends ConfigurationFile {
         sidebarRotationSeconds = Math.max(3, ConfigurationEngine.setInt(
                 List.of("How often the party sidebar alternates between its invite and leave command hints."),
                 fileConfiguration, "sidebarRotationSeconds", 10));
+        playerInteractionHintsEnabled = ConfigurationEngine.setBoolean(
+                List.of("Shows a short party invitation hint when a player right-clicks another player.",
+                        "This has no effect when the party system itself is disabled."),
+                fileConfiguration, "playerInteractionHintsEnabled", true);
+        playerInteractionHintCooldownSeconds = Math.max(1, ConfigurationEngine.setInt(
+                List.of("Minimum time before a player can receive another right-click party hint."),
+                fileConfiguration, "playerInteractionHintCooldownSeconds", 300));
 
-        prefix = message("prefix", "&8[&6Party&8] &7");
+        migrateDefault("sidebarLeaderLine", "&6♛ &f$player", "&6♛ &f$player$health$lives");
+        migrateDefault("sidebarMemberLine", "&a● &f$player", "&a● &f$player$health$lives");
+        migrateWipVisualDefaults();
+
+        prefix = message("prefix", "&8[<g:#A04468:#E07A9A>Party</g>&8] &7");
+        unknownPlayerName = message("unknownPlayerName", "Unknown");
         disabledMessage = message("disabledMessage", "$prefixThe party system is disabled on this server.");
         alreadyInPartyMessage = message("alreadyInPartyMessage", "$prefixYou are already in a party.");
         notInPartyMessage = message("notInPartyMessage", "$prefixYou are not in a party.");
@@ -179,8 +261,12 @@ public class PartyConfig extends ConfigurationFile {
         playerAlreadyInPartyMessage = message("playerAlreadyInPartyMessage", "$prefixThat player is already in a party.");
         selfInviteMessage = message("selfInviteMessage", "$prefixYou cannot invite yourself.");
         inviteSentMessage = message("inviteSentMessage", "$prefixInvitation sent to &f$player&7.");
+        inviteAlreadyPendingMessage = message("inviteAlreadyPendingMessage",
+                "$prefix&f$player &7already has a pending party invitation.");
+        playerCannotUsePartiesMessage = message("playerCannotUsePartiesMessage",
+                "$prefix&f$player &7does not have permission to use parties.");
         inviteReceivedMessage = message("inviteReceivedMessage", "$prefix&f$player &7invited you to join their party. ");
-        inviteAcceptButton = message("inviteAcceptButton", "&a&l[ACCEPT]");
+        inviteAcceptButton = message("inviteAcceptButton", "<g:#2E7D4F:#69C56F>[ACCEPT]</g>");
         inviteAcceptHover = message("inviteAcceptHover", "&7Click to join the party");
         noPendingInviteMessage = message("noPendingInviteMessage", "$prefixYou do not have a pending party invitation.");
         inviteExpiredMessage = message("inviteExpiredMessage", "$prefixThat party invitation expired.");
@@ -207,13 +293,13 @@ public class PartyConfig extends ConfigurationFile {
                 "$prefix&f$player &7wants to enter &f$dungeon&7. Waiting for the party (&f$ready&7/&f$total&7).");
         dungeonReadyCheckPromptMessage = message("dungeonReadyCheckPromptMessage",
                 "$prefixReady to enter &f$dungeon&7? ");
-        dungeonReadyCheckReadyButton = message("dungeonReadyCheckReadyButton", "&a&l[READY]");
+        dungeonReadyCheckReadyButton = message("dungeonReadyCheckReadyButton", "<g:#2E7D4F:#69C56F>[READY]</g>");
         dungeonReadyCheckReadyHover = message("dungeonReadyCheckReadyHover", "&7Click to confirm dungeon entry");
-        dungeonReadyCheckDeclineButton = message("dungeonReadyCheckDeclineButton", " &c&l[DECLINE]");
+        dungeonReadyCheckDeclineButton = message("dungeonReadyCheckDeclineButton", " <g:#7A1F2B:#C2414A>[DECLINE]</g>");
         dungeonReadyCheckDeclineHover = message("dungeonReadyCheckDeclineHover", "&7Click to cancel this party entry");
         dungeonReadyCheckCancelPromptMessage = message("dungeonReadyCheckCancelPromptMessage",
                 "$prefixStarted the wrong dungeon? ");
-        dungeonReadyCheckCancelButton = message("dungeonReadyCheckCancelButton", "&c&l[CANCEL]");
+        dungeonReadyCheckCancelButton = message("dungeonReadyCheckCancelButton", "<g:#7A1F2B:#C2414A>[CANCEL]</g>");
         dungeonReadyCheckNoPendingMessage = message("dungeonReadyCheckNoPendingMessage",
                 "$prefixThat dungeon ready check is no longer active.");
         dungeonReadyCheckAlreadyReadyMessage = message("dungeonReadyCheckAlreadyReadyMessage",
@@ -226,11 +312,11 @@ public class PartyConfig extends ConfigurationFile {
                 "$prefix&f$player &cdeclined &7the ready check for &f$dungeon&7.");
         dungeonReadyCheckExpiredMessage = message("dungeonReadyCheckExpiredMessage",
                 "$prefixThe ready check for &f$dungeon &7expired.");
+        dungeonReadyCheckUnknownDungeonName = message("dungeonReadyCheckUnknownDungeonName", "this dungeon");
+        dungeonReadyCheckLevelFormat = message("dungeonReadyCheckLevelFormat", "$dungeon - level $level");
 
-        sidebarTitle = message("sidebarTitle", "&6&lElite Party");
-        migrateDefault("sidebarLeaderLine", "&6♛ &f$player", "&6♛ &f$player$health$lives");
-        migrateDefault("sidebarMemberLine", "&a● &f$player", "&a● &f$player$health$lives");
-        sidebarLeaderLine = message("sidebarLeaderLine", "&6♛ &f$player$health$lives");
+        sidebarTitle = message("sidebarTitle", "<g:#A04468:#E07A9A>♥ Elite Party</g>");
+        sidebarLeaderLine = message("sidebarLeaderLine", "&6★ &f$player$health$lives");
         sidebarMemberLine = message("sidebarMemberLine", "&a● &f$player$health$lives");
         sidebarQuestLine = message("sidebarQuestLine", "&bQuest: &f$quest");
         sidebarHealthGlyph = message("sidebarHealthGlyph", "❤");
@@ -239,9 +325,100 @@ public class PartyConfig extends ConfigurationFile {
         sidebarHealthCriticalColor = message("sidebarHealthCriticalColor", "&c");
         sidebarHealthMissingColor = message("sidebarHealthMissingColor", "&8");
         sidebarDownedDisplay = message("sidebarDownedDisplay", " &c☠");
-        sidebarLivesDisplay = message("sidebarLivesDisplay", " &b✦&f$lives");
-        sidebarInviteAction = message("sidebarInviteAction", "&a➕ &f/em party invite <player>");
-        sidebarLeaveAction = message("sidebarLeaveAction", "&c✖ &f/em party leave");
+        sidebarLivesDisplay = message("sidebarLivesDisplay", " &b◆&f$lives");
+        sidebarInviteAction = message("sidebarInviteAction", "&b✉ &f/em party invite <player>");
+        sidebarLeaveAction = message("sidebarLeaveAction", "&c✘ &f/em party leave");
+        playerInteractionHintMessage = message("playerInteractionHintMessage",
+                "$prefixWant to team up with &f$player&7? ");
+        playerInteractionHintInviteButton = message("playerInteractionHintInviteButton",
+                "<g:#2E7D4F:#69C56F>[INVITE]</g>");
+        playerInteractionHintInviteHover = message("playerInteractionHintInviteHover",
+                "&7Invite &f$player &7to your party");
+        playerInteractionHintDisableButton = message("playerInteractionHintDisableButton", "&8[Don't show again]");
+        playerInteractionHintDisableHover = message("playerInteractionHintDisableHover",
+                "&7Permanently hide right-click party hints");
+        playerInteractionHintDisabledMessage = message("playerInteractionHintDisabledMessage",
+                "$prefixRight-click party hints have been disabled for you.");
+        inventoryControlsTitle = message("inventoryControlsTitle", "<g:#A04468:#E07A9A>♥ Elite Party</g>");
+        inventoryInvitePlayersTitle = message("inventoryInvitePlayersTitle", "<g:#A04468:#E07A9A>✉ Invite a Player</g>");
+        inventoryInteractionTitle = message("inventoryInteractionTitle", "<g:#A04468:#E07A9A>♥ Party with</g> &f$player");
+        inventoryInvitationTitle = message("inventoryInvitationTitle", "<g:#A04468:#E07A9A>✉ Party Invitation</g>");
+        inventoryReadyCheckTitle = message("inventoryReadyCheckTitle", "<g:#6D3AA8:#A855F7>★ Dungeon Ready Check</g>");
+        inventoryInviteName = message("inventoryInviteName", "<g:#267A78:#58B8A9>✉ Invite a Player</g>");
+        inventoryInviteLore = message("inventoryInviteLore", "&7Choose an online player to invite.");
+        inventoryLeaveName = message("inventoryLeaveName", "<g:#7A1F2B:#C2414A>✘ Leave Party</g>");
+        inventoryLeaveLore = message("inventoryLeaveLore", "&7Leave your current party.");
+        inventoryCreateName = message("inventoryCreateName", "<g:#2E7D4F:#69C56F>+ Create a Party</g>");
+        inventoryCreateLore = message("inventoryCreateLore", "&7Create a party for up to five players.");
+        inventoryBackName = message("inventoryBackName", "&eBack to /em");
+        inventoryBackToPartyName = message("inventoryBackToPartyName", "&eBack to Party Controls");
+        inventoryPreviousName = message("inventoryPreviousName", "&ePrevious Page");
+        inventoryNextName = message("inventoryNextName", "&eNext Page");
+        inventoryInvitePlayerName = message("inventoryInvitePlayerName", "<g:#267A78:#58B8A9>✉ Invite</g> &f$player");
+        inventorySelectInviteLore = message("inventorySelectInviteLore", "&7Click to invite.");
+        inventoryNoInvitePlayersName = message("inventoryNoInvitePlayersName", "&7No Players Available");
+        inventoryNoInvitePlayersLore = message("inventoryNoInvitePlayersLore", "&8Nobody online can currently be invited.");
+        inventoryInteractionInviteName = message("inventoryInteractionInviteName", "<g:#267A78:#58B8A9>✉ Invite</g> &f$player");
+        inventoryInteractionInviteLore = message("inventoryInteractionInviteLore", "&7Invite this player to your party.");
+        inventoryNeverShowName = message("inventoryNeverShowName", "&8Never Show This Again");
+        inventoryNeverShowLore = message("inventoryNeverShowLore", "&7Permanently hide right-click party hints.");
+        inventoryAcceptInviteName = message("inventoryAcceptInviteName", "<g:#2E7D4F:#69C56F>Accept Invite</g> &f— $player");
+        inventoryAcceptInviteLore = message("inventoryAcceptInviteLore", "&7Join their EliteMobs party.");
+        inventoryDeclineName = message("inventoryDeclineName", "<g:#7A1F2B:#C2414A>Decline</g>");
+        inventoryDeclineLore = message("inventoryDeclineLore", "&7Ignore this invitation.");
+        inventoryReadyDungeonName = message("inventoryReadyDungeonName", "<g:#6D3AA8:#A855F7>★ Dungeon</g> &f$dungeon");
+        inventoryReadyWaitingLore = message("inventoryReadyWaitingLore", "&7Waiting for your party.");
+        inventoryReadyConfirmLore = message("inventoryReadyConfirmLore", "&7Confirm that you are ready to enter.");
+        inventoryReadyName = message("inventoryReadyName", "<g:#2E7D4F:#69C56F>Ready</g>");
+        inventoryReadyLore = message("inventoryReadyLore", "&7Enter when everyone is ready.");
+        inventoryCancelReadyName = message("inventoryCancelReadyName", "<g:#7A1F2B:#C2414A>Cancel Ready Check</g>");
+        inventoryCancelReadyLore = message("inventoryCancelReadyLore", "&7Cancel this party dungeon entry.");
+        inventoryNoPermissionMessage = message("inventoryNoPermissionMessage",
+                "&cYou do not have permission to use EliteMobs parties.");
+        commandCreateDescription = message("commandCreateDescription", "Creates a session-scoped EliteMobs party.");
+        commandInviteDescription = message("commandInviteDescription", "Invites an online player to your EliteMobs party.");
+        commandMenuDescription = message("commandMenuDescription", "Opens compatible EliteMobs party controls.");
+        commandAcceptDescription = message("commandAcceptDescription", "Accepts your pending EliteMobs party invitation.");
+        commandLeaveDescription = message("commandLeaveDescription", "Leaves your current EliteMobs party.");
+        commandReadyDescription = message("commandReadyDescription", "Accepts an active party dungeon ready check.");
+        commandDeclineDescription = message("commandDeclineDescription", "Declines an active party dungeon ready check.");
+        commandHideInteractionHintDescription = message("commandHideInteractionHintDescription",
+                "Permanently hides right-click party invitation hints.");
+        readyCheckTokenHint = message("readyCheckTokenHint", "ready check token");
+    }
+
+    /** Updates only unreleased stock visuals, preserving every customized or translated value. */
+    private void migrateWipVisualDefaults() {
+        migrateDefault("prefix", "&8[&6Party&8] &7", "&8[<g:#A04468:#E07A9A>Party</g>&8] &7");
+        migrateDefault("inviteAcceptButton", "&a&l[ACCEPT]", "<g:#2E7D4F:#69C56F>[ACCEPT]</g>");
+        migrateDefault("dungeonReadyCheckReadyButton", "&a&l[READY]", "<g:#2E7D4F:#69C56F>[READY]</g>");
+        migrateDefault("dungeonReadyCheckDeclineButton", " &c&l[DECLINE]", " <g:#7A1F2B:#C2414A>[DECLINE]</g>");
+        migrateDefault("dungeonReadyCheckCancelButton", "&c&l[CANCEL]", "<g:#7A1F2B:#C2414A>[CANCEL]</g>");
+        migrateDefault("playerInteractionHintInviteButton", "&a&l[INVITE]",
+                "<g:#2E7D4F:#69C56F>[INVITE]</g>");
+        migrateDefault("sidebarTitle", "&6&lElite Party", "<g:#A04468:#E07A9A>♥ Elite Party</g>");
+        migrateDefault("sidebarLeaderLine", "&6♛ &f$player$health$lives",
+                "&6★ &f$player$health$lives");
+        migrateDefault("sidebarLivesDisplay", " &b✦&f$lives", " &b◆&f$lives");
+        migrateDefault("sidebarInviteAction", "&a➕ &f/em party invite <player>",
+                "&b✉ &f/em party invite <player>");
+        migrateDefault("sidebarLeaveAction", "&c✖ &f/em party leave",
+                "&c✘ &f/em party leave");
+        migrateDefault("inventoryControlsTitle", "&6Elite Party", "<g:#A04468:#E07A9A>♥ Elite Party</g>");
+        migrateDefault("inventoryInvitePlayersTitle", "&6Invite a Player", "<g:#A04468:#E07A9A>✉ Invite a Player</g>");
+        migrateDefault("inventoryInteractionTitle", "&6Party with $player", "<g:#A04468:#E07A9A>♥ Party with</g> &f$player");
+        migrateDefault("inventoryInvitationTitle", "&6Party Invitation", "<g:#A04468:#E07A9A>✉ Party Invitation</g>");
+        migrateDefault("inventoryReadyCheckTitle", "&6Dungeon Ready Check", "<g:#6D3AA8:#A855F7>★ Dungeon Ready Check</g>");
+        migrateDefault("inventoryInviteName", "&aInvite a Player", "<g:#267A78:#58B8A9>✉ Invite a Player</g>");
+        migrateDefault("inventoryLeaveName", "&cLeave Party", "<g:#7A1F2B:#C2414A>✘ Leave Party</g>");
+        migrateDefault("inventoryCreateName", "&aCreate a Party", "<g:#2E7D4F:#69C56F>+ Create a Party</g>");
+        migrateDefault("inventoryInvitePlayerName", "&a$player", "<g:#267A78:#58B8A9>✉ Invite</g> &f$player");
+        migrateDefault("inventoryInteractionInviteName", "&aInvite $player", "<g:#267A78:#58B8A9>✉ Invite</g> &f$player");
+        migrateDefault("inventoryAcceptInviteName", "&aAccept $player's Invite", "<g:#2E7D4F:#69C56F>Accept Invite</g> &f— $player");
+        migrateDefault("inventoryDeclineName", "&cDecline", "<g:#7A1F2B:#C2414A>Decline</g>");
+        migrateDefault("inventoryReadyDungeonName", "&e$dungeon", "<g:#6D3AA8:#A855F7>★ Dungeon</g> &f$dungeon");
+        migrateDefault("inventoryReadyName", "&aReady", "<g:#2E7D4F:#69C56F>Ready</g>");
+        migrateDefault("inventoryCancelReadyName", "&cCancel Ready Check", "<g:#7A1F2B:#C2414A>Cancel Ready Check</g>");
     }
 
     private String message(String key, String defaultValue) {

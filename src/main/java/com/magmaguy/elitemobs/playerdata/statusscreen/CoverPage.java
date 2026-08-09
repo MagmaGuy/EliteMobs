@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.playerdata.statusscreen;
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
+import com.magmaguy.elitemobs.config.PartyConfig;
+import com.magmaguy.elitemobs.parties.PartyInventoryMenu;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -13,22 +15,27 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class CoverPage {
-    protected static TextComponent coverPage(int statsPage, int gearPage, int teleportsPage, int commandsPage, int questsPage, int bossTrackingPage, int skillsPage) {
+    protected static TextComponent coverPage(Player requestingPlayer, int statsPage, int gearPage, int teleportsPage,
+                                             int commandsPage, int questsPage, int bossTrackingPage, int skillsPage) {
 
         TextComponent textComponent = new TextComponent();
 
-        for (int i = 0; i < 13; i++) {
-            if (PlayerStatusMenuConfig.getIndexTextLines()[i] == null) continue;
+        for (int i = 0; i < PlayerStatusMenuConfig.getIndexTextLines().length; i++) {
+            String configuredText = PlayerStatusMenuConfig.getIndexTextLines()[i];
+            String configuredCommand = PlayerStatusMenuConfig.getIndexCommandLines()[i];
+            if (configuredText == null || configuredText.isBlank()) continue;
+            if (configuredCommand == null) configuredCommand = "";
+            if (unavailablePageTarget(configuredText + configuredCommand, statsPage, gearPage, teleportsPage,
+                    commandsPage, questsPage, bossTrackingPage, skillsPage)) continue;
+            if (configuredCommand.equalsIgnoreCase("/em party menu")
+                    && (!PartyConfig.isEnabled() || !requestingPlayer.hasPermission("elitemobs.party"))) continue;
             TextComponent line = new TextComponent(
-                    PlayerStatusMenuConfig.getIndexTextLines()[i]
+                    configuredText
                             .replace("$statsPage", statsPage + "")
                             .replace("$gearPage", gearPage + "")
                             .replace("$teleportsPage", teleportsPage + "")
@@ -43,23 +50,23 @@ public class CoverPage {
             if (!PlayerStatusMenuConfig.getIndexHoverLines()[i].isEmpty())
                 PlayerStatusScreen.setHoverText(line, PlayerStatusMenuConfig.getIndexHoverLines()[i]);
 
-            if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$statsPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$statsPage", statsPage + "")));
-            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$gearPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$gearPage", gearPage + "")));
-            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$teleportsPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$teleportsPage", teleportsPage + "")));
-            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$commandsPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$commandsPage", commandsPage + "")));
-            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$questsPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$questsPage", questsPage + "")));
-            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$bossTrackingPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$bossTrackingPage", bossTrackingPage + "")));
-            else if (PlayerStatusMenuConfig.getIndexCommandLines()[i].contains("$skillsPage"))
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, PlayerStatusMenuConfig.getIndexCommandLines()[i].replace("$skillsPage", skillsPage + "")));
+            if (configuredCommand.contains("$statsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, configuredCommand.replace("$statsPage", statsPage + "")));
+            else if (configuredCommand.contains("$gearPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, configuredCommand.replace("$gearPage", gearPage + "")));
+            else if (configuredCommand.contains("$teleportsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, configuredCommand.replace("$teleportsPage", teleportsPage + "")));
+            else if (configuredCommand.contains("$commandsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, configuredCommand.replace("$commandsPage", commandsPage + "")));
+            else if (configuredCommand.contains("$questsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, configuredCommand.replace("$questsPage", questsPage + "")));
+            else if (configuredCommand.contains("$bossTrackingPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, configuredCommand.replace("$bossTrackingPage", bossTrackingPage + "")));
+            else if (configuredCommand.contains("$skillsPage"))
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, configuredCommand.replace("$skillsPage", skillsPage + "")));
 
-            else
-                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PlayerStatusMenuConfig.getIndexCommandLines()[i]));
+            else if (!configuredCommand.isBlank())
+                line.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, configuredCommand));
 
             textComponent.addExtra(line);
         }
@@ -68,9 +75,21 @@ public class CoverPage {
 
     }
 
-    protected static void coverPage(Player requestingPlayer) {
+    private static boolean unavailablePageTarget(String command, int statsPage, int gearPage, int teleportsPage,
+                                                 int commandsPage, int questsPage, int bossTrackingPage, int skillsPage) {
+        return command.contains("$statsPage") && statsPage <= 0 ||
+                command.contains("$gearPage") && gearPage <= 0 ||
+                command.contains("$teleportsPage") && teleportsPage <= 0 ||
+                command.contains("$commandsPage") && commandsPage <= 0 ||
+                command.contains("$questsPage") && questsPage <= 0 ||
+                command.contains("$bossTrackingPage") && bossTrackingPage <= 0 ||
+                command.contains("$skillsPage") && skillsPage <= 0;
+    }
+
+    public static void coverPage(Player requestingPlayer) {
         Inventory inventory = Bukkit.createInventory(requestingPlayer, 27, PlayerStatusMenuConfig.getIndexChestMenuName());
-        inventory.setItem(PlayerStatusMenuConfig.getIndexHeaderSlot(), PlayerStatusMenuConfig.getIndexHeaderItem());
+        inventory.setItem(PlayerStatusMenuConfig.getIndexHeaderSlot(),
+                PlayerStatusOverview.decorateHeader(PlayerStatusMenuConfig.getIndexHeaderItem(), requestingPlayer));
 
         if (PlayerStatusMenuConfig.isDoStatsPage())
             inventory.setItem(PlayerStatusMenuConfig.getIndexStatsSlot(), PlayerStatusMenuConfig.getIndexStatsItem());
@@ -84,30 +103,15 @@ public class CoverPage {
             inventory.setItem(PlayerStatusMenuConfig.getIndexQuestTrackingSlot(), PlayerStatusMenuConfig.getIndexQuestTrackingItem());
         if (PlayerStatusMenuConfig.isDoBossTrackingPage())
             inventory.setItem(PlayerStatusMenuConfig.getIndexBossTrackingSlot(), PlayerStatusMenuConfig.getIndexBossTrackingItem());
+        if (PartyConfig.isEnabled() && requestingPlayer.hasPermission("elitemobs.party"))
+            inventory.setItem(PlayerStatusMenuConfig.getIndexPartySlot(), PlayerStatusMenuConfig.getIndexPartyItem());
 
-        // Add Skills page button (slot 22)
-        if (SkillsConfig.isSkillSystemEnabled()) {
-            inventory.setItem(22, createSkillsItem());
-        }
+        if (SkillsConfig.isSkillSystemEnabled())
+            inventory.setItem(PlayerStatusMenuConfig.getIndexSkillsSlot(), PlayerStatusMenuConfig.getIndexSkillsItem());
 
+        if (requestingPlayer.openInventory(inventory) == null) return;
+        StatusInventorySafety.protect(inventory);
         CoverPageEvents.pageInventories.add(inventory);
-        requestingPlayer.openInventory(inventory);
-    }
-
-    private static final int SKILLS_SLOT = 22;
-
-    private static ItemStack createSkillsItem() {
-        ItemStack item = new ItemStack(Material.EXPERIENCE_BOTTLE);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(PlayerStatusMenuConfig.getSkillsItemDisplayName());
-        meta.setLore(List.of(
-                PlayerStatusMenuConfig.getSkillsItemLore1(),
-                PlayerStatusMenuConfig.getSkillsItemLore2(),
-                "",
-                PlayerStatusMenuConfig.getSkillsItemClickLore()
-        ));
-        item.setItemMeta(meta);
-        return item;
     }
 
     public static class CoverPageEvents implements Listener {
@@ -122,6 +126,7 @@ public class CoverPage {
             Player player = ((Player) event.getWhoClicked()).getPlayer();
             if (!pageInventories.contains(event.getInventory())) return;
             event.setCancelled(true);
+            if (event.getClickedInventory() != event.getView().getTopInventory()) return;
 
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexHeaderSlot()) {
                 player.closeInventory();
@@ -165,8 +170,16 @@ public class CoverPage {
                 return;
             }
 
+            if (event.getSlot() == PlayerStatusMenuConfig.getIndexPartySlot()
+                    && PartyConfig.isEnabled()
+                    && player.hasPermission("elitemobs.party")) {
+                player.closeInventory();
+                PartyInventoryMenu.open(player);
+                return;
+            }
+
             // Skills page
-            if (event.getSlot() == SKILLS_SLOT && SkillsConfig.isSkillSystemEnabled()) {
+            if (event.getSlot() == PlayerStatusMenuConfig.getIndexSkillsSlot() && SkillsConfig.isSkillSystemEnabled()) {
                 player.closeInventory();
                 SkillsPage.skillsPage(player, player);
             }

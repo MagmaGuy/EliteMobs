@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 /**
  * Owns all session-only party state. Nothing in this manager is serialized; quitting immediately removes a member.
@@ -44,6 +46,8 @@ public final class PartyManager implements Listener {
                 .filter(java.util.Objects::nonNull)
                 .toList();
         PartyDungeonReadyCheckManager.shutdown();
+        PartyInteractionHint.shutdown();
+        PartyInventoryMenu.shutdown();
         parties.clear();
         partyByPlayer.clear();
         pendingInvites.clear();
@@ -62,6 +66,24 @@ public final class PartyManager implements Listener {
 
     public static boolean isInParty(UUID playerId) {
         return getParty(playerId) != null;
+    }
+
+    /** Returns the currently online players this owner can meaningfully invite. */
+    public static List<Player> getInvitablePlayers(Player owner) {
+        Party ownerParty = getParty(owner.getUniqueId());
+        if (ownerParty != null && ownerParty.isFull()) return List.of();
+
+        List<Player> targets = new ArrayList<>();
+        for (Player candidate : Bukkit.getOnlinePlayers()) {
+            if (candidate.equals(owner)
+                    || candidate.hasMetadata("NPC")
+                    || !candidate.hasPermission("elitemobs.party")
+                    || isInParty(candidate.getUniqueId())
+                    || hasActivePendingInvite(candidate.getUniqueId())) continue;
+            targets.add(candidate);
+        }
+        targets.sort(Comparator.comparing(Player::getName, String.CASE_INSENSITIVE_ORDER));
+        return List.copyOf(targets);
     }
 
     /**
@@ -93,6 +115,7 @@ public final class PartyManager implements Listener {
 
     public static void create(Player creator) {
         if (!requireEnabled(creator)) return;
+        invalidatePendingInvite(creator.getUniqueId());
         if (isInParty(creator.getUniqueId())) {
             send(creator, PartyConfig.getAlreadyInPartyMessage());
             return;
@@ -106,16 +129,6 @@ public final class PartyManager implements Listener {
 
     public static void invite(Player inviter, String targetName) {
         if (!requireEnabled(inviter)) return;
-        Party party = getParty(inviter.getUniqueId());
-        if (party == null) {
-            send(inviter, PartyConfig.getNotInPartyMessage());
-            return;
-        }
-        if (party.isFull()) {
-            send(inviter, PartyConfig.getPartyFullMessage());
-            return;
-        }
-
         Player target = Bukkit.getPlayerExact(targetName);
         if (target == null || !target.isOnline()) {
             send(inviter, PartyConfig.getPlayerUnavailableMessage());
@@ -127,6 +140,25 @@ public final class PartyManager implements Listener {
         }
         if (isInParty(target.getUniqueId())) {
             send(inviter, PartyConfig.getPlayerAlreadyInPartyMessage());
+            return;
+        }
+        if (!target.hasPermission("elitemobs.party")) {
+            send(inviter, PartyConfig.getPlayerCannotUsePartiesMessage().replace("$player", target.getName()));
+            return;
+        }
+        if (hasActivePendingInvite(target.getUniqueId())) {
+            send(inviter, PartyConfig.getInviteAlreadyPendingMessage().replace("$player", target.getName()));
+            return;
+        }
+
+        Party party = getParty(inviter.getUniqueId());
+        if (party == null) {
+            create(inviter);
+            party = getParty(inviter.getUniqueId());
+            if (party == null) return;
+        }
+        if (party.isFull()) {
+            send(inviter, PartyConfig.getPartyFullMessage());
             return;
         }
 
@@ -142,17 +174,41 @@ public final class PartyManager implements Listener {
                         format(PartyConfig.getInviteAcceptButton()),
                         format(PartyConfig.getInviteAcceptHover()),
                         "/em party accept"));
+        if (PartyInventoryMenu.usesInventoryFallback(target))
+            PartyInventoryMenu.openInvitePrompt(target, inviter);
+    }
+
+    static void ignoreInvite(Player player) {
+        invalidatePendingInvite(player.getUniqueId());
+    }
+
+    static boolean openPendingInviteInventory(Player player) {
+        PendingInvite invite = pendingInvites.get(player.getUniqueId());
+        if (!isPendingInviteValid(player.getUniqueId(), invite)) {
+            invalidatePendingInvite(player.getUniqueId());
+            return false;
+        }
+        Player inviter = Bukkit.getPlayer(invite.inviterId());
+        PartyInventoryMenu.openInvitePrompt(player, inviter);
+        return true;
+    }
+
+    static boolean hasActivePendingInvite(UUID playerId) {
+        PendingInvite invite = pendingInvites.get(playerId);
+        if (isPendingInviteValid(playerId, invite)) return true;
+        if (invite != null) invalidatePendingInvite(playerId);
+        return false;
     }
 
     public static void accept(Player player) {
         if (!requireEnabled(player)) return;
         if (isInParty(player.getUniqueId())) {
-            pendingInvites.remove(player.getUniqueId());
+            invalidatePendingInvite(player.getUniqueId());
             send(player, PartyConfig.getAlreadyInPartyMessage());
             return;
         }
 
-        PendingInvite invite = pendingInvites.remove(player.getUniqueId());
+        PendingInvite invite = invalidatePendingInvite(player.getUniqueId());
         if (invite == null) {
             send(player, PartyConfig.getNoPendingInviteMessage());
             return;
@@ -170,9 +226,12 @@ public final class PartyManager implements Listener {
             return;
         }
         if (!party.addMember(player.getUniqueId())) {
+            if (party.isFull()) invalidatePendingInvites(inviteEntry -> inviteEntry.partyId().equals(party.getId()));
             send(player, PartyConfig.getPartyFullMessage());
             return;
         }
+
+        if (party.isFull()) invalidatePendingInvites(inviteEntry -> inviteEntry.partyId().equals(party.getId()));
 
         PartyDungeonReadyCheckManager.cancelForRosterChange(party);
         partyByPlayer.put(player.getUniqueId(), party.getId());
@@ -238,6 +297,8 @@ public final class PartyManager implements Listener {
     }
 
     private static void leave(UUID playerId, boolean notifyPlayer) {
+        invalidatePendingInvite(playerId);
+        invalidatePendingInvites(invite -> invite.inviterId().equals(playerId));
         Party party = getParty(playerId);
         if (party == null) {
             if (notifyPlayer) {
@@ -253,8 +314,6 @@ public final class PartyManager implements Listener {
         SharedLootTable.onPartyMemberLeave(party.getId(), playerId);
         party.removeMember(playerId);
         partyByPlayer.remove(playerId);
-        pendingInvites.remove(playerId);
-        pendingInvites.entrySet().removeIf(entry -> entry.getValue().inviterId().equals(playerId));
         Player leavingPlayer = Bukkit.getPlayer(playerId);
         if (leavingPlayer != null) {
             if (notifyPlayer) send(leavingPlayer, PartyConfig.getLeftPartyMessage());
@@ -263,7 +322,7 @@ public final class PartyManager implements Listener {
 
         if (party.isEmpty()) {
             parties.remove(party.getId());
-            pendingInvites.entrySet().removeIf(entry -> entry.getValue().partyId().equals(party.getId()));
+            invalidatePendingInvites(invite -> invite.partyId().equals(party.getId()));
             return;
         }
 
@@ -309,12 +368,37 @@ public final class PartyManager implements Listener {
 
     private static String playerName(UUID playerId) {
         String name = Bukkit.getOfflinePlayer(playerId).getName();
-        return name == null ? "Unknown" : name;
+        return name == null ? PartyConfig.getUnknownPlayerName() : name;
     }
 
     static void cleanupExpiredInvites() {
         long now = System.nanoTime();
-        pendingInvites.entrySet().removeIf(entry -> entry.getValue().expiresAtNanos() <= now);
+        invalidatePendingInvites(invite -> invite.expiresAtNanos() <= now);
+    }
+
+    private static boolean isPendingInviteValid(UUID invitedPlayerId, PendingInvite invite) {
+        if (invite == null || invite.expiresAtNanos() <= System.nanoTime() || isInParty(invitedPlayerId))
+            return false;
+        Party invitedParty = parties.get(invite.partyId());
+        if (invitedParty == null || invitedParty.isFull()) return false;
+        Player inviter = Bukkit.getPlayer(invite.inviterId());
+        Party inviterParty = getParty(invite.inviterId());
+        return inviter != null && inviter.isOnline()
+                && inviterParty != null && inviterParty.getId().equals(invitedParty.getId());
+    }
+
+    private static PendingInvite invalidatePendingInvite(UUID invitedPlayerId) {
+        PendingInvite removed = pendingInvites.remove(invitedPlayerId);
+        PartyInventoryMenu.closeInvitePrompt(invitedPlayerId);
+        return removed;
+    }
+
+    private static void invalidatePendingInvites(Predicate<PendingInvite> predicate) {
+        List<UUID> invitedPlayerIds = pendingInvites.entrySet().stream()
+                .filter(entry -> predicate.test(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .toList();
+        invitedPlayerIds.forEach(PartyManager::invalidatePendingInvite);
     }
 
     @EventHandler

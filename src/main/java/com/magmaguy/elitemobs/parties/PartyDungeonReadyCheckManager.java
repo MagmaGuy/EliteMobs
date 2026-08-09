@@ -88,7 +88,9 @@ public final class PartyDungeonReadyCheckManager {
                         SpigotMessage.commandHoverMessage(
                                 PartyManager.format(PartyConfig.getDungeonReadyCheckCancelButton()),
                                 PartyManager.format(PartyConfig.getDungeonReadyCheckDeclineHover()),
-                                "/em party decline " + token));
+                        "/em party decline " + token));
+                if (PartyInventoryMenu.usesInventoryFallback(member))
+                    PartyInventoryMenu.openReadyCheck(member, token, check.dungeonDescription, true, true);
                 continue;
             }
             member.spigot().sendMessage(
@@ -102,6 +104,8 @@ public final class PartyDungeonReadyCheckManager {
                             PartyManager.format(PartyConfig.getDungeonReadyCheckDeclineButton()),
                             PartyManager.format(PartyConfig.getDungeonReadyCheckDeclineHover()),
                             "/em party decline " + token));
+            if (PartyInventoryMenu.usesInventoryFallback(member))
+                PartyInventoryMenu.openReadyCheck(member, token, check.dungeonDescription, false, false);
         }
         return true;
     }
@@ -129,6 +133,18 @@ public final class PartyDungeonReadyCheckManager {
         broadcast(check, PartyConfig.getDungeonReadyCheckDeclinedMessage()
                 .replace("$player", player.getName())
                 .replace("$dungeon", check.dungeonDescription));
+    }
+
+    static boolean openPendingInventory(Player player) {
+        Party party = PartyManager.getParty(player.getUniqueId());
+        ReadyCheck check = party == null ? null : checksByParty.get(party.getId());
+        if (check == null || check.state != ReadyState.WAITING
+                || !check.memberIdSet.contains(player.getUniqueId())
+                || check.expiresAtNanos <= System.nanoTime()) return false;
+        PartyInventoryMenu.openReadyCheck(player, check.token, check.dungeonDescription,
+                check.initiatorId.equals(player.getUniqueId()),
+                check.readyPlayerIds.contains(player.getUniqueId()));
+        return true;
     }
 
     /** Cancels pending consent, or invalidates an in-flight launch while retaining its reservation. */
@@ -189,6 +205,7 @@ public final class PartyDungeonReadyCheckManager {
 
         cancelExpiration(check);
         check.state = ReadyState.LAUNCHING;
+        PartyInventoryMenu.closeReadyCheck(check.token);
         broadcast(check, PartyConfig.getDungeonReadyCheckCompleteMessage()
                 .replace("$dungeon", check.dungeonDescription));
         LaunchReservation reservation = new LaunchReservation() {
@@ -224,6 +241,7 @@ public final class PartyDungeonReadyCheckManager {
         check.authorized.set(false);
         checksByParty.remove(check.partyId, check);
         cancelExpiration(check);
+        PartyInventoryMenu.closeReadyCheck(check.token);
     }
 
     private static void cancelExpiration(ReadyCheck check) {
@@ -249,7 +267,9 @@ public final class PartyDungeonReadyCheckManager {
     }
 
     private static String safeDescription(String description) {
-        return description == null || description.isBlank() ? "this dungeon" : description;
+        return description == null || description.isBlank()
+                ? PartyConfig.getDungeonReadyCheckUnknownDungeonName()
+                : description;
     }
 
     @FunctionalInterface

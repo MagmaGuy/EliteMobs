@@ -105,8 +105,14 @@ public class ConfigurationEngine extends com.magmaguy.magmacore.config.Configura
             Logger.warn("Item lore " + fileConfiguration.getString(key + ".lore") + " is not valid! Correct it to make a valid item.");
         }
         ItemStack fileItemStack = ItemStackGenerator.generateItemStack(material, name, lore);
-        if (material == Material.PLAYER_HEAD)
-            ((SkullMeta) itemStack.getItemMeta()).setOwningPlayer(Bukkit.getOfflinePlayer(fileConfiguration.getString(key + ".owner")));
+        if (material == Material.PLAYER_HEAD) {
+            String owner = fileConfiguration.getString(key + ".owner");
+            if (owner != null && !owner.isBlank()) {
+                SkullMeta skullMeta = (SkullMeta) fileItemStack.getItemMeta();
+                skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(owner));
+                fileItemStack.setItemMeta(skullMeta);
+            }
+        }
         return fileItemStack;
     }
 

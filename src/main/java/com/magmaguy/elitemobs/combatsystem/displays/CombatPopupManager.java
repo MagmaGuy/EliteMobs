@@ -139,7 +139,8 @@ final class CombatPopupManager {
     static void createImmunePopup(Location location, Player viewer) {
         if (location == null || location.getWorld() == null || viewer == null || !viewer.isOnline()) return;
         FakeText display = VisualDisplay.createStyledFakeText(
-                location, "&9&lINVULNERABLE", Color.fromARGB(120, 0, 30, 80), true, 1.0f);
+                location, MobCombatSettingsConfig.getInvulnerablePopupText(),
+                Color.fromARGB(120, 0, 30, 80), true, 1.0f);
         if (display == null) return;
 
         display.displayTo(viewer);
