@@ -14,8 +14,6 @@ import java.util.ArrayList;
 
 public class KillHandler {
 
-    //TODO: FIX NPE ISSUE YOU FUCKING MORON
-
     public static void killAggressiveMobs(CommandSender commandSender) {
         int counter = 0;
         for (EliteEntity eliteEntity : new ArrayList<>(EntityTracker.getEliteMobEntities().values())) {
@@ -28,8 +26,8 @@ public class KillHandler {
     public static void killEntityType(CommandSender commandSender, EntityType entityType) {
         if (EliteMobProperties.getValidMobTypes().contains(entityType)) {
             int counter = 0;
-            for (EliteEntity eliteEntity : EntityTracker.getEliteMobEntities().values()) {
-                if (!eliteEntity.getLivingEntity().getType().equals(entityType)) continue;
+            for (EliteEntity eliteEntity : new ArrayList<>(EntityTracker.getEliteMobEntities().values())) {
+                if (eliteEntity.getLivingEntity() == null || !eliteEntity.getLivingEntity().getType().equals(entityType)) continue;
                 eliteEntity.remove(RemovalReason.OTHER);
                 counter++;
             }
@@ -56,7 +54,7 @@ public class KillHandler {
             if (!entity.getType().equals(entityType)) continue;
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(entity);
             if (eliteEntity != null) {
-                ((EliteEntity) entity).remove(RemovalReason.OTHER);
+                eliteEntity.remove(RemovalReason.OTHER);
                 counter++;
             }
         }

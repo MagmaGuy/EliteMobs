@@ -32,6 +32,8 @@ public class SpawnCommand {
         EliteEntity eliteEntity = new EliteEntity();
         eliteEntity.setLevel(level);
         eliteEntity.setNaturalEntity(true);
+        //The living entity has to exist before powers are applied, the power stance rings spawn item entities in its world
+        eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
 
         if (powers.isPresent()) {
             String[] powersArray = powers.get().split(" ");
@@ -40,7 +42,6 @@ public class SpawnCommand {
         } else {
             eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));
         }
-        eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
     }
 
     public static void spawnEliteEntityTypeCommand(CommandSender commandSender,
