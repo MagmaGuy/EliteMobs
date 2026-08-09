@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.testing;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.combatsystem.ArmorDefenseCalculator;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.combatsystem.DamageBreakdown;
@@ -9,7 +8,6 @@ import com.magmaguy.elitemobs.combatsystem.LevelScaling;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
@@ -25,11 +23,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +74,8 @@ public class CombatSimulator {
 
     @Getter
     private final Player player;
+    private final CombatTestEquipment equipment;
+    private final CombatBreakdownDiagnostics breakdownDiagnostics;
 
     // All active dummies by skill ID
     private final Map<String, CustomBossEntity> dummies = new HashMap<>();
@@ -108,6 +107,8 @@ public class CombatSimulator {
 
     public CombatSimulator(Player player) {
         this.player = player;
+        this.equipment = new CombatTestEquipment(player);
+        this.breakdownDiagnostics = new CombatBreakdownDiagnostics(this, player);
     }
 
     /**
@@ -148,7 +149,7 @@ public class CombatSimulator {
             currentDummyEntity = null;
         }
     }
-    private Material savedBlockMaterial = null;
+    private BlockData savedBlockData = null;
 
     /**
      * Updates a dummy's name to show it's currently being tested.
@@ -315,27 +316,7 @@ public class CombatSimulator {
      * Equips the player with a weapon appropriate for the skill type.
      */
     public void equipWeapon(SkillType skillType) {
-        ItemStack weapon = switch (skillType) {
-            case SWORDS -> new ItemStack(Material.NETHERITE_SWORD);
-            case AXES -> new ItemStack(Material.NETHERITE_AXE);
-            case BOWS -> new ItemStack(Material.BOW);
-            case CROSSBOWS -> new ItemStack(Material.CROSSBOW);
-            case TRIDENTS -> new ItemStack(Material.TRIDENT);
-            case HOES -> new ItemStack(Material.NETHERITE_HOE);
-            case MACES -> new ItemStack(Material.MACE);
-            case SPEARS -> {
-                try {
-                    yield new ItemStack(Material.IRON_SPEAR);
-                } catch (NoSuchFieldError e) {
-                    yield new ItemStack(Material.TRIDENT); // Fallback for pre-1.21.11
-                }
-            }
-            case ARMOR -> null;
-        };
-
-        if (weapon != null) {
-            player.getInventory().setItemInMainHand(weapon);
-        }
+        equipment.equipWeapon(skillType);
     }
 
     /**
@@ -401,61 +382,21 @@ public class CombatSimulator {
      * @param level The elite level for the armor
      */
     public void equipArmorSet(int level) {
-        ItemStack helmet = createEliteArmor(Material.IRON_HELMET, level);
-        ItemStack chestplate = createEliteArmor(Material.IRON_CHESTPLATE, level);
-        ItemStack leggings = createEliteArmor(Material.IRON_LEGGINGS, level);
-        ItemStack boots = createEliteArmor(Material.IRON_BOOTS, level);
-
-        player.getInventory().setHelmet(helmet);
-        player.getInventory().setChestplate(chestplate);
-        player.getInventory().setLeggings(leggings);
-        player.getInventory().setBoots(boots);
+        equipment.equipArmorSet(level);
     }
-
-    /**
-     * Creates an elite armor piece at the specified level.
-     */
-    private ItemStack createEliteArmor(Material material, int level) {
-        ItemStack armor = new ItemStack(material);
-
-        // Add durability enchantment
-        ItemMeta meta = armor.getItemMeta();
-        meta.addEnchant(Enchantment.UNBREAKING, 5, true);
-        armor.setItemMeta(meta);
-
-        // Set elite level
-        EliteItemManager.setEliteLevel(armor, level);
-
-        // Generate lore
-        new EliteItemLore(armor, false);
-
-        return armor;
-    }
-
-    // Saved armor for restoration
-    private ItemStack savedHelmet;
-    private ItemStack savedChestplate;
-    private ItemStack savedLeggings;
-    private ItemStack savedBoots;
 
     /**
      * Saves the player's current armor for later restoration.
      */
     public void savePlayerArmor() {
-        savedHelmet = player.getInventory().getHelmet();
-        savedChestplate = player.getInventory().getChestplate();
-        savedLeggings = player.getInventory().getLeggings();
-        savedBoots = player.getInventory().getBoots();
+        equipment.capture();
     }
 
     /**
      * Restores the player's saved armor.
      */
     public void restorePlayerArmor() {
-        player.getInventory().setHelmet(savedHelmet);
-        player.getInventory().setChestplate(savedChestplate);
-        player.getInventory().setLeggings(savedLeggings);
-        player.getInventory().setBoots(savedBoots);
+        equipment.restore();
     }
 
     /**
@@ -617,21 +558,12 @@ public class CombatSimulator {
      * arrows, tridents, fireballs, or area-effect-clouds within range of the player.
      */
     public void cleanupTestEntities() {
-        World world = player.getWorld();
-        Location center = player.getLocation();
-        double radius = 30.0;
-        double radiusSq = radius * radius;
-
-        for (Entity entity : world.getEntities()) {
-            if (entity instanceof Player) continue;
-            if (entity.getLocation().distanceSquared(center) > radiusSq) continue;
-
-            if (entity instanceof Arrow
-                    || entity instanceof AbstractArrow
-                    || entity instanceof Fireball
-                    || entity instanceof AreaEffectCloud
-                    || entity instanceof LightningStrike) {
+        for (Entity entity : player.getNearbyEntities(30, 30, 30)) {
+            if (entity instanceof Projectile projectile && projectile.getShooter() == player) {
                 entity.remove();
+            } else if (entity instanceof AreaEffectCloud cloud) {
+                ProjectileSource source = cloud.getSource();
+                if (source == player) entity.remove();
             }
         }
     }
@@ -838,7 +770,7 @@ public class CombatSimulator {
         LivingEntity entity = getDummyEntity(skillId);
         if (entity == null) return;
         Location loc = entity.getLocation().getBlock().getLocation();
-        savedBlockMaterial = loc.getBlock().getType();
+        savedBlockData = loc.getBlock().getBlockData().clone();
         waterBlockLocation = loc;
         loc.getBlock().setType(Material.WATER);
     }
@@ -847,10 +779,10 @@ public class CombatSimulator {
      * Restores the original block material at the water placement location.
      */
     public void restoreWaterBlock() {
-        if (waterBlockLocation != null && savedBlockMaterial != null) {
-            waterBlockLocation.getBlock().setType(savedBlockMaterial);
+        if (waterBlockLocation != null && savedBlockData != null) {
+            waterBlockLocation.getBlock().setBlockData(savedBlockData, false);
             waterBlockLocation = null;
-            savedBlockMaterial = null;
+            savedBlockData = null;
         }
     }
 
@@ -896,13 +828,13 @@ public class CombatSimulator {
 
         player.setNoDamageTicks(0);
         player.setHealth(5.0);
-        player.setAbsorptionAmount(0);
+        // Absorption catches the hit if all prevention skills fail. EliteMobs determines whether
+        // the hit is fatal from health and event damage, so this still exercises the actual
+        // prevention pipeline without firing real death/drop/respawn side effects.
+        double fatalDamage = player.getMaxHealth() * 2;
+        player.setAbsorptionAmount(fatalDamage + 1);
 
         double healthBefore = player.getHealth();
-        // Override defense formula with guaranteed-fatal damage (10x player max HP)
-        // This ensures damage is still fatal even after all skill reductions
-        // (Fortify stacking, IronStance, Grit, ReactiveShielding, BattleHardened)
-        double fatalDamage = player.getMaxHealth() * 10;
         testDamageOverride = fatalDamage;
         try {
             player.damage(fatalDamage, attacker);
@@ -910,17 +842,6 @@ public class CombatSimulator {
             testDamageOverride = -1;
         }
         double healthAfter = player.getHealth();
-        boolean playerDied = player.isDead();
-
-        // If the player died, a death prevention skill failed to trigger
-        if (playerDied) {
-            Logger.warn("[SkillTest] FATAL_DEBUG: Player DIED during fatal damage test!"
-                + " health=" + healthBefore + " maxHP=" + player.getMaxHealth()
-                + " fatalDamage=" + fatalDamage + " attacker=" + attacker.getType()
-                + " attackerAlive=" + !attacker.isDead());
-            player.spigot().respawn();
-        }
-
         // Restore for next hit
         player.setHealth(player.getMaxHealth());
         player.setAbsorptionAmount(0);
@@ -938,29 +859,7 @@ public class CombatSimulator {
      * @return DamageBreakdown with all damage components, or null if attack failed
      */
     public DamageBreakdown simulateMeleeAttackWithBreakdown(String skillId) {
-        LivingEntity target = getDummyEntity(skillId);
-        if (target == null || !target.isValid()) return null;
-
-        // Start tracking breakdown
-        DamageBreakdown breakdown = DamageBreakdown.startTracking(player);
-
-        // Reset iframes before attack
-        target.setNoDamageTicks(0);
-
-        double healthBefore = target.getHealth();
-        // Use actual player attack - attack speed is set very high to bypass cooldown
-        player.attack(target);
-        double healthAfter = target.getHealth();
-        double actualDamage = Math.max(0, healthBefore - healthAfter);
-
-        // Stop tracking and get results
-        DamageBreakdown result = DamageBreakdown.stopTracking(player);
-        if (result != null) {
-            // The breakdown should have been populated during the attack event
-            result.compute();
-        }
-
-        return result;
+        return breakdownDiagnostics.simulateMeleeAttack(skillId);
     }
 
     /**
@@ -971,68 +870,7 @@ public class CombatSimulator {
      * @return Formatted string with breakdown summary
      */
     public String simulateMultipleAttacksWithBreakdown(String skillId, int hitCount) {
-        LivingEntity target = getDummyEntity(skillId);
-        if (target == null || !target.isValid()) return "§cNo valid target found!";
-
-        EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
-        if (eliteEntity == null) return "§cTarget is not an elite entity!";
-
-        StringBuilder report = new StringBuilder();
-        report.append("§6=== COMBAT SIMULATION REPORT ===\n");
-        report.append(String.format("§7Target: §f%s §7(Lv %d, HP: %.0f)\n",
-                target.getName(), eliteEntity.getLevel(), target.getMaxHealth()));
-        report.append(String.format("§7Hits simulated: §f%d\n\n", hitCount));
-
-        double totalDamage = 0;
-        double minDamage = Double.MAX_VALUE;
-        double maxDamage = 0;
-        int crits = 0;
-        DamageBreakdown sampleBreakdown = null;
-
-        for (int i = 0; i < hitCount; i++) {
-            // Respawn if dead
-            if (!target.isValid() || target.isDead() || target.getHealth() <= 0) {
-                healDummy(skillId);
-                target = getDummyEntity(skillId);
-                if (target == null) break;
-            }
-
-            DamageBreakdown breakdown = simulateMeleeAttackWithBreakdown(skillId);
-            if (breakdown != null) {
-                double dmg = breakdown.getFinalDamage();
-                totalDamage += dmg;
-                minDamage = Math.min(minDamage, dmg);
-                maxDamage = Math.max(maxDamage, dmg);
-                if (breakdown.isCriticalHit()) crits++;
-
-                // Keep first non-crit sample for detailed breakdown
-                if (sampleBreakdown == null && !breakdown.isCriticalHit()) {
-                    sampleBreakdown = breakdown;
-                }
-            }
-
-            // Heal for next hit
-            healDummy(skillId);
-        }
-
-        double avgDamage = hitCount > 0 ? totalDamage / hitCount : 0;
-        double critRate = hitCount > 0 ? (double) crits / hitCount * 100 : 0;
-        double hitsToKill = avgDamage > 0 ? target.getMaxHealth() / avgDamage : 0;
-
-        report.append("§6--- DAMAGE STATISTICS ---\n");
-        report.append(String.format("§7Average Damage: §f%.1f\n", avgDamage));
-        report.append(String.format("§7Min/Max: §f%.1f §7/ §f%.1f\n", minDamage, maxDamage));
-        report.append(String.format("§7Crit Rate: §f%.1f%% §7(%d/%d)\n", critRate, crits, hitCount));
-        report.append(String.format("§7Estimated Hits to Kill: §f%.1f\n", hitsToKill));
-        report.append(String.format("§7Total DPS (1 hit/s): §f%.1f\n\n", avgDamage));
-
-        // Include detailed breakdown from sample hit
-        if (sampleBreakdown != null) {
-            report.append("§6--- SAMPLE HIT BREAKDOWN ---\n");
-            report.append(sampleBreakdown.toFormattedString());
-        }
-
-        return report.toString();
+        return breakdownDiagnostics.simulateMultipleAttacks(skillId, hitCount);
     }
 
     /**
@@ -1041,16 +879,7 @@ public class CombatSimulator {
      * @param breakdown The breakdown to display
      */
     public void sendBreakdownToPlayer(DamageBreakdown breakdown) {
-        if (breakdown == null) {
-            Logger.sendMessage(player, "§cNo damage breakdown available.");
-            return;
-        }
-
-        // Split the breakdown into lines and send each one
-        String[] lines = breakdown.toFormattedString().split("\n");
-        for (String line : lines) {
-            Logger.sendMessage(player, line);
-        }
+        breakdownDiagnostics.sendToPlayer(breakdown);
     }
 
     /**
@@ -1060,61 +889,21 @@ public class CombatSimulator {
      * @param dummyLevel The level of dummy to spawn (uses training_dummy_lv{level}.yml)
      */
     public void runQuickDamageTest(int dummyLevel) {
-        String dummyConfig = "training_dummy_lv" + dummyLevel + ".yml";
-        CustomBossesConfigFields config = CustomBossesConfig.getCustomBoss(dummyConfig);
-
-        if (config == null) {
-            Logger.sendMessage(player, "§cDummy config not found: " + dummyConfig);
-            return;
-        }
-
-        // Spawn dummy in front of player
-        org.bukkit.util.Vector direction = player.getLocation().getDirection();
-        direction.setY(0).normalize();
-        Location spawnLoc = player.getLocation().add(direction.multiply(5));
-        int highestY = spawnLoc.getWorld().getHighestBlockYAt(spawnLoc);
-        spawnLoc.setY(highestY + 1);
-        spawnLoc.setDirection(player.getLocation().toVector().subtract(spawnLoc.toVector()).normalize());
-
-        CustomBossEntity dummy = RegionalBossEntity.createTemporaryRegionalBossEntity(dummyConfig, spawnLoc);
-        if (dummy == null) {
-            Logger.sendMessage(player, "§cFailed to spawn dummy!");
-            return;
-        }
-
-        dummy.spawn(true);
-
-        if (dummy.getLivingEntity() == null) {
-            Logger.sendMessage(player, "§cDummy entity is null!");
-            return;
-        }
-
-        LivingEntity entity = dummy.getLivingEntity();
-        entity.setMaximumNoDamageTicks(0);
-        entity.setNoDamageTicks(0);
-        entity.setCustomName("§eDamage Test Dummy §7(Lv " + dummyLevel + ")");
-        entity.setCustomNameVisible(true);
-        entity.setGlowing(true);
-
-        Logger.sendMessage(player, "§aSpawned Lv" + dummyLevel + " test dummy. Attack it to see damage breakdown!");
-        Logger.sendMessage(player, "§7Dummy HP: §f" + String.format("%.0f", entity.getMaxHealth()));
-
-        // Start tracking - the breakdown will be populated when the player attacks
-        DamageBreakdown.startTracking(player);
+        breakdownDiagnostics.runQuickDamageTest(dummyLevel);
     }
 
     /**
      * Checks if the player has an active damage breakdown tracking session.
      */
     public boolean hasActiveBreakdownTracking() {
-        return DamageBreakdown.isTracking(player);
+        return breakdownDiagnostics.isTracking();
     }
 
     /**
      * Stops breakdown tracking and returns the result.
      */
     public DamageBreakdown stopBreakdownTracking() {
-        return DamageBreakdown.stopTracking(player);
+        return breakdownDiagnostics.stopTracking();
     }
 
     // ===== DAMAGE TEST DUMMY =====
