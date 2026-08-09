@@ -12,46 +12,60 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Harvester (PASSIVE) - Passive damage and loot bonus.
- * Increases base damage and improves loot quality.
+ * Harvester (PASSIVE) - Passive damage and Elite Coin bonus.
+ * Increases base damage and awards up to 20% more Elite Coins.
  * Tier 2 unlock.
  */
 public class HarvesterSkill extends SkillBonus {
 
     public static final String SKILL_ID = "hoes_harvester";
     private static final double BASE_DAMAGE_BONUS = 0.10; // 10% damage
-    private static final double BASE_LOOT_BONUS = 0.15; // 15% loot quality
+    private static final double MAX_REWARD_BONUS = 0.20;
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public HarvesterSkill() {
         super(SkillType.HOES, 25, "Harvester",
-              "Reap better rewards from your enemies.",
+              "Deal more damage and reap up to 20% more Elite Coins.",
               SkillBonusType.PASSIVE, 2, SKILL_ID);
     }
 
     public double getDamageBonus(int skillLevel) {
-        if (configFields != null) return configFields.calculateValue(skillLevel);
-        return scaled(BASE_DAMAGE_BONUS, 0.002, skillLevel); // 10% base + 0.2% per level
+        double approvedCurve = scaled(BASE_DAMAGE_BONUS, 0.001, skillLevel); // 20% at the level 100 soft cap
+        if (configFields == null) return approvedCurve;
+        double configuredBonus = configFields.calculateValue(skillLevel);
+        if (!Double.isFinite(configuredBonus)) return approvedCurve;
+        // Existing public configs used an older, over-budget curve. Preserve the ability to nerf
+        // the skill locally without allowing stale values to exceed the approved damage curve.
+        return Math.max(0D, Math.min(configuredBonus, approvedCurve));
     }
 
     public double getLootBonus(int skillLevel) {
-        if (configFields != null) return configFields.calculateValue(skillLevel) * 1.5;
-        return scaled(BASE_LOOT_BONUS, 0.003, skillLevel);
+        return Math.max(0D, Math.min(getDamageBonus(skillLevel), MAX_REWARD_BONUS));
     }
 
     /**
-     * Returns the configured loot-quality multiplier for integrations that apply this skill to a
-     * reward path. The feature is intentionally preserved even though the in-tree loot pipeline
-     * does not currently call it; it is externally usable and may have been disconnected.
+     * Returns the bounded reward multiplier used by Elite Coin payouts. This method is also the
+     * safe integration point for any future chance-based reward: multiplying a 1% chance by 1.2
+     * yields 1.2%, never a flat +20 percentage points.
      */
     public static double getLootMultiplier(Player player) {
-        if (!activePlayers.contains(player.getUniqueId())) return 1.0;
+        if (player == null || !activePlayers.contains(player.getUniqueId())) return 1.0;
         SkillBonus skill = com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry.getSkillById(SKILL_ID);
         if (!(skill instanceof HarvesterSkill harvester)) return 1.0;
         int skillLevel = com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry
                 .getPlayerSkillLevel(player, SkillType.HOES);
         return 1.0 + harvester.getLootBonus(skillLevel);
+    }
+
+    /**
+     * Applies Harvester to a concrete Elite Coin amount without ever exceeding the 20% cap.
+     * Flooring keeps the payout integral and guarantees the awarded amount cannot round above the
+     * advertised multiplier.
+     */
+    public static int applyEliteCoinBonus(Player player, int baseAmount) {
+        if (baseAmount <= 0) return Math.max(0, baseAmount);
+        return (int) Math.floor(baseAmount * getLootMultiplier(player));
     }
 
     @Override
@@ -95,7 +109,8 @@ public class HarvesterSkill extends SkillBonus {
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "damagePercent", String.format("%.1f", getDamageBonus(skillLevel) * 100)
+                "damagePercent", String.format("%.1f", getDamageBonus(skillLevel) * 100),
+                "lootPercent", String.format("%.1f", getLootBonus(skillLevel) * 100)
         ));
     }
 

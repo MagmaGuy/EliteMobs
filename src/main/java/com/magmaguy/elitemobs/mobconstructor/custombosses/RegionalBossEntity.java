@@ -211,7 +211,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                 ticksBeforeRespawn = 0;
                 //Reminder: this might not spawn a living entity as it gets queued for when the chunk loads
                 regionalBossEntity.spawn(silent);
-                regionalBossEntity.getDamagers().clear();
+                regionalBossEntity.clearDamagers();
             }
         }.runTaskLater(MetadataHandler.PLUGIN, ticksBeforeRespawn);
     }
@@ -221,7 +221,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         respawnTask.cancel();
         ticksBeforeRespawn = 0;
         spawn(false);
-        getDamagers().clear();
+        clearDamagers();
     }
 
     public void respawn() {

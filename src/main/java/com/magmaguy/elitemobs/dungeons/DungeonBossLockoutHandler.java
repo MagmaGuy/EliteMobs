@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
+import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -129,8 +130,9 @@ public class DungeonBossLockoutHandler implements Listener {
         int lockoutMinutes = config.getDungeonLockoutMinutes();
         if (lockoutMinutes <= 0) return;
 
-        Set<Player> damagers = instancedBoss.getDamagers().keySet();
-        Set<Player> lockedOutPlayers = processLockouts(instancedBoss, damagers, lockoutMinutes);
+        Set<Player> eligiblePlayers = new HashSet<>(PartyManager.expandSharedCreditParticipants(
+                instancedBoss.getDamagers().keySet(), instancedBoss));
+        Set<Player> lockedOutPlayers = processLockouts(instancedBoss, eligiblePlayers, lockoutMinutes);
 
         // Store locked out players on the boss so CustomBossDeath can skip their loot
         instancedBoss.setLockoutPlayers(lockedOutPlayers);

@@ -17,7 +17,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Legion's Discipline (STACKING) - Consecutive hits increase damage. Stacks fade after 2.5s without a hit.
+ * Legion's Discipline (STACKING) - Maintaining an aggressive combat pace builds damage; letting
+ * more than 2.5 seconds pass without landing a hit breaks the rhythm.
  * Tier 3 unlock.
  */
 public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill {
@@ -26,12 +27,8 @@ public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill 
     private static final int BASE_MAX_STACKS = 10;
     private static final double BASE_STACK_BONUS = 0.025; // 2.5% per stack
     /**
-     * Discipline breaks after 2.5s without landing a hit.
-     * <p>
-     * The skill was written to reset on a miss, but the miss hook had no callers anywhere in
-     * the plugin, so stacks were never cleared: a player ramped to the cap once and
-     * kept the full bonus permanently, including across fights. This timeout is what actually
-     * makes the bonus intermittent, and it is what the per-stack value above is priced for.
+     * The pace window makes the bonus intermittent and prevents stacks carrying between fights.
+     * It is also the uptime assumption used by the per-stack power budget below.
      */
     private static final long STACK_DECAY_MS = 2500;
 
@@ -41,7 +38,7 @@ public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill 
 
     public LegionsDisciplineSkill() {
         super(SkillType.SPEARS, 50, "Legion's Discipline",
-              "Consecutive hits increase damage. Stacks fade after 2.5s without a hit.",
+              "Keep landing hits to build damage; lose the rhythm for 2.5s and the stacks fade.",
               SkillBonusType.STACKING, 3, SKILL_ID);
     }
 
@@ -50,18 +47,16 @@ public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill 
         return BASE_MAX_STACKS;
     }
 
-    /**
-     * Compatibility overload retained for callers that select a stack cap by skill level.
-     */
-    public int getMaxStacks(int skillLevel) {
-        return getMaxStacks();
-    }
-
     @Override
     public double getBonusPerStack(int skillLevel) {
         // Power budget: ~50% uptime on the ramp, so a full 10 stack bar is worth +40% at
-        // level 50 (E = 0.50 * 0.40 = 0.20).
-        return scaled(BASE_STACK_BONUS, 0.0003, skillLevel);
+        // the level 100 soft cap (E = 0.50 * 0.40 = 0.20).
+        double approvedCurve = scaled(BASE_STACK_BONUS, 0.00015, skillLevel);
+        if (configFields == null) return approvedCurve;
+        double configuredBonus = configFields.getStackBonus()
+                + (skillLevel * configFields.getScalingPerLevel());
+        if (!Double.isFinite(configuredBonus)) return approvedCurve;
+        return Math.max(0D, Math.min(configuredBonus, approvedCurve));
     }
 
     @Override
@@ -96,23 +91,13 @@ public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill 
     }
 
     /**
-     * Drops the whole stack bar once the player has gone {@link #STACK_DECAY_MS} without
-     * landing a hit.
+     * Drops the stack bar when the player stops maintaining the combat pace.
      */
     private void checkStackDecay(Player player) {
         Long last = lastHitTime.get(player.getUniqueId());
         if (last != null && System.currentTimeMillis() - last > STACK_DECAY_MS) {
             resetStacks(player);
         }
-    }
-
-    /**
-     * Explicitly breaks discipline after a missed attack. The built-in dispatcher currently uses
-     * inactivity decay because it has no miss event, but this hook remains part of the skill's
-     * behavior for integrations able to identify a miss.
-     */
-    public void onMiss(Player player) {
-        if (isActive(player)) resetStacks(player);
     }
 
     public double getDamageMultiplier(Player player, int skillLevel) {

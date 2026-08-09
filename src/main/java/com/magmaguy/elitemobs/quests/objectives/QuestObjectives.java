@@ -4,6 +4,8 @@ import com.magmaguy.elitemobs.api.QuestObjectivesCompletedEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.parties.PartyManager;
+import com.magmaguy.elitemobs.parties.PartySidebar;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
@@ -118,12 +120,24 @@ public class QuestObjectives implements Serializable {
     public void displayTemporaryObjectivesScoreboard(Player player) {
         if (!QuestsConfig.isUseQuestScoreboards()) return;
         if (scoreboardHiddenForDialogue(player)) return;
+        if (PartyManager.isInParty(player.getUniqueId())) {
+            PartySidebar.showTemporaryQuest(
+                    player,
+                    ChatColorConverter.convert(getQuest().getQuestName()),
+                    getScoreboardObjectiveText(),
+                    20 * 20);
+            return;
+        }
         SimpleScoreboard.temporaryScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), getScoreboardObjectiveText(), 20 * 20);
     }
 
     public void displayLazyObjectivesScoreboard(Player player) {
         if (!QuestsConfig.isUseQuestScoreboards()) return;
         if (scoreboardHiddenForDialogue(player)) return;
+        if (PartyManager.isInParty(player.getUniqueId())) {
+            PartySidebar.refresh(player);
+            return;
+        }
         SimpleScoreboard.lazyScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), getScoreboardObjectiveText());
     }
 
@@ -134,7 +148,7 @@ public class QuestObjectives implements Serializable {
                 && QuestDialogueBossBarManager.hasActiveSession(player);
     }
 
-    private List<String> getScoreboardObjectiveText() {
+    public List<String> getScoreboardObjectiveText() {
         List<String> strings = new ArrayList<>();
         if (!isOver())
             for (Objective objective : objectives)

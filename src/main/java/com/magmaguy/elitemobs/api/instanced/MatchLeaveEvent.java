@@ -6,6 +6,10 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Public API event fired after a player has fully left a match. Moving between the active-player
+ * and spectator sets does not count as leaving while the player remains a participant.
+ */
 public class MatchLeaveEvent extends Event implements MatchEvent, MatchPlayerEvent {
     private static final HandlerList handlers = new HandlerList();
     private final MatchInstance matchInstance;
@@ -24,6 +28,11 @@ public class MatchLeaveEvent extends Event implements MatchEvent, MatchPlayerEve
     @NotNull
     @Override
     public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    @NotNull
+    public static HandlerList getHandlerList() {
         return handlers;
     }
 

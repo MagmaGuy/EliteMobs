@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata;
 
-import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import org.bukkit.entity.EntityType;
 
@@ -34,10 +33,6 @@ public abstract class PluginMobProperties {
 
     public double getDefaultMaxHealth() {
         return defaultMaxHealth;
-    }
-
-    public double getSuperMobMaxHealth() {
-        return defaultMaxHealth * DefaultConfig.getSuperMobStackAmount();
     }
 
 }

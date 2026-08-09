@@ -25,8 +25,6 @@ public class DefaultConfig extends ConfigurationFile {
     @Getter
     private static boolean alwaysShowNametags;
     @Getter
-    private static int superMobStackAmount;
-    @Getter
     private static boolean preventEliteMobConversionOfNamedMobs;
     @Getter
     private static boolean doStrictSpawningRules;
@@ -132,9 +130,6 @@ public class DefaultConfig extends ConfigurationFile {
         alwaysShowNametags = ConfigurationEngine.setBoolean(
                 List.of("Sets whether elites and bosses spawned by elitemobs will always show their nametags.", "Not recommended!"),
                 fileConfiguration, "alwaysShowEliteMobNameTags", false);
-        superMobStackAmount = Math.max(ConfigurationEngine.setInt(
-                List.of("Sets the amount of passive mobs that have to be in close proximity before they can be merged.", "Don't set this to 0!"),
-                fileConfiguration, "superMobStackAmount", 50), 1);
         preventEliteMobConversionOfNamedMobs = ConfigurationEngine.setBoolean(
                 List.of("Sets whether EliteMobs will prevent converting named mobs to elites.", "Especially important for compatibility with other plugins."),
                 fileConfiguration, "preventEliteMobConversionOfNamedMobs", true);

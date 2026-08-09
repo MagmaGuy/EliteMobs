@@ -17,6 +17,7 @@ economy, player progression and skills, NPCs, and shops.
 - **Dungeons** — Installable, packageable instanced content with kill-percentage and kill-target objectives.
 - **Arenas** — Wave-based combat instances (optional MythicMobs integration for arena mobs).
 - **Quests** — Static and dynamic quests with objectives, tracking, rewards and quest NPCs.
+- **Parties** — Six-player, session-scoped groups with shared kill credit, need/greed Elite gear, and a compact sidebar.
 - **Items & enchantments** — Custom items plus procedurally generated gear, custom enchantments, and scrolls.
 - **Economy & shops** — Elite currency with custom, dynamic and sell shops; Vault integration.
 - **Progression** — Player ranks, level scaling, a skills system and the Adventurer's Guild hub.
@@ -50,6 +51,32 @@ Two commands are registered (see `plugin.yml`):
 
 Both are dispatched through MagmaCore's `CommandManager` (see `commands/CommandHandler.java`), which exposes a large set
 of player and admin subcommands. Run `/em help` in-game for the full list, or consult the wiki.
+
+### Parties
+
+Parties are enabled by default through `Party.yml` and last only while their members remain logged in. A party contains
+one creator plus up to five invited players. Membership is never written to the player database.
+
+| Command | Purpose |
+|---|---|
+| `/em party create` | Create a party. |
+| `/em party invite <player>` | Invite an online player. Any current member may invite. |
+| `/em party accept` | Accept the most recent unexpired invitation. |
+| `/em party leave` | Leave the party. Leadership passes to the next member when necessary. |
+
+Nearby party members in the same world receive credit for matching active kill objectives, including quest-specific
+boss kills. Quests remain separate per player: parties never accept quests, turn quests in, or collect rewards for
+another member. Fetch items, NPC dialogue, and arena participation remain personal because their underlying item,
+story, and match requirements must not be bypassed.
+
+Normal Elite equipment and special Elite gear earned while at least two party members are nearby enter the existing
+need/greed flow exposed by `/em loot`. Coins and Elite Scrolls remain personal. Each drop has an independent vote,
+large pools are paginated, overlapping roll sessions can be cycled by running `/em loot` again, and dungeon boss
+lockouts are applied before a player is admitted to a vote.
+
+The sidebar lists the leader and members, incorporates the currently tracked quest when space permits, and alternates
+between the invite and leave command hints. `sharedProgressRange`, invitation expiry, rotation timing, styling, and
+messages are configurable in `Party.yml`.
 
 ## Permissions
 
@@ -85,8 +112,9 @@ On Windows:
 gradlew.bat shadowJar
 ```
 
-The shaded jar is written to `testbed/plugins/EliteMobs.jar`. The build relocates bStats and `easyminecraftgoals`, and
-shades MagmaCore and commons-io.
+The shaded jar is written to `build/libs/EliteMobs.jar`. When `MC_DIST_DIR` is set, the stable deployable copy is also
+written to that directory as `EliteMobs.jar`. The build relocates bStats and `easyminecraftgoals`, and shades MagmaCore
+and commons-io.
 
 # Dev notes
 
@@ -268,6 +296,38 @@ Used for listening to moments when the antiexploit runs a check but no players d
 - Detect when the antiexploit is doing a non-player based exploit check.
 - Cancel an antiexploit check.
 
+### MatchInstantiateEvent
+
+Fires before an arena or instanced-dungeon match is registered or starts its watchdog tasks.
+
+- Can be cancelled to prevent the match from becoming active.
+- The constructor parameters are already available from the match instance.
+
+### MatchJoinEvent and MatchLeaveEvent
+
+Public lifecycle hooks for players entering and fully leaving a match. An active-player to spectator transition remains
+inside the same match and therefore does not emit a second join or leave pair.
+
+- `MatchJoinEvent` can be cancelled before admission.
+- Both events expose the match instance and player.
+
+### MatchStartEvent, MatchEndEvent and MatchDestroyEvent
+
+Fired as a match enters `ONGOING`, reaches its final result, and clears its generic runtime state respectively.
+`MatchEndEvent` happens before any configured closing delay; `MatchDestroyEvent` happens before subtype-specific arena or
+world teardown finishes.
+
+### PlayerJoinArenaEvent, PlayerLeaveArenaEvent, PlayerJoinDungeonEvent and PlayerLeaveDungeonEvent
+
+Non-cancellable, content-specific notifications fired alongside the generic match API after admission or removal has
+completed. Each event exposes both the player and the arena or dungeon instance.
+
+### WorldInstanceEvent and WorldUninstanceEvent
+
+`WorldInstanceEvent` fires before an instanced dungeon world is cloned and can cancel that operation.
+`WorldUninstanceEvent` fires after the cloned world has been successfully unloaded and accepted for permanent deletion;
+it exposes the content package and generated world name.
+
 ### NPCEntityRemoveEvent
 
 Used when an npc gets removed. This removal may not be permanent, as it might just be a chunk unload.
@@ -322,26 +382,6 @@ Used when a player progresses in a quest, such as by killing a quest mob or coll
 ### QuestRewardEvent
 
 Used when a player gets the reward from a quest.
-
-### SuperMobDamageEvent
-
-Used when a Super Mob gets damaged.
-
-- Can be cancelled.
-
-### SuperMobDeathEvent
-
-Used when a Super Mob dies.
-
-### SuperMobRemoveEvent
-
-Used when a Super Mob gets removed. Note that removals might be temporary due to chunk unloads.
-
-### SuperMobSpawnEvent
-
-Used when a Super Mob spawns.
-
-- Can be cancelled.
 
 ---
 

@@ -24,6 +24,12 @@ public class LootMenuConfig extends MenusConfigFields {
     private static String needListLore3;
     @Getter
     private static String noGroupLootMessage;
+    @Getter
+    private static String previousPageTitle;
+    @Getter
+    private static String nextPageTitle;
+    @Getter
+    private static String pageIndicatorTitle;
 
     public LootMenuConfig() {
         super("loot_menu", true);
@@ -49,5 +55,11 @@ public class LootMenuConfig extends MenusConfigFields {
                 "be rolled for people who needed them!", true);
         noGroupLootMessage = ConfigurationEngine.setString(file, fileConfiguration, "noGroupLootMessage",
                 "&4[EliteMobs] &6You don't currently have any group loot to vote on!", true);
+        previousPageTitle = ConfigurationEngine.setString(file, fileConfiguration, "previousPageTitle",
+                "&6Previous loot page", true);
+        nextPageTitle = ConfigurationEngine.setString(file, fileConfiguration, "nextPageTitle",
+                "&6Next loot page", true);
+        pageIndicatorTitle = ConfigurationEngine.setString(file, fileConfiguration, "pageIndicatorTitle",
+                "&8Loot page &f$current&8/&f$total", true);
     }
 }

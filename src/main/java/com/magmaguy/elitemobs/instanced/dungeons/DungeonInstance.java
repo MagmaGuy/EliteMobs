@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.api.DungeonCompleteEvent;
 import com.magmaguy.elitemobs.api.DungeonStartEvent;
 import com.magmaguy.elitemobs.api.InstancedDungeonRemoveEvent;
 import com.magmaguy.elitemobs.api.WorldInstanceEvent;
+import com.magmaguy.elitemobs.api.WorldUninstanceEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
@@ -256,7 +257,7 @@ public class DungeonInstance extends MatchInstance {
     public void endMatch() {
         super.endMatch();
         if (players.isEmpty()) {
-            removeInstance();
+            destroyMatch();
             return;
         }
         announce(DungeonsConfig.getInstancedDungeonCompleteMessage());
@@ -281,6 +282,7 @@ public class DungeonInstance extends MatchInstance {
     }
 
     public void removeInstance() {
+        if (!isDestroyingMatch() && !hasMatchDestroyEventFired()) super.destroyMatch();
         boolean immediateRemoval = MetadataHandler.shutdownRequested;
         cancelScheduledTasks();
         cancelInitializeEntitiesTask();
@@ -574,6 +576,7 @@ public class DungeonInstance extends MatchInstance {
                     retryDeletion(worldName);
                     return;
                 }
+                new EventCaller(new WorldUninstanceEvent(contentPackagesConfigFields, worldName));
                 cleanupInstanceReferences();
             } catch (Exception e) {
                 Logger.warn("Exception while deleting world " + worldName + ": " + e.getMessage());

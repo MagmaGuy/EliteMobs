@@ -34,6 +34,7 @@ import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.ondeathcommands.OnDeathCommands;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
+import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.elitemobs.peacebanner.PeaceBannerListener;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.PlayerStatsTracker;
@@ -124,6 +125,7 @@ public class EventsRegistrer {
 
         register(new FixPlayerOnLoginOrRespawn());
         register(new PlayerQuitCleanup());
+        if (PartyConfig.isEnabled()) register(new PartyManager());
         register(new com.magmaguy.elitemobs.wormhole.WormholePlayerListener());
 
         //Mob damage
@@ -194,7 +196,6 @@ public class EventsRegistrer {
         register(new PersistentObjectHandler.PersistentObjectHandlerEvents());
         register(new CustomBossTaunts());
         register(new PhaseBossEntity.PhaseBossEntityListener());
-        register(new AdvancedAggroManager());
         register(new TransitiveBossBlock());
         register(new TransitiveBlockCommand.TemporaryBossBlockCommandEvents());
         register(new CustomModel.ModelEntityEvents());

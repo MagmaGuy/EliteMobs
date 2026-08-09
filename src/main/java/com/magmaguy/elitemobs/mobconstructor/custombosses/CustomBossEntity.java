@@ -547,7 +547,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             return;
         }
         phaseBossEntity.resetToFirstPhase();
-        super.damagers.clear();
+        clearDamagers();
     }
 
     @Override

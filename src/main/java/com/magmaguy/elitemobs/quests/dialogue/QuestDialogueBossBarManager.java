@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.quests.dialogue;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.parties.PartyManager;
+import com.magmaguy.elitemobs.parties.PartySidebar;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -211,6 +213,7 @@ public class QuestDialogueBossBarManager {
             // progressed during the dialogue); otherwise restore whatever board they had before.
             QuestTracking tracking = QuestTracking.getPlayerTrackingQuests().get(player.getUniqueId());
             if (tracking != null) tracking.refreshScoreboard();
+            else if (PartyManager.isInParty(player.getUniqueId())) PartySidebar.refresh(player);
             else SimpleScoreboard.clearScoreboard(player);
         }
 

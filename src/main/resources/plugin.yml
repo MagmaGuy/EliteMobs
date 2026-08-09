@@ -111,6 +111,9 @@ permissions:
   elitemobs.money.pay:
     description: Allows users to check their balance
     default: true
+  elitemobs.party:
+    description: Allows players to create, join, invite to, and leave EliteMobs parties
+    default: true
   elitemobs.place.admin:
     description: Allows admins to run all commands related to placing and spawning npcs, bosses, treasure chests and more
     default: op
@@ -275,6 +278,7 @@ permissions:
       elitemobs.loot.command: true
       elitemobs.money.check.self: true
       elitemobs.money.pay: true
+      elitemobs.party: true
       elitemobs.quest.accept: true
       elitemobs.quest.complete: true
       elitemobs.quest.leave: true

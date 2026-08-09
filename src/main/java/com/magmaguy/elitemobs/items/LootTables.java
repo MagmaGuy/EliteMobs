@@ -8,11 +8,14 @@ import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.items.customloottable.SharedLootTable;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
@@ -44,6 +47,8 @@ public class LootTables implements Listener {
         for (Player player : eliteEntity.getDamagers().keySet()) {
 
             if (player.hasMetadata("NPC") || !PlayerData.isInMemory(player.getUniqueId())) continue;
+            if (eliteEntity instanceof InstancedBossEntity instancedBossEntity
+                    && instancedBossEntity.getLockoutPlayers().contains(player)) continue;
 
             if (eliteEntity.getDamagers().get(player) / eliteEntity.getMaxHealth() < 0.1) continue;
 
@@ -76,17 +81,33 @@ public class LootTables implements Listener {
             if (!(eliteEntity.isRandomLoot())) continue;
 
             // Skill-based gear restriction now handles equipping, not drops
-            if (eliteEntity instanceof CustomBossEntity) generateLoot(eliteEntity, player);
+            if (PartyManager.shouldUsePartyLoot(player, eliteEntity)) {
+                int partyRewardLevel = eliteEntity instanceof CustomBossEntity
+                        ? (int) MobTierCalculator.findMobTier(eliteEntity)
+                        : effectiveLootLevel;
+                int partyItemTier = (int) setItemTier(partyRewardLevel);
+                ItemStack partyItem = rollUndeliveredLoot(partyItemTier, eliteEntity);
+                if (partyItem != null && !SharedLootTable.addPartyLoot(eliteEntity, player, partyItem))
+                    deliverGeneratedItem(player, eliteEntity.getLocation(), partyItem);
+            } else if (eliteEntity instanceof CustomBossEntity) generateLoot(eliteEntity, player);
             else generateLoot(eliteEntity, player, effectiveLootLevel);
 
             if (SpecialItemSystemsConfig.isDropSpecialLoot()) {
+                boolean shouldDropSpecialLoot = false;
                 if (eliteEntity instanceof CustomBossEntity customBossEntity &&
                         customBossEntity.getCustomBossesConfigFields().getHealthMultiplier() > 1.0 &&
                         ThreadLocalRandom.current().nextDouble() < SpecialItemSystemsConfig.getBossChanceToDrop())
-                    generateSpecialLoot(player, 0, eliteEntity);
+                    shouldDropSpecialLoot = true;
                 else if (eliteEntity instanceof CustomBossEntity &&
                         ThreadLocalRandom.current().nextDouble() < SpecialItemSystemsConfig.getNonEliteChanceToDrop())
-                    generateSpecialLoot(player, 0, eliteEntity);
+                    shouldDropSpecialLoot = true;
+                if (shouldDropSpecialLoot) {
+                    if (PartyManager.shouldUsePartyLoot(player, eliteEntity)) {
+                        ItemStack specialItem = generateSpecialLootItem(null, 0, eliteEntity);
+                        if (specialItem != null && !SharedLootTable.addPartyLoot(eliteEntity, player, specialItem))
+                            deliverGeneratedItem(player, eliteEntity.getLocation(), specialItem);
+                    } else generateSpecialLoot(player, 0, eliteEntity);
+                }
             }
 
             if (ItemSettingsConfig.isUseEliteItemScrolls() &&
@@ -172,6 +193,36 @@ public class LootTables implements Listener {
 
         return null;
 
+    }
+
+    /** Rolls a normal Elite equipment drop without assigning ownership or delivering it. */
+    private static ItemStack rollUndeliveredLoot(int itemTier, EliteEntity eliteEntity) {
+        double baseChance = ItemSettingsConfig.getFlatDropRate();
+        if (eliteEntity instanceof RegionalBossEntity)
+            baseChance = ItemSettingsConfig.getRegionalBossNonUniqueDropRate();
+        double dropChanceBonus = ItemSettingsConfig.getLevelIncreaseDropRate() * itemTier;
+        if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus) return null;
+
+        HashMap<String, Double> weightedProbability = new HashMap<>();
+        if (proceduralItemsOn) weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
+        if (customItemsOn) {
+            if (weighedItemsExist) weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
+            if (fixedItemsExist && CustomItem.getFixedItems().containsKey(itemTier))
+                weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
+            if (limitedItemsExist) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
+            if (scalableItemsExist) weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
+        }
+
+        String selectedLootSystem = pickWeighedProbability(weightedProbability);
+        if (selectedLootSystem == null) return null;
+        return switch (selectedLootSystem) {
+            case "procedural" -> generateProcedurallyGeneratedItem(itemTier, null, eliteEntity);
+            case "weighed" -> generateWeighedFixedItemStack(null);
+            case "fixed" -> generateFixedItem(itemTier, null, eliteEntity);
+            case "limited" -> generateLimitedItem(itemTier, null, eliteEntity);
+            case "scalable" -> generateScalableItem(itemTier, null, eliteEntity);
+            default -> null;
+        };
     }
 
     /**
@@ -403,14 +454,27 @@ public class LootTables implements Listener {
     }
 
     public static void generateSpecialLoot(Player player, int level, EliteEntity eliteEntity) {
-        CustomItem customItem = WeightedProbability.pickWeighedProbabilityFromCustomItems(SpecialItemSystemsConfig.getSpecialValues());
-        if (customItem == null) return;
-        ItemStack specialItem = customItem.generateItemStack(level, player, eliteEntity);
+        ItemStack specialItem = generateSpecialLootItem(player, level, eliteEntity);
+        if (specialItem == null) return;
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) {
             HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(specialItem);
             leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
         } else
             player.getWorld().dropItem(player.getLocation(), specialItem);
+    }
+
+    private static ItemStack generateSpecialLootItem(Player player, int level, EliteEntity eliteEntity) {
+        CustomItem customItem = WeightedProbability.pickWeighedProbabilityFromCustomItems(SpecialItemSystemsConfig.getSpecialValues());
+        if (customItem == null) return null;
+        return customItem.generateItemStack(level, player, eliteEntity);
+    }
+
+    private static void deliverGeneratedItem(Player player, Location location, ItemStack itemStack) {
+        SoulbindEnchantment.addEnchantment(itemStack, player);
+        if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) {
+            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(itemStack);
+            leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
+        } else processPhysicalItem(location, itemStack, player);
     }
 
 

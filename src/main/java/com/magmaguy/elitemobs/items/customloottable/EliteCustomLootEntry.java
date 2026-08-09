@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -262,16 +263,21 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     }
 
     private boolean isGroupLoot(int itemTier, Player player, EliteEntity eliteEntity) {
-        if (difficultyID == null) return false;
-        MatchInstance matchInstance = PlayerData.getMatchInstance(player);
-        String dungeonDifficultyID = null;
-        if (matchInstance instanceof DungeonInstance dungeonInstance)
-            dungeonDifficultyID = dungeonInstance.getDifficultyID();
-        if (dungeonDifficultyID == null) return false;
-        //Beyond this point the item is for instanced dungeons
-        if (!dungeonDifficultyID.equals(difficultyID)) return true;
-        addGroupLoot(CustomItem.limitItemLevel(player, itemTier), eliteEntity);
-        return true;
+        if (difficultyID != null) {
+            MatchInstance matchInstance = PlayerData.getMatchInstance(player);
+            String dungeonDifficultyID = null;
+            if (matchInstance instanceof DungeonInstance dungeonInstance)
+                dungeonDifficultyID = dungeonInstance.getDifficultyID();
+            if (dungeonDifficultyID != null) {
+                // Beyond this point the item is for an instanced dungeon. A mismatched difficulty suppresses it.
+                if (!dungeonDifficultyID.equals(difficultyID)) return true;
+                addGroupLoot(CustomItem.limitItemLevel(player, itemTier), eliteEntity);
+                return true;
+            }
+        }
+
+        if (!PartyManager.shouldUsePartyLoot(player, eliteEntity)) return false;
+        return addPartyLoot(CustomItem.limitItemLevel(player, itemTier), player, eliteEntity);
     }
 
     private void addGroupLoot(int itemTier, EliteEntity eliteEntity) {
@@ -295,6 +301,32 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
                 else name = itemStack.getType().toString().replace("_", " ");
             }
         }
+    }
+
+    private boolean addPartyLoot(int itemTier, Player contributor, EliteEntity eliteEntity) {
+        boolean pooledAnyItem = false;
+        for (int i = 0; i < getAmount(); i++) {
+            CustomItem customItem = generateCustomItem();
+            if (customItem == null) {
+                Logger.warn("Failed to generate a custom item for the boss " + eliteEntity.getName()
+                        + "! The configuration file for one of its loot items is not correctly configured.");
+                return true;
+            }
+            ItemStack itemStack = customItem.generateItemStack(itemTier, null, eliteEntity);
+            if (itemStack == null) {
+                Logger.warn("A custom item for boss " + eliteEntity.getName()
+                        + " was null! This item will be skipped.");
+                return true;
+            }
+            if (!SharedLootTable.addPartyLoot(eliteEntity, contributor, itemStack)) {
+                // The lockout-aware eligibility check may reject a pool which looked viable before
+                // the item was generated. Fall back to the normal personal path only if nothing was
+                // already committed to the vote, preventing either item loss or duplication.
+                return pooledAnyItem;
+            }
+            pooledAnyItem = true;
+        }
+        return true;
     }
 
     @Override

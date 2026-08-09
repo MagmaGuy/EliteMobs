@@ -3,12 +3,13 @@ package com.magmaguy.elitemobs.instanced;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.instanced.MatchDestroyEvent;
+import com.magmaguy.elitemobs.api.instanced.MatchEndEvent;
 import com.magmaguy.elitemobs.api.instanced.MatchInstantiateEvent;
-import com.magmaguy.elitemobs.api.instanced.MatchJoinEvent;
-import com.magmaguy.elitemobs.api.instanced.MatchLeaveEvent;
+import com.magmaguy.elitemobs.api.instanced.MatchStartEvent;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -52,6 +53,8 @@ public abstract class MatchInstance {
     protected HashMap<Player, Integer> playerLives = new HashMap();
     @Getter
     protected HashSet<Player> participants = new HashSet<>();
+    @Getter
+    protected final HashSet<java.util.UUID> startingParticipantIds = new HashSet<>();
     protected HashSet<Player> spectators = new HashSet<>();
     @Getter
     protected InstancedRegionState state = InstancedRegionState.WAITING;
@@ -65,22 +68,28 @@ public abstract class MatchInstance {
     protected String permission = null;
     @Getter
     protected boolean cancelled = false;
+    @Getter
+    protected boolean destroyingMatch = false;
+    private boolean matchHasStarted = false;
+    private boolean matchEndEventFired = false;
+    private boolean matchDestroyEventFired = false;
     private BukkitTask watchdogTask = null;
     private BukkitTask instanceMessageTask = null;
     private BukkitTask countdownTask = null;
 
 
     public MatchInstance(Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {
-        MatchInstantiateEvent matchInstantiateEvent = new MatchInstantiateEvent(this);
-        if (matchInstantiateEvent.isCancelled()) {
-            cancelled = true;
-            return;
-        }
-
         this.startLocation = startLocation;
         this.exitLocation = exitLocation;
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
+
+        MatchInstantiateEvent matchInstantiateEvent = new MatchInstantiateEvent(this);
+        new EventCaller(matchInstantiateEvent);
+        if (matchInstantiateEvent.isCancelled()) {
+            cancelled = true;
+            return;
+        }
 
         startWatchdogs();
         instanceMessages();
@@ -121,12 +130,10 @@ public abstract class MatchInstance {
     }
 
     public boolean addNewPlayer(Player player) {
-        new MatchJoinEvent(this, player);
         return InstancePlayerManager.addNewPlayer(player, this);
     }
 
     public void removePlayer(Player player) {
-        new MatchLeaveEvent(this, player);
         lastSafeLocation.remove(player.getUniqueId());
         consecutiveRescues.remove(player.getUniqueId());
         InstancePlayerManager.removePlayer(player, this);
@@ -145,12 +152,10 @@ public abstract class MatchInstance {
     }
 
     public void removeSpectator(Player player) {
-        new MatchLeaveEvent(this, player);
         InstancePlayerManager.removeSpectator(this, player);
     }
 
     public void removeAnyKind(Player player) {
-        new MatchLeaveEvent(this, player);
         InstancePlayerManager.removeAnyKind(this, player);
     }
 
@@ -357,12 +362,18 @@ public abstract class MatchInstance {
     protected abstract boolean isInRegion(Location location);
 
     protected void startMatch() {
+        matchHasStarted = true;
+        matchEndEventFired = false;
+        matchDestroyEventFired = false;
         state = InstancedRegionState.ONGOING;
         players.forEach(player -> {
             MatchInstanceEvents.teleportBypass = true;
             player.teleport(startLocation);
         });
         participants = (HashSet<Player>) players.clone();
+        startingParticipantIds.clear();
+        players.forEach(player -> startingParticipantIds.add(player.getUniqueId()));
+        new EventCaller(new MatchStartEvent(this));
     }
 
     /*
@@ -383,23 +394,40 @@ public abstract class MatchInstance {
                 state != InstancedRegionState.COMPLETED_DEFEAT)
             state = InstancedRegionState.COMPLETED;
         restoreParticipantsHealth();
-        //todo this should probable call resetMatch() and resetMatch() should probably be renamed because that's not what it does
-        new MatchDestroyEvent(this);
+        if (matchHasStarted && !matchEndEventFired) {
+            matchEndEventFired = true;
+            new EventCaller(new MatchEndEvent(this));
+        }
     }
 
     protected void destroyMatch() {
-        boolean matchWasCompleted = state == InstancedRegionState.COMPLETED ||
-                state == InstancedRegionState.COMPLETED_VICTORY ||
-                state == InstancedRegionState.COMPLETED_DEFEAT;
-        if (matchWasCompleted) restoreParticipantsHealth();
-        state = InstancedRegionState.WAITING;
-        HashSet<Player> copy = new HashSet<>(participants);
-        copy.forEach(this::removeAnyKind);
-        players.clear();
-        spectators.clear();
-        new ArrayList<>(deathBanners.values()).forEach(deathLocation -> deathLocation.clear(false));
-        deathBanners.clear();
-        new MatchDestroyEvent(this);
+        if (destroyingMatch) return;
+        destroyingMatch = true;
+        try {
+            boolean matchWasCompleted = state == InstancedRegionState.COMPLETED ||
+                    state == InstancedRegionState.COMPLETED_VICTORY ||
+                    state == InstancedRegionState.COMPLETED_DEFEAT;
+            if (matchWasCompleted) restoreParticipantsHealth();
+            HashSet<Player> copy = new HashSet<>(participants);
+            copy.forEach(this::removeAnyKind);
+            players.clear();
+            spectators.clear();
+            new ArrayList<>(deathBanners.values()).forEach(deathLocation -> deathLocation.clear(false));
+            deathBanners.clear();
+            state = InstancedRegionState.WAITING;
+            if (!matchDestroyEventFired) {
+                matchDestroyEventFired = true;
+                new EventCaller(new MatchDestroyEvent(this));
+            }
+            startingParticipantIds.clear();
+            matchHasStarted = false;
+        } finally {
+            destroyingMatch = false;
+        }
+    }
+
+    protected boolean hasMatchDestroyEventFired() {
+        return matchDestroyEventFired;
     }
 
     private void restoreParticipantsHealth() {

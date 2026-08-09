@@ -803,7 +803,7 @@ public class DungeonsConfig extends ConfigurationFile {
         // LegionsDisciplineSkill messages
         legionsDisciplineBrokenMessage = ConfigurationEngine.setString(
                 List.of("Sets the action bar message shown when discipline stacks are broken."),
-                file, fileConfiguration, "legionsDisciplineBrokenMessage", "&7Discipline broken...", true);
+                file, fileConfiguration, "legionsDisciplineBrokenMessage", "&7Combat rhythm lost...", true);
 
         // AvatarOfJudgmentSkill messages
         avatarFadesMessage = ConfigurationEngine.setString(

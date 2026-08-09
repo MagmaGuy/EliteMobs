@@ -25,8 +25,10 @@ public class DepthChargeSkill extends SkillBonus implements ConditionalSkill {
 
     public static final String SKILL_ID = "tridents_depth_charge";
     private static final double AOE_RADIUS = 4.0;
-    private static final double BASE_DAMAGE_BONUS = 0.5;
-    private static final double BASE_AOE_DAMAGE = 0.4;
+    private static final double BASE_DAMAGE_BONUS = 0.30;
+    private static final double DAMAGE_BONUS_PER_LEVEL = 0.0025;
+    private static final double BASE_AOE_DAMAGE = 0.10;
+    private static final double AOE_DAMAGE_PER_LEVEL = 0.001;
 
     // Track which players have this skill active
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
@@ -50,17 +52,20 @@ public class DepthChargeSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public double getConditionalBonus(int skillLevel) {
-        if (configFields != null) return BASE_DAMAGE_BONUS + configFields.calculateValue(skillLevel);
-        return scaled(BASE_DAMAGE_BONUS, 0.01, skillLevel);
+        // Power budget at the level 100 soft cap: +55% to the primary target plus a 20% secondary hit.
+        // At the standard 26.7% conditional trigger rate this totals E = 0.267 * 0.75 = 0.20
+        // when one additional aquatic target is caught in the blast.
+        double approvedCurve = scaled(BASE_DAMAGE_BONUS, DAMAGE_BONUS_PER_LEVEL, skillLevel);
+        if (configFields == null) return approvedCurve;
+        double configuredBonus = configFields.calculateValue(skillLevel);
+        if (!Double.isFinite(configuredBonus)) return approvedCurve;
+        return Math.max(0D, Math.min(configuredBonus, approvedCurve));
     }
 
-    /**
-     * Preserved activation hook for the advertised splash effect. It is currently not dispatched
-     * by the generic conditional-skill path; keeping the hook avoids deleting a potentially
-     * disconnected feature or breaking an external caller while that product decision is open.
-     */
-    public void onActivate(Player player, EliteMobDamagedByPlayerEvent event) {
-        if (!isActive(player) || !conditionMet(player, event)) return;
+    @Override
+    public void onConditionMet(Player player, Object context) {
+        if (!(context instanceof EliteMobDamagedByPlayerEvent event)) return;
+        if (!isActive(player)) return;
         EliteEntity eliteEntity = event.getEliteMobEntity();
         if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return;
 
@@ -79,8 +84,7 @@ public class DepthChargeSkill extends SkillBonus implements ConditionalSkill {
     }
 
     private double calculateAoeDamage(int skillLevel) {
-        if (configFields != null) return BASE_AOE_DAMAGE * configFields.calculateValue(skillLevel);
-        return scaled(BASE_AOE_DAMAGE, 0.005, skillLevel);
+        return scaled(BASE_AOE_DAMAGE, AOE_DAMAGE_PER_LEVEL, skillLevel);
     }
 
     @Override

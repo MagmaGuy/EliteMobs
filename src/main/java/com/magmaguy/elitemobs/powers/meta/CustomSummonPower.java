@@ -674,6 +674,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     eliteEntity.addReinforcement(regionalBossEntity);
                 customBossReinforcement.isSummoned = true;
                 regionalBossEntity.setSummoningEntity(eliteEntity);
+                if (customBossReinforcement.inheritAggro)
+                    regionalBossEntity.inheritAggroFrom(eliteEntity);
                 regionalBossEntity.initialize();
                 if (DebugMessage.isAnyDebugEnabled())
                     DebugMessage.log(DEBUG_PREFIX + "queued regional reinforcement " + customBossReinforcement.bossFileName
@@ -702,6 +704,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
                     eliteEntity.addReinforcement(customBossEntity);
                 customBossReinforcement.isSummoned = true;
                 customBossEntity.setSummoningEntity(eliteEntity);
+                if (customBossReinforcement.inheritAggro)
+                    customBossEntity.inheritAggroFrom(eliteEntity);
             }
         }
     }

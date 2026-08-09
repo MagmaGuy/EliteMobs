@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.skills.bonuses.skills.hoes.HarvesterSkill;
 import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.elitemobs.utils.MessageThrottler;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -87,7 +88,7 @@ public class ItemLootShower {
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
             addDirectly(getCurrencyAmount(itemLevel));
         else
-            addIndirectly(location, getCurrencyAmount(itemLevel));
+            addIndirectly(location, HarvesterSkill.applyEliteCoinBonus(player, getCurrencyAmount(itemLevel)));
     }
 
     public static void shutdown() {
@@ -110,7 +111,7 @@ public class ItemLootShower {
 
     public ItemLootShower(Location location, Player player, int amount) {
         this.player = player;
-        addIndirectly(location, amount);
+        addIndirectly(location, HarvesterSkill.applyEliteCoinBonus(player, amount));
     }
 
     private void addIndirectly(Location location, int currencyAmount2) {
@@ -183,11 +184,12 @@ public class ItemLootShower {
         return (int) (eliteMobTier / 2D * EconomySettingsConfig.getCurrencyShowerMultiplier());
     }
 
-    private void addDirectly(double eliteMobTier) {
-        EconomyHandler.addCurrency(player.getUniqueId(), getCurrencyAmount(eliteMobTier));
+    private void addDirectly(int baseCurrencyAmount) {
+        int currencyAmount = HarvesterSkill.applyEliteCoinBonus(player, baseCurrencyAmount);
+        EconomyHandler.addCurrency(player.getUniqueId(), currencyAmount);
         player.sendMessage(EconomySettingsConfig.getChatCurrencyShowerMessage()
                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                .replace("$amount", getCurrencyAmount(eliteMobTier) + ""));
+                .replace("$amount", currencyAmount + ""));
     }
 
     /**

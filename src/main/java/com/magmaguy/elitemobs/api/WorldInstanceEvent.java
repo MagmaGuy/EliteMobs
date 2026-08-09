@@ -6,6 +6,10 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Public API event fired before EliteMobs clones and loads an instanced dungeon world. Cancelling
+ * aborts the world operation before files are cloned.
+ */
 public class WorldInstanceEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     @Getter

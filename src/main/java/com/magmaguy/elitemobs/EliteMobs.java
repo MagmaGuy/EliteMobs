@@ -174,6 +174,7 @@ public class EliteMobs extends JavaPlugin {
         new PeaceBannerConfig();
         new CustomEventsConfig();
         new QuestsConfig();
+        new PartyConfig();
         new WormholesConfig();
         new ArenasConfig();
         //ModelsConfig.initializeConfig();
@@ -420,6 +421,9 @@ public class EliteMobs extends JavaPlugin {
         }
         CombatLevelDisplay.initialize();
 
+        initializationContext.step("Party System");
+        com.magmaguy.elitemobs.parties.PartyManager.initialize();
+
         //Initialize gambling system
         initializationContext.step("Gambling System");
         if (GamblingConfig.isGamblingEnabled()) {
@@ -618,6 +622,7 @@ public class EliteMobs extends JavaPlugin {
         }
         Logger.info("Starting EliteMobs shutdown sequence...");
         Explosion.shutdown();
+        com.magmaguy.elitemobs.parties.PartyManager.shutdown();
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
         Wormhole.shutdown();
         RegionalBossEntity.save();

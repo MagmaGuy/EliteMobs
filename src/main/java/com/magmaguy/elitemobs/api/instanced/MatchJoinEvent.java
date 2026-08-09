@@ -7,6 +7,11 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Public API event fired immediately before a valid player or external spectator is admitted to a
+ * match. Cancelling leaves the player outside the instance. Internal player-to-spectator death
+ * transitions do not fire another join event because the participant never left the match.
+ */
 public class MatchJoinEvent extends Event implements MatchEvent, MatchPlayerEvent, Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private final MatchInstance matchInstance;
@@ -26,6 +31,11 @@ public class MatchJoinEvent extends Event implements MatchEvent, MatchPlayerEven
     @NotNull
     @Override
     public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    @NotNull
+    public static HandlerList getHandlerList() {
         return handlers;
     }
 

@@ -25,7 +25,6 @@ public class StatsCommand {
     public static void statsHandler(CommandSender commandSender) {
 
         int aggressiveCount = 0;
-        int passiveCount = 0;
 
         HashMap<EntityType, Integer> entitiesCounted = new HashMap<>();
 
@@ -64,9 +63,8 @@ public class StatsCommand {
                         .replace("$version", Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS).getDescription().getVersion()));
         commandSender.sendMessage(
                 CommandMessagesConfig.getStatsEntityCountMessage()
-                        .replace("$total", String.valueOf(aggressiveCount + passiveCount))
-                        .replace("$aggressive", String.valueOf(aggressiveCount))
-                        .replace("$passive", String.valueOf(passiveCount)));
+                        .replace("$total", String.valueOf(aggressiveCount))
+                        .replace("$aggressive", String.valueOf(aggressiveCount)));
         commandSender.sendMessage(ChatColorConverter.convert(breakdownString.toString()));
         commandSender.sendMessage(
                 CommandMessagesConfig.getStatsHighestThreatMessage()

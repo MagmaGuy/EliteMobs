@@ -20,8 +20,6 @@ public class PersistentTagger {
     @Getter
     private static final String NPC_ENTITY = "NPCEntity";
     @Getter
-    private static final String SUPER_MOB = "SuperMob";
-    @Getter
     private static final String VISUAL_EFFECT = "VisualEffect";
     @Getter
     private static final String ELITE_PROJECTILE = "EliteProjectile";
@@ -62,15 +60,6 @@ public class PersistentTagger {
         UUID uuid = getUUID(entity, NPC_ENTITY);
         if (uuid == null) return null;
         return EntityTracker.getNpcEntities().get(uuid);
-    }
-
-    public static void tagSuperMob(Entity entity) {
-        tag(entity, SUPER_MOB, entity.getType().toString());
-    }
-
-    public static boolean isSuperMob(Entity entity) {
-        if (entity == null) return false;
-        return entity.getPersistentDataContainer().has(new NamespacedKey(MetadataHandler.PLUGIN, SUPER_MOB), PersistentDataType.STRING);
     }
 
     public static void tagVisualEffect(Entity entity) {

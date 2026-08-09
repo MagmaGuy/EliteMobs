@@ -33,6 +33,18 @@ public class SimpleScoreboard {
         return scoreboard;
     }
 
+    /** Reuses the current EliteMobs scoreboard when possible, avoiding a new board allocation for periodic UI updates. */
+    public static Scoreboard updateScoreboard(Player player, String displayName, List<String> scoreboardContents) {
+        Scoreboard scoreboard = player.getScoreboard();
+        if (!isManagedScoreboard(scoreboard)) return lazyScoreboard(player, displayName, scoreboardContents);
+        Objective existing = scoreboard.getObjective(SIDEBAR_OBJECTIVE);
+        if (existing != null) existing.unregister();
+        Objective objective = ScoreboardUtil.registerSidebarObjective(
+                MetadataHandler.PLUGIN, scoreboard, SIDEBAR_OBJECTIVE, displayName);
+        setSidebarLines(objective, scoreboardContents);
+        return scoreboard;
+    }
+
     public static Scoreboard temporaryScoreboard(Player player, String displayName, List<String> scoreboardContents, int ticksTimeout) {
         Scoreboard scoreboard = lazyScoreboard(player, displayName, scoreboardContents);
         new BukkitRunnable() {

@@ -6,6 +6,11 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Public API event fired after the match's constructor parameters have been assigned but before
+ * watchdog tasks start or the instance enters the global registry. Cancelling prevents the match
+ * from becoming active.
+ */
 public class MatchInstantiateEvent extends Event implements MatchEvent, Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private final MatchInstance matchInstance;
@@ -23,6 +28,11 @@ public class MatchInstantiateEvent extends Event implements MatchEvent, Cancella
     @NotNull
     @Override
     public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    @NotNull
+    public static HandlerList getHandlerList() {
         return handlers;
     }
 

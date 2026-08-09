@@ -527,6 +527,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             case CONDITIONAL -> {
                 if (skill instanceof ConditionalSkill conditionalSkill) {
                     if (conditionalSkill.conditionMet(player, this)) {
+                        conditionalSkill.onConditionMet(player, this);
                         skill.incrementProcCount(player);
                         SkillBonus.sendSkillActionBar(player, skill);
                     }
@@ -595,6 +596,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             case CONDITIONAL -> {
                 if (skill instanceof ConditionalSkill conditionalSkill) {
                     if (conditionalSkill.conditionMet(player, this)) {
+                        conditionalSkill.onConditionMet(player, this);
                         skill.incrementProcCount(player); // Track activation
                         SkillBonus.sendSkillActionBar(player, skill);
                         yield 1.0 + conditionalSkill.getConditionalBonus(player, skillLevel);

@@ -144,6 +144,10 @@ public class CommandHandler {
         emCommand.registerCommand(new PayCommand());
         emCommand.registerCommand(new AdventurersGuildArgCommand());
         emCommand.registerCommand(new NPCQuestList());
+        emCommand.registerCommand(new PartyCreateCommand());
+        emCommand.registerCommand(new PartyInviteCommand());
+        emCommand.registerCommand(new PartyAcceptCommand());
+        emCommand.registerCommand(new PartyLeaveCommand());
 
         emCommand.registerCommand(new EliteMobsCommand());
         emCommand.registerCommand(new HelpCommand());

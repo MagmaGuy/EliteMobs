@@ -3,50 +3,9 @@ package com.magmaguy.elitemobs.combatsystem;
 import org.bukkit.Bukkit;
 
 /**
- * Handles level-based combat scaling calculations.
- * <p>
- * This system ensures that level differences feel consistent across all level ranges.
- * A level 10 player fighting a level 15 mob feels the same difficulty as a level 95
- * player fighting a level 100 mob.
- * <p>
- * <h2>Core Formula</h2>
- * <pre>
- * modifier = SCALING_BASE ^ (levelDifference / LEVELS_PER_POWER_DOUBLE)
- * </pre>
- * <p>
- * Where:
- * <ul>
- *   <li><b>levelDifference</b> = targetLevel - sourceLevel (positive = target is higher)</li>
- *   <li><b>SCALING_BASE</b> = The base multiplier (default 2.0 for doubling)</li>
- *   <li><b>LEVELS_PER_POWER_DOUBLE</b> = How many levels for power to double (default 5)</li>
- * </ul>
- * <p>
- * <h2>Example Modifiers (with defaults)</h2>
- * <table border="1">
- *   <tr><th>Level Difference</th><th>Modifier</th><th>Meaning</th></tr>
- *   <tr><td>-10</td><td>0.25x</td><td>Target is 10 below you - very weak</td></tr>
- *   <tr><td>-5</td><td>0.5x</td><td>Target is 5 below you - easy fight</td></tr>
- *   <tr><td>0</td><td>1.0x</td><td>Same level - balanced combat</td></tr>
- *   <tr><td>+5</td><td>2.0x</td><td>Target is 5 above you - hard fight</td></tr>
- *   <tr><td>+10</td><td>4.0x</td><td>Target is 10 above you - very hard</td></tr>
- * </table>
- * <p>
- * <h2>How This Affects Combat</h2>
- * When fighting an enemy 5 levels above you:
- * <ul>
- *   <li>Enemy effectively has 2x health (takes twice as many hits)</li>
- *   <li>Enemy effectively deals 2x damage (you die twice as fast)</li>
- *   <li>Combined effect: fight is roughly 4x harder</li>
- * </ul>
- * <p>
- * <h2>Customization</h2>
- * Adjust these constants to change the feel:
- * <ul>
- *   <li>Increase LEVELS_PER_POWER_DOUBLE to make level differences matter less</li>
- *   <li>Decrease LEVELS_PER_POWER_DOUBLE to make level differences matter more</li>
- *   <li>Change SCALING_BASE to adjust the curve shape (2.0 = exponential doubling)</li>
- *   <li>Adjust RECOMMENDED_LEVEL_RANGE to change the "viable combat" window</li>
- * </ul>
+ * Owns the live, playtested EliteMobs combat curve: exponential elite health plus the offensive
+ * and defensive skill adjustments used by the damage pipelines. Experimental level-difference
+ * damage modifiers intentionally do not live here.
  */
 public class LevelScaling {
 
@@ -84,57 +43,6 @@ public class LevelScaling {
      * </ul>
      */
     public static final double LEVELS_PER_POWER_DOUBLE = 5.0;
-
-    // ========================================
-    // COMBAT RANGE CONSTANTS
-    // Define what level ranges are considered viable
-    // ========================================
-
-    /**
-     * The recommended maximum level difference for challenging but fair combat.
-     * <p>
-     * Players can attempt content up to this many levels above them, though
-     * it will be significantly harder. Content beyond this is possible but
-     * may be frustrating or require exceptional skill/gear.
-     */
-    public static final int RECOMMENDED_LEVEL_RANGE = 5;
-
-    /**
-     * The absolute maximum level difference before combat becomes nearly impossible.
-     * <p>
-     * At this difference, the modifier is extreme (with defaults: 4x at +10 levels).
-     * Beyond this, players should be warned or prevented from engaging.
-     */
-    public static final int EXTREME_LEVEL_RANGE = 10;
-
-    /**
-     * Level difference at which content becomes trivial.
-     * <p>
-     * When a player is this many levels above content, consider reducing
-     * rewards or skipping combat entirely.
-     */
-    public static final int TRIVIAL_LEVEL_RANGE = -10;
-
-    // ========================================
-    // MODIFIER CAPS (Optional safety limits)
-    // Prevent extreme values at very large level differences
-    // ========================================
-
-    /**
-     * Maximum modifier value (caps how much stronger enemies can be).
-     * <p>
-     * Set to a high value to effectively disable the cap.
-     * With defaults, this caps at +15 level difference (8x modifier).
-     */
-    public static final double MAX_MODIFIER = 8.0;
-
-    /**
-     * Minimum modifier value (caps how weak enemies can be).
-     * <p>
-     * Prevents enemies from becoming completely trivial.
-     * With defaults, this caps at -15 level difference (0.125x modifier).
-     */
-    public static final double MIN_MODIFIER = 0.125;
 
     /**
      * Fallback maximum mob health allowed.
@@ -180,15 +88,6 @@ public class LevelScaling {
     public static final double TARGET_HITS_TO_KILL_PLAYER = 5.0;
 
     /**
-     * Target number of hits for a player to die when fighting content 10 levels above them.
-     * <p>
-     * Used to calculate the boss damage level scaling exponent.
-     * With values of 5 hits at same level and 2 hits at +10, the scaling
-     * feels challenging but not impossible for skilled players.
-     */
-    public static final double TARGET_HITS_AT_PLUS_10 = 2.0;
-
-    /**
      * Controls how fast the skill-based damage adjustment scales exponentially
      * in the defensive (elite→player) damage formula.
      * <p>
@@ -199,31 +98,9 @@ public class LevelScaling {
      *   <li>At -7.5 levels: damage halves</li>
      * </ul>
      * <p>
-     * Note: This is the defensive equivalent of {@link #LEVELS_PER_BOSS_DAMAGE_DOUBLE},
-     * which is used for the offensive (old level modifier) path. They happen to share the
-     * same value but are conceptually separate constants.
+     * This rate is mirrored by the offensive adjustment for a symmetric approved curve.
      */
     public static final double SKILL_SCALING_RATE = 7.5;
-
-    /**
-     * Levels required for boss damage to double against players.
-     * <p>
-     * This is calculated from TARGET_HITS_TO_KILL_PLAYER and TARGET_HITS_AT_PLUS_10:
-     * <ul>
-     *   <li>At same level: 5 hits to kill</li>
-     *   <li>At +10 levels: 2 hits to kill</li>
-     *   <li>Damage ratio: 5/2 = 2.5x at +10 levels</li>
-     *   <li>Formula: 2^(10/x) = 2.5 → x ≈ 7.57</li>
-     * </ul>
-     * <p>
-     * Using 7.5 for cleaner math:
-     * <ul>
-     *   <li>+5 levels: 2^(5/7.5) = ~1.6x damage (3.1 hits)</li>
-     *   <li>+10 levels: 2^(10/7.5) = ~2.5x damage (2 hits)</li>
-     *   <li>+15 levels: 2^(15/7.5) = 4x damage (1.25 hits)</li>
-     * </ul>
-     */
-    public static final double LEVELS_PER_BOSS_DAMAGE_DOUBLE = 7.5;
 
     // ========================================
     // OFFENSIVE FORMULA CONSTANTS (Player → Elite)
@@ -267,203 +144,6 @@ public class LevelScaling {
 
     private LevelScaling() {
         // Utility class - no instantiation
-    }
-
-    // ========================================
-    // COMBAT APPLICATION METHODS
-    // Convenience methods for common combat scenarios
-    // ========================================
-
-    /**
-     * Calculates the level scaling modifier for combat.
-     * <p>
-     * This is the core method that determines how level differences affect combat.
-     * Apply this modifier to damage dealt or received based on level difference.
-     *
-     * @param sourceLevel The level of the entity dealing damage or being evaluated
-     * @param targetLevel The level of the entity receiving damage or being compared to
-     * @return The scaling modifier (1.0 = no change, 2.0 = double, 0.5 = half)
-     *
-     * <h3>Usage Examples:</h3>
-     * <pre>
-     * // Player (level 50) attacking Boss (level 55)
-     * double modifier = getLevelModifier(50, 55);
-     * // modifier = 2.0, so the boss effectively has 2x health
-     *
-     * // Boss (level 55) attacking Player (level 50)
-     * double modifier = getLevelModifier(55, 50);
-     * // modifier = 0.5, so player takes 2x damage (inverse)
-     * </pre>
-     */
-    public static double getLevelModifier(int sourceLevel, int targetLevel) {
-        int levelDifference = targetLevel - sourceLevel;
-        return getLevelModifierFromDifference(levelDifference);
-    }
-
-    /**
-     * Calculates the level scaling modifier from a raw level difference.
-     * <p>
-     * Positive difference = target is higher level (harder)
-     * Negative difference = target is lower level (easier)
-     *
-     * @param levelDifference The level difference (target - source)
-     * @return The scaling modifier, clamped between MIN_MODIFIER and MAX_MODIFIER
-     */
-    public static double getLevelModifierFromDifference(int levelDifference) {
-        // Core formula: modifier = base ^ (difference / levelsPerDouble)
-        double rawModifier = Math.pow(SCALING_BASE, levelDifference / LEVELS_PER_POWER_DOUBLE);
-
-        // Clamp to prevent extreme values
-        return clampModifier(rawModifier);
-    }
-
-    // ========================================
-    // UTILITY METHODS
-    // Helper methods for combat range checks
-    // ========================================
-
-    /**
-     * Clamps a modifier value between MIN_MODIFIER and MAX_MODIFIER.
-     *
-     * @param modifier The raw modifier value
-     * @return The clamped modifier
-     */
-    public static double clampModifier(double modifier) {
-        return Math.max(MIN_MODIFIER, Math.min(MAX_MODIFIER, modifier));
-    }
-
-    /**
-     * Calculates effective damage when accounting for level difference.
-     * <p>
-     * When attacking a higher level target, your effective damage is reduced.
-     * When attacking a lower level target, your effective damage is increased.
-     *
-     * @param baseDamage The base damage before level scaling
-     * @param attackerLevel The level of the attacker
-     * @param defenderLevel The level of the defender
-     * @return The level-adjusted damage
-     *
-     * <h3>Example:</h3>
-     * <pre>
-     * // Player (50) attacks Boss (55) for 100 base damage
-     * double effectiveDamage = calculateEffectiveDamage(100, 50, 55);
-     * // effectiveDamage = 50 (halved because boss is 5 levels higher)
-     * </pre>
-     */
-    public static double calculateEffectiveDamage(double baseDamage, int attackerLevel, int defenderLevel) {
-        // When defender is higher level, damage is reduced (divide by modifier)
-        // When defender is lower level, damage is increased (divide by smaller modifier)
-        double modifier = getLevelModifier(attackerLevel, defenderLevel);
-        return baseDamage / modifier;
-    }
-
-    /**
-     * Calculates effective incoming damage when accounting for level difference.
-     * <p>
-     * When being attacked by a higher level enemy, you take more damage.
-     * When being attacked by a lower level enemy, you take less damage.
-     *
-     * @param baseDamage The base damage before level scaling
-     * @param attackerLevel The level of the attacker
-     * @param defenderLevel The level of the defender
-     * @return The level-adjusted incoming damage
-     *
-     * <h3>Example:</h3>
-     * <pre>
-     * // Boss (55) attacks Player (50) for 100 base damage
-     * double incomingDamage = calculateIncomingDamage(100, 55, 50);
-     * // incomingDamage = 200 (doubled because boss is 5 levels higher)
-     * </pre>
-     */
-    public static double calculateIncomingDamage(double baseDamage, int attackerLevel, int defenderLevel) {
-        // When attacker is higher level, damage is increased (multiply by modifier)
-        double modifier = getLevelModifier(attackerLevel, defenderLevel);
-        return baseDamage * modifier;
-    }
-
-    /**
-     * Checks if a level difference is within the recommended combat range.
-     *
-     * @param playerLevel The player's level
-     * @param targetLevel The target's level
-     * @return true if the target is within ±RECOMMENDED_LEVEL_RANGE
-     */
-    public static boolean isWithinRecommendedRange(int playerLevel, int targetLevel) {
-        int difference = Math.abs(targetLevel - playerLevel);
-        return difference <= RECOMMENDED_LEVEL_RANGE;
-    }
-
-    /**
-     * Checks if a level difference is within the extreme (but possible) combat range.
-     *
-     * @param playerLevel The player's level
-     * @param targetLevel The target's level
-     * @return true if the target is within ±EXTREME_LEVEL_RANGE
-     */
-    public static boolean isWithinExtremeRange(int playerLevel, int targetLevel) {
-        int difference = Math.abs(targetLevel - playerLevel);
-        return difference <= EXTREME_LEVEL_RANGE;
-    }
-
-    // ========================================
-    // MOB HP SCALING
-    // Level difficulty is now built into mob HP rather than damage modifiers
-    // ========================================
-
-    /**
-     * Checks if content would be trivial for the player.
-     *
-     * @param playerLevel The player's level
-     * @param contentLevel The content's level
-     * @return true if the player is more than TRIVIAL_LEVEL_RANGE above the content
-     */
-    public static boolean isTrivialContent(int playerLevel, int contentLevel) {
-        return (playerLevel - contentLevel) >= Math.abs(TRIVIAL_LEVEL_RANGE);
-    }
-
-    /**
-     * Gets a difficulty description based on level difference.
-     *
-     * @param playerLevel The player's level
-     * @param targetLevel The target's level
-     * @return A string describing the relative difficulty
-     */
-    public static String getDifficultyDescription(int playerLevel, int targetLevel) {
-        int difference = targetLevel - playerLevel;
-
-        if (difference <= TRIVIAL_LEVEL_RANGE) {
-            return "Trivial";
-        } else if (difference < -RECOMMENDED_LEVEL_RANGE) {
-            return "Very Easy";
-        } else if (difference < 0) {
-            return "Easy";
-        } else if (difference == 0) {
-            return "Balanced";
-        } else if (difference <= RECOMMENDED_LEVEL_RANGE) {
-            return "Challenging";
-        } else if (difference <= EXTREME_LEVEL_RANGE) {
-            return "Very Hard";
-        } else {
-            return "Extreme";
-        }
-    }
-
-    /**
-     * Gets the modifier value as a human-readable percentage.
-     *
-     * @param sourceLevel The source level
-     * @param targetLevel The target level
-     * @return A string like "+100%" or "-50%"
-     */
-    public static String getModifierAsPercentage(int sourceLevel, int targetLevel) {
-        double modifier = getLevelModifier(sourceLevel, targetLevel);
-        double percentage = (modifier - 1.0) * 100;
-
-        if (percentage >= 0) {
-            return String.format("+%.0f%%", percentage);
-        } else {
-            return String.format("%.0f%%", percentage);
-        }
     }
 
     /**
@@ -541,45 +221,4 @@ public class LevelScaling {
         return Math.pow(2.0, (weaponSkillLevel - mobLevel) / OFFENSIVE_SKILL_SCALING_RATE);
     }
 
-    // ========================================
-    // DEBUG / REFERENCE METHODS
-    // ========================================
-
-    /**
-     * Prints a reference table of level modifiers for debugging.
-     * <p>
-     * Useful for visualizing how the current constants affect combat.
-     */
-    public static void printModifierTable() {
-        com.magmaguy.magmacore.util.Logger.info("=== Level Scaling Reference Table ===");
-        com.magmaguy.magmacore.util.Logger.info("Settings: SCALING_BASE=" + SCALING_BASE +
-                ", LEVELS_PER_POWER_DOUBLE=" + LEVELS_PER_POWER_DOUBLE);
-        com.magmaguy.magmacore.util.Logger.info(String.format("%-12s %-12s %-15s", "Level Diff", "Modifier", "Description"));
-        com.magmaguy.magmacore.util.Logger.info("-".repeat(40));
-
-        int[] differences = {-15, -10, -5, -3, -1, 0, 1, 3, 5, 10, 15};
-        for (int diff : differences) {
-            double modifier = getLevelModifierFromDifference(diff);
-            String desc = diff < 0 ? "Easier" : (diff > 0 ? "Harder" : "Balanced");
-            com.magmaguy.magmacore.util.Logger.info(String.format("%-12d %-12.3f %-15s", diff, modifier, desc));
-        }
-    }
-
-    /**
-     * Prints a reference table of mob HP at various levels.
-     */
-    public static void printHealthTable() {
-        com.magmaguy.magmacore.util.Logger.info("=== Mob HP Scaling Reference Table ===");
-        com.magmaguy.magmacore.util.Logger.info("Formula: HP = " + BASE_MOB_HP + " * 2^(level/5)");
-        com.magmaguy.magmacore.util.Logger.info("+5 levels = exactly 2x HP at all levels");
-        com.magmaguy.magmacore.util.Logger.info(String.format("%-8s %-12s %-15s", "Level", "HP", "+5 Level HP"));
-        com.magmaguy.magmacore.util.Logger.info("-".repeat(40));
-
-        int[] levels = {1, 5, 10, 15, 20, 25, 30, 50, 75, 100};
-        for (int level : levels) {
-            double hp = calculateMobHealth(level, 20);
-            double hpPlus5 = calculateMobHealth(level + 5, 20);
-            com.magmaguy.magmacore.util.Logger.info(String.format("%-8d %-12.1f %-15.1f (2x)", level, hp, hpPlus5));
-        }
-    }
 }

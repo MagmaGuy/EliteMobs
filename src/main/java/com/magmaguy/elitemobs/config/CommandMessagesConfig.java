@@ -1006,9 +1006,8 @@ public class CommandMessagesConfig extends ConfigurationFile {
         statsEntityCountMessage = ConfigurationEngine.setString(
                 List.of("Sets the entity count message for the stats command.",
                         "$total is the placeholder for total elite entities.",
-                        "$aggressive is the placeholder for elite mobs count.",
-                        "$passive is the placeholder for super mobs count."),
-                file, fileConfiguration, "statsEntityCountMessage", "&7[EM] &2There are currently &l&6$total &f&2EliteMobs mobs entities in the world, of which &a$aggressive &2are Elite Mobs and &a$passive &2are Super Mobs.", true);
+                        "$aggressive is the placeholder for elite mobs count."),
+                file, fileConfiguration, "statsEntityCountMessage", "&7[EM] &2There are currently &l&6$total &f&2EliteMobs entities in the world.", true);
         statsBreakdownPrefix = ConfigurationEngine.setString(
                 List.of("Sets the breakdown prefix for the stats command."),
                 file, fileConfiguration, "statsBreakdownPrefix", "&2Breakdown: &a", true);

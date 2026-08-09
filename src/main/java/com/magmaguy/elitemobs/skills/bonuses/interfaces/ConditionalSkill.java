@@ -38,4 +38,13 @@ public interface ConditionalSkill {
     default double getConditionalBonus(Player player, int skillLevel) {
         return getConditionalBonus(skillLevel);
     }
+
+    /**
+     * Optional side-effect hook invoked exactly once when the condition succeeds for a hit.
+     * Secondary damage created here should use a custom-damage scope so it cannot recursively
+     * activate the skill pipeline.
+     */
+    default void onConditionMet(Player player, Object context) {
+        // Most conditional skills only modify the triggering hit.
+    }
 }

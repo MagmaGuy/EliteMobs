@@ -14,6 +14,7 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.CustomEvent;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.AdvancedAggroManager;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
@@ -59,8 +60,12 @@ public class EliteEntity {
     @Getter
     protected HashSet<ElitePower> elitePowers = new TrackedElitePowerSet();
     private transient List<ElitePower> orderedElitePowers = null;
-    //coming soon - decoupling aggro from damage to allow for tanking mechanics
-    protected HashMap<Player, Double> aggro = new HashMap<>();
+    /**
+     * Threat is deliberately tracked separately from damage contribution. Damage remains the
+     * source of loot and participation credit, while threat is what target selection consumes and
+     * can therefore be amplified by tanking mechanics such as Loud Strikes.
+     */
+    protected final HashMap<Player, Double> aggro = new HashMap<>();
     /*
     Note that a lot of values here are defined by EliteMobProperties.java
      */
@@ -254,17 +259,25 @@ public class EliteEntity {
     }
 
     public void addDamager(Player player, double damage) {
-        if (!damagers.isEmpty())
-            for (Player iteratedPlayer : damagers.keySet())
-                if (iteratedPlayer.getUniqueId().equals(player.getUniqueId())) {
-                    this.damagers.put(iteratedPlayer, this.damagers.get(iteratedPlayer) + damage);
-                    this.aggro.put(iteratedPlayer, this.aggro.get(iteratedPlayer) + damage *
-                            ElitePlayerInventory.getPlayer(player).getLoudStrikesBonusMultiplier(false));
-                    return;
-                }
-        this.damagers.put(player, damage);
-        this.aggro.put(player, damage *
-                ElitePlayerInventory.getPlayer(player).getLoudStrikesBonusMultiplier(false));
+        if (player == null || !Double.isFinite(damage) || damage <= 0) return;
+
+        Player trackedPlayer = findTrackedPlayer(player);
+        damagers.merge(trackedPlayer, damage, Double::sum);
+
+        ElitePlayerInventory inventory = ElitePlayerInventory.getPlayer(player);
+        double loudStrikesBonus = inventory == null ? 0D : inventory.getLoudStrikesBonusMultiplier(false);
+        if (!Double.isFinite(loudStrikesBonus) || loudStrikesBonus < 0D) loudStrikesBonus = 0D;
+        aggro.merge(trackedPlayer, damage * (1D + loudStrikesBonus), Double::sum);
+
+        AdvancedAggroManager.updateTarget(this);
+    }
+
+    private Player findTrackedPlayer(Player player) {
+        for (Player trackedPlayer : damagers.keySet())
+            if (trackedPlayer.getUniqueId().equals(player.getUniqueId())) return trackedPlayer;
+        for (Player trackedPlayer : aggro.keySet())
+            if (trackedPlayer.getUniqueId().equals(player.getUniqueId())) return trackedPlayer;
+        return player;
     }
 
     public boolean hasDamagers() {
@@ -273,6 +286,36 @@ public class EliteEntity {
 
     public Map<Player, Double> getDamagers() {
         return damagers;
+    }
+
+    /**
+     * Returns the accumulated threat used by elite target selection. The returned map is read-only;
+     * callers that need to reset combat state must use {@link #clearDamagers()} so damage and threat
+     * cannot drift apart.
+     */
+    public Map<Player, Double> getAggro() {
+        return Collections.unmodifiableMap(aggro);
+    }
+
+    /**
+     * Copies threat, but not damage/reward contribution, from a summoning elite.
+     */
+    public void inheritAggroFrom(EliteEntity summoningEntity) {
+        if (summoningEntity == null || summoningEntity == this) return;
+        aggro.clear();
+        summoningEntity.aggro.forEach((player, threat) -> {
+            if (player != null && threat != null && Double.isFinite(threat) && threat > 0D)
+                aggro.put(player, threat);
+        });
+        AdvancedAggroManager.updateTarget(this);
+    }
+
+    /**
+     * Clears both reward contribution and combat threat for a fresh encounter.
+     */
+    public void clearDamagers() {
+        damagers.clear();
+        aggro.clear();
     }
 
     public boolean isCustomBossEntity() {
@@ -388,6 +431,7 @@ public class EliteEntity {
 
         PersistentTagger.tagElite(livingEntity, eliteUUID);
         EntityTracker.registerEliteMob(this);
+        AdvancedAggroManager.updateTarget(this);
     }
 
     public void setNameVisible(boolean isVisible) {
@@ -495,7 +539,7 @@ public class EliteEntity {
         if (eliteMobHealEvent.isCancelled()) return;
         setHealth(this.maxHealth);
         this.health = maxHealth;
-        damagers.clear();
+        clearDamagers();
     }
 
     private void setArmor() {

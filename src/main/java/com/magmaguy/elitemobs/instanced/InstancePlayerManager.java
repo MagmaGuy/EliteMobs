@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.instanced;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerJoinArenaEvent;
 import com.magmaguy.elitemobs.api.PlayerJoinDungeonEvent;
+import com.magmaguy.elitemobs.api.PlayerLeaveArenaEvent;
+import com.magmaguy.elitemobs.api.PlayerLeaveDungeonEvent;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.api.instanced.MatchJoinEvent;
 import com.magmaguy.elitemobs.api.instanced.MatchLeaveEvent;
@@ -35,9 +37,6 @@ public class InstancePlayerManager {
     }
 
     public static boolean addNewPlayer(Player player, MatchInstance matchInstance) {
-        MatchJoinEvent event = new MatchJoinEvent(matchInstance, player);
-        if (event.isCancelled()) return false;
-
         //Right now new players can't join ongoing instances
         if (!matchInstance.state.equals(MatchInstance.InstancedRegionState.WAITING)) {
             player.sendMessage(ArenasConfig.getArenasOngoingMessage());
@@ -52,6 +51,8 @@ public class InstancePlayerManager {
         if (matchInstance.getPermission() != null && !player.hasPermission(matchInstance.getPermission()))
             return false;
 
+        if (!fireJoinEvent(matchInstance, player)) return false;
+
         //Add the player to the relevant fields
         matchInstance.participants.add(player);
         matchInstance.players.add(player);
@@ -62,9 +63,9 @@ public class InstancePlayerManager {
         //Should be the first join of the player, do the join events
         matchInstance.getPreviousPlayerLocations().put(player, player.getLocation());
         if (matchInstance instanceof ArenaInstance arenaInstance)
-            new EventCaller(new PlayerJoinArenaEvent(arenaInstance));
+            new EventCaller(new PlayerJoinArenaEvent(arenaInstance, player));
         else if (matchInstance instanceof DungeonInstance dungeonInstance)
-            new EventCaller(new PlayerJoinDungeonEvent(dungeonInstance));
+            new EventCaller(new PlayerJoinDungeonEvent(dungeonInstance, player));
 
 
         new BukkitRunnable() {
@@ -88,7 +89,7 @@ public class InstancePlayerManager {
     }
 
     public static void removePlayer(Player player, MatchInstance matchInstance) {
-        new MatchLeaveEvent(matchInstance, player);
+        boolean wasParticipant = matchInstance.participants.contains(player);
         restoreFullHealthIfMatchFinished(player, matchInstance);
 
         //Remove match instance where needed
@@ -98,6 +99,8 @@ public class InstancePlayerManager {
             matchInstance.participants.remove(player);
             PlayerData.setMatchInstance(player, null);
         }
+        if (wasParticipant && !matchInstance.participants.contains(player))
+            fireLeaveEvents(matchInstance, player);
 
         if (matchInstance.players.isEmpty() && matchInstance.getDeathLocationByPlayer(player) != null)
             matchInstance.getDeathLocationByPlayer(player).clear(false);
@@ -117,7 +120,7 @@ public class InstancePlayerManager {
         if (matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED &&
                 matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_DEFEAT &&
                 matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_VICTORY &&
-                matchInstance.players.isEmpty()) {
+                matchInstance.players.isEmpty() && !matchInstance.isDestroyingMatch()) {
             matchInstance.defeat();
         } else
             //Remove lives
@@ -138,6 +141,7 @@ public class InstancePlayerManager {
                 player.teleport(matchInstance.exitLocation);
             PlayerData.setMatchInstance(player, null);
             matchInstance.participants.remove(player);
+            fireLeaveEvents(matchInstance, player);
             return;
         }
         // When spectating is disabled the server wants vanilla spectator mode to never be
@@ -155,6 +159,7 @@ public class InstancePlayerManager {
             PlayerData.setMatchInstance(player, null);
             matchInstance.participants.remove(player);
             matchInstance.playerLives.remove(player);
+            fireLeaveEvents(matchInstance, player);
             return;
         }
 
@@ -174,7 +179,7 @@ public class InstancePlayerManager {
     }
 
     public static void addSpectator(MatchInstance matchInstance, Player player, boolean wasPlayer) {
-        new MatchJoinEvent(matchInstance, player);
+        if (!wasPlayer && !fireJoinEvent(matchInstance, player)) return;
 
         if (!wasPlayer) matchInstance.previousPlayerLocations.put(player, player.getLocation());
         matchInstance.participants.add(player);
@@ -187,15 +192,19 @@ public class InstancePlayerManager {
             player.teleport(matchInstance.startLocation);
         }
         PlayerData.setMatchInstance(player, matchInstance);
+        if (!wasPlayer) fireTypedJoinEvent(matchInstance, player);
     }
 
     public static void removeSpectator(MatchInstance matchInstance, Player player) {
+        boolean wasParticipant = matchInstance.participants.contains(player);
         restoreFullHealthIfMatchFinished(player, matchInstance);
         matchInstance.spectators.remove(player);
         if (!matchInstance.players.contains(player)) {
             PlayerData.setMatchInstance(player, null);
             matchInstance.participants.remove(player);
         }
+        if (wasParticipant && !matchInstance.participants.contains(player))
+            fireLeaveEvents(matchInstance, player);
         player.setGameMode(GameMode.SURVIVAL);
         MatchInstance.MatchInstanceEvents.teleportBypass = true;
         if (matchInstance instanceof DungeonInstance) {
@@ -213,8 +222,29 @@ public class InstancePlayerManager {
     public static void removeAnyKind(MatchInstance matchInstance, Player player) {
         if (matchInstance.players.contains(player)) matchInstance.removePlayer(player);
         if (matchInstance.spectators.contains(player)) matchInstance.removeSpectator(player);
-        matchInstance.participants.remove(player);
+        if (matchInstance.participants.remove(player)) fireLeaveEvents(matchInstance, player);
         PlayerData.setMatchInstance(player, null);
+    }
+
+    private static boolean fireJoinEvent(MatchInstance matchInstance, Player player) {
+        MatchJoinEvent event = new MatchJoinEvent(matchInstance, player);
+        new EventCaller(event);
+        return !event.isCancelled();
+    }
+
+    private static void fireTypedJoinEvent(MatchInstance matchInstance, Player player) {
+        if (matchInstance instanceof ArenaInstance arenaInstance)
+            new EventCaller(new PlayerJoinArenaEvent(arenaInstance, player));
+        else if (matchInstance instanceof DungeonInstance dungeonInstance)
+            new EventCaller(new PlayerJoinDungeonEvent(dungeonInstance, player));
+    }
+
+    private static void fireLeaveEvents(MatchInstance matchInstance, Player player) {
+        new EventCaller(new MatchLeaveEvent(matchInstance, player));
+        if (matchInstance instanceof ArenaInstance arenaInstance)
+            new EventCaller(new PlayerLeaveArenaEvent(arenaInstance, player));
+        else if (matchInstance instanceof DungeonInstance dungeonInstance)
+            new EventCaller(new PlayerLeaveDungeonEvent(dungeonInstance, player));
     }
 
 }
