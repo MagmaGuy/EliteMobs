@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.spears;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -26,10 +27,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
 
     public static final String SKILL_ID = "spears_impaling_strike";
-    private static final double BASE_PROC_CHANCE = 0.15;
+    private static final double BASE_PROC_CHANCE = 0.17;
     private static final int BLEED_DURATION_TICKS = 100; // 5 seconds
     private static final int BLEED_TICK_INTERVAL = 20; // Damage every second
-    private static final double BASE_BLEED_DAMAGE = 0.10; // 10% of initial hit per tick (50% total over 5s)
+    private static final double BASE_BLEED_DAMAGE = 0.08; // 8% of initial hit per tick
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, BukkitRunnable> activeBleedTasks = new ConcurrentHashMap<>();
@@ -42,7 +43,8 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        return Math.min(0.35, BASE_PROC_CHANCE + (skillLevel * 0.003));
+        // ~27% at level 50
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.35, skillLevel);
     }
 
     @Override
@@ -91,12 +93,8 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
                     // Bypass the player→elite formula so the flat bleed tick lands as-is
                     // (mirrors LacerateSkill) instead of being re-scaled by the formula
                     // and counted as a click by the autoclicker throttle.
-                    com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-                    try {
-                        livingTarget.damage(damagePerTick, player);
-                    } finally {
-                        com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-                    }
+                    CombatDamageContext.runPlayerToEliteBypass(
+                            () -> livingTarget.damage(damagePerTick, player));
 
                     // Bleed particle effect
                     LivingEntity living = target.getLivingEntity();
@@ -116,10 +114,10 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
     }
 
     public double getBleedDamagePercent(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return BASE_BLEED_DAMAGE + (skillLevel * 0.01);
+        // Power budget: 5 bleed ticks at 15% of the hit each is 75% of a hit at level 50, on a
+        // 27% proc rate (E = 0.267 * 0.75 = 0.20). Hardcoded rather than read from config so
+        // every server runs the same numbers while the rebalance is being validated.
+        return scaled(BASE_BLEED_DAMAGE, 0.0014, skillLevel); // 8% base + 0.14% per level
     }
 
     @Override
@@ -156,7 +154,13 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // Fraction of the hit dealt per bleed tick, not a bonus to the main hit - see affectsDamage().
         return getBleedDamagePercent(skillLevel);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // DoT skill - applies bleed via onProc, doesn't multiply main hit damage
     }
 
     @Override

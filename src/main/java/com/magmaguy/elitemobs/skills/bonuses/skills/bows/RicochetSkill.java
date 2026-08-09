@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.bows;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
@@ -22,7 +23,7 @@ public class RicochetSkill extends SkillBonus implements ProcSkill {
     public static final String SKILL_ID = "bows_ricochet";
     private static final double BASE_PROC_CHANCE = 0.15; // 15% chance
     private static final double RICOCHET_RANGE = 5.0;
-    private static final double BASE_RICOCHET_DAMAGE = 0.50; // 50% of original damage
+    private static final double BASE_RICOCHET_DAMAGE = 0.55; // 55% of original damage
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
@@ -34,7 +35,7 @@ public class RicochetSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        return Math.min(0.35, BASE_PROC_CHANCE + (skillLevel * 0.002));
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.35, skillLevel);
     }
 
     @Override
@@ -53,12 +54,8 @@ public class RicochetSkill extends SkillBonus implements ProcSkill {
                 .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(target.getLocation())))
                 .ifPresent(bounceTarget -> {
                     // Use bypass to prevent recursive skill processing
-                    EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-                    try {
-                        bounceTarget.damage(ricochetDamage, player);
-                    } finally {
-                        EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-                    }
+                    CombatDamageContext.runPlayerToEliteBypass(
+                            () -> bounceTarget.damage(ricochetDamage, player));
 
                     // Visual effect - line between targets
                     bounceTarget.getWorld().spawnParticle(
@@ -66,8 +63,12 @@ public class RicochetSkill extends SkillBonus implements ProcSkill {
                 });
     }
 
+    /**
+     * Power budget: the bounce is a second hit worth 80% of the first at level 50, on a 25%
+     * proc rate (E = 0.25 * 0.80 = 0.20).
+     */
     private double getRicochetDamageMultiplier(int skillLevel) {
-        return BASE_RICOCHET_DAMAGE + (skillLevel * 0.005); // 50% base + 0.5% per level
+        return scaled(BASE_RICOCHET_DAMAGE, 0.005, skillLevel); // 55% base + 0.5% per level
     }
 
     @Override
@@ -91,7 +92,10 @@ public class RicochetSkill extends SkillBonus implements ProcSkill {
     }
 
     @Override
+    // Fraction of the hit dealt to the ricochet target, not a bonus to the main hit - see affectsDamage()
     public double getBonusValue(int skillLevel) { return getRicochetDamageMultiplier(skillLevel); }
+    @Override
+    public boolean affectsDamage() { return false; } // Damages a second target via onProc, not the main hit
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(

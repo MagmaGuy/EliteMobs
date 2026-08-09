@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.tridents;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -26,9 +27,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LeviathanWrathSkill extends SkillBonus implements CooldownSkill {
 
     public static final String SKILL_ID = "tridents_leviathan_wrath";
-    private static final long BASE_COOLDOWN = 60; // 60 seconds
+    private static final long BASE_COOLDOWN = 30; // 30 seconds
     private static final double AOE_RADIUS = 6.0;
-    private static final double BASE_DAMAGE_MULTIPLIER = 2.0;
+    private static final double BASE_DAMAGE_MULTIPLIER = 3.0;
 
     // Track cooldowns: PlayerUUID -> Cooldown end time
     private static final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
@@ -43,8 +44,8 @@ public class LeviathanWrathSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
-        // Cooldown reduces by 0.2s per level, minimum 30 seconds
-        return Math.max(30, BASE_COOLDOWN - (skillLevel / 5));
+        // Cooldown reduces by 0.2s per level, 20s at level 50, minimum 15 seconds
+        return Math.max(15, BASE_COOLDOWN - (skillLevel / 5));
     }
 
     @Override
@@ -88,7 +89,9 @@ public class LeviathanWrathSkill extends SkillBonus implements CooldownSkill {
         LivingEntity target = eliteEntity.getLivingEntity();
         int skillLevel = getPlayerSkillLevel(player);
 
-        startCooldown(player, skillLevel);
+        // The cooldown is started by the caller (processOffensiveSkill starts it as soon as
+        // tryActivate reports the skill fired). Starting it here too just overwrote the same
+        // end time with an identical one.
 
         // Leviathan's Wrath: Massive AOE water attack
         target.getWorld().spawnParticle(Particle.SPLASH, target.getLocation(), 200, 3, 2, 3, 0.5);
@@ -108,21 +111,17 @@ public class LeviathanWrathSkill extends SkillBonus implements CooldownSkill {
         // Massive damage to all nearby enemies
         // Use bypass to prevent recursive skill processing
         double aoeDamage = damageEvent.getDamage() * calculateDamageMultiplier(skillLevel);
-        EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-        try {
-            target.getNearbyEntities(AOE_RADIUS, AOE_RADIUS, AOE_RADIUS).stream()
-                    .filter(e -> e instanceof LivingEntity && !(e instanceof Player))
-                    .forEach(e -> ((LivingEntity) e).damage(aoeDamage, player));
-        } finally {
-            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-        }
+        target.getNearbyEntities(AOE_RADIUS, AOE_RADIUS, AOE_RADIUS).stream()
+                .filter(e -> e instanceof LivingEntity && !(e instanceof Player))
+                .forEach(e -> CombatDamageContext.runPlayerToEliteBypass(
+                        () -> ((LivingEntity) e).damage(aoeDamage, player)));
     }
 
     private double calculateDamageMultiplier(int skillLevel) {
-        if (configFields != null) {
-            return BASE_DAMAGE_MULTIPLIER + configFields.calculateValue(skillLevel);
-        }
-        return BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.02);
+        // Power budget: a 20s cooldown at level 50 is a 1-in-20 trigger, which earns a 5.0x
+        // payload (E = 0.05 * 4.00 = 0.20). Hardcoded rather than read from config so every
+        // server runs the same numbers while the rebalance is being validated.
+        return scaled(BASE_DAMAGE_MULTIPLIER, 0.04, skillLevel);
     }
 
     private int getPlayerSkillLevel(Player player) {
@@ -169,13 +168,16 @@ public class LeviathanWrathSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
-        return calculateDamageMultiplier(skillLevel);
+        // Return the bonus portion only (e.g., 2.5 for a 3.5x multiplier).
+        // processOffensiveSkill adds 1.0 + this, so total = the damage multiplier.
+        return calculateDamageMultiplier(skillLevel) - 1.0;
     }
 
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "multiplier", String.format("%.1f", calculateDamageMultiplier(skillLevel))
+                "multiplier", String.format("%.1f", calculateDamageMultiplier(skillLevel)),
+                "radius", String.valueOf(AOE_RADIUS)
         ));
     }
 

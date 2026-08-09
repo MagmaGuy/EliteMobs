@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.hoes;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -28,9 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SpectralScytheSkill extends SkillBonus implements CooldownSkill {
 
     public static final String SKILL_ID = "hoes_spectral_scythe";
-    private static final long BASE_COOLDOWN = 25; // 25 seconds
+    private static final long BASE_COOLDOWN = 30; // 30 seconds
     private static final double PROJECTILE_RANGE = 10.0;
-    private static final double BASE_DAMAGE_MULTIPLIER = 1.0; // 100% of weapon damage
+    private static final double BASE_DAMAGE_MULTIPLIER = 2.0; // 200% of weapon damage
 
     private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
@@ -43,9 +44,9 @@ public class SpectralScytheSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
-        // Base cooldown - 0.2s per level
+        // Base cooldown - 0.2s per level, 20s at level 50
         long reduction = (long) (skillLevel * 0.2);
-        return Math.max(10, BASE_COOLDOWN - reduction);
+        return Math.max(12, BASE_COOLDOWN - reduction);
     }
 
     @Override
@@ -122,30 +123,24 @@ public class SpectralScytheSkill extends SkillBonus implements CooldownSkill {
                     currentLoc, 1, 0.1, 0.1, 0.1, 0);
 
                 // Check for entity hits (piercing - can hit multiple)
-                // Use bypass to prevent recursive skill processing
-                EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-                try {
-                    currentLoc.getWorld().getNearbyEntities(currentLoc, 1, 1, 1).stream()
+                currentLoc.getWorld().getNearbyEntities(currentLoc, 1, 1, 1).stream()
                         .filter(e -> e instanceof LivingEntity && !(e instanceof Player))
                         .filter(e -> !hitEntities.contains(e.getUniqueId()))
                         .forEach(e -> {
                             LivingEntity target = (LivingEntity) e;
-                            target.damage(baseDamage, player);
+                            CombatDamageContext.runPlayerToEliteBypass(
+                                    () -> target.damage(baseDamage, player));
                             hitEntities.add(e.getUniqueId());
                         });
-                } finally {
-                    EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-                }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
 
     private double calculateDamage(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        // Base 100% + 2% per level
-        return BASE_DAMAGE_MULTIPLIER + (skillLevel * 0.02);
+        // Power budget: a 20s cooldown at level 50 is a 1-in-20 trigger, so the projectile is
+        // worth 4 hits of damage (E = 0.05 * 4.00 = 0.20). Hardcoded rather than read from
+        // config so every server runs the same numbers while the rebalance is being validated.
+        return scaled(BASE_DAMAGE_MULTIPLIER, 0.04, skillLevel); // 200% base + 4% per level
     }
 
     private int getPlayerSkillLevel(Player player) {
@@ -183,6 +178,9 @@ public class SpectralScytheSkill extends SkillBonus implements CooldownSkill {
     public List<String> getLoreDescription(int skillLevel) {
         return applyLoreTemplates(Map.of(
                 "damagePercent", String.format("%.0f", calculateDamage(skillLevel) * 100),
+                // calculateDamage is a flat damage value handed straight to target.damage(), not a
+                // multiple of the player's hit, so this is the figure the menu should quote.
+                "damageAmount", String.format("%.1f", calculateDamage(skillLevel)),
                 "range", String.format("%.1f", PROJECTILE_RANGE),
                 "cooldown", String.valueOf(getCooldownSeconds(skillLevel))
         ));
@@ -190,13 +188,22 @@ public class SpectralScytheSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // This is the projectile's own damage value, not a damage fraction - see affectsDamage().
         return calculateDamage(skillLevel);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // The spectral projectile deals its own damage, doesn't modify main hit damage
     }
 
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "damagePercent", String.format("%.0f", calculateDamage(skillLevel) * 100)
+                "damagePercent", String.format("%.0f", calculateDamage(skillLevel) * 100),
+                // calculateDamage is a flat damage value handed straight to target.damage(), not a
+                // multiple of the player's hit, so this is the figure the menu should quote.
+                "damageAmount", String.format("%.1f", calculateDamage(skillLevel))
         ));
     }
 

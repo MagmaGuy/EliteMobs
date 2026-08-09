@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.spears;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
@@ -135,12 +136,8 @@ public class VanguardSkill extends SkillBonus implements CooldownSkill {
                         double damage = baseDamage * damageMultiplier;
                         // Bypass the player→elite formula so this skill-computed charge hit lands
                         // as-is instead of being re-scaled and counted by the autoclicker throttle.
-                        com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-                        try {
-                            living.damage(damage, player);
-                        } finally {
-                            com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-                        }
+                        CombatDamageContext.runPlayerToEliteBypass(
+                                () -> living.damage(damage, player));
                         hitEntities.add(entity.getUniqueId());
 
                         // Knockback
@@ -161,10 +158,10 @@ public class VanguardSkill extends SkillBonus implements CooldownSkill {
     }
 
     public double getDamageMultiplier(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return 1.0 + (skillLevel * 0.02);
+        // Power budget: a 13s cooldown at level 50 is a 1-in-13 trigger, so the charge is worth
+        // 2.66 hits of damage (E = 0.075 * 2.66 = 0.20). Hardcoded rather than read from config
+        // so every server runs the same numbers while the rebalance is being validated.
+        return scaled(1.0, 0.033, skillLevel);
     }
 
     @Override
@@ -203,7 +200,13 @@ public class VanguardSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // This is the charge's own damage value, not a damage fraction - see affectsDamage().
         return getDamageMultiplier(skillLevel);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // The charge damages entities it passes through, doesn't modify main hit damage
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.tridents;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -37,7 +38,7 @@ public class StormCallerSkill extends SkillBonus implements ProcSkill {
     @Override
     public double getProcChance(int skillLevel) {
         // Base chance + 0.15% per level, capped at 35%
-        return Math.min(0.35, BASE_PROC_CHANCE + (skillLevel * 0.0015));
+        return scaled(BASE_PROC_CHANCE, 0.0015, 0.35, skillLevel);
     }
 
     @Override
@@ -58,19 +59,14 @@ public class StormCallerSkill extends SkillBonus implements ProcSkill {
         // Deal additional lightning damage
         // Use bypass to prevent recursive skill processing
         double lightningDamage = calculateLightningDamage(skillLevel);
-        EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-        try {
-            target.damage(event.getDamage() * lightningDamage, player);
-        } finally {
-            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-        }
+        CombatDamageContext.runPlayerToEliteBypass(
+                () -> target.damage(event.getDamage() * lightningDamage, player));
     }
 
     private double calculateLightningDamage(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        return 0.5 + (skillLevel * 0.01);
+        // Fraction of the hit dealt as lightning, 100% at level 50. Hardcoded rather than read
+        // from config so every server runs the same numbers while the rebalance is validated.
+        return scaled(0.5, 0.01, skillLevel);
     }
 
     private int getPlayerSkillLevel(Player player) {
@@ -108,7 +104,9 @@ public class StormCallerSkill extends SkillBonus implements ProcSkill {
         double damage = calculateLightningDamage(skillLevel);
         return applyLoreTemplates(Map.of(
                 "procChance", String.format("%.1f", procChance),
-                "lightningDamage", String.format("%.1f", damage * 100)
+                // Same quantity as getFormattedBonus below, so it must be formatted the same way:
+                // the lore used to print "100.0%" where the menu summary printed "100%".
+                "lightningDamage", String.format("%.0f", damage * 100)
         ));
     }
 
@@ -120,7 +118,8 @@ public class StormCallerSkill extends SkillBonus implements ProcSkill {
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "lightningDamage", String.format("%.0f", calculateLightningDamage(skillLevel) * 100)
+                "lightningDamage", String.format("%.0f", calculateLightningDamage(skillLevel) * 100),
+                "procChance", String.format("%.1f", getProcChance(skillLevel) * 100)
         ));
     }
 

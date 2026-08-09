@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.testing;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.combatsystem.ArmorDefenseCalculator;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.combatsystem.DamageBreakdown;
 import com.magmaguy.elitemobs.combatsystem.LevelScaling;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
@@ -533,12 +534,7 @@ public class CombatSimulator {
         // Apply the damage to the target
         // Use bypass to prevent recursive skill processing
         double finalDamage = event.getDamage();
-        EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-        try {
-            target.damage(finalDamage, player);
-        } finally {
-            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-        }
+        CombatDamageContext.runPlayerToEliteBypass(() -> target.damage(finalDamage, player));
 
         double healthAfter = target.getHealth();
         return Math.max(0, healthBefore - healthAfter);
@@ -574,12 +570,7 @@ public class CombatSimulator {
         // Apply the damage to the target
         // Use bypass to prevent recursive skill processing
         double finalDamage = event.getDamage();
-        EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-        try {
-            target.damage(finalDamage, player);
-        } finally {
-            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-        }
+        CombatDamageContext.runPlayerToEliteBypass(() -> target.damage(finalDamage, player));
 
         double healthAfter = target.getHealth();
         return Math.max(0, healthBefore - healthAfter);
@@ -704,6 +695,49 @@ public class CombatSimulator {
      */
     public int getDummyCount() {
         return dummies.size();
+    }
+
+    /**
+     * Kills a dummy with a real player swing, so the whole death chain actually runs.
+     * <p>
+     * Needed by skills that bank state on elite <i>kills</i> rather than on hits (Soul Siphon
+     * listens to {@link com.magmaguy.elitemobs.api.EliteMobDeathEvent}). The rest of the harness
+     * deliberately keeps its dummy alive - {@code healDummy} after every attack - so those skills
+     * would otherwise never see a single event.
+     * <p>
+     * The kill is not faked. The dummy is dropped to one point of health and then hit with
+     * {@code player.attack()}, the same call the melee path already uses, so the server records the
+     * player as the killer, {@code EntityDeathEvent} fires, and
+     * {@code EliteMobDeathEvent.EliteMobDeathEventFilter} converts it exactly as it would in play.
+     * {@code direct setHealth(0)} would fire the death event with no kill credit and every
+     * killer-aware listener would ignore it.
+     * <p>
+     * Safe to run repeatedly: the damage test dummy drops no loot, no vanilla loot and no skill XP
+     * ({@code DamageTestDummyConfig}), and a temporary regional boss has no respawn cooldown, so
+     * {@code RegionalBossEntity.remove(DEATH)} schedules nothing. Nothing leaks between levels.
+     *
+     * @param skillId The dummy to kill
+     * @return true if the dummy actually died
+     */
+    public boolean simulateKill(String skillId) {
+        LivingEntity target = getDummyEntity(skillId);
+        if (target == null || !target.isValid() || target.isDead()) return false;
+
+        EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
+        if (eliteEntity == null || !eliteEntity.isValid()) return false;
+
+        target.setNoDamageTicks(0);
+        // One point of health left, so any real swing is lethal regardless of skill level or gear.
+        target.setHealth(1.0);
+        player.attack(target);
+
+        boolean died = target.isDead() || target.getHealth() <= 0;
+        if (!died)
+            // A kill that silently did not happen reads downstream as "the skill never fired",
+            // which is the wrong diagnosis. Say so loudly instead.
+            Logger.warn("[SkillTest] simulateKill: dummy " + skillId + " survived a killing blow (health="
+                    + target.getHealth() + ")");
+        return died;
     }
 
     /**

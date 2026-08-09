@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.powers.lua;
 
-import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.elitemobs.powers.scripts.ScriptActionData;
@@ -289,13 +289,18 @@ final class LuaPowerScriptApi {
     private void damageTargets(Collection<LivingEntity> targets, double amount, double multiplier) {
         for (LivingEntity target : targets) {
             if (target instanceof Player) {
-                PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter.setSpecialMultiplier(multiplier);
-            }
-            if (eliteEntity.getLivingEntity() != null) {
-                target.damage(amount, eliteEntity.getLivingEntity());
+                CombatDamageContext.runEliteToPlayerMultiplier(multiplier, () -> damageTarget(target, amount));
             } else {
-                target.damage(amount);
+                damageTarget(target, amount);
             }
+        }
+    }
+
+    private void damageTarget(LivingEntity target, double amount) {
+        if (eliteEntity.getLivingEntity() != null) {
+            target.damage(amount, eliteEntity.getLivingEntity());
+        } else {
+            target.damage(amount);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.hoes;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -24,9 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ScytheSweepSkill extends SkillBonus implements ProcSkill {
 
     public static final String SKILL_ID = "hoes_scythe_sweep";
-    private static final double BASE_PROC_CHANCE = 0.30; // 30% chance
+    private static final double BASE_PROC_CHANCE = 0.17; // 17% chance
     private static final double SWEEP_RADIUS = 3.0;
-    private static final double BASE_SWEEP_MULTIPLIER = 0.50; // 50% of damage
+    private static final double BASE_SWEEP_MULTIPLIER = 0.45; // 45% of damage
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
@@ -38,8 +39,8 @@ public class ScytheSweepSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        // Base chance + 0.4% per level
-        return Math.min(0.6, BASE_PROC_CHANCE + (skillLevel * 0.004));
+        // Base chance + 0.2% per level, ~27% at level 50
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.40, skillLevel);
     }
 
     @Override
@@ -60,22 +61,17 @@ public class ScytheSweepSkill extends SkillBonus implements ProcSkill {
 
         // Hit nearby enemies
         // Use bypass to prevent recursive skill processing
-        EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-        try {
-            target.getNearbyEntities(SWEEP_RADIUS, SWEEP_RADIUS, SWEEP_RADIUS).stream()
+        target.getNearbyEntities(SWEEP_RADIUS, SWEEP_RADIUS, SWEEP_RADIUS).stream()
                 .filter(e -> e instanceof LivingEntity && !(e instanceof Player) && !e.equals(target))
-                .forEach(e -> ((LivingEntity) e).damage(sweepDamage, player));
-        } finally {
-            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-        }
+                .forEach(e -> CombatDamageContext.runPlayerToEliteBypass(
+                        () -> ((LivingEntity) e).damage(sweepDamage, player)));
     }
 
     private double calculateSweepMultiplier(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel);
-        }
-        // Base 50% + 1% per level
-        return BASE_SWEEP_MULTIPLIER + (skillLevel * 0.01);
+        // Power budget: the sweep is worth 75% of the triggering hit at level 50, on a 27%
+        // proc rate (E = 0.267 * 0.75 = 0.20). Hardcoded rather than read from config so every
+        // server runs the same numbers while the rebalance is being validated.
+        return scaled(BASE_SWEEP_MULTIPLIER, 0.006, skillLevel); // 45% base + 0.6% per level
     }
 
     private int getPlayerSkillLevel(Player player) {
@@ -118,7 +114,13 @@ public class ScytheSweepSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // Fraction of the hit dealt to swept enemies, not a bonus to the main hit - see affectsDamage().
         return calculateSweepMultiplier(skillLevel);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // Sweep damages surrounding enemies via onProc, doesn't modify main hit damage
     }
 
     @Override

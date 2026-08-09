@@ -24,17 +24,19 @@ import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
+import com.magmaguy.elitemobs.skills.bonuses.interfaces.TargetDebuffBonus;
 import com.magmaguy.elitemobs.skills.bonuses.skills.bows.HuntersMarkSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.bows.RangersFocusSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.bows.WindRunnerSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.crossbows.HeavyBoltsSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.crossbows.QuickReloadSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.hoes.DeathMarkSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.maces.AvatarOfJudgmentSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.maces.JudgmentSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.maces.StunningForceSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.swords.ExposeWeaknessSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.swords.RiposteSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.tridents.PoseidonsFavorSkill;
-import com.magmaguy.elitemobs.skills.bonuses.skills.tridents.ReturningHasteSkill;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.DebugMessage;
@@ -61,7 +63,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -224,6 +225,13 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
     private static final HandlerList handlers = new HandlerList();
+    // Cross-skill target debuff bonuses, processed in the same fixed order the previous
+    // hand-rolled blocks ran in: HuntersMark, DeathMark, Judgment, ExposeWeakness.
+    private static final List<String> TARGET_DEBUFF_SKILL_IDS = List.of(
+            HuntersMarkSkill.SKILL_ID,
+            DeathMarkSkill.SKILL_ID,
+            JudgmentSkill.SKILL_ID,
+            ExposeWeaknessSkill.SKILL_ID);
     @Getter
     private final Entity entity;
     @Getter
@@ -234,6 +242,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
     private final EntityDamageByEntityEvent entityDamageByEntityEvent;
     @Getter
     private final boolean criticalStrike;
+    private boolean criticalStrikeDamageApplied;
     @Getter
     private final boolean isCustomDamage;
     @Getter
@@ -278,6 +287,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         this.entityDamageByEntityEvent = event;
         this.rangedAttack = event != null && event.getDamager() instanceof Projectile;
         this.criticalStrike = criticalStrike;
+        this.criticalStrikeDamageApplied = criticalStrike;
         this.isCustomDamage = isCustomDamage;
         this.damageModifier = damageModifier;
     }
@@ -299,6 +309,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         this.entityDamageByEntityEvent = null;
         this.rangedAttack = isRangedAttack;
         this.criticalStrike = false;
+        this.criticalStrikeDamageApplied = false;
         this.isCustomDamage = false;
         this.damageModifier = 1.0;
     }
@@ -321,6 +332,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         this.entityDamageByEntityEvent = null;
         this.rangedAttack = isRangedAttack;
         this.criticalStrike = criticalStrike;
+        // Test/simulation callers pass raw damage, so no critical multiplier is present yet.
+        this.criticalStrikeDamageApplied = false;
         this.isCustomDamage = false;
         this.damageModifier = 1.0;
     }
@@ -335,8 +348,23 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
     }
 
     public double getDamageWithoutCriticalStrike() {
-        if (!criticalStrike) return getDamage();
+        if (!criticalStrikeDamageApplied) return getDamage();
         return getDamage() / 1.5D;
+    }
+
+    /**
+     * Combines one skill's multiplier into the running total. Additive for every weapon type:
+     * each skill contributes its bonus fraction, so three skills at 1.2x total 1.6x rather than
+     * compounding to 1.73x.
+     * <p>
+     * Axes previously used max() here, which meant only the single largest bonus applied and, worse,
+     * that critical strikes were silently discarded on any axe hit where a skill beat 1.5x. Running
+     * one weapon type on a different stacking rule also made axe damage incomparable to everything
+     * else.
+     */
+    static double mergeOffensiveMultiplier(double accumulatedMultiplier,
+                                             double candidateMultiplier) {
+        return accumulatedMultiplier + (candidateMultiplier - 1.0);
     }
 
     /**
@@ -355,6 +383,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         if (SkillsConfig.isWorldExcludedFromSkills(player)) return;
         if (!ElitePlayerInventory.playerInventories.containsKey(player.getUniqueId())) return;
 
+        final boolean debug = DebugMessage.isDebugEnabled(player);
+
         // For ranged attacks, use skill type/level from launch time (stored in PDC).
         // For melee, read from current mainhand.
         SkillType weaponSkillType;
@@ -369,9 +399,12 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         }
         List<String> activeSkillIds = PlayerSkillSelection.getActiveSkills(player.getUniqueId(), weaponSkillType);
 
+        // Skill bonuses stack additively on top of the already-crit damage, for every weapon type.
+        // The critical strike stays a separate multiplicative step applied before this event, so it
+        // is never folded into (and therefore never swallowed by) the skill multiplier.
         double damageMultiplier = 1.0;
-        StringBuilder debugLog = new StringBuilder();
-        debugLog.append("[SkillBonuses] ");
+        StringBuilder debugLog = null;
+        if (debug) debugLog = new StringBuilder("[SkillBonuses] ");
 
         // First pass: process damage-modifying skills
         for (String skillId : activeSkillIds) {
@@ -386,43 +419,37 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 // Check for Avatar buff - apply damage boost if buff is active
                 if (skill instanceof AvatarOfJudgmentSkill avatar && AvatarOfJudgmentSkill.hasAvatarBuff(player)) {
                     double avatarBoost = avatar.getDamageBoost(skillLevel);
-                    debugLog.append(skill.getBonusName()).append("=").append(String.format("%.2fx", avatarBoost)).append(" ");
-                    damageMultiplier += (avatarBoost - 1.0);
+                    if (debug)
+                        debugLog.append(skill.getBonusName()).append("=").append(String.format("%.2fx", avatarBoost)).append(" ");
+                    damageMultiplier = mergeOffensiveMultiplier(damageMultiplier, avatarBoost);
                 }
                 continue;
             }
 
             double skillMultiplier = processOffensiveSkill(skill, skillLevel);
-            if (skillMultiplier != 1.0) {
+            if (debug && skillMultiplier != 1.0) {
                 debugLog.append(skill.getBonusName()).append("=").append(String.format("%.2fx", skillMultiplier)).append(" ");
             }
-            damageMultiplier += (skillMultiplier - 1.0); // Additive stacking for linear scaling
+            damageMultiplier = mergeOffensiveMultiplier(damageMultiplier, skillMultiplier);
         }
 
         // Check cross-skill debuff bonuses on the target (applied by any player's previous hits)
         if (eliteMobEntity != null && eliteMobEntity.getLivingEntity() != null) {
-            UUID targetUUID = eliteMobEntity.getLivingEntity().getUniqueId();
+            LivingEntity target = eliteMobEntity.getLivingEntity();
 
-            // HuntersMark: bonus damage against marked targets
-            if (HuntersMarkSkill.isMarkedBy(eliteMobEntity.getLivingEntity(), player)) {
-                int bowLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.BOWS);
-                SkillBonus markSkill = SkillBonusRegistry.getSkillById(HuntersMarkSkill.SKILL_ID);
-                if (markSkill instanceof HuntersMarkSkill hm) {
-                    double markBonus = hm.getMarkBonus(bowLevel);
-                    damageMultiplier += markBonus;
-                    debugLog.append("HuntersMark=").append(String.format("+%.2f", markBonus)).append(" ");
-                }
-            }
-
-            // ExposeWeakness: bonus damage against debuffed targets
-            if (ExposeWeaknessSkill.isDebuffed(targetUUID)) {
-                double exposeBonus = ExposeWeaknessSkill.getDamageMultiplier(targetUUID) - 1.0;
-                damageMultiplier += exposeBonus;
-                debugLog.append("ExposeWeakness=").append(String.format("+%.2f", exposeBonus)).append(" ");
+            for (String debuffSkillId : TARGET_DEBUFF_SKILL_IDS) {
+                if (!(SkillBonusRegistry.getSkillById(debuffSkillId) instanceof TargetDebuffBonus targetDebuff))
+                    continue;
+                if (!targetDebuff.appliesTo(target, player)) continue;
+                int debuffLevel = SkillBonusRegistry.getPlayerSkillLevel(player, targetDebuff.levelSource());
+                double debuffBonus = targetDebuff.bonusFor(player, target, debuffLevel);
+                damageMultiplier = mergeOffensiveMultiplier(damageMultiplier, 1.0 + debuffBonus);
+                if (debug)
+                    debugLog.append(targetDebuff.debugLabel()).append(String.format("+%.2f", debuffBonus)).append(" ");
             }
 
             // Riposte: bonus damage if riposte is ready (player blocked recently)
-            if (RiposteSkill.hasRiposteReady(player.getUniqueId())) {
+            if (weaponSkillType == SkillType.SWORDS && RiposteSkill.hasRiposteReady(player.getUniqueId())) {
                 SkillBonus riposteSkill = SkillBonusRegistry.getSkillById(RiposteSkill.SKILL_ID);
                 if (riposteSkill != null && riposteSkill.isActive(player) && riposteSkill.meetsLevelRequirement(skillLevel)) {
                     // Delegate to riposte's onProc to apply bonus and consume the riposte
@@ -437,10 +464,12 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         if (damageMultiplier != 1.0) {
             double oldDamage = getDamage();
             setDamage(oldDamage * damageMultiplier);
-            debugLog.append("| Total=").append(String.format("%.2fx", damageMultiplier))
-                    .append(" | Damage: ").append(String.format("%.1f", oldDamage))
-                    .append(" -> ").append(String.format("%.1f", getDamage()));
-            DebugMessage.log(player, debugLog.toString());
+            if (debug) {
+                debugLog.append("| Total=").append(String.format("%.2fx", damageMultiplier))
+                        .append(" | Damage: ").append(String.format("%.1f", oldDamage))
+                        .append(" -> ").append(String.format("%.1f", getDamage()));
+                DebugMessage.log(player, debugLog.toString());
+            }
         }
 
         // Second pass: process non-damage skills (side effects only)
@@ -479,19 +508,19 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                             && getEliteMobEntity().getLivingEntity() != null) {
                         rf.setTargetedEnemy(player, getEliteMobEntity().getLivingEntity().getUniqueId());
                     }
-                    // Special handling for ReturningHaste - only stack on projectile attacks
-                    if (skill instanceof ReturningHasteSkill) {
-                        if (entityDamageByEntityEvent == null) {
-                            // In test mode (rangedAttack flag set without real event), allow stacking
-                            if (!rangedAttack) break;
-                        } else if (entityDamageByEntityEvent.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) {
-                            break; // Skip stacking for melee trident
-                        }
+                    // Skills that only stack on particular attack shapes veto the stack themselves
+                    if (!stackingSkill.stacksOnHit(this)) break;
+                    if (stackingSkill.banksStacksExternally()) {
+                        // Stacks are added elsewhere (e.g. a kill listener); only read and display them
+                        skill.incrementProcCount(player);
+                        SkillBonus.sendStackingSkillActionBar(player, skill,
+                                stackingSkill.getCurrentStacks(player), stackingSkill.getMaxStacks());
+                    } else {
+                        stackingSkill.addStack(player);
+                        skill.incrementProcCount(player);
+                        int stacks = stackingSkill.getCurrentStacks(player);
+                        SkillBonus.sendStackingSkillActionBar(player, skill, stacks, stackingSkill.getMaxStacks());
                     }
-                    stackingSkill.addStack(player);
-                    skill.incrementProcCount(player);
-                    int stacks = stackingSkill.getCurrentStacks(player);
-                    SkillBonus.sendStackingSkillActionBar(player, skill, stacks, stackingSkill.getMaxStacks());
                 }
             }
             case CONDITIONAL -> {
@@ -506,12 +535,13 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 if (skill instanceof CooldownSkill cooldownSkill) {
                     if (!cooldownSkill.triggersOnOffensiveHit()) break;
                     if (!cooldownSkill.isOnCooldown(player)) {
-                        cooldownSkill.onActivate(player, this);
+                        if (!cooldownSkill.tryActivate(player, this)) break;
                         if (!cooldownSkill.isOnCooldown(player)) break;
                         skill.incrementProcCount(player);
                         SkillBonus.sendSkillActionBar(player, skill);
                         // Note: skills that conditionally activate (e.g. VorpalStrike on crits)
-                        // handle their own cooldown start in onActivate
+                        // gate themselves in tryActivate and start their own cooldown in
+                        // onActivate; the isOnCooldown re-check above detects that they fired
                     }
                 }
             }
@@ -566,31 +596,30 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                     if (conditionalSkill.conditionMet(player, this)) {
                         skill.incrementProcCount(player); // Track activation
                         SkillBonus.sendSkillActionBar(player, skill);
-                        yield 1.0 + conditionalSkill.getConditionalBonus(skillLevel);
+                        yield 1.0 + conditionalSkill.getConditionalBonus(player, skillLevel);
                     }
                 }
                 yield 1.0;
             }
             case STACKING -> {
                 if (skill instanceof StackingSkill stackingSkill) {
-                    // ReturningHaste: only stack on projectile attacks (thrown trident, not melee)
-                    if (skill instanceof ReturningHasteSkill) {
-                        if (entityDamageByEntityEvent == null) {
-                            // In test mode (rangedAttack flag set without real event), allow stacking
-                            if (!rangedAttack) yield 1.0;
-                        } else if (entityDamageByEntityEvent.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) {
-                            yield 1.0; // Skip stacking for melee trident
-                        }
-                    }
+                    // Skills that only stack on particular attack shapes veto the stack themselves
+                    if (!stackingSkill.stacksOnHit(this)) yield 1.0;
                     // RangersFocus: track target before calculating stacks (switch resets stacks)
                     if (skill instanceof RangersFocusSkill rf && eliteMobEntity != null
                             && eliteMobEntity.getLivingEntity() != null) {
                         rf.setTargetedEnemy(player, eliteMobEntity.getLivingEntity().getUniqueId());
                     }
                     int stacks = stackingSkill.getCurrentStacks(player);
-                    stackingSkill.addStack(player); // Add stack for this hit
-                    skill.incrementProcCount(player); // Track activation
-                    SkillBonus.sendStackingSkillActionBar(player, skill, stacks + 1, stackingSkill.getMaxStacks());
+                    if (stackingSkill.banksStacksExternally()) {
+                        // Stacks are added elsewhere (e.g. a kill listener); only read and display them
+                        skill.incrementProcCount(player); // Track activation
+                        SkillBonus.sendStackingSkillActionBar(player, skill, stacks, stackingSkill.getMaxStacks());
+                    } else {
+                        stackingSkill.addStack(player); // Add stack for this hit
+                        skill.incrementProcCount(player); // Track activation
+                        SkillBonus.sendStackingSkillActionBar(player, skill, stacks + 1, stackingSkill.getMaxStacks());
+                    }
                     yield 1.0 + (stacks * stackingSkill.getBonusPerStack(skillLevel));
                 }
                 yield 1.0;
@@ -613,7 +642,10 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 if (skill instanceof CooldownSkill cooldownSkill) {
                     if (!cooldownSkill.triggersOnOffensiveHit()) yield 1.0;
                     if (!cooldownSkill.isOnCooldown(player)) {
-                        cooldownSkill.onActivate(player, this);
+                        // Ask the skill whether it actually fired. Skills with their own gating
+                        // condition report false, in which case neither the cooldown nor the
+                        // damage bonus is consumed and the condition keeps its meaning.
+                        if (!cooldownSkill.tryActivate(player, this)) yield 1.0;
                         cooldownSkill.startCooldown(player, skillLevel);
                         skill.incrementProcCount(player); // Track activation
                         SkillBonus.sendSkillActionBar(player, skill);
@@ -657,8 +689,6 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
     //The thing that calls the event
     public static class EliteMobDamagedByPlayerEventFilter implements Listener {
-        public static boolean bypass = false;
-
         /**
          * Applies a projectile hit that was caught by a custom model hitbox rather
          * than by Minecraft's native entity hitbox.
@@ -1099,10 +1129,13 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             eliteEntity.setLevel(simulatedMobLevel);
 
             // 3. Run the standard formula (now sees mobLevel = player's level)
-            double formulaDamage = playerToEliteDamageFormula(player, eliteEntity, event);
-
-            // 4. Restore real level immediately
-            eliteEntity.setLevel(realMobLevel);
+            double formulaDamage;
+            try {
+                formulaDamage = playerToEliteDamageFormula(player, eliteEntity, event);
+            } finally {
+                // The elite's real level is authoritative state and must survive formula failures.
+                eliteEntity.setLevel(realMobLevel);
+            }
 
             // 5. Rescale: convert from "damage to simulated mob" to "equivalent % of actual boss HP"
             double simulatedMobHP = NaturalEliteCombatTweak.getTweakedMobHealthForLevel(
@@ -1201,6 +1234,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
         @EventHandler(ignoreCancelled = true)
         public void onEliteMobAttacked(EntityDamageByEntityEvent event) {
+            boolean bypass = CombatDamageContext.consumePlayerToElite().bypass();
+
             if (event.getEntity().getType().equals(EntityType.ENDER_DRAGON) && ((EnderDragon) event.getEntity()).getPhase().equals(EnderDragon.Phase.DYING))
                 return;
             LivingEntity livingEntity = EntityFinder.filterRangedDamagers(event.getDamager());
@@ -1469,7 +1504,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                         "P->E target=%s Lv%d path=%s %s=%.3f rawFormula=%.2f dmgMod=%.3f cfgMult=%.3f crit=%s finalApplied=%.2f mobHP=%.1f/%.1f",
                         mobType, eliteEntity.getLevel(), pathTag, keyTag, appliedKeyValue,
                         damageAfterRawFormula, damageModifier, combatMultiplier,
-                        criticalHit ? "1.5" : "1.0", damage,
+                        eliteMobDamagedByPlayerEvent.criticalStrikeDamageApplied ? "1.5" : "1.0", damage,
                         eliteEntity.getHealth(), eliteEntity.getMaxHealth()));
                 DebugMessage.send(player, "§6═════════════════════════════════════");
             }

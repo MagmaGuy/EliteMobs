@@ -2,9 +2,9 @@ package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteDamageEvent;
-import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -525,13 +525,13 @@ public class ScriptAction {
 
             getTargets(scriptActionData).forEach(target -> {
                 if (target instanceof Player) {
-                    PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter.setSpecialMultiplier(multiplier);
-
-                    if (scriptActionData.getEliteEntity().getLivingEntity() != null) {
-                        target.damage(damageAmount, scriptActionData.getEliteEntity().getLivingEntity());
-                    } else {
-                        target.damage(damageAmount);
-                    }
+                    CombatDamageContext.runEliteToPlayerMultiplier(multiplier, () -> {
+                        if (scriptActionData.getEliteEntity().getLivingEntity() != null) {
+                            target.damage(damageAmount, scriptActionData.getEliteEntity().getLivingEntity());
+                        } else {
+                            target.damage(damageAmount);
+                        }
+                    });
                 } else {
                     if (scriptActionData.getEliteEntity().getLivingEntity() != null) {
                         target.damage(damageAmount, scriptActionData.getEliteEntity().getLivingEntity());

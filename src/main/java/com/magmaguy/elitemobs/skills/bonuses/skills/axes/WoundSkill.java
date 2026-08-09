@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.axes;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -28,7 +29,6 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
 
     public static final String SKILL_ID = "axes_wound";
     private static final double BASE_PROC_CHANCE = 0.15;
-    private static final double BASE_BLEED_DAMAGE = 3.0;
     private static final int BLEED_DURATION = 80; // 4 seconds
 
     private static final Map<UUID, BukkitRunnable> activeWounds = new ConcurrentHashMap<>();
@@ -42,7 +42,7 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        return Math.min(0.40, BASE_PROC_CHANCE + (skillLevel * 0.003));
+        return scaled(BASE_PROC_CHANCE, 0.003, 0.40, skillLevel);
     }
 
     @Override
@@ -76,12 +76,7 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
                 }
                 LivingEntity entity = target.getLivingEntity();
                 // Use bypass to prevent recursive skill processing
-                EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-                try {
-                    entity.damage(damagePerTick, player);
-                } finally {
-                    EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-                }
+                CombatDamageContext.runPlayerToEliteBypass(() -> entity.damage(damagePerTick, player));
                 entity.getWorld().spawnParticle(Particle.BLOCK, entity.getLocation().add(0, 1, 0),
                         8, 0.3, 0.3, 0.3, 0, Material.REDSTONE_BLOCK.createBlockData());
                 ticks += 20;
@@ -97,7 +92,7 @@ public class WoundSkill extends SkillBonus implements ProcSkill {
      */
     private double getBleedPercent(int skillLevel) {
         // 10% per tick base (40% total over 4s), +0.15% per level
-        return 0.10 + (skillLevel * 0.0015);
+        return scaled(0.10, 0.0015, skillLevel);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.armor;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
@@ -22,6 +23,16 @@ import java.util.concurrent.ThreadLocalRandom;
  * Chance to reflect damage back to attackers
  */
 public class RetaliationSkill extends SkillBonus implements ProcSkill {
+
+    /**
+     * Share of the incoming hit reflected back at the attacker.
+     * <p>
+     * Retaliation deals damage rather than preventing it, so it carries no reduction term and sits
+     * outside the {@code E = uptime * reduction} defensive budget. Pinned to the value the old config
+     * scaling produced at the reference skill level of 50 (it hit its 50% cap from level 34 onward
+     * anyway), so nothing changes in practice — this only removes balance config from the skill.
+     */
+    private static final double REFLECT_PERCENT = 0.50;
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
@@ -103,12 +114,7 @@ public class RetaliationSkill extends SkillBonus implements ProcSkill {
                 int skillLevel = getPlayerSkillLevel(player);
                 double reflectDamage = damage * getReflectPercent(skillLevel);
                 // Use bypass to prevent recursive skill processing
-                EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-                try {
-                    attacker.damage(reflectDamage, player);
-                } finally {
-                    EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-                }
+                CombatDamageContext.runPlayerToEliteBypass(() -> attacker.damage(reflectDamage, player));
 
                 // Visual effect
                 player.getWorld().spawnParticle(Particle.CRIT,
@@ -124,8 +130,8 @@ public class RetaliationSkill extends SkillBonus implements ProcSkill {
      * @return The reflect percentage (0.0 to 1.0)
      */
     private double getReflectPercent(int skillLevel) {
-        // Base 30% + scaled value, capped at 50%
-        return Math.min(0.50, 0.30 * getScaledValue(skillLevel));
+        // Flat 50% of the incoming hit
+        return REFLECT_PERCENT;
     }
 
     /**

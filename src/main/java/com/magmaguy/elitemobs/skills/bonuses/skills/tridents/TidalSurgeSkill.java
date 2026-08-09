@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.tridents;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -94,41 +95,36 @@ public class TidalSurgeSkill extends SkillBonus implements CooldownSkill {
         double knockbackStrength = calculateKnockback(skillLevel);
         double aoeDamageMultiplier = calculateAoeDamage(skillLevel);
 
-        // Use bypass to prevent recursive skill processing
-        EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-        try {
-            target.getNearbyEntities(SURGE_RADIUS, SURGE_RADIUS, SURGE_RADIUS).stream()
-                    .filter(e -> e instanceof LivingEntity && !(e instanceof Player))
-                    .forEach(e -> {
-                        Vector direction = e.getLocation().toVector()
-                                .subtract(target.getLocation().toVector());
-                        // Check for zero/near-zero vector to avoid NaN from normalize()
-                        if (direction.lengthSquared() < 0.001) {
-                            // Entities at same location - use random direction
-                            direction = new Vector(Math.random() - 0.5, 0, Math.random() - 0.5);
-                        }
-                        direction.normalize().multiply(knockbackStrength);
-                        direction.setY(0.5);
-                        e.setVelocity(direction);
-                        ((LivingEntity) e).damage(damageEvent.getDamage() * aoeDamageMultiplier, player);
-                    });
-        } finally {
-            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-        }
+        target.getNearbyEntities(SURGE_RADIUS, SURGE_RADIUS, SURGE_RADIUS).stream()
+                .filter(e -> e instanceof LivingEntity && !(e instanceof Player))
+                .forEach(e -> {
+                    Vector direction = e.getLocation().toVector()
+                            .subtract(target.getLocation().toVector());
+                    // Check for zero/near-zero vector to avoid NaN from normalize()
+                    if (direction.lengthSquared() < 0.001) {
+                        // Entities at same location - use random direction
+                        direction = new Vector(Math.random() - 0.5, 0, Math.random() - 0.5);
+                    }
+                    direction.normalize().multiply(knockbackStrength);
+                    direction.setY(0.5);
+                    e.setVelocity(direction);
+                    CombatDamageContext.runPlayerToEliteBypass(
+                            () -> ((LivingEntity) e).damage(
+                                    damageEvent.getDamage() * aoeDamageMultiplier, player));
+                });
     }
 
     private double calculateKnockback(int skillLevel) {
-        if (configFields != null) {
-            return 1.5 + (configFields.calculateValue(skillLevel) * 0.5);
-        }
-        return 1.5 + (skillLevel * 0.01);
+        // Knockback velocity, not a damage value - left at its current strength (2.5 at level
+        // 50) and simply no longer read from config.
+        return scaled(1.5, 0.02, skillLevel);
     }
 
     private double calculateAoeDamage(int skillLevel) {
-        if (configFields != null) {
-            return 0.3 * configFields.calculateValue(skillLevel);
-        }
-        return 0.3 + (skillLevel * 0.003);
+        // Fraction of the hit dealt to everything caught in the surge, 60% at level 50.
+        // Hardcoded rather than read from config so every server runs the same numbers while
+        // the rebalance is being validated.
+        return scaled(0.3, 0.006, skillLevel);
     }
 
     private int getPlayerSkillLevel(Player player) {
@@ -169,19 +165,27 @@ public class TidalSurgeSkill extends SkillBonus implements CooldownSkill {
         return applyLoreTemplates(Map.of(
                 "cooldown", String.valueOf(cooldown),
                 "knockback", String.format("%.1f", knockback),
-                "radius", String.valueOf(SURGE_RADIUS)
+                "radius", String.valueOf(SURGE_RADIUS),
+                "aoeDamage", String.format("%.0f", calculateAoeDamage(skillLevel) * 100)
         ));
     }
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // This is the knockback strength (a velocity), not a damage fraction - see affectsDamage().
         return calculateKnockback(skillLevel);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // Knocks back and damages nearby enemies via onActivate, doesn't modify main hit damage
     }
 
     @Override
     public String getFormattedBonus(int skillLevel) {
         return applyFormattedBonusTemplate(Map.of(
-                "knockback", String.format("%.1f", calculateKnockback(skillLevel))
+                "knockback", String.format("%.1f", calculateKnockback(skillLevel)),
+                "radius", String.valueOf(SURGE_RADIUS)
         ));
     }
 

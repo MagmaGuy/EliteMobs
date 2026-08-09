@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.swords;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -26,7 +27,6 @@ public class LacerateSkill extends SkillBonus implements ProcSkill {
 
     public static final String SKILL_ID = "swords_lacerate";
     private static final double BASE_PROC_CHANCE = 0.15; // 15% base chance
-    private static final double BASE_BLEED_DAMAGE = 2.0;
     private static final int BLEED_DURATION_TICKS = 100; // 5 seconds
     private static final int BLEED_TICK_INTERVAL = 20; // Every second
 
@@ -44,7 +44,7 @@ public class LacerateSkill extends SkillBonus implements ProcSkill {
     @Override
     public double getProcChance(int skillLevel) {
         // Base chance + 0.2% per level
-        return Math.min(0.5, BASE_PROC_CHANCE + (skillLevel * 0.002));
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.5, skillLevel);
     }
 
     @Override
@@ -88,12 +88,8 @@ public class LacerateSkill extends SkillBonus implements ProcSkill {
                 LivingEntity entity = target.getLivingEntity();
                 if (entity != null && !entity.isDead()) {
                     // Use bypass to prevent recursive skill processing
-                    EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-                    try {
-                        entity.damage(damagePerTick, player);
-                    } finally {
-                        EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-                    }
+                    CombatDamageContext.runPlayerToEliteBypass(
+                            () -> entity.damage(damagePerTick, player));
                     // Visual effect - red particles
                     entity.getWorld().spawnParticle(org.bukkit.Particle.BLOCK,
                             entity.getLocation().add(0, 1, 0), 5, 0.3, 0.3, 0.3, 0,
@@ -114,7 +110,7 @@ public class LacerateSkill extends SkillBonus implements ProcSkill {
      */
     private double getBleedPercent(int skillLevel) {
         // 8% per tick base (40% total over 5s), +0.1% per level
-        return 0.08 + (skillLevel * 0.001);
+        return scaled(0.08, 0.001, skillLevel);
     }
 
     private int getPlayerSkillLevel(Player player) {

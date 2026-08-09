@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.customenchantments;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.collateralminecraftchanges.LightningSpawnBypass;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.config.enchantments.premade.LightningConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -40,13 +41,7 @@ public class LightningEnchantment extends CustomEnchantment {
             if (eliteEntity == null) return;
             double damage = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getWeaponLevel(true) * 2.5;
             EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(player, eliteEntity.getLivingEntity(), EntityDamageEvent.DamageCause.CUSTOM, DamageSource.builder(DamageType.MOB_ATTACK).build(), damage);
-            boolean previousBypass = EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass;
-            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-            try {
-                new EventCaller(entityDamageByEntityEvent);
-            } finally {
-                EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = previousBypass;
-            }
+            CombatDamageContext.runPlayerToEliteBypass(() -> new EventCaller(entityDamageByEntityEvent));
         }));
     }
 

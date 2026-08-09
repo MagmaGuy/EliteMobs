@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.maces;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
@@ -128,12 +129,8 @@ public class ConsecrationSkill extends SkillBonus implements CooldownSkill {
                         if (eliteEntity != null) {
                             // Bypass the player→elite formula so the flat AoE tick lands as-is
                             // instead of being re-scaled and counted by the autoclicker throttle.
-                            com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-                            try {
-                                living.damage(damagePerTick, player);
-                            } finally {
-                                com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-                            }
+                            CombatDamageContext.runPlayerToEliteBypass(
+                                    () -> living.damage(damagePerTick, player));
                             // Small hit effect
                             living.getWorld().spawnParticle(Particle.FLAME,
                                 living.getLocation().add(0, 1, 0), 5, 0.2, 0.2, 0.2, 0.02);
@@ -149,10 +146,10 @@ public class ConsecrationSkill extends SkillBonus implements CooldownSkill {
     }
 
     public double getDamagePerTick(int skillLevel) {
-        if (configFields != null) {
-            return configFields.calculateValue(skillLevel); // Base damage per tick
-        }
-        return 5.0 + (skillLevel * 0.1);
+        // 2.4 damage per second tick at level 50, 5 ticks per cast on a 20s cooldown.
+        // Hardcoded rather than read from config so every server runs the same numbers while
+        // the rebalance is being validated.
+        return scaled(1.4, 0.02, skillLevel);
     }
 
     @Override
@@ -192,7 +189,13 @@ public class ConsecrationSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public double getBonusValue(int skillLevel) {
+        // This is the flat DoT damage per tick in hit points, not a damage fraction - see affectsDamage().
         return getDamagePerTick(skillLevel);
+    }
+
+    @Override
+    public boolean affectsDamage() {
+        return false; // Ground DoT applies its own damage over time, doesn't modify main hit damage
     }
 
     @Override

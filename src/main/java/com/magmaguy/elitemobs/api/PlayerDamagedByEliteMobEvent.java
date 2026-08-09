@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.combatsystem.ArmorDefenseCalculator;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.combatsystem.LevelScaling;
 import com.magmaguy.elitemobs.combatsystem.PotionCombatModifierCalculator;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -17,10 +18,6 @@ import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.elitemobs.skills.bonuses.PlayerSkillSelection;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
-import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
-import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
-import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.armor.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.hoes.DeathsEmbraceSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.maces.DivineShieldSkill;
@@ -53,6 +50,19 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
+
+    /**
+     * Hard ceiling on the <b>total</b> damage reduction every skill source combined may apply to a
+     * single hit.
+     * <p>
+     * Value: 0.85 (85%) — a fully stacked defensive build always eats at least 15% of the incoming
+     * hit. {@link SkillBonus#MAX_DEFENSIVE_REDUCTION} bounds one skill; it says nothing about their
+     * combination. Defensive skills compose multiplicatively (each branch feeds the already-reduced
+     * {@link #getDamage()} back through {@code damage * (1 - reduction)}), so three sources at the
+     * per-skill ceiling produce {@code 0.2 * 0.2 * 0.2} = 99.2% total reduction: effective immunity
+     * with every individual clamp intact. Per-source clamps are a guard rail, this is the invariant.
+     */
+    public static final double MAX_AGGREGATE_DEFENSIVE_REDUCTION = 0.85;
 
     private static final HandlerList handlers = new HandlerList();
     private final Entity entity;
@@ -115,15 +125,69 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
     }
 
     /**
+     * Applies a damage value produced by a defensive skill, floored at zero.
+     * <p>
+     * Defensive skills reduce damage by multiplying it by {@code (1 - reduction)}. A reduction
+     * above 1.0 from any source, present or future, flips the sign and would heal the player for
+     * being hit. Individual skills clamp their own reduction to
+     * {@link SkillBonus#MAX_DEFENSIVE_REDUCTION}; this is the last line of defence covering every
+     * skill-driven damage assignment regardless of where the reduction came from.
+     *
+     * @param modifiedDamage The damage value returned by a defensive skill
+     */
+    private void setSkillModifiedDamage(double modifiedDamage) {
+        setDamage(Math.max(0, modifiedDamage));
+    }
+
+    /**
+     * Applies the aggregate defensive ceiling to a post-skill damage value.
+     * <p>
+     * Pure function: compares the damage that entered the skill pipeline against the damage that
+     * came out and refuses to let the ratio drop below
+     * {@code 1 - }{@link #MAX_AGGREGATE_DEFENSIVE_REDUCTION}. Working on the ratio rather than on a
+     * running sum of reductions is what makes this robust — the branches are differently shaped
+     * (some multiply, some assign, some stack, some read config), and a future skill only has to
+     * route its damage through this pipeline to be covered. Order and count of contributors are
+     * irrelevant to the result.
+     *
+     * @param incomingDamage The damage before any skill touched it
+     * @param reducedDamage  The damage after every skill has been applied
+     * @return The damage to actually deal, never negative and never below the aggregate floor
+     */
+    public static double capAggregateReduction(double incomingDamage, double reducedDamage) {
+        double flooredDamage = Math.max(0, reducedDamage);
+        if (incomingDamage <= 0) return flooredDamage;
+        // Strictly positive whenever the hit itself was: incomingDamage * 0.15 > 0.
+        return Math.max(flooredDamage, incomingDamage * (1 - MAX_AGGREGATE_DEFENSIVE_REDUCTION));
+    }
+
+    /**
      * Unified method to apply all active ARMOR skill bonuses to this damage event.
      * This is the single entry point for the skill bonus system to modify incoming damage.
      * <p>
      * Processes all active armor skills, applying damage reduction from
-     * PASSIVE, CONDITIONAL, COOLDOWN, and PROC skills.
+     * PASSIVE, CONDITIONAL, COOLDOWN, and PROC skills, then enforces
+     * {@link #MAX_AGGREGATE_DEFENSIVE_REDUCTION} on their combined effect.
      *
      * @return true if damage was completely negated (e.g., by dodge or death prevention), false otherwise
      */
     public boolean applySkillBonuses() {
+        double incomingDamage = getDamage();
+        try {
+            return applyDefensiveSkillBonuses();
+        } finally {
+            // Single point of final application: every reduction above has already been folded into
+            // getDamage() by now, whichever branch produced it, so one ratio check bounds the lot.
+            // Full negation (Evasion, Last Stand, Divine Shield) cancels the event instead of
+            // reducing damage — that is an all-or-nothing mechanic, not a stacked reduction, so it
+            // deliberately stays outside the ceiling.
+            //
+            // TODO: replace the flat aggregate cap with diminishing returns per stacked reduction (design sketch in git history).
+            if (!isCancelled()) setDamage(capAggregateReduction(incomingDamage, getDamage()));
+        }
+    }
+
+    private boolean applyDefensiveSkillBonuses() {
         if (player == null || player.hasMetadata("NPC")) return false;
         if (SkillsConfig.isWorldExcludedFromSkills(player)) return false;
         if (!ElitePlayerInventory.playerInventories.containsKey(player.getUniqueId())) return false;
@@ -160,7 +224,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             // Fortify - stacking damage reduction (always applies, action bar handled internally)
             if (skill instanceof FortifySkill fortify) {
                 double modifiedDamage = fortify.modifyIncomingDamage(player, getDamage());
-                setDamage(modifiedDamage);
+                setSkillModifiedDamage(modifiedDamage);
                 skill.incrementProcCount(player);
                 continue;
             }
@@ -173,15 +237,29 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 // Apply shield reduction if active (might have been activated by this hit or a previous one)
                 double modifiedDamage = reactiveShielding.modifyIncomingDamage(player, getDamage());
                 if (modifiedDamage != getDamage()) {
-                    setDamage(modifiedDamage);
+                    setSkillModifiedDamage(modifiedDamage);
                     skill.incrementProcCount(player);
                     SkillBonus.sendSkillActionBar(player, skill);
                 }
                 continue;
             }
 
-            // AdrenalineSurge - buffs when health drops below threshold
+            // AdrenalineSurge - buffs when health drops below threshold, plus a timed damage
+            // reduction while the surge runs.
+            //
+            // That reduction used to be a RESISTANCE potion effect, which
+            // PotionCombatModifierCalculator applies at step 6 of eliteToPlayerDamageFormula -
+            // before this event exists. It was therefore baked into the incoming damage that
+            // capAggregateReduction measures against, so the ceiling capped the rest of the stack
+            // at 85% of an already-reduced number and a full defensive build reached ~88% total
+            // reduction. Applying it here instead puts it inside the pipeline, on the same footing
+            // as every other skill reduction, with no change to how RESISTANCE from any other
+            // source behaves.
             if (skill instanceof AdrenalineSurgeSkill adrenaline) {
+                // Reduction before trigger, mirroring the old potion ordering: the potion was
+                // resolved before the event ran, so it never reduced the hit that started it.
+                double modifiedDamage = adrenaline.modifyIncomingDamage(player, getDamage());
+                if (modifiedDamage != getDamage()) setSkillModifiedDamage(modifiedDamage);
                 double newHealthPercent = (player.getHealth() - getDamage()) / player.getMaxHealth();
                 adrenaline.checkTrigger(player, newHealthPercent);
                 continue;
@@ -212,7 +290,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             if (skill instanceof IronStanceSkill ironStance) {
                 double modifiedDamage = ironStance.modifyIncomingDamage(player, getDamage(), this);
                 if (modifiedDamage != getDamage()) {
-                    setDamage(modifiedDamage);
+                    setSkillModifiedDamage(modifiedDamage);
                     skill.incrementProcCount(player);
                     SkillBonus.sendSkillActionBar(player, skill);
                 }
@@ -223,7 +301,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             if (skill instanceof GritSkill grit) {
                 double modifiedDamage = grit.modifyIncomingDamage(player, getDamage(), this);
                 if (modifiedDamage != getDamage()) {
-                    setDamage(modifiedDamage);
+                    setSkillModifiedDamage(modifiedDamage);
                     skill.incrementProcCount(player);
                     SkillBonus.sendSkillActionBar(player, skill);
                 }
@@ -232,20 +310,16 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             // For any remaining skills (PASSIVE like BattleHardened),
             // use the generic handler
-            DefensiveSkillResult result = processDefensiveSkill(skill, skillLevel);
-            if (result.negatesDamage) {
-                setCancelled(true);
-                return true;
-            }
-            if (result.multiplier != 1.0) {
-                setDamage(getDamage() * result.multiplier);
+            double multiplier = processPassiveDefensiveSkill(skill, skillLevel);
+            if (multiplier != 1.0) {
+                setSkillModifiedDamage(getDamage() * multiplier);
             }
         }
 
         // Check weapon-type defensive skills (Parry - sword blocking)
         double parryDamage = ParrySkill.applyParryReduction(player, this, getDamage());
         if (parryDamage != getDamage()) {
-            setDamage(parryDamage);
+            setSkillModifiedDamage(parryDamage);
             SkillBonus parrySkill = SkillBonusRegistry.getSkillById(ParrySkill.SKILL_ID);
             if (parrySkill != null) SkillBonus.sendSkillActionBar(player, parrySkill);
         }
@@ -253,7 +327,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
         // Phalanx - frontal damage reduction when holding spear
         double phalanxDamage = PhalanxSkill.applyFrontalReduction(player, this, getDamage());
         if (phalanxDamage != getDamage()) {
-            setDamage(phalanxDamage);
+            setSkillModifiedDamage(phalanxDamage);
         }
 
         // Check death prevention skills from weapon types
@@ -272,79 +346,26 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
     }
 
     /**
-     * Processes a single defensive skill and returns its result.
-     * Tracks proc counts for testing purposes.
+     * Generic fallback for armor skills without a bespoke branch in
+     * {@link #applyDefensiveSkillBonuses()}.
+     * <p>
+     * Every armor skill except BattleHardened has an instanceof branch above that ends in
+     * {@code continue}, and BattleHardened is PASSIVE, so only PASSIVE skills can reach this
+     * point. Skill registration is a closed, compile-time list ({@code SkillBonusInitializer}),
+     * which is what makes this reduction safe. If a new armor skill of another bonus type is
+     * added, give it a bespoke branch above.
+     * <p>
+     * The reduction is run through {@link SkillBonus#clampDefensiveReduction(double)} before it
+     * becomes a multiplier, so a bonus value that scales past 100% cannot produce a negative
+     * multiplier and heal the player on hit.
      */
-    private DefensiveSkillResult processDefensiveSkill(SkillBonus skill, int skillLevel) {
-        return switch (skill.getBonusType()) {
-            case PASSIVE -> {
-                skill.incrementProcCount(player); // Track activation
-                yield new DefensiveSkillResult(1.0 - skill.getBonusValue(skillLevel), false);
-            }
-            case CONDITIONAL -> {
-                if (skill instanceof ConditionalSkill conditionalSkill) {
-                    if (conditionalSkill.conditionMet(player, this)) {
-                        skill.incrementProcCount(player); // Track activation
-                        SkillBonus.sendSkillActionBar(player, skill);
-                        yield new DefensiveSkillResult(1.0 - conditionalSkill.getConditionalBonus(skillLevel), false);
-                    }
-                }
-                yield new DefensiveSkillResult(1.0, false);
-            }
-            case STACKING -> {
-                if (skill instanceof StackingSkill stackingSkill) {
-                    int stacks = stackingSkill.getCurrentStacks(player);
-                    stackingSkill.addStack(player);
-                    skill.incrementProcCount(player); // Track activation
-                    SkillBonus.sendStackingSkillActionBar(player, skill, stacks + 1, stackingSkill.getMaxStacks());
-                    yield new DefensiveSkillResult(1.0 - (stacks * stackingSkill.getBonusPerStack(skillLevel)), false);
-                }
-                yield new DefensiveSkillResult(1.0, false);
-            }
-            case COOLDOWN -> {
-                if (skill instanceof CooldownSkill cooldownSkill) {
-                    if (!cooldownSkill.isOnCooldown(player)) {
-                        // Check for death prevention skills (like Last Stand)
-                        if (player.getHealth() - getDamage() <= 0) {
-                            cooldownSkill.onActivate(player, this);
-                            cooldownSkill.startCooldown(player, skillLevel);
-                            skill.incrementProcCount(player); // Track activation
-                            SkillBonus.sendSkillActionBar(player, skill);
-                            yield new DefensiveSkillResult(1.0, true); // Damage negated
-                        }
-                    }
-                }
-                yield new DefensiveSkillResult(1.0, false);
-            }
-            case PROC -> {
-                if (skill instanceof ProcSkill procSkill) {
-                    double procChance = procSkill.getProcChance(skillLevel);
-                    if (ThreadLocalRandom.current().nextDouble() < procChance) {
-                        procSkill.onProc(player, this);
-                        skill.incrementProcCount(player); // Track proc
-                        SkillBonus.sendSkillActionBar(player, skill);
-                        yield new DefensiveSkillResult(1.0 - skill.getBonusValue(skillLevel), false);
-                    }
-                }
-                yield new DefensiveSkillResult(1.0, false);
-            }
-        };
+    private double processPassiveDefensiveSkill(SkillBonus skill, int skillLevel) {
+        skill.incrementProcCount(player); // Track activation
+        return 1.0 - SkillBonus.clampDefensiveReduction(skill.getBonusValue(skillLevel));
     }
-
-    /**
-     * Result of processing a defensive skill.
-     */
-    private record DefensiveSkillResult(double multiplier, boolean negatesDamage) {}
 
     //Thing that launches the event
     public static class PlayerDamagedByEliteMobEventFilter implements Listener {
-        @Getter
-        @Setter
-        private static boolean bypass = false;
-        @Getter
-        @Setter
-        private static double specialMultiplier = 1;
-
         /**
          * Calculates boss damage to player using the redesigned defensive formula.
          * <p>
@@ -366,7 +387,9 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
          * </ul>
          * Final damage is capped at maxHP - 1 (1-shot protection).
          */
-        private static double eliteToPlayerDamageFormula(Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
+        private static double eliteToPlayerDamageFormula(Player player, EliteEntity eliteEntity,
+                                                         EntityDamageByEntityEvent event,
+                                                         double specialMultiplier) {
             if (ElitePlayerInventory.getPlayer(player) == null) return 0;
 
             // 1. Player stats
@@ -434,8 +457,6 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                     * customBossDamageMultiplier
                     * specialMultiplier
                     * configMultiplier;
-
-            if (specialMultiplier != 1) specialMultiplier = 1;
 
             // 8. 1-shot protection
             double actualMaxHealth = AttributeManager.getAttributeValue(player, "generic_max_health");
@@ -519,7 +540,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
         //Remove potion effects of creepers when they blow up because Minecraft passes those effects to players, and they are infinite
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-        private void explosionEvent(EntityExplodeEvent event) {
+        public void explosionEvent(EntityExplodeEvent event) {
             if (event.getEntity().getType().equals(EntityType.CREEPER) && EntityTracker.isEliteMob(event.getEntity())) {
                 //by default minecraft spreads potion effects
                 Set<PotionEffect> potionEffects = new HashSet<>(((Creeper) event.getEntity()).getActivePotionEffects());
@@ -529,8 +550,11 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
         @EventHandler
         public void onEliteDamagePlayer(EntityDamageByEntityEvent event) {
+            CombatDamageContext.DamageOverride damageOverride = CombatDamageContext.consumeEliteToPlayer();
+            boolean bypass = damageOverride.bypass();
+            double specialMultiplier = damageOverride.specialMultiplier();
+
             if (event.isCancelled()) {
-                bypass = false;
                 if (!(event.getDamager() instanceof Explosive))
                     return;
             }
@@ -562,20 +586,9 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             //Blocking reduces melee damage and nullifies most ranged damage at the cost of shield durability
             if (player.isBlocking() || (com.magmaguy.elitemobs.testing.CombatSimulator.isTestingActive() && com.magmaguy.elitemobs.testing.CombatSimulator.isBlockingOverride())) {
                 blocking = true;
-                if (player.getInventory().getItemInOffHand().getType().equals(Material.SHIELD)) {
-                    ItemMeta itemMeta = player.getInventory().getItemInOffHand().getItemMeta();
-                    org.bukkit.inventory.meta.Damageable damageable = (Damageable) itemMeta;
-
-                    if (player.getInventory().getItemInOffHand().getItemMeta().hasEnchant(Enchantment.UNBREAKING) &&
-                            player.getInventory().getItemInOffHand().getItemMeta().getEnchantLevel(Enchantment.UNBREAKING) / 20D > ThreadLocalRandom.current().nextDouble())
-                        damageable.setDamage(damageable.getDamage() + 5);
-                    player.getInventory().getItemInOffHand().setItemMeta(itemMeta);
-                    if (Material.SHIELD.getMaxDurability() < damageable.getDamage())
-                        player.getInventory().setItemInOffHand(null);
-                }
+                damageBlockingShield(player);
 
                 if (event.getDamager() instanceof Projectile) {
-                    bypass = false;
                     event.getDamager().remove();
                     return;
                 }
@@ -585,7 +598,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             }
 
             //Calculate the damage for the event
-            double newDamage = eliteToPlayerDamageFormula(player, eliteEntity, event);
+            double newDamage = eliteToPlayerDamageFormula(player, eliteEntity, event, specialMultiplier);
             double damageAfterFormula = newDamage;
             // Test damage override: bypass defense formula during automated testing
             boolean testOverrideHit = CombatSimulator.isTestingActive() && CombatSimulator.getTestDamageOverride() >= 0;
@@ -610,7 +623,6 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 //Use raw damage in case of bypass
                 rawBypassDamage = event.getOriginalDamage(EntityDamageEvent.DamageModifier.BASE);
                 newDamage = rawBypassDamage;
-                bypass = false;
             }
             double damageEnteringEvent = newDamage;
 
@@ -674,7 +686,6 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             }
 
             if (playerDamagedByEliteMobEvent.isCancelled()) {
-                bypass = false;
                 return;
             }
 
@@ -685,6 +696,31 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             if (player.getHealth() - event.getDamage() <= 0)
                 PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, eliteEntity));
 
+        }
+
+        private static void damageBlockingShield(Player player) {
+            boolean mainHand = player.getInventory().getItemInMainHand().getType() == Material.SHIELD;
+            boolean offHand = player.getInventory().getItemInOffHand().getType() == Material.SHIELD;
+            if (!mainHand && !offHand) return;
+
+            org.bukkit.inventory.ItemStack shield = mainHand
+                    ? player.getInventory().getItemInMainHand()
+                    : player.getInventory().getItemInOffHand();
+            ItemMeta itemMeta = shield.getItemMeta();
+            if (!(itemMeta instanceof Damageable damageable)) return;
+
+            int unbreakingLevel = itemMeta.getEnchantLevel(Enchantment.UNBREAKING);
+            if (unbreakingLevel > 0 && ThreadLocalRandom.current().nextInt(unbreakingLevel + 1) != 0) return;
+
+            int newDamage = damageable.getDamage() + 5;
+            if (newDamage >= shield.getType().getMaxDurability()) {
+                if (mainHand) player.getInventory().setItemInMainHand(null);
+                else player.getInventory().setItemInOffHand(null);
+                return;
+            }
+
+            damageable.setDamage(newDamage);
+            shield.setItemMeta(itemMeta);
         }
 
     }

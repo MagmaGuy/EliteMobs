@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.crossbows;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
@@ -26,7 +27,7 @@ public class ExplosiveTipSkill extends SkillBonus implements ProcSkill {
     public static final String SKILL_ID = "crossbows_explosive_tip";
     private static final double BASE_PROC_CHANCE = 0.15; // 15% chance
     private static final double BASE_EXPLOSION_RADIUS = 4.0;
-    private static final double BASE_EXPLOSION_DAMAGE = 0.50; // 50% of original
+    private static final double BASE_EXPLOSION_DAMAGE = 0.55; // 55% of original
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
@@ -38,11 +39,11 @@ public class ExplosiveTipSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public double getProcChance(int skillLevel) {
-        return Math.min(0.35, BASE_PROC_CHANCE + (skillLevel * 0.002));
+        return scaled(BASE_PROC_CHANCE, 0.002, 0.35, skillLevel);
     }
 
     public double getExplosionRadius(int skillLevel) {
-        return BASE_EXPLOSION_RADIUS + (skillLevel * 0.02); // 4.0 to 5.5 at level 75
+        return scaled(BASE_EXPLOSION_RADIUS, 0.02, skillLevel); // 4.0 to 5.5 at level 75
     }
 
     @Override
@@ -61,18 +62,18 @@ public class ExplosiveTipSkill extends SkillBonus implements ProcSkill {
 
         // Damage nearby enemies
         // Use bypass to prevent recursive skill processing
-        EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = true;
-        try {
-            target.getNearbyEntities(radius, radius, radius).stream()
-                    .filter(e -> e instanceof LivingEntity && !(e instanceof Player))
-                    .forEach(e -> ((LivingEntity) e).damage(explosionDamage, player));
-        } finally {
-            EliteMobDamagedByPlayerEvent.EliteMobDamagedByPlayerEventFilter.bypass = false;
-        }
+        target.getNearbyEntities(radius, radius, radius).stream()
+                .filter(e -> e instanceof LivingEntity && !(e instanceof Player))
+                .forEach(e -> CombatDamageContext.runPlayerToEliteBypass(
+                        () -> ((LivingEntity) e).damage(explosionDamage, player)));
     }
 
+    /**
+     * Power budget: the blast is worth 80% of the triggering hit at level 50, on a 25% proc
+     * rate (E = 0.25 * 0.80 = 0.20).
+     */
     private double getExplosionDamageMultiplier(int skillLevel) {
-        return BASE_EXPLOSION_DAMAGE + (skillLevel * 0.005); // 50% base + 0.5% per level
+        return scaled(BASE_EXPLOSION_DAMAGE, 0.005, skillLevel); // 55% base + 0.5% per level
     }
 
     @Override
@@ -96,7 +97,10 @@ public class ExplosiveTipSkill extends SkillBonus implements ProcSkill {
     }
 
     @Override
+    // Fraction of the hit dealt to nearby enemies by the explosion, not a bonus to the main hit - see affectsDamage()
     public double getBonusValue(int skillLevel) { return getExplosionDamageMultiplier(skillLevel); }
+    @Override
+    public boolean affectsDamage() { return false; } // Deals AoE explosion damage via onProc, not the main hit
     @Override
     public String getFormattedBonus(int skillLevel) { return applyFormattedBonusTemplate(Map.of("aoeDamage", String.format("%.0f", getExplosionDamageMultiplier(skillLevel) * 100))); }
     @Override
