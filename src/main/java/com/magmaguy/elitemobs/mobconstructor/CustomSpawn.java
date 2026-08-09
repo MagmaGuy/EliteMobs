@@ -25,6 +25,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -33,6 +34,9 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomSpawn {
+
+    private static final int MAX_LOCATION_ATTEMPTS = 100;
+    private static final int LOCATION_ATTEMPTS_PER_TICK = 1;
 
     @Getter
     private final CustomSpawnConfigFields customSpawnConfigFields;
@@ -45,7 +49,7 @@ public class CustomSpawn {
     @Setter
     private World world;
     private TimedEvent timedEvent;
-    private int allTries = 0;
+    private BukkitTask spawnLocationSearchTask;
     @Getter
     @Setter
     private Location spawnLocation;
@@ -136,16 +140,12 @@ public class CustomSpawn {
     }
 
     public void queueSpawn() {
-        //Make sure a location exists
-        if (spawnLocation == null)
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    generateCustomSpawn();
-                }
-            }.runTaskAsynchronously(MetadataHandler.PLUGIN);
-        else
-            spawn();
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, this::queueSpawn);
+            return;
+        }
+        if (spawnLocation == null) generateCustomSpawn();
+        else spawn();
     }
 
     private void spawn() {
@@ -153,19 +153,21 @@ public class CustomSpawn {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (Objects.requireNonNull(spawnLocation.getWorld()).getTime() < customSpawnConfigFields.getEarliestTime() ||
-                        spawnLocation.getWorld().getTime() > customSpawnConfigFields.getLatestTime())
+                if (spawnLocation == null || spawnLocation.getWorld() == null) {
+                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, CustomSpawn.this::generateCustomSpawn, 1);
+                    cancel();
+                    return;
+                }
+
+                World spawnWorld = spawnLocation.getWorld();
+                if (spawnWorld.getTime() < customSpawnConfigFields.getEarliestTime() ||
+                        spawnWorld.getTime() > customSpawnConfigFields.getLatestTime())
                     return;
 
                 if (customSpawnConfigFields.getMoonPhase() != null)
                     if (!MoonPhaseDetector.detectMoonPhase(spawnLocation.getWorld()).equals(customSpawnConfigFields.getMoonPhase()))
                         return;
 
-                if (spawnLocation == null) {
-                    Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> generateCustomSpawn(), 1);
-                    cancel();
-                    return;
-                }
                 //One last check
                 //Last line of defense - spawn a test mob. If some unknown protection system prevents spawning it should prevent this
                 LivingEntity testEntity = spawnLocation.getWorld().spawn(spawnLocation, Zombie.class, spawnEntity -> spawnEntity.setAdult());
@@ -178,7 +180,11 @@ public class CustomSpawn {
                 }
                 testEntity.remove();
 
-                if (!keepTrying) cancel();
+                if (!keepTrying) {
+                    cancel();
+                    releaseSummoningEntities();
+                    return;
+                }
 
                 if (PeaceBannerConfig.isSuppressEvents() && PeaceBannerManager.isProtected(spawnLocation)) {
                     cancel();
@@ -200,43 +206,66 @@ public class CustomSpawn {
     }
 
     private void generateCustomSpawn() {
-        //If the global cooldown if enforced and this is a timed event wait for the cd to be over
-
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, this::generateCustomSpawn);
+            return;
+        }
+        if (spawnLocationSearchTask != null) return;
+        if (!keepTrying) {
+            releaseSummoningEntities();
+            return;
+        }
         if (timedEvent != null && System.currentTimeMillis() < TimedEvent.getNextEventStartMinimum()) {
-            Bukkit.getScheduler().scheduleAsyncDelayedTask(MetadataHandler.PLUGIN, this::generateCustomSpawn, 20 * 60L);
+            scheduleLocationSearchRetry();
             return;
         }
 
+        spawnLocationSearchTask = new BukkitRunnable() {
+            private int attempts;
 
-        int maxTries = 100;
-        int tries = 0;
-        while (tries < maxTries && spawnLocation == null) {
-            if (!keepTrying)
-                return;
-            tries++;
-            allTries++;
-            this.spawnLocation = generateRandomSpawnLocation();
-            if (spawnLocation != null)
-                break;
-        }
+            @Override
+            public void run() {
+                if (!keepTrying) {
+                    stopSearch();
+                    releaseSummoningEntities();
+                    return;
+                }
 
-        if (spawnLocation == null) {
-            if (keepTrying) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        generateCustomSpawn();
+                for (int attempt = 0; attempt < LOCATION_ATTEMPTS_PER_TICK && attempts < MAX_LOCATION_ATTEMPTS; attempt++) {
+                    attempts++;
+                    spawnLocation = generateRandomSpawnLocation();
+                    if (spawnLocation != null) {
+                        stopSearch();
+                        spawn();
+                        return;
                     }
-                }.runTaskLaterAsynchronously(MetadataHandler.PLUGIN, 20 * 60);
-            } else {
-                customBossEntities.forEach((customBossEntity -> {
-                    if (customBossEntity.summoningEntity != null)
-                        customBossEntity.summoningEntity.removeReinforcement(customBossEntity);
-                }));
+                }
+
+                if (attempts >= MAX_LOCATION_ATTEMPTS) {
+                    stopSearch();
+                    scheduleLocationSearchRetry();
+                }
             }
-        } else {
-            spawn();
-        }
+
+            private void stopSearch() {
+                cancel();
+                spawnLocationSearchTask = null;
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 1L);
+    }
+
+    private void scheduleLocationSearchRetry() {
+        if (!keepTrying || spawnLocationSearchTask != null) return;
+        spawnLocationSearchTask = Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+            spawnLocationSearchTask = null;
+            generateCustomSpawn();
+        }, 20L * 60L);
+    }
+
+    private void releaseSummoningEntities() {
+        for (CustomBossEntity customBossEntity : customBossEntities)
+            if (customBossEntity.summoningEntity != null)
+                customBossEntity.summoningEntity.removeReinforcement(customBossEntity);
     }
 
     public Location generateRandomSpawnLocation() {
@@ -316,6 +345,9 @@ public class CustomSpawn {
         //This doesn't matter too much since it will be parsed later, also these values are already tweaked for 1.18.
         location.setY(ThreadLocalRandom.current().nextInt(-0, 256));
         World world = location.getWorld();
+        //Reject candidates in unloaded chunks so the checks below never force a synchronous chunk load
+        if (world == null || !world.isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4))
+            return null;
 
         if (!customSpawnConfigFields.getValidBiomesStrings().isEmpty() && !customSpawnConfigFields.getValidBiomesStrings().contains(location.getBlock().getBiome()))
             return null;
@@ -326,39 +358,42 @@ public class CustomSpawn {
             location = Objects.requireNonNull(location.getWorld()).getHighestBlockAt(location).getLocation().add(new Vector(0.5, 1, 0.5));
         else if (customSpawnConfigFields.isUndergroundSpawn()) {
             int highestBlockYAt = Objects.requireNonNull(location.getWorld()).getHighestBlockYAt(location);
+            Location undergroundLocation = null;
             //Let's hope there's caves
             if (location.getY() > highestBlockYAt ||
                     location.getY() > highestBlockYAt / 2D) {
                 for (int y = (int) location.getY(); y > -64; y--) {
                     Location tempLocation = location.clone();
                     tempLocation.setY(y);
-                    if (location.getBlock().getType().equals(Material.VOID_AIR)) return null;
+                    if (tempLocation.getBlock().getType().equals(Material.VOID_AIR)) return null;
                     if (y < customSpawnConfigFields.getLowestYLevel()) return null;
-                    Block groundBlock = location.clone().subtract(new Vector(0, 1, 0)).getBlock();
+                    Block groundBlock = tempLocation.clone().subtract(new Vector(0, 1, 0)).getBlock();
                     if (!groundBlock.getType().isSolid()) continue;
                     //Check temp location block
                     if (!tempLocation.getBlock().getType().isAir()) continue;
                     //Check block above temp location
-                    if (!tempLocation.add(new Vector(0, 1, 0)).getBlock().getType().isAir()) continue;
-                    location = tempLocation;
+                    if (!tempLocation.clone().add(new Vector(0, 1, 0)).getBlock().getType().isAir()) continue;
+                    undergroundLocation = tempLocation;
                     break;
                 }
             } else {
                 for (int y = (int) location.getY(); y < highestBlockYAt; y++) {
                     Location tempLocation = location.clone();
                     tempLocation.setY(y);
-                    if (location.getBlock().getType().equals(Material.VOID_AIR)) return null;
+                    if (tempLocation.getBlock().getType().equals(Material.VOID_AIR)) return null;
                     if (y < customSpawnConfigFields.getLowestYLevel()) return null;
-                    Block groundBlock = location.clone().subtract(new Vector(0, 1, 0)).getBlock();
+                    Block groundBlock = tempLocation.clone().subtract(new Vector(0, 1, 0)).getBlock();
                     if (!groundBlock.getType().isSolid()) continue;
                     //Check temp location block
                     if (!tempLocation.getBlock().getType().isAir()) continue;
                     //Check block above temp location
-                    if (!tempLocation.add(new Vector(0, 1, 0)).getBlock().getType().isAir()) continue;
-                    location = tempLocation;
+                    if (!tempLocation.clone().add(new Vector(0, 1, 0)).getBlock().getType().isAir()) continue;
+                    undergroundLocation = tempLocation;
                     break;
                 }
             }
+            if (undergroundLocation == null) return null;
+            location = undergroundLocation;
         } else
             //Straight upwards check
             location.setY(getHighestValidBlock(location, getHighestValidBlock(location, customSpawnConfigFields.getHighestYLevel())));
