@@ -155,6 +155,16 @@ public class ArenaInstance extends MatchInstance {
     }
 
     public static void initializeArena(CustomArenasConfigFields customArenasConfigFields) {
+        if (!Bukkit.isPrimaryThread()) {
+            // MatchInstance's constructor fires the synchronous MatchInstantiateEvent,
+            // which Bukkit refuses off the main thread, and pendingArenas is otherwise
+            // only touched on the main thread. Async initialization — e.g. the reload
+            // right after a DLC install when the arena's world is already loaded —
+            // must hop before constructing anything.
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN,
+                    () -> initializeArena(customArenasConfigFields));
+            return;
+        }
         Location corner1 = ConfigurationLocation.serialize(customArenasConfigFields.getCorner1());
         Location corner2 = ConfigurationLocation.serialize(customArenasConfigFields.getCorner2());
         Location startLocation = ConfigurationLocation.serialize(customArenasConfigFields.getStartLocation());

@@ -29,6 +29,13 @@ public class WorldInstantiator {
             Logger.warn("Blueprint world " + worldName + " is not a directory!");
             return null;
         }
+        File levelData = new File(blueprintWorld, "level.dat");
+        if (!levelData.isFile()) {
+            Logger.warn("Blueprint world " + worldName + " is incomplete because its required level.dat file is missing. " +
+                    "Reinstall or update the content package before starting this dungeon. Path: " +
+                    blueprintWorld.getAbsolutePath());
+            return null;
+        }
 
         // Wipe both legacy and Paper-26.1+ modern paths so the blueprint clone
         // doesn't collide with leftovers from a previous instance of this world.

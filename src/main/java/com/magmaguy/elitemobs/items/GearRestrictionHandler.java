@@ -36,10 +36,11 @@ public class GearRestrictionHandler {
      * @return true if the player can equip, false if restricted
      */
     public static boolean canEquip(Player player, ItemStack itemStack) {
-        if (!AdventurersGuildConfig.isSkillBasedGearRestriction()) return true;
+        RestrictionContext restrictionContext = getRestrictionContext(player, itemStack);
+        if (!restrictionContext.enabled()) return true;
         // Login hydration is asynchronous. Allow equipment until the complete snapshot is published
         // instead of treating the temporary absence as skill level 1 and rejecting valid gear.
-        if (!PlayerData.isDataLoaded(player.getUniqueId())) return true;
+        if (!restrictionContext.playerDataLoaded()) return true;
         if (itemStack == null || itemStack.getType().isAir()) return true;
         if (!EliteItemManager.isEliteMobsItem(itemStack)) return true;
 
@@ -51,15 +52,31 @@ public class GearRestrictionHandler {
         if (itemLevel <= 20) return true;
 
         // Determine which skill type this item belongs to
-        SkillType skillType = SkillType.fromMaterialIncludingArmor(itemStack.getType());
+        SkillType skillType = restrictionContext.skillType();
         if (skillType == null) return true;
 
-        // Get the player's skill level for this type
-        long skillXP = PlayerData.getSkillXP(player.getUniqueId(), skillType);
-        int playerSkillLevel = SkillXPCalculator.levelFromTotalXP(skillXP);
-
         // Player can equip if their skill level is >= item level
-        return playerSkillLevel >= itemLevel;
+        return restrictionContext.playerSkillLevel() >= itemLevel;
+    }
+
+    /**
+     * Captures the player state that can change an otherwise unchanged item's eligibility.
+     * PlayerItem includes this in its cache key so login hydration, configuration reloads and
+     * skill-level changes cannot leave a stale equipment snapshot behind.
+     */
+    public static RestrictionContext getRestrictionContext(Player player, ItemStack itemStack) {
+        boolean enabled = AdventurersGuildConfig.isSkillBasedGearRestriction();
+        if (!enabled)
+            return new RestrictionContext(false, false, null, 0);
+
+        boolean playerDataLoaded = PlayerData.isDataLoaded(player.getUniqueId());
+        SkillType skillType = itemStack == null || itemStack.getType().isAir()
+                ? null
+                : SkillType.fromMaterialIncludingArmor(itemStack.getType());
+        int playerSkillLevel = playerDataLoaded && skillType != null
+                ? SkillXPCalculator.levelFromTotalXP(PlayerData.getSkillXP(player.getUniqueId(), skillType))
+                : 0;
+        return new RestrictionContext(true, playerDataLoaded, skillType, playerSkillLevel);
     }
 
     /**
@@ -110,5 +127,11 @@ public class GearRestrictionHandler {
                 .replace("$skillType", SkillBonusMenuConfig.getSkillTypeDisplayName(skillType));
 
         player.sendMessage(ChatColorConverter.convert(message));
+    }
+
+    public record RestrictionContext(boolean enabled,
+                                     boolean playerDataLoaded,
+                                     SkillType skillType,
+                                     int playerSkillLevel) {
     }
 }

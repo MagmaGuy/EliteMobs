@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.playerdata;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
@@ -23,7 +22,6 @@ public class ElitePlayerInventory {
     private final Player player;
     //Used by elite scripts
     private final HashSet<String> customMetadata = new HashSet<>();
-    private boolean isUpdateLock = false;
 
     /**
      * Object of the player's inventory for EliteMobs.
@@ -74,44 +72,36 @@ public class ElitePlayerInventory {
     }
 
     public double getEliteDamage(boolean update) {
-        if (isUpdateLock) update = false;
         double eliteDamage = helmet.getEliteDamage(player.getInventory().getHelmet(), update) +
                 chestplate.getEliteDamage(player.getInventory().getChestplate(), update) +
                 leggings.getEliteDamage(player.getInventory().getLeggings(), update) +
                 boots.getEliteDamage(player.getInventory().getBoots(), update) +
                 mainhand.getEliteDamage(player.getInventory().getItemInMainHand(), update) +
                 offhand.getEliteDamage(player.getInventory().getItemInOffHand(), update);
-        updateLock();
         return eliteDamage;
     }
 
     public double getEliteEnchantmentDamage(boolean update) {
-        if (isUpdateLock) update = false;
         double eliteEnchantmentDamage = helmet.getEliteEnchantmentDamage(player.getInventory().getHelmet(), update) +
                 chestplate.getEliteEnchantmentDamage(player.getInventory().getChestplate(), update) +
                 leggings.getEliteEnchantmentDamage(player.getInventory().getLeggings(), update) +
                 boots.getEliteEnchantmentDamage(player.getInventory().getBoots(), update) +
                 mainhand.getEliteEnchantmentDamage(player.getInventory().getItemInMainHand(), update) +
                 offhand.getEliteEnchantmentDamage(player.getInventory().getItemInOffHand(), update);
-        updateLock();
         return eliteEnchantmentDamage;
     }
 
     public double getEliteDefense(boolean update) {
-        if (isUpdateLock) update = false;
         double defense = helmet.getEliteDefense(player.getInventory().getHelmet(), update) +
                 chestplate.getEliteDefense(player.getInventory().getChestplate(), update) +
                 leggings.getEliteDefense(player.getInventory().getLeggings(), update) +
                 boots.getEliteDefense(player.getInventory().getBoots(), update) +
                 mainhand.getEliteDefense(player.getInventory().getItemInMainHand(), update) +
                 offhand.getEliteDefense(player.getInventory().getItemInOffHand(), update);
-        updateLock();
         return defense;
     }
 
     public double getEliteProjectileProtection(boolean update) {
-        if (isUpdateLock) update = false;
-
         double eliteProjectileProtection = (helmet.getProtectionProjectile(player.getInventory().getHelmet(), update) +
                 chestplate.getProtectionProjectile(player.getInventory().getChestplate(), update) +
                 leggings.getProtectionProjectile(player.getInventory().getLeggings(), update) +
@@ -119,12 +109,10 @@ public class ElitePlayerInventory {
                 mainhand.getProtectionProjectile(player.getInventory().getItemInMainHand(), update) +
                 offhand.getProtectionProjectile(player.getInventory().getItemInOffHand(), update))
                 / 6d;
-        updateLock();
         return eliteProjectileProtection;
     }
 
     public double getEliteBlastProtection(boolean update) {
-        if (isUpdateLock) update = false;
         double eliteBlastProtection = (helmet.getBlastProtection(player.getInventory().getHelmet(), update) +
                 chestplate.getBlastProtection(player.getInventory().getChestplate(), update) +
                 leggings.getBlastProtection(player.getInventory().getLeggings(), update) +
@@ -132,14 +120,7 @@ public class ElitePlayerInventory {
                 mainhand.getBlastProtection(player.getInventory().getItemInMainHand(), update) +
                 offhand.getBlastProtection(player.getInventory().getItemInOffHand(), update))
                 / 6d;
-        updateLock();
         return eliteBlastProtection;
-    }
-
-    private boolean updateLock() {
-        isUpdateLock = true;
-        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> isUpdateLock = false, 1);
-        return true;
     }
 
     /**
@@ -148,9 +129,7 @@ public class ElitePlayerInventory {
      * @return Tier of the weapon in the main hand.
      */
     public int getWeaponLevel(boolean update) {
-        if (isUpdateLock) update = false;
         int weaponLevel = mainhand.getTier(player.getInventory().getItemInMainHand(), update);
-        updateLock();
         return weaponLevel;
     }
 
@@ -169,7 +148,6 @@ public class ElitePlayerInventory {
      * @return ArrayList of all continuous potion effects.
      */
     public ArrayList<ElitePotionEffect> getContinuousPotionEffects(boolean update) {
-        if (isUpdateLock) update = false;
         ArrayList<ElitePotionEffect> elitePotionEffects = new ArrayList<>();
         elitePotionEffects.addAll(helmet.getContinuousPotionEffects(player.getInventory().getHelmet(), update));
         elitePotionEffects.addAll(chestplate.getContinuousPotionEffects(player.getInventory().getChestplate(), update));
@@ -177,7 +155,6 @@ public class ElitePlayerInventory {
         elitePotionEffects.addAll(boots.getContinuousPotionEffects(player.getInventory().getBoots(), update));
         elitePotionEffects.addAll(mainhand.getContinuousPotionEffects(player.getInventory().getItemInMainHand(), update));
         elitePotionEffects.addAll(offhand.getContinuousPotionEffects(player.getInventory().getItemInOffHand(), update));
-        updateLock();
         return elitePotionEffects;
     }
 
@@ -187,7 +164,6 @@ public class ElitePlayerInventory {
      * @return ArrayList of all onHit potion effects.
      */
     public ArrayList<ElitePotionEffect> getOnHitPotionEffects(boolean update) {
-        if (isUpdateLock) update = false;
         ArrayList<ElitePotionEffect> elitePotionEffects = new ArrayList<>();
         elitePotionEffects.addAll(helmet.getOnHitPotionEffects(player.getInventory().getHelmet(), update));
         elitePotionEffects.addAll(chestplate.getOnHitPotionEffects(player.getInventory().getChestplate(), update));
@@ -195,12 +171,10 @@ public class ElitePlayerInventory {
         elitePotionEffects.addAll(boots.getOnHitPotionEffects(player.getInventory().getBoots(), update));
         elitePotionEffects.addAll(mainhand.getOnHitPotionEffects(player.getInventory().getItemInMainHand(), update));
         elitePotionEffects.addAll(offhand.getOnHitPotionEffects(player.getInventory().getItemInOffHand(), update));
-        updateLock();
         return elitePotionEffects;
     }
 
     public double getCritChance(boolean update) {
-        if (isUpdateLock) update = false;
         ItemStack[] activeItems = getHeldAndEquippedItems(player.getInventory());
         double critChance = mainhand.getCritChance(activeItems[0], update) +
                 offhand.getCritChance(activeItems[1], update) +
@@ -208,7 +182,6 @@ public class ElitePlayerInventory {
                 chestplate.getCritChance(activeItems[3], update) +
                 leggings.getCritChance(activeItems[4], update) +
                 boots.getCritChance(activeItems[5], update);
-        updateLock();
         // Cap the total. Chance is additive across six slots, so without a ceiling a player can
         // reach 100% and crit on every swing - at which point the crit IS the typical hit and
         // stops reading as a critical strike, while still paying out the full 1.5x multiplier.
@@ -217,37 +190,29 @@ public class ElitePlayerInventory {
     }
 
     public double getLightningChance(boolean update) {
-        if (isUpdateLock) update = false;
         double lightningChance = mainhand.getLightningChance(player.getInventory().getItemInMainHand(), update);
-        updateLock();
         return lightningChance;
     }
 
     public double getHunterChance(boolean update) {
-        if (isUpdateLock) update = false;
         double hunterChance = helmet.getHunterChance(player.getInventory().getHelmet(), update) +
                 chestplate.getHunterChance(player.getInventory().getChestplate(), update) +
                 leggings.getHunterChance(player.getInventory().getLeggings(), update) +
                 boots.getHunterChance(player.getInventory().getBoots(), update);
-        updateLock();
         return hunterChance;
     }
 
     public double getPlasmaBootsLevel(boolean update) {
-        if (isUpdateLock) update = false;
         double plasmaBootsLevel = boots.getPlasmaBootsLevel(player.getInventory().getBoots(), update);
-        updateLock();
         return plasmaBootsLevel;
     }
 
     public double getEarthquakeLevel(boolean update) {
         //todo: should earthquake really apply for things other than the boots?
-        if (isUpdateLock) update = false;
         double earthquakeLevel = helmet.getEarthquakeLevel(player.getInventory().getHelmet(), update) +
                 chestplate.getEarthquakeLevel(player.getInventory().getChestplate(), update) +
                 leggings.getEarthquakeLevel(player.getInventory().getLeggings(), update) +
                 boots.getEarthquakeLevel(player.getInventory().getBoots(), update);
-        updateLock();
         return earthquakeLevel;
     }
 
@@ -264,14 +229,12 @@ public class ElitePlayerInventory {
     }
 
     public double getLoudStrikesBonusMultiplier(boolean update) {
-        if (isUpdateLock) update = false;
         double loudStrikesBonusMultiplier = helmet.getLoudStrikesBonus(player.getInventory().getHelmet(), update) +
                 chestplate.getLoudStrikesBonus(player.getInventory().getChestplate(), update) +
                 leggings.getLoudStrikesBonus(player.getInventory().getLeggings(), update) +
                 boots.getLoudStrikesBonus(player.getInventory().getBoots(), update) +
                 mainhand.getLoudStrikesBonus(player.getInventory().getItemInMainHand(), update) +
                 offhand.getLoudStrikesBonus(player.getInventory().getItemInOffHand(), update);
-        updateLock();
         return loudStrikesBonusMultiplier;
     }
 

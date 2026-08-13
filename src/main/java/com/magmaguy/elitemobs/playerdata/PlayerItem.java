@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.items.customenchantments.*;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.BossBarUtil;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -23,6 +22,8 @@ public class PlayerItem {
 
     public EquipmentSlot equipmentSlot;
     public Player player;
+    // Clone of the last parsed slot contents. Keeping a snapshot instead of Bukkit's live
+    // ItemStack reference makes in-place metadata changes visible to isSimilar().
     public ItemStack itemStack = null;
     public int itemTier = 0;
     public ArrayList<ElitePotionEffect> continuousPotionEffects = new ArrayList<>();
@@ -43,6 +44,7 @@ public class PlayerItem {
     private double loudStrikesBonus = 0;
 
     private boolean displayingAsBroken = false;
+    private ItemRuntimeContext itemRuntimeContext = null;
 
     /**
      * Stores an instance of the custom EliteMobs values of what a player is wearing. This is used to reduce the amount
@@ -60,7 +62,7 @@ public class PlayerItem {
     }
 
     private boolean fullUpdate(ItemStack itemStack) {
-        boolean itemIsEmpty = itemStack == null || itemStack.getType().isAir();
+        boolean itemIsEmpty = itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0;
         boolean cachedItemIsEmpty = this.itemStack == null || this.itemStack.getType().isAir();
 
         // Case where both the live and cached slots are empty.
@@ -75,6 +77,15 @@ public class PlayerItem {
             }
             return fillNullItem();
         }
+
+        ItemRuntimeContext currentRuntimeContext = ItemRuntimeContext.capture(player, itemStack);
+
+        // The old optimization stored Bukkit's mutable ItemStack reference, so prestige and other
+        // in-place metadata edits compared the item with itself and were missed. The cached stack is
+        // now a clone, and runtime state that can affect the parsed result is part of the cache key.
+        if (!cachedItemIsEmpty && itemStack.isSimilar(this.itemStack) &&
+                currentRuntimeContext.equals(itemRuntimeContext))
+            return false;
 
         if (EliteItemManager.isOnLastDamage(itemStack)) {
             if (!displayingAsBroken) {
@@ -91,15 +102,11 @@ public class PlayerItem {
             displayingAsBroken = false;
         }
 
-//        //case when it's the same item as before - best performance todo: causes issues with the prestige system
-//        if (itemStack.isSimilar(this.itemStack))
-//            return false;
-
-        if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled()) {
+        if (currentRuntimeContext.soulbindEnabled()) {
             if (!SoulbindEnchantment.isValidSoulbindUser(itemStack.getItemMeta(), player)) {
                 player.getWorld().dropItem(player.getLocation(), itemStack);
                 itemStack.setAmount(0);
-                itemStack = new ItemStack(Material.AIR);
+                return fillNullItem();
             }
         }
 
@@ -109,7 +116,7 @@ public class PlayerItem {
             // Drop the item instead of just removing it
             player.getWorld().dropItem(player.getLocation(), itemStack);
             itemStack.setAmount(0);
-            itemStack = new ItemStack(Material.AIR);
+            return fillNullItem();
         }
 
         //Neither offhand nor armor contribute to baseline damage outside of the enchants, so we reset the damage before anything
@@ -117,7 +124,6 @@ public class PlayerItem {
         this.eliteEnchantmentDamage = 0;
 
         //case when the item changed during runtime to another valid ItemStack
-        this.itemStack = itemStack;
         if (equipmentSlot.equals(EquipmentSlot.MAINHAND)) {
             this.itemTier = (int) Math.round(EliteItemManager.getWeaponLevel(itemStack));
             this.eliteDamage = EliteItemManager.getEliteDamageFromEliteAttributes(itemStack);
@@ -125,11 +131,9 @@ public class PlayerItem {
             this.itemTier = (int) Math.round(EliteItemManager.getArmorLevel(itemStack));
 
         //Level sync for instanced dungeons - limits the max level of the item
-        if (PlayerData.getMatchInstance(player) != null &&
-                PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeonInstance &&
-                dungeonInstance.getLevelSync() > 0) {
-            if (itemTier > dungeonInstance.getLevelSync()) {
-                itemTier = dungeonInstance.getLevelSync();
+        if (currentRuntimeContext.dungeonLevelSync() > 0) {
+            if (itemTier > currentRuntimeContext.dungeonLevelSync()) {
+                itemTier = currentRuntimeContext.dungeonLevelSync();
                 if (equipmentSlot.equals(EquipmentSlot.MAINHAND))
                     this.eliteDamage = EliteItemManager.calculateEliteBonus(itemStack, itemTier);
             }
@@ -152,6 +156,9 @@ public class PlayerItem {
         this.thornsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.THORNS.getKey());
         this.loudStrikesBonus = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, LoudStrikesEnchantment.key)) / 3d;
         eliteEnchantmentDamage = EliteItemManager.getEliteDamageFromEnchantments(itemStack);
+
+        this.itemStack = itemStack.clone();
+        this.itemRuntimeContext = currentRuntimeContext;
 
         return true;
 
@@ -176,6 +183,7 @@ public class PlayerItem {
         eliteEnchantmentDamage = 0;
         blastProtection = 0;
         loudStrikesBonus = 0;
+        itemRuntimeContext = null;
         return true;
     }
 
@@ -266,6 +274,21 @@ public class PlayerItem {
         BOOTS,
         MAINHAND,
         OFFHAND
+    }
+
+    private record ItemRuntimeContext(GearRestrictionHandler.RestrictionContext restrictionContext,
+                                      boolean soulbindEnabled,
+                                      int dungeonLevelSync) {
+
+        private static ItemRuntimeContext capture(Player player, ItemStack itemStack) {
+            int dungeonLevelSync = PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeonInstance
+                    ? dungeonInstance.getLevelSync()
+                    : 0;
+            return new ItemRuntimeContext(
+                    GearRestrictionHandler.getRestrictionContext(player, itemStack),
+                    EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled(),
+                    dungeonLevelSync);
+        }
     }
 
 }

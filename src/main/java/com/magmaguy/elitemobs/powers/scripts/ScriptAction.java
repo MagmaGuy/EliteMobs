@@ -821,12 +821,14 @@ public class ScriptAction {
      */
     private void runNavigate(ScriptActionData scriptActionData) {
         Collection<LivingEntity> targets = getTargets(scriptActionData);
-        Collection<Location> destinations = getFinalLocationTargets(scriptActionData);
 
-        if (destinations.isEmpty()) {
+        if (finalScriptTargets == null) {
             Logger.warn("Failed to get navigation destination for script '" + blueprint.getScriptName() + "' because there is no set FinalTarget!");
             return;
         }
+
+        Collection<Location> destinations = getFinalLocationTargets(scriptActionData);
+        if (destinations.isEmpty()) return;
 
         Location destination = destinations.iterator().next();
         double speed = blueprint.getVelocity().getValue();

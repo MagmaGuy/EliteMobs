@@ -8,6 +8,7 @@ import com.magmaguy.magmacore.command.CommandManager;
 import com.magmaguy.magmacore.nightbreak.NightbreakDownloadContentCommand;
 import com.magmaguy.magmacore.nightbreak.NightbreakDownloadEverythingCommand;
 import com.magmaguy.magmacore.nightbreak.NightbreakDownloadPluginUpdateCommand;
+import com.magmaguy.magmacore.nightbreak.NightbreakForceReinstallContentCommand;
 import com.magmaguy.magmacore.nightbreak.NightbreakRecommendedPluginsCommand;
 
 import java.util.ArrayList;
@@ -104,6 +105,10 @@ public class CommandHandler {
                 ReloadCommand::reload,
                 true,
                 "elitemobs.updatecontent"));
+        emCommand.registerCommand(new NightbreakForceReinstallContentCommand<>(MetadataHandler.PLUGIN,
+                EliteMobs.NIGHTBREAK_PLUGIN_SPEC,
+                CommandHandler::nightbreakBulkPackages,
+                ReloadCommand::reload));
         emCommand.registerCommand(new PeaceBannerGiveCommand());
         emCommand.registerCommand(new PeaceBannerListCommand());
 
