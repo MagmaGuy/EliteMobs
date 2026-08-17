@@ -53,7 +53,7 @@ public class QuestTracking {
     private static final HashMap<UUID, QuestTracking> playerTrackingQuests = new HashMap<>();
     private final Player player;
     @Getter
-    private final CustomQuest customQuest;
+    private final Quest quest;
     private final List<Location> turnInNPCs = new ArrayList<>();
     private List<ObjectiveDestinations> objectiveDestinations = new ArrayList<>();
     private BukkitTask locationRefresher;
@@ -62,13 +62,13 @@ public class QuestTracking {
     private boolean questIsDone = false;
     private boolean stopped = false;
 
-    public QuestTracking(Player player, CustomQuest customQuest) {
+    public QuestTracking(Player player, Quest quest) {
         this.player = player;
-        this.customQuest = customQuest;
+        this.quest = quest;
         startLocationGetter();
         startCompass();
         playerTrackingQuests.put(player.getUniqueId(), this);
-        customQuest.getQuestObjectives().displayLazyObjectivesScoreboard(player);
+        quest.getQuestObjectives().displayLazyObjectivesScoreboard(player);
     }
 
     public static boolean isTracking(Player player) {
@@ -80,15 +80,15 @@ public class QuestTracking {
     }
 
     public static void toggleTracking(Player player, String questID) {
-        CustomQuest customQuest = (CustomQuest) PlayerData.getQuest(player.getUniqueId(), questID);
-        if (customQuest == null) {
+        Quest quest = PlayerData.getQuest(player.getUniqueId(), questID);
+        if (quest == null) {
             player.sendMessage(QuestsConfig.getQuestTrackingInvalidMessage());
             return;
         }
-        toggleTracking(player, customQuest);
+        toggleTracking(player, quest);
     }
 
-    public static void toggleTracking(Player player, CustomQuest quest) {
+    public static void toggleTracking(Player player, Quest quest) {
         if (playerTrackingQuests.containsKey(player.getUniqueId())) {
             playerTrackingQuests.get(player.getUniqueId()).stop();
         } else {
@@ -96,13 +96,15 @@ public class QuestTracking {
                 player.sendMessage(QuestsConfig.getQuestTrackingInvalidMessage());
                 return;
             }
-            if (!quest.getCustomQuestsConfigFields().isTrackable()) return;
+            //Only custom quests carry a trackable flag; dynamic quests are always trackable
+            if (quest instanceof CustomQuest customQuest && !customQuest.getCustomQuestsConfigFields().isTrackable())
+                return;
             new QuestTracking(player, quest);
         }
     }
 
     public void refreshScoreboard() {
-        customQuest.getQuestObjectives().displayLazyObjectivesScoreboard(player);
+        quest.getQuestObjectives().displayLazyObjectivesScoreboard(player);
     }
 
     private void startLocationGetter() {
@@ -113,7 +115,7 @@ public class QuestTracking {
                     stop();
                     return;
                 }
-                updateLocations(customQuest);
+                updateLocations(quest);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 20L * 60L);
     }
@@ -170,7 +172,7 @@ public class QuestTracking {
 
     private void getTurnInNPC() {
         turnInNPCs.clear();
-        turnInNPCs.addAll(getNPCLocations(customQuest.getQuestTaker()));
+        turnInNPCs.addAll(getNPCLocations(quest.getQuestTaker()));
     }
 
     private boolean dropsCustomItem(List<CustomLootEntry> customLootEntries, String itemFilename) {
@@ -409,27 +411,28 @@ public class QuestTracking {
         public void onQuestProgressEvent(QuestProgressionEvent event) {
             //if (event.getObjective().isObjectiveCompleted()) return;
             if (!isTracking(event.getPlayer())) return;
-            if (!getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getCustomQuest().getQuestID().equals(event.getQuest().getQuestID()))
+            if (!getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getQuest().getQuestID().equals(event.getQuest().getQuestID()))
                 return;
             getPlayerTrackingQuests().get(event.getPlayer().getUniqueId())
-                    .updateLocations(getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getCustomQuest());
+                    .updateLocations(getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getQuest());
             getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).refreshScoreboard();
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onQuestCompleteEvent(QuestCompleteEvent event) {
             if (!isTracking(event.getPlayer())) return;
-            if (!getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getCustomQuest().getQuestID().equals(event.getQuest().getQuestID()))
+            if (!getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getQuest().getQuestID().equals(event.getQuest().getQuestID()))
                 return;
             getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).stop();
         }
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onQuestAcceptEvent(QuestAcceptEvent event) {
-            if (!(event.getQuest() instanceof CustomQuest)) return;
-            if (!((CustomQuest) event.getQuest()).getCustomQuestsConfigFields().isTrackable()) return;
+            //Dynamic quests are always trackable; only custom quests carry a trackable flag
+            if (event.getQuest() instanceof CustomQuest customQuest && !customQuest.getCustomQuestsConfigFields().isTrackable())
+                return;
             if (QuestsConfig.isAutoTrackQuestsOnAccept()) {
-                toggleTracking(event.getPlayer(), (CustomQuest) event.getQuest());
+                toggleTracking(event.getPlayer(), event.getQuest());
                 event.getPlayer().spigot().sendMessage(SpigotMessage.commandHoverMessage(
                         QuestsConfig.getChatTrackingMessage(),
                         QuestsConfig.getChatTrackingHover(),

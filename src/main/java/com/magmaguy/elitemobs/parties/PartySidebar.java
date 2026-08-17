@@ -223,8 +223,8 @@ public final class PartySidebar {
         QuestTracking tracking = QuestTracking.getPlayerTrackingQuests().get(player.getUniqueId());
         if (tracking == null) return null;
         return new QuestView(
-                tracking.getCustomQuest().getQuestName(),
-                tracking.getCustomQuest().getQuestObjectives().getScoreboardObjectiveText());
+                tracking.getQuest().getQuestName(),
+                tracking.getQuest().getQuestObjectives().getScoreboardObjectiveText());
     }
 
     private static void cleanupExpiredViews() {

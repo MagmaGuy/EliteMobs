@@ -52,12 +52,12 @@ public class QuestLeaveEvent extends Event {
                         for (String permission : customQuestsConfigFields.getTemporaryPermissions())
                             permissionAttachment.setPermission(permission, false);
                     }
-
-                    QuestTracking questTracking = QuestTracking.getPlayerTrackingQuests().get(event.getPlayer().getUniqueId());
-                    if (questTracking != null && customQuestsConfigFields.equals(questTracking.getCustomQuest().getCustomQuestsConfigFields()))
-                        questTracking.stop();
                 }
             }
+
+            QuestTracking questTracking = QuestTracking.getPlayerTrackingQuests().get(event.getPlayer().getUniqueId());
+            if (questTracking != null && questTracking.getQuest().getQuestID().equals(event.getQuest().getQuestID()))
+                questTracking.stop();
 
             event.getPlayer().playSound(event.getPlayer().getLocation(), SoundsConfig.questAbandonSound, 1, 1);
         }

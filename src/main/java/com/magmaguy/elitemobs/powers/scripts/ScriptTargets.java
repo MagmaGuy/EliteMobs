@@ -8,6 +8,7 @@ import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ScriptTargets {
@@ -63,6 +65,16 @@ public class ScriptTargets {
         Location parsedLocation = ConfigurationLocation.serialize(locationString);
         if (parsedLocation.getWorld() == null && locationString.split(",")[0].equalsIgnoreCase("same_as_boss")) {
             parsedLocation.setWorld(eliteEntity.getLocation().getWorld());
+        }
+        if (parsedLocation.getWorld() == null && eliteEntity.getLocation() != null && eliteEntity.getLocation().getWorld() != null) {
+            //Instanced dungeons clone the blueprint world under "<blueprintWorldName>_<number>", so a
+            //configured world name that isn't loaded must still resolve when the boss is inside an
+            //instance of that blueprint world - otherwise teleports and zone origins get a null world.
+            World bossWorld = eliteEntity.getLocation().getWorld();
+            String configuredWorldName = ConfigurationLocation.worldName(locationString);
+            if (configuredWorldName != null && !configuredWorldName.isBlank() &&
+                    bossWorld.getName().matches(Pattern.quote(configuredWorldName) + "_\\d+"))
+                parsedLocation.setWorld(bossWorld);
         }
 
         addOffsets(parsedLocation, scriptActionData);
