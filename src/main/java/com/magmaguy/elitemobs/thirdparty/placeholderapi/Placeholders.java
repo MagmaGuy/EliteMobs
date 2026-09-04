@@ -170,6 +170,12 @@ public class Placeholders extends PlaceholderExpansion {
             case "player_spears_level":
                 return "" + SkillXPCalculator.levelFromTotalXP(
                         PlayerData.getSkillXP(player.getUniqueId(), SkillType.SPEARS));
+            case "player_staves_level":
+                return "" + SkillXPCalculator.levelFromTotalXP(
+                        PlayerData.getSkillXP(player.getUniqueId(), SkillType.STAVES));
+            case "player_wands_level":
+                return "" + SkillXPCalculator.levelFromTotalXP(
+                        PlayerData.getSkillXP(player.getUniqueId(), SkillType.WANDS));
             case "player_armor_level":
                 return "" + SkillXPCalculator.levelFromTotalXP(
                         PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR));

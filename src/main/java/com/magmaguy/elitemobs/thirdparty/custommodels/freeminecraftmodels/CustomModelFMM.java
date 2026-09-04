@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEventFilter;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.experimentalcombat.abilities.ClassAbilityProjectileCarrier;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModelInterface;
@@ -61,6 +62,20 @@ public class CustomModelFMM implements CustomModelInterface {
 
     public static boolean modelExists(String modelName) {
         return ModeledEntityManager.modelExists(modelName);
+    }
+
+    /** Prevents FMM from cancelling or re-routing a projectile damage event already owned by EliteMobs. */
+    public static void runProjectileDamageBypass(Runnable damageCall) {
+        boolean previousApplyDamage = OBBHitDetection.applyDamage;
+        boolean previousBypassProjectileRedirect = OBBHitDetection.bypassProjectileRedirect;
+        OBBHitDetection.applyDamage = true;
+        OBBHitDetection.bypassProjectileRedirect = true;
+        try {
+            damageCall.run();
+        } finally {
+            OBBHitDetection.applyDamage = previousApplyDamage;
+            OBBHitDetection.bypassProjectileRedirect = previousBypassProjectileRedirect;
+        }
     }
 
     @Override
@@ -189,13 +204,21 @@ public class CustomModelFMM implements CustomModelInterface {
 
         @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
         public void onFmmProjectileHit(ModeledEntityHitByProjectileEvent event) {
+            Projectile projectile = event.getProjectile();
+            if (ClassAbilityProjectileCarrier.isCarrier(projectile)) {
+                event.setCancelled(true);
+                Entity underlying = event.getEntity().getUnderlyingEntity();
+                ClassAbilityProjectileCarrier.tryModeledImpact(projectile, underlying);
+                event.getEntity().getSkeleton().tint();
+                return;
+            }
+
             Entity underlying = event.getEntity().getUnderlyingEntity();
             if (!(underlying instanceof LivingEntity)) return;
 
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(underlying);
             if (eliteEntity == null || !eliteEntity.isValid()) return;
 
-            Projectile projectile = event.getProjectile();
             if (!(projectile.getShooter() instanceof Player player)) return;
 
             event.setCancelled(true);
@@ -213,17 +236,10 @@ public class CustomModelFMM implements CustomModelInterface {
                 damage = Math.max(1.0, Math.ceil(arrow.getDamage() * projectile.getVelocity().length()));
             }
 
-            boolean previousApplyDamage = OBBHitDetection.applyDamage;
-            boolean previousBypassProjectileRedirect = OBBHitDetection.bypassProjectileRedirect;
-            OBBHitDetection.applyDamage = true;
-            OBBHitDetection.bypassProjectileRedirect = true;
-            try {
+            double modeledDamage = damage;
+            runProjectileDamageBypass(() ->
                 EliteMobDamagedByPlayerEventFilter.applyModeledProjectileHit(
-                        player, eliteEntity, projectile, damage);
-            } finally {
-                OBBHitDetection.applyDamage = previousApplyDamage;
-                OBBHitDetection.bypassProjectileRedirect = previousBypassProjectileRedirect;
-            }
+                        player, eliteEntity, projectile, modeledDamage));
             event.getEntity().getSkeleton().tint();
         }
     }

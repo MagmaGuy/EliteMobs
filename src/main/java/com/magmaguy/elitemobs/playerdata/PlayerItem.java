@@ -65,16 +65,16 @@ public class PlayerItem {
         boolean itemIsEmpty = itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0;
         boolean cachedItemIsEmpty = this.itemStack == null || this.itemStack.getType().isAir();
 
-        // Case where both the live and cached slots are empty.
-        if (itemIsEmpty && cachedItemIsEmpty)
-            return false;
-
-        // Case where the slot became empty.
+        // Case where the slot is empty. The broken-item branch below empties the cache
+        // while the live slot still holds the broken item, so unequipping must be
+        // detected on the live slot alone — consulting the cache first swallowed the
+        // transition and left the broken-item boss bar up forever.
         if (itemIsEmpty) {
             if (displayingAsBroken) {
                 BossBarUtil.HideBrokenItemBossBar(equipmentSlot, player);
                 displayingAsBroken = false;
             }
+            if (cachedItemIsEmpty) return false;
             return fillNullItem();
         }
 

@@ -30,10 +30,13 @@ public class TrackBossCommand extends AdvancedCommand {
                     customBossEntity.getBossTrackingBar().addTrackingPlayer(commandData.getPlayerSender());
                     return;
                 }
-            Logger.sendMessage(commandData.getCommandSender(), DefaultConfig.getBossAlreadyGoneMessage());
+            // sendSimpleMessage: the configured message already carries its own
+            // [EliteMobs] prefix, and sendMessage prepends another — players saw
+            // "[EliteMobs] [EliteMobs] Sorry, this boss is already gone!".
+            Logger.sendSimpleMessage(commandData.getCommandSender(), DefaultConfig.getBossAlreadyGoneMessage());
         } catch (Exception ex) {
             //happens when players try to track an entity that has despawned for any reason
-            Logger.sendMessage(commandData.getCommandSender(), DefaultConfig.getBossAlreadyGoneMessage());
+            Logger.sendSimpleMessage(commandData.getCommandSender(), DefaultConfig.getBossAlreadyGoneMessage());
         }
     }
 }

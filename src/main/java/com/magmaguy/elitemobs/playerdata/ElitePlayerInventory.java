@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.playerdata;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
+import com.magmaguy.elitemobs.utils.BossBarUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -263,6 +264,10 @@ public class ElitePlayerInventory {
         @EventHandler
         public void onPlayerLogout(PlayerQuitEvent event) {
             playerInventories.remove(event.getPlayer().getUniqueId());
+            // The per-slot broken-item bars live in BossBarUtil, keyed by UUID; without
+            // this they leak across relogs and their stale entries block the bar from
+            // ever being shown again for that slot.
+            BossBarUtil.clearPlayer(event.getPlayer().getUniqueId());
         }
     }
 }

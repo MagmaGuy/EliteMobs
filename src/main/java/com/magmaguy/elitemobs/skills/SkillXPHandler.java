@@ -6,6 +6,8 @@ import com.magmaguy.elitemobs.combatsystem.ScaledCombatRewardResolver;
 import com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
+import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
+import com.magmaguy.elitemobs.experimentalcombat.progression.AwardResult;
 import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -21,6 +23,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -73,10 +78,27 @@ public class SkillXPHandler implements Listener {
                 ? instancedBoss.getLockoutPlayers()
                 : Set.of();
 
-        // Award XP to each player who contributed
-        for (Map.Entry<Player, Double> entry : eliteEntity.getDamagers().entrySet()) {
-            Player player = entry.getKey();
-            double damageDealt = entry.getValue();
+        // Class participation includes meaningful healing, mitigation and threat in addition to
+        // damage. Foundation skills keep their established damage-proportional distribution.
+        Set<Player> meaningfulParticipants = ExperimentalCombatModule.isInitialized()
+                ? ExperimentalCombatModule.get().meaningfulParticipants(eliteEntity)
+                : new LinkedHashSet<>(eliteEntity.getDamagers().keySet());
+
+        // Class progression belongs to the encounter, not to a participant's combat level or
+        // damage share. Resolve it once so every eligible damage/healing/mitigation/threat
+        // contributor receives the exact same raw class-XP award. Classes deliberately level at
+        // exactly half the weapon-skill rate.
+        double bossMultiplier = SkillXPCalculator.calculateBossXPMultiplier(
+                eliteEntity.getHealthMultiplier(), eliteEntity.getDamageMultiplier());
+        long rawClassReward = Math.max(0L, (long) (
+                SkillXPCalculator.calculateMobXP(Math.max(1, eliteEntity.getLevel())) * bossMultiplier / 2D));
+
+        // Award XP to each meaningful participant.
+        for (Player player : meaningfulParticipants) {
+            double damageDealt = eliteEntity.getDamagers().entrySet().stream()
+                    .filter(entry -> entry.getKey().getUniqueId().equals(player.getUniqueId()))
+                    .mapToDouble(Map.Entry::getValue)
+                    .sum();
 
             // Skip NPCs and players not in memory
             if (player.hasMetadata("NPC")) continue;
@@ -95,6 +117,12 @@ public class SkillXPHandler implements Listener {
                 }
             }
 
+            AwardResult classAward = ExperimentalCombatModule.isInitialized()
+                    && classXpInRange(player, rewardLevel, eliteEntity.isScaledCombat())
+                    ? ExperimentalCombatModule.get().awardClassXp(player, rawClassReward)
+                    : null;
+            long classXpEarned = classAward == null ? 0L : classAward.appliedXp();
+
             // Get effective mob level (capped at +5 above combat level)
             int effectiveMobLevel = FarmingProtection.getEffectiveMobLevelForXP(player, rewardLevel);
 
@@ -102,6 +130,8 @@ public class SkillXPHandler implements Listener {
             // decide whether the mob is too low for that specific skill below.
             double xpMultiplier = FarmingProtection.getXPMultiplier(player, rewardLevel);
             if (xpMultiplier <= 0) {
+                if (classXpEarned > 0 && deathLocation != null)
+                    BossHealthDisplay.createXPPopup(deathLocation, player, classXpEarned);
                 continue;
             }
 
@@ -114,24 +144,27 @@ public class SkillXPHandler implements Listener {
             long baseXP = SkillXPCalculator.calculateMobXP(effectiveMobLevel);
 
             // Apply boss multiplier based on HP and damage multipliers
-            double bossMultiplier = SkillXPCalculator.calculateBossXPMultiplier(
-                    eliteEntity.getHealthMultiplier(), eliteEntity.getDamageMultiplier());
             baseXP = (long) (baseXP * bossMultiplier);
 
             // Calculate proportional XP based on damage contribution
             double damagePercent = damageDealt / totalDamage;
             long earnedXP = (long) (baseXP * damagePercent);
 
-            if (earnedXP <= 0) continue;
+            if (earnedXP <= 0) {
+                if (classXpEarned > 0 && deathLocation != null)
+                    BossHealthDisplay.createXPPopup(deathLocation, player, classXpEarned);
+                continue;
+            }
 
             // Award weapon XP based on main hand weapon
-            long weaponXP = awardWeaponXP(player, earnedXP, rewardLevel, eliteEntity.isScaledCombat());
+            long weaponXP = awardWeaponXP(
+                    player, eliteEntity, earnedXP, damageDealt, rewardLevel, eliteEntity.isScaledCombat());
 
             // Award armor XP (always, at 1/3 rate)
             long armorXP = awardArmorXP(player, earnedXP, rewardLevel, eliteEntity.isScaledCombat());
 
             // Show XP popup with total XP earned (weapon + armor)
-            long totalXPEarned = weaponXP + armorXP;
+            long totalXPEarned = weaponXP + armorXP + classXpEarned;
             if (totalXPEarned > 0 && deathLocation != null) {
                 BossHealthDisplay.createXPPopup(deathLocation, player, totalXPEarned);
             }
@@ -143,13 +176,46 @@ public class SkillXPHandler implements Listener {
      *
      * @return The amount of XP awarded, or 0 if no weapon skill applies
      */
-    private long awardWeaponXP(Player player, long baseXP, int rewardLevel, boolean scaledCombat) {
+    private long awardWeaponXP(
+            Player player,
+            EliteEntity eliteEntity,
+            long playerEarnedXP,
+            double playerDamage,
+            int rewardLevel,
+            boolean scaledCombat) {
         if (!PlayerData.isDataLoaded(player.getUniqueId())) return 0;
-        Material weaponMaterial = player.getInventory().getItemInMainHand().getType();
-        SkillType skillType = SkillType.fromMaterial(weaponMaterial);
+        Map<SkillType, Double> contributions =
+                eliteEntity.getSkillDamageContributions(player.getUniqueId());
+        // Never infer a weapon at death. Class abilities are intentionally source-less, and a
+        // player may have switched items since any delayed projectile launched. Only damage that
+        // carried a hit-time or launch-time skill identity is eligible for weapon progression.
+        if (contributions.isEmpty()) return 0;
 
-        // No XP if not holding a recognized weapon
-        if (skillType == null) return 0;
+        Map<SkillType, Long> shares = WeaponXpAttribution.distribute(
+                playerEarnedXP, playerDamage, contributions);
+        long totalAwarded = 0L;
+        for (Map.Entry<SkillType, Long> entry : shares.entrySet()) {
+            totalAwarded += awardWeaponXP(
+                    player, entry.getKey(), entry.getValue(), rewardLevel, scaledCombat);
+        }
+        return totalAwarded;
+    }
+
+    private static boolean classXpInRange(Player player, int rewardLevel, boolean scaledCombat) {
+        if (!FarmingProtection.isLevelRewardProtectionEnabled() || scaledCombat) return true;
+        return ExperimentalCombatModule.get().profile(player.getUniqueId())
+                .flatMap(snapshot -> snapshot.optionalActiveLineage())
+                .map(active -> FarmingProtection.isSkillXPInRange(
+                        active.activeEffectiveLevel(), rewardLevel, false))
+                .orElse(true);
+    }
+
+    private long awardWeaponXP(
+            Player player,
+            SkillType skillType,
+            long baseXP,
+            int rewardLevel,
+            boolean scaledCombat) {
 
         // Get current XP before adding
         long oldXP = PlayerData.getSkillXP(player.getUniqueId(), skillType);

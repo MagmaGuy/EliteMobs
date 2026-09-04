@@ -1,10 +1,13 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
+import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.config.PartyConfig;
+import com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu;
 import com.magmaguy.elitemobs.parties.PartyInventoryMenu;
+import com.magmaguy.magmacore.util.ItemStackGenerator;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -15,11 +18,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class CoverPage {
+    private static final int[] CLASS_SLOT_PREFERENCES = {18, 19, 21, 23, 25};
+
     protected static TextComponent coverPage(Player requestingPlayer, int statsPage, int gearPage, int teleportsPage,
                                              int commandsPage, int questsPage, int bossTrackingPage, int skillsPage) {
 
@@ -109,16 +118,44 @@ public class CoverPage {
         if (SkillsConfig.isSkillSystemEnabled())
             inventory.setItem(PlayerStatusMenuConfig.getIndexSkillsSlot(), PlayerStatusMenuConfig.getIndexSkillsItem());
 
+        int classesSlot = -1;
+        if (ExperimentalCombatConfig.isEnabled()) {
+            classesSlot = firstFreeClassesSlot(inventory);
+            inventory.setItem(classesSlot, classesItem());
+        }
+
         if (requestingPlayer.openInventory(inventory) == null) return;
         StatusInventorySafety.protect(inventory);
         CoverPageEvents.pageInventories.add(inventory);
+        if (classesSlot >= 0) CoverPageEvents.classesSlots.put(inventory, classesSlot);
+    }
+
+    private static int firstFreeClassesSlot(Inventory inventory) {
+        for (int slot : CLASS_SLOT_PREFERENCES)
+            if (inventory.getItem(slot) == null) return slot;
+        for (int slot = 0; slot < inventory.getSize(); slot++)
+            if (inventory.getItem(slot) == null) return slot;
+        throw new IllegalStateException("The player status inventory has no free slot for Experimental Combat classes");
+    }
+
+    private static ItemStack classesItem() {
+        return ItemStackGenerator.generateItemStack(
+                Material.NETHER_STAR,
+                "&dClasses",
+                List.of(
+                        "&7Inspect class branches, requirements,",
+                        "&7levels, and your active selection.",
+                        "",
+                        "&eClick to open."));
     }
 
     public static class CoverPageEvents implements Listener {
         private static final Set<Inventory> pageInventories = new HashSet<>();
+        private static final Map<Inventory, Integer> classesSlots = new HashMap<>();
 
         public static void shutdown() {
             pageInventories.clear();
+            classesSlots.clear();
         }
 
         @EventHandler
@@ -178,6 +215,13 @@ public class CoverPage {
                 return;
             }
 
+            Integer classesSlot = classesSlots.get(event.getInventory());
+            if (classesSlot != null && event.getSlot() == classesSlot && ExperimentalCombatConfig.isEnabled()) {
+                player.closeInventory();
+                ClassSelectionMenu.open(player);
+                return;
+            }
+
             // Skills page
             if (event.getSlot() == PlayerStatusMenuConfig.getIndexSkillsSlot() && SkillsConfig.isSkillSystemEnabled()) {
                 player.closeInventory();
@@ -188,6 +232,7 @@ public class CoverPage {
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event) {
             pageInventories.remove(event.getInventory());
+            classesSlots.remove(event.getInventory());
         }
     }
 }

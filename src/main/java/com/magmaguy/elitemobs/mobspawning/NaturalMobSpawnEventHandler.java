@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteMindServiceModule;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.peacebanner.PeaceBannerManager;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -16,7 +17,9 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.PlayerScanner;
+import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.magmacore.util.AttributeManager;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -90,22 +93,9 @@ public class NaturalMobSpawnEventHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
 
-        if (event.getSpawnReason().equals(DROWNED) || event.getSpawnReason().equals(BREEDING)) return;
-
-        if (event.getEntity().getType().equals(EntityType.BEE))
-            return;
-
-        if (event.getEntity().getType().equals(EntityType.VEX))
-            return;
-
-
-        if (MobPropertiesConfig.getMobProperties().get(event.getEntityType()) == null ||
-                !MobPropertiesConfig.getMobProperties().get(event.getEntityType()).isEnabled())
-            return;
-
-        if (EliteMobs.worldGuardIsEnabled)
-            if (!WorldGuardFlagChecker.checkFlag(event.getLocation(), WorldGuardCompatibility.getELITEMOBS_SPAWN_FLAG()))
-                return;
+        // Native Mind bodies are committed through EliteMindService after the world accepts the
+        // carrier. Converting one here would create a second EliteEntity before that commitment.
+        if (NMSManager.isEnabled() && NMSManager.getAdapter().isMindBody(event.getEntity())) return;
 
         //This fires for custom bosses, so don't override those spawns
         if (WorldGuardSpawnEventBypasser.isForcedSpawn()) return;
@@ -115,38 +105,13 @@ public class NaturalMobSpawnEventHandler implements Listener {
          */
         if (EntityTracker.isEliteMob(event.getEntity())) return;
 
-        if (!MobCombatSettingsConfig.isDoNaturalMobSpawning())
-            return;
-        if (!ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean("validWorlds." + event.getEntity().getWorld().getName()))
-            return;
-        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) &&
-                !MobCombatSettingsConfig.isDoSpawnersSpawnEliteMobs() ||
-                event.getSpawnReason() != NATURAL && DefaultConfig.isDoStrictSpawningRules())
-            return;
         if (event.getEntity().getCustomName() != null && DefaultConfig.isPreventEliteMobConversionOfNamedMobs())
             return;
 
-        // Peace banner suppression
-        if (PeaceBannerManager.isProtected(event.getLocation())) return;
-
-        if (!EliteMobProperties.isValidEliteMobType(event.getEntityType()))
-            return;
-
         LivingEntity livingEntity = event.getEntity();
-
-
-        double validChance = MobCombatSettingsConfig.getAggressiveMobConversionPercentage();
-
         List<Player> nearbyPlayers = PlayerScanner.getNearbyPlayers(livingEntity.getLocation());
-
-        double huntingGearChanceAdder = HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
-        validChance += huntingGearChanceAdder;
-
-        // Peace banner suppression is handled earlier in onSpawn
-
-        if (ThreadLocalRandom.current().nextDouble() >= validChance) return;
-
-        int eliteMobLevel = getNaturalMobLevel(livingEntity.getLocation(), nearbyPlayers, event.getSpawnReason());
+        int eliteMobLevel = getNaturalMobLevel(
+                livingEntity.getLocation(), nearbyPlayers, event.getSpawnReason());
 
         //Takes worldguard minimum and maximum level flags into account
         if (EliteMobs.worldGuardIsEnabled) {
@@ -158,10 +123,57 @@ public class NaturalMobSpawnEventHandler implements Listener {
                 eliteMobLevel = maxLevel < eliteMobLevel ? maxLevel : eliteMobLevel;
         }
 
-        if (eliteMobLevel < 0) return;
+        // External game modes claim environment-owned carriers before the optional global
+        // conversion gates. This keeps exact mode ownership independent of EliteMobs' generic
+        // spawn percentage and strict-spawning settings. Explicit external spawns never enter the
+        // provider seam, and native Mind bodies were excluded above to prevent recursion.
+        if (EliteNaturalSpawnReasonPolicy.isProviderEligible(event.getSpawnReason())) {
+            try {
+                int providerLevel = Math.max(0, Math.min(
+                        eliteMobLevel,
+                        Math.max(0, MobCombatSettingsConfig.getNaturalEliteMobLevelCap())));
+                if (EliteMindServiceModule.replaceNaturalSpawn(event, providerLevel)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            } catch (RuntimeException | Error failure) {
+                event.setCancelled(true);
+                Logger.warn("Environment-owned Mind replacement failed closed for "
+                        + event.getEntityType().getKeyOrThrow() + ": " + failure.getMessage());
+                return;
+            }
+        }
 
+        // Historical generic EliteMobs conversion starts here. These settings do not weaken an
+        // exact provider claim, but remain unchanged for worlds without one.
+        if (eliteMobLevel < 0) return;
         if (eliteMobLevel > MobCombatSettingsConfig.getNaturalEliteMobLevelCap())
             eliteMobLevel = MobCombatSettingsConfig.getNaturalEliteMobLevelCap();
+        if (event.getSpawnReason().equals(DROWNED) || event.getSpawnReason().equals(BREEDING)) return;
+        if (EliteMobs.worldGuardIsEnabled)
+            if (!WorldGuardFlagChecker.checkFlag(event.getLocation(), WorldGuardCompatibility.getELITEMOBS_SPAWN_FLAG()))
+                return;
+        if (!MobCombatSettingsConfig.isDoNaturalMobSpawning()) return;
+        if (!ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean(
+                "validWorlds." + event.getEntity().getWorld().getName())) return;
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) &&
+                !MobCombatSettingsConfig.isDoSpawnersSpawnEliteMobs() ||
+                event.getSpawnReason() != NATURAL && DefaultConfig.isDoStrictSpawningRules()) return;
+        if (PeaceBannerManager.isProtected(event.getLocation())) return;
+
+        boolean genericTypeEnabled = !event.getEntity().getType().equals(EntityType.BEE)
+                && !event.getEntity().getType().equals(EntityType.VEX)
+                && MobPropertiesConfig.getMobProperties().get(event.getEntityType()) != null
+                && MobPropertiesConfig.getMobProperties().get(event.getEntityType()).isEnabled()
+                && EliteMobProperties.isValidEliteMobType(event.getEntityType());
+        boolean genericSelected = false;
+        if (genericTypeEnabled) {
+            double validChance = MobCombatSettingsConfig.getAggressiveMobConversionPercentage()
+                    + HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
+            genericSelected = ThreadLocalRandom.current().nextDouble() < validChance;
+        }
+
+        if (!genericTypeEnabled || !genericSelected) return;
 
         EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
 

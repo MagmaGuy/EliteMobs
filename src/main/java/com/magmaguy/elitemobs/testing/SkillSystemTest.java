@@ -25,6 +25,7 @@ import com.magmaguy.elitemobs.skills.bonuses.skills.swords.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.tridents.DepthChargeSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.tridents.ReturningHasteSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.tridents.RiptideMasterySkill;
+import com.magmaguy.elitemobs.utils.BossBarOrderManager;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -306,7 +307,7 @@ public class SkillSystemTest implements Listener {
         // Create progress bar
         progressBar = Bukkit.createBossBar("Initializing...", BarColor.BLUE, BarStyle.SEGMENTED_10);
         progressBar.setProgress(0);
-        progressBar.addPlayer(player);
+        BossBarOrderManager.show(player, progressBar);
 
         // Save and setup player
         try {
@@ -920,6 +921,7 @@ public class SkillSystemTest implements Listener {
         for (BukkitTask task : new ArrayList<>(scheduledTasks)) task.cancel();
         scheduledTasks.clear();
         if (progressBar != null) {
+            BossBarOrderManager.hide(player, progressBar);
             progressBar.removeAll();
             progressBar = null;
         }

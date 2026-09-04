@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.api.NPCEntitySpawnEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.EliteMindServiceModule;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
@@ -187,14 +188,74 @@ public class EntityTracker implements Listener {
         for (World world : Bukkit.getWorlds())
             for (Entity entity : world.getEntities())
                 unregister(entity, RemovalReason.SHUTDOWN);
-        CustomBossEntity.getTrackableCustomBosses().clear();
         CrashFix.knownSessionChunks.clear();
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent event) {
         EntityTracker.wipeWorld(event.getWorld(), RemovalReason.WORLD_UNLOAD);
+        //Undisguise everything left in the unloading world: LibsDisguises' registry
+        //holds hard entity references, its own world-unload handler saves disguises
+        //rather than removing them, and untracked entities never pass through
+        //EliteEntity.remove() — each disguised entity left behind pins the unloaded
+        //ServerLevel in memory.
+        if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
+            for (Entity entity : event.getWorld().getEntities())
+                com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity.undisguise(entity);
+        purgeWorldReferences(event.getWorld());
+        scheduleWorldRetentionCanary(event.getWorld());
         // Temporary block world cleanup is handled by MagmaCore's TemporaryBlockManager
+    }
+
+    /**
+     * wipeWorld only reaches entities in still-loaded chunks of the unloading world. Tracked
+     * elites whose chunks already unloaded, whose boss is waiting on a respawn timer, or whose
+     * removal path intentionally keeps them tracked (regional bosses) stay in these maps holding
+     * the unloaded world through their entities and locations — enough to keep every completed
+     * instanced dungeon's ServerLevel in memory. Anything still pointing at the world gets a
+     * proper removal, and whatever a removal path chose to keep is evicted anyway: a later spawn
+     * re-registers through registerEliteMob, so eviction is always safe here.
+     */
+    private static void purgeWorldReferences(World world) {
+        for (EliteEntity eliteEntity : new java.util.ArrayList<>(eliteMobEntities.values()))
+            if (eliteEntity.referencesWorld(world))
+                eliteEntity.remove(RemovalReason.WORLD_UNLOAD);
+        eliteMobEntities.values().removeIf(eliteEntity -> eliteEntity.referencesWorld(world));
+
+        for (NPCEntity npcEntity : new java.util.ArrayList<>(npcEntities.values()))
+            if (npcEntity.referencesWorld(world))
+                npcEntity.remove(RemovalReason.WORLD_UNLOAD);
+        npcEntities.values().removeIf(npcEntity -> npcEntity.referencesWorld(world));
+    }
+
+    /**
+     * Leak canary: a successfully unloaded world should become garbage-collectable.
+     * If it is still strongly reachable minutes later, some plugin retains it — a
+     * condition otherwise only visible in a heap dump.
+     */
+    private static void scheduleWorldRetentionCanary(World world) {
+        String worldName = world.getName();
+        UUID worldUUID = world.getUID();
+        java.lang.ref.WeakReference<World> reference = new java.lang.ref.WeakReference<>(world);
+        //Test/diagnostic override: -Delitemobs.worldRetentionCanaryTicks=<ticks> checks sooner,
+        //forces a GC first so the weak reference is meaningful, and also logs the healthy case,
+        //giving automated tests a positive line to assert instead of the absence of a warning.
+        Long canaryTicksOverride = Long.getLong("elitemobs.worldRetentionCanaryTicks");
+        long delayTicks = canaryTicksOverride != null ? canaryTicksOverride : 5L * 60L * 20L;
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+            if (Bukkit.getWorld(worldUUID) != null) return; //unload was cancelled or the world was reloaded
+            if (canaryTicksOverride != null) System.gc();
+            if (reference.get() == null) {
+                if (canaryTicksOverride != null)
+                    com.magmaguy.magmacore.util.Logger.info("World retention canary: " + worldName
+                            + " was garbage collected after unloading.");
+                return;
+            }
+            com.magmaguy.magmacore.util.Logger.warn("World " + worldName + " was unloaded " + (delayTicks / 20L)
+                    + " seconds ago but may still be retained in memory. If this appears after every instanced" +
+                    " dungeon, a plugin is holding references to unloaded worlds (this leaks RAM) - take a heap" +
+                    " dump and look for the retaining plugin.");
+        }, delayTicks);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -213,7 +274,9 @@ public class EntityTracker implements Listener {
                 // Safely iterate over eliteMobEntities by cloning the values first to avoid CME
                 new HashSet<>(eliteMobEntities.values()).forEach(value -> {
                     if (value.getLivingEntity() != null && !value.getLivingEntity().isValid()) {
-                        value.remove(RemovalReason.CHUNK_UNLOAD);
+                        LivingEntity removedBody = value.getLivingEntity();
+                        if (!EliteMindServiceModule.suspendForChunkUnload(value, removedBody))
+                            value.remove(RemovalReason.CHUNK_UNLOAD);
                     }
                 });
 
@@ -229,8 +292,12 @@ public class EntityTracker implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onRemove(EntityRemoveEvent event) {
-        if (event.getCause().equals(EntityRemoveEvent.Cause.UNLOAD))
-            EntityTracker.unregister(event.getEntity(), RemovalReason.CHUNK_UNLOAD);
+        EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
+        if (!event.getCause().equals(EntityRemoveEvent.Cause.UNLOAD)) return;
+        if (eliteEntity != null
+                && event.getEntity() instanceof LivingEntity livingEntity
+                && EliteMindServiceModule.suspendForChunkUnload(eliteEntity, livingEntity)) return;
+        EntityTracker.unregister(event.getEntity(), RemovalReason.CHUNK_UNLOAD);
     }
 
 

@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.playerdata.statusscreen;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
@@ -67,6 +68,10 @@ public class PlayerStatusScreenDialog {
 
         if (SkillsConfig.isSkillSystemEnabled()) {
             listBuilder.addDialog(DialogManager.DialogReference.inline(buildSkillsDialog(player)));
+        }
+
+        if (ExperimentalCombatConfig.isEnabled()) {
+            listBuilder.addDialog(DialogManager.DialogReference.inline(buildClassesDialog()));
         }
 
         if (PartyConfig.isEnabled() && player.hasPermission("elitemobs.party")) {
@@ -424,6 +429,22 @@ public class PlayerStatusScreenDialog {
 
         addBackButton(builder);
 
+        return builder;
+    }
+
+    private static DialogManager.MultiActionDialogBuilder buildClassesDialog() {
+        DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder()
+                .title("<g:#6D3AA8:#A855F7>⚗ Classes</g>")
+                .columns(1)
+                .addBody(DialogManager.PlainMessageBody.of(
+                        "&7Choose a class and inspect its progression.")
+                        .width(DIALOG_WIDTH));
+
+        builder.addAction(DialogManager.ActionButton.of(
+                "<g:#267A78:#58B8A9>Open Classes</g>",
+                new DialogManager.RunCommandAction("/elitemobs class"))
+                .width(DIALOG_WIDTH));
+        addBackButton(builder);
         return builder;
     }
 

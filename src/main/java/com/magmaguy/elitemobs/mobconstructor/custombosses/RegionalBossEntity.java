@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlock;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolService;
 import com.magmaguy.elitemobs.powers.specialpowers.SpiritWalkSupport;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.util.AttributeManager;
@@ -142,12 +143,14 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
             for (RegionalBossEntity regionalBossEntity : regionalBossesFromConfigFields.get(customBossesConfigFields))
                 if (!regionalBossEntity.removed)
                     spawnLocations.add(regionalBossEntity.rawString);
-            customBossesConfigFields.getFileConfiguration().set("spawnLocations", spawnLocations);
+            org.bukkit.configuration.file.FileConfiguration writable =
+                    customBossesConfigFields.getWritableFileConfiguration();
+            writable.set("spawnLocations", spawnLocations);
             //Serialize on the main thread so nothing off-thread ever touches the live FileConfiguration;
             //only the resulting string is written to disk asynchronously.
-            String yaml = customBossesConfigFields.getFileConfiguration().saveToString();
+            String yaml = writable.saveToString();
             File file = customBossesConfigFields.getFile();
-            String configName = customBossesConfigFields.getFileConfiguration().getName();
+            String configName = writable.getName();
             Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
                 synchronized (customBossesConfigFields) {
                     try {
@@ -171,6 +174,20 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         return new ArrayList<>(regionalBossesFromConfigFields.values());
     }
 
+    public String getConfigurationLocationString() {
+        return rawString;
+    }
+
+    /** Moves this live actor between config ownership buckets so the periodic saver cannot undo a fork. */
+    public void rebindPatrolConfig(CustomBossesConfigFields fields) {
+        CustomBossesConfigFields previous = getCustomBossesConfigFields();
+        regionalBossesFromConfigFields.remove(previous, this);
+        setCustomBossesConfigFields(Objects.requireNonNull(fields, "fields"));
+        regionalBossesFromConfigFields.put(fields, this);
+        previous.setFilesOutOfSync(false);
+        fields.setFilesOutOfSync(false);
+    }
+
     @Nullable
     public static RegionalBossEntity createTemporaryRegionalBossEntity(String filename, Location spawnLocation) {
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(filename);
@@ -181,7 +198,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
     public static RegionalBossEntity createPermanentRegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location spawnLocation) {
         RegionalBossEntity regionalBossEntity = new RegionalBossEntity(customBossesConfigFields, spawnLocation, true, true);
-        regionalBossEntity.initialize();
+        regionalBossEntity.queueSpawn(false);
         return regionalBossEntity;
     }
 
@@ -195,13 +212,19 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         }
         customBossesConfigFields.setFilesOutOfSync(true);
         rawString = ConfigurationLocation.deserialize(spawnLocation);
+        rawLocationString = rawString;
+        unixRespawnTime = 0;
     }
 
     public void initialize() {
-        queueSpawn(false);
+        queueSpawn(RegionalBossSpawnPolicy.forPersistedState(unixRespawnTime));
     }
 
     public void queueSpawn(boolean silent) {
+        queueSpawn(SpawnLifecycle.fromSilentFlag(silent));
+    }
+
+    private void queueSpawn(SpawnLifecycle.Context spawnContext) {
         RegionalBossEntity regionalBossEntity = this;
         this.isRespawning = true;
         respawnTask = new BukkitRunnable() {
@@ -209,17 +232,29 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
             public void run() {
                 if (phaseBossEntity != null) phaseBossEntity.silentReset();
                 ticksBeforeRespawn = 0;
+                clearPersistedRespawnTime();
                 //Reminder: this might not spawn a living entity as it gets queued for when the chunk loads
-                regionalBossEntity.spawn(silent);
+                regionalBossEntity.spawn(spawnContext);
                 regionalBossEntity.clearDamagers();
             }
         }.runTaskLater(MetadataHandler.PLUGIN, ticksBeforeRespawn);
+    }
+
+    private void clearPersistedRespawnTime() {
+        if (unixRespawnTime <= 0) return;
+        unixRespawnTime = 0;
+        rawString = rawLocationString;
+        if (phaseBossEntity != null)
+            phaseBossEntity.getPhase1Config().setFilesOutOfSync(true);
+        else
+            customBossesConfigFields.setFilesOutOfSync(true);
     }
 
     public void forceRespawn() {
         if (respawnTask == null) return;
         respawnTask.cancel();
         ticksBeforeRespawn = 0;
+        clearPersistedRespawnTime();
         spawn(false);
         clearDamagers();
     }
@@ -270,7 +305,12 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
     @Override
     public void spawn(boolean silent) {
-        super.spawn(silent);
+        spawn(SpawnLifecycle.fromSilentFlag(silent));
+    }
+
+    @Override
+    protected void spawn(SpawnLifecycle.Context spawnContext) {
+        super.spawn(spawnContext);
         this.isRespawning = false;
         if (!ItemSettingsConfig.isRegionalBossesDropVanillaLoot())
             super.vanillaLoot = false;
@@ -297,7 +337,11 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                 case DEATH:
                 case BOSS_TIMEOUT:
                     //this is used for 1-time regional bosses, such as the ones spawned by BetterStructures
-                    if (customBossesConfigFields.isRemoveAfterDeath()) {
+                    //Temporary regionals (reinforcement summons) can never respawn - their cooldown
+                    //is unset, so respawn() no-ops - and without a full removal each one stayed in
+                    //the elite tracking map forever, pinning its world in memory. Heavy instanced
+                    //dungeon usage accumulated thousands of them.
+                    if (customBossesConfigFields.isRemoveAfterDeath() || isTemporary()) {
                         permanentlyRemove();
                         break;
                     }
@@ -305,9 +349,26 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                         respawn();
                     break;
                 case CHUNK_UNLOAD:
-                    if (ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation))
+                    if (isTemporary()) {
+                        //A chunk-unloaded temporary regional is gone for good (nothing respawns
+                        //it), so its tracking must go too.
+                        permanentlyRemove();
+                        break;
+                    }
+                    if (!PatrolService.hasConfiguredPatrol(this)
+                            && ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation))
                         respawn();
+                    break;
+                case PHASE_BOSS_RESET:
+                case PHASE_BOSS_PHASE_END:
+                case EFFECT_TIMEOUT:
+                case ENTITY_REPLACEMENT:
+                    //The elite continues to exist through these - never a terminal removal.
+                    break;
                 default:
+                    //WORLD_UNLOAD, SHUTDOWN, KILL_COMMAND, REINFORCEMENT_CULL, ARENA_RESET and the
+                    //remaining terminal reasons: temporary regionals must be fully removed.
+                    if (isTemporary()) permanentlyRemove();
                     break;
             }
         } finally {
@@ -315,12 +376,26 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         }
     }
 
+    /**
+     * Whether this regional boss exists outside the configuration files: reinforcement summons and
+     * other runtime-only regionals have no serialized location, are never in
+     * regionalBossesFromConfigFields, and can never respawn once removed.
+     */
+    private boolean isTemporary() {
+        return rawString == null;
+    }
+
     private void permanentlyRemove() {
         if (phaseBossEntity != null)
             phaseBossEntity.silentReset();
         EntityTracker.getEliteMobEntities().remove(super.eliteUUID);
         removed = true;
-        getCustomBossesConfigFields().setFilesOutOfSync(true);
+        if (respawnTask != null) {
+            respawnTask.cancel();
+            respawnTask = null;
+        }
+        //Temporary regionals were never written to the configuration, so there is nothing to sync.
+        if (!isTemporary()) getCustomBossesConfigFields().setFilesOutOfSync(true);
     }
 
     /**
@@ -328,7 +403,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
      */
     @Override
     public void chunkLoad() {
-        super.chunkLoad();
+        restorePersistedSpawn(SpawnLifecycle.Context.RESTORED);
     }
 
     public void removeSlow() {

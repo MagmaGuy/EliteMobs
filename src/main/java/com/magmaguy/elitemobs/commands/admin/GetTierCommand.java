@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
+import com.magmaguy.elitemobs.experimentalcombat.weapons.ExperimentalMagicWeaponItems;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.itemconstructor.EliteItemSkins;
@@ -16,6 +18,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
 
 public class GetTierCommand {
     private GetTierCommand() {
@@ -48,6 +52,7 @@ public class GetTierCommand {
         ItemStack crossbow = null;
         ItemStack trident = null;
         ItemStack mace = null;
+        List<ItemStack> magicWeapons = List.of();
         if (!limited) {
             axe = new ItemStack(Material.IRON_AXE);
             addDurability(axe);
@@ -64,6 +69,10 @@ public class GetTierCommand {
                 addDurability(spear);
             } catch (NoSuchFieldError ignored) {
                 // SPEAR doesn't exist pre-1.21.11
+            }
+            if (ExperimentalCombatConfig.isEnabled()) {
+                magicWeapons = ExperimentalMagicWeaponItems.generateDebugLoadout(tierLevel, player);
+                magicWeapons.forEach(GetTierCommand::addDurability);
             }
         }
         ItemStack cheatSword = new ItemStack(Material.NETHERITE_SWORD);
@@ -129,6 +138,7 @@ public class GetTierCommand {
         if (trident != null) player.getInventory().addItem(trident);
         if (mace != null) player.getInventory().addItem(mace);
         if (spear != null) player.getInventory().addItem(spear);
+        for (ItemStack magicWeapon : magicWeapons) player.getInventory().addItem(magicWeapon);
         player.getInventory().addItem(cheatSword);
         player.getInventory().addItem(new ItemStack(Material.SHIELD));
         player.getInventory().addItem(new ItemStack(Material.ARROW, 64));

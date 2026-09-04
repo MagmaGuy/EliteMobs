@@ -20,10 +20,13 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.PowerExecutionOrder;
+import com.magmaguy.elitemobs.powers.lua.LuaElitePower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.elitemobs.powers.scripts.EliteScript;
 import com.magmaguy.elitemobs.powerstances.MajorPowerPowerStance;
 import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
+import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -38,14 +41,17 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EliteEntity {
 
     protected final HashMap<Player, Double> damagers = new HashMap<>();
+    private final Map<UUID, EnumMap<SkillType, Double>> skillDamageContributions = new HashMap<>();
     protected final UUID eliteUUID = UUID.randomUUID();
     private boolean removalEventCalled = false;
     private int removalCallDepth = 0;
@@ -66,6 +72,9 @@ public class EliteEntity {
      * can therefore be amplified by tanking mechanics such as Loud Strikes.
      */
     protected final HashMap<Player, Double> aggro = new HashMap<>();
+    private UUID forcedTargetPlayerId;
+    private UUID forcedTargetLeaseId;
+    private long forcedTargetExpiresAtNanos;
     /*
     Note that a lot of values here are defined by EliteMobProperties.java
      */
@@ -167,6 +176,22 @@ public class EliteEntity {
     //Used by other plugins to tag bosses with custom data
     private final HashMap<NamespacedKey, Object> customData = new HashMap<>();
     private final HashMap<String, Long> sharedCooldowns = new HashMap<>();
+    //Owned by EliteMobs. Kept on the actor so mind lifecycle cannot drift into a parallel UUID map.
+    private transient EliteMindBinding eliteMindBinding;
+    //Same ownership rule for API-registered Lua powers: the actor is the lifecycle source of truth.
+    private transient EliteLuaPowerBinding eliteLuaPowerBinding;
+    @Getter
+    private final ElitePowerSuppression powerSuppression =
+            new ElitePowerSuppression(this::onPowerPauseReasonChanged);
+    private transient List<Runnable> powerStanceCleanup = new ArrayList<>();
+    private transient BukkitTask pendingPowerStanceRefresh;
+    private transient long powerStanceGeneration;
+    private transient boolean serviceManagedPowerMutation;
+    //Native Mind actors are normalized before they become observable through EliteMobSpawnEvent.
+    //The service attaches the native Mind between preparation and this one-shot commit.
+    private transient boolean preparedMindSpawn;
+    private transient boolean preparedMindSpawnAttempted;
+    private transient List<Runnable> preparedMindSpawnCleanup;
 
     /**
      * Functions as a placeholder for {@link CustomBossEntity} that haven't been initialized yet. Uses the builder pattern
@@ -188,16 +213,168 @@ public class EliteEntity {
                        int level,
                        CreatureSpawnEvent.SpawnReason spawnReason) {
         setLevel(level);
+        // Ordinary actors retain the historical event boundary in setLivingEntity. Native Mind
+        // actors use the explicit prepare/commit transaction below.
         setLivingEntity(livingEntity, spawnReason);
+        if (spawnReason == CreatureSpawnEvent.SpawnReason.NATURAL) {
+            isNaturalEntity = true;
+        }
+        EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity);
+        setDefaultName(eliteMobProperties);
+        setArmor();
+        setMaxHealth();
+        randomizePowers(eliteMobProperties);
+    }
+
+    private void prepareNormalizedActor(LivingEntity livingEntity,
+                                        int level,
+                                        CreatureSpawnEvent.SpawnReason spawnReason,
+                                        boolean randomizePowers) {
+        setLevel(level);
+        normalizeLivingEntity(livingEntity, spawnReason);
         if (spawnReason == CreatureSpawnEvent.SpawnReason.NATURAL) {
             isNaturalEntity = true;
         }
         //Get correct instance of plugin data, necessary for settings names and health among other things
         EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity);
-        setName(eliteMobProperties);
+        NativeMindActorDefaults.requireRandomizedPowerSupport(
+                livingEntity.getType(), eliteMobProperties, randomizePowers);
+        setDefaultName(eliteMobProperties);
         setArmor();
         setMaxHealth();
-        randomizePowers(eliteMobProperties);
+        if (randomizePowers) randomizePowers(eliteMobProperties);
+    }
+
+    /**
+     * Prepares a native Mind actor without publishing {@link com.magmaguy.elitemobs.api.EliteMobSpawnEvent}.
+     * The Mind service attaches its native program and then calls {@link #commitPreparedMindSpawn()}.
+     */
+    void prepareMindActor(LivingEntity livingEntity,
+                          int level,
+                          CreatureSpawnEvent.SpawnReason spawnReason,
+                          boolean randomizePowers) {
+        Objects.requireNonNull(livingEntity, "livingEntity");
+        Objects.requireNonNull(spawnReason, "spawnReason");
+        if (preparedMindSpawn || preparedMindSpawnAttempted || this.livingEntity != null) {
+            throw new IllegalStateException("Elite actor was already prepared");
+        }
+        preparedMindSpawn = true;
+        preparedMindSpawnCleanup = new ArrayList<>();
+        prepareNormalizedActor(livingEntity, level, spawnReason, randomizePowers);
+    }
+
+    /**
+     * Publishes a prepared native Mind actor exactly once after its binding is attached.
+     *
+     * @return true when listeners accepted the actor; false when the spawn event was cancelled
+     */
+    boolean commitPreparedMindSpawn() {
+        if (!preparedMindSpawn) {
+            throw new IllegalStateException("Elite actor does not have a prepared native Mind spawn");
+        }
+        if (preparedMindSpawnAttempted) {
+            throw new IllegalStateException("Prepared native Mind spawn was already committed");
+        }
+        if (eliteMindBinding == null) {
+            throw new IllegalStateException("Prepared native Mind spawn has no attached Mind binding");
+        }
+        preparedMindSpawnAttempted = true;
+        boolean accepted = commitNormalizedSpawn();
+        if (accepted) {
+            preparedMindSpawn = false;
+            preparedMindSpawnCleanup = null;
+        }
+        return accepted;
+    }
+
+    /** Cleans a prepared actor that never became an accepted EliteMobs spawn. */
+    void rollbackPreparedMindSpawn() {
+        EntityTracker.getEliteMobEntities().remove(eliteUUID, this);
+        cleanupPreparedMindSpawnEffects();
+        preparedMindSpawn = false;
+        preparedMindSpawnAttempted = true;
+        closeAllPowerRuntimes();
+        closePowerSuppression();
+        elitePowers.clear();
+        clearDamagers();
+        if (livingEntity != null && livingEntity.isValid()) livingEntity.remove();
+        livingEntity = null;
+        unsyncedLivingEntity = null;
+        spawnLocation = null;
+    }
+
+    EliteMindBinding getEliteMindBinding() {
+        return eliteMindBinding;
+    }
+
+    void setEliteMindBinding(EliteMindBinding eliteMindBinding) {
+        this.eliteMindBinding = eliteMindBinding;
+    }
+
+    EliteLuaPowerBinding getEliteLuaPowerBinding() {
+        return eliteLuaPowerBinding;
+    }
+
+    void setEliteLuaPowerBinding(EliteLuaPowerBinding eliteLuaPowerBinding) {
+        this.eliteLuaPowerBinding = eliteLuaPowerBinding;
+        if (eliteLuaPowerBinding == null) return;
+        for (ElitePowerPauseReason reason : ElitePowerPauseReason.values()) {
+            if (powerSuppression.isSuppressed(reason)) {
+                eliteLuaPowerBinding.setPauseReason(reason, true);
+            }
+        }
+    }
+
+    boolean isPreparedMindSpawn() {
+        return preparedMindSpawn && !preparedMindSpawnAttempted;
+    }
+
+    void addPreparedMindSpawnCleanup(Runnable cleanup) {
+        Objects.requireNonNull(cleanup, "cleanup");
+        if (!isPreparedMindSpawn() || preparedMindSpawnCleanup == null) {
+            throw new IllegalStateException("Elite actor is not accepting prepared-spawn cleanup");
+        }
+        preparedMindSpawnCleanup.add(cleanup);
+    }
+
+    /** Reconnects a native body restored within the same server session without replaying spawn. */
+    void reattachMindBody(LivingEntity replacement) {
+        this.livingEntity = Objects.requireNonNull(replacement, "replacement");
+        this.unsyncedLivingEntity = replacement;
+        this.entityType = replacement.getType();
+        if (!(this instanceof CustomBossEntity)) this.spawnLocation = replacement.getLocation().clone();
+        PersistentTagger.tagElite(replacement, eliteUUID);
+    }
+
+    boolean suspendMindBodyForChunkUnload(LivingEntity removedBody) {
+        if (eliteMindBinding == null) return false;
+        if (livingEntity != null
+                && removedBody != null
+                && !livingEntity.getUniqueId().equals(removedBody.getUniqueId())) return false;
+        livingEntity = null;
+        unsyncedLivingEntity = null;
+        return true;
+    }
+
+    /** Terminal removal for a native Mind actor, including one whose body is chunk-unloaded. */
+    void terminateMindActor(RemovalReason removalReason) {
+        cleanupPreparedMindSpawnEffects();
+        EntityTracker.getEliteMobEntities().remove(eliteUUID);
+        remove(removalReason);
+    }
+
+    private void cleanupPreparedMindSpawnEffects() {
+        if (preparedMindSpawnCleanup == null) return;
+        List<Runnable> cleanup = preparedMindSpawnCleanup;
+        preparedMindSpawnCleanup = null;
+        for (int index = cleanup.size() - 1; index >= 0; index--) {
+            try {
+                cleanup.get(index).run();
+            } catch (RuntimeException exception) {
+                Logger.warn("Failed to roll back a prepared EliteMobs spawn effect: "
+                        + exception.getMessage());
+            }
+        }
     }
 
     /**
@@ -259,10 +436,19 @@ public class EliteEntity {
     }
 
     public void addDamager(Player player, double damage) {
+        addDamager(player, damage, null);
+    }
+
+    /** Records reward damage and, when known, the weapon skill that actually produced it. */
+    public void addDamager(Player player, double damage, SkillType progressionSkill) {
         if (player == null || !Double.isFinite(damage) || damage <= 0) return;
 
         Player trackedPlayer = findTrackedPlayer(player);
         damagers.merge(trackedPlayer, damage, Double::sum);
+        if (progressionSkill != null && progressionSkill.isWeaponSkill())
+            skillDamageContributions
+                    .computeIfAbsent(player.getUniqueId(), ignored -> new EnumMap<>(SkillType.class))
+                    .merge(progressionSkill, damage, Double::sum);
 
         ElitePlayerInventory inventory = ElitePlayerInventory.getPlayer(player);
         double loudStrikesBonus = inventory == null ? 0D : inventory.getLoudStrikesBonusMultiplier(false);
@@ -270,6 +456,61 @@ public class EliteEntity {
         aggro.merge(trackedPlayer, damage * (1D + loudStrikesBonus), Double::sum);
 
         AdvancedAggroManager.updateTarget(this);
+    }
+
+    /**
+     * Adds combat threat without inventing damage or reward contribution. Class taunts and other
+     * semantic threat sources must use this path so targeting and kill-credit accounting cannot
+     * silently collapse back into the same number.
+     */
+    public void addThreat(Player player, double threat) {
+        if (player == null || !Double.isFinite(threat) || threat <= 0D) return;
+        Player trackedPlayer = findTrackedPlayer(player);
+        aggro.merge(trackedPlayer, threat, Double::sum);
+        AdvancedAggroManager.updateTarget(this);
+    }
+
+    /** Temporarily pins target selection without conflating taunt threat with reward damage. */
+    public void forceTarget(Player player, int durationTicks) {
+        if (player == null || durationTicks <= 0) return;
+        long now = System.nanoTime();
+        long duration = durationTicks > Long.MAX_VALUE / 50_000_000L
+                ? Long.MAX_VALUE
+                : durationTicks * 50_000_000L;
+        long expiresAt = duration == Long.MAX_VALUE || Long.MAX_VALUE - now < duration
+                ? Long.MAX_VALUE
+                : now + duration;
+        forcedTargetPlayerId = player.getUniqueId();
+        UUID leaseId = UUID.randomUUID();
+        forcedTargetLeaseId = leaseId;
+        forcedTargetExpiresAtNanos = expiresAt;
+        AdvancedAggroManager.updateTarget(this);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!leaseId.equals(forcedTargetLeaseId)
+                        || !player.getUniqueId().equals(forcedTargetPlayerId)) return;
+                clearForcedTarget();
+                if (isValid()) AdvancedAggroManager.updateTarget(EliteEntity.this);
+            }
+        }.runTaskLater(MetadataHandler.PLUGIN, durationTicks);
+    }
+
+    /** Returns the live lease owner; spatial eligibility remains the aggro manager's concern. */
+    public UUID getForcedTargetPlayerId() {
+        if (forcedTargetPlayerId != null && forcedTargetExpiresAtNanos <= System.nanoTime())
+            clearForcedTarget();
+        return forcedTargetPlayerId;
+    }
+
+    public void clearForcedTarget(UUID playerId) {
+        if (playerId != null && playerId.equals(forcedTargetPlayerId)) clearForcedTarget();
+    }
+
+    public void clearForcedTarget() {
+        forcedTargetPlayerId = null;
+        forcedTargetLeaseId = null;
+        forcedTargetExpiresAtNanos = 0L;
     }
 
     private Player findTrackedPlayer(Player player) {
@@ -288,6 +529,12 @@ public class EliteEntity {
         return damagers;
     }
 
+    /** Immutable per-skill damage for one player in this encounter. */
+    public Map<SkillType, Double> getSkillDamageContributions(UUID playerId) {
+        Map<SkillType, Double> contributions = skillDamageContributions.get(playerId);
+        return contributions == null ? Map.of() : Collections.unmodifiableMap(new EnumMap<>(contributions));
+    }
+
     /**
      * Returns the accumulated threat used by elite target selection. The returned map is read-only;
      * callers that need to reset combat state must use {@link #clearDamagers()} so damage and threat
@@ -302,6 +549,7 @@ public class EliteEntity {
      */
     public void inheritAggroFrom(EliteEntity summoningEntity) {
         if (summoningEntity == null || summoningEntity == this) return;
+        clearForcedTarget();
         aggro.clear();
         summoningEntity.aggro.forEach((player, threat) -> {
             if (player != null && threat != null && Double.isFinite(threat) && threat > 0D)
@@ -316,6 +564,8 @@ public class EliteEntity {
     public void clearDamagers() {
         damagers.clear();
         aggro.clear();
+        skillDamageContributions.clear();
+        clearForcedTarget();
     }
 
     public boolean isCustomBossEntity() {
@@ -357,6 +607,12 @@ public class EliteEntity {
     }
 
     public void setLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
+        if (livingEntity == null) return;
+        normalizeLivingEntity(livingEntity, spawnReason);
+        commitNormalizedSpawn();
+    }
+
+    private void normalizeLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
         if (livingEntity == null) return;
         this.removalEventCalled = false;
         this.pendingRemovalEventReason = null;
@@ -425,13 +681,27 @@ public class EliteEntity {
         setMaxHealth();
 
         if (getName() == null)
-            setName(EliteMobProperties.getPluginData(entityType));
+            setDefaultName(EliteMobProperties.getPluginData(entityType));
 
         this.name = livingEntity.getCustomName();
+    }
 
+    private boolean commitNormalizedSpawn() {
+        if (livingEntity == null) {
+            throw new IllegalStateException("Cannot commit an EliteEntity without a living entity");
+        }
+        // Preserve the historical event-time marker contract. EntityTracker writes the same tag
+        // again after listeners accept the spawn and only then publishes the actor in its map.
         PersistentTagger.tagElite(livingEntity, eliteUUID);
         EntityTracker.registerEliteMob(this);
+        if (EntityTracker.getEliteMobEntities().get(eliteUUID) != this) return false;
+        if (preparedMindSpawn
+                && (eliteMindBinding == null || livingEntity == null || !livingEntity.isValid())) {
+            EntityTracker.getEliteMobEntities().remove(eliteUUID, this);
+            throw new IllegalStateException("Native Mind actor was removed during EliteMobSpawnEvent");
+        }
         AdvancedAggroManager.updateTarget(this);
+        return true;
     }
 
     public void setNameVisible(boolean isVisible) {
@@ -441,9 +711,11 @@ public class EliteEntity {
     }
 
     public void setMaxHealth() {
-        if (EliteMobProperties.getPluginData(entityType) != null)
-            this.defaultMaxHealth = EliteMobProperties.getPluginData(entityType).getDefaultMaxHealth();
-        else this.defaultMaxHealth = 20;
+        EliteMobProperties properties = EliteMobProperties.getPluginData(entityType);
+        double nativeBaseHealth = livingEntity == null
+                ? Double.NaN
+                : AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health");
+        this.defaultMaxHealth = NativeMindActorDefaults.baseHealth(properties, nativeBaseHealth);
         // Use exponential HP scaling: +5 levels = 2x HP, -5 levels = 0.5x HP
         // This replaces the old damage modifier system for a better player experience
         double calculatedHealth = LevelScaling.calculateMobHealth(level, this.defaultMaxHealth);
@@ -615,8 +887,7 @@ public class EliteEntity {
         //apply major powers
         applyPowers((HashSet<PowersConfigFields>) eliteMobProperties.getValidMajorPowers().clone(), availableMajorPowers);
 
-        new MinorPowerPowerStance(this);
-        new MajorPowerPowerStance(this);
+        initializePowerStances();
 
     }
 
@@ -659,8 +930,7 @@ public class EliteEntity {
             countPower(field);
         });
 
-        new MinorPowerPowerStance(this);
-        new MajorPowerPowerStance(this);
+        initializePowerStances();
     }
 
     private void countPower(PowersConfigFields powersConfigFields) {
@@ -673,6 +943,115 @@ public class EliteEntity {
     public void setElitePowers(Collection<ElitePower> elitePowers) {
         this.elitePowers.clear();
         this.elitePowers.addAll(elitePowers);
+    }
+
+    List<ElitePower> copyElitePowersInAttachmentOrder() {
+        return List.copyOf(elitePowers);
+    }
+
+    void replaceElitePowersInOrder(Collection<? extends ElitePower> replacement) {
+        Objects.requireNonNull(replacement, "replacement");
+        boolean previousMutationState = serviceManagedPowerMutation;
+        serviceManagedPowerMutation = true;
+        try {
+            elitePowers.clear();
+            elitePowers.addAll(replacement);
+        } finally {
+            serviceManagedPowerMutation = previousMutationState;
+        }
+        minorPowerCount = 0;
+        majorPowerCount = 0;
+        for (ElitePower power : replacement) {
+            if (PowersConfigFields.isMajorPowerType(power.getPowerType())) majorPowerCount++;
+            else minorPowerCount++;
+        }
+    }
+
+    void refreshPowerStances() {
+        initializePowerStances();
+    }
+
+    /**
+     * Moves the legacy obfuscation transition back through the actor-owned stance lifecycle.
+     * A generation token prevents a next-tick callback from resurrecting visuals after unload,
+     * removal, or a power-loadout replacement.
+     */
+    public void requestPowerStanceRefreshAfterObfuscation() {
+        if (livingEntity == null || pendingPowerStanceRefresh != null) return;
+        long scheduledGeneration = powerStanceGeneration;
+        pendingPowerStanceRefresh = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (scheduledGeneration != powerStanceGeneration) return;
+                pendingPowerStanceRefresh = null;
+                visualEffectObfuscated = false;
+                refreshPowerStances();
+            }
+        }.runTask(MetadataHandler.PLUGIN);
+    }
+
+    void suspendPowerStances() {
+        closePowerStances();
+    }
+
+    void suspendUnmanagedPowerRuntimes() {
+        closeAllPowerRuntimes();
+    }
+
+    void resumeUnmanagedPowerRuntimes() {
+        try {
+            for (ElitePower elitePower : elitePowers) {
+                if (elitePower instanceof LuaElitePower luaElitePower) {
+                    luaElitePower.startRuntimeOrThrow();
+                } else if (elitePower instanceof EliteScript eliteScript) {
+                    eliteScript.initializeCustomEvents(this);
+                }
+            }
+        } catch (RuntimeException exception) {
+            closeAllPowerRuntimes();
+            throw exception;
+        }
+    }
+
+    private void initializePowerStances() {
+        closePowerStances();
+        ArrayList<Runnable> cleanup = new ArrayList<>();
+        powerStanceCleanup = cleanup;
+        Consumer<Runnable> cleanupRegistrar = cleanup::add;
+        try {
+            new MinorPowerPowerStance(this, cleanupRegistrar);
+            new MajorPowerPowerStance(this, cleanupRegistrar);
+        } catch (RuntimeException exception) {
+            closePowerStancesIfCurrent(cleanup);
+            throw exception;
+        }
+        if (isPreparedMindSpawn()) {
+            addPreparedMindSpawnCleanup(() -> closePowerStancesIfCurrent(cleanup));
+        }
+    }
+
+    private void closePowerStances() {
+        closePowerStancesIfCurrent(powerStanceCleanup);
+    }
+
+    private void closePowerStancesIfCurrent(List<Runnable> expectedCleanup) {
+        if (powerStanceCleanup != expectedCleanup) return;
+        powerStanceGeneration++;
+        if (pendingPowerStanceRefresh != null) {
+            pendingPowerStanceRefresh.cancel();
+            pendingPowerStanceRefresh = null;
+        }
+        List<Runnable> cleanup = powerStanceCleanup;
+        powerStanceCleanup = new ArrayList<>();
+        for (int index = cleanup.size() - 1; index >= 0; index--) {
+            try {
+                cleanup.get(index).run();
+            } catch (RuntimeException exception) {
+                Logger.warn("Failed to close an EliteMobs power stance: " + exception.getMessage());
+            }
+        }
+        minorVisualEffect = false;
+        majorVisualEffect = false;
     }
 
     public List<ElitePower> getElitePowersInExecutionOrder() {
@@ -714,6 +1093,18 @@ public class EliteEntity {
         this.name = ChatColorConverter.convert(
                 MobLevelPlaceholderFormatter.replaceLevelPlaceholders(
                         eliteMobProperties.getName(), this, level));
+        livingEntity.setCustomName(this.name);
+        livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
+    }
+
+    private void setDefaultName(EliteMobProperties eliteMobProperties) {
+        if (eliteMobProperties != null) {
+            setName(eliteMobProperties);
+            return;
+        }
+        this.name = ChatColorConverter.convert(
+                MobLevelPlaceholderFormatter.replaceLevelPlaceholders(
+                        NativeMindActorDefaults.nameTemplate(entityType), this, level));
         livingEntity.setCustomName(this.name);
         livingEntity.setCustomNameVisible(DefaultConfig.isAlwaysShowNametags());
     }
@@ -767,20 +1158,29 @@ public class EliteEntity {
     private final class TrackedElitePowerSet extends LinkedHashSet<ElitePower> {
         @Override
         public boolean add(ElitePower elitePower) {
+            requirePowerMutationAllowed();
             boolean changed = super.add(elitePower);
-            if (changed) invalidateElitePowerOrder();
+            if (changed) {
+                applyPowerPauseState(elitePower);
+                invalidateElitePowerOrder();
+            }
             return changed;
         }
 
         @Override
         public boolean addAll(Collection<? extends ElitePower> collection) {
+            requirePowerMutationAllowed();
             boolean changed = super.addAll(collection);
-            if (changed) invalidateElitePowerOrder();
+            if (changed) {
+                collection.forEach(EliteEntity.this::applyPowerPauseState);
+                invalidateElitePowerOrder();
+            }
             return changed;
         }
 
         @Override
         public boolean remove(Object object) {
+            requirePowerMutationAllowed();
             boolean changed = super.remove(object);
             if (changed) invalidateElitePowerOrder();
             return changed;
@@ -788,6 +1188,7 @@ public class EliteEntity {
 
         @Override
         public boolean removeAll(Collection<?> collection) {
+            requirePowerMutationAllowed();
             boolean changed = super.removeAll(collection);
             if (changed) invalidateElitePowerOrder();
             return changed;
@@ -795,6 +1196,7 @@ public class EliteEntity {
 
         @Override
         public boolean retainAll(Collection<?> collection) {
+            requirePowerMutationAllowed();
             boolean changed = super.retainAll(collection);
             if (changed) invalidateElitePowerOrder();
             return changed;
@@ -802,11 +1204,42 @@ public class EliteEntity {
 
         @Override
         public void clear() {
+            requirePowerMutationAllowed();
             if (isEmpty()) {
                 return;
             }
             super.clear();
             invalidateElitePowerOrder();
+        }
+
+        @Override
+        public Iterator<ElitePower> iterator() {
+            Iterator<ElitePower> delegate = super.iterator();
+            return new Iterator<>() {
+                @Override
+                public boolean hasNext() {
+                    return delegate.hasNext();
+                }
+
+                @Override
+                public ElitePower next() {
+                    return delegate.next();
+                }
+
+                @Override
+                public void remove() {
+                    requirePowerMutationAllowed();
+                    delegate.remove();
+                    invalidateElitePowerOrder();
+                }
+            };
+        }
+
+        private void requirePowerMutationAllowed() {
+            if (!serviceManagedPowerMutation && eliteLuaPowerBinding != null) {
+                throw new IllegalStateException(
+                        "Service-managed Lua powers must be replaced through EliteLuaPowerService");
+            }
         }
     }
 
@@ -899,10 +1332,27 @@ public class EliteEntity {
     public void remove(RemovalReason removalReason) {
         beginRemovalCall();
         try {
+            closePowerStances();
+            closeAllPowerRuntimes();
+            closeEliteLuaPowerBinding();
+            closePowerSuppression();
             //This prevents the entity tracker from running this code twice when removing due to specific reasons
             //Custom bosses have their own tracking removal rules
             if (livingEntity != null && (!(this instanceof CustomBossEntity)))
                 EntityTracker.getEliteMobEntities().remove(eliteUUID);
+            //LibsDisguises' registry holds a hard reference to disguised entities and does
+            //not reliably release it when the entity or its world goes away, pinning
+            //instanced-world ServerLevels in memory. On death the undisguise is delayed
+            //so the death animation still plays on the disguised form.
+            if (livingEntity != null && org.bukkit.Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
+                if (removalReason.equals(RemovalReason.DEATH)) {
+                    org.bukkit.entity.LivingEntity disguisedEntity = livingEntity;
+                    org.bukkit.Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN,
+                            () -> com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity.undisguise(disguisedEntity), 60L);
+                } else {
+                    com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity.undisguise(livingEntity);
+                }
+            }
             if (livingEntity != null && !removalReason.equals(RemovalReason.DEATH))
                 livingEntity.remove();
             if (livingEntity instanceof EnderDragon enderDragon && removalReason.equals(RemovalReason.DEATH)) {
@@ -911,6 +1361,7 @@ public class EliteEntity {
                     enderDragon.getDragonBattle().generateEndPortal(false);
             }
             this.livingEntity = null;
+            releaseWorldReferences(removalReason);
             //Custom bosses finish additional persistent/model/tracking cleanup in
             //their override before publishing the terminal removal event.
             if (!(this instanceof CustomBossEntity))
@@ -918,6 +1369,95 @@ public class EliteEntity {
         } finally {
             finishRemovalCall();
         }
+    }
+
+    private void closeEliteLuaPowerBinding() {
+        EliteLuaPowerBinding binding = eliteLuaPowerBinding;
+        if (binding == null) return;
+        eliteLuaPowerBinding = null;
+        try {
+            binding.close();
+        } catch (RuntimeException exception) {
+            Logger.warn("Failed to close an EliteMobs Lua power binding: "
+                    + exception.getMessage());
+        }
+    }
+
+    private void closeAllPowerRuntimes() {
+        for (ElitePower elitePower : elitePowers) {
+            try {
+                elitePower.closeRuntime();
+            } catch (RuntimeException exception) {
+                Logger.warn("Failed to close an EliteMobs power runtime: "
+                        + exception.getMessage());
+            }
+        }
+    }
+
+    private void onPowerPauseReasonChanged(ElitePowerPauseReason reason, boolean paused) {
+        EliteLuaPowerBinding binding = eliteLuaPowerBinding;
+        if (binding != null) {
+            try {
+                binding.setPauseReason(reason, paused);
+            } catch (RuntimeException exception) {
+                Logger.warn("Failed to update an EliteMobs Lua power binding pause state: "
+                        + exception.getMessage());
+            }
+        }
+        for (ElitePower elitePower : elitePowers) {
+            if (elitePower instanceof LuaElitePower luaElitePower) {
+                try {
+                    luaElitePower.setRuntimePauseReason(reason, paused);
+                } catch (RuntimeException exception) {
+                    Logger.warn("Failed to update an EliteMobs Lua power pause state: "
+                            + exception.getMessage());
+                }
+            }
+        }
+    }
+
+    private void applyPowerPauseState(ElitePower elitePower) {
+        if (!(elitePower instanceof LuaElitePower luaElitePower)) return;
+        for (ElitePowerPauseReason reason : ElitePowerPauseReason.values()) {
+            if (powerSuppression.isSuppressed(reason)) {
+                luaElitePower.setRuntimePauseReason(reason, true);
+            }
+        }
+    }
+
+    private void closePowerSuppression() {
+        try {
+            powerSuppression.close();
+        } catch (RuntimeException exception) {
+            Logger.warn("Failed to close Elite power suppression: " + exception.getMessage());
+        }
+    }
+
+    /**
+     * Drops the references that keep a gone world reachable: the discarded NMS entity behind
+     * unsyncedLivingEntity (whose .level pins an entire ServerLevel) and the tracked
+     * damager/threat players. Elites stay in static tracking maps well past removal — regional
+     * bosses intentionally forever — so without this every retained elite pinned the world its
+     * last living entity lived in, which is how completed instanced dungeons accumulated in
+     * memory. Deliberately limited to the reasons where the world itself is going away: a dead
+     * entity in a still-loaded world pins nothing extra, and death/combat listeners (loot
+     * location reads, exit-combat watchdogs, delayed undisguises) may still need the reference.
+     */
+    private void releaseWorldReferences(RemovalReason removalReason) {
+        if (!removalReason.equals(RemovalReason.WORLD_UNLOAD)
+                && !removalReason.equals(RemovalReason.SHUTDOWN)) return;
+        unsyncedLivingEntity = null;
+        clearDamagers();
+    }
+
+    /**
+     * @return whether any reference this elite still holds (living entity, spawn location) points
+     * at the given world — used to purge tracking when that world unloads
+     */
+    public boolean referencesWorld(org.bukkit.World world) {
+        if (world == null) return false;
+        if (unsyncedLivingEntity != null && world.equals(unsyncedLivingEntity.getWorld())) return true;
+        return spawnLocation != null && world.equals(spawnLocation.getWorld());
     }
 
     /**

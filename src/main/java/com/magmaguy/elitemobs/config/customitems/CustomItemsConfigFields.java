@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.config.customitems;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.LegacyValueConverter;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,6 +47,12 @@ public class CustomItemsConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private String scriptedItem = null;
+    @Getter
+    @Setter
+    private SkillType weaponType = null;
+    @Getter
+    @Setter
+    private String fmmItemModel = null;
     @Getter
     @Setter
     private String permission = "";
@@ -104,6 +111,8 @@ public class CustomItemsConfigFields extends CustomConfigFields {
         this.customModelID = processString("customModelV2", customModelID, null, false);
         this.equipmentModelID = processString("equipmentModelID", equipmentModelID, null, false);
         this.scriptedItem = processString("scriptedItem", scriptedItem, null, false);
+        // Experimental magic-weapon identity and presentation remain code-owned until the
+        // baseline has been tested. Deliberately do not expose either value to YAML yet.
         this.permission = processString("permission", permission, "", false);
         this.level = processInt("level", level, 0, false);
         this.soulbound = processBoolean("soulbound", soulbound, true, false);

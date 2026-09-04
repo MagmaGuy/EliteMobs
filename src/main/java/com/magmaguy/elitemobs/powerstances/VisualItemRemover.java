@@ -25,4 +25,14 @@ public class VisualItemRemover {
             }
     }
 
+    /** Main-thread rollback path used before a prepared elite has been published. */
+    public static void removeItemsNow(Object[][] multiDimensionalTrailTracker) {
+        for (Object[] objects : multiDimensionalTrailTracker)
+            for (Object object : objects) {
+                if (!(object instanceof Item item)) continue;
+                item.remove();
+                EntityTracker.unregister(item, RemovalReason.EFFECT_TIMEOUT);
+            }
+    }
+
 }

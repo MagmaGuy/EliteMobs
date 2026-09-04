@@ -11,17 +11,25 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Created by MagmaGuy on 11/05/2017.
  */
-public class MajorPowerPowerStance implements Listener {
+public class MajorPowerPowerStance implements Listener, AutoCloseable {
 
     public static int trackAmount = 2;
     public static int individualEffectsPerTrack = 2;
     private EliteEntity eliteEntity;
+    private final List<Item> spawnedItems = new ArrayList<>();
+    private VisualItemProcessor visualItemProcessor;
 
     public MajorPowerPowerStance(EliteEntity eliteEntity) {
+        this(eliteEntity, ignored -> { });
+    }
+
+    public MajorPowerPowerStance(EliteEntity eliteEntity, Consumer<Runnable> cleanupRegistrar) {
 
         if (!MobCombatSettingsConfig.isEnableVisualEffectsForNaturalMobs())
             return;
@@ -32,6 +40,7 @@ public class MajorPowerPowerStance implements Listener {
             return;
 
         this.eliteEntity = eliteEntity;
+        Objects.requireNonNull(cleanupRegistrar, "cleanupRegistrar").accept(this::close);
 
         if (eliteEntity.isMajorVisualEffect()) return;
         eliteEntity.setMajorVisualEffect(true);
@@ -56,7 +65,7 @@ public class MajorPowerPowerStance implements Listener {
 
                 }
 
-                VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
+                visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
                         MajorPowerStanceMath.cachedVectors, eliteEntity.isMajorVisualEffect(),
                         MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
@@ -74,7 +83,7 @@ public class MajorPowerPowerStance implements Listener {
                     multiDimensionalTrailTracker[i][j] = localObjects.get(j);
         }
 
-        VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
+        visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
                 MajorPowerStanceMath.cachedVectors, eliteEntity.isMajorVisualEffect(),
                 MajorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
@@ -113,6 +122,7 @@ public class MajorPowerPowerStance implements Listener {
 
         Item item = eliteEntity.getLivingEntity().getWorld().dropItem(eliteEntity.getLivingEntity().getLocation(),
                 new ItemStack(material));
+        spawnedItems.add(item);
         item.setPickupDelay(Integer.MAX_VALUE);
         item.setGravity(false);
         item.setInvulnerable(true);
@@ -123,6 +133,16 @@ public class MajorPowerPowerStance implements Listener {
 
     private Object addEffect(Particle particle) {
         return particle;
+    }
+
+    @Override
+    public void close() {
+        if (visualItemProcessor != null) visualItemProcessor.close();
+        for (Item item : spawnedItems) {
+            item.remove();
+            EntityTracker.unregister(item, com.magmaguy.elitemobs.api.internal.RemovalReason.EFFECT_TIMEOUT);
+        }
+        spawnedItems.clear();
     }
 
 }

@@ -44,6 +44,7 @@ public class EliteMobsScriptProvider implements ScriptProvider {
             case "on_boss_target_changed" -> ScriptableBoss.ON_TARGET;
             case "on_death" -> ScriptableBoss.ON_DEATH;
             case "on_phase_switch" -> ScriptableBoss.ON_PHASE_SWITCH;
+            case "on_mind_action" -> ScriptableBoss.ON_MIND_ACTION;
             default -> null;
         };
     }

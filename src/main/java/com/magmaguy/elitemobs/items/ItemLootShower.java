@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.skills.bonuses.skills.hoes.HarvesterSkill;
 import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.elitemobs.utils.MessageThrottler;
@@ -16,8 +17,6 @@ import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.Round;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -77,10 +76,10 @@ public class ItemLootShower {
                         cancel();
                         return;
                     }
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
+                    ActionBarCompositor.show(player, ActionBarCompositor.Source.CRITICAL_WARNING,
                             ItemSettingsConfig.getLevelRangeTooDifferent()
                                     .replace("$playerLevel", ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getFullPlayerTier(false) + "")
-                                    .replace("$bossLevel", (int) mobLevel + "")));
+                                    .replace("$bossLevel", (int) mobLevel + ""));
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
             return;
@@ -372,11 +371,10 @@ public class ItemLootShower {
             EconomyHandler.addCurrency(player.getUniqueId(), amountIncremented);
             double runningTotal = MessageThrottler.pushCurrency(player, amountIncremented);
 
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    TextComponent.fromLegacyText(
-                            EconomySettingsConfig.getActionBarCurrencyShowerMessage()
-                                    .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                    .replace("$amount", Round.twoDecimalPlaces(runningTotal) + "")));
+            ActionBarCompositor.show(player, ActionBarCompositor.Source.ECONOMY,
+                    EconomySettingsConfig.getActionBarCurrencyShowerMessage()
+                            .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
+                            .replace("$amount", Round.twoDecimalPlaces(runningTotal) + ""));
         }
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -498,11 +496,10 @@ public class ItemLootShower {
             EconomyHandler.addCurrency(targetPlayer.getUniqueId(), value);
             double runningTotal = MessageThrottler.pushCurrency(targetPlayer, value);
 
-            targetPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    TextComponent.fromLegacyText(
-                            EconomySettingsConfig.getActionBarCurrencyShowerMessage()
-                                    .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                    .replace("$amount", Round.twoDecimalPlaces(runningTotal) + "")));
+            ActionBarCompositor.show(targetPlayer, ActionBarCompositor.Source.ECONOMY,
+                    EconomySettingsConfig.getActionBarCurrencyShowerMessage()
+                            .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
+                            .replace("$amount", Round.twoDecimalPlaces(runningTotal) + ""));
         }
     }
 
@@ -560,11 +557,10 @@ public class ItemLootShower {
                         EconomyHandler.addCurrency(player.getUniqueId(), value);
                         double runningTotal = MessageThrottler.pushCurrency(player, value);
 
-                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                                TextComponent.fromLegacyText(
-                                        EconomySettingsConfig.getActionBarCurrencyShowerMessage()
-                                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
-                                                .replace("$amount", Round.twoDecimalPlaces(runningTotal) + "")));
+                        ActionBarCompositor.show(player, ActionBarCompositor.Source.ECONOMY,
+                                EconomySettingsConfig.getActionBarCurrencyShowerMessage()
+                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
+                                        .replace("$amount", Round.twoDecimalPlaces(runningTotal) + ""));
                         coinValues.remove(item.getUniqueId());
                         cancel();
                         return;

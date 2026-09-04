@@ -3,10 +3,9 @@ package com.magmaguy.elitemobs.utils;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.magmacore.util.Round;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -125,8 +124,8 @@ public final class MessageThrottler {
                     player.sendMessage(EconomySettingsConfig.getChatCurrencyShowerMessage()
                             .replace("$currency_name", EconomySettingsConfig.getCurrencyName())
                             .replace("$amount", Round.twoDecimalPlaces(accumulatedAmount) + ""));
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(EconomySettingsConfig.getAdventurersGuildNotificationMessage()));
+                    ActionBarCompositor.show(player, ActionBarCompositor.Source.ECONOMY,
+                            EconomySettingsConfig.getAdventurersGuildNotificationMessage());
                 }
                 case NO_XP -> {
                     String suffix = count > 1 ? " (x" + count + ")" : "";

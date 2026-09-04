@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.util.Logger;
@@ -20,6 +21,7 @@ public class ReloadCommand extends AdvancedCommand {
     public static void reload(CommandSender commandSender) {
         Logger.sendMessage(commandSender, CommandMessagesConfig.getReloadStartMessage());
         MetadataHandler.pendingReloadSender = commandSender;
+        ExperimentalCombatRuntime.prepareForSoftReload();
         MetadataHandler.PLUGIN.onDisable();
         MetadataHandler.PLUGIN.onLoad();
         MetadataHandler.PLUGIN.onEnable();

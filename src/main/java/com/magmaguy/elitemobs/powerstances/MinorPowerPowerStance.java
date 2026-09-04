@@ -11,18 +11,26 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Created by MagmaGuy on 04/11/2016.
  */
-public class MinorPowerPowerStance implements Listener {
+public class MinorPowerPowerStance implements Listener, AutoCloseable {
 
     public static int trackAmount = 2;
     public static int individualEffectsPerTrack = 2;
     private EliteEntity eliteEntity;
+    private final List<Item> spawnedItems = new ArrayList<>();
+    private VisualItemProcessor visualItemProcessor;
 
     //Secondary effect item processing
     public MinorPowerPowerStance(EliteEntity eliteEntity) {
+        this(eliteEntity, ignored -> { });
+    }
+
+    public MinorPowerPowerStance(EliteEntity eliteEntity, Consumer<Runnable> cleanupRegistrar) {
 
         if (!MobCombatSettingsConfig.isEnableVisualEffectsForNaturalMobs())
             return;
@@ -33,6 +41,7 @@ public class MinorPowerPowerStance implements Listener {
             return;
 
         this.eliteEntity = eliteEntity;
+        Objects.requireNonNull(cleanupRegistrar, "cleanupRegistrar").accept(this::close);
         if (eliteEntity.isMinorVisualEffect()) return;
         eliteEntity.setMinorVisualEffect(true);
 
@@ -56,7 +65,7 @@ public class MinorPowerPowerStance implements Listener {
 
                 }
 
-                VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
+                visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
                         MinorPowerStanceMath.cachedVectors, eliteEntity.isMinorVisualEffect(),
                         MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
@@ -74,7 +83,7 @@ public class MinorPowerPowerStance implements Listener {
                     multiDimensionalTrailTracker[i][j] = localObjects.get(j);
         }
 
-        VisualItemProcessor visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
+        visualItemProcessor = new VisualItemProcessor(multiDimensionalTrailTracker,
                 MinorPowerStanceMath.cachedVectors, eliteEntity.isMinorVisualEffect(),
                 MinorPowerStanceMath.NUMBER_OF_POINTS_PER_FULL_ROTATION, eliteEntity);
 
@@ -113,6 +122,7 @@ public class MinorPowerPowerStance implements Listener {
 
         Item item = eliteEntity.getLivingEntity().getWorld().dropItem(eliteEntity.getLivingEntity().getLocation(),
                 new ItemStack(material));
+        spawnedItems.add(item);
         item.setPickupDelay(Integer.MAX_VALUE);
         item.setGravity(false);
         item.setInvulnerable(true);
@@ -123,6 +133,16 @@ public class MinorPowerPowerStance implements Listener {
 
     private Object addEffect(Particle particle) {
         return particle;
+    }
+
+    @Override
+    public void close() {
+        if (visualItemProcessor != null) visualItemProcessor.close();
+        for (Item item : spawnedItems) {
+            item.remove();
+            EntityTracker.unregister(item, com.magmaguy.elitemobs.api.internal.RemovalReason.EFFECT_TIMEOUT);
+        }
+        spawnedItems.clear();
     }
 
 }

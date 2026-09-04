@@ -115,6 +115,9 @@ public class PersistentObjectHandler {
         remove();
         //Assign key
         addWorldKey(this);
+        //worldLoad() re-attaches the world on reload; until then keep coordinates only, or every
+        //handler parked on a world key pins the unloaded ServerLevel in memory.
+        if (persistentLocation != null) persistentLocation.setWorld(null);
     }
 
     public void updatePersistentLocation(Location location) {

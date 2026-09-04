@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
+import com.magmaguy.elitemobs.experimentalcombat.progression.StoredClassProfile;
 import com.magmaguy.magmacore.util.Logger;
 
 import java.sql.DatabaseMetaData;
@@ -40,12 +41,16 @@ public class GenerateDatabase {
                 "SkillXP_HOES BIGINT, " +
                 "SkillXP_MACES BIGINT, " +
                 "SkillXP_SPEARS BIGINT, " +
+                "SkillXP_STAVES BIGINT, " +
+                "SkillXP_WANDS BIGINT, " +
                 "SkillBonusSelections BLOB, " +
                 "GamblingDebt DOUBLE, " +
                 "GamblingDebtCents BIGINT" +
                 ");";
         statement.executeUpdate(sql);
         statement.close();
+
+        createExperimentalCombatTables();
 
         // Check and add missing columns if any
         addEntryIfEmpty("DisplayName", ColumnValues.TEXT);
@@ -75,6 +80,8 @@ public class GenerateDatabase {
         addEntryIfEmpty("SkillXP_HOES", ColumnValues.BIGINT);
         addEntryIfEmpty("SkillXP_MACES", ColumnValues.BIGINT);
         addEntryIfEmpty("SkillXP_SPEARS", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_STAVES", ColumnValues.BIGINT);
+        addEntryIfEmpty("SkillXP_WANDS", ColumnValues.BIGINT);
 
         // Skill bonus selections (JSON)
         addEntryIfEmpty("SkillBonusSelections", ColumnValues.BLOB);
@@ -82,6 +89,29 @@ public class GenerateDatabase {
         // Gambling debt
         addEntryIfEmpty("GamblingDebt", ColumnValues.REAL);
         addEntryIfEmpty("GamblingDebtCents", ColumnValues.BIGINT);
+    }
+
+    private static void createExperimentalCombatTables() throws Exception {
+        synchronized (PlayerDataRepository.monitor()) {
+            try (Statement statement = PlayerDataRepository.connection().createStatement()) {
+                statement.executeUpdate("CREATE TABLE IF NOT EXISTS "
+                        + JdbcClassProgressionStore.PROFILE_TABLE + " ("
+                        + "PlayerUUID VARCHAR(36) PRIMARY KEY NOT NULL, "
+                        + "SelectedFormId VARCHAR(64), "
+                        + "SelectedInputId VARCHAR(64), "
+                        + "FocusSlot INTEGER DEFAULT " + StoredClassProfile.DEFAULT_FOCUS_SLOT + ", "
+                        + "CatalogVersion INTEGER NOT NULL DEFAULT 0"
+                        + ")");
+                statement.executeUpdate("CREATE TABLE IF NOT EXISTS "
+                        + JdbcClassProgressionStore.PROGRESS_TABLE + " ("
+                        + "PlayerUUID VARCHAR(36) NOT NULL, "
+                        + "FormId VARCHAR(64) NOT NULL, "
+                        + "XP BIGINT NOT NULL DEFAULT 0, "
+                        + "CatalogVersion INTEGER NOT NULL DEFAULT 0, "
+                        + "PRIMARY KEY (PlayerUUID, FormId)"
+                        + ")");
+            }
+        }
     }
 
     private static void addEntryIfEmpty(String columnName, ColumnValues columnValues) {

@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.npcs.chatter;
 import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolEditor;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolService;
 import com.magmaguy.elitemobs.utils.VisualDisplay;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -18,8 +20,10 @@ public class NPCChatBubble {
     public NPCChatBubble(String message, NPCEntity npcEntity, Player player) {
 
         if (!npcEntity.getNPCsConfigFields().isCanTalk()) return;
+        if (PatrolService.isActivelyMoving(npcEntity) || PatrolEditor.isEditing(npcEntity)) return;
 
         if (message == null) return;
+        if (npcEntity.getVillager() == null || !npcEntity.getVillager().isValid()) return;
         if (npcEntity.getVillager().hasPotionEffect(PotionEffectType.INVISIBILITY)) return;
         if (npcEntity.getIsTalking()) return;
         npcEntity.startTalkingCooldown();
@@ -41,7 +45,8 @@ public class NPCChatBubble {
 
                 @Override
                 public void run() {
-                    if (counter > 20 * 5 || npcEntity.getVillager() == null || !npcEntity.getVillager().isValid()) {
+                    if (counter > 20 * 5 || npcEntity.getVillager() == null || !npcEntity.getVillager().isValid()
+                            || PatrolService.isActivelyMoving(npcEntity) || PatrolEditor.isEditing(npcEntity)) {
                         fakeText.remove();
                         cancel();
                         return;

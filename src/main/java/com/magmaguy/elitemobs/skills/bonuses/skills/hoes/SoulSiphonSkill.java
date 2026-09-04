@@ -3,12 +3,11 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.hoes;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -139,7 +138,8 @@ public class SoulSiphonSkill extends SkillBonus implements StackingSkill {
                 resetStacks(player);
                 decayTasks.remove(uuid);
                 if (player.isOnline()) {
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(DungeonsConfig.getSoulSiphonDecayMessage()));
+                    ActionBarCompositor.show(player, ActionBarCompositor.Source.SKILL_FEEDBACK,
+                            DungeonsConfig.getSoulSiphonDecayMessage());
                 }
             }
         };
@@ -257,7 +257,8 @@ public class SoulSiphonSkill extends SkillBonus implements StackingSkill {
             if (killer == null) return;
             // Souls are reaped with a scythe: only hoe kills bank a stack, matching the weapon
             // the bonus can actually be spent with.
-            if (SkillType.fromMaterial(killer.getInventory().getItemInMainHand().getType()) != SkillType.HOES) return;
+            if (com.magmaguy.elitemobs.skills.WeaponIdentityResolver.progressionSkill(
+                    killer.getInventory().getItemInMainHand()) != SkillType.HOES) return;
             onKill(killer);
         }
     }

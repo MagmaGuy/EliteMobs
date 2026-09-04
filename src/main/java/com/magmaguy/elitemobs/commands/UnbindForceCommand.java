@@ -1,10 +1,12 @@
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.UnbindEnchantment;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -22,7 +24,19 @@ public class UnbindForceCommand extends AdvancedCommand {
     @Override
     public void execute(CommandData commandData) {
         ItemStack itemStack = commandData.getPlayerSender().getInventory().getItemInMainHand();
-        if (ItemTagger.isEliteItem(itemStack))
-            SoulbindEnchantment.removeEnchantment(itemStack);
+        // Gate on the soulbind tag itself, not isEliteItem: soulbound currency
+        // drops carry the tag without being elite items and could never be
+        // force-unbound. unbindItem (unlike removeEnchantment) also strips the
+        // prestige tag, and works on a clone that must be written back.
+        if (itemStack != null && itemStack.hasItemMeta()
+                && SoulbindEnchantment.itemHasSoulbindEnchantment(itemStack.getItemMeta())) {
+            commandData.getPlayerSender().getInventory()
+                    .setItemInMainHand(UnbindEnchantment.unbindItem(itemStack));
+            Logger.sendMessage(commandData.getCommandSender(),
+                    CommandMessagesConfig.getUnbindForceSuccessMessage());
+        } else {
+            Logger.sendMessage(commandData.getCommandSender(),
+                    CommandMessagesConfig.getUnbindForceNotSoulboundMessage());
+        }
     }
 }

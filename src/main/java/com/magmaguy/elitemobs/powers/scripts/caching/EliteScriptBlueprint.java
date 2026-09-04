@@ -110,8 +110,8 @@ public class EliteScriptBlueprint {
 
         if (!updated) return;
         try {
-            customConfigFields.getFileConfiguration().set("eliteScript", configurationSection.getValues(false));
-            customConfigFields.getFileConfiguration().save(customConfigFields.getFile());
+            customConfigFields.getWritableFileConfiguration().set("eliteScript", configurationSection.getValues(false));
+            customConfigFields.getWritableFileConfiguration().save(customConfigFields.getFile());
         } catch (Exception exception) {
             Logger.warn("Failed to update old script targets! Report this to the dev.");
         }

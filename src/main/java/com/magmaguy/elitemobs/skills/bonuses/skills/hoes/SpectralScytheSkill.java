@@ -4,12 +4,11 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -87,7 +86,9 @@ public class SpectralScytheSkill extends SkillBonus implements CooldownSkill {
     public void onActivate(Player player, Object event) {
         if (isOnCooldown(player)) {
             long remaining = getRemainingCooldown(player);
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(DungeonsConfig.getSpectralScytheCooldownMessage().replace("$time", String.valueOf(remaining))));
+            ActionBarCompositor.show(player, ActionBarCompositor.Source.SKILL_FEEDBACK,
+                    DungeonsConfig.getSpectralScytheCooldownMessage()
+                            .replace("$time", String.valueOf(remaining)));
             return;
         }
 

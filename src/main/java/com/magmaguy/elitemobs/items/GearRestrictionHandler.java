@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -72,7 +73,7 @@ public class GearRestrictionHandler {
         boolean playerDataLoaded = PlayerData.isDataLoaded(player.getUniqueId());
         SkillType skillType = itemStack == null || itemStack.getType().isAir()
                 ? null
-                : SkillType.fromMaterialIncludingArmor(itemStack.getType());
+                : WeaponIdentityResolver.progressionSkillIncludingArmor(itemStack);
         int playerSkillLevel = playerDataLoaded && skillType != null
                 ? SkillXPCalculator.levelFromTotalXP(PlayerData.getSkillXP(player.getUniqueId(), skillType))
                 : 0;
@@ -103,7 +104,7 @@ public class GearRestrictionHandler {
         if (!AdventurersGuildConfig.isSkillBasedGearRestriction()) return;
         if (!PlayerData.isDataLoaded(player.getUniqueId())) return;
 
-        SkillType skillType = SkillType.fromMaterialIncludingArmor(itemStack.getType());
+        SkillType skillType = WeaponIdentityResolver.progressionSkillIncludingArmor(itemStack);
         if (skillType == null) return;
 
         // Avoid spamming warnings

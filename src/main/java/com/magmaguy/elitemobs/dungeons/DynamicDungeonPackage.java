@@ -26,10 +26,10 @@ public class DynamicDungeonPackage extends EMPackage implements CombatContent {
         DungeonInstallEvent event = new DungeonInstallEvent(contentPackagesConfigFields);
         new EventCaller(event);
         contentPackagesConfigFields.simpleInstall();
-        player.sendMessage(DungeonsConfig.getDynamicDungeonInstalledMessage().replace("$name", contentPackagesConfigFields.getFilename()));
-        player.sendMessage(DungeonsConfig.getDynamicDungeonAccessMessage1());
-        player.sendMessage(DungeonsConfig.getDynamicDungeonAccessMessage2());
-        player.sendMessage(DungeonsConfig.getDynamicDungeonAccessMessage3());
+        notify(player, DungeonsConfig.getDynamicDungeonInstalledMessage().replace("$name", contentPackagesConfigFields.getFilename()));
+        notify(player, DungeonsConfig.getDynamicDungeonAccessMessage1());
+        notify(player, DungeonsConfig.getDynamicDungeonAccessMessage2());
+        notify(player, DungeonsConfig.getDynamicDungeonAccessMessage3());
         this.isInstalled = true;
     }
 
@@ -39,7 +39,7 @@ public class DynamicDungeonPackage extends EMPackage implements CombatContent {
         new EventCaller(event);
         contentPackagesConfigFields.simpleUninstall();
         isInstalled = false;
-        player.sendMessage(DungeonsConfig.getContentUninstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
+        notify(player, DungeonsConfig.getContentUninstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
     }
 
     @Override

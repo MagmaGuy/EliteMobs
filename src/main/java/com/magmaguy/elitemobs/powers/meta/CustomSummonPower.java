@@ -450,7 +450,7 @@ public class CustomSummonPower extends ElitePower implements Listener {
             }
         }
         customBossesConfigFields.getPowers().add(replacement);
-        customBossesConfigFields.getFileConfiguration().set("powers", customBossesConfigFields.getPowers());
+        customBossesConfigFields.getWritableFileConfiguration().set("powers", customBossesConfigFields.getPowers());
         customBossesConfigFields.saveFile();
     }
 

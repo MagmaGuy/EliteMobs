@@ -1,12 +1,11 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.spears;
 
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.StackingSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
@@ -85,8 +84,8 @@ public class LegionsDisciplineSkill extends SkillBonus implements StackingSkill 
         lastHitTime.remove(player.getUniqueId());
         if (current > 0) {
             playerStacks.remove(player.getUniqueId());
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText(DungeonsConfig.getLegionsDisciplineBrokenMessage()));
+            ActionBarCompositor.show(player, ActionBarCompositor.Source.SKILL_FEEDBACK,
+                    DungeonsConfig.getLegionsDisciplineBrokenMessage());
         }
     }
 

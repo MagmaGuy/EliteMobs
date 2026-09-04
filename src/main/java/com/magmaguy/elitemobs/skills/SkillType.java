@@ -16,7 +16,9 @@ public enum SkillType {
     TRIDENTS("Tridents", 1.0),
     HOES("Hoes", 1.0),
     MACES("Maces", 1.0),
-    SPEARS("Spears", 1.0);
+    SPEARS("Spears", 1.0),
+    STAVES("Staves", 1.0),
+    WANDS("Wands", 1.0);
 
     @Getter
     private final String displayName;
@@ -89,7 +91,7 @@ public enum SkillType {
     }
 
     public static SkillType[] getWeaponSkills() {
-        return new SkillType[]{SWORDS, AXES, BOWS, CROSSBOWS, TRIDENTS, HOES, MACES, SPEARS};
+        return new SkillType[]{SWORDS, AXES, BOWS, CROSSBOWS, TRIDENTS, HOES, MACES, SPEARS, STAVES, WANDS};
     }
 
     /**

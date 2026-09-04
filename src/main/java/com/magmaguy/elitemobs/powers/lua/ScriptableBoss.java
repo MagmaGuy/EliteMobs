@@ -1,8 +1,11 @@
 package com.magmaguy.elitemobs.powers.lua;
 
+import com.magmaguy.elitemobs.api.power.ElitePowerActionPosition;
+import com.magmaguy.elitemobs.api.power.ElitePowerActionRequest;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.magmacore.scripting.ScriptHook;
 import com.magmaguy.magmacore.scripting.ScriptInstance;
+import com.magmaguy.magmacore.scripting.ScriptQueryResult;
 import com.magmaguy.magmacore.scripting.ScriptableEntity;
 import com.magmaguy.magmacore.scripting.zones.Shape;
 import com.magmaguy.magmacore.util.Logger;
@@ -46,13 +49,14 @@ public class ScriptableBoss extends ScriptableEntity {
     public static final ScriptHook ON_TARGET = new ScriptHook("on_boss_target_changed");
     public static final ScriptHook ON_DEATH = new ScriptHook("on_death");
     public static final ScriptHook ON_PHASE_SWITCH = new ScriptHook("on_phase_switch");
+    public static final ScriptHook ON_MIND_ACTION = new ScriptHook("on_mind_action");
 
     private static final Set<ScriptHook> SUPPORTED_HOOKS = Set.of(
             ScriptHook.ON_SPAWN, ScriptHook.ON_TICK,
             ScriptHook.ON_ZONE_ENTER, ScriptHook.ON_ZONE_LEAVE,
             ON_DAMAGED, ON_DAMAGED_BY_PLAYER, ON_DAMAGED_BY_ELITE,
             ON_PLAYER_DAMAGED, ON_ENTER_COMBAT, ON_EXIT_COMBAT,
-            ON_HEAL, ON_TARGET, ON_DEATH, ON_PHASE_SWITCH
+            ON_HEAL, ON_TARGET, ON_DEATH, ON_PHASE_SWITCH, ON_MIND_ACTION
     );
 
     private final EliteEntity eliteEntity;
@@ -65,6 +69,7 @@ public class ScriptableBoss extends ScriptableEntity {
     private LuaPowerEntityTables entityTables;
     private LuaPowerContextTables contextTables;
     private LuaPowerScriptApi scriptApi;
+    private ElitePowerActionRequest currentMindAction;
 
     public ScriptableBoss(EliteEntity eliteEntity) {
         this.eliteEntity = eliteEntity;
@@ -72,6 +77,21 @@ public class ScriptableBoss extends ScriptableEntity {
 
     public EliteEntity getEliteEntity() {
         return eliteEntity;
+    }
+
+    ScriptQueryResult handleMindAction(
+            ScriptInstance instance,
+            ElitePowerActionRequest request) {
+        if (request.actor() != eliteEntity) {
+            throw new IllegalArgumentException("Mind action actor does not own this Lua power");
+        }
+        ElitePowerActionRequest previous = currentMindAction;
+        currentMindAction = request;
+        try {
+            return instance.handleQuery(ON_MIND_ACTION, null, null, null);
+        } finally {
+            currentMindAction = previous;
+        }
     }
 
     private void ensureHelpers(ScriptInstance instance) {
@@ -149,8 +169,43 @@ public class ScriptableBoss extends ScriptableEntity {
             case "player" -> contextPlayer == null ? LuaValue.NIL : entityTables.createPlayerTable(contextPlayer);
             case "event" -> event == null ? LuaValue.NIL : entityTables.createEventTable(event);
             case "script" -> scriptApi.createTable(event, directTarget);
+            case "mind_action" -> createMindActionTable();
             default -> LuaValue.NIL;
         };
+    }
+
+    private LuaValue createMindActionTable() {
+        ElitePowerActionRequest request = currentMindAction;
+        if (request == null) return LuaValue.NIL;
+
+        LuaTable action = new LuaTable();
+        action.set("key", LuaValue.valueOf(request.actionKey().toString()));
+        action.set("game_tick", LuaValue.valueOf((double) request.gameTick()));
+        action.set("generation", LuaValue.valueOf((double) request.generation()));
+        LuaTable payload = new LuaTable();
+        for (Map.Entry<String, Object> entry : request.payload().entrySet()) {
+            payload.set(entry.getKey(), mindActionValue(entry.getValue()));
+        }
+        action.set("payload", payload);
+        return action;
+    }
+
+    private static LuaValue mindActionValue(Object value) {
+        if (value instanceof String string) return LuaValue.valueOf(string);
+        if (value instanceof Boolean flag) return LuaValue.valueOf(flag);
+        if (value instanceof Long number) return LuaValue.valueOf(number.doubleValue());
+        if (value instanceof Double number) return LuaValue.valueOf(number);
+        if (value instanceof UUID uuid) return LuaValue.valueOf(uuid.toString());
+        if (value instanceof ElitePowerActionPosition position) {
+            LuaTable table = new LuaTable();
+            table.set("world", LuaValue.valueOf(position.world()));
+            table.set("x", LuaValue.valueOf(position.x()));
+            table.set("y", LuaValue.valueOf(position.y()));
+            table.set("z", LuaValue.valueOf(position.z()));
+            return table;
+        }
+        throw new IllegalArgumentException("Unsupported Mind action payload type "
+                + value.getClass().getName());
     }
 
     // ── Boss-specific context tables (moved verbatim from the old LuaPowerInstance) ──

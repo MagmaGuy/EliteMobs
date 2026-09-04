@@ -90,6 +90,10 @@ public class DisguiseEntity {
     private static void scheduleDisguise(Disguise disguise, Entity entity) {
         applyDisguise(disguise, entity);
         Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+            //The boss can die or be torn down inside this window; re-applying then would
+            //re-register the disguise after removal already cleaned it up, leaving a
+            //permanent registry entry that pins the entity (and its world) in memory.
+            if (!entity.isValid()) return;
             applyDisguise(disguise, entity);
         }, 20);
     }
@@ -105,6 +109,43 @@ public class DisguiseEntity {
         disguise.setDynamicName(true);
         if (disguise instanceof PlayerDisguise)
             ((PlayerDisguise) disguise).setNameVisible(nameVisible);
+    }
+
+    /**
+     * Removes any active disguise before an entity is discarded. LibsDisguises keeps
+     * every active disguise in a static registry that holds a hard reference to the
+     * entity, and its world-unload handler saves disguises instead of removing them —
+     * without this call every disguised boss in an instanced world can pin that
+     * world's ServerLevel in memory after the world is unloaded.
+     */
+    public static void undisguise(Entity entity) {
+        if (entity == null) return;
+        try {
+            if (!DisguiseAPI.isDisguised(entity)) return;
+            DisguiseAPI.undisguiseToAll(entity);
+            //LibsDisguises' removal is not exception-safe on its side either: once its internal
+            //in-use flag clears mid-failure, the registry entry becomes unremovable through the
+            //API and silently pins the entity. Verifying makes that visible instead of silent.
+            if (DisguiseAPI.isDisguised(entity)) warnUndisguiseFailure(entity, null);
+        } catch (Throwable throwable) {
+            //Soft dependency: a LibsDisguises API difference must never break entity removal,
+            //but each failure here is one entity LibsDisguises keeps in memory forever.
+            warnUndisguiseFailure(entity, throwable);
+        }
+    }
+
+    private static int undisguiseFailureCount = 0;
+
+    private static void warnUndisguiseFailure(Entity entity, Throwable throwable) {
+        undisguiseFailureCount++;
+        if (undisguiseFailureCount > 3 && undisguiseFailureCount % 100 != 0) return;
+        Logger.warn("Failed to remove a LibsDisguises disguise from " + entity.getType()
+                + " (failure #" + undisguiseFailureCount + "). LibsDisguises keeps a hard reference to every"
+                + " disguised entity, so repeated failures leak memory - and can keep whole unloaded worlds"
+                + " in RAM. Cause: " + (throwable != null
+                ? throwable
+                : "LibsDisguises still reports the entity as disguised after undisguiseToAll (is another"
+                + " plugin cancelling UndisguiseEvent?)"));
     }
 
     public static void setDisguiseNameVisibility(boolean disguiseNameVisibility, Entity entity, String name) {

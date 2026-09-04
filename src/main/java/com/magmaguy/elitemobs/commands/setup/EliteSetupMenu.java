@@ -95,6 +95,12 @@ public class EliteSetupMenu {
         if (player == null || !player.isOnline()) return;
         String title = player.getOpenInventory().getTitle();
         if (title == null || !title.contains(MENU_TITLE)) return;
+        // Refresh in place instead of rebuilding: reopening swapped the container
+        // under the player, which Java clients never notice but which leaves
+        // Geyser clients bound to a stale window — every Bedrock tap on the menu
+        // was silently dropped. Rebuild only when the open menu is no longer a
+        // live setup menu.
+        if (com.magmaguy.magmacore.menus.SetupMenu.refreshInPlaceFor(player)) return;
         createMenu(player, false);
     }
 

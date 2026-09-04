@@ -11,17 +11,17 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
+import com.magmaguy.elitemobs.utils.BossBarOrderManager;
 import com.magmaguy.magmacore.scripting.zones.Shape;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
@@ -135,6 +135,7 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void scriptTask(ScriptActionData scriptActionData) {
+        if (powerSuppressed(scriptActionData)) return;
         scriptTargets.cacheTargets(scriptActionData);
         if (finalScriptTargets != null) {
             finalScriptTargets.cacheTargets(scriptActionData);
@@ -144,9 +145,11 @@ public class ScriptAction {
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    if (powerSuppressed(scriptActionData)) return;
+                    cancel();
                     runScriptTask(scriptActionData);
                 }
-            }.runTaskLater(MetadataHandler.PLUGIN, blueprint.getWait().getValue());
+            }.runTaskTimer(MetadataHandler.PLUGIN, blueprint.getWait().getValue(), 1L);
         } else {
             runScriptTask(scriptActionData);
         }
@@ -158,6 +161,7 @@ public class ScriptAction {
      * @param scriptActionData The data for the script action.
      */
     private void runScriptTask(ScriptActionData scriptActionData) {
+        if (powerSuppressed(scriptActionData)) return;
         if (blueprint.getRepeatEvery().getValue() > 0) {
             // If it's a repeating task, schedule it accordingly.
             new BukkitRunnable() {
@@ -165,6 +169,7 @@ public class ScriptAction {
 
                 @Override
                 public void run() {
+                    if (powerSuppressed(scriptActionData)) return;
                     counter++;
 
                     //Cancel if the entity's world is no longer loaded (e.g. world/chunk unloaded)
@@ -243,6 +248,7 @@ public class ScriptAction {
      * @param scriptActionData The data for the current action.
      */
     private void runActions(ScriptActionData scriptActionData) {
+        if (powerSuppressed(scriptActionData)) return;
         if (blueprint.getActionType() == null) {
             Logger.warn("Failed to determine action type in script '"
                     + blueprint.getScriptName() + "' for file '" + blueprint.getScriptFilename() + "'");
@@ -293,6 +299,12 @@ public class ScriptAction {
         if (!blueprint.getActionType().equals(ActionType.RUN_SCRIPT)) {
             runAdditionalScripts(scriptActionData);
         }
+    }
+
+    private static boolean powerSuppressed(ScriptActionData scriptActionData) {
+        return scriptActionData == null
+                || scriptActionData.getEliteEntity() == null
+                || scriptActionData.getEliteEntity().getPowerSuppression().isSuppressed();
     }
 
     /**
@@ -423,7 +435,7 @@ public class ScriptAction {
         String message = ChatColorConverter.convert(parsePlaceholders(scriptActionData, blueprint.getSValue()));
         getTargets(scriptActionData).forEach(target -> {
             if (target instanceof Player player) {
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+                ActionBarCompositor.show(player, ActionBarCompositor.Source.SCRIPT, message);
             } else {
                 Logger.warn("ACTION_BAR_MESSAGE actions must target players! Problematic script: '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
             }
@@ -442,19 +454,22 @@ public class ScriptAction {
         }
         String message = ChatColorConverter.convert(parsePlaceholders(scriptActionData, blueprint.getSValue()));
         BossBar bossBar = Bukkit.createBossBar(message, blueprint.getBarColor(), blueprint.getBarStyle());
-        boolean hasViewer = false;
+        Set<Player> viewers = new HashSet<>();
         for (LivingEntity target : getTargets(scriptActionData)) {
             if (target instanceof Player player) {
-                bossBar.addPlayer(player);
-                hasViewer = true;
+                BossBarOrderManager.show(player, bossBar);
+                viewers.add(player);
             } else {
                 Logger.warn("BOSS_BAR_MESSAGE actions must target players! Problematic script: '" + blueprint.getScriptName() + "' in file '" + blueprint.getScriptFilename() + "'");
             }
         }
-        if (hasViewer) {
+        if (!viewers.isEmpty()) {
             int configuredDuration = blueprint.getDuration().getValue();
             int duration = configuredDuration > 0 ? configuredDuration : DEFAULT_BOSS_BAR_DURATION_TICKS;
-            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, bossBar::removeAll, duration);
+            Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+                viewers.forEach(player -> BossBarOrderManager.hide(player, bossBar));
+                bossBar.removeAll();
+            }, duration);
         }
     }
 

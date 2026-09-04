@@ -86,9 +86,13 @@ public class DynamicDungeonBrowser extends EliteMenu {
             availableLevels.add(level);
         }
 
-        // Find existing dynamic dungeon instances for this dungeon
+        // Find existing dynamic dungeon instances for this dungeon. Defunct instances
+        // (teardown begun, world awaiting deletion) linger in the registry for up to
+        // ~90 seconds and must not be listed at all — their state reads WAITING, which
+        // used to render them as joinable fresh lobbies.
         instancesList = DungeonInstance.getDungeonInstances().stream()
                 .filter(instance -> instance instanceof DynamicDungeonInstance)
+                .filter(instance -> !instance.isDefunct())
                 .filter(instance -> instance.getContentPackagesConfigFields().getFilename().equals(dynamicDungeonName))
                 .map(instance -> (DynamicDungeonInstance) instance)
                 .collect(Collectors.toList());
@@ -236,7 +240,10 @@ public class DynamicDungeonBrowser extends EliteMenu {
                     int instanceIndex = browser.validSlots.indexOf(event.getSlot());
                     if (instanceIndex < browser.instancesList.size()) {
                         DynamicDungeonInstance dungeonInstance = browser.instancesList.get(instanceIndex);
-                        switch (dungeonInstance.getState()) {
+                        // The instance can die between menu render and click; re-check.
+                        if (dungeonInstance.isDefunct())
+                            player.sendMessage(DungeonsConfig.getMatchAlreadyEndedMessage());
+                        else switch (dungeonInstance.getState()) {
                             case ONGOING, STARTING -> {
                                 if (DungeonsConfig.isAllowSpectatorsInInstancedContent())
                                     dungeonInstance.addSpectator(player, false);

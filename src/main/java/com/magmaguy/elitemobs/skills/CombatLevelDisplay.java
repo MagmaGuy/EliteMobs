@@ -16,10 +16,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.Map;
 import java.util.UUID;
@@ -44,9 +45,7 @@ public class CombatLevelDisplay implements Listener {
      * @param player The player to create the display for
      */
     public static void createDisplay(Player player) {
-        if (!SkillsConfig.isSkillSystemEnabled()) return;
-        if (!SkillsConfig.isShowCombatLevelDisplay()) return;
-        if (SkillsConfig.isWorldExcludedFromSkills(player)) {
+        if (!shouldRender(player)) {
             removeDisplay(player);
             return;
         }
@@ -57,11 +56,12 @@ public class CombatLevelDisplay implements Listener {
 
         // Create the FakeText display at the player's location (will be mounted)
         FakeText fakeText = NMSManager.getAdapter().fakeTextBuilder()
-                .text(ChatColorConverter.convert(CombatLevelCalculator.getFormattedCombatLevel(player.getUniqueId())))
+                .text(ChatColorConverter.convert(PlayerIdentityLabelRenderer.render(player.getUniqueId())))
                 .billboard(Display.Billboard.CENTER)
                 .shadow(true)
                 .seeThrough(false)
                 .translation(0, getDisplayHeight(player), 0)
+                .viewerFilter(viewer -> canSeeNameTag(player, viewer))
                 .build(player.getLocation());
 
         playerDisplays.put(player.getUniqueId(), fakeText);
@@ -69,6 +69,27 @@ public class CombatLevelDisplay implements Listener {
         // Attach to the player - this mounts and registers with the global tracker
         // which handles visibility, world changes, respawns, etc. automatically
         fakeText.attachTo(player);
+    }
+
+    /**
+     * Mirrors name-tag visibility exposed by the Spigot API. Packet-only changes made by other plugins
+     * are not represented by Player or Scoreboard state and therefore cannot be detected here.
+     */
+    private static boolean canSeeNameTag(Player player, Player viewer) {
+        if (!viewer.canSee(player)) return false;
+
+        Scoreboard scoreboard = viewer.getScoreboard();
+        Team playerTeam = scoreboard.getEntryTeam(player.getName());
+        if (playerTeam == null) return true;
+
+        Team viewerTeam = scoreboard.getEntryTeam(viewer.getName());
+        boolean sameTeam = playerTeam.equals(viewerTeam);
+        return switch (playerTeam.getOption(Team.Option.NAME_TAG_VISIBILITY)) {
+            case ALWAYS -> true;
+            case NEVER -> false;
+            case FOR_OWN_TEAM -> sameTeam;
+            case FOR_OTHER_TEAMS -> !sameTeam;
+        };
     }
 
     private static float getDisplayHeight(Player player) {
@@ -93,14 +114,14 @@ public class CombatLevelDisplay implements Listener {
      * @param player The player to update the display for
      */
     public static void updateDisplay(Player player) {
-        if (SkillsConfig.isWorldExcludedFromSkills(player)) {
+        if (!shouldRender(player)) {
             removeDisplay(player);
             return;
         }
 
         FakeText fakeText = playerDisplays.get(player.getUniqueId());
         if (fakeText != null) {
-            fakeText.setText(ChatColorConverter.convert(CombatLevelCalculator.getFormattedCombatLevel(player.getUniqueId())));
+            fakeText.setText(ChatColorConverter.convert(PlayerIdentityLabelRenderer.render(player.getUniqueId())));
         } else {
             // Recreate if missing
             createDisplay(player);
@@ -137,9 +158,6 @@ public class CombatLevelDisplay implements Listener {
      * Called on plugin startup.
      */
     public static void initialize() {
-        if (!SkillsConfig.isSkillSystemEnabled()) return;
-        if (!SkillsConfig.isShowCombatLevelDisplay()) return;
-
         // Delay initialization to ensure players are fully loaded
         new BukkitRunnable() {
             @Override
@@ -149,26 +167,6 @@ public class CombatLevelDisplay implements Listener {
                 }
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20L);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        if (!SkillsConfig.isSkillSystemEnabled()) return;
-        if (!SkillsConfig.isShowCombatLevelDisplay()) return;
-
-        Player joiningPlayer = event.getPlayer();
-
-        // Delay to ensure player is fully loaded
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!joiningPlayer.isOnline()) return;
-
-                // Create display for the joining player
-                // The global tracker handles showing other players' displays automatically
-                createDisplay(joiningPlayer);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20L * 2);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -189,10 +187,8 @@ public class CombatLevelDisplay implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerBedLeave(PlayerBedLeaveEvent event) {
-        if (!SkillsConfig.isSkillSystemEnabled()) return;
-        if (!SkillsConfig.isShowCombatLevelDisplay()) return;
-
         Player player = event.getPlayer();
+        if (!shouldRender(player)) return;
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -211,10 +207,11 @@ public class CombatLevelDisplay implements Listener {
         // settles. The MagmaCore tracker tries to remount on its own one tick
         // later, but that races with the server's own sync, which can land last
         // and wipe the mount.
-        if (!SkillsConfig.isSkillSystemEnabled()) return;
-        if (!SkillsConfig.isShowCombatLevelDisplay()) return;
-
         Player player = event.getPlayer();
+        if (!shouldRender(player)) {
+            removeDisplay(player);
+            return;
+        }
         removeDisplay(player);
         new BukkitRunnable() {
             @Override
@@ -233,10 +230,11 @@ public class CombatLevelDisplay implements Listener {
         // doesn't resend a spawn packet — and its follow-up remount references
         // an entity ID the client no longer knows about. Tear it down here and
         // rebuild so a fresh spawn + mount goes out.
-        if (!SkillsConfig.isSkillSystemEnabled()) return;
-        if (!SkillsConfig.isShowCombatLevelDisplay()) return;
-
         Player player = event.getPlayer();
+        if (!shouldRender(player)) {
+            removeDisplay(player);
+            return;
+        }
         removeDisplay(player);
         new BukkitRunnable() {
             @Override
@@ -245,5 +243,12 @@ public class CombatLevelDisplay implements Listener {
                 createDisplay(player);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, 20L);
+    }
+
+    private static boolean shouldRender(Player player) {
+        if (PlayerIdentityLabelRenderer.hasClassLabel(player.getUniqueId())) return true;
+        return SkillsConfig.isSkillSystemEnabled()
+                && SkillsConfig.isShowCombatLevelDisplay()
+                && !SkillsConfig.isWorldExcludedFromSkills(player);
     }
 }

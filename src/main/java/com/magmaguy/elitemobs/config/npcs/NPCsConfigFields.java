@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.config.npcs;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolRoute;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.VersionChecker;
 import lombok.Getter;
@@ -87,6 +88,8 @@ public class NPCsConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private List<String> scripts = new ArrayList<>();
+    @Getter
+    private PatrolRoute patrolRoute;
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -133,8 +136,8 @@ public class NPCsConfigFields extends CustomConfigFields {
 
     private void saveSpawnLocations() {
         try {
-            this.fileConfiguration.set("spawnLocations", locations);
-            ConfigurationEngine.fileSaverCustomValues(fileConfiguration, this.file);
+            this.getWritableFileConfiguration().set("spawnLocations", locations);
+            ConfigurationEngine.fileSaverCustomValues(getWritableFileConfiguration(), this.file);
         } catch (Exception ex) {
             Logger.warn("Attempted to update the location status for an NPC with no config file! Did you delete it during runtime?");
         }
@@ -185,6 +188,12 @@ public class NPCsConfigFields extends CustomConfigFields {
         this.scale = processDouble("scale", scale, 1, false);
         this.syncMovement = processBoolean("syncMovement", syncMovement, false, true);
         this.scripts = processStringList("scripts", scripts, new ArrayList<>(), false);
+        try {
+            this.patrolRoute = PatrolRoute.parse(fileConfiguration);
+        } catch (IllegalArgumentException exception) {
+            this.patrolRoute = null;
+            Logger.warn("Invalid patrol in " + filename + ": " + exception.getMessage());
+        }
     }
 
     public Villager.Profession getProfession() {
@@ -199,9 +208,9 @@ public class NPCsConfigFields extends CustomConfigFields {
 
     public void setEnabled(boolean enabled) {
         this.isEnabled = enabled;
-        this.fileConfiguration.set("isEnabled", enabled);
+        this.getWritableFileConfiguration().set("isEnabled", enabled);
         try {
-            ConfigurationEngine.fileSaverCustomValues(this.fileConfiguration, this.file);
+            ConfigurationEngine.fileSaverCustomValues(this.getWritableFileConfiguration(), this.file);
         } catch (Exception e) {
             Logger.warn("Attempted to update the enabled status for an NPC with no config file! Did you delete it during runtime?");
         }
@@ -211,6 +220,17 @@ public class NPCsConfigFields extends CustomConfigFields {
         if (locations == null) return;
         locations.removeIf(entry -> Objects.equals(entry, locationString));
         saveSpawnLocations();
+    }
+
+    public boolean reloadPatrolRoute() {
+        try {
+            patrolRoute = PatrolRoute.parse(getWritableFileConfiguration());
+            return patrolRoute != null;
+        } catch (IllegalArgumentException exception) {
+            patrolRoute = null;
+            Logger.warn("Invalid patrol in " + filename + ": " + exception.getMessage());
+            return false;
+        }
     }
 
 }

@@ -119,6 +119,16 @@ public class CustomModel implements CustomModelInterface {
         return modelPlugin != ModelPlugin.NONE;
     }
 
+    /**
+     * Runs an EliteMobs-owned projectile damage event without letting FMM cancel and redirect it
+     * back through its OBB collision path. Other model providers need no special handling.
+     */
+    public static void runProjectileDamageBypass(Runnable damageCall) {
+        if (modelPlugin == ModelPlugin.FREE_MINECRAFT_MODELS)
+            CustomModelFMM.runProjectileDamageBypass(damageCall);
+        else damageCall.run();
+    }
+
     @Override
     public void shoot() {
         switch (modelPlugin) {

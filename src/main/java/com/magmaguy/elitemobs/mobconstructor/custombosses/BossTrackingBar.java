@@ -15,7 +15,6 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -29,15 +28,8 @@ import java.util.Map;
  * This shows boss location and distance information to players who are tracking the boss.
  * For health-based boss bars, see {@link com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay}
  */
-public class BossTrackingBar {
+public class BossTrackingBar implements BossTrackingLifecycle.Handle {
     private static final String DEFAULT_LOCATION_MESSAGE = "$name: $distance blocks away!";
-    private static final double NEARBY_RANGE = 30;
-    // Bars are only removed once a player is well past the range they were added at
-    // (hysteresis) — adding and removing at the same distance made bars flicker and
-    // re-stack for players hovering near the boundary.
-    private static final double NEARBY_BAR_REMOVAL_RANGE = NEARBY_RANGE + 6;
-    // Squared copy so the removal check can use distanceSquared and skip the sqrt per player per cycle.
-    private static final double NEARBY_BAR_REMOVAL_RANGE_SQUARED = NEARBY_BAR_REMOVAL_RANGE * NEARBY_BAR_REMOVAL_RANGE;
 
     private final CustomBossEntity customBossEntity;
     private final Map<Player, BossBar> bossBars = new HashMap<>();
@@ -47,10 +39,10 @@ public class BossTrackingBar {
     public BossTrackingBar(CustomBossEntity customBossEntity) {
         this.customBossEntity = customBossEntity;
         start();
-        sendLocation();
     }
 
-    private void sendLocation() {
+    @Override
+    public void notifyPlayers() {
         Location bossLoc = customBossEntity.getLocation();
         if (bossLoc == null || bossLoc.getWorld() == null) return;
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -67,10 +59,11 @@ public class BossTrackingBar {
             remove();
             return;
         }
-        if (!trackingPlayers.contains(player))
-            trackingPlayers.add(player);
-        else
-            trackingPlayers.remove(player);
+        if (trackingPlayers.contains(player)) {
+            removeTrackingPlayer(player);
+            return;
+        }
+        trackingPlayers.add(player);
     }
 
     public void removeTrackingPlayer(Player player) {
@@ -80,12 +73,16 @@ public class BossTrackingBar {
     }
 
     public void remove() {
+        customBossEntity.removeTracking(this);
+    }
+
+    @Override
+    public void dispose() {
         bossBars.forEach((player, bossBar) -> BossBarOrderManager.hide(player, bossBar));
         bossBars.clear();
         trackingPlayers.clear();
         if (bossBarUpdater != null)
             bossBarUpdater.cancel();
-        CustomBossEntity.trackableCustomBosses.remove(customBossEntity);
     }
 
     /**
@@ -153,29 +150,15 @@ public class BossTrackingBar {
                     return;
                 }
 
-                //Tracking players always get a bar; nearby players get one while close
-                HashSet<Player> playersWithBars = new HashSet<>(trackingPlayers);
-                if (customBossEntity.isValid())
-                    for (Entity entity : customBossEntity.getLivingEntity().getNearbyEntities(NEARBY_RANGE, NEARBY_RANGE, NEARBY_RANGE))
-                        if (entity instanceof Player player)
-                            playersWithBars.add(player);
-
-                for (Player player : playersWithBars) {
-                    if (!player.isOnline()) continue;
+                trackingPlayers.removeIf(player -> !player.isOnline());
+                for (Player player : new HashSet<>(trackingPlayers)) {
                     if (!bossBars.containsKey(player)) createBossBar(player);
                     else updateBossBar(player, bossBars.get(player));
                 }
 
-                //Remove bars only for players that are offline, in another world, or well
-                //past the add range — never for players merely absent from trackingPlayers,
-                //which used to destroy and recreate every nearby player's bar each cycle
-                //and made the client re-stack all bars constantly
                 bossBars.entrySet().removeIf(entry -> {
                     Player player = entry.getKey();
-                    if (player.isOnline() && trackingPlayers.contains(player)) return false;
-                    boolean shouldRemove = !player.isOnline()
-                            || !player.getWorld().equals(bossLocation.getWorld())
-                            || player.getLocation().distanceSquared(bossLocation) > NEARBY_BAR_REMOVAL_RANGE_SQUARED;
+                    boolean shouldRemove = !player.isOnline() || !trackingPlayers.contains(player);
                     if (shouldRemove) BossBarOrderManager.hide(player, entry.getValue());
                     return shouldRemove;
                 });

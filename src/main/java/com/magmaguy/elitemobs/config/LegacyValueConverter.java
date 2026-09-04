@@ -35,11 +35,11 @@ public class LegacyValueConverter {
                 return "LOOTING";
             case "LUCK":
                 return "LUCK_OF_THE_SEA";
-            case "RESPIRATION":
+            case "OXYGEN":
                 return "RESPIRATION";
             case "PROTECTION_ENVIRONMENTAL":
                 return "PROTECTION";
-            case "BLAST_PROTECTION":
+            case "PROTECTION_EXPLOSIONS":
                 return "BLAST_PROTECTION";
             case "PROTECTION_FALL":
                 return "FEATHER_FALLING";

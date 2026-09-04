@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.elitemobs.skills.bonuses.PlayerSkillSelection;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -63,6 +64,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -232,6 +234,8 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             DeathMarkSkill.SKILL_ID,
             JudgmentSkill.SKILL_ID,
             ExposeWeaknessSkill.SKILL_ID);
+    private final ClassAbilityDamageAttribution classAbilityDamageAttribution =
+            new ClassAbilityDamageAttribution();
     @Getter
     private final Entity entity;
     @Getter
@@ -353,6 +357,29 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         return getDamage() / 1.5D;
     }
 
+    /** Applies a live class ability's damage multiplier and records its real contribution. */
+    public void applyClassAbilityDamageMultiplier(String abilityId, double multiplier) {
+        double modifiedDamage = classAbilityDamageAttribution.applyMultiplier(
+                abilityId, getDamage(), multiplier);
+        super.setDamage(modifiedDamage);
+    }
+
+    /** Damage present in the final hit only because one or more active class abilities modified it. */
+    public double getClassAbilityBonusDamage() {
+        return classAbilityDamageAttribution.bonusDamage(getDamage());
+    }
+
+    public Set<String> getClassAbilityDamageSources() {
+        return classAbilityDamageAttribution.sources();
+    }
+
+    @Override
+    public void setDamage(double damage) {
+        double previousDamage = getDamage();
+        super.setDamage(damage);
+        classAbilityDamageAttribution.observeReplacement(previousDamage, damage);
+    }
+
     /**
      * Combines one skill's multiplier into the running total. Additive for every weapon type:
      * each skill contributes its bonus fraction, so three skills at 1.2x total 1.6x rather than
@@ -390,7 +417,11 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         // For melee, read from current mainhand.
         SkillType weaponSkillType;
         int skillLevel;
-        if (rangedSkillType != null) {
+        if (rangedAttack) {
+            // Ranged identity is captured from the firing item. Missing or invalid launch
+            // metadata must not turn a delayed projectile into whatever the player happens to
+            // hold when it lands.
+            if (rangedSkillType == null) return;
             weaponSkillType = rangedSkillType;
             skillLevel = rangedSkillLevel > 0 ? rangedSkillLevel : SkillBonusRegistry.getPlayerSkillLevel(player, weaponSkillType);
         } else {
@@ -664,30 +695,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
      * Determines the weapon skill type based on the player's main hand item.
      */
     static SkillType getWeaponSkillType(Player player) {
-        ItemStack mainHand = player.getInventory().getItemInMainHand();
-        if (mainHand == null || mainHand.getType() == Material.AIR) return null;
-
-        Material type = mainHand.getType();
-        String typeName = type.name();
-
-        if (typeName.endsWith("_SWORD")) return SkillType.SWORDS;
-        if (typeName.endsWith("_AXE")) return SkillType.AXES;
-        if (type == Material.BOW) return SkillType.BOWS;
-        if (type == Material.CROSSBOW) return SkillType.CROSSBOWS;
-        if (type == Material.TRIDENT) return SkillType.TRIDENTS;
-        if (typeName.endsWith("_HOE")) return SkillType.HOES;
-
-        // Check for maces (1.21+)
-        try {
-            if (type == Material.MACE) return SkillType.MACES;
-        } catch (NoSuchFieldError e) {
-            // MACE doesn't exist pre-1.21
-        }
-
-        // Check for spears (1.21.11+)
-        if (typeName.endsWith("_SPEAR")) return SkillType.SPEARS;
-
-        return null;
+        return WeaponIdentityResolver.progressionSkill(player.getInventory().getItemInMainHand());
     }
 
 }

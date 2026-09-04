@@ -44,10 +44,6 @@ final class EliteOverheadHealthDisplay {
         return eliteEntity;
     }
 
-    double healthMultiplier() {
-        return healthMultiplier;
-    }
-
     boolean isValid() {
         return eliteEntity != null && eliteEntity.isValid();
     }

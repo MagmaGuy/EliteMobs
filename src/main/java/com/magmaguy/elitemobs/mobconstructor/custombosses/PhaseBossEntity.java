@@ -99,9 +99,7 @@ public class PhaseBossEntity {
                     customBossEntity.setBossMusic(new CustomMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
                 }
             }
-            //Make sure the chunk is loaded so the boss can be initialized properly, or else you'll have some issues with health
-            customBossEntity.getSpawnLocation().getChunk().load();
-            //spawn the boss
+            //Spawn policy decides whether the effective location is ready; phase changes never force-load terrain.
             customBossEntity.spawn(true);
         }
         currentPhase = bossPhase;

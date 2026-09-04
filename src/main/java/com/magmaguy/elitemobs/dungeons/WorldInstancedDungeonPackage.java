@@ -26,12 +26,12 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
         DungeonInstallEvent event = new DungeonInstallEvent(contentPackagesConfigFields);
         new EventCaller(event);
         contentPackagesConfigFields.simpleInstall();
-        player.sendMessage(DungeonsConfig.getInstancedDungeonInstalledMessage().replace("$name", contentPackagesConfigFields.getFilename()));
+        notify(player, DungeonsConfig.getInstancedDungeonInstalledMessage().replace("$name", contentPackagesConfigFields.getFilename()));
         if (!contentPackagesConfigFields.isEnchantmentChallenge()) {
-            player.sendMessage(DungeonsConfig.getInstancedDungeonAccessMessage());
-            player.sendMessage(DungeonsConfig.getInstancedDungeonInstallNote());
+            notify(player, DungeonsConfig.getInstancedDungeonAccessMessage());
+            notify(player, DungeonsConfig.getInstancedDungeonInstallNote());
         } else {
-            player.sendMessage(DungeonsConfig.getEnchantmentDungeonInstalledMessage());
+            notify(player, DungeonsConfig.getEnchantmentDungeonInstalledMessage());
             ContentPackagesConfig.getEnchantedChallengeDungeonPackages().put(contentPackagesConfigFields.getFilename(), contentPackagesConfigFields);
         }
         this.isInstalled = true;
@@ -43,7 +43,7 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
         new EventCaller(event);
         contentPackagesConfigFields.simpleUninstall();
         isInstalled = false;
-        player.sendMessage(DungeonsConfig.getContentUninstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
+        notify(player, DungeonsConfig.getContentUninstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
     }
 
     @Override

@@ -9,8 +9,8 @@ import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -32,11 +32,6 @@ import java.util.logging.Level;
 final class BossHealthBarManager {
 
     private static final int MAX_VISIBLE_BARS_PER_PLAYER = 4;
-    private static final double PROXIMITY_RANGE = 30.0;
-    private static final double PROXIMITY_REMOVAL_RANGE = PROXIMITY_RANGE + 6.0;
-    private static final double PROXIMITY_RANGE_SQUARED = PROXIMITY_RANGE * PROXIMITY_RANGE;
-    private static final double PROXIMITY_REMOVAL_RANGE_SQUARED =
-            PROXIMITY_REMOVAL_RANGE * PROXIMITY_REMOVAL_RANGE;
 
     private static final Map<UUID, BossCandidate> candidatesByBoss = new HashMap<>();
     private static final Map<UUID, PlayerBarPool> poolsByPlayer = new HashMap<>();
@@ -44,44 +39,10 @@ final class BossHealthBarManager {
     private BossHealthBarManager() {
     }
 
-    static void registerCombatCandidate(EliteEntity eliteEntity, Player player) {
-        if (eliteEntity == null || !eliteEntity.isValid() || player == null || !player.isValid()) return;
-        candidatesByBoss
-                .computeIfAbsent(eliteEntity.getEliteUUID(), ignored -> new BossCandidate(eliteEntity))
-                .playerUUIDs.add(player.getUniqueId());
-    }
-
-    static void updateProximityCandidates(EliteEntity eliteEntity, double healthMultiplier) {
-        if (!MobCombatSettingsConfig.isDisplayBossBarForHighMultiplier()) return;
-        if (healthMultiplier < MobCombatSettingsConfig.getProximityBossBarHealthMultiplierThreshold()) return;
+    static void registerBoss(EliteEntity eliteEntity) {
         if (eliteEntity == null || !eliteEntity.isValid()) return;
-
-        Location bossLocation = eliteEntity.getLocation();
-        LivingEntity livingEntity = eliteEntity.getLivingEntity();
-        if (bossLocation == null || bossLocation.getWorld() == null || livingEntity == null) return;
-
-        BossCandidate candidate = candidatesByBoss.computeIfAbsent(
+        candidatesByBoss.computeIfAbsent(
                 eliteEntity.getEliteUUID(), ignored -> new BossCandidate(eliteEntity));
-
-        for (Entity entity : livingEntity.getNearbyEntities(PROXIMITY_RANGE, PROXIMITY_RANGE, PROXIMITY_RANGE)) {
-            if (!(entity instanceof Player player)) continue;
-            if (player.getLocation().distanceSquared(bossLocation) <= PROXIMITY_RANGE_SQUARED)
-                candidate.playerUUIDs.add(player.getUniqueId());
-        }
-
-        // The wider removal range prevents repeated add/remove cycles at the 30-block edge.
-        Iterator<UUID> iterator = candidate.playerUUIDs.iterator();
-        while (iterator.hasNext()) {
-            Player player = Bukkit.getPlayer(iterator.next());
-            if (player == null || !player.isOnline() || !player.isValid() ||
-                    !player.getWorld().equals(bossLocation.getWorld())) {
-                iterator.remove();
-                continue;
-            }
-            if (player.getLocation().distanceSquared(bossLocation) > PROXIMITY_REMOVAL_RANGE_SQUARED &&
-                    !eliteEntity.getDamagers().containsKey(player))
-                iterator.remove();
-        }
     }
 
     static void removeBoss(EliteEntity eliteEntity) {
@@ -104,18 +65,12 @@ final class BossHealthBarManager {
                 continue;
             }
 
-            Iterator<UUID> playerIterator = candidate.playerUUIDs.iterator();
-            while (playerIterator.hasNext()) {
-                UUID playerUUID = playerIterator.next();
-                Player player = Bukkit.getPlayer(playerUUID);
-                if (player == null || !player.isOnline() || !player.isValid() ||
-                        !player.getWorld().equals(bossLocation.getWorld())) {
-                    playerIterator.remove();
-                    continue;
-                }
-                candidatePlayers.put(playerUUID, player);
-                candidatesByPlayer.computeIfAbsent(playerUUID, ignored -> new ArrayList<>()).add(eliteEntity);
-            }
+            Player aggroTarget = currentAggroTarget(eliteEntity);
+            if (aggroTarget == null) continue;
+            UUID playerUUID = aggroTarget.getUniqueId();
+            Player player = aggroTarget;
+            candidatePlayers.put(playerUUID, player);
+            candidatesByPlayer.computeIfAbsent(playerUUID, ignored -> new ArrayList<>()).add(eliteEntity);
         }
 
         Set<UUID> updatedPlayers = new HashSet<>();
@@ -155,6 +110,15 @@ final class BossHealthBarManager {
         candidatesByBoss.clear();
     }
 
+    static Player currentAggroTarget(EliteEntity eliteEntity) {
+        if (eliteEntity == null || !eliteEntity.isValid() || !eliteEntity.isInCombat()) return null;
+        LivingEntity livingEntity = eliteEntity.getLivingEntity();
+        if (!(livingEntity instanceof Mob mob) || !(mob.getTarget() instanceof Player player)) return null;
+        if (!player.isOnline() || player.isDead() || !player.isValid()) return null;
+        if (!player.getWorld().equals(mob.getWorld())) return null;
+        return player;
+    }
+
     private static double distanceSquared(Player player, EliteEntity eliteEntity) {
         Location bossLocation = eliteEntity.getLocation();
         if (bossLocation == null || bossLocation.getWorld() == null ||
@@ -170,7 +134,6 @@ final class BossHealthBarManager {
 
     private static final class BossCandidate {
         private final EliteEntity eliteEntity;
-        private final Set<UUID> playerUUIDs = new HashSet<>();
 
         private BossCandidate(EliteEntity eliteEntity) {
             this.eliteEntity = eliteEntity;

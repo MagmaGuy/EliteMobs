@@ -11,7 +11,7 @@ import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.menus.QuestMenu;
 import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
-import com.magmaguy.elitemobs.utils.BossBarUtil;
+import com.magmaguy.elitemobs.utils.BossBarOrderManager;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -33,9 +33,11 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -94,7 +96,11 @@ public class QuestDialogueBossBarManager {
     }
 
     private static void startDialogue(Player player, String speakerName, List<String> dialogueLines, Runnable onComplete) {
-        close(player, false);
+        DialogueSession existingSession = activeSessions.get(player.getUniqueId());
+        if (existingSession != null) {
+            existingSession.replace(speakerName, dialogueLines, onComplete);
+            return;
+        }
         DialogueSession session = new DialogueSession(player, speakerName, dialogueLines, onComplete);
         activeSessions.put(player.getUniqueId(), session);
         session.start();
@@ -109,7 +115,7 @@ public class QuestDialogueBossBarManager {
         return player != null && activeSessions.containsKey(player.getUniqueId());
     }
 
-    private static List<String> getQuestDialogueLines(Quest quest, Player player, NPCEntity npcEntity) {
+    static List<String> getQuestDialogueLines(Quest quest, Player player, NPCEntity npcEntity) {
         List<String> lines = new ArrayList<>();
         if (quest instanceof CustomQuest customQuest) {
             if (customQuest.getCustomQuestsConfigFields() == null) return lines;
@@ -126,10 +132,8 @@ public class QuestDialogueBossBarManager {
                     recentlyShownTurnInDialogs.put(dialogueKey(player, quest), System.currentTimeMillis());
                 }
             }
-            if (!lines.isEmpty()) lines.add(0, "&e" + customQuest.getQuestName());
         } else if (quest instanceof DynamicQuest && !quest.isAccepted()) {
             QuestMenu.QuestText questText = new QuestMenu.QuestText(quest, npcEntity, player);
-            lines.add("&e" + quest.getQuestName());
             for (TextComponent textComponent : questText.getBody()) {
                 lines.add(textComponent.toPlainText());
             }
@@ -169,13 +173,13 @@ public class QuestDialogueBossBarManager {
 
     private static class DialogueSession {
         private final Player player;
-        private final String speakerName;
-        private final List<Page> pages;
-        private final Runnable onComplete;
-        private final List<KeyedBossBar> hiddenKeyedBossBars = new ArrayList<>();
-        private final List<BossBar> hiddenEliteBossBars = new ArrayList<>();
+        private String speakerName;
+        private List<Page> pages;
+        private Runnable onComplete;
+        private final Set<KeyedBossBar> hiddenKeyedBossBars = new LinkedHashSet<>();
         private final BossBar[] bars = new BossBar[TOTAL_BARS];
         private final PotionEffect previousSlowness;
+        private BossBarOrderManager.Suspension bossBarSuspension;
         private BukkitTask task;
         private int pageIndex = 0;
         private int visibleCharacters = 0;
@@ -190,18 +194,32 @@ public class QuestDialogueBossBarManager {
         }
 
         private void start() {
-            suppressExistingBossBars();
-            suppressScoreboard();
-            applyMovementLock();
-            createBars();
+            try {
+                bossBarSuspension = BossBarOrderManager.suspendPlayer(player);
+                suppressOtherBossBars();
+                suppressScoreboard();
+                applyMovementLock();
+                createBars();
+                showCurrentPage();
+                task = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, this::tick, 1L, 1L);
+            } catch (RuntimeException | Error failure) {
+                close(false);
+                throw failure;
+            }
+        }
+
+        private void replace(String speakerName, List<String> dialogueLines, Runnable onComplete) {
+            this.speakerName = speakerName;
+            this.pages = paginate(wrapLines(dialogueLines));
+            this.onComplete = onComplete;
+            this.pageIndex = 0;
+            suppressOtherBossBars();
             showCurrentPage();
-            task = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, this::tick, 1L, 1L);
         }
 
         private void suppressScoreboard() {
-            // The quest tracking scoreboard (sidebar) and compass boss bar would otherwise clutter the
-            // dialogue box. The compass bar re-adds the player every tick, so QuestTracking gates on
-            // hasActiveSession(); here we just blank the sidebar and restore it on close.
+            // The sidebar would otherwise clutter the dialogue box. BossBarOrderManager owns
+            // compass visibility with the rest of EliteMobs' non-dialogue bars.
             if (!QuestsConfig.isHideQuestScoreboardDuringQuestDialogue()) return;
             SimpleScoreboard.blankScoreboard(player);
         }
@@ -226,20 +244,13 @@ public class QuestDialogueBossBarManager {
                     false), true);
         }
 
-        private void suppressExistingBossBars() {
-            if (QuestsConfig.isHideKeyedBossBarsDuringQuestDialogue()) {
-                Iterator<KeyedBossBar> iterator = Bukkit.getBossBars();
-                while (iterator.hasNext()) {
-                    KeyedBossBar bossBar = iterator.next();
-                    if (!bossBar.getPlayers().contains(player)) continue;
-                    bossBar.removePlayer(player);
-                    hiddenKeyedBossBars.add(bossBar);
-                }
-            }
-            for (BossBar bossBar : new ArrayList<>(BossBarUtil.bossBars)) {
+        private void suppressOtherBossBars() {
+            Iterator<KeyedBossBar> iterator = Bukkit.getBossBars();
+            while (iterator.hasNext()) {
+                KeyedBossBar bossBar = iterator.next();
                 if (!bossBar.getPlayers().contains(player)) continue;
+                hiddenKeyedBossBars.add(bossBar);
                 bossBar.removePlayer(player);
-                hiddenEliteBossBars.add(bossBar);
             }
         }
 
@@ -263,9 +274,10 @@ public class QuestDialogueBossBarManager {
 
         private void tick() {
             if (!player.isOnline()) {
-                close(false);
+                close(false, false);
                 return;
             }
+            suppressOtherBossBars();
             Page page = pages.get(pageIndex);
             if (visibleCharacters >= page.visibleLength()) return;
             visibleCharacters = Math.min(page.visibleLength(),
@@ -304,6 +316,10 @@ public class QuestDialogueBossBarManager {
         }
 
         private void close(boolean runCallback) {
+            close(runCallback, true);
+        }
+
+        private void close(boolean runCallback, boolean restoreUi) {
             if (closed) return;
             closed = true;
             activeSessions.remove(player.getUniqueId(), this);
@@ -312,8 +328,13 @@ public class QuestDialogueBossBarManager {
                 if (bossBar != null) bossBar.removeAll();
             }
             clearMovementLock();
-            restoreBossBars();
-            restoreScoreboard();
+            if (restoreUi) {
+                restoreBossBars();
+                restoreScoreboard();
+            } else {
+                BossBarOrderManager.discardSuspension(player, bossBarSuspension);
+                bossBarSuspension = null;
+            }
             if (runCallback && onComplete != null && player.isOnline()) {
                 Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, onComplete);
             }
@@ -331,13 +352,47 @@ public class QuestDialogueBossBarManager {
         }
 
         private void restoreBossBars() {
+            BossBarOrderManager.Suspension suspension = bossBarSuspension;
+            bossBarSuspension = null;
+            try {
+                BossBarOrderManager.resumePlayer(player, suspension);
+            } catch (RuntimeException firstFailure) {
+                scheduleManagedBossBarRestoreRetry(suspension, firstFailure);
+            }
             if (!player.isOnline()) return;
             for (KeyedBossBar bossBar : hiddenKeyedBossBars) {
-                bossBar.addPlayer(player);
+                if (Bukkit.getBossBar(bossBar.getKey()) == bossBar) bossBar.addPlayer(player);
             }
-            for (BossBar bossBar : hiddenEliteBossBars) {
-                bossBar.addPlayer(player);
+        }
+
+        private void scheduleManagedBossBarRestoreRetry(BossBarOrderManager.Suspension suspension,
+                                                        RuntimeException firstFailure) {
+            if (!player.isOnline() || !MetadataHandler.PLUGIN.isEnabled()) {
+                discardFailedManagedBossBarRestore(suspension, firstFailure);
+                return;
             }
+            try {
+                Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                    try {
+                        BossBarOrderManager.resumePlayer(player, suspension);
+                    } catch (RuntimeException retryFailure) {
+                        firstFailure.addSuppressed(retryFailure);
+                        discardFailedManagedBossBarRestore(suspension, firstFailure);
+                    }
+                });
+            } catch (RuntimeException schedulingFailure) {
+                firstFailure.addSuppressed(schedulingFailure);
+                discardFailedManagedBossBarRestore(suspension, firstFailure);
+            }
+        }
+
+        private void discardFailedManagedBossBarRestore(BossBarOrderManager.Suspension suspension,
+                                                        RuntimeException failure) {
+            BossBarOrderManager.discardSuspension(player, suspension);
+            MetadataHandler.PLUGIN.getLogger().log(
+                    java.util.logging.Level.WARNING,
+                    "Failed to restore managed boss bars after quest dialogue",
+                    failure);
         }
     }
 
@@ -545,7 +600,8 @@ public class QuestDialogueBossBarManager {
 
         @EventHandler
         public void onQuit(PlayerQuitEvent event) {
-            close(event.getPlayer(), false);
+            DialogueSession session = activeSessions.get(event.getPlayer().getUniqueId());
+            if (session != null) session.close(false, false);
         }
     }
 }

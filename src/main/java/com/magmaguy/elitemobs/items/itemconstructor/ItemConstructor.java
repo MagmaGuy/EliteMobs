@@ -8,6 +8,8 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
@@ -40,7 +42,9 @@ public class ItemConstructor {
                                           String equipmentModelID,
                                           boolean soulbound,
                                           String filename,
-                                          String scriptedItem) {
+                                          String scriptedItem,
+                                          SkillType weaponType,
+                                          String fmmItemModel) {
         /*
         Construct initial item
          */
@@ -78,8 +82,9 @@ public class ItemConstructor {
 
         itemStack.setItemMeta(itemMeta);
 
-        // Apply custom models — skip if scriptedItem is set (FMM provides the model)
-        if (scriptedItem == null || scriptedItem.isEmpty()) {
+        // Apply ordinary models only when neither FMM path owns presentation.
+        if ((scriptedItem == null || scriptedItem.isEmpty())
+                && (fmmItemModel == null || fmmItemModel.isEmpty())) {
             if ((customModelID != null && !customModelID.isEmpty()) || (equipmentModelID != null && !equipmentModelID.isEmpty())) {
                 //Config defines at least one model - use config values (may be null for the other)
                 String effectiveCustomModelID = (customModelID != null && !customModelID.isEmpty())
@@ -100,7 +105,14 @@ public class ItemConstructor {
 
         //Register filename of the custom item into the persistent metadata
         Objects.requireNonNull(itemMeta).getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, filename), PersistentDataType.STRING, filename);
+        ItemTagger.registerCustomItemId(itemMeta, filename);
         itemStack.setItemMeta(itemMeta);
+
+        if (weaponType != null) WeaponIdentityResolver.stamp(itemStack, weaponType);
+
+        // Built-in magic IDs let FMM stamp the item it owns. Other IDs remain presentation-only.
+        if (fmmItemModel != null && !fmmItemModel.isEmpty())
+            applyFmmItemData(itemStack, fmmItemModel, filename);
 
         // Apply FMM scripted item data if configured and FMM is installed
         if (scriptedItem != null && !scriptedItem.isEmpty()
@@ -119,6 +131,36 @@ public class ItemConstructor {
         }
 
         return commonFeatures(itemStack, eliteEntity, player, enchantments, customEnchantments, showItemWorth, soulbound);
+    }
+
+    private static void applyFmmItemData(ItemStack itemStack, String fmmItemModel, String filename) {
+        if (!org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")) return;
+        boolean magicWeapon = com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI.DEFAULT_STAFF_ID
+                .equalsIgnoreCase(fmmItemModel)
+                || com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI.DEFAULT_WAND_ID
+                .equalsIgnoreCase(fmmItemModel);
+        boolean applied = false;
+        try {
+            magicWeapon = magicWeapon || com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI
+                    .isBuiltInWeapon(fmmItemModel);
+            applied = magicWeapon
+                    ? com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI
+                    .applyBuiltInWeaponData(itemStack, fmmItemModel)
+                    : com.magmaguy.freeminecraftmodels.api.ModelItemAPI
+                    .applyDisplayModel(itemStack, fmmItemModel);
+        } catch (LinkageError incompatibleFmm) {
+            try {
+                applied = com.magmaguy.freeminecraftmodels.api.ModelItemAPI
+                        .applyDisplayModel(itemStack, fmmItemModel);
+            } catch (LinkageError ignored) {
+                // The Experimental Combat integration emits the single actionable compatibility warning.
+            }
+        }
+        if (!applied && !magicWeapon) {
+            com.magmaguy.magmacore.util.Logger.warn("FMM presentation model '"
+                    + fmmItemModel + "' was not found for custom item " + filename
+                    + "; its vanilla material will be used.");
+        }
     }
 
     /**

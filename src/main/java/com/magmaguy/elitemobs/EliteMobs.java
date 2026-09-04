@@ -40,6 +40,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.ActionEvent;
 import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
+import com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
@@ -56,6 +57,8 @@ import com.magmaguy.elitemobs.items.potioneffects.custom.Heal;
 import com.magmaguy.elitemobs.items.potioneffects.custom.Saturation;
 import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
+import com.magmaguy.elitemobs.mobconstructor.EliteMindServiceModule;
+import com.magmaguy.elitemobs.mobconstructor.EliteLuaPowerServiceModule;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomMusic;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
@@ -68,6 +71,8 @@ import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
 import com.magmaguy.elitemobs.npcs.scripts.NPCScriptManager;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolService;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolEditor;
 import com.magmaguy.elitemobs.peacebanner.PeaceBannerItem;
 import com.magmaguy.elitemobs.peacebanner.PeaceBannerManager;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -92,6 +97,7 @@ import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
 import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
+import com.magmaguy.elitemobs.skills.HealthDisplayCoordinator;
 import com.magmaguy.elitemobs.skills.SkillSystemMigration;
 import com.magmaguy.elitemobs.skills.SkillXPBar;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusInitializer;
@@ -181,6 +187,7 @@ public class EliteMobs extends JavaPlugin {
         new ArenasConfig();
         //ModelsConfig.initializeConfig();
         new DungeonsConfig();
+        new ExperimentalCombatConfig();
         new CommandMessagesConfig();
         new ChangelogsConfig();
         new InitializeConfig();
@@ -253,6 +260,9 @@ public class EliteMobs extends JavaPlugin {
                         return;
                     }
                     MetadataHandler.pluginState = PluginState.INITIALIZED;
+                    EventsRegistrer.registerPostInitializationEvents();
+                    EliteLuaPowerServiceModule.initialize();
+                    EliteMindServiceModule.initialize();
                     Bukkit.getPluginManager().callEvent(new EliteMobsInitializedEvent());
                     Logger.info("EliteMobs fully initialized!");
                     NightbreakPluginUpdater.autoDownloadPluginUpdateIfEnabled(this, NIGHTBREAK_PLUGIN_SPEC);
@@ -264,6 +274,9 @@ public class EliteMobs extends JavaPlugin {
                 throwable -> {
                     MetadataHandler.pluginState = PluginState.UNINITIALIZED;
                     MetadataHandler.pendingReloadSender = null;
+                    com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule.shutdownIfInitialized();
+                    com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime.shutdownIfInitialized();
+                    com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatStateRecovery.clearAllOnlinePlayers();
                     throwable.printStackTrace();
                 });
     }
@@ -292,6 +305,8 @@ public class EliteMobs extends JavaPlugin {
         initializationContext.step("Custom Items");
         new CustomItemsConfig();
         CustomItem.initializeCustomItems();
+        if (ExperimentalCombatConfig.isEnabled())
+            com.magmaguy.elitemobs.experimentalcombat.weapons.ExperimentalMagicWeaponItems.register();
         initializationContext.step("Loot Tables");
         LootTables.initialize();
         initializationContext.step("Content Packages Config");
@@ -407,6 +422,8 @@ public class EliteMobs extends JavaPlugin {
         //Hook up all listeners, some depend on config
         initializationContext.step("Event Listeners");
         EventsRegistrer.registerEvents();
+        PatrolService.initialize();
+        PatrolEditor.initialize();
 
         //Launch the local data cache
         initializationContext.step("Player Database");
@@ -419,6 +436,7 @@ public class EliteMobs extends JavaPlugin {
         SkillBonusInitializer.initialize();
         // Re-apply skill bonuses for any players already online (e.g. after plugin reload)
         for (Player p : Bukkit.getOnlinePlayers()) {
+            if (!PlayerData.isDataLoaded(p.getUniqueId())) continue;
             SkillBonusRegistry.applyAllBonuses(p);
             ArmorSkillHealthBonus.applyHealthBonus(p);
         }
@@ -608,18 +626,29 @@ public class EliteMobs extends JavaPlugin {
     public void onDisable() {
         MetadataHandler.shutdownRequested = true;
         CustomItem.shutdownCacheRegeneration();
+        ClassSelectionMenu.shutdown();
+        GuildTrainingMenu.shutdown();
         MagmaCore.requestInitializationShutdown(this);
+        PatrolEditor.shutdown();
+        PatrolService.shutdown();
+        // Physical class servants and portal surfaces must be removed while their native Mind
+        // runtime is still available.
+        com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule.shutdownIfInitialized();
+        EliteMindServiceModule.shutdown();
+        EliteLuaPowerServiceModule.shutdown();
         AutoclickerThrottle.shutdown();
         SpiritWalkSupport.shutdown();
         ZombieNecronomiconSupport.shutdown();
         if (MetadataHandler.pluginState == PluginState.INITIALIZING) {
             Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
             MetadataHandler.pluginState = PluginState.UNINITIALIZED;
+            HealthDisplayCoordinator.shutdown();
             MagmaCore.shutdown(this);
             Logger.info("EliteMobs shutdown during init -- cancelled async loading.");
             return;
         }
         if (MetadataHandler.pluginState == PluginState.UNINITIALIZED) {
+            HealthDisplayCoordinator.shutdown();
             MagmaCore.shutdown(this);
             return;
         }
@@ -629,7 +658,6 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
         Wormhole.shutdown();
         RegionalBossEntity.save();
-        RegionalBossEntity.getTrackableCustomBosses().clear();
         RegionalBossEntity.getRegionalBossEntitySet().clear();
         InstancedBossEntity.shutdown();
         NPCEntity.shutdown();
@@ -662,8 +690,8 @@ public class EliteMobs extends JavaPlugin {
         ProceduralShopMenu.shutdown();
         EliteMobsWorld.shutdown();
         Navigation.shutdown();
+        QuestDialogueBossBarManager.shutdown();
         BossBarUtil.shutdown();
-        com.magmaguy.elitemobs.utils.BossBarOrderManager.shutdown();
         com.magmaguy.elitemobs.testing.SkillSystemTest.shutdown();
         ScriptAction.shutdown();
         CustomMusic.shutdown();
@@ -720,7 +748,6 @@ public class EliteMobs extends JavaPlugin {
         EarthquakeEnchantment.EarthquakeEnchantmentEvents.shutdown();
         BuyOrSellMenu.BuyOrSellMenuEvents.shutdown();
         Quest.shutdown();
-        QuestDialogueBossBarManager.shutdown();
         QuestInventoryMenu.shutdown();
         StatsPage.StatsPageEvents.shutdown();
         GearPage.GearPageEvents.shutdown();
@@ -732,6 +759,12 @@ public class EliteMobs extends JavaPlugin {
         SkillBonusInitializer.shutdown();
         SkillXPBar.shutdown();
         CombatLevelDisplay.shutdown();
+        com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime.shutdownIfInitialized();
+        HealthDisplayCoordinator.shutdown();
+        com.magmaguy.elitemobs.presentation.experience.ExperienceBarLease.shutdown();
+        com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor.shutdown();
+        com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime.shutdownIfInitialized();
+        com.magmaguy.elitemobs.utils.BossBarOrderManager.shutdown();
         ArenaMenu.ArenaMenuEvents.shutdown();
         ItemEnchantmentMenu.ItemEnchantMenuEvents.shutdown();
         EliteScrollMenu.EliteScrollMenuEvents.shutdown();

@@ -6,22 +6,29 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Item;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-
-public class VisualItemProcessor {
+public class VisualItemProcessor implements AutoCloseable {
 
     private boolean hasValidEffect;
+    private final Object[][] trailTracker;
+    private BukkitTask task;
+    private boolean closed;
 
     public VisualItemProcessor(Object[][] multiDimensionalTrailTracker, Vector[][] cachedVectorPositions,
                                boolean visualEffectBoolean, int pointsPerRotation, EliteEntity eliteEntity) {
 
         this.hasValidEffect = visualEffectBoolean;
+        this.trailTracker = multiDimensionalTrailTracker;
         if (multiDimensionalTrailTracker.length < 1)
             return;
 
-        rotateExistingEffects(multiDimensionalTrailTracker, cachedVectorPositions, pointsPerRotation, eliteEntity);
+        task = rotateExistingEffects(
+                multiDimensionalTrailTracker,
+                cachedVectorPositions,
+                pointsPerRotation,
+                eliteEntity);
 
     }
 
@@ -36,10 +43,10 @@ public class VisualItemProcessor {
         return location;
     }
 
-    private void rotateExistingEffects(Object[][] multiDimensionalTrailTracker, Vector[][] cachedVectorPositions,
-                                       int pointsPerRotation, EliteEntity eliteEntity) {
+    private BukkitTask rotateExistingEffects(Object[][] multiDimensionalTrailTracker, Vector[][] cachedVectorPositions,
+                                              int pointsPerRotation, EliteEntity eliteEntity) {
 
-        new BukkitRunnable() {
+        return new BukkitRunnable() {
 
             final boolean isObfuscated = eliteEntity.isVisualEffectObfuscated();
             int counter = 0;
@@ -90,21 +97,7 @@ public class VisualItemProcessor {
                 if (isObfuscated != eliteEntity.isVisualEffectObfuscated()) {
                     VisualItemRemover.removeItems(multiDimensionalTrailTracker);
                     cancel();
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            eliteEntity.setVisualEffectObfuscated(false);
-                            if (Arrays.deepEquals(cachedVectorPositions, MinorPowerStanceMath.cachedVectors)) {
-                                eliteEntity.setMinorVisualEffect(false);
-                                new MinorPowerPowerStance(eliteEntity);
-                            }
-                            if (Arrays.deepEquals(cachedVectorPositions, MajorPowerStanceMath.cachedVectors)) {
-                                eliteEntity.setMajorVisualEffect(false);
-                                new MajorPowerPowerStance(eliteEntity);
-                            }
-                        }
-                    }.runTask(MetadataHandler.PLUGIN);
-
+                    eliteEntity.requestPowerStanceRefreshAfterObfuscation();
                 }
 
             }
@@ -152,6 +145,15 @@ public class VisualItemProcessor {
             eliteEntity.getLivingEntity().getWorld().spawnParticle(
                     particle, eliteEntity.getLivingEntity().getLocation().add(0, 1, 0).add(vector),
                     1, 0, 0, 0, 0.01);
+    }
+
+    @Override
+    public void close() {
+        if (closed) return;
+        closed = true;
+        hasValidEffect = false;
+        if (task != null) task.cancel();
+        VisualItemRemover.removeItemsNow(trailTracker);
     }
 
 }

@@ -31,6 +31,9 @@ import java.util.Map;
  */
 public class SkillsPage {
 
+    // Seven entries on the first content row and four on the second. Slot 26 remains Back.
+    private static final int[] SKILL_SLOTS = {10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22};
+
     private SkillsPage() {
     }
 
@@ -76,19 +79,17 @@ public class SkillsPage {
     protected static void skillsPage(Player targetPlayer, Player requestingPlayer) {
         Inventory inventory = Bukkit.createInventory(requestingPlayer, 27, SkillsConfig.getSkillsMenuTitle().replace("&", "\u00A7"));
 
-        // Skill slots: spread across two rows to fit all 9 skills
-        int[] skillSlots = {10, 11, 12, 13, 14, 15, 16, 19, 20};
         int slotIndex = 0;
 
         // Create slot-to-skill mapping
         Map<Integer, SkillType> slotToSkillType = new HashMap<>();
 
         for (SkillType skillType : SkillType.values()) {
-            if (slotIndex >= skillSlots.length) break;
+            if (slotIndex >= SKILL_SLOTS.length) break;
 
             ItemStack skillItem = createSkillItem(targetPlayer, skillType);
-            inventory.setItem(skillSlots[slotIndex], skillItem);
-            slotToSkillType.put(skillSlots[slotIndex], skillType);
+            inventory.setItem(SKILL_SLOTS[slotIndex], skillItem);
+            slotToSkillType.put(SKILL_SLOTS[slotIndex], skillType);
             slotIndex++;
         }
 
@@ -98,6 +99,10 @@ public class SkillsPage {
         if (requestingPlayer.openInventory(inventory) == null) return;
         StatusInventorySafety.protect(inventory);
         SkillsPageEvents.pageInventories.put(inventory, slotToSkillType);
+    }
+
+    static int skillSlotCapacity() {
+        return SKILL_SLOTS.length;
     }
 
     /**
@@ -148,6 +153,14 @@ public class SkillsPage {
                     yield Material.TRIDENT; // Fallback for pre-1.21.11
                 }
             }
+            case STAVES -> {
+                try {
+                    yield Material.WOODEN_SPEAR;
+                } catch (NoSuchFieldError e) {
+                    yield Material.STICK; // Fallback for pre-1.21.11
+                }
+            }
+            case WANDS -> Material.BLAZE_ROD;
         };
     }
 

@@ -8,6 +8,8 @@ import com.magmaguy.elitemobs.combatsystem.PotionCombatModifierCalculator;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRules;
+import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -433,8 +435,9 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 }
             }
 
-            // 6. Resistance potion effect (percentage-based)
-            double potionMultiplier = PotionCombatModifierCalculator.getIncomingDamageMultiplier(player);
+            // 6. Source Strength/Weakness and target Resistance (percentage-based)
+            double potionMultiplier = PotionCombatModifierCalculator.getCombinedDamageMultiplier(
+                    eliteEntity.getLivingEntity(), player);
 
             // 7. Boss damage multiplier (for custom bosses with increased damage)
             double customBossDamageMultiplier = eliteEntity.getDamageMultiplier();
@@ -460,7 +463,13 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             // 8. 1-shot protection
             double actualMaxHealth = AttributeManager.getAttributeValue(player, "generic_max_health");
-            double finalDamage = Math.min(preCapDamage, actualMaxHealth - 1);
+            // Experimental Combat expands the health reservoir, not incoming damage. Remove only
+            // its flat health increase so ordinary skill and plugin bonuses still contribute to
+            // the same one-shot ceiling they provided before the player entered the mode.
+            double oneShotProtectionMaxHealth = ExperimentalCombatRuntime.isActive(player)
+                    ? ExperimentalCombatRules.ordinaryMaximumHealth(actualMaxHealth)
+                    : actualMaxHealth;
+            double finalDamage = Math.min(preCapDamage, oneShotProtectionMaxHealth - 1);
 
             // Per-player diagnostic breakdown (toggle with /em debug)
             if (DebugMessage.isDebugEnabled(player)) {
@@ -514,9 +523,9 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 DebugMessage.send(player, "§7× max(scaledDamage, 1) = §f"
                         + String.format("%.2f", Math.max(scaledDamage, 1))
                         + " §8(floor so trivial hits still register 1)");
-                DebugMessage.send(player, "§7× Potion multiplier (incoming) = §f"
+                DebugMessage.send(player, "§7× Potion multiplier (source → target) = §f"
                         + String.format("%.3f", potionMultiplier)
-                        + " §8(resistance/weakness on you)");
+                        + " §8(source strength/weakness × your resistance)");
                 DebugMessage.send(player, "§7× Per-mob damageMultiplier = §f"
                         + String.format("%.3f", customBossDamageMultiplier)
                         + " §8(eliteEntity.getDamageMultiplier(); per-boss YAML 'damageMultiplier')");
@@ -528,8 +537,8 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                         + " §8(" + configKey + " in MobCombatSettings.yml)");
                 DebugMessage.send(player, "§e── Result ──");
                 DebugMessage.send(player, "§7Pre-cap product = §f" + String.format("%.2f", preCapDamage));
-                DebugMessage.send(player, "§71-shot cap (actualMaxHP − 1 = "
-                        + String.format("%.2f", actualMaxHealth - 1) + ") → final = §f"
+                DebugMessage.send(player, "§71-shot cap (pre-mode maxHP − 1 = "
+                        + String.format("%.2f", oneShotProtectionMaxHealth - 1) + ") → final = §f"
                         + String.format("%.2f", finalDamage));
                 DebugMessage.send(player, "§a⇒ Formula returns: §f" + String.format("%.2f", finalDamage)
                         + " §8(may still be adjusted by blocking/bypass/skill bonuses after this)");

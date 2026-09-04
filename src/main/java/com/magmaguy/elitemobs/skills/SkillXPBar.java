@@ -326,6 +326,8 @@ public class SkillXPBar implements Listener {
                 @Override
                 public void run() {
                     if (bossBar != null) {
+                        Player player = getPlayer();
+                        if (player != null) BossBarOrderManager.hide(player, bossBar);
                         bossBar.setVisible(false);
                     }
                 }
@@ -366,6 +368,8 @@ public class SkillXPBar implements Listener {
                 case HOES -> BarColor.PURPLE;
                 case MACES -> BarColor.YELLOW;
                 case SPEARS -> BarColor.WHITE;
+                case STAVES -> BarColor.PURPLE;
+                case WANDS -> BarColor.PINK;
             };
         }
 

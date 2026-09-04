@@ -2,12 +2,11 @@ package com.magmaguy.elitemobs.skills.bonuses;
 
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusConfigFields;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import lombok.Setter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -68,10 +67,9 @@ public abstract class SkillBonus {
      * @param skill  The skill that triggered
      */
     public static void sendSkillActionBar(Player player, SkillBonus skill) {
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText(ChatColorConverter.convert(
-                        DungeonsConfig.getSkillActivationFormat()
-                                .replace("$skillName", skill.getBonusName()))));
+        ActionBarCompositor.show(player, ActionBarCompositor.Source.SKILL_FEEDBACK,
+                ChatColorConverter.convert(DungeonsConfig.getSkillActivationFormat()
+                        .replace("$skillName", skill.getBonusName())));
     }
 
     @Getter
@@ -216,12 +214,11 @@ public abstract class SkillBonus {
      * @param maxStacks     Maximum number of stacks
      */
     public static void sendStackingSkillActionBar(Player player, SkillBonus skill, int currentStacks, int maxStacks) {
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText(ChatColorConverter.convert(
-                        DungeonsConfig.getSkillStackFormat()
-                                .replace("$skillName", skill.getBonusName())
-                                .replace("$current", String.valueOf(currentStacks))
-                                .replace("$max", String.valueOf(maxStacks)))));
+        ActionBarCompositor.show(player, ActionBarCompositor.Source.SKILL_FEEDBACK,
+                ChatColorConverter.convert(DungeonsConfig.getSkillStackFormat()
+                        .replace("$skillName", skill.getBonusName())
+                        .replace("$current", String.valueOf(currentStacks))
+                        .replace("$max", String.valueOf(maxStacks))));
     }
 
     /**

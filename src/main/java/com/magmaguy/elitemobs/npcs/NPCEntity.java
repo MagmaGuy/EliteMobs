@@ -17,6 +17,7 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.npcs.scripts.NPCScriptManager;
 import com.magmaguy.elitemobs.npcs.scripts.ScriptableNPC;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolService;
 import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.magmacore.scripting.ScriptHook;
 import com.magmaguy.magmacore.scripting.ScriptInstance;
@@ -52,7 +53,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class NPCEntity implements PersistentObject, PersistentMovingEntity {
 
     private static final ArrayListMultimap<String, InstancedNPCContainer> instancedNPCEntities = ArrayListMultimap.create();
-    public final NPCsConfigFields npCsConfigFields;
+    public NPCsConfigFields npCsConfigFields;
     @Getter
     private final UUID uuid = UUID.randomUUID();
     private boolean isInstancedDuplicate = false;
@@ -158,6 +159,16 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         return false;
     }
 
+    /**
+     * @return whether any reference this NPC still holds (villager, spawn location) points at the
+     * given world — used to purge tracking when that world unloads
+     */
+    public boolean referencesWorld(World world) {
+        if (world == null) return false;
+        if (villager != null && world.equals(villager.getWorld())) return true;
+        return spawnLocation != null && world.equals(spawnLocation.getWorld());
+    }
+
     public void remove(RemovalReason removalReason) {
         String removedLocationString = locationString;
         NPCEntityRemoveEvent npcEntityRemoveEvent = new NPCEntityRemoveEvent(villager, this, removalReason);
@@ -173,6 +184,10 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         // Remove house earnings display if this is the gambling den owner
         com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.removeDisplay(uuid);
         if (villager != null) {
+            //Release the LibsDisguises registry entry before discarding the entity, or
+            //it keeps a hard reference that can pin an unloaded world in memory.
+            if (org.bukkit.Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
+                DisguiseEntity.undisguise(villager);
             villager.remove();
             this.villager = null;
         }
@@ -238,9 +253,10 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     }
 
     private void spawn() {
-        if (spawnLocation == null ||
-                spawnLocation.getWorld() == null ||
-                !ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation)) return;
+        Location effectiveSpawnLocation = PatrolService.materializationLocation(this).orElse(spawnLocation);
+        if (effectiveSpawnLocation == null ||
+                effectiveSpawnLocation.getWorld() == null ||
+                !PatrolService.canMaterialize(this, effectiveSpawnLocation)) return;
         if (villager != null && villager.isValid()) return;
         if (npCsConfigFields.getInteractionType().equals(NPCInteractions.NPCInteractionType.SCROLL_APPLIER) &&
                 !ItemSettingsConfig.isUseEliteItemScrolls()) return;
@@ -248,7 +264,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
             WorldGuardSpawnEventBypasser.forceSpawn();
         String displayName = ChatColorConverter.convert(npCsConfigFields.getName());
         boolean disguiseQueued = queueDisguise(displayName);
-        villager = spawnLocation.getWorld().spawn(spawnLocation, Villager.class, villagerInstance -> {
+        villager = effectiveSpawnLocation.getWorld().spawn(effectiveSpawnLocation, Villager.class, villagerInstance -> {
             villagerInstance.setAI(false);
             villagerInstance.setPersistent(false);
             villagerInstance.setRemoveWhenFarAway(false);
@@ -358,7 +374,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
                 (player, modeledEntity) -> NPCInteractions.handleNPCInteraction(player, this),
                 (player, modeledEntity) -> NPCInteractions.handleNPCInteraction(player, this));
         if (customModel != null)
-            customModel.setSyncMovement(getNPCsConfigFields().isSyncMovement());
+            customModel.setSyncMovement(
+                    getNPCsConfigFields().isSyncMovement() || getNPCsConfigFields().getPatrolRoute() != null);
     }
 
     /**
@@ -394,6 +411,19 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         return npCsConfigFields;
     }
 
+    public String getLocationString() {
+        return locationString;
+    }
+
+    public void rebindPatrolConfig(NPCsConfigFields fields) {
+        this.npCsConfigFields = java.util.Objects.requireNonNull(fields, "fields");
+        if (fields.getPatrolRoute() != null) enablePatrolMovementSync();
+    }
+
+    public void enablePatrolMovementSync() {
+        if (customModel != null) customModel.setSyncMovement(true);
+    }
+
     public Location getSpawnLocation() {
         return spawnLocation;
     }
@@ -423,7 +453,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     @Override
     public void worldLoad(World world) {
         setSpawnLocation();
-        //queueSpawn();
+        if (PatrolService.hasConfiguredPatrol(this)) spawn();
     }
 
     @Override
@@ -434,7 +464,32 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
 
     @Override
     public Location getPersistentLocation() {
-        return getSpawnLocation();
+        return PatrolService.materializationLocation(this).orElse(getSpawnLocation());
+    }
+
+    /** Re-keys the persistent handler without changing the authored route origin. */
+    public void updatePatrolPersistentLocation(Location location) {
+        if (location == null || persistentObjectHandler == null) return;
+        persistentObjectHandler.updatePersistentLocation(location.clone());
+    }
+
+    /** Keeps role entities attached to the moving villager without driving the villager by teleport. */
+    public void syncPatrolVisuals() {
+        if (villager == null || !villager.isValid()) return;
+        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.syncDisplay(this);
+        if (roleDisplay != null && roleDisplay.isValid()) {
+            double yOffset = customModel != null ? 2.3D : isDisguised ? 2.30D : 2.52D;
+            Location target = villager.getLocation().clone().add(0D, yOffset, 0D);
+            if (!roleDisplay.getWorld().equals(target.getWorld())
+                    || roleDisplay.getLocation().distanceSquared(target) > 0.0025D)
+                roleDisplay.teleport(target);
+        }
+        if (bedrockRoleArmorStand != null && bedrockRoleArmorStand.isValid()) {
+            Location target = villager.getLocation().clone().add(0D, DefaultConfig.getBedrockNPCRoleYOffset(), 0D);
+            if (!bedrockRoleArmorStand.getWorld().equals(target.getWorld())
+                    || bedrockRoleArmorStand.getLocation().distanceSquared(target) > 0.0025D)
+                bedrockRoleArmorStand.teleport(target);
+        }
     }
 
     @Override

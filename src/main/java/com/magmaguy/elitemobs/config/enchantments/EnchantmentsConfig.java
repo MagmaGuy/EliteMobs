@@ -7,12 +7,15 @@ import lombok.Getter;
 import org.bukkit.enchantments.Enchantment;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 public class EnchantmentsConfig extends CustomConfig {
 
     @Getter
     private static HashMap<String, EnchantmentsConfigFields> enchantments = new HashMap();
+    private static final Set<String> missingEnchantmentWarnings = new HashSet<>();
 
     public EnchantmentsConfig() {
         super("enchantments", "com.magmaguy.elitemobs.config.enchantments.premade", EnchantmentsConfigFields.class);
@@ -25,10 +28,8 @@ public class EnchantmentsConfig extends CustomConfig {
         String newString = LegacyValueConverter.parseEnchantment(string.replace(".yml", "")) + ".yml";
         newString = newString.toLowerCase(Locale.ROOT);
         EnchantmentsConfigFields test = enchantments.get(newString);
-        if (test == null) {
+        if (test == null && missingEnchantmentWarnings.add(newString))
             Logger.warn("Failed to find enchant file " + newString);
-            new Exception().printStackTrace();
-        }
         return enchantments.get(newString);
     }
 

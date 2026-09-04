@@ -1,9 +1,44 @@
 {
     "sources": [
         {
-            "type": "directory",
-            "source": "entity",
-			"prefix": "entity/"
+            "type": "single",
+            "resource": "elitemobs:entity/equipment/humanoid/bronze"
+        },
+        {
+            "type": "single",
+            "resource": "elitemobs:entity/equipment/humanoid/corrupted"
+        },
+        {
+            "type": "single",
+            "resource": "elitemobs:entity/equipment/humanoid/living"
+        },
+        {
+            "type": "single",
+            "resource": "elitemobs:entity/equipment/humanoid/palladium"
+        },
+        {
+            "type": "single",
+            "resource": "elitemobs:entity/equipment/humanoid/ultimatium"
+        },
+        {
+            "type": "single",
+            "resource": "elitemobs:entity/equipment/humanoid_leggings/bronze"
+        },
+        {
+            "type": "single",
+            "resource": "elitemobs:entity/equipment/humanoid_leggings/corrupted"
+        },
+        {
+            "type": "single",
+            "resource": "elitemobs:entity/equipment/humanoid_leggings/living"
+        },
+        {
+            "type": "single",
+            "resource": "elitemobs:entity/equipment/humanoid_leggings/palladium"
+        },
+        {
+            "type": "single",
+            "resource": "elitemobs:entity/equipment/humanoid_leggings/ultimatium"
         },
         {
             "type": "directory",

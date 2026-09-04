@@ -52,7 +52,10 @@ public class InstancedDungeonBrowser extends EliteMenu {
         }
         Set<DungeonInstance> dungeonInstances = new HashSet<>();
         DungeonInstance.getDungeonInstances().forEach(instance -> {
-            if (instance.getContentPackagesConfigFields().getFilename().equals(instancedDungeonName))
+            // Defunct instances linger in the registry while their world awaits
+            // deletion and read as WAITING; listing them offered ghost lobbies.
+            if (instance.getContentPackagesConfigFields().getFilename().equals(instancedDungeonName)
+                    && !instance.isDefunct())
                 dungeonInstances.add(instance);
         });
         instancesList = new ArrayList<>(dungeonInstances);
@@ -135,7 +138,10 @@ public class InstancedDungeonBrowser extends EliteMenu {
                         (String) instancedDungeonBrowser.getEmPackage().getContentPackagesConfigFields().getDifficulties().get(instancedDungeonBrowser.difficultySlots.indexOf(event.getSlot())).get("name"));
             } else {
                 DungeonInstance dungeonInstance = instancedDungeonBrowser.instancesList.get(instancedDungeonBrowser.validSlots.indexOf(event.getSlot()));
-                switch (dungeonInstance.getState()) {
+                // The instance can die between menu render and click; re-check.
+                if (dungeonInstance.isDefunct())
+                    event.getWhoClicked().sendMessage(DungeonsConfig.getMatchAlreadyEndedMessage());
+                else switch (dungeonInstance.getState()) {
                     case ONGOING, STARTING -> {
                         if (DungeonsConfig.isAllowSpectatorsInInstancedContent())
                             dungeonInstance.addSpectator((Player) event.getWhoClicked(), false);

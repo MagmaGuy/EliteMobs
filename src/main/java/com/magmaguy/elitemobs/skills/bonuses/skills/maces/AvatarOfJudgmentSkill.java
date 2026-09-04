@@ -2,13 +2,12 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.maces;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -144,8 +143,8 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
                 if (ticksRemaining <= 0 || !player.isOnline() || !buffedPlayers.contains(player.getUniqueId())) {
                     buffedPlayers.remove(player.getUniqueId());
                     if (player.isOnline()) {
-                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(DungeonsConfig.getAvatarFadesMessage()));
+                        ActionBarCompositor.show(player, ActionBarCompositor.Source.SKILL_FEEDBACK,
+                                DungeonsConfig.getAvatarFadesMessage());
                     }
                     cancel();
                     return;

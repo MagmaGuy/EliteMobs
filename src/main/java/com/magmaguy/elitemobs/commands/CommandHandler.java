@@ -2,8 +2,11 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.EliteMobs;
+import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.MetaPackage;
+import com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu;
+import com.magmaguy.elitemobs.menus.GuildTrainingMenu;
 import com.magmaguy.magmacore.command.CommandManager;
 import com.magmaguy.magmacore.nightbreak.NightbreakDownloadContentCommand;
 import com.magmaguy.magmacore.nightbreak.NightbreakDownloadEverythingCommand;
@@ -57,6 +60,7 @@ public class CommandHandler {
         emCommand.registerCommand(new MoneySetCommand());
         emCommand.registerCommand(new MoneyCheckPlayerCommand());
         emCommand.registerCommand(new UnbindForceCommand());
+        emCommand.registerCommand(new UnbindForceAllCommand());
         emCommand.registerCommand(new FireballCommand());
         emCommand.registerCommand(new RespawnAllCommand());
         emCommand.registerCommand(new PackageDungeonCommand());
@@ -87,6 +91,8 @@ public class CommandHandler {
         emCommand.registerCommand(new FirstTimeSetupCommand());
         emCommand.registerCommand(new DebugCommand());
         emCommand.registerCommand(new DebugInfoCommand());
+        for (String patrolAction : List.of("edit", "add", "remove", "undo", "mode", "save", "cancel", "status"))
+            emCommand.registerCommand(new PatrolCommand(patrolAction));
         emCommand.registerCommand(new NightbreakRecommendedPluginsCommand(MetadataHandler.PLUGIN, EliteMobs.NIGHTBREAK_PLUGIN_SPEC));
         emCommand.registerCommand(new NightbreakDownloadPluginUpdateCommand(MetadataHandler.PLUGIN, EliteMobs.NIGHTBREAK_PLUGIN_SPEC));
         emCommand.registerCommand(new NightbreakDownloadEverythingCommand<>(MetadataHandler.PLUGIN,
@@ -129,6 +135,7 @@ public class CommandHandler {
         emCommand.registerCommand(new QuestCheckCommand());
         emCommand.registerCommand(new QuestTrackCommand());
         emCommand.registerCommand(new QuestLeaveCommand());
+        emCommand.registerCommand(new QuestLeaveConfirmedCommand());
         emCommand.registerCommand(new SkillSetCommand());
         emCommand.registerCommand(new SkillSetAllCommand());
         emCommand.registerCommand(new SkillCheckCommand());
@@ -141,6 +148,7 @@ public class CommandHandler {
         emCommand.registerCommand(new StartCommand());
         emCommand.registerCommand(new ArenaCommand());
         emCommand.registerCommand(new DismissCommand());
+        emCommand.registerCommand(new ExperimentalCombatDismissSuggestionCommand());
         emCommand.registerCommand(new AltCommand());
         emCommand.registerCommand(new SpawnTeleportCommand());
         emCommand.registerCommand(new DungeonTeleportCommand());
@@ -157,6 +165,17 @@ public class CommandHandler {
         emCommand.registerCommand(new PartyReadyCommand());
         emCommand.registerCommand(new PartyDeclineCommand());
         emCommand.registerCommand(new PartyHideInteractionHintCommand());
+
+        if (ExperimentalCombatConfig.isEnabled()) {
+            emCommand.registerCommand(new ExperimentalClassCommand());
+            emCommand.registerCommand(new ExperimentalClassInfoCommand());
+            emCommand.registerCommand(new ExperimentalClassSelectCommand());
+            emCommand.registerCommand(new ExperimentalClassInputCommand());
+            emCommand.registerCommand(new ExperimentalClassFocusCommand());
+            emCommand.registerCommand(new ExperimentalClassTestSetCommand());
+            ClassSelectionMenu.commands().forEach(emCommand::registerCommand);
+            GuildTrainingMenu.commands().forEach(emCommand::registerCommand);
+        }
 
         emCommand.registerCommand(new EliteMobsCommand());
         emCommand.registerCommand(new HelpCommand());

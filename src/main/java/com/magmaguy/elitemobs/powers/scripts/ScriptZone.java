@@ -99,6 +99,15 @@ public class ScriptZone {
         zoneListenerTask.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
     }
 
+    /** Stops this zone's owned listener immediately during actor rollback or removal. */
+    public void shutdown() {
+        if (zoneListenerTask != null) {
+            zoneListenerTask.cancel();
+            zoneListenerTask = null;
+        }
+        if (entitiesInZone != null) entitiesInZone.clear();
+    }
+
     /**
      * Triggers a ScriptZoneEnterEvent when a living entity enters the zone.
      *

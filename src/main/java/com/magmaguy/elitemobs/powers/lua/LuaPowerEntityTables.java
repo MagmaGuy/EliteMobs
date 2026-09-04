@@ -16,11 +16,11 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
+import com.magmaguy.elitemobs.utils.BossBarOrderManager;
 import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -243,7 +243,8 @@ final class LuaPowerEntityTables {
             return LuaValue.NIL;
         }));
         table.set("show_action_bar", method(table, args -> {
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColorConverter.convert(args.checkjstring(1))));
+            ActionBarCompositor.show(player, ActionBarCompositor.Source.LUA,
+                    ChatColorConverter.convert(args.checkjstring(1)));
             return LuaValue.NIL;
         }));
         table.set("show_title", method(table, args -> {
@@ -260,9 +261,12 @@ final class LuaPowerEntityTables {
             BarStyle style = support.parseEnum(args.optjstring(3, "SOLID"), BarStyle.class, BarStyle.SOLID);
             int duration = args.optint(4, 40);
             BossBar bossBar = Bukkit.createBossBar(title, color, style);
-            bossBar.addPlayer(player);
+            BossBarOrderManager.show(player, bossBar);
             if (duration > 0) {
-                GameClock.scheduleLater(duration, bossBar::removeAll);
+                GameClock.scheduleLater(duration, () -> {
+                    BossBarOrderManager.hide(player, bossBar);
+                    bossBar.removeAll();
+                });
             }
             return LuaValue.NIL;
         });
@@ -668,6 +672,21 @@ final class LuaPowerEntityTables {
                 }
             }
             return LuaValue.NIL;
+        }));
+        entityTable.set("damage_equipment", method(entityTable, args -> {
+            EquipmentSlot slot;
+            try {
+                slot = EquipmentDamagePolicy.parseSlot(args.checkjstring(1));
+            } catch (IllegalArgumentException exception) {
+                return LuaValue.argerror(1, exception.getMessage());
+            }
+            int amount = args.checkint(2);
+            try {
+                EquipmentDamagePolicy.requireRequestedDamage(amount);
+            } catch (IllegalArgumentException exception) {
+                return LuaValue.argerror(2, exception.getMessage());
+            }
+            return LuaValue.valueOf(EquipmentDamageRuntime.damage(livingEntity, slot, amount));
         }));
         entityTable.set("set_fire_ticks", method(entityTable, args -> {
             if (livingEntity != null && livingEntity.isValid()) {

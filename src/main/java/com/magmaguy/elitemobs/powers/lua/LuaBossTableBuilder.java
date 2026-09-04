@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolService;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.meta.ProjectileTagger;
 import com.magmaguy.elitemobs.powers.specialpowers.ShieldWallSupport;
@@ -26,8 +27,12 @@ import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Builds the Lua table exposed as {@code context.boss} to Lua power scripts.
@@ -88,6 +93,8 @@ final class LuaBossTableBuilder {
             return LuaValue.NIL;
         }));
         boss.set("has_tag", method(boss, args -> LuaValue.valueOf(eliteEntity.hasTag(args.checkjstring(1)))));
+        boss.set("get_nearby_elites", method(boss,
+                args -> nearbyEliteTables(args.checkdouble(1))));
         boss.set("reset_custom_name", method(boss, args -> {
             if (eliteEntity.getLivingEntity() != null) {
                 eliteEntity.getLivingEntity().setCustomName(eliteEntity.getName());
@@ -133,6 +140,20 @@ final class LuaBossTableBuilder {
             eliteEntity.remove(RemovalReason.OTHER);
             return LuaValue.NIL;
         }));
+        boss.set("remove", method(boss, args -> {
+            eliteEntity.remove(RemovalReason.OTHER);
+            return LuaValue.NIL;
+        }));
+        boss.set("patrol_pause", method(boss,
+                args -> LuaValue.valueOf(PatrolService.pause(eliteEntity))));
+        boss.set("patrol_resume", method(boss,
+                args -> LuaValue.valueOf(PatrolService.resume(eliteEntity))));
+        boss.set("hold", method(boss, args -> LuaValue.valueOf(
+                PatrolService.hold(eliteEntity, patrolOffset(args)))));
+        boss.set("walk_to", method(boss, args -> LuaValue.valueOf(
+                PatrolService.walkTo(eliteEntity, patrolOffset(args)))));
+        boss.set("teleport", method(boss, args -> LuaValue.valueOf(
+                PatrolService.teleport(eliteEntity, patrolOffset(args)))));
         boss.set("get_ender_dragon_phase", method(boss, args -> eliteEntity.getLivingEntity() instanceof EnderDragon enderDragon
                 ? LuaValue.valueOf(enderDragon.getPhase().name())
                 : LuaValue.NIL));
@@ -313,6 +334,64 @@ final class LuaBossTableBuilder {
             entityTables.addEntityEffectMethods(boss, null);
         }
         return boss;
+    }
+
+    private LuaValue nearbyEliteTables(double radius) {
+        LivingEntity source = eliteEntity.getLivingEntity();
+        if (!isAlive(source) || source.getWorld() == null) {
+            return new LuaTable();
+        }
+        Map<UUID, EliteEntity> tracked = new HashMap<>(EntityTracker.getEliteMobEntities());
+        Map<UUID, EliteEntity> byId = new HashMap<>();
+        List<NearbyEliteSelectionPolicy.Candidate> candidates = new ArrayList<>();
+        Location sourceLocation = source.getLocation();
+        for (Map.Entry<UUID, EliteEntity> entry : tracked.entrySet()) {
+            EliteEntity candidate = entry.getValue();
+            if (candidate == null || candidate == eliteEntity) {
+                continue;
+            }
+            LivingEntity living = candidate.getLivingEntity();
+            Location location = living == null ? null : living.getLocation();
+            if (location == null || location.getWorld() == null) {
+                continue;
+            }
+            UUID candidateId = candidate.getEliteUUID();
+            boolean isTracked = entry.getKey().equals(candidateId)
+                    && tracked.get(candidateId) == candidate;
+            boolean alive = candidate.exists() && candidate.isValid() && isAlive(living);
+            double dx = location.getX() - sourceLocation.getX();
+            double dy = location.getY() - sourceLocation.getY();
+            double dz = location.getZ() - sourceLocation.getZ();
+            candidates.add(new NearbyEliteSelectionPolicy.Candidate(
+                    candidateId,
+                    location.getWorld().getUID(),
+                    isTracked,
+                    alive,
+                    dx * dx + dy * dy + dz * dz));
+            byId.put(candidateId, candidate);
+        }
+
+        List<NearbyEliteSelectionPolicy.Candidate> selected;
+        try {
+            selected = NearbyEliteSelectionPolicy.select(
+                    source.getWorld().getUID(), radius, candidates);
+        } catch (IllegalArgumentException exception) {
+            return LuaValue.argerror(1, exception.getMessage());
+        }
+        LuaTable result = new LuaTable();
+        int index = 1;
+        for (NearbyEliteSelectionPolicy.Candidate selectedCandidate : selected) {
+            EliteEntity candidate = byId.get(selectedCandidate.entityId());
+            LivingEntity living = candidate == null ? null : candidate.getLivingEntity();
+            if (candidate != null
+                    && tracked.get(selectedCandidate.entityId()) == candidate
+                    && candidate.exists()
+                    && candidate.isValid()
+                    && isAlive(living)) {
+                result.set(index++, entityTables.createLivingEntityTable(living));
+            }
+        }
+        return result;
     }
 
     // ── Boss-only helpers ──────────────────────────────────────────────
@@ -535,6 +614,10 @@ final class LuaBossTableBuilder {
             return (float) args.arg(2).checktable().get("pitch").optdouble(1.0);
         }
         return support.getFloat(args, 3, 1f);
+    }
+
+    private Vector patrolOffset(Varargs args) {
+        return new Vector(args.checkdouble(1), args.checkdouble(2), args.checkdouble(3));
     }
 
     // ── Lua method-call boilerplate ────────────────────────────────────

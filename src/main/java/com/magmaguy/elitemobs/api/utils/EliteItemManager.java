@@ -380,7 +380,13 @@ public class EliteItemManager {
     public static void tagArrow(@Nullable Projectile projectile) {
         if (projectile == null) return;
         if (!(projectile.getShooter() instanceof Player)) return;
-        ItemTagger.setEliteDamageAttribute(projectile, getEliteMobsSpecificDamage(((Player) projectile.getShooter()).getInventory().getItemInMainHand()));
+        tagArrow(projectile, ((Player) projectile.getShooter()).getInventory().getItemInMainHand());
+    }
+
+    /** Tags a projectile from the exact weapon snapshot that launched it. */
+    public static void tagArrow(@Nullable Projectile projectile, @Nullable ItemStack weapon) {
+        if (projectile == null || !(projectile.getShooter() instanceof Player)) return;
+        ItemTagger.setEliteDamageAttribute(projectile, getEliteMobsSpecificDamage(weapon));
     }
 
     public static double getArrowEliteDamage(@Nullable Projectile projectile) {

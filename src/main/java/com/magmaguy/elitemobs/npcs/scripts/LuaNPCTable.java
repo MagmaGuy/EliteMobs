@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.npcs.scripts;
 
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolService;
 import com.magmaguy.magmacore.scripting.ScriptInstance;
 import com.magmaguy.magmacore.scripting.tables.LuaLivingEntityTable;
 import com.magmaguy.magmacore.scripting.tables.LuaTableSupport;
@@ -64,6 +66,20 @@ final class LuaNPCTable {
                 npcEntity.getCustomModel().playAnimationByName(args.checkjstring(1));
             return LuaValue.NIL;
         }));
+        npc.set("patrol_pause", LuaTableSupport.tableMethod(npc,
+                args -> LuaValue.valueOf(PatrolService.pause(npcEntity))));
+        npc.set("patrol_resume", LuaTableSupport.tableMethod(npc,
+                args -> LuaValue.valueOf(PatrolService.resume(npcEntity))));
+        npc.set("hold", LuaTableSupport.tableMethod(npc, args -> LuaValue.valueOf(
+                PatrolService.hold(npcEntity, offset(args)))));
+        npc.set("walk_to", LuaTableSupport.tableMethod(npc, args -> LuaValue.valueOf(
+                PatrolService.walkTo(npcEntity, offset(args)))));
+        npc.set("teleport", LuaTableSupport.tableMethod(npc, args -> LuaValue.valueOf(
+                PatrolService.teleport(npcEntity, offset(args)))));
+        npc.set("remove", LuaTableSupport.tableMethod(npc, args -> {
+            npcEntity.remove(RemovalReason.OTHER);
+            return LuaValue.NIL;
+        }));
 
         LivingEntity villager = npcEntity.getVillager();
         if (villager != null) {
@@ -105,6 +121,7 @@ final class LuaNPCTable {
 
     private static void faceDirectionOrLocation(NPCEntity npcEntity, LuaValue value) {
         if (npcEntity.getVillager() == null || !npcEntity.getVillager().isValid()) return;
+        if (PatrolService.isActivelyMoving(npcEntity)) return;
         Vector direction = toVector(value);
         if (direction == null) {
             Location destination = toLocation(value, npcEntity);
@@ -116,6 +133,10 @@ final class LuaNPCTable {
         Location location = npcEntity.getVillager().getLocation();
         location.setDirection(direction);
         npcEntity.getVillager().teleport(location);
+    }
+
+    private static Vector offset(com.magmaguy.shaded.luaj.vm2.Varargs args) {
+        return new Vector(args.checkdouble(1), args.checkdouble(2), args.checkdouble(3));
     }
 
     private static Location toLocation(LuaValue value, NPCEntity npcEntity) {

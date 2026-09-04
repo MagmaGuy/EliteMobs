@@ -7,8 +7,7 @@ import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -103,7 +102,7 @@ public class DungeonBossLockoutHandler implements Listener {
     private static void notifyLockout(Player player, InstancedBossEntity boss, DungeonBossLockout lockout, String bossIdentifier) {
         // Show subtitle
         String subtitle = DungeonsConfig.getDungeonLockoutSubtitle();
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(subtitle));
+        ActionBarCompositor.show(player, ActionBarCompositor.Source.LOCKOUT, subtitle);
 
         // Send title with empty title and just subtitle
         player.sendTitle(DungeonsConfig.getDungeonLockoutTitle(), subtitle, 10, 70, 20);

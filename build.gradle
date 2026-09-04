@@ -108,7 +108,10 @@ dependencies {
     //Model Engine - legacy
     compileOnly "com.ticxo.modelengine:api:R3.1.7"
     //Free Minecraft Models
-    compileOnly (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.7.0'){
+    compileOnly (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.11.2'){
+        changing = true
+    }
+    testImplementation (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.11.2'){
         changing = true
     }
     // Mythic Mobs integration - currently only for arenas
@@ -120,6 +123,15 @@ dependencies {
     implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '2.2.0-SNAPSHOT'){
         changing = true
     }
+
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation "org.spigotmc:spigot-api:26.2-R0.1-SNAPSHOT"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
 
 artifacts { // task 'build' runs generates uberjar
@@ -175,8 +187,8 @@ publishing {
             name = "EliteMobs"
             url = "https://repo.magmaguy.com/releases"
             credentials {
-                username = project.hasProperty('ossrhUsername') ? ossrhUsername : "Unknown user"
-                password = project.hasProperty('ossrhPassword') ? ossrhPassword : "Unknown password"
+                username = project.findProperty('magmaguyUsername') ?: System.getenv('MAGMAGUY_USERNAME') ?: ''
+                password = project.findProperty('magmaguyPassword') ?: System.getenv('MAGMAGUY_PASSWORD') ?: ''
             }
         }
     }

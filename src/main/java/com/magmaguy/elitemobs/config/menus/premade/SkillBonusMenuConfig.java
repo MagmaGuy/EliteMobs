@@ -62,6 +62,14 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
     private static ItemStack spearsItem;
     @Getter
     private static int spearsSlot;
+    @Getter
+    private static ItemStack stavesItem;
+    @Getter
+    private static int stavesSlot;
+    @Getter
+    private static ItemStack wandsItem;
+    @Getter
+    private static int wandsSlot;
 
     // Skill status items
     @Getter
@@ -205,6 +213,21 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
                 ItemStackGenerator.generateItemStack(spearsMaterial, "&6Spears", List.of("&7View spear skills", "&7Click to select")), true);
         spearsSlot = ConfigurationEngine.setInt(fileConfiguration, "spearsSlot", 22);
 
+        // Staves use a spear item (1.21.11+) - use STICK as fallback for older versions
+        Material stavesMaterial;
+        try {
+            stavesMaterial = Material.WOODEN_SPEAR;
+        } catch (NoSuchFieldError e) {
+            stavesMaterial = Material.STICK;
+        }
+        stavesItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "stavesItem",
+                ItemStackGenerator.generateItemStack(stavesMaterial, "&6Staves", List.of("&7View staff progression", "&7Click to select")), true);
+        stavesSlot = ConfigurationEngine.setInt(fileConfiguration, "stavesSlot", 24);
+
+        wandsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "wandsItem",
+                ItemStackGenerator.generateItemStack(Material.BLAZE_ROD, "&6Wands", List.of("&7View wand progression", "&7Click to select")), true);
+        wandsSlot = ConfigurationEngine.setInt(fileConfiguration, "wandsSlot", 25);
+
         armorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "armorItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_CHESTPLATE, "&6Armor", List.of("&7View armor skills", "&7Click to select")), true);
         armorSlot = ConfigurationEngine.setInt(fileConfiguration, "armorSlot", 23);
@@ -218,6 +241,8 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
         hideAttributes(hoesItem);
         hideAttributes(macesItem);
         hideAttributes(spearsItem);
+        hideAttributes(stavesItem);
+        hideAttributes(wandsItem);
         hideAttributes(armorItem);
 
         // Navigation items

@@ -75,9 +75,9 @@ final class PlayerDataRepository {
             String sql = "INSERT INTO " + PlayerData.getPLAYER_DATA_TABLE_NAME() + " ("
                     + "PlayerUUID, DisplayName, CurrencyV2, CurrencyCents, Score, Kills, HighestLevelKilled,"
                     + " Deaths, QuestsCompleted, DungeonsCompleted, SkillXP_ARMOR, SkillXP_SWORDS, SkillXP_AXES, SkillXP_BOWS,"
-                    + " SkillXP_CROSSBOWS, SkillXP_TRIDENTS, SkillXP_HOES, SkillXP_MACES, SkillXP_SPEARS,"
+                    + " SkillXP_CROSSBOWS, SkillXP_TRIDENTS, SkillXP_HOES, SkillXP_MACES, SkillXP_SPEARS, SkillXP_STAVES, SkillXP_WANDS,"
                     + " SkillBonusSelections, GamblingDebt, GamblingDebtCents, UseBookMenus, DismissEMStatusScreenMessage)"
-                    + " VALUES (?, ?, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '{}', 0, 0, 1, 0)";
+                    + " VALUES (?, ?, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '{}', 0, 0, 1, 0)";
             try (PreparedStatement statement = connection().prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 statement.setString(2, playerName);

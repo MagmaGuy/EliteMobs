@@ -6,9 +6,17 @@ import com.magmaguy.elitemobs.combatsystem.EliteMobDamagedByEliteMobHandler;
 import com.magmaguy.elitemobs.combatsystem.EliteMobGenericDamagedHandler;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.*;
 import com.magmaguy.elitemobs.combatsystem.combattag.CombatTag;
+import com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime;
 import com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay;
 import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
 import com.magmaguy.elitemobs.config.*;
+import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime;
+import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
+import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatSuggestion;
+import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatStateRecovery;
+import com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu;
+import com.magmaguy.elitemobs.presentation.experience.ExperienceBarLeaseListener;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.dungeons.DungeonBossLockoutHandler;
@@ -94,6 +102,7 @@ public class EventsRegistrer {
         plugin = MetadataHandler.PLUGIN;
 
         register(new FirstTimeSetup());
+        register(new ExperimentalCombatSuggestion());
 
         register(new Navigation());
 
@@ -109,6 +118,7 @@ public class EventsRegistrer {
         register(new SkillSystemMigration.MigrationEvents());
         register(new CombatLevelDisplay());
         register(new SkillBonusEventHandler());
+        register(new ExperimentalCombatStateRecovery());
         register(new SkillBonusMenu.SkillBonusMenuEvents());
         register(new PlayerQuestCooldownsLogout());
 
@@ -234,6 +244,10 @@ public class EventsRegistrer {
         //player status menu
         register(new StatusInventorySafety());
         register(new CoverPage.CoverPageEvents());
+        if (ExperimentalCombatConfig.isEnabled()) {
+            register(ClassSelectionMenu.listener());
+            register(GuildTrainingMenu.listener());
+        }
         register(new StatsPage.StatsPageEvents());
         register(new SkillsPage.SkillsPageEvents());
         register(new GearPage.GearPageEvents());
@@ -387,6 +401,27 @@ public class EventsRegistrer {
     private static void registerPower(Listener listener, String config) {
         if (PowersConfig.getPower(config).isEnabled())
             register(listener);
+    }
+
+    /** Registers task-owning listeners only after the initialization pipeline succeeds. */
+    public static void registerPostInitializationEvents() {
+        ActionBarCompositor.initialize();
+        for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers())
+            ExperimentalCombatStateRecovery.reconcile(player);
+        if (!DungeonsConfig.isEnableDungeonFoodRegeneration() && !ExperimentalCombatConfig.isEnabled()) return;
+
+        DungeonCombatRuntime dungeonCombatRuntime = new DungeonCombatRuntime();
+        register(dungeonCombatRuntime);
+        dungeonCombatRuntime.start();
+
+        if (ExperimentalCombatConfig.isEnabled()) {
+            ExperimentalCombatRuntime experimentalCombatRuntime =
+                    new ExperimentalCombatRuntime(dungeonCombatRuntime);
+            register(experimentalCombatRuntime);
+            register(new ExperienceBarLeaseListener());
+            experimentalCombatRuntime.start();
+            ExperimentalCombatModule.initialize(dungeonCombatRuntime);
+        }
     }
 
     private static void register(Listener listener) {

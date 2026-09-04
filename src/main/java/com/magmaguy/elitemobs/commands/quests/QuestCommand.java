@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands.quests;
 
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -8,6 +9,7 @@ import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
+import com.magmaguy.magmacore.util.SpigotMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -39,6 +41,24 @@ public class QuestCommand {
 
     // /em quest leave questFilename
     public static void leaveQuest(Player player, String questID) {
+        Quest quest = PlayerData.getQuest(player.getUniqueId(), questID);
+        if (quest == null) {
+            //Falls through to the standard "no active quest" feedback.
+            Quest.stopPlayerQuest(player, questID);
+            return;
+        }
+        //Abandoning starts the quest's full cooldown (which can run to days), so a
+        //misclick on [Abandon] is expensive — every abandon now requires an explicit
+        //confirmation click before anything happens.
+        player.spigot().sendMessage(SpigotMessage.commandHoverMessage(
+                QuestsConfig.getQuestAbandonConfirmationText()
+                        .replace("$questName", quest.getQuestName() == null ? "" : quest.getQuestName()),
+                QuestsConfig.getQuestAbandonConfirmationHover(),
+                "/elitemobs quest leaveconfirmed " + questID));
+    }
+
+    // /em quest leaveconfirmed questFilename — only reached through the confirmation click
+    public static void leaveQuestConfirmed(Player player, String questID) {
         Quest.stopPlayerQuest(player, questID);
     }
 

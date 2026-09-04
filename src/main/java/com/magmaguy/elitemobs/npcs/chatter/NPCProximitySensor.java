@@ -8,6 +8,8 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.scripts.ScriptableNPC;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolEditor;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolService;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.DynamicQuest;
@@ -53,6 +55,7 @@ public class NPCProximitySensor implements Listener {
                 for (NPCEntity npcEntity : npcEntities) {
                     LivingEntity villager = npcEntity.getVillager();
                     if (villager == null || !villager.isValid()) continue;
+                    if (PatrolService.isActivelyMoving(npcEntity) || PatrolEditor.isEditing(npcEntity)) continue;
                     double activationRadius = npcEntity.getNPCsConfigFields().getActivationRadius();
                     if (activationRadius <= 0) continue;
                     double activationRadiusSquared = activationRadius * activationRadius;
@@ -204,6 +207,7 @@ public class NPCProximitySensor implements Listener {
             if (!player.isValid() ||
                     npcEntity.getVillager() == null ||
                     !npcEntity.getVillager().isValid() ||
+                    PatrolService.isActivelyMoving(npcEntity) || PatrolEditor.isEditing(npcEntity) ||
                     !npcEntity.getVillager().getWorld().equals(player.getWorld()) ||
                     npcEntity.getVillager().getLocation().distance(player.getLocation()) > npcEntity.getNPCsConfigFields().getActivationRadius()) {
                 task.cancel();

@@ -6,6 +6,7 @@ import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.arguments.DynamicListStringCommandArgument;
 import com.magmaguy.magmacore.util.Logger;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,10 +24,15 @@ public class SetupToggleCommand extends AdvancedCommand {
     @Override
     public void execute(CommandData commandData) {
         String dungeon = commandData.getStringArgument("empackages");
-        if (dungeon.isEmpty() || EMPackage.getEmPackages().get(dungeon) == null)
+        if (dungeon.isEmpty() || EMPackage.getEmPackages().get(dungeon) == null) {
             Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSetupNotValidPackageMessage());
+            return;
+        }
         EMPackage emPackage = EMPackage.getEmPackages().get(dungeon);
-        emPackage.doInstall(null);
+        //Toggle means toggle: route through the same state-aware dispatcher the setup menu uses.
+        //A console sender toggles with no player - packages handle the null player gracefully.
+        Player player = commandData.getCommandSender() instanceof Player playerSender ? playerSender : null;
+        emPackage.setupMenuToggle(player);
         if (emPackage.isInstalled())
             Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getSetupInstalledMessage());
         else

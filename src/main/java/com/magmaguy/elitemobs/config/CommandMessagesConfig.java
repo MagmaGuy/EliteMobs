@@ -41,6 +41,14 @@ public class CommandMessagesConfig extends ConfigurationFile {
     @Getter
     private static String dungeonLockoutResetSuccessMessage;
 
+    // Unbind commands
+    @Getter
+    private static String unbindForceSuccessMessage;
+    @Getter
+    private static String unbindForceNotSoulboundMessage;
+    @Getter
+    private static String unbindForceAllMessage;
+
     // Quest commands
     @Getter
     private static String questPlayerNotValidMessage;
@@ -559,6 +567,18 @@ public class CommandMessagesConfig extends ConfigurationFile {
         dungeonLockoutResetSuccessMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when a player's dungeon boss lockouts are reset", "$player - the target player name", "$amount - the number of lockouts cleared"),
                 file, fileConfiguration, "dungeonLockoutResetSuccessMessage", "[EliteMobs] Cleared $amount dungeon boss lockout(s) for player $player", true);
+
+        // Unbind commands. These are sent through the prefixing message path, so the
+        // defaults deliberately carry no [EliteMobs] prefix of their own.
+        unbindForceSuccessMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when /em unbind force unbinds the held item"),
+                file, fileConfiguration, "unbindForceSuccessMessage", "Unbound the held item.", true);
+        unbindForceNotSoulboundMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when /em unbind force finds the held item is not soulbound"),
+                file, fileConfiguration, "unbindForceNotSoulboundMessage", "The held item is not soulbound.", true);
+        unbindForceAllMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when /em unbind force all sweeps the inventory", "$amount - the number of items unbound"),
+                file, fileConfiguration, "unbindForceAllMessage", "Unbound $amount soulbound item(s) in your inventory.", true);
 
         // Quest commands
         questPlayerNotValidMessage = ConfigurationEngine.setString(

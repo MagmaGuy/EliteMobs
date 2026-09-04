@@ -116,8 +116,11 @@ public class InstancePlayerManager {
     private static boolean canAdmitPlayers(List<Player> playersToAdd,
                                            MatchInstance matchInstance,
                                            boolean sendFeedback) {
-        //Right now new players can't join ongoing instances
-        if (!matchInstance.state.equals(MatchInstance.InstancedRegionState.WAITING)) {
+        //New players can only join instances still accepting them: WAITING *and* alive.
+        //destroyMatch() resets dead dungeon instances to WAITING while their world
+        //awaits deletion, so the bare state check used to admit players into worlds
+        //already scheduled for removal. Ongoing instances are also refused here.
+        if (!matchInstance.isAcceptingNewPlayers()) {
             if (sendFeedback) playersToAdd.get(0).sendMessage(ArenasConfig.getArenasOngoingMessage());
             return false;
         }

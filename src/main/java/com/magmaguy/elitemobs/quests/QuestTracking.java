@@ -18,9 +18,9 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.elitemobs.parties.PartySidebar;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.quests.objectives.*;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.elitemobs.utils.BossBarOrderManager;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
 import com.magmaguy.elitemobs.wormhole.WormholeNavigation;
@@ -263,7 +263,10 @@ public class QuestTracking {
         resetPlayerScoreboard();
         if (locationRefresher != null) locationRefresher.cancel();
         if (compassTask != null) compassTask.cancel();
-        if (compassBar != null) compassBar.removeAll();
+        if (compassBar != null) {
+            BossBarOrderManager.hide(player, compassBar);
+            compassBar.removeAll();
+        }
     }
 
     private void resetPlayerScoreboard() {
@@ -297,13 +300,6 @@ public class QuestTracking {
     }
 
     private void updateCompassContents() {
-        // While quest dialogue is showing, hide the compass bar and scoreboard so they don't clutter
-        // the dialogue box. This must be gated here because the compass re-adds the player every tick.
-        if (QuestsConfig.isHideQuestScoreboardDuringQuestDialogue()
-                && QuestDialogueBossBarManager.hasActiveSession(player)) {
-            compassBar.removePlayer(player);
-            return;
-        }
         //for reference, character 32 is straight ahead
         String compassText = "---------------------------------------------------------------";
         List<LocationAndSymbol> locationAndSymbols = projectLocations();
@@ -342,7 +338,7 @@ public class QuestTracking {
         }
 
         compassBar.setTitle(compassText);
-        compassBar.addPlayer(player);
+        BossBarOrderManager.show(player, compassBar);
     }
 
     private List<LocationAndSymbol> projectLocations() {
@@ -424,6 +420,27 @@ public class QuestTracking {
             if (!getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getQuest().getQuestID().equals(event.getQuest().getQuestID()))
                 return;
             getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).stop();
+            if (!QuestsConfig.isAutoTrackNextQuestOnCompletion()) return;
+            //Completing the tracked quest hands tracking to the player's next active
+            //quest instead of leaving the compass empty. Deferred a tick so every
+            //completion listener (turn-in, rewards, quest removal) settles first;
+            //the completed quest is excluded by ID in case it still lingers.
+            Player player = event.getPlayer();
+            UUID completedQuestID = event.getQuest().getQuestID();
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                if (!player.isOnline() || isTracking(player)) return;
+                List<Quest> activeQuests = PlayerData.getQuests(player.getUniqueId());
+                if (activeQuests == null) return;
+                for (Quest nextQuest : new ArrayList<>(activeQuests)) {
+                    if (nextQuest == null || nextQuest.getQuestID().equals(completedQuestID)) continue;
+                    if (nextQuest instanceof CustomQuest customQuest
+                            && !customQuest.getCustomQuestsConfigFields().isTrackable()) continue;
+                    new QuestTracking(player, nextQuest);
+                    player.sendMessage(QuestsConfig.getQuestAutoTrackNextMessage()
+                            .replace("$questName", nextQuest.getQuestName() == null ? "" : nextQuest.getQuestName()));
+                    return;
+                }
+            });
         }
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)

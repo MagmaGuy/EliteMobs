@@ -76,32 +76,111 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
     public static void shutdown() {
         content.clear();
         emPackages.clear();
+        // Statics survive /em reload; without this a batch interrupted by an
+        // unrelated reload would leave the toggle gate stuck closed.
+        synchronized (BULK_TOGGLE_LOCK) {
+            collectingBulkSaves = null;
+            bulkToggleInitiator = null;
+            bulkReloadingMessage = null;
+            bulkContentType = null;
+            bulkSavesInFlight = false;
+        }
+    }
+
+    // ---- Bulk member-toggle coalescing ----
+    // Items/events packages persist one file per member (100+ for the default items
+    // package) and finish with a full plugin reload. Batches launched in the same
+    // tick — a MetaPackage installs its children in one synchronous sweep — are
+    // coalesced into ONE save-set and ONE reload, and new toggles are refused while
+    // a batch is still saving. Overlapping batches used to interleave their per-file
+    // writes and could strand a package half enabled, which is how servers ended up
+    // with a "partially installed" default items package nobody asked for. All
+    // submissions happen on the main thread; the lock covers the async completion.
+    private static final Object BULK_TOGGLE_LOCK = new Object();
+    private static List<CompletableFuture<Void>> collectingBulkSaves = null;
+    private static boolean bulkSavesInFlight = false;
+    private static Player bulkToggleInitiator = null;
+    private static String bulkReloadingMessage = null;
+    private static String bulkContentType = null;
+
+    /**
+     * @return true when a previous batch is still saving. Callers must not write
+     * any member configuration while this holds — half of a toggle applied over
+     * half of another is exactly the corruption this gate exists to prevent.
+     */
+    protected static boolean bulkMemberTogglesLocked() {
+        synchronized (BULK_TOGGLE_LOCK) {
+            return bulkSavesInFlight;
+        }
     }
 
     /**
-     * Completes a batch of asynchronous configuration saves without blocking the server thread.
-     * Player feedback and the plugin reload are always handed back to Bukkit's main thread.
+     * Queues a batch of member-configuration saves for the shared end-of-tick flush.
+     * The first submission of a tick schedules the flush; later same-tick submissions
+     * (meta children) join it. The flush completes every save without blocking the
+     * server thread, then hands feedback and the single plugin reload back to the
+     * main thread. Tolerates a null player (console/automation).
      */
-    protected static void reloadAfterConfigurationSaves(Player player,
-                                                        Collection<? extends CompletableFuture<Void>> saves,
-                                                        String reloadingMessage,
-                                                        String contentType) {
-        CompletableFuture<Void> allSaves = CompletableFuture.allOf(saves.toArray(CompletableFuture[]::new));
-        allSaves.whenComplete((ignored, failure) -> {
-            if (MetadataHandler.shutdownRequested) return;
+    protected static void submitBulkMemberSaves(Player player,
+                                                Collection<? extends CompletableFuture<Void>> saves,
+                                                String reloadingMessage,
+                                                String contentType) {
+        synchronized (BULK_TOGGLE_LOCK) {
+            if (collectingBulkSaves == null) {
+                collectingBulkSaves = new ArrayList<>(saves);
+                bulkToggleInitiator = player;
+                bulkReloadingMessage = reloadingMessage;
+                bulkContentType = contentType;
+                Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, EMPackage::flushBulkMemberSaves);
+            } else {
+                collectingBulkSaves.addAll(saves);
+                if (bulkToggleInitiator == null) bulkToggleInitiator = player;
+            }
+        }
+    }
+
+    private static void flushBulkMemberSaves() {
+        final List<CompletableFuture<Void>> saves;
+        final Player player;
+        final String reloadingMessage;
+        final String contentType;
+        synchronized (BULK_TOGGLE_LOCK) {
+            if (collectingBulkSaves == null) return;
+            saves = collectingBulkSaves;
+            player = bulkToggleInitiator;
+            reloadingMessage = bulkReloadingMessage;
+            contentType = bulkContentType;
+            collectingBulkSaves = null;
+            bulkToggleInitiator = null;
+            bulkReloadingMessage = null;
+            bulkContentType = null;
+            bulkSavesInFlight = true;
+        }
+        CompletableFuture.allOf(saves.toArray(CompletableFuture[]::new)).whenComplete((ignored, failure) -> {
+            if (MetadataHandler.shutdownRequested) {
+                synchronized (BULK_TOGGLE_LOCK) {
+                    bulkSavesInFlight = false;
+                }
+                return;
+            }
             Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                // The reload below runs synchronously on this same thread, so clearing
+                // first cannot admit a competing toggle mid-reload.
+                synchronized (BULK_TOGGLE_LOCK) {
+                    bulkSavesInFlight = false;
+                }
                 if (MetadataHandler.shutdownRequested) return;
                 if (failure != null) {
                     Throwable cause = failure.getCause() == null ? failure : failure.getCause();
                     Logger.warn("Failed to save " + contentType + " content configuration: " + cause.getMessage());
                     cause.printStackTrace();
-                    if (player.isOnline())
+                    if (player != null && player.isOnline())
                         Logger.sendMessage(player, DungeonsConfig.getContentConfigurationSaveFailedMessage());
                     return;
                 }
 
-                if (player.isOnline()) Logger.sendMessage(player, reloadingMessage);
-                ReloadCommand.reload(player.isOnline() ? player : Bukkit.getConsoleSender());
+                if (player != null && player.isOnline()) Logger.sendMessage(player, reloadingMessage);
+                ReloadCommand.reload(player != null && player.isOnline() ? player : Bukkit.getConsoleSender());
             });
         });
     }
@@ -153,16 +232,27 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
         }
     }
 
+    /**
+     * Install/uninstall feedback that tolerates a missing player: setup actions can come from the
+     * console or automation, where the message belongs in the server log instead of a chat window.
+     */
+    protected static void notify(Player player, String message) {
+        if (player != null) player.sendMessage(message);
+        else com.magmaguy.magmacore.util.Logger.info(message);
+    }
+
     public void setupMenuToggle(Player player) {
-        if (isInstalled) {
-            doUninstall(player);
-            return;
+        // Dispatch on freshly derived state, mirroring ContentPackage#onClick, so the
+        // command path and the setup menu agree. The old flag checks read isInstalled /
+        // isDownloaded directly, which only ratchet true during menu rendering — a
+        // package that was never rendered (or was rebuilt by the reload every toggle
+        // triggers) answered from stale state.
+        switch (getContentState()) {
+            case INSTALLED -> doUninstall(player);
+            case NOT_INSTALLED -> doInstall(player);
+            case NEEDS_ACCESS, OUT_OF_DATE_NO_ACCESS -> doShowAccessInfo(player);
+            default -> doDownload(player);
         }
-        if (isDownloaded) {
-            doInstall(player);
-            return;
-        }
-        doDownload(player);
     }
 
     protected ItemStack getInstalledItemStack() {
@@ -298,7 +388,7 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
         return itemStack;
     }
 
-    private ItemStack generateItemStackWithIcon(List<String> specificTooltip, Material material, String modelId) {
+    protected ItemStack generateItemStackWithIcon(List<String> specificTooltip, Material material, String modelId) {
         List<String> tooltip = new ArrayList<>(specificTooltip);
         tooltip.addAll(contentPackagesConfigFields.getSetupMenuDescription());
         // Use the actual material - resource pack shows custom icon, fallback shows colored glass pane

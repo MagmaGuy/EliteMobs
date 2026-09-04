@@ -17,8 +17,12 @@ import org.bukkit.entity.EntityType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class QuestsConfig extends ConfigurationFile {
+
+    private static final String QUEST_TURN_IN_OBJECTIVE_KEY = "questTurnInObjective";
+    static final String DEFAULT_QUEST_TURN_IN_OBJECTIVE = "&aTalk to $npcName";
 
     @Getter
     private static boolean requireQuestTurnIn;
@@ -97,6 +101,14 @@ public class QuestsConfig extends ConfigurationFile {
     @Getter
     private static boolean autoTrackQuestsOnAccept;
     @Getter
+    private static boolean autoTrackNextQuestOnCompletion;
+    @Getter
+    private static String questAutoTrackNextMessage;
+    @Getter
+    private static String questAbandonConfirmationText;
+    @Getter
+    private static String questAbandonConfirmationHover;
+    @Getter
     private static String noQuestDestinationFound;
     @Getter
     private static String questDestinationInOtherWorld;
@@ -134,8 +146,6 @@ public class QuestsConfig extends ConfigurationFile {
     private static String questAbandonText;
     @Getter
     private static boolean useQuestDialogueBossBars;
-    @Getter
-    private static boolean hideKeyedBossBarsDuringQuestDialogue;
     @Getter
     private static boolean hideQuestScoreboardDuringQuestDialogue;
     @Getter
@@ -281,8 +291,28 @@ public class QuestsConfig extends ConfigurationFile {
         return ChatColor.WHITE + (strippedName == null ? "" : strippedName);
     }
 
+    /** Repairs the exact legacy prefix in both YAML defaults and color-converted translations. */
+    static String repairLegacyTurnInObjective(String value) {
+        if (value == null || !value.contains("$npcName")) return value;
+        if (value.startsWith("&a2")) return "&a" + value.substring(3);
+        String convertedPrefix = ChatColor.GREEN + "2";
+        if (value.startsWith(convertedPrefix))
+            return ChatColor.GREEN + value.substring(convertedPrefix.length());
+        return value;
+    }
+
+    static void repairStoredLegacyTurnInObjective(FileConfiguration configuration) {
+        String configured = configuration.getString(QUEST_TURN_IN_OBJECTIVE_KEY);
+        String repaired = repairLegacyTurnInObjective(configured);
+        if (!Objects.equals(configured, repaired))
+            configuration.set(QUEST_TURN_IN_OBJECTIVE_KEY, repaired);
+    }
+
     @Override
     public void initializeValues() {
+        // Dialogue boss bars are exclusive by design. Keeping this opt-out would allow a
+        // configuration value that can break the dialogue layout.
+        fileConfiguration.set("hideKeyedBossBarsDuringQuestDialogue", null);
 
         requireQuestTurnIn = ConfigurationEngine.setBoolean(
                 List.of("Sets if quests have to be returned to quest givers to complete the quest."),
@@ -405,6 +435,22 @@ public class QuestsConfig extends ConfigurationFile {
                 List.of("Sets if quests are automatically tracked when accepted."),
                 fileConfiguration, "autoTrackQuestsOnAccept", true);
 
+        autoTrackNextQuestOnCompletion = ConfigurationEngine.setBoolean(
+                List.of("Sets if completing the tracked quest automatically starts tracking another active quest."),
+                fileConfiguration, "autoTrackNextQuestOnCompletion", true);
+        questAutoTrackNextMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when tracking switches to the next active quest after completing one."),
+                file, fileConfiguration, "questAutoTrackNextMessage", "&8[EliteMobs]&9 Now tracking: &f$questName", true);
+
+        questAbandonConfirmationText = ConfigurationEngine.setString(
+                List.of("Sets the confirmation message shown when a player clicks to abandon a quest.",
+                        "Abandoning starts the quest's full cooldown, so it requires a second click to confirm."),
+                file, fileConfiguration, "questAbandonConfirmationText",
+                "&cAbandoning &f$questName &cstarts its full cooldown! &4&l[Click here to confirm abandoning]", true);
+        questAbandonConfirmationHover = ConfigurationEngine.setString(
+                List.of("Sets the hover message of the quest abandon confirmation."),
+                file, fileConfiguration, "questAbandonConfirmationHover", "&cThis cannot be undone!", true);
+
         noQuestDestinationFound = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when the destination of the quest could not be found."),
                 file, fileConfiguration, "noQuestDestinationFound", "[EM] No quest destination found!", true);
@@ -423,9 +469,10 @@ public class QuestsConfig extends ConfigurationFile {
                 List.of("Sets the message sent to players trying to get a quest for which they do not have the correct guild rank activated."),
                 file, fileConfiguration, "lowRankDynamicQuestWarning", "&8[EliteMobs] &cYou can't take these quests with your current guild rank! Increase your guild rank to accept these quests.", true);
 
-        questTurnInObjective = ConfigurationEngine.setString(
+        repairStoredLegacyTurnInObjective(fileConfiguration);
+        questTurnInObjective = repairLegacyTurnInObjective(ConfigurationEngine.setString(
                 List.of("Sets the formatting for the quest turn-in message."),
-                file, fileConfiguration, "questTurnInObjective", "&a2Talk to $npcName", true);
+                file, fileConfiguration, QUEST_TURN_IN_OBJECTIVE_KEY, DEFAULT_QUEST_TURN_IN_OBJECTIVE, true));
 
         horizontalCharacterLimitBedrockMenu = ConfigurationEngine.setInt(
                 List.of("Sets the maximum amount of characters inventory-based menus for quests will have before breaking the line."),
@@ -478,13 +525,9 @@ public class QuestsConfig extends ConfigurationFile {
         useQuestDialogueBossBars = ConfigurationEngine.setBoolean(
                 List.of("Experimental: shows quest NPC text through top-anchored boss bars before opening the quest menu."),
                 fileConfiguration, "useQuestDialogueBossBars", true);
-        hideKeyedBossBarsDuringQuestDialogue = ConfigurationEngine.setBoolean(
-                List.of("Experimental: temporarily hides Bukkit keyed boss bars from a player while quest dialogue boss bars are active.",
-                        "Anonymous boss bars from other plugins cannot be discovered through Bukkit."),
-                fileConfiguration, "hideKeyedBossBarsDuringQuestDialogue", true);
         hideQuestScoreboardDuringQuestDialogue = ConfigurationEngine.setBoolean(
-                List.of("Experimental: hides the quest tracking scoreboard and compass boss bar while quest dialogue is active,",
-                        "so the dialogue box is not cluttered by the objective list. Restored when the dialogue closes."),
+                List.of("Experimental: hides the quest tracking scoreboard while quest dialogue is active.",
+                        "Boss bars are always hidden because the dialogue layout requires exclusive control of that area."),
                 fileConfiguration, "hideQuestScoreboardDuringQuestDialogue", true);
         questDialogueCharactersPerLine = ConfigurationEngine.setInt(
                 List.of("Experimental: maximum visible characters per boss-bar dialogue line before wrapping."),

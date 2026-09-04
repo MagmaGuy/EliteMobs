@@ -17,6 +17,7 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.tags.ItemTagType;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import javax.annotation.Nullable;
@@ -32,6 +33,8 @@ public class ItemTagger {
     private static final NamespacedKey ELITE_DEFENSE = new NamespacedKey(MetadataHandler.PLUGIN, "eliteDefense");
     @Getter
     private static final NamespacedKey ELITE_LEVEL = new NamespacedKey(MetadataHandler.PLUGIN, "eliteLevel");
+    private static final NamespacedKey CUSTOM_ITEM_ID =
+            new NamespacedKey(MetadataHandler.PLUGIN, "custom_item_id");
 
     // Arrow combat data — stored at launch time for accurate ranged damage calculation
     private static final NamespacedKey ARROW_WEAPON_LEVEL = new NamespacedKey(MetadataHandler.PLUGIN, "arrowWeaponLevel");
@@ -58,6 +61,22 @@ public class ItemTagger {
         itemStack.setItemMeta(itemMeta);
         new EliteItemLore(itemStack, false);
         return;
+    }
+
+    /**
+     * Stores the stable content identity independently from the historical filename-as-key tag.
+     * Runtime systems should use this value when distinct custom items share one vanilla material.
+     */
+    public static void registerCustomItemId(ItemMeta itemMeta, String itemId) {
+        if (itemMeta == null || itemId == null || itemId.isBlank()) return;
+        itemMeta.getPersistentDataContainer().set(CUSTOM_ITEM_ID, PersistentDataType.STRING, itemId);
+    }
+
+    @Nullable
+    public static String getCustomItemId(@Nullable ItemStack itemStack) {
+        if (itemStack == null || !itemStack.hasItemMeta()) return null;
+        return itemStack.getItemMeta().getPersistentDataContainer()
+                .get(CUSTOM_ITEM_ID, PersistentDataType.STRING);
     }
 
 
@@ -350,6 +369,18 @@ public class ItemTagger {
         return val != null ? val : -1;
     }
 
+    /** Clears launch-time weapon identity from a projectile owned by another combat system. */
+    public static void clearArrowCombatData(@Nullable Projectile projectile) {
+        if (projectile == null) return;
+        PersistentDataContainer data = projectile.getPersistentDataContainer();
+        data.remove(ELITE_DAMAGE);
+        data.remove(ARROW_WEAPON_LEVEL);
+        data.remove(ARROW_SKILL_TYPE);
+        data.remove(ARROW_SKILL_LEVEL);
+        data.remove(ARROW_DAMAGE_MULTIPLIER);
+        data.remove(ARROW_LAUNCH_VELOCITY);
+    }
+
     public static double getEliteDefenseAttribute(@Nullable ItemStack itemStack) {
         if (itemStack == null) return 0D;
         if (itemStack.getItemMeta() == null) return 0D;
@@ -419,9 +450,9 @@ public class ItemTagger {
         for (Enchantment enchantment : Enchantment.values()) {
             int enchantmentLevel = getEnchantment(itemMeta, enchantment.getKey());
             if (enchantmentLevel > 0) {
-                EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(enchantment.getName().toLowerCase(Locale.ROOT) + ".yml");
+                EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(enchantment);
                 if (enchantmentsConfigFields == null) {
-                    Logger.warn("Failed to get configuration file for enchantment called " + enchantment.getName().toLowerCase(Locale.ROOT) + ".yml");
+                    Logger.warn("Failed to get configuration file for enchantment called " + enchantment.getKey().getKey().toLowerCase(Locale.ROOT) + ".yml");
                     continue;
                 }
                 itemEnchantmentFilenames.put(enchantmentsConfigFields, enchantmentLevel);

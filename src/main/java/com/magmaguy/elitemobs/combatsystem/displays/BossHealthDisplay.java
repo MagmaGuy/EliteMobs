@@ -40,21 +40,23 @@ public class BossHealthDisplay implements Listener {
                 while (iterator.hasNext()) {
                     EliteOverheadHealthDisplay display = iterator.next();
                     try {
-                        if (!display.isValid() || display.hasTimedOut()) {
-                            removeDisplay(iterator, display);
+                        if (!display.isValid()) {
+                            removeInvalidDisplay(iterator, display);
+                            continue;
+                        }
+                        if (display.hasTimedOut()) {
+                            removeOverheadDisplay(iterator, display);
                             continue;
                         }
 
                         display.updatePositions();
-                        BossHealthBarManager.updateProximityCandidates(
-                                display.eliteEntity(), display.healthMultiplier());
                     } catch (RuntimeException exception) {
                         MetadataHandler.PLUGIN.getLogger().log(
                                 Level.WARNING,
                                 "Discarding a failed overhead health display for " +
                                         display.eliteEntity().getEliteUUID(),
                                 exception);
-                        removeDisplay(iterator, display);
+                        removeOverheadDisplay(iterator, display);
                     }
                 }
 
@@ -104,7 +106,8 @@ public class BossHealthDisplay implements Listener {
                 ThreadLocalRandom.current().nextDouble(-1.5, 1.5));
         CombatPopupManager.createDamagePopup(
                 eliteEntity, event.getDamage(), event.isCriticalStrike(),
-                event.getDamageModifier(), offset, event.getPlayer());
+                event.getDamageModifier(), event.getClassAbilityBonusDamage(),
+                offset, event.getPlayer());
 
         if (!anyHealthDisplayEnabled()) return;
         EliteOverheadHealthDisplay display = getOrCreateDisplay(eliteEntity);
@@ -135,7 +138,7 @@ public class BossHealthDisplay implements Listener {
                 !(eliteEntity instanceof CustomBossEntity customBoss) ||
                 customBoss.getHealthMultiplier() <= MobCombatSettingsConfig.getBossBarHealthMultiplierThreshold())
             return;
-        BossHealthBarManager.registerCombatCandidate(eliteEntity, event.getTargetEntity());
+        BossHealthBarManager.registerBoss(eliteEntity);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -148,10 +151,16 @@ public class BossHealthDisplay implements Listener {
                 eliteEntity.getEliteUUID(), ignored -> new EliteOverheadHealthDisplay(eliteEntity));
     }
 
-    private static void removeDisplay(Iterator<EliteOverheadHealthDisplay> iterator,
-                                      EliteOverheadHealthDisplay display) {
+    private static void removeInvalidDisplay(Iterator<EliteOverheadHealthDisplay> iterator,
+                                             EliteOverheadHealthDisplay display) {
         cleanupDisplay(display);
         BossHealthBarManager.removeBoss(display.eliteEntity());
+        iterator.remove();
+    }
+
+    private static void removeOverheadDisplay(Iterator<EliteOverheadHealthDisplay> iterator,
+                                              EliteOverheadHealthDisplay display) {
+        cleanupDisplay(display);
         iterator.remove();
     }
 

@@ -23,7 +23,10 @@ public class EliteMobExitCombatEvent extends Event {
         this.eliteMobExitCombatReason = reason;
 //        if (!eliteEntity.isInCombat()) return; todo: this might be necessary
         eliteEntity.setInCombat(false);
-        if (eliteEntity.getUnsyncedLivingEntity().isDead()) return;
+        //The combat watchdog that constructs this event can outlive the boss: after a world
+        //unload or shutdown the entity reference is released, so null means gone, same as dead.
+        if (eliteEntity.getUnsyncedLivingEntity() == null
+                || eliteEntity.getUnsyncedLivingEntity().isDead()) return;
         //only run commands if the reason for leaving combat isn't death, onDeath commands exist for that case
         if (eliteEntity instanceof CustomBossEntity)
             CommandRunner.runCommandFromList(((CustomBossEntity) eliteEntity).getCustomBossesConfigFields().getOnCombatLeaveCommands(), new ArrayList<>());

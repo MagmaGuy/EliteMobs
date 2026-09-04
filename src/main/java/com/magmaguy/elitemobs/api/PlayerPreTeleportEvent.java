@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.api;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
@@ -104,18 +105,14 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
                         player.getLocation().getZ() != originalLocation.getZ())
                     isCancelled = true;
 
-                ChatMessageType chatMessageType = CombatTagConfig.isUseActionBarMessagesInsteadOfChat() ? ChatMessageType.ACTION_BAR : ChatMessageType.CHAT;
-
                 if (isCancelled) {
-                    player.spigot().sendMessage(chatMessageType,
-                            TextComponent.fromLegacyText(CombatTagConfig.getTeleportCancelled()));
+                    sendCombatTagMessage(CombatTagConfig.getTeleportCancelled());
                     cancel();
                     return;
                 }
 
-                player.spigot().sendMessage(chatMessageType,
-                        TextComponent.fromLegacyText(CombatTagConfig.getTeleportTimeLeft()
-                                .replace("$time", timerLeft + "")));
+                sendCombatTagMessage(CombatTagConfig.getTeleportTimeLeft()
+                        .replace("$time", timerLeft + ""));
 
 
                 if (timerLeft == 0) {
@@ -127,6 +124,14 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
                 timerLeft--;
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20);
+    }
+
+    private void sendCombatTagMessage(String message) {
+        if (CombatTagConfig.isUseActionBarMessagesInsteadOfChat()) {
+            ActionBarCompositor.show(player, ActionBarCompositor.Source.COMBAT_TRANSITION, message);
+            return;
+        }
+        player.spigot().sendMessage(ChatMessageType.CHAT, TextComponent.fromLegacyText(message));
     }
 
     @Override

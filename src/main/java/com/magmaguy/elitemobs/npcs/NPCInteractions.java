@@ -3,10 +3,12 @@ package com.magmaguy.elitemobs.npcs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.menus.gambling.BettingMenu;
 import com.magmaguy.elitemobs.npcs.scripts.ScriptableNPC;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolEditor;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestInteractionHandler;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -36,6 +38,7 @@ public class NPCInteractions implements Listener {
     }
 
     public static void handleNPCInteraction(Player player, NPCEntity npcEntity) {
+        if (PatrolEditor.isEditing(npcEntity)) return;
         UUID playerUUID = player.getUniqueId();
         if (cooldowns.contains(playerUUID)) return;
         cooldowns.add(playerUUID);
@@ -49,7 +52,10 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            SkillBonusMenu.openWeaponSelectMenu(player);
+                            if (ExperimentalCombatConfig.isEnabled())
+                                GuildTrainingMenu.open(player);
+                            else
+                                SkillBonusMenu.openWeaponSelectMenu(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }
@@ -248,6 +254,10 @@ public class NPCInteractions implements Listener {
         if (event.isCancelled()) return;
         NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());
         if (npcEntity == null) return;
+        if (PatrolEditor.isEditing(npcEntity)) {
+            event.setCancelled(true);
+            return;
+        }
         Player player = event.getPlayer();
         if (player.getInventory().getItemInMainHand().getType().equals(Material.NAME_TAG)) {
             event.setCancelled(true);

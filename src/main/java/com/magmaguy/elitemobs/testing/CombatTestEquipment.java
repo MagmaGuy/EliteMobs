@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.testing;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -52,6 +53,14 @@ final class CombatTestEquipment {
             case TRIDENTS -> new ItemStack(Material.TRIDENT);
             case HOES -> new ItemStack(Material.NETHERITE_HOE);
             case MACES -> new ItemStack(Material.MACE);
+            case STAVES -> {
+                try {
+                    yield explicitlyIdentified(new ItemStack(Material.WOODEN_SPEAR), SkillType.STAVES);
+                } catch (NoSuchFieldError error) {
+                    yield explicitlyIdentified(new ItemStack(Material.STICK), SkillType.STAVES);
+                }
+            }
+            case WANDS -> explicitlyIdentified(new ItemStack(Material.BLAZE_ROD), SkillType.WANDS);
             case SPEARS -> {
                 try {
                     yield new ItemStack(Material.IRON_SPEAR);
@@ -62,6 +71,11 @@ final class CombatTestEquipment {
             case ARMOR -> null;
         };
         if (weapon != null) inventory.setItemInMainHand(weapon);
+    }
+
+    private static ItemStack explicitlyIdentified(ItemStack itemStack, SkillType skillType) {
+        WeaponIdentityResolver.stamp(itemStack, skillType);
+        return itemStack;
     }
 
     void equipArmorSet(int level) {

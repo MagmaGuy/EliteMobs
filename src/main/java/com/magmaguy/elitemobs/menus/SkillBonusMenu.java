@@ -61,6 +61,8 @@ public class SkillBonusMenu {
         inventory.setItem(SkillBonusMenuConfig.getArmorSlot(), SkillBonusMenuConfig.getArmorItem());
         inventory.setItem(SkillBonusMenuConfig.getMacesSlot(), SkillBonusMenuConfig.getMacesItem());
         inventory.setItem(SkillBonusMenuConfig.getSpearsSlot(), SkillBonusMenuConfig.getSpearsItem());
+        inventory.setItem(SkillBonusMenuConfig.getStavesSlot(), SkillBonusMenuConfig.getStavesItem());
+        inventory.setItem(SkillBonusMenuConfig.getWandsSlot(), SkillBonusMenuConfig.getWandsItem());
 
         player.openInventory(inventory);
         SkillBonusMenuEvents.weaponSelectMenus.add(inventory);
@@ -266,6 +268,8 @@ public class SkillBonusMenu {
             else if (slot == SkillBonusMenuConfig.getArmorSlot()) selectedType = SkillType.ARMOR;
             else if (slot == SkillBonusMenuConfig.getMacesSlot()) selectedType = SkillType.MACES;
             else if (slot == SkillBonusMenuConfig.getSpearsSlot()) selectedType = SkillType.SPEARS;
+            else if (slot == SkillBonusMenuConfig.getStavesSlot()) selectedType = SkillType.STAVES;
+            else if (slot == SkillBonusMenuConfig.getWandsSlot()) selectedType = SkillType.WANDS;
 
             if (selectedType != null) {
                 openSkillSelectMenu(player, selectedType);

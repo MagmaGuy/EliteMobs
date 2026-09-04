@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.TextDisplay;
+import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -82,6 +83,15 @@ public class GamblingDenOwnerDisplay {
         if (display != null && display.isValid()) {
             display.remove();
         }
+    }
+
+    public static void syncDisplay(NPCEntity npcEntity) {
+        if (npcEntity == null || npcEntity.getVillager() == null) return;
+        TextDisplay display = earningsDisplays.get(npcEntity.getUuid());
+        if (display == null || !display.isValid()) return;
+        Location target = npcEntity.getVillager().getLocation().clone().add(0D, 2.8D, 0D);
+        if (!display.getWorld().equals(target.getWorld()) || display.getLocation().distanceSquared(target) > 0.0025D)
+            display.teleport(target);
     }
 
     /**

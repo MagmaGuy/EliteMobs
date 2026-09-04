@@ -1,13 +1,14 @@
 package com.magmaguy.elitemobs.skills.bonuses;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.PlayerDataLoadedEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
 import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
 import com.magmaguy.elitemobs.skills.SkillXPBar;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.elitemobs.skills.bonuses.skills.armor.IronStanceSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.bows.OverdrawSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.crossbows.SteadyAimSkill;
@@ -26,7 +27,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
 
@@ -57,21 +57,12 @@ public class SkillBonusEventHandler implements Listener {
      * Loads player skill selections on join.
      */
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    public void onPlayerDataLoaded(PlayerDataLoadedEvent event) {
         if (!SkillsConfig.isSkillSystemEnabled()) return;
-
         Player player = event.getPlayer();
-
-        // Delay slightly to ensure PlayerData is loaded
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (player.isOnline()) {
-                    PlayerSkillSelection.onPlayerJoin(player);
-                    refreshSkillState(player);
-                }
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 40); // 2 seconds after PlayerData loads
+        if (!player.isOnline()) return;
+        PlayerSkillSelection.onPlayerJoin(player);
+        refreshSkillState(player);
     }
 
     /**
@@ -115,19 +106,7 @@ public class SkillBonusEventHandler implements Listener {
      * Gets weapon skill type from an item stack (for weapon switch handling).
      */
     private static SkillType getWeaponSkillTypeFromItem(ItemStack item) {
-        if (item == null || item.getType() == Material.AIR) return null;
-        String typeName = item.getType().name();
-        if (typeName.endsWith("_SWORD")) return SkillType.SWORDS;
-        if (typeName.endsWith("_AXE")) return SkillType.AXES;
-        if (item.getType() == Material.BOW) return SkillType.BOWS;
-        if (item.getType() == Material.CROSSBOW) return SkillType.CROSSBOWS;
-        if (item.getType() == Material.TRIDENT) return SkillType.TRIDENTS;
-        if (typeName.endsWith("_HOE")) return SkillType.HOES;
-        try {
-            if (item.getType() == Material.MACE) return SkillType.MACES;
-        } catch (NoSuchFieldError e) { /* pre-1.21 */ }
-        if (typeName.endsWith("_SPEAR")) return SkillType.SPEARS;
-        return null;
+        return WeaponIdentityResolver.progressionSkill(item);
     }
 
     // ==================== WEAPON SKILL EVENT HOOKS ====================
@@ -149,7 +128,7 @@ public class SkillBonusEventHandler implements Listener {
     /**
      * Handles weapon switching - applies/removes passive weapon skill effects.
      */
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onItemHeldChange(PlayerItemHeldEvent event) {
         if (!SkillsConfig.isSkillSystemEnabled()) return;
         Player player = event.getPlayer();

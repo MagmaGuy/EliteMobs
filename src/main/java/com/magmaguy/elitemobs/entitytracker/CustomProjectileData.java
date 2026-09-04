@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.entitytracker;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.experimentalcombat.abilities.ClassAbilityProjectileCarrier;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -46,6 +47,7 @@ public class CustomProjectileData implements Listener {
 
     @EventHandler
     public void onPlayerFireProjectile(ProjectileLaunchEvent event) {
+        if (ClassAbilityProjectileCarrier.isCarrier(event.getEntity())) return;
         if (event.getEntity().getShooter() == null || !(event.getEntity().getShooter() instanceof Player player))
             return;
         customProjectileDataHashMap.put(event.getEntity(), new CustomProjectileData(player, event.getEntity()));

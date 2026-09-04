@@ -127,8 +127,6 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     @Getter
     private static double bossBarHealthMultiplierThreshold;
     @Getter
-    private static double proximityBossBarHealthMultiplierThreshold;
-    @Getter
     private static int combatDisplayTimeoutSeconds;
     @Getter
     private static boolean useFixedHealthBarSize;
@@ -185,6 +183,9 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
     @Override
     public void initializeValues() {
         instance = this;
+        // Proximity-based boss-bar admission no longer exists. Remove the retired key so the
+        // generated configuration does not advertise a setting that cannot affect behavior.
+        fileConfiguration.set("proximityBossBarHealthMultiplierThreshold", null);
         doNaturalMobSpawning = ConfigurationEngine.setBoolean(
                 List.of("Sets if naturally spawned elites will spawn. Note: event mobs like the zombie king are not naturally spawned elites! You will have to disable events if you want to disable event bosses."),
                 fileConfiguration, "doNaturalEliteMobSpawning", true);
@@ -357,12 +358,12 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
                         "Default of 0.2 matches vanilla: Resistance I = 20% reduction, Resistance V = 100% reduction (immune)."),
                 fileConfiguration, "resistanceDamageMultiplierV2", 0.2);
         strengthDamageMultiplier = ConfigurationEngine.setDouble(
-                List.of("Sets the bonus damage per strength level applied to player damage against elites.",
+                List.of("Sets the outgoing damage bonus per strength level for players and elites.",
                         "Strength I = + (1 * this value), Strength II = + (2 * this value), etc.",
                         "Default of 0.2 means Strength I = +20% damage."),
                 fileConfiguration, "strengthDamageMultiplierV2", 0.2);
         weaknessDamageMultiplier = ConfigurationEngine.setDouble(
-                List.of("Sets the damage penalty per weakness level applied to player damage against elites.",
+                List.of("Sets the outgoing damage penalty per weakness level for players and elites.",
                         "Weakness I = - (1 * this value), Weakness II = - (2 * this value), etc.",
                         "Default of 0.2 means Weakness I = -20% damage."),
                 fileConfiguration, "weaknessDamageMultiplierV2", 0.2);
@@ -377,19 +378,15 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
                 List.of("Sets if numeric health values (current/max) will be displayed above the visual health bars."),
                 fileConfiguration, "displayNumericHealth", true);
         displayBossBarForHighMultiplier = ConfigurationEngine.setBoolean(
-                List.of("Sets if boss bars (at the top of the screen) will be displayed for bosses with health multiplier above the threshold."),
+                List.of("Sets if boss bars (at the top of the screen) will be displayed while eligible bosses actively target a player."),
                 fileConfiguration, "displayBossBarForHighMultiplier", true);
         bossBarHealthMultiplierThreshold = ConfigurationEngine.setDouble(
                 List.of("Sets the health multiplier threshold above which boss bars will be displayed when entering combat.",
-                        "Bosses with a health multiplier greater than this value will show boss bars to players in combat."),
+                        "Bosses with a health multiplier greater than this value show a boss bar only to their current target."),
                 fileConfiguration, "bossBarHealthMultiplierThreshold", 1.0);
-        proximityBossBarHealthMultiplierThreshold = ConfigurationEngine.setDouble(
-                List.of("Sets the health multiplier threshold above which boss bars will be displayed to nearby players (within 30 blocks).",
-                        "Bosses with a health multiplier of this value or greater will show boss bars even without combat engagement."),
-                fileConfiguration, "proximityBossBarHealthMultiplierThreshold", 9.0);
         combatDisplayTimeoutSeconds = ConfigurationEngine.setInt(
-                List.of("Sets how many seconds after the last combat action the health display will remain visible.",
-                        "After this time, the visual health bars and boss bars will disappear."),
+                List.of("Sets how many seconds after the last combat action the overhead visual and numeric health displays remain visible.",
+                        "Top-of-screen boss bars instead follow the boss's current target."),
                 fileConfiguration, "combatDisplayTimeoutSeconds", 30);
         useFixedHealthBarSize = ConfigurationEngine.setBoolean(
                 List.of("Sets if the health bar should always be a fixed size (10 bars) regardless of boss health multiplier.",

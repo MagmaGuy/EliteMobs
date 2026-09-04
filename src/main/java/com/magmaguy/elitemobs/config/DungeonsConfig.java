@@ -30,6 +30,16 @@ public class DungeonsConfig extends ConfigurationFile {
     @Getter
     private static double witherDamageMultiplier;
     @Getter
+    private static boolean enableDungeonFoodRegeneration;
+    @Getter
+    private static int dungeonFoodRegenerationCombatTimeoutSeconds;
+    @Getter
+    private static int dungeonFoodRegenerationIntervalSeconds;
+    @Getter
+    private static String dungeonFoodRegenerationCombatStartMessage;
+    @Getter
+    private static String dungeonFoodRegenerationCombatEndMessage;
+    @Getter
     private static String dynamicDungeonLevelSelectionMenuTitle;
     @Getter
     private static String dynamicDungeonLevelSelectionItemTitle;
@@ -147,6 +157,14 @@ public class DungeonsConfig extends ConfigurationFile {
     private static String contentPartialLine3;
     @Getter
     private static String contentPartialLine4;
+    @Getter
+    private static String bundledContentPartialLine1;
+    @Getter
+    private static String bundledContentPartialLine2;
+    @Getter
+    private static String bundledContentPartialLine3;
+    @Getter
+    private static String contentToggleInProgressMessage;
     @Getter
     private static String contentNotDownloadedLine1;
     @Getter
@@ -381,6 +399,21 @@ public class DungeonsConfig extends ConfigurationFile {
                 List.of("Sets the damage multiplier for fire damage in dungeons",
                         "This is important for balance as by default the damage is a bit too high for the dungeons as we design them"),
                 fileConfiguration, "poisonDamageMultiplier", 0.5);
+        enableDungeonFoodRegeneration = ConfigurationEngine.setBoolean(
+                List.of("Whether players regenerate food while out of combat in EliteMobs dungeons."),
+                fileConfiguration, "enableDungeonFoodRegeneration", true);
+        dungeonFoodRegenerationCombatTimeoutSeconds = Math.max(1, ConfigurationEngine.setInt(
+                List.of("Seconds without dealing or receiving enemy damage before a player leaves combat."),
+                fileConfiguration, "dungeonFoodRegenerationCombatTimeoutSeconds", 20));
+        dungeonFoodRegenerationIntervalSeconds = Math.max(1, ConfigurationEngine.setInt(
+                List.of("Seconds between level-I saturation pulses while an eligible player is out of combat."),
+                fileConfiguration, "dungeonFoodRegenerationIntervalSeconds", 5));
+        dungeonFoodRegenerationCombatStartMessage = ConfigurationEngine.setString(
+                List.of("Action bar message shown when dungeon combat starts."),
+                file, fileConfiguration, "dungeonFoodRegenerationCombatStartMessage", "&cCombat start", true);
+        dungeonFoodRegenerationCombatEndMessage = ConfigurationEngine.setString(
+                List.of("Action bar message shown when dungeon combat ends."),
+                file, fileConfiguration, "dungeonFoodRegenerationCombatEndMessage", "&aCombat end", true);
         dynamicDungeonLevelSelectionMenuTitle = ConfigurationEngine.setString(
                 List.of("Sets the title for the dynamic dungeon level selection menu"),
                 file, fileConfiguration, "dynamicDungeonLevelSelectionMenuTitle", "&8Select Dungeon Level", true);
@@ -572,6 +605,18 @@ public class DungeonsConfig extends ConfigurationFile {
         contentPartialLine4 = ConfigurationEngine.setString(
                 List.of("Sets the fourth line of the tooltip for partially installed content."),
                 file, fileConfiguration, "contentPartialLine4", "Click to download!", true);
+        bundledContentPartialLine1 = ConfigurationEngine.setString(
+                List.of("Sets the first line of the tooltip for partially installed content that ships inside the plugin jar (default items, events)."),
+                file, fileConfiguration, "bundledContentPartialLine1", "Content partially installed!", true);
+        bundledContentPartialLine2 = ConfigurationEngine.setString(
+                List.of("Sets the second line of the tooltip for partially installed content that ships inside the plugin jar."),
+                file, fileConfiguration, "bundledContentPartialLine2", "Some of this plugin-bundled content is disabled.", true);
+        bundledContentPartialLine3 = ConfigurationEngine.setString(
+                List.of("Sets the third line of the tooltip for partially installed content that ships inside the plugin jar."),
+                file, fileConfiguration, "bundledContentPartialLine3", "Click to enable all of it!", true);
+        contentToggleInProgressMessage = ConfigurationEngine.setString(
+                List.of("Message shown when a content install/uninstall is clicked while a previous one is still saving."),
+                file, fileConfiguration, "contentToggleInProgressMessage", "&cStill applying a previous content change! Wait for the reload to finish, then try again.", true);
         contentNotDownloadedLine1 = ConfigurationEngine.setString(
                 List.of("Sets the first line of the tooltip for content that has not been downloaded."),
                 file, fileConfiguration, "contentNotDownloadedLine1", "Content is not downloaded!", true);

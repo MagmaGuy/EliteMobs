@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
 import com.magmaguy.elitemobs.mobconstructor.BossType;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolRoute;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.loading.ScriptValueNormalizer;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
@@ -238,6 +239,8 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private List<String> spawnLocations = new ArrayList<>();
+    @Getter
+    private PatrolRoute patrolRoute;
 
     /**
      * Creates a new default pre-made Custom Boss. The boss is further customized through a builder pattern.
@@ -291,8 +294,8 @@ public class CustomBossesConfigFields extends CustomConfigFields {
 
     public void runtimeSetLeashRadius(double leashRadius) {
         this.leashRadius = leashRadius;
-        this.fileConfiguration.set("leashRadius", leashRadius);
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+        this.getWritableFileConfiguration().set("leashRadius", leashRadius);
+        ConfigurationEngine.fileSaverCustomValues(getWritableFileConfiguration(), file);
     }
 
     public double getDamageModifier(Material material) {
@@ -314,9 +317,9 @@ public class CustomBossesConfigFields extends CustomConfigFields {
 
     public void setOnSpawnBlockStates(List<String> onSpawnBlockStates) {
         this.onSpawnBlockStates = onSpawnBlockStates;
-        fileConfiguration.set("onSpawnBlockStates", onSpawnBlockStates);
+        getWritableFileConfiguration().set("onSpawnBlockStates", onSpawnBlockStates);
         try {
-            fileConfiguration.save(file);
+            getWritableFileConfiguration().save(file);
         } catch (Exception ex) {
             Logger.warn("Failed to save on spawn block states!", true);
         }
@@ -324,9 +327,9 @@ public class CustomBossesConfigFields extends CustomConfigFields {
 
     public void setOnRemoveBlockStates(List<String> onRemoveBlockStates) {
         this.onRemoveBlockStates = onRemoveBlockStates;
-        fileConfiguration.set("onRemoveBlockStates", onRemoveBlockStates);
+        getWritableFileConfiguration().set("onRemoveBlockStates", onRemoveBlockStates);
         try {
-            fileConfiguration.save(file);
+            getWritableFileConfiguration().save(file);
         } catch (Exception ex) {
             Logger.warn("Failed to save on remove block states!", true);
         }
@@ -444,6 +447,12 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         this.silent = processBoolean("silent", silent, false, false);
         this.ai = processBoolean("ai", ai, true, false);
         this.alwaysShowName = processBoolean("alwaysShowName", alwaysShowName, false, false);
+        try {
+            this.patrolRoute = PatrolRoute.parse(fileConfiguration);
+        } catch (IllegalArgumentException exception) {
+            this.patrolRoute = null;
+            Logger.warn("Invalid patrol in " + filename + ": " + exception.getMessage());
+        }
     }
 
     public boolean isCustomModelExists() {
@@ -527,9 +536,20 @@ public class CustomBossesConfigFields extends CustomConfigFields {
 
     public void saveFile() {
         try {
-            fileConfiguration.save(file);
+            getWritableFileConfiguration().save(file);
         } catch (Exception ex) {
             Logger.warn("Failed to save boss file " + filename + "!");
+        }
+    }
+
+    public boolean reloadPatrolRoute() {
+        try {
+            patrolRoute = PatrolRoute.parse(getWritableFileConfiguration());
+            return patrolRoute != null;
+        } catch (IllegalArgumentException exception) {
+            patrolRoute = null;
+            Logger.warn("Invalid patrol in " + filename + ": " + exception.getMessage());
+            return false;
         }
     }
 

@@ -4,8 +4,7 @@ import com.magmaguy.elitemobs.api.QuestRewardEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -44,7 +43,7 @@ public class QuestLockoutHandler implements Listener {
 
         // Show action bar subtitle
         String subtitle = QuestsConfig.getQuestLockoutSubtitle();
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(subtitle));
+        ActionBarCompositor.show(player, ActionBarCompositor.Source.LOCKOUT, subtitle);
 
         // Send title with empty title and just subtitle
         player.sendTitle("", subtitle, 10, 70, 20);

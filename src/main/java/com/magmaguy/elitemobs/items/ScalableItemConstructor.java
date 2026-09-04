@@ -42,7 +42,9 @@ public class ScalableItemConstructor {
                 customItem.getCustomItemsConfigFields().getEquipmentModelID(),
                 customItem.getCustomItemsConfigFields().isSoulbound(),
                 customItem.getCustomItemsConfigFields().getFilename(),
-                customItem.getCustomItemsConfigFields().getScriptedItem()
+                customItem.getCustomItemsConfigFields().getScriptedItem(),
+                customItem.getCustomItemsConfigFields().getWeaponType(),
+                customItem.getCustomItemsConfigFields().getFmmItemModel()
         );
     }
 
@@ -116,7 +118,9 @@ public class ScalableItemConstructor {
                 customItem.getCustomItemsConfigFields().getEquipmentModelID(),
                 customItem.getCustomItemsConfigFields().isSoulbound(),
                 customItem.getCustomItemsConfigFields().getFilename(),
-                customItem.getCustomItemsConfigFields().getScriptedItem()
+                customItem.getCustomItemsConfigFields().getScriptedItem(),
+                customItem.getCustomItemsConfigFields().getWeaponType(),
+                customItem.getCustomItemsConfigFields().getFmmItemModel()
         );
 
     }

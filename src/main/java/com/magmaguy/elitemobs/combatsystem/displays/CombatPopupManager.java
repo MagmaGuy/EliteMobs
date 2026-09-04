@@ -65,7 +65,8 @@ final class CombatPopupManager {
     }
 
     static void createDamagePopup(EliteEntity eliteEntity, double damage, boolean critical,
-                                  double damageModifier, Vector offset, Player player) {
+                                  double damageModifier, double classAbilityBonusDamage,
+                                  Vector offset, Player player) {
         if (!MobCombatSettingsConfig.isDisplayDamageOnHit()) return;
         LivingEntity entity = eliteEntity.getUnsyncedLivingEntity();
         if (entity == null || !entity.isValid()) return;
@@ -93,9 +94,9 @@ final class CombatPopupManager {
         }
 
         if (critical) text.append(CriticalStrikesConfig.getCriticalHitColor()).append("&l");
-        text.append(eliteEntity.isScaledCombat()
-                ? DisplayTextFormatter.percentage(damage / Math.max(1D, eliteEntity.getMaxHealth()))
-                : DisplayTextFormatter.number(damage));
+        text.append(CombatPopupText.damageAmount(
+                eliteEntity.isScaledCombat(), eliteEntity.getMaxHealth(), damage,
+                classAbilityBonusDamage));
         create(baseLocation, ChatColorConverter.convert(text.toString()),
                 critical ? PopupType.CRITICAL : PopupType.DAMAGE, critical ? 1.3f : 1.0f);
 

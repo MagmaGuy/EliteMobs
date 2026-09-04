@@ -27,13 +27,14 @@ public class WorldPackage extends EMPackage {
     public void doInstall(Player player) {
         DungeonUtils.loadWorld(this);
         contentPackagesConfigFields.installWorld();
-        player.teleport(contentPackagesConfigFields.getTeleportLocation());
+        if (player != null) player.teleport(contentPackagesConfigFields.getTeleportLocation());
         world = contentPackagesConfigFields.getTeleportLocation().getWorld();
         if (contentPackagesConfigFields.getSong() != null)
             new CustomMusic(contentPackagesConfigFields.getSong(), contentPackagesConfigFields, world);
         for (Wormhole wormhole : Wormhole.getWormholes())
             wormhole.onDungeonInstall(contentPackagesConfigFields.getFilename());
-        player.sendMessage(DungeonsConfig.getContentInstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
+        isInstalled = true;
+        notify(player, DungeonsConfig.getContentInstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
     }
 
     @Override
@@ -43,14 +44,14 @@ public class WorldPackage extends EMPackage {
         isInstalled = false;
         if (!DungeonUtils.unloadWorld(this)) {
             isInstalled = true;
-            player.sendMessage(DungeonsConfig.getContentUninstallFailedMessage().replace("$name", contentPackagesConfigFields.getName()));
+            notify(player, DungeonsConfig.getContentUninstallFailedMessage().replace("$name", contentPackagesConfigFields.getName()));
             return;
         }
         for (Wormhole wormhole : Wormhole.getWormholes())
             wormhole.onDungeonUninstall(contentPackagesConfigFields.getFilename());
         contentPackagesConfigFields.uninstallWorld();
         world = null;
-        player.sendMessage(DungeonsConfig.getContentUninstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
+        notify(player, DungeonsConfig.getContentUninstalledMessage().replace("$name", contentPackagesConfigFields.getName()));
     }
 
     @Override

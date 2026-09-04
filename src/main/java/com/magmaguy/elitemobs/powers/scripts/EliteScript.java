@@ -61,6 +61,7 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
      * @param player
      */
     public void check(Event event, EliteEntity eliteEntity, Player player) {
+        if (suppressed(eliteEntity)) return;
         //If the script uses the cooldown system then it should respect if the boss is in a global or local cooldown state
         //If the script does not define a local or global cooldown then it is considered to ignore cooldowns. This is an
         //important bypass for a lot of behavior like teleporting at specific triggers regardless of state
@@ -84,6 +85,7 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
      * @param damager
      */
     public void check(Event event, EliteEntity eliteEntity, LivingEntity damager) {
+        if (suppressed(eliteEntity)) return;
         //If the script uses the cooldown system then it should respect if the boss is in a global or local cooldown state
         //If the script does not define a local or global cooldown then it is considered to ignore cooldowns. This is an
         //important bypass for a lot of behavior like teleporting at specific triggers regardless of state
@@ -106,6 +108,7 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
      * @param directTarget
      */
     public void check(EliteEntity eliteEntity, LivingEntity directTarget, ScriptActionData previousScriptActionData) {
+        if (suppressed(eliteEntity)) return;
         //Check if the event conditions are met
         if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(eliteEntity, directTarget))
             return;
@@ -121,6 +124,7 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
      * @param landingLocation Location where the projectile or block landed
      */
     public void check(Location landingLocation, ScriptActionData previousScriptActionData) {
+        if (suppressed(previousScriptActionData.getEliteEntity())) return;
         //Check if the event conditions are met
         if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(previousScriptActionData.getEliteEntity(), null))
             return;
@@ -135,6 +139,15 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
             scriptZone.setZoneListener(true);
             scriptZone.startZoneListener(eliteEntity);
         }
+    }
+
+    @Override
+    public void closeRuntime() {
+        if (scriptZone != null) scriptZone.shutdown();
+    }
+
+    private static boolean suppressed(EliteEntity eliteEntity) {
+        return eliteEntity == null || eliteEntity.getPowerSuppression().isSuppressed();
     }
 
     public static class EliteScriptEvents implements Listener {

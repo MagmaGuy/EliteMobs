@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolService;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.elitemobs.thirdparty.discordsrv.DiscordSRVAnnouncement;
 import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
@@ -45,6 +46,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.logging.Level;
 
 public class CustomBossEntity extends EliteEntity implements Listener, PersistentObject, PersistentMovingEntity {
 
@@ -62,8 +64,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     @Setter
     protected Location persistentLocation;
     protected CustomBossTrail customBossTrail;
-    @Getter
-    protected BossTrackingBar bossTrackingBar;
+    private final BossTrackingLifecycle<BossTrackingBar> bossTrackingLifecycle;
     protected Integer escapeMechanism;
     @Getter
     protected PhaseBossEntity phaseBossEntity = null;
@@ -114,6 +115,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     public CustomBossEntity(CustomBossesConfigFields customBossesConfigFields) {
         //This creates a placeholder empty EliteMobEntity to be filled in later
         super();
+        bossTrackingLifecycle = new BossTrackingLifecycle<>(
+                () -> trackableCustomBosses.add(this),
+                () -> trackableCustomBosses.remove(this),
+                () -> new BossTrackingBar(this));
         if (customBossesConfigFields.getSong() != null)
             bossMusic = new CustomMusic(customBossesConfigFields.getSong(), this);
         //This stores everything that will need to be initialized for the EliteMobEntity
@@ -174,6 +179,16 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         if (dynamicLevelUpdater != null)
             dynamicLevelUpdater.cancel();
         dynamicLevelBossEntities.clear();
+        for (CustomBossEntity customBossEntity : new HashSet<>(trackableCustomBosses)) {
+            try {
+                customBossEntity.removeTracking();
+            } catch (RuntimeException exception) {
+                MetadataHandler.PLUGIN.getLogger().log(
+                        Level.WARNING,
+                        "Failed to remove a boss tracking bar during shutdown",
+                        exception);
+            }
+        }
         trackableCustomBosses.clear();
     }
 
@@ -248,14 +263,21 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     public void spawn(boolean silent) {
+        spawn(SpawnLifecycle.fromSilentFlag(silent));
+    }
+
+    protected void spawn(SpawnLifecycle.Context spawnContext) {
         if (livingEntity != null && livingEntity.isValid())
             return;
 
+        Location effectiveSpawnLocation = PatrolService.materializationLocation(this).orElse(spawnLocation);
+        if (effectiveSpawnLocation != null) persistentLocation = effectiveSpawnLocation.clone();
+
         if (isPersistent && persistentObjectHandler == null)
             persistentObjectHandler = new PersistentObjectHandler(this);
-        else if (isPersistent) persistentObjectHandler.updatePersistentLocation(spawnLocation);
+        else if (isPersistent) persistentObjectHandler.updatePersistentLocation(effectiveSpawnLocation);
 
-        if (spawnLocation == null) {
+        if (effectiveSpawnLocation == null) {
             Logger.warn("Boss " + customBossesConfigFields.getFilename() + " has a null location! This is probably due to an incorrectly configured regional location!");
             return;
         }
@@ -263,10 +285,12 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         //This is a bit dumb but -1 is reserved for dynamic levels, commands can force a dynamic to spawn with a level so check that
         if (customBossesConfigFields.getLevel() == -1 && level == -1) {
             dynamicLevel = true;
-            getDynamicLevel(spawnLocation);
+            getDynamicLevel(effectiveSpawnLocation);
         }
 
-        if (ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation) || isMount) {
+        if (PatrolService.canMaterialize(this, effectiveSpawnLocation) || isMount) {
+            if (!effectiveSpawnLocation.equals(spawnLocation))
+                setRespawnOverrideLocation(effectiveSpawnLocation);
             super.livingEntity = new CustomBossMegaConsumer(this).spawn();
             setNormalizedHealth();
             if (super.livingEntity == null)
@@ -301,8 +325,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             Logger.warn("- The region was protected by a plugin (most likely)");
             Logger.warn("- The spawn was interfered with by some incompatible third party plugin");
             Logger.warn("Debug data: ");
-            Logger.warn("Chunk is loaded: " + ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation));
-            Logger.warn("Attempted spawn location: " + spawnLocation.toString(), true);
+            Logger.warn("Chunk is loaded: " + ChunkLocationChecker.chunkAtLocationIsLoaded(effectiveSpawnLocation));
+            Logger.warn("Attempted spawn location: " + effectiveSpawnLocation, true);
             return;
         }
 
@@ -317,8 +341,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         } else
             persistentLocation = spawnLocation;
 
-        if (!silent)
-            announceSpawn();
+        SpawnLifecycle.apply(spawnContext, this::setTracking, this::spawnMessage, this::startEscapeMechanismDelay);
 
         if (summoningEntity != null)
             summoningEntity.addReinforcement(this);
@@ -401,18 +424,30 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     public void announceSpawn() {
-        setTracking();
-        spawnMessage();
-        startEscapeMechanismDelay();
+        SpawnLifecycle.apply(
+                SpawnLifecycle.Context.ANNOUNCED,
+                this::setTracking,
+                this::spawnMessage,
+                this::startEscapeMechanismDelay);
     }
 
-    private void setTracking() {
+    private void setTracking(boolean notifyPlayers) {
         if (customBossesConfigFields.getAnnouncementPriority() < 1 ||
                 !MobCombatSettingsConfig.isShowCustomBossLocation())
             return;
-        trackableCustomBosses.add(this);
-        if (bossTrackingBar != null) bossTrackingBar.remove();
-        bossTrackingBar = new BossTrackingBar(this);
+        bossTrackingLifecycle.activate(notifyPlayers);
+    }
+
+    public BossTrackingBar getBossTrackingBar() {
+        return bossTrackingLifecycle.current();
+    }
+
+    void removeTracking(BossTrackingBar expected) {
+        bossTrackingLifecycle.deactivate(expected);
+    }
+
+    private void removeTracking() {
+        bossTrackingLifecycle.deactivate();
     }
 
     private void spawnMessage() {
@@ -486,6 +521,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     private void startEscapeMechanismDelay() {
+        if (escapeMechanism != null) Bukkit.getScheduler().cancelTask(escapeMechanism);
         escapeMechanism = CustomBossEscapeMechanism.startEscape(customBossesConfigFields.getTimeout(), this);
     }
 
@@ -508,14 +544,24 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     @Override
     public Location getLocation() {
         if (getLivingEntity() != null) return getLivingEntity().getLocation();
-        else return persistentLocation;
+        return PatrolService.logicalLocation(this).orElse(persistentLocation);
     }
 
     @Override
     public Location getPersistentLocation() {
+        Location patrolLocation = PatrolService.materializationLocation(this).orElse(null);
+        if (patrolLocation != null) return patrolLocation;
         if (persistentLocation == null && getLocation() != null) persistentLocation = getLocation();
         if (persistentLocation == null && spawnLocation != null) persistentLocation = spawnLocation;
         return persistentLocation;
+    }
+
+    /** Updates persistence without changing the authored route origin. */
+    public void updatePatrolPersistentLocation(Location location) {
+        if (location == null) return;
+        persistentLocation = location.clone();
+        if (persistentObjectHandler != null)
+            persistentObjectHandler.updatePersistentLocation(persistentLocation);
     }
 
     public String getWorldName() {
@@ -590,8 +636,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                 persistentObjectHandler.remove();
                 persistentObjectHandler = null;
             }
-            if (bossTrackingBar != null)
-                bossTrackingBar.remove();
+            removeTracking();
             if (!removalReason.equals(RemovalReason.SHUTDOWN) &&
                     !removalReason.equals(RemovalReason.DEATH) &&
                     !removalReason.equals(RemovalReason.ARENA_RESET))
@@ -613,8 +658,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
         } else if (removalReason.equals(RemovalReason.CHUNK_UNLOAD) || removalReason.equals(RemovalReason.WORLD_UNLOAD)) {
             //Cancel boss tracking bar to prevent task leak and potential NPE from stale world references
-            if (bossTrackingBar != null)
-                bossTrackingBar.remove();
+            removeTracking();
             //when bosses get removed due to chunk unloads and are persistent they should remain stored
             if (persistentObjectHandler != null)
                 persistentObjectHandler.updatePersistentLocation(getPersistentLocation());
@@ -630,8 +674,15 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     @Override
     public void chunkLoad() {
-        respawnOverrideLocation = persistentLocation;
-        spawn(true);
+        restorePersistedSpawn(SpawnLifecycle.Context.SILENT);
+    }
+
+    protected final void restorePersistedSpawn(SpawnLifecycle.Context spawnContext) {
+        SpawnLifecycle.restorePersistedSpawn(
+                spawnContext,
+                persistentLocation,
+                this::setRespawnOverrideLocation,
+                this::spawn);
     }
 
     @Override
@@ -655,16 +706,32 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             spawnLocation.setWorld(world);
         if (persistentLocation != null)
             persistentLocation.setWorld(world);
-        if (spawnLocation == null || spawnLocation.getWorld() == null) return;
+        Location effectiveLocation = PatrolService.materializationLocation(this).orElse(spawnLocation);
+        if (effectiveLocation == null || effectiveLocation.getWorld() == null) return;
         //Deliberately mirrors WormholeEntry: leave unloaded chunks to the ChunkLoadEvent path rather than letting
         //spawn() fail and log a protection/incompatibility warning for a chunk that simply is not there yet.
-        if (!ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation)) return;
+        if (!PatrolService.canMaterialize(this, effectiveLocation)) return;
         chunkLoad();
     }
 
     @Override
     public void worldUnload() {
         remove(RemovalReason.WORLD_UNLOAD);
+        //Mirror of worldLoad's setWorld(world): while the world is unloaded the stored locations
+        //keep coordinates only, so the unloaded ServerLevel can actually be garbage collected —
+        //regional bosses stay tracked across world reloads and pinned their old world otherwise.
+        if (spawnLocation != null) spawnLocation.setWorld(null);
+        if (persistentLocation != null) persistentLocation.setWorld(null);
+    }
+
+    /**
+     * Adds the persistent location to the world references checked when a world unloads:
+     * bosses waiting out a chunk unload hold their last position through it.
+     */
+    @Override
+    public boolean referencesWorld(org.bukkit.World world) {
+        if (super.referencesWorld(world)) return true;
+        return persistentLocation != null && world.equals(persistentLocation.getWorld());
     }
 
     public static class CustomBossEntityEvents implements Listener {

@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.pathfinding;
 import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.easyminecraftgoals.events.WanderBackToPointEndEvent;
 import com.magmaguy.easyminecraftgoals.events.WanderBackToPointStartEvent;
+import com.magmaguy.easyminecraftgoals.internal.AbstractWanderBackToPoint;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.combatsystem.displays.LeashReturnDamageIndicator;
@@ -35,14 +36,16 @@ public class Navigation implements Listener {
     }
 
     private static final HashMap<CustomBossEntity, BukkitTask> currentlyNavigating = new HashMap<>();
+    private static final HashMap<RegionalBossEntity, AbstractWanderBackToPoint> softLeashes = new HashMap<>();
+    private static final HashMap<RegionalBossEntity, AbstractWanderBackToPoint> hardLeashes = new HashMap<>();
     private static final LeashReturnTracker activeLeashReturns = new LeashReturnTracker();
 
     public static void addSoftLeashAI(RegionalBossEntity regionalBossEntity) {
         if (NMSManager.getAdapter() == null) return;
         if (regionalBossEntity.getUnsyncedLivingEntity() != null &&
                 regionalBossEntity.getUnsyncedLivingEntity().getType() == EntityType.ENDER_DRAGON) return;
-        if (regionalBossEntity.getLivingEntity() instanceof Creature)
-            NMSManager.getAdapter().wanderBackToPoint(
+        if (regionalBossEntity.getLivingEntity() instanceof Creature) {
+            AbstractWanderBackToPoint leash = NMSManager.getAdapter().wanderBackToPoint(
                             regionalBossEntity.getLivingEntity(),
                             regionalBossEntity.getSpawnLocation(),
                             regionalBossEntity.getLeashRadius() / 2D,
@@ -53,15 +56,16 @@ public class Navigation implements Listener {
                     .setHardObjective(false)
                     .setReturnDuringCombat(true)
                     .setTeleportOnFail(true)
-                    .setStartWithCooldown(true)
-                    .register();
+                    .setStartWithCooldown(true);
+            replaceLeash(softLeashes, regionalBossEntity, leash);
+        }
     }
 
     public static void addHardLeashAI(RegionalBossEntity regionalBossEntity) {
         if (NMSManager.getAdapter() == null) return;
         if (regionalBossEntity.getUnsyncedLivingEntity() != null &&
                 regionalBossEntity.getUnsyncedLivingEntity().getType() == EntityType.ENDER_DRAGON) return;
-        NMSManager.getAdapter().wanderBackToPoint(
+        AbstractWanderBackToPoint leash = NMSManager.getAdapter().wanderBackToPoint(
                         regionalBossEntity.getLivingEntity(),
                         regionalBossEntity.getSpawnLocation(),
                         regionalBossEntity.getLeashRadius(),
@@ -71,13 +75,41 @@ public class Navigation implements Listener {
                 .setGoalRefreshCooldownTicks(20 * 3)
                 .setHardObjective(true)
                 .setTeleportOnFail(true)
-                .setStartWithCooldown(true)
-                .register();
+                .setStartWithCooldown(true);
+        replaceLeash(hardLeashes, regionalBossEntity, leash);
+    }
+
+    private static void replaceLeash(HashMap<RegionalBossEntity, AbstractWanderBackToPoint> leashes,
+                                     RegionalBossEntity boss,
+                                     AbstractWanderBackToPoint replacement) {
+        AbstractWanderBackToPoint previous = leashes.put(boss, replacement);
+        if (previous != null) previous.unregister();
+        replacement.register();
+    }
+
+    /** Moves both leash envelopes with the nearest point on a configured patrol route. */
+    public static void updateLeashAnchor(RegionalBossEntity boss, Location location) {
+        if (location == null || location.getWorld() == null) return;
+        AbstractWanderBackToPoint soft = softLeashes.get(boss);
+        if (soft != null) soft.setReturnLocation(location);
+        AbstractWanderBackToPoint hard = hardLeashes.get(boss);
+        if (hard != null) hard.setReturnLocation(location);
+    }
+
+    private static void removeLeashes(RegionalBossEntity boss) {
+        AbstractWanderBackToPoint soft = softLeashes.remove(boss);
+        if (soft != null) soft.unregister();
+        AbstractWanderBackToPoint hard = hardLeashes.remove(boss);
+        if (hard != null) hard.unregister();
     }
 
     public static void shutdown() {
         currentlyNavigating.values().forEach(BukkitTask::cancel);
         currentlyNavigating.clear();
+        softLeashes.values().forEach(AbstractWanderBackToPoint::unregister);
+        hardLeashes.values().forEach(AbstractWanderBackToPoint::unregister);
+        softLeashes.clear();
+        hardLeashes.clear();
         activeLeashReturns.clear();
         LeashReturnDamageIndicator.shutdown();
     }
@@ -183,5 +215,7 @@ public class Navigation implements Listener {
     public void clearLeashReturnOnRemoval(EliteMobRemoveEvent event) {
         if (event.getEntity() != null)
             activeLeashReturns.clear(event.getEntity().getUniqueId());
+        if (event.getEliteMobEntity() instanceof RegionalBossEntity regionalBossEntity)
+            removeLeashes(regionalBossEntity);
     }
 }

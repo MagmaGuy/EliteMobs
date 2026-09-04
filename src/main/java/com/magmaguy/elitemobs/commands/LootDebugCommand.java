@@ -1,10 +1,12 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.commands.admin.GetTierCommand;
+import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import com.magmaguy.magmacore.command.arguments.IntegerCommandArgument;
+import com.magmaguy.magmacore.util.Logger;
 
 import java.util.List;
 
@@ -21,6 +23,13 @@ public class LootDebugCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
-        GetTierCommand.getUnbreakable(commandData.getPlayerSender(), commandData.getIntegerArgument("level"));
+        int level = commandData.getIntegerArgument("level");
+        GetTierCommand.getUnbreakable(commandData.getPlayerSender(), level);
+        if (!ExperimentalCombatModule.isInitialized()) return;
+        int formsAtLevel = ExperimentalCombatModule.get()
+                .scaleAllClassesForAdministration(commandData.getPlayerSender(), level);
+        if (formsAtLevel > 0)
+            Logger.sendMessage(commandData.getPlayerSender(), "&7Scaled &f" + formsAtLevel
+                    + " &7class branch(es) to level &f" + level + "&7. Pick one with &f/em class&7.");
     }
 }

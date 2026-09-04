@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.magmacore.util.AttributeManager;
@@ -59,7 +60,7 @@ final class GearProfile {
         int combatLevel = CombatLevelCalculator.calculateCombatLevel(player.getUniqueId());
         int referenceLevel = Math.max(1, combatLevel);
         double weaponLevel = WeaponOffenseCalculator.getEffectiveWeaponLevel(weapon);
-        SkillType weaponSkillType = SkillType.fromMaterial(weapon.getType());
+        SkillType weaponSkillType = WeaponIdentityResolver.progressionSkill(weapon);
         boolean skillsExcluded = SkillsConfig.isWorldExcludedFromSkills(player);
         int weaponSkillLevel = skillsExcluded || weaponSkillType == null ? 1 : Math.max(1,
                 SkillXPCalculator.levelFromTotalXP(PlayerData.getSkillXP(player.getUniqueId(), weaponSkillType)));

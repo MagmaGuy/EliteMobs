@@ -10,9 +10,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlotGroup;
 
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Applies bonus max health to players based on their Armor skill level.
@@ -22,8 +20,6 @@ public class ArmorSkillHealthBonus {
 
     private static final String MODIFIER_KEY_STRING = "armor_skill_health";
     private static final double VANILLA_MAX_HEALTH = 20.0;
-    private static final double VANILLA_HEALTH_DISPLAY_SCALE = 20.0;
-    private static final Set<UUID> SCALED_HEALTH_DISPLAY_PLAYERS = ConcurrentHashMap.newKeySet();
 
     private ArmorSkillHealthBonus() {
         // Static utility class
@@ -55,37 +51,25 @@ public class ArmorSkillHealthBonus {
             return;
         }
 
-        // First remove any existing modifier to avoid duplicates/stale values
-        removeHealthBonus(player);
+        // During startup and /em reload, online-player hydration is asynchronous. The old modifier
+        // is still the only authoritative value until PlayerDataLoadedEvent supplies the real XP.
+        if (!PlayerData.isDataLoaded(player.getUniqueId())) return;
 
         // Get the player's armor skill level
         long armorXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
         int armorLevel = SkillXPCalculator.levelFromTotalXP(armorXP);
 
         // No bonus at level 1 (base level)
-        if (armorLevel <= 1) {
-            updatePlayerHealthDisplay(player);
-            return;
-        }
-
-        // Calculate bonus: +1 heart (2 HP) per level above 1
-        double bonusHealth = (armorLevel - 1) * 2.0;
-
-        // Apply the attribute modifier
-        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
-            maxHealth.addModifier(new AttributeModifier(key, bonusHealth, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
-        }
+        // Calculate bonus: +1 heart (2 HP) per level above 1.
+        double bonusHealth = Math.max(0, armorLevel - 1) * 2.0;
+        replaceHealthBonus(player, bonusHealth);
 
         updatePlayerHealthDisplay(player);
     }
 
     private static void updatePlayerHealthDisplay(Player player) {
         if (SkillsConfig.isScalePlayerHealthDisplayToVanilla()) {
-            player.setHealthScale(VANILLA_HEALTH_DISPLAY_SCALE);
-            player.setHealthScaled(true);
-            SCALED_HEALTH_DISPLAY_PLAYERS.add(player.getUniqueId());
+            HealthDisplayCoordinator.acquire(player, HealthDisplayCoordinator.Owner.ARMOR_SKILL);
             return;
         }
 
@@ -97,8 +81,7 @@ public class ArmorSkillHealthBonus {
      */
     public static void resetPlayerHealthDisplay(Player player) {
         if (player == null) return;
-        if (!SCALED_HEALTH_DISPLAY_PLAYERS.remove(player.getUniqueId())) return;
-        player.setHealthScaled(false);
+        HealthDisplayCoordinator.release(player, HealthDisplayCoordinator.Owner.ARMOR_SKILL);
     }
 
     private static void clampHealthToCurrentMaxHealth(Player player) {
@@ -126,17 +109,32 @@ public class ArmorSkillHealthBonus {
      * @param player The player to remove the bonus from
      */
     public static void removeHealthBonus(Player player) {
-        if (player == null) return;
+        replaceHealthBonus(player, 0D);
+    }
 
+    private static void replaceHealthBonus(Player player, double bonusHealth) {
+        if (player == null) return;
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        if (maxHealth != null) {
-            for (AttributeModifier modifier : maxHealth.getModifiers()) {
-                if (modifier.getKey().equals(new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING))) {
-                    maxHealth.removeModifier(modifier);
-                    break;
-                }
-            }
-        }
+        if (maxHealth == null) return;
+
+        NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
+        AttributeModifier existing = maxHealth.getModifiers().stream()
+                .filter(modifier -> modifier.getKey().equals(key))
+                .findFirst()
+                .orElse(null);
+        boolean shouldExist = bonusHealth > 0D;
+        if (!shouldExist && existing == null) return;
+        if (shouldExist && existing != null && Math.abs(existing.getAmount() - bonusHealth) < 1.0E-9) return;
+
+        HealthPercentagePreserver.during(player, maxHealth, () -> {
+            if (existing != null) maxHealth.removeModifier(existing);
+            if (shouldExist)
+                maxHealth.addModifier(new AttributeModifier(
+                        key,
+                        bonusHealth,
+                        AttributeModifier.Operation.ADD_NUMBER,
+                        EquipmentSlotGroup.ANY));
+        });
     }
 
     /**

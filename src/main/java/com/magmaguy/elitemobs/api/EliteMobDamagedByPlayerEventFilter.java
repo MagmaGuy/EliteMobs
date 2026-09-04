@@ -10,12 +10,14 @@ import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.entitytracker.CustomProjectileData;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.experimentalcombat.abilities.ClassAbilityProjectileCarrier;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.elitemobs.skills.bonuses.PlayerSkillSelection;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -59,6 +61,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -284,12 +287,12 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
             } else {
                 // Arrow/bolt: read weapon level from PDC (stored at launch time)
                 double storedLevel = ItemTagger.getArrowWeaponLevel(projectile);
-                weaponLevel = storedLevel >= 0 ? storedLevel : WeaponOffenseCalculator.getEffectiveWeaponLevel(weapon);
+                weaponLevel = storedLevel >= 0 ? storedLevel : 0;
             }
             // Skill level: read from PDC (stored at launch time)
             Projectile proj = (Projectile) event.getDamager();
             int storedSkillLevel = ItemTagger.getArrowSkillLevel(proj);
-            weaponSkillLevel = storedSkillLevel >= 0 ? storedSkillLevel : getPlayerWeaponSkillLevel(player);
+            weaponSkillLevel = storedSkillLevel >= 0 ? storedSkillLevel : 1;
         } else if (isRangedWeaponMelee) {
             // Ranged weapons used in melee = unarmed (level 0, skill level 1)
             weaponLevel = 0;
@@ -484,8 +487,9 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
     private static double scaledPlayerToEliteDamage(Player player, EliteEntity eliteEntity, EntityDamageByEntityEvent event) {
         // 1. Get the player's weapon skill level (the "simulated" mob level)
         // Ranged weapons used in melee = unarmed, so simulated level is 1
-        boolean isRangedMelee = event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE;
-        if (isRangedMelee) {
+        boolean projectileAttack = event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE;
+        boolean isRangedMelee = !projectileAttack;
+        if (!projectileAttack) {
             ItemStack mainHand = player.getInventory().getItemInMainHand();
             if (mainHand != null) {
                 Material type = mainHand.getType();
@@ -494,7 +498,9 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
                 isRangedMelee = false;
             }
         }
-        int simulatedMobLevel = isRangedMelee ? 1 : getPlayerWeaponSkillLevel(player);
+        int simulatedMobLevel = projectileAttack
+                ? 1
+                : isRangedMelee ? 1 : getPlayerWeaponSkillLevel(player);
         if (simulatedMobLevel <= 0) simulatedMobLevel = 1;
 
         // For ranged attacks, read skill level from projectile PDC (stored at launch time)
@@ -571,38 +577,63 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
         return baseDamage * thornsLevel * WeaponOffenseCalculator.THORNS_PERCENT_PER_LEVEL;
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerShootBow(EntityShootBowEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!(event.getProjectile() instanceof Projectile projectile)) return;
+        snapshotProjectileCombatData(player, projectile, event.getBow());
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onPlayerShootArrow(ProjectileLaunchEvent event) {
+        if (ClassAbilityProjectileCarrier.isCarrier(event.getEntity())) return;
         if (!(event.getEntity().getShooter() instanceof Player player)) return;
-        EliteItemManager.tagArrow(event.getEntity());
-
-        // Store combat data at launch time for accurate ranged damage calculation.
-        // Without this, switching weapons between firing and impact would use the
-        // wrong weapon level, skill type, and skill level.
         Projectile projectile = event.getEntity();
-        ItemStack weapon;
-        if (projectile instanceof Trident trident) {
-            weapon = trident.getItem();
-        } else {
-            weapon = player.getInventory().getItemInMainHand();
-        }
+        ItemTagger.setArrowLaunchVelocity(projectile, projectile.getVelocity().length());
 
+        // Vanilla bows and crossbows are snapshotted by EntityShootBowEvent, which exposes the
+        // exact item even when it was fired from the off hand. Tridents do not use that event.
+        // For plugin-spawned projectiles, use a held ranged weapon only when the hand is
+        // unambiguous; guessing would award the wrong skill after a delayed hit.
+        if (ItemTagger.getArrowWeaponLevel(projectile) >= 0) return;
+        if (projectile instanceof Trident trident) {
+            snapshotProjectileCombatData(player, projectile, trident.getItem());
+            return;
+        }
+        ItemStack heldRangedWeapon = unambiguousHeldRangedWeapon(player);
+        if (heldRangedWeapon != null)
+            snapshotProjectileCombatData(player, projectile, heldRangedWeapon);
+    }
+
+    private static void snapshotProjectileCombatData(
+            Player player,
+            Projectile projectile,
+            ItemStack weapon) {
+        EliteItemManager.tagArrow(projectile, weapon);
         double weaponLevel = WeaponOffenseCalculator.getEffectiveWeaponLevel(weapon);
         ItemTagger.setArrowWeaponLevel(projectile, weaponLevel);
 
-        // Capture the launch-time velocity magnitude. Arrows decelerate from gravity
-        // and drag in flight; reading projectile.getVelocity() at impact gives values
-        // well below 3.0 even for full-draw shots, which underflows the ranged damage
-        // multiplier and was the source of "bows do very little damage" reports.
-        ItemTagger.setArrowLaunchVelocity(projectile, projectile.getVelocity().length());
-
-        SkillType skillType = getWeaponSkillType(player);
+        SkillType skillType = WeaponIdentityResolver.progressionSkill(weapon);
         if (skillType != null) {
             ItemTagger.setArrowSkillType(projectile, skillType.name());
             long skillXP = SkillsConfig.isWorldExcludedFromSkills(player) ? 0 : PlayerData.getSkillXP(player.getUniqueId(), skillType);
             int skillLevel = SkillsConfig.isWorldExcludedFromSkills(player) ? 1 : Math.max(1, SkillXPCalculator.levelFromTotalXP(skillXP));
             ItemTagger.setArrowSkillLevel(projectile, skillLevel);
         }
+    }
+
+    private static ItemStack unambiguousHeldRangedWeapon(Player player) {
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        ItemStack offHand = player.getInventory().getItemInOffHand();
+        boolean mainRanged = isBowOrCrossbow(mainHand);
+        boolean offRanged = isBowOrCrossbow(offHand);
+        if (mainRanged == offRanged) return null;
+        return mainRanged ? mainHand : offHand;
+    }
+
+    private static boolean isBowOrCrossbow(ItemStack item) {
+        SkillType skillType = WeaponIdentityResolver.progressionSkill(item);
+        return skillType == SkillType.BOWS || skillType == SkillType.CROSSBOWS;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -732,9 +763,13 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
         double damageAfterConfigMultipliers = damage;
 
         // Critical hit
+        boolean guaranteedClassCritical = CombatDamageContext.currentClassAbilityDamageDomain()
+                .map(domain -> domain.strikeQuality()
+                        == CombatDamageContext.ClassAbilityStrikeQuality.GUARANTEED_CRITICAL)
+                .orElse(false);
         boolean criticalHit = false;
-        if (validPlayer && !bypass) {
-            criticalHit = isCriticalHit(player);
+        if (validPlayer && (!bypass || guaranteedClassCritical)) {
+            criticalHit = guaranteedClassCritical || isCriticalHit(player);
             if (criticalHit) {
                 damage *= 1.5;
                 if (breakdown != null) {
@@ -812,25 +847,20 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
 
         // For ranged attacks, propagate launch-time weapon data so applySkillBonuses()
         // uses the correct skill type and level (not the player's current mainhand).
-        if (event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+        if (event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE
+                && !ClassAbilityProjectileCarrier.isCarrier((Projectile) event.getDamager())) {
             Projectile projectile = (Projectile) event.getDamager();
-            if (projectile instanceof Trident) {
-                eliteMobDamagedByPlayerEvent.setRangedSkillType(SkillType.TRIDENTS);
-                long tridentXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.TRIDENTS);
-                eliteMobDamagedByPlayerEvent.setRangedSkillLevel(Math.max(1, SkillXPCalculator.levelFromTotalXP(tridentXP)));
-            } else {
-                String storedType = ItemTagger.getArrowSkillType(projectile);
-                if (storedType != null) {
-                    try {
-                        eliteMobDamagedByPlayerEvent.setRangedSkillType(SkillType.valueOf(storedType));
-                    } catch (IllegalArgumentException ignored) {
-                        // Invalid skill type name in PDC — fall back to mainhand
-                    }
+            String storedType = ItemTagger.getArrowSkillType(projectile);
+            if (storedType != null) {
+                try {
+                    eliteMobDamagedByPlayerEvent.setRangedSkillType(SkillType.valueOf(storedType));
+                } catch (IllegalArgumentException ignored) {
+                    // Unknown launch metadata fails closed; never substitute the impact-time hand.
                 }
-                int storedLevel = ItemTagger.getArrowSkillLevel(projectile);
-                if (storedLevel >= 0) {
-                    eliteMobDamagedByPlayerEvent.setRangedSkillLevel(storedLevel);
-                }
+            }
+            int storedLevel = ItemTagger.getArrowSkillLevel(projectile);
+            if (storedLevel >= 0) {
+                eliteMobDamagedByPlayerEvent.setRangedSkillLevel(storedLevel);
             }
         }
 
@@ -892,7 +922,7 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
 
         if (validPlayer) {
             //Time to deal custom damage!
-            eliteEntity.addDamager(player, damage);
+            eliteEntity.addDamager(player, damage, progressionSkillFor(event, player));
         }
 
         //Dragons need special handling due to their custom deaths
@@ -919,6 +949,28 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
 
 
         runAntiexploit(eliteEntity, event, eliteMobDamagedByPlayerEvent);
+    }
+
+    private static SkillType progressionSkillFor(EntityDamageByEntityEvent event, Player player) {
+        java.util.Optional<CombatDamageContext.PlayerDamageSource> source =
+                CombatDamageContext.currentPlayerToEliteSource();
+        if (source.isPresent()) return source.get().progressionSkill();
+        // Class abilities and other programmatic effects are separate progression systems. Only
+        // a source-snapshotted magic weapon is allowed to turn bypass damage into weapon XP.
+        if (CombatDamageContext.isPlayerToEliteBypassActive()) return null;
+        if (event.getDamager() instanceof Trident) return SkillType.TRIDENTS;
+        if (event.getDamager() instanceof Projectile projectile) {
+            String storedType = ItemTagger.getArrowSkillType(projectile);
+            if (storedType != null) {
+                try {
+                    return SkillType.valueOf(storedType);
+                } catch (IllegalArgumentException ignored) {
+                    return null;
+                }
+            }
+            return null;
+        }
+        return WeaponIdentityResolver.progressionSkill(player.getInventory().getItemInMainHand());
     }
 
     private void runAntiexploit(EliteEntity eliteEntity, EntityDamageByEntityEvent event, EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent) {

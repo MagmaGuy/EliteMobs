@@ -4,8 +4,10 @@ import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
-import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.menus.NightbreakSetupIcons;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,22 +55,37 @@ public class ItemsPackage extends EMPackage {
     }
 
     private void handleInstallation(Player player, boolean enable) {
+        if (bulkMemberTogglesLocked()) {
+            notify(player, DungeonsConfig.getContentToggleInProgressMessage());
+            return;
+        }
         String actionMessage = enable
                 ? DungeonsConfig.getItemsInstallingMessage().replace("$count", String.valueOf(customItems.size()))
                 : DungeonsConfig.getItemsUninstallingMessage().replace("$count", String.valueOf(customItems.size()));
-        Logger.sendMessage(player, actionMessage);
+        notify(player, actionMessage);
 
         List<CompletableFuture<Void>> futures = customItems.stream()
                 .map(customItem -> customItem.setEnabledAndSave(enable))
                 .toList();
 
-        Logger.sendMessage(player, DungeonsConfig.getItemsSavingMessage().replace("$count", String.valueOf(customItems.size())));
+        notify(player, DungeonsConfig.getItemsSavingMessage().replace("$count", String.valueOf(customItems.size())));
 
-        reloadAfterConfigurationSaves(
-                player,
-                futures,
-                DungeonsConfig.getItemsReloadingMessage(),
-                "item");
+        submitBulkMemberSaves(player, futures, DungeonsConfig.getItemsReloadingMessage(), "item");
+    }
+
+    /**
+     * Bundled content: partial means members were disabled, not that files are
+     * missing — the tooltip must promise enabling, matching what {@link #doDownload}
+     * (the action a partial-state click runs) actually does.
+     */
+    @Override
+    protected ItemStack getPartiallyInstalledItemStack() {
+        return generateItemStackWithIcon(
+                List.of(DungeonsConfig.getBundledContentPartialLine1(),
+                        DungeonsConfig.getBundledContentPartialLine2(),
+                        DungeonsConfig.getBundledContentPartialLine3()),
+                Material.ORANGE_STAINED_GLASS_PANE,
+                NightbreakSetupIcons.MODEL_GRAY_X);
     }
 
     @Override
@@ -79,6 +96,20 @@ public class ItemsPackage extends EMPackage {
     @Override
     public void doUninstall(Player player) {
         handleInstallation(player, false);
+    }
+
+    /**
+     * Items packages ship inside the plugin jar — there is nothing to download.
+     * The setup menu routes PARTIALLY_INSTALLED clicks (and the defensive
+     * NOT_DOWNLOADED fallback) to doDownload; for premade items the only
+     * sensible repair is to finish enabling every member. Without this, a
+     * partially installed Default EliteMobs Custom Items package pointed
+     * operators at a Discord download link for content they already have,
+     * with no path in the menu to actually re-enable it.
+     */
+    @Override
+    public void doDownload(Player player) {
+        handleInstallation(player, true);
     }
 
     @Override
