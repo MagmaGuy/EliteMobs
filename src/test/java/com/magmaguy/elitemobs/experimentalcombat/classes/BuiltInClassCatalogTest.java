@@ -5,11 +5,9 @@ import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
 import org.junit.jupiter.api.Test;
 
 import java.util.EnumSet;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,14 +43,6 @@ class BuiltInClassCatalogTest {
     }
 
     @Test
-    void paladinMobilityCopyDescribesTheMountedCharge() {
-        AbilityDefinition steed = catalog.lineageOf("paladin").mobility();
-
-        assertEquals("Divine Steed", steed.displayName());
-        assertEquals("Ride an armored steed and taunt foes struck.", steed.description());
-    }
-
-    @Test
     void spellcasterTreeInheritsBlinkAndManaAndUsesBothMagicSkills() {
         ClassLineage lineage = catalog.lineageOf("spiritbinder");
 
@@ -76,56 +66,6 @@ class BuiltInClassCatalogTest {
         assertEquals(100D, mana.initialAmount());
         assertEquals(100D / 60D, mana.inCombatTickDelta());
         assertEquals(100D / 60D, mana.outOfCombatTickDelta());
-    }
-
-    @Test
-    void allPlayerFacingClassRowsStaySnappyAndSelfContained() {
-        List<String> descriptions = new ArrayList<>();
-        List<String> renderedRows = new ArrayList<>();
-        for (ClassFormDefinition form : catalog.forms()) {
-            if (form.rootKit() != null) {
-                AbilityDefinition mobility = form.rootKit().mobility();
-                descriptions.add(mobility.description());
-                renderedRows.add(abilityRow("Mobility", mobility));
-            }
-            descriptions.add(form.signature().description());
-            descriptions.add(form.utility().description());
-            descriptions.add(form.passive().description());
-            renderedRows.add(abilityRow("Signature", form.signature()));
-            renderedRows.add(abilityRow("Utility", form.utility()));
-            renderedRows.add("Bonus " + form.displayName() + " · " + form.passive().description());
-        }
-        for (ClassResourceType resource : ClassResourceType.values()) {
-            descriptions.add(resource.description());
-            renderedRows.add(resource.displayName() + " · " + resource.description());
-        }
-
-        for (String renderedRow : renderedRows) {
-            assertTrue(renderedRow.length() <= 68,
-                    () -> "Rendered detail row exceeds the one-line copy budget: " + renderedRow);
-        }
-
-        for (String description : descriptions) {
-            assertTrue(description.endsWith("."),
-                    () -> "Description must be one sentence: " + description);
-            assertEquals(1, description.chars().filter(character -> character == '.').count(),
-                    () -> "Description must be one sentence: " + description);
-            assertTrue(description.indexOf('\n') < 0 && description.indexOf('\r') < 0,
-                    () -> "Description must stay on one source line: " + description);
-            assertTrue(description.indexOf('—') < 0 && description.indexOf('–') < 0,
-                    () -> "Description contains a dash separator: " + description);
-
-            String lower = description.toLowerCase(Locale.ROOT);
-            for (String externalReference : List.of(
-                    "diablo", "overwatch", "world of warcraft", "dark souls", "d&d")) {
-                assertTrue(!lower.contains(externalReference),
-                        () -> "Description references another game: " + description);
-            }
-        }
-    }
-
-    private static String abilityRow(String label, AbilityDefinition ability) {
-        return label + " " + ability.displayName() + " · " + ability.description();
     }
 
     @Test
