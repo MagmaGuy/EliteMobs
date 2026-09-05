@@ -144,6 +144,46 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(9.6D, player.getHealth(), "Changing class must revoke the previous lifesteal window");
     }
 
+    @ParameterizedTest
+    @CsvSource({"reaver,true", "slayer,false"})
+    void detectionUtilitySpendsEarnedFuryAndRevealsOnlyEligibleNearbyElites(String form, boolean woundedOnly) {
+        int level = module.catalog().require(form).band().effectiveStart();
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        var wounded = target().getLivingEntity();
+        wounded.setHealth(wounded.getAttribute(Attribute.MAX_HEALTH).getValue() * .25D);
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertFalse(wounded.hasPotionEffect(PotionEffectType.GLOWING));
+        assertFalse(player.hasPotionEffect(PotionEffectType.SPEED));
+        incomingDamage();
+        incomingDamage();
+        wounded.setHealth(wounded.getAttribute(Attribute.MAX_HEALTH).getValue() * .25D);
+        var healthy = CombatTestEntities.spawnElite(player.getLocation().add(1, 0, 2));
+        var distant = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 20));
+        var bystander = MockBukkit.getMock().addPlayer();
+        bystander.teleport(player.getLocation().add(1, 0, 0));
+        bystander.setHealth(4D);
+        distant.getLivingEntity().setHealth(distant.getLivingEntity().getAttribute(Attribute.MAX_HEALTH).getValue() * .25D);
+        try {
+            var cast = module.useAbility(player, AbilitySlot.UTILITY);
+            assertTrue(cast.successful(), () -> cast.failureReason() + "; target health=" + wounded.getHealth()
+                    + "/" + wounded.getAttribute(Attribute.MAX_HEALTH).getValue());
+            assertTrue(wounded.hasPotionEffect(PotionEffectType.GLOWING));
+            assertEquals(!woundedOnly, healthy.getLivingEntity().hasPotionEffect(PotionEffectType.GLOWING));
+            assertFalse(distant.getLivingEntity().hasPotionEffect(PotionEffectType.GLOWING));
+            assertFalse(bystander.hasPotionEffect(PotionEffectType.GLOWING));
+            assertFalse(bystander.hasPotionEffect(PotionEffectType.SPEED));
+            assertEquals(1, player.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
+            player.removePotionEffect(PotionEffectType.SPEED);
+            wounded.removePotionEffect(PotionEffectType.GLOWING);
+            assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            assertFalse(player.hasPotionEffect(PotionEffectType.SPEED));
+            assertFalse(wounded.hasPotionEffect(PotionEffectType.GLOWING));
+        } finally {
+            healthy.remove(RemovalReason.SHUTDOWN);
+            distant.remove(RemovalReason.SHUTDOWN);
+        }
+    }
+
     @Test
     void manaWardAppliesShieldAndSpendsManaBeforeAnotherCast() {
         assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
