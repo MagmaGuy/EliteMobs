@@ -15,6 +15,7 @@ import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.magmacore.instance.InstanceProtector;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffectType;
@@ -218,6 +219,45 @@ class ExperimentalCombatBehaviorTest {
         assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
         assertTrue(module.selectForm(player, "spellcaster").accepted());
         assertEquals(10D, outgoingDamage());
+    }
+
+    @Test
+    void bloodragerFrenzyTracksHealthAfterCastingAndRevokesItsAttributeOnClassChange() {
+        assertTrue(module.setClassLevelForAdministration(player, "bloodrager", 31).applied());
+        for (int hit = 0; hit < 5; hit++) incomingDamage();
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        assertEquals(10D, outgoingDamage(), "Frenzy must not grant its missing-health bonus at full health");
+        player.setHealth(10D);
+        MockBukkit.getMock().getScheduler().performOneTick();
+        assertEquals(11.18525D, outgoingDamage(), 0.000001);
+        assertEquals(.12155D, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), 0.000001);
+        player.setHealth(20D);
+        MockBukkit.getMock().getScheduler().performOneTick();
+        assertEquals(10D, outgoingDamage());
+        assertEquals(.1D, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), 0.000001);
+        player.setHealth(10D);
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        MockBukkit.getMock().getScheduler().performOneTick();
+        assertEquals(10D, outgoingDamage());
+        assertEquals(.1D, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), 0.000001);
+    }
+
+    @Test
+    void deathlessUtilitySpendsEarnedFuryToHealShieldAndProtect() {
+        assertTrue(module.setClassLevelForAdministration(player, "deathless", 91).applied());
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        for (int hit = 0; hit < 3; hit++) incomingDamage();
+        player.setHealth(4D);
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertEquals(5.2275D, player.getHealth(), 0.000001);
+        var shield = player.getPotionEffect(PotionEffectType.ABSORPTION);
+        assertNotNull(shield);
+        assertEquals(1, shield.getAmplifier());
+        assertEquals(7.545D, incomingDamage(), 0.000001);
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertEquals(5.2275D, player.getHealth(), 0.000001);
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        assertEquals(10D, incomingDamage());
     }
 
     @Test
