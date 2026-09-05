@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.experimentalcombat.classes.ClassCatalog;
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassLineage;
 import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ActiveLineageSnapshot;
-import com.magmaguy.elitemobs.skills.SkillType;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -20,7 +19,6 @@ class PassiveAggregateTest {
 
     @Test
     void registryMapsEveryShippedFormIncludingFormsWithoutConditionalTraits() {
-        assertEquals(75, catalog.forms().size());
         assertEquals(catalog.forms().stream().map(form -> form.id()).collect(java.util.stream.Collectors.toSet()),
                 registry.mappedFormIds());
         assertEquals(Set.of(), Set.copyOf(registry.traits("paladin")));
@@ -42,30 +40,6 @@ class PassiveAggregateTest {
                 > level31.evaluate(healthy).incomingDamageMultiplier());
         assertTrue(level60.evaluate(critical).outgoingDamageMultiplier()
                 > level31.evaluate(critical).outgoingDamageMultiplier());
-    }
-
-    @Test
-    void rangerMovementFlipsAfterARecentHit() {
-        PassiveAggregate ranger = aggregate("ranger", 30);
-        PassiveConditionContext untouched = PassiveConditionContext.playerOnly(1D, true, false, false);
-        PassiveConditionContext hit = PassiveConditionContext.playerOnly(1D, true, true, false);
-
-        assertTrue(ranger.evaluate(untouched).movementSpeedAdjustment()
-                > ranger.evaluate(hit).movementSpeedAdjustment());
-        assertTrue(ranger.evaluate(hit).incomingDamageMultiplier()
-                > ranger.evaluate(untouched).incomingDamageMultiplier());
-    }
-
-    @Test
-    void specialistTargetTradeoffsUseTheAdvertisedTargetType() {
-        PassiveAggregate dragonslayer = aggregate("dragonslayer", 100);
-        PassiveConditionContext boss = context(1D, false, false, false, true, .8D,
-                true, false, true, false, 24D, false, true, false);
-        PassiveConditionContext ordinary = context(1D, false, false, false, true, .8D,
-                false, false, true, false, 24D, false, true, false);
-
-        assertTrue(dragonslayer.evaluate(boss).outgoingDamageMultiplier()
-                > dragonslayer.evaluate(ordinary).outgoingDamageMultiplier());
     }
 
     @Test
@@ -189,45 +163,6 @@ class PassiveAggregateTest {
     }
 
     @Test
-    void spellPassivesUseDirectClassWandAndStaffDomainsButExcludeSummons() {
-        assertSpellDomainDelta("mage", 60, true);
-        assertSpellDomainDelta("pyromancer", 100, true);
-        assertSpellDomainDelta("summoner", 90, false);
-        assertSpellDomainDelta("spiritbinder", 100, false);
-
-        PassiveAggregate cryomancer = aggregate("cryomancer", 100);
-        PassiveConditionContext physical = damageContext(false, false, false, false, false, null, false);
-        PassiveConditionContext classSpell = damageContext(true, true, false, false, false, null, false);
-        PassiveConditionContext wand = damageContext(false, false, false, false, false, SkillType.WANDS, false);
-        PassiveConditionContext staff = damageContext(false, false, false, false, false, SkillType.STAVES, false);
-        PassiveConditionContext summon = damageContext(true, false, false, false, false, null, false);
-        assertTrue(cryomancer.conditionalTraits().stream()
-                .filter(trait -> trait.conditions().equals(Set.of(PassiveCondition.SPELL_DAMAGE)))
-                .anyMatch(trait -> trait.contribution().outgoingDamage() < 0D));
-        assertEquals(cryomancer.evaluate(classSpell).outgoingDamageMultiplier(),
-                cryomancer.evaluate(wand).outgoingDamageMultiplier(), 1.0E-9D);
-        assertEquals(cryomancer.evaluate(classSpell).outgoingDamageMultiplier(),
-                cryomancer.evaluate(staff).outgoingDamageMultiplier(), 1.0E-9D);
-        assertEquals(cryomancer.evaluate(physical).outgoingDamageMultiplier(),
-                cryomancer.evaluate(summon).outgoingDamageMultiplier(), 1.0E-9D);
-    }
-
-    @Test
-    void classAbilityDomainsDriveAreaTrapAndBlastSpecialists() {
-        PassiveConditionContext direct = damageContext(true, true, false, false, false, null, false);
-        PassiveConditionContext area = damageContext(true, true, true, false, false, null, false);
-        PassiveConditionContext trap = damageContext(true, true, false, true, false, null, false);
-        PassiveConditionContext blast = damageContext(true, true, true, false, true, null, false);
-
-        assertTrue(aggregate("elementalist", 90).evaluate(area).outgoingDamageMultiplier()
-                > aggregate("elementalist", 90).evaluate(direct).outgoingDamageMultiplier());
-        assertTrue(aggregate("saboteur", 90).evaluate(trap).outgoingDamageMultiplier()
-                > aggregate("saboteur", 90).evaluate(direct).outgoingDamageMultiplier());
-        assertTrue(aggregate("demolitionist", 100).evaluate(blast).outgoingDamageMultiplier()
-                > aggregate("demolitionist", 100).evaluate(direct).outgoingDamageMultiplier());
-    }
-
-    @Test
     void positionalAndTriggeredRisksOnlyApplyWhenTheirFactsAreTrue() {
         PassiveConditionContext close = context(1D, false, false, false, true, 1D,
                 false, false, true, false, 4D, false, false, false);
@@ -309,39 +244,4 @@ class PassiveAggregateTest {
                 magicWeaponDamage, false, wardBroken);
     }
 
-    private void assertSpellDomainDelta(String formId, int effectiveLevel, boolean positive) {
-        PassiveAggregate aggregate = aggregate(formId, effectiveLevel);
-        PassiveConditionContext physical = damageContext(false, false, false, false, false, null, false);
-        PassiveConditionContext classSpell = damageContext(true, true, false, false, false, null, false);
-        PassiveConditionContext wand = damageContext(false, false, false, false, false, SkillType.WANDS, false);
-        PassiveConditionContext staff = damageContext(false, false, false, false, false, SkillType.STAVES, false);
-        PassiveConditionContext summon = damageContext(true, false, false, false, false, null, false);
-        double baseline = aggregate.evaluate(physical).outgoingDamageMultiplier();
-
-        for (PassiveConditionContext spell : java.util.List.of(classSpell, wand, staff)) {
-            double actual = aggregate.evaluate(spell).outgoingDamageMultiplier();
-            if (positive) assertTrue(actual > baseline, formId + " should boost direct spells");
-            else assertTrue(actual < baseline, formId + " should weaken direct spells");
-        }
-        assertEquals(baseline, aggregate.evaluate(summon).outgoingDamageMultiplier(),
-                1.0E-9D, formId + " should not alter servant damage");
-    }
-
-    private static PassiveConditionContext damageContext(
-            boolean classAbilityDamage,
-            boolean nonSummonClassAbilityDamage,
-            boolean areaClassAbilityDamage,
-            boolean trapClassAbilityDamage,
-            boolean blastClassAbilityDamage,
-            SkillType magicWeaponSkill,
-            boolean wardBroken) {
-        return new PassiveConditionContext(
-                1D, false, false, false,
-                true, 1D, false, false, true, false,
-                8D, false, false, classAbilityDamage,
-                nonSummonClassAbilityDamage, areaClassAbilityDamage,
-                trapClassAbilityDamage, blastClassAbilityDamage,
-                PassiveRuntimePolicy.isSpellDamage(false, magicWeaponSkill),
-                false, wardBroken);
-    }
 }

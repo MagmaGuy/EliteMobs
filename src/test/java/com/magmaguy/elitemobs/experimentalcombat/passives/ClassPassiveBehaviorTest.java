@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.combatsystem.CombatDamageContext.ClassAbilityDamag
 import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
 import com.magmaguy.elitemobs.experimentalcombat.CombatTestEntities;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ActiveLineageSnapshot;
+import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import org.bukkit.Bukkit;
@@ -16,6 +17,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,6 +29,7 @@ import org.mockbukkit.mockbukkit.plugin.PluginMock;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -186,6 +190,23 @@ class ClassPassiveBehaviorTest {
     }
 
     @ParameterizedTest
+    @CsvSource({"juggernaut,86", "dreadnought,89"})
+    void controlResistanceShortensAppliedEffectsWithoutChangingTheirOtherProperties(String form, int duration) {
+        activate(form);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 2, true, false, false));
+        assertEquals(new PotionEffect(PotionEffectType.SLOWNESS, duration, 2, true, false, false),
+                player.getPotionEffect(PotionEffectType.SLOWNESS));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100, 0));
+        assertEquals(100, player.getPotionEffect(PotionEffectType.NIGHT_VISION).getDuration());
+
+        active = false;
+        runtime.reconcile(player, false);
+        player.removePotionEffect(PotionEffectType.SLOWNESS);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 2));
+        assertEquals(100, player.getPotionEffect(PotionEffectType.SLOWNESS).getDuration());
+    }
+
+    @ParameterizedTest
     @CsvSource({
             "mage,spell,10,10.284", "pyromancer,spell,10,10.355",
             "cryomancer,spell,10,9.929", "summoner,spell,10,9.858",
@@ -207,6 +228,15 @@ class ClassPassiveBehaviorTest {
         // Summons and ordinary hits must not inherit spell/trap/blast-only modifiers.
         CombatDamageContext.runClassAbilityDamage(ClassAbilityDamageDomain.SINGLE_TARGET_SUMMON,
                 () -> assertEquals(ordinary, outgoingDamage(), 0.000001));
+        for (var weapon : List.of(SkillType.WANDS, SkillType.STAVES)) {
+            CombatDamageContext.runPlayerToEliteBypass(
+                    new CombatDamageContext.PlayerDamageSource(UUID.randomUUID(), weapon),
+                    () -> assertEquals(kind.equals("spell") ? ability : ordinary, outgoingDamage(), 0.000001));
+        }
+        if (!kind.equals("spell")) {
+            CombatDamageContext.runClassAbilityDamage(ClassAbilityDamageDomain.SINGLE_TARGET_DIRECT,
+                    () -> assertEquals(ordinary, outgoingDamage(), 0.000001));
+        }
         assertEquals(ordinary, outgoingDamage(), 0.000001);
     }
 

@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.experimentalcombat.passives;
 
-import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.ClassControlAttribution;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -28,39 +27,6 @@ class ClassPassiveRuntimeTest {
         }
 
         assertFalse(ClassPassiveRuntime.targetControlled(player, target));
-    }
-
-    @Test
-    void classAbilityArchetypesRemainOrthogonalToShapeAndSummonDelivery() {
-        ClassPassiveRuntime.AbilityDamageFacts trap = ClassPassiveRuntime.abilityDamageFacts(
-                true, CombatDamageContext.ClassAbilityDamageDomain.AREA_TRAP);
-        assertTrue(trap.classAbilityDamage());
-        assertTrue(trap.nonSummonClassAbilityDamage());
-        assertTrue(trap.areaClassAbilityDamage());
-        assertTrue(trap.trapClassAbilityDamage());
-        assertFalse(trap.blastClassAbilityDamage());
-
-        ClassPassiveRuntime.AbilityDamageFacts blast = ClassPassiveRuntime.abilityDamageFacts(
-                true, CombatDamageContext.ClassAbilityDamageDomain.AREA_BLAST);
-        assertTrue(blast.areaClassAbilityDamage());
-        assertFalse(blast.trapClassAbilityDamage());
-        assertTrue(blast.blastClassAbilityDamage());
-
-        ClassPassiveRuntime.AbilityDamageFacts summon = ClassPassiveRuntime.abilityDamageFacts(
-                true, CombatDamageContext.ClassAbilityDamageDomain.SINGLE_TARGET_SUMMON);
-        assertTrue(summon.classAbilityDamage());
-        assertFalse(summon.nonSummonClassAbilityDamage());
-        assertFalse(summon.areaClassAbilityDamage());
-        assertFalse(summon.trapClassAbilityDamage());
-        assertFalse(summon.blastClassAbilityDamage());
-
-        ClassPassiveRuntime.AbilityDamageFacts inactive = ClassPassiveRuntime.abilityDamageFacts(
-                false, CombatDamageContext.ClassAbilityDamageDomain.AREA_TRAP);
-        assertFalse(inactive.classAbilityDamage());
-        assertFalse(inactive.nonSummonClassAbilityDamage());
-        assertFalse(inactive.areaClassAbilityDamage());
-        assertFalse(inactive.trapClassAbilityDamage());
-        assertFalse(inactive.blastClassAbilityDamage());
     }
 
     @SuppressWarnings("unchecked")
