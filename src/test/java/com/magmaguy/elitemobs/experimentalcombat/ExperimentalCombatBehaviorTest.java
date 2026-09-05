@@ -244,6 +244,31 @@ class ExperimentalCombatBehaviorTest {
         }
     }
 
+    @ParameterizedTest
+    @CsvSource({"necromancer,61,8.27125", "plaguebringer,91,7.7905"})
+    void areaDebuffSlowsAndWeakensEnemiesWithoutAffectingBystanders(
+            String form, int level, double weakenedDamage) {
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        var enemy = target().getLivingEntity();
+        var distant = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 20));
+        var bystander = MockBukkit.getMock().addPlayer();
+        bystander.teleport(player.getLocation().add(1, 0, 0));
+        try {
+            assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            assertNotNull(enemy.getPotionEffect(PotionEffectType.SLOWNESS));
+            assertFalse(distant.getLivingEntity().hasPotionEffect(PotionEffectType.SLOWNESS));
+            assertFalse(bystander.hasPotionEffect(PotionEffectType.SLOWNESS));
+            assertFalse(player.hasPotionEffect(PotionEffectType.SLOWNESS));
+            assertEquals(weakenedDamage, incomingDamage(), .000001);
+            assertEquals(10D, outgoingDamage(), "Weakening must not become a caster damage buff");
+
+            assertTrue(module.selectForm(player, "spellcaster").accepted());
+            assertEquals(10D, incomingDamage(), "Retiring the class must revoke its weakening modifier");
+        } finally {
+            distant.remove(RemovalReason.SHUTDOWN);
+        }
+    }
+
     @Test
     void manaWardAppliesShieldAndSpendsManaBeforeAnotherCast() {
         assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());

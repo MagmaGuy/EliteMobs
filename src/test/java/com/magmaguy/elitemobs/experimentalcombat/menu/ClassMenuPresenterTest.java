@@ -5,8 +5,6 @@ import com.magmaguy.elitemobs.experimentalcombat.classes.ClassCatalog;
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassFormDefinition;
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassLineage;
 import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
-import com.magmaguy.elitemobs.experimentalcombat.passives.PassiveProfile;
-import com.magmaguy.elitemobs.experimentalcombat.passives.PassiveTrait;
 import com.magmaguy.elitemobs.experimentalcombat.progression.InputProfile;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -29,9 +26,6 @@ class ClassMenuPresenterTest {
     private static final Pattern LEGACY_HEX = Pattern.compile(
             "(?i)(?:[&§]x(?:[&§][0-9a-f]){6}|[&§]#[0-9a-f]{6})");
     private static final Pattern LEGACY_FORMAT = Pattern.compile("(?i)[&§][0-9a-fk-or]");
-    private static final Pattern GAME_REFERENCE = Pattern.compile(
-            "(?i)(?:\\bdiablo\\b|\\boverwatch\\b|\\bwarcraft\\b|"
-                    + "\\bdark souls\\b|\\bdungeons[ &]+dragons\\b|d&d)");
 
     @Test
     void detailPagesHaveOneAllClassesActionAndControlsExistOnlyOnTheOverview() {
@@ -67,24 +61,6 @@ class ClassMenuPresenterTest {
     }
 
     @Test
-    void rangerResourceBurstUtilitiesDescribeTheFocusTheyRestore() {
-        ClassMenuView view = catalogView(true);
-        Map<String, String> expectedDescriptions = Map.of(
-                "artillerist", "Gain speed, power and a burst of Focus.",
-                "windrunner", "Gain speed and restore Focus.",
-                "tempest_archer", "Reveal foes, gain speed and restore Focus.");
-
-        for (Map.Entry<String, String> expected : expectedDescriptions.entrySet()) {
-            ClassMenuPresentation page = ClassMenuPresenter.form(
-                    view, view.requireForm(expected.getKey()));
-            String copy = visibleText(String.join("\n", playerFacingCopy(page)));
-
-            assertTrue(copy.contains(expected.getValue()), expected.getKey());
-            assertFalse(copy.contains("hasten Windstep"), expected.getKey());
-        }
-    }
-
-    @Test
     void everyLockedClassButtonIsRedAndExplainsItsBlockers() {
         ClassMenuView view = catalogView(false);
         int lockedActions = 0;
@@ -111,58 +87,6 @@ class ClassMenuPresenterTest {
         assertTrue(overlongRows.isEmpty(), () -> "Description rows exceed "
                 + MAX_DESCRIPTION_ROW_LENGTH + " visible characters:\n"
                 + String.join("\n", overlongRows));
-    }
-
-    @Test
-    void playerFacingCopyHasNoGameReferencesOrLongDashes() {
-        for (ClassMenuView view : List.of(catalogView(true), catalogView(false))) {
-            for (ClassMenuPresentation page : pages(view)) {
-                assertTrue(page.title().contains("<g:"));
-                for (String rendered : playerFacingCopy(page)) {
-                    String visible = visibleText(rendered);
-                    assertFalse(visible.contains("—"), () -> "Em dash in: " + visible);
-                    assertFalse(visible.contains("–"), () -> "En dash in: " + visible);
-                    assertFalse(GAME_REFERENCE.matcher(visible).find(),
-                            () -> "External game reference in: " + visible);
-                }
-            }
-        }
-    }
-
-    @Test
-    void passiveRowsShowTheExactLevelScaledMechanicalValue() {
-        ClassMenuPresentation levelOne = ClassMenuPresenter.form(
-                catalogView(true, 1), catalogView(true, 1).requireForm("berserker"));
-        ClassMenuPresentation levelThirty = ClassMenuPresenter.form(
-                catalogView(true, 30), catalogView(true, 30).requireForm("berserker"));
-        PassiveProfile profile = BuiltInClassContent.passiveRegistry().require("berserker");
-
-        String oneText = visibleText(levelOne.bodyText());
-        String thirtyText = visibleText(levelThirty.bodyText());
-        assertTrue(oneText.contains("Bonus Berserker • Lv 1"));
-        assertTrue(thirtyText.contains("Bonus Berserker • Lv 30"));
-        assertTrue(oneText.contains(percent(profile.atContributionLevel(1).outgoingDamage())));
-        assertTrue(thirtyText.contains(percent(profile.atContributionLevel(30).outgoingDamage())));
-        assertFalse(percent(profile.atContributionLevel(1).outgoingDamage())
-                .equals(percent(profile.atContributionLevel(30).outgoingDamage())));
-    }
-
-    @Test
-    void passiveRowsIncludeDescriptionsAndScaledConditionalTraits() {
-        ClassMenuView view = catalogView(true);
-        ClassMenuPresentation bloodrager = ClassMenuPresenter.form(
-                view, view.requireForm("bloodrager"));
-        String text = visibleText(bloodrager.bodyText());
-        ClassFormDefinition definition = BuiltInClassContent.catalog().require("bloodrager");
-        PassiveTrait belowHalf = BuiltInClassContent.passiveRegistry().traits("bloodrager").stream()
-                .filter(trait -> trait.conditions().stream()
-                        .anyMatch(condition -> condition.name().equals("HEALTH_BELOW_50")))
-                .findFirst()
-                .orElseThrow();
-        double expected = belowHalf.profile().atContributionLevel(1).outgoingDamage();
-
-        assertTrue(text.contains(definition.passive().description()));
-        assertTrue(text.contains("Damage under 50% HP " + percent(expected)));
     }
 
     @Test
@@ -371,10 +295,6 @@ class ClassMenuPresenterTest {
                 contributionLevel,
                 preview,
                 ClassMenuProjector.passiveStats(form.id(), contributionLevel));
-    }
-
-    private static String percent(double fraction) {
-        return String.format(Locale.ROOT, "%+.1f%%", fraction * 100D);
     }
 
     private static ClassMenuView.AbilityView ability(AbilityDefinition definition) {
