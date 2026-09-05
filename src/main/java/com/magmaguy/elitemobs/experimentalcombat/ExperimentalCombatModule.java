@@ -192,11 +192,9 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
                 module::controlsAlwaysAvailable,
                 module.inputRouter::controlsEnabled);
         module.magicWeaponIntegration.start();
-        module.registerGameplayListeners();
+        module.startGameplay();
         PlayerIdentityLabelRenderer.installClassLabelProvider(module::classLabel);
         ExperimentalCombatRuntime.installHudProvider(module::renderHud);
-        module.updateTask = Bukkit.getScheduler().runTaskTimer(
-                MetadataHandler.PLUGIN, module::tick, 1L, 20L);
         for (Player player : Bukkit.getOnlinePlayers())
             if (PlayerData.isDataLoaded(player.getUniqueId())) module.load(player);
         return module;
@@ -206,11 +204,13 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         return instance != null;
     }
 
-    void registerGameplayListeners() {
+    void startGameplay() {
+        if (updateTask != null) throw new IllegalStateException("Combat gameplay is already started");
         Bukkit.getPluginManager().registerEvents(this, MetadataHandler.PLUGIN);
         Bukkit.getPluginManager().registerEvents(passiveRuntime, MetadataHandler.PLUGIN);
         Bukkit.getPluginManager().registerEvents(inputRouter, MetadataHandler.PLUGIN);
         Bukkit.getPluginManager().registerEvents(weaponAffinity, MetadataHandler.PLUGIN);
+        updateTask = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, this::tick, 1L, 20L);
     }
 
     /** Stable observation seam for the external every-class behavior probe. */

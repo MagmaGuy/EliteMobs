@@ -73,7 +73,7 @@ class ExperimentalCombatBehaviorTest {
         progression.load(player.getUniqueId()).join();
         module = new ExperimentalCombatModule(new DungeonCombatRuntime(200, 20), availability -> progression,
                 ignored -> fullCombatActive);
-        module.registerGameplayListeners();
+        module.startGameplay();
         ClassAbilityEligibility.install(module::controlsAlwaysAvailable, module::mechanicsActive);
         module.onControlModeChanged(player);
     }
@@ -261,6 +261,41 @@ class ExperimentalCombatBehaviorTest {
         module.close();
         module = null;
         assertEquals(10D, incomingDamage(), "Closing combat must remove its damage modifier");
+    }
+
+    @Test
+    void manaRecoveryAllowsAnotherWardOnlyAfterSixtyScheduledUpdates() {
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        player.removePotionEffect(PotionEffectType.ABSORPTION);
+        var scheduler = MockBukkit.getMock().getScheduler();
+        scheduler.performTicks(1180);
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertFalse(player.hasPotionEffect(PotionEffectType.ABSORPTION));
+        scheduler.performOneTick();
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful(),
+                "The production update task must restore enough Mana to cast again");
+        assertNotNull(player.getPotionEffect(PotionEffectType.ABSORPTION));
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+    }
+
+    @Test
+    void takingDamageDelaysFocusRecoveryBeforeAnotherMarkCanBeCast() {
+        assertTrue(module.setClassLevelForAdministration(player, "ranger", 1).applied());
+        var enemy = target().getLivingEntity();
+        for (int cast = 0; cast < 4; cast++)
+            assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        incomingDamage();
+        enemy.removePotionEffect(PotionEffectType.GLOWING);
+        var scheduler = MockBukkit.getMock().getScheduler();
+        scheduler.performTicks(60);
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(),
+                "Taking damage must postpone positive Focus recovery");
+        scheduler.performTicks(20);
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertFalse(enemy.hasPotionEffect(PotionEffectType.GLOWING));
+        scheduler.performOneTick();
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertTrue(enemy.hasPotionEffect(PotionEffectType.GLOWING));
     }
 
     @ParameterizedTest

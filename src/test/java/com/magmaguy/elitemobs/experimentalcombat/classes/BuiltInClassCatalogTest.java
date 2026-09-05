@@ -1,10 +1,8 @@
 package com.magmaguy.elitemobs.experimentalcombat.classes;
 
 import com.magmaguy.elitemobs.skills.SkillType;
-import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
 import org.junit.jupiter.api.Test;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,15 +55,6 @@ class BuiltInClassCatalogTest {
             if (!catalog.rootOf(form.id()).id().equals("spellcaster")) continue;
             assertEquals(List.of(SkillType.STAVES, SkillType.WANDS), form.foundationSkills().asList());
         }
-    }
-
-    @Test
-    void everyResourceHasCodeOwnedRulesIncludingMana() {
-        assertEquals(EnumSet.allOf(ClassResourceType.class), BuiltInClassContent.resourceDefinitions().keySet());
-        var mana = BuiltInClassContent.resourceDefinitions().get(ClassResourceType.MANA);
-        assertEquals(100D, mana.initialAmount());
-        assertEquals(100D / 60D, mana.inCombatTickDelta());
-        assertEquals(100D / 60D, mana.outOfCombatTickDelta());
     }
 
     @Test
