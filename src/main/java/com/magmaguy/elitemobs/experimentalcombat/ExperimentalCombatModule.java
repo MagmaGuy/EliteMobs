@@ -38,6 +38,7 @@ import com.magmaguy.elitemobs.experimentalcombat.passives.PassiveMechanics;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ActiveLineageSnapshot;
 import com.magmaguy.elitemobs.experimentalcombat.progression.AwardResult;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ClassProgressionModule;
+import com.magmaguy.elitemobs.experimentalcombat.progression.ClassContentAvailability;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ClassProgressionSetResult;
 import com.magmaguy.elitemobs.experimentalcombat.progression.InputProfile;
 import com.magmaguy.elitemobs.experimentalcombat.progression.FoundationLevelSnapshot;
@@ -91,6 +92,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
+import java.util.function.Function;
 
 /**
  * Deep module boundary for Experimental Combat classes.
@@ -99,7 +101,7 @@ import java.util.concurrent.CompletionException;
  * run locks, resources, passives, threat, contribution and presentation. Active abilities have
  * no cooldowns: resource costs are the only pacing.</p>
  */
-public final class ExperimentalCombatModule implements Listener, ClassAbilityInput {
+public final class ExperimentalCombatModule implements Listener, ClassAbilityInput, AutoCloseable {
 
     private static final long CAP_WARNING_INTERVAL_NANOS = 15_000_000_000L;
 
@@ -125,15 +127,21 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     private BukkitTask updateTask;
 
     private ExperimentalCombatModule(PlayerCombatState combatState) {
-        this.combatState = Objects.requireNonNull(combatState, "combatState");
-        this.magicWeaponIntegration = new ExperimentalMagicWeaponIntegration(MetadataHandler.PLUGIN);
-        this.progression = new ClassProgressionModule(catalog, playerId -> {
+        this(combatState, availability -> new ClassProgressionModule(BuiltInClassContent.catalog(), playerId -> {
             if (!PlayerData.isDataLoaded(playerId)) return Optional.empty();
             Map<SkillType, Integer> levels = new EnumMap<>(SkillType.class);
             for (SkillType skillType : SkillType.values())
                 levels.put(skillType, PlayerData.getSkillLevel(playerId, skillType));
             return Optional.of(new FoundationLevelSnapshot(playerId, levels));
-        }, new JdbcClassProgressionStore(), magicWeaponIntegration::unavailableReason);
+        }, new JdbcClassProgressionStore(), availability));
+    }
+
+    ExperimentalCombatModule(PlayerCombatState combatState,
+                             Function<ClassContentAvailability, ClassProgressionModule> progressionFactory) {
+        this.combatState = Objects.requireNonNull(combatState, "combatState");
+        this.magicWeaponIntegration = new ExperimentalMagicWeaponIntegration(MetadataHandler.PLUGIN);
+        this.progression = Objects.requireNonNull(
+                progressionFactory.apply(magicWeaponIntegration::unavailableReason), "progression");
         this.passiveRegistry = BuiltInClassContent.passiveRegistry();
         this.passiveRuntime = new ClassPassiveRuntime(this::passivesFor);
         EliteMobsAbilitySemantics semantics = new EliteMobsAbilitySemantics(
@@ -212,7 +220,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     }
 
     public static void shutdownIfInitialized() {
-        if (instance != null) instance.shutdown();
+        if (instance != null) instance.close();
     }
 
     public ClassCatalog catalog() {
@@ -796,7 +804,8 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         });
     }
 
-    private void shutdown() {
+    @Override
+    public void close() {
         if (updateTask != null) {
             updateTask.cancel();
             updateTask = null;

@@ -33,14 +33,17 @@ public final class DungeonCombatRuntime implements Listener, PlayerCombatState {
     private BukkitTask updateTask;
 
     public DungeonCombatRuntime() {
+        this(ExperimentalCombatConfig.isEnabled()
+                        ? ExperimentalCombatRules.COMBAT_TIMEOUT_TICKS
+                        : DungeonsConfig.getDungeonFoodRegenerationCombatTimeoutSeconds() * 20L,
+                DungeonsConfig.getDungeonFoodRegenerationIntervalSeconds() * 20L);
+    }
+
+    public DungeonCombatRuntime(long combatTimeoutTicks, long foodRegenerationIntervalTicks) {
         if (instance != null)
             throw new IllegalStateException("Dungeon combat runtime is already initialized.");
-        long combatTimeoutTicks = ExperimentalCombatConfig.isEnabled()
-                ? ExperimentalCombatRules.COMBAT_TIMEOUT_TICKS
-                : DungeonsConfig.getDungeonFoodRegenerationCombatTimeoutSeconds() * 20L;
         combatSessions = new CombatSessionTracker(combatTimeoutTicks);
-        foodRegenerationIntervalTicks =
-                DungeonsConfig.getDungeonFoodRegenerationIntervalSeconds() * 20L;
+        this.foodRegenerationIntervalTicks = foodRegenerationIntervalTicks;
         nextFoodRegenerationTick = foodRegenerationIntervalTicks;
         instance = this;
     }
