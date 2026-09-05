@@ -276,6 +276,37 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @ParameterizedTest
+    @CsvSource({"deathless,SIGNATURE,3.964,false", "deathless,SIGNATURE,3.964,true",
+            "lich,UTILITY,2.982,false", "lich,UTILITY,2.982,true"})
+    void deathGuardTriggersOnceAndCannotHealAfterClassChange(
+            String form, AbilitySlot slot, double recoveredHealth, boolean changeClassBeforeRecovery) {
+        assertTrue(module.setClassLevelForAdministration(player, form, 91).applied());
+        if (form.equals("deathless")) {
+            assertFalse(module.useAbility(player, slot).successful());
+            for (int hit = 0; hit < 5; hit++) incomingDamage();
+        }
+        assertTrue(module.useAbility(player, slot).successful());
+        assertEquals(7.545D, incomingDamage(), 0.000001, "A nonfatal hit must not consume the guard");
+        player.setHealth(2D);
+        player.removePotionEffect(PotionEffectType.ABSORPTION);
+        player.setAbsorptionAmount(2D);
+
+        assertEquals(3D, incomingDamage(), 0.000001, "The guard must count absorption when capping this custom event");
+        assertEquals(2D, player.getHealth(), "Recovery is scheduled after damage processing");
+        if (changeClassBeforeRecovery) assertTrue(module.selectForm(player, "spellcaster").accepted());
+        MockBukkit.getMock().getScheduler().performOneTick();
+        if (changeClassBeforeRecovery) {
+            assertEquals(2D, player.getHealth(), "A retired class must not apply delayed recovery");
+            assertFalse(player.hasPotionEffect(PotionEffectType.ABSORPTION));
+            assertEquals(10D, incomingDamage());
+        } else {
+            assertEquals(recoveredHealth, player.getHealth(), 0.000001);
+            assertEquals(1, player.getPotionEffect(PotionEffectType.ABSORPTION).getAmplifier());
+            assertEquals(7.545D, incomingDamage(), 0.000001, "The consumed guard must not cap another hit");
+        }
+    }
+
+    @ParameterizedTest
     @CsvSource({"mage,31,11.5085,false", "spellblade,91,11.964,true"})
     void damageBuffAppliesItsEffectsUntilClassChange(String form, int level, double damage, boolean warcasting) {
         assertTrue(module.setClassLevelForAdministration(player, form, level).applied());

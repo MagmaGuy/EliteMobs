@@ -8,11 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AbilityStateRuntimeTest {
     @Test
-    void deathGuardCountsAbsorptionBeforePreservingOneHealth() {
-        assertEquals(27D, AbilityStateMath.deathGuardDamageCeiling(20D, 8D));
-    }
-
-    @Test
     void deathGuardFailsClosedForInvalidState() {
         assertEquals(0D, AbilityStateMath.deathGuardDamageCeiling(Double.NaN, 8D));
         assertEquals(0D, AbilityStateMath.deathGuardDamageCeiling(20D, Double.POSITIVE_INFINITY));
