@@ -263,17 +263,20 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(10D, incomingDamage(), "Closing combat must remove its damage modifier");
     }
 
-    @Test
-    void manaRecoveryAllowsAnotherWardOnlyAfterSixtyScheduledUpdates() {
-        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+    @ParameterizedTest
+    @CsvSource({"spellcaster,1,true,1180", "guardian,31,false,1240"})
+    void scheduledRecoveryFundsAShieldOnlyAfterEnoughUpdates(
+            String form, int level, boolean initiallyAffordable, int ticksBeforeAffordable) {
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        assertEquals(initiallyAffordable, module.useAbility(player, AbilitySlot.UTILITY).successful());
         player.removePotionEffect(PotionEffectType.ABSORPTION);
         var scheduler = MockBukkit.getMock().getScheduler();
-        scheduler.performTicks(1180);
+        scheduler.performTicks(ticksBeforeAffordable);
         assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
         assertFalse(player.hasPotionEffect(PotionEffectType.ABSORPTION));
         scheduler.performOneTick();
         assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful(),
-                "The production update task must restore enough Mana to cast again");
+                "The production update task must earn enough resource for the shield");
         assertNotNull(player.getPotionEffect(PotionEffectType.ABSORPTION));
         assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
     }
@@ -470,7 +473,7 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @Test
-    void prayerOfMendingHealsWithoutGrantingEnoughGraceToRepeat() {
+    void prayerOfMendingSpendsGraceAndRecoversThroughScheduledUpdates() {
         assertTrue(module.setClassLevelForAdministration(player, "priest", 31).applied());
         player.setHealth(8D);
 
@@ -479,6 +482,12 @@ class ExperimentalCombatBehaviorTest {
         assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
         assertEquals(11.017, player.getHealth(), 0.000001,
                 "Insufficient Grace must stop the second heal before applying it");
+        var scheduler = MockBukkit.getMock().getScheduler();
+        scheduler.performTicks(20);
+        assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        scheduler.performOneTick();
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        assertEquals(14.034D, player.getHealth(), .000001);
     }
 
     @ParameterizedTest(name = "{displayName} [{index}] changeClass={0}")
@@ -575,10 +584,14 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @Test
-    void berserkerSignatureSpendsEarnedFuryForDamageAndSpeedUntilClassChange() {
+    void berserkerSignatureNeedsFuryThatHasNotDecayedThenAppliesDamageAndSpeedUntilClassChange() {
         assertTrue(module.setClassLevelForAdministration(player, "berserker", 1).applied());
         assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
         incomingDamage();
+        incomingDamage();
+        MockBukkit.getMock().getScheduler().performOneTick();
+        assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful(),
+                "An out-of-combat update must decay Fury below this cast's cost");
         incomingDamage();
         assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
         assertEquals(11.8045D, outgoingDamage(), 0.000001);
