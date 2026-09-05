@@ -16,9 +16,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionEffect;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockbukkit.mockbukkit.MockBukkit;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
 
@@ -79,6 +82,41 @@ class ExperimentalCombatBehaviorTest {
         module.close();
         module = null;
         assertEquals(10D, incomingDamage(), "Closing combat must remove its damage modifier");
+    }
+
+    @ParameterizedTest
+    @CsvSource({"cryomancer,91,123,1,7.545,true", "battlemage,61,115,0,7.695,false"})
+    void selfWardAppliesItsEffectsAndRevokesProtectionOnClassChange(
+            String form, int level, int duration, int amplifier, double damage, boolean cleanses) {
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 0));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 0));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100, 0));
+
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertEquals(!cleanses, player.hasPotionEffect(PotionEffectType.POISON));
+        assertEquals(!cleanses, player.hasPotionEffect(PotionEffectType.SLOWNESS));
+        assertTrue(player.hasPotionEffect(PotionEffectType.NIGHT_VISION));
+        var shield = player.getPotionEffect(PotionEffectType.ABSORPTION);
+        assertNotNull(shield);
+        assertEquals(duration, shield.getDuration());
+        assertEquals(amplifier, shield.getAmplifier());
+        assertEquals(damage, incomingDamage(), 0.000001);
+
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        assertEquals(10D, incomingDamage(), "Changing class must revoke the previous ward modifier");
+    }
+
+    @Test
+    void prayerOfMendingHealsWithoutGrantingEnoughGraceToRepeat() {
+        assertTrue(module.setClassLevelForAdministration(player, "priest", 31).applied());
+        player.setHealth(8D);
+
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        assertEquals(11.017, player.getHealth(), 0.000001);
+        assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        assertEquals(11.017, player.getHealth(), 0.000001,
+                "Insufficient Grace must stop the second heal before applying it");
     }
 
     @SuppressWarnings("removal")
