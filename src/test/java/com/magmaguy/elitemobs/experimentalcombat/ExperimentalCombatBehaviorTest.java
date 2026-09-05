@@ -357,7 +357,7 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(10D, incomingDamage(ally), "Changing the caster's class must revoke the ally's protection");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{displayName} [{index}] changeClass={0}")
     @CsvSource({"false", "true"})
     void seraphChainHealsTheMostWoundedPartyMemberFirstAndStopsOnClassChange(
             boolean changeClass) throws Exception {
@@ -446,7 +446,7 @@ class ExperimentalCombatBehaviorTest {
                 "Insufficient Grace must stop the second heal before applying it");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{displayName} [{index}] changeClass={0}")
     @CsvSource({"false", "true"})
     void spiritcallerEchoUsesEffectiveHealingOnceAndCannotOutliveItsClass(
             boolean changeClass) {
