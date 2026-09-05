@@ -286,9 +286,11 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(10D, incomingDamage(), "Changing class must revoke the previous ward modifier");
     }
 
-    @Test
-    void prayerOfMendingHealsTheThreeMostWoundedPartyMembersAndExcludesOutsiders() throws Exception {
-        assertTrue(module.setClassLevelForAdministration(player, "priest", 31).applied());
+    @ParameterizedTest
+    @CsvSource({"priest,31,3.017,false", "hierophant,61,4.61,true"})
+    void partyHealSelectsItsRecipientsAndExcludesOutsiders(
+            String form, int level, double healing, boolean healsCaster) throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
         var server = MockBukkit.getMock();
         var first = server.addPlayer();
         var second = server.addPlayer();
@@ -304,11 +306,55 @@ class ExperimentalCombatBehaviorTest {
         outsider.setHealth(1D);
 
         assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
-        assertEquals(5.017D, first.getHealth(), .000001);
-        assertEquals(7.017D, second.getHealth(), .000001);
-        assertEquals(11.017D, third.getHealth(), .000001);
-        assertEquals(16D, player.getHealth(), "The healthier caster must not displace a wounded ally");
+        assertEquals(2D + healing, first.getHealth(), .000001);
+        assertEquals(4D + healing, second.getHealth(), .000001);
+        assertEquals(8D + healing, third.getHealth(), .000001);
+        assertEquals(healsCaster ? 20D : 16D, player.getHealth(),
+                "Priest selects the three most wounded members; Hierophant heals the nearby party");
         assertEquals(1D, outsider.getHealth(), "Low health alone must not make another player a party ally");
+    }
+
+    @ParameterizedTest
+    @CsvSource({"shepherd,false", "mistweaver,true"})
+    void partyUtilitySpendsGraceAndProtectsOnlyNearbyMembersUntilClassChange(
+            String form, boolean cleanses) throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, form, 91).applied());
+        var server = MockBukkit.getMock();
+        var ally = server.addPlayer();
+        var distant = server.addPlayer();
+        var outsider = server.addPlayer();
+        ally.teleport(player.getLocation().add(1, 0, 0));
+        outsider.teleport(player.getLocation().add(2, 0, 0));
+        distant.teleport(player.getLocation().add(0, 0, 40));
+        openParty(ally, distant);
+        for (var member : List.of(player, ally, distant, outsider)) {
+            assertTrue(ClassAbilityEligibility.isEligible(member));
+            member.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 0));
+            member.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100, 0));
+        }
+
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        for (var member : List.of(player, ally)) {
+            assertEquals(1, member.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
+            assertEquals(!cleanses, member.hasPotionEffect(PotionEffectType.POISON));
+            assertTrue(member.hasPotionEffect(PotionEffectType.NIGHT_VISION));
+        }
+        for (var excluded : List.of(distant, outsider)) {
+            assertFalse(excluded.hasPotionEffect(PotionEffectType.SPEED));
+            assertTrue(excluded.hasPotionEffect(PotionEffectType.POISON));
+            assertEquals(10D, incomingDamage(excluded));
+        }
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        for (var member : List.of(player, ally)) member.removePotionEffect(PotionEffectType.SPEED);
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(),
+                "Two 35-Grace casts must leave too little Grace for a third");
+        for (var member : List.of(player, ally)) {
+            assertFalse(member.hasPotionEffect(PotionEffectType.SPEED));
+            assertEquals(7.545D, incomingDamage(member), .000001);
+        }
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        assertEquals(10D, incomingDamage());
+        assertEquals(10D, incomingDamage(ally), "Changing the caster's class must revoke the ally's protection");
     }
 
     @Test
@@ -560,12 +606,16 @@ class ExperimentalCombatBehaviorTest {
         return new EliteMobDamagedByPlayerEvent(victim, attacker, hit, 10D, false, false, 1D);
     }
 
-    @SuppressWarnings("removal")
     private double incomingDamage() {
+        return incomingDamage(player);
+    }
+
+    @SuppressWarnings("removal")
+    private double incomingDamage(PlayerMock victim) {
         var attacker = target();
-        var hit = new EntityDamageByEntityEvent(attacker.getLivingEntity(), player,
+        var hit = new EntityDamageByEntityEvent(attacker.getLivingEntity(), victim,
                 EntityDamageEvent.DamageCause.ENTITY_ATTACK, 10D);
-        var event = new PlayerDamagedByEliteMobEvent(attacker, player, hit, null, 10D);
+        var event = new PlayerDamagedByEliteMobEvent(attacker, victim, hit, null, 10D);
         Bukkit.getPluginManager().callEvent(event);
         return event.getDamage();
     }
