@@ -184,6 +184,37 @@ class ExperimentalCombatBehaviorTest {
         }
     }
 
+    @ParameterizedTest
+    @CsvSource({"ranger,false,false", "skirmisher,false,true", "elementalist,true,false",
+            "pyromancer,true,false", "occultist,true,false"})
+    void nearbyMarkChangesCasterDamageAndRevokesItsModifiersOnClassChange(
+            String form, boolean weakens, boolean grantsSpeed) {
+        int level = module.catalog().require(form).band().effectiveStart();
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        var marked = target().getLivingEntity();
+        var distant = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 20));
+        var bystander = MockBukkit.getMock().addPlayer();
+        bystander.teleport(player.getLocation().add(1, 0, 0));
+        try {
+            assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            assertTrue(marked.hasPotionEffect(PotionEffectType.GLOWING));
+            assertFalse(distant.getLivingEntity().hasPotionEffect(PotionEffectType.GLOWING));
+            assertFalse(bystander.hasPotionEffect(PotionEffectType.GLOWING));
+            assertEquals(grantsSpeed, player.hasPotionEffect(PotionEffectType.SPEED));
+            assertTrue(outgoingDamage() > 10D, "The mark must modify actual damage events for its caster");
+            var distantHit = outgoingEvent(distant);
+            Bukkit.getPluginManager().callEvent(distantHit);
+            assertEquals(10D, distantHit.getDamage(), "The mark must not become a caster-wide damage buff");
+            assertEquals(weakens, incomingDamage() < 10D);
+
+            assertTrue(module.selectForm(player, "spellcaster").accepted());
+            assertEquals(10D, outgoingDamage());
+            assertEquals(10D, incomingDamage());
+        } finally {
+            distant.remove(RemovalReason.SHUTDOWN);
+        }
+    }
+
     @Test
     void manaWardAppliesShieldAndSpendsManaBeforeAnotherCast() {
         assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
@@ -437,11 +468,15 @@ class ExperimentalCombatBehaviorTest {
         return event.getDamage();
     }
 
-    @SuppressWarnings("removal")
     private EliteMobDamagedByPlayerEvent outgoingEvent() {
-        var hit = new EntityDamageByEntityEvent(player, target().getLivingEntity(),
+        return outgoingEvent(target());
+    }
+
+    @SuppressWarnings("removal")
+    private EliteMobDamagedByPlayerEvent outgoingEvent(EliteEntity victim) {
+        var hit = new EntityDamageByEntityEvent(player, victim.getLivingEntity(),
                 EntityDamageEvent.DamageCause.ENTITY_ATTACK, 10D);
-        return new EliteMobDamagedByPlayerEvent(target(), player, hit, 10D, false, false, 1D);
+        return new EliteMobDamagedByPlayerEvent(victim, player, hit, 10D, false, false, 1D);
     }
 
     @SuppressWarnings("removal")
