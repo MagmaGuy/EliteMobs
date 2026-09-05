@@ -15,12 +15,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.util.Vector;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockbukkit.mockbukkit.MockBukkit;
@@ -187,6 +189,61 @@ class ClassPassiveBehaviorTest {
         var event = new EliteMobDamagedByPlayerEvent(target, player, 10D, false, true);
         Bukkit.getPluginManager().callEvent(event);
         assertEquals(critical, event.getDamage(), 0.000001);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"justicar,9.148", "inquisitor,8.935", "reaver,9.29"})
+    void healingTradeoffChangesRegainHealthEventsAndStopsWhenInactive(String form, double amount) {
+        activate(form);
+        var heal = new EntityRegainHealthEvent(player, 10D, EntityRegainHealthEvent.RegainReason.CUSTOM);
+        Bukkit.getPluginManager().callEvent(heal);
+        assertEquals(amount, heal.getAmount(), 0.000001);
+        assertFalse(heal.isCancelled());
+
+        active = false;
+        runtime.reconcile(player, false);
+        var ordinary = new EntityRegainHealthEvent(player, 10D, EntityRegainHealthEvent.RegainReason.CUSTOM);
+        Bukkit.getPluginManager().callEvent(ordinary);
+        assertEquals(10D, ordinary.getAmount());
+    }
+
+    @Test
+    void lichWardBreakOpensDamageRiskAndLeavingCombatClearsIt() {
+        activate("lich");
+        assertEquals(10D, incomingDamage());
+        runtime.signalWardBroken(player, 100);
+        assertEquals(10.568D, incomingDamage(), 0.000001);
+
+        active = false;
+        runtime.reconcile(player, false);
+        active = true;
+        runtime.reconcile(player, true);
+        assertEquals(10D, incomingDamage(), "A new combat session must not inherit the broken-ward risk");
+    }
+
+    @Test
+    void saboteurRangedPenaltyDoesNotLeakIntoMelee() {
+        activate("saboteur");
+        assertEquals(10.081D, outgoingDamage(), 0.000001);
+        var ranged = new EliteMobDamagedByPlayerEvent(target, player, 10D, true);
+        Bukkit.getPluginManager().callEvent(ranged);
+        assertEquals(9.584D, ranged.getDamage(), 0.000001);
+        assertEquals(10.081D, outgoingDamage(), 0.000001);
+    }
+
+    @Test
+    void skirmisherGainsDamageWhileMovingButLosesSpeedAfterAHit() {
+        activate("skirmisher");
+        assertEquals(10.152D, outgoingDamage(), 0.000001);
+        assertEquals(.102525D, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), 0.000001);
+        player.setVelocity(new Vector(.2, 0, 0));
+        assertEquals(10.72D, outgoingDamage(), 0.000001);
+        assertEquals(10.121D, incomingDamage(), 0.000001);
+        assertEquals(.096845D, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), 0.000001);
+        assertEquals(10.405D, incomingDamage(), 0.000001);
+
+        runtime.discard(player);
+        assertEquals(.1D, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), 0.000001);
     }
 
     @ParameterizedTest

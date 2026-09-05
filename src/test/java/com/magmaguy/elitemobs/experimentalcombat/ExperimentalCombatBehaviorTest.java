@@ -25,6 +25,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockbukkit.mockbukkit.MockBukkit;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
+import org.mockbukkit.mockbukkit.plugin.PluginMock;
 
 import java.util.*;
 
@@ -35,21 +36,34 @@ class ExperimentalCombatBehaviorTest {
     private PlayerMock player;
     private ExperimentalCombatModule module;
     private EliteEntity target;
+    private boolean fullCombatActive;
 
     @BeforeEach
     void openCombat() {
         var server = MockBukkit.mock();
         previousPlugin = MetadataHandler.PLUGIN;
-        MetadataHandler.PLUGIN = MockBukkit.createMockPlugin();
+        MetadataHandler.PLUGIN = MockBukkit.loadWith(PluginMock.class, new java.io.ByteArrayInputStream("""
+                name: CombatBehaviorTest
+                version: 1
+                main: org.mockbukkit.mockbukkit.plugin.PluginMock
+                authors: [Autotester]
+                """.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
         player = server.addPlayer();
         InstanceProtector.addProtectedWorld(player.getWorld());
+        fullCombatActive = false;
+        openModule();
+    }
+
+    private void openModule() {
         var levels = new EnumMap<SkillType, Integer>(SkillType.class);
         for (var skill : SkillType.values()) levels.put(skill, 100);
         var progression = new ClassProgressionModule(BuiltInClassContent.catalog(),
                 id -> Optional.of(new FoundationLevelSnapshot(id, levels)),
                 new MemoryStore(player.getUniqueId()), Runnable::run);
         progression.load(player.getUniqueId()).join();
-        module = new ExperimentalCombatModule(new DungeonCombatRuntime(200, 20), availability -> progression);
+        module = new ExperimentalCombatModule(new DungeonCombatRuntime(200, 20), availability -> progression,
+                ignored -> fullCombatActive);
+        module.registerGameplayListeners();
         ClassAbilityEligibility.install(module::controlsAlwaysAvailable, module::mechanicsActive);
         module.onControlModeChanged(player);
     }
@@ -120,6 +134,18 @@ class ExperimentalCombatBehaviorTest {
         assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
         assertEquals(11.017, player.getHealth(), 0.000001,
                 "Insufficient Grace must stop the second heal before applying it");
+    }
+
+    @Test
+    void prayerOfMendingUsesInheritedPassivesWhenFullCombatIsActive() {
+        fullCombatActive = true;
+        assertTrue(module.setClassLevelForAdministration(player, "priest", 31).applied());
+        player.setHealth(8D);
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        // Rank-31 Priest: 14% heal, rank scale 1.0775, Cleric/Priest passives +10.6%.
+        assertEquals(8D + 20D * .14D * 1.0775D * 1.106D, player.getHealth(), 0.000001);
+        assertEquals(9.5D, outgoingDamage(), 0.000001,
+                "The same active lineage must also reach the damage event listener");
     }
 
     @ParameterizedTest

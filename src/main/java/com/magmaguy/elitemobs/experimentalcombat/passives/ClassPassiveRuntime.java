@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.ClassControlAttribution;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.parties.PartyManager;
@@ -61,11 +60,7 @@ public final class ClassPassiveRuntime implements Listener {
     private final Set<UUID> applyingControlResistance = new HashSet<>();
     private final PassiveStateTracker state = new PassiveStateTracker();
 
-    public ClassPassiveRuntime(Function<UUID, PassiveAggregate> passiveProvider) {
-        this(passiveProvider, ExperimentalCombatRuntime::isActive);
-    }
-
-    ClassPassiveRuntime(Function<UUID, PassiveAggregate> passiveProvider, Predicate<Player> combatActive) {
+    public ClassPassiveRuntime(Function<UUID, PassiveAggregate> passiveProvider, Predicate<Player> combatActive) {
         this.passiveProvider = Objects.requireNonNull(passiveProvider, "passiveProvider");
         this.combatActive = Objects.requireNonNull(combatActive, "combatActive");
     }

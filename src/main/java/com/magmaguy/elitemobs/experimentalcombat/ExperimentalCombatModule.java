@@ -93,6 +93,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Deep module boundary for Experimental Combat classes.
@@ -117,6 +118,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     private final FixedAbilityRegistry abilityRegistry = BuiltInClassContent.abilityRegistry();
     private final FixedPassiveRegistry passiveRegistry;
     private final ClassPassiveRuntime passiveRuntime;
+    private final Predicate<Player> passiveActive;
     private final ClassAbilityEngine abilityEngine;
     private final ClassAbilityInputRouter inputRouter;
     private final ClassWeaponAffinity weaponAffinity = new ClassWeaponAffinity();
@@ -133,17 +135,19 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
             for (SkillType skillType : SkillType.values())
                 levels.put(skillType, PlayerData.getSkillLevel(playerId, skillType));
             return Optional.of(new FoundationLevelSnapshot(playerId, levels));
-        }, new JdbcClassProgressionStore(), availability));
+        }, new JdbcClassProgressionStore(), availability), ExperimentalCombatRuntime::isActive);
     }
 
     ExperimentalCombatModule(PlayerCombatState combatState,
-                             Function<ClassContentAvailability, ClassProgressionModule> progressionFactory) {
+                             Function<ClassContentAvailability, ClassProgressionModule> progressionFactory,
+                             Predicate<Player> passiveActive) {
         this.combatState = Objects.requireNonNull(combatState, "combatState");
+        this.passiveActive = Objects.requireNonNull(passiveActive, "passiveActive");
         this.magicWeaponIntegration = new ExperimentalMagicWeaponIntegration(MetadataHandler.PLUGIN);
         this.progression = Objects.requireNonNull(
                 progressionFactory.apply(magicWeaponIntegration::unavailableReason), "progression");
         this.passiveRegistry = BuiltInClassContent.passiveRegistry();
-        this.passiveRuntime = new ClassPassiveRuntime(this::passivesFor);
+        this.passiveRuntime = new ClassPassiveRuntime(this::passivesFor, passiveActive);
         EliteMobsAbilitySemantics semantics = new EliteMobsAbilitySemantics(
                 this::applyThreat,
                 this::recordAbilityContribution,
@@ -188,10 +192,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
                 module::controlsAlwaysAvailable,
                 module.inputRouter::controlsEnabled);
         module.magicWeaponIntegration.start();
-        Bukkit.getPluginManager().registerEvents(module, MetadataHandler.PLUGIN);
-        Bukkit.getPluginManager().registerEvents(module.passiveRuntime, MetadataHandler.PLUGIN);
-        Bukkit.getPluginManager().registerEvents(module.inputRouter, MetadataHandler.PLUGIN);
-        Bukkit.getPluginManager().registerEvents(module.weaponAffinity, MetadataHandler.PLUGIN);
+        module.registerGameplayListeners();
         PlayerIdentityLabelRenderer.installClassLabelProvider(module::classLabel);
         ExperimentalCombatRuntime.installHudProvider(module::renderHud);
         module.updateTask = Bukkit.getScheduler().runTaskTimer(
@@ -203,6 +204,13 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
 
     public static boolean isInitialized() {
         return instance != null;
+    }
+
+    void registerGameplayListeners() {
+        Bukkit.getPluginManager().registerEvents(this, MetadataHandler.PLUGIN);
+        Bukkit.getPluginManager().registerEvents(passiveRuntime, MetadataHandler.PLUGIN);
+        Bukkit.getPluginManager().registerEvents(inputRouter, MetadataHandler.PLUGIN);
+        Bukkit.getPluginManager().registerEvents(weaponAffinity, MetadataHandler.PLUGIN);
     }
 
     /** Stable observation seam for the external every-class behavior probe. */
@@ -578,7 +586,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         UUID runToken = optional.get().lockedRunId();
         if (!resources.isOpen(player.getUniqueId(), resourceType, runToken))
             resources.open(player, resourceType, runToken);
-        passiveRuntime.reconcile(player, ExperimentalCombatRuntime.isActive(player));
+        passiveRuntime.reconcile(player, passiveActive.test(player));
         if (optional.get().activeInputProfile() == InputProfile.FOCUS_ITEM
                 && !inputRouter.hasFocusItem(player)) giveFocusItem(player);
     }
