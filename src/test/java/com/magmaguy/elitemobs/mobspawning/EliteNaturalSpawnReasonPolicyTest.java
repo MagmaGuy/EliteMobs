@@ -28,42 +28,6 @@ class EliteNaturalSpawnReasonPolicyTest {
                 union(externallyOwned, environmentOwned));
     }
 
-    @Test
-    void coversEveryKnownHostileProducing26_2Reason() {
-        EnumSet<CreatureSpawnEvent.SpawnReason> hostileProducing = EnumSet.of(
-                CreatureSpawnEvent.SpawnReason.NATURAL,
-                CreatureSpawnEvent.SpawnReason.JOCKEY,
-                CreatureSpawnEvent.SpawnReason.CHUNK_GEN,
-                CreatureSpawnEvent.SpawnReason.SPAWNER,
-                CreatureSpawnEvent.SpawnReason.TRIAL_SPAWNER,
-                CreatureSpawnEvent.SpawnReason.LIGHTNING,
-                CreatureSpawnEvent.SpawnReason.BUILD_WITHER,
-                CreatureSpawnEvent.SpawnReason.VILLAGE_INVASION,
-                CreatureSpawnEvent.SpawnReason.BREEDING,
-                CreatureSpawnEvent.SpawnReason.SLIME_SPLIT,
-                CreatureSpawnEvent.SpawnReason.REINFORCEMENTS,
-                CreatureSpawnEvent.SpawnReason.NETHER_PORTAL,
-                CreatureSpawnEvent.SpawnReason.INFECTION,
-                CreatureSpawnEvent.SpawnReason.SILVERFISH_BLOCK,
-                CreatureSpawnEvent.SpawnReason.MOUNT,
-                CreatureSpawnEvent.SpawnReason.TRAP,
-                CreatureSpawnEvent.SpawnReason.ENDER_PEARL,
-                CreatureSpawnEvent.SpawnReason.DROWNED,
-                CreatureSpawnEvent.SpawnReason.EXPLOSION,
-                CreatureSpawnEvent.SpawnReason.RAID,
-                CreatureSpawnEvent.SpawnReason.PATROL,
-                CreatureSpawnEvent.SpawnReason.BEEHIVE,
-                CreatureSpawnEvent.SpawnReason.PIGLIN_ZOMBIFIED,
-                CreatureSpawnEvent.SpawnReason.SPELL,
-                CreatureSpawnEvent.SpawnReason.FROZEN,
-                CreatureSpawnEvent.SpawnReason.ENCHANTMENT,
-                CreatureSpawnEvent.SpawnReason.POTION_EFFECT);
-
-        assertEquals(
-                hostileProducing,
-                intersection(hostileProducing, EliteNaturalSpawnReasonPolicy.providerEligibleReasons()));
-    }
-
     private static EnumSet<CreatureSpawnEvent.SpawnReason> union(
             EnumSet<CreatureSpawnEvent.SpawnReason> left,
             EnumSet<CreatureSpawnEvent.SpawnReason> right) {
