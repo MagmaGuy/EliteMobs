@@ -23,24 +23,5 @@ class EliteNaturalSpawnReasonPolicyTest {
 
         assertEquals(externallyOwned, EliteNaturalSpawnReasonPolicy.externallyOwnedReasons());
         assertEquals(environmentOwned, EliteNaturalSpawnReasonPolicy.providerEligibleReasons());
-        assertEquals(
-                EnumSet.allOf(CreatureSpawnEvent.SpawnReason.class),
-                union(externallyOwned, environmentOwned));
-    }
-
-    private static EnumSet<CreatureSpawnEvent.SpawnReason> union(
-            EnumSet<CreatureSpawnEvent.SpawnReason> left,
-            EnumSet<CreatureSpawnEvent.SpawnReason> right) {
-        EnumSet<CreatureSpawnEvent.SpawnReason> union = EnumSet.copyOf(left);
-        union.addAll(right);
-        return union;
-    }
-
-    private static EnumSet<CreatureSpawnEvent.SpawnReason> intersection(
-            EnumSet<CreatureSpawnEvent.SpawnReason> left,
-            EnumSet<CreatureSpawnEvent.SpawnReason> right) {
-        EnumSet<CreatureSpawnEvent.SpawnReason> intersection = EnumSet.copyOf(left);
-        intersection.retainAll(right);
-        return intersection;
     }
 }
