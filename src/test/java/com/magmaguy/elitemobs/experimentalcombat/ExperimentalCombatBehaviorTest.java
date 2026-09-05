@@ -120,6 +120,31 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @Test
+    void reaverSignatureDamagesAndHealsThenRevokesItsLifestealWindowOnClassChange() {
+        assertTrue(module.setClassLevelForAdministration(player, "reaver", 61).applied());
+        assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        for (int hit = 0; hit < 3; hit++) incomingDamage();
+        var enemy = target().getLivingEntity();
+        double enemyHealth = enemy.getHealth();
+        player.setHealth(8D);
+
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        double damageDealt = enemyHealth - enemy.getHealth();
+        assertTrue(damageDealt > 0D, "The cleave must actually damage its target");
+        assertEquals(8D + damageDealt * .22D, player.getHealth(), 0.000001);
+        player.setHealth(8D);
+        var cancelled = outgoingEvent();
+        cancelled.setCancelled(true);
+        Bukkit.getPluginManager().callEvent(cancelled);
+        assertEquals(8D, player.getHealth(), "A cancelled hit must not grant lifesteal");
+        outgoingDamage();
+        assertEquals(9.6D, player.getHealth(), 0.000001, "Later hits must use the armed lifesteal window");
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        outgoingDamage();
+        assertEquals(9.6D, player.getHealth(), "Changing class must revoke the previous lifesteal window");
+    }
+
+    @Test
     void manaWardAppliesShieldAndSpendsManaBeforeAnotherCast() {
         assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
         var shield = player.getPotionEffect(PotionEffectType.ABSORPTION);
@@ -367,9 +392,16 @@ class ExperimentalCombatBehaviorTest {
     }
 
     private double outgoingDamage() {
-        var event = new EliteMobDamagedByPlayerEvent(target(), player, 10D, false);
+        var event = outgoingEvent();
         Bukkit.getPluginManager().callEvent(event);
         return event.getDamage();
+    }
+
+    @SuppressWarnings("removal")
+    private EliteMobDamagedByPlayerEvent outgoingEvent() {
+        var hit = new EntityDamageByEntityEvent(player, target().getLivingEntity(),
+                EntityDamageEvent.DamageCause.ENTITY_ATTACK, 10D);
+        return new EliteMobDamagedByPlayerEvent(target(), player, hit, 10D, false, false, 1D);
     }
 
     @SuppressWarnings("removal")
