@@ -73,7 +73,7 @@ public class EliteScroll {
     public static boolean isEliteScroll(ItemStack itemStack) {
         if (itemStack == null) return false;
         if (!itemStack.hasItemMeta()) return false;
-        return itemStack.getItemMeta().getPersistentDataContainer().has(eliteScrollNamespacedKey);
+        return itemStack.getItemMeta().getPersistentDataContainer().has(eliteScrollNamespacedKey, PersistentDataType.INTEGER);
     }
 
     public static int getEliteScrollLevel(ItemStack itemStack) {
@@ -81,8 +81,27 @@ public class EliteScroll {
         return itemStack.getItemMeta().getPersistentDataContainer().get(eliteScrollNamespacedKey, PersistentDataType.INTEGER);
     }
 
-    public static ItemStack convertVanillaItem(ItemStack originalItem, ItemStack scrollItemStack) {
-        Player player = SoulbindEnchantment.getSoulboundPlayer(scrollItemStack.getItemMeta());
+    /**
+     * A bound scroll can only be spent by its stored owner. Check the UUID directly so
+     * offline owners and soulbind bypass permissions cannot authorize someone else's scroll.
+     * Scrolls without an owner remain usable by anyone.
+     */
+    public static boolean canUseScroll(Player player, ItemStack scrollItemStack) {
+        if (player == null || !isEliteScroll(scrollItemStack) || scrollItemStack.getAmount() <= 0) return false;
+        var data = scrollItemStack.getItemMeta().getPersistentDataContainer();
+        if (!data.has(SoulbindEnchantment.SOULBIND_KEY)) return true;
+        return data.has(SoulbindEnchantment.SOULBIND_KEY, PersistentDataType.STRING)
+                && player.getUniqueId().toString().equals(data.get(SoulbindEnchantment.SOULBIND_KEY, PersistentDataType.STRING));
+    }
+
+    /**
+     * Returns a converted copy, or null when the player cannot use these inputs.
+     * Soulbind ownership and prestige belong to the original item, never to the scroll.
+     */
+    public static ItemStack convertVanillaItem(ItemStack originalItem, ItemStack scrollItemStack, Player player) {
+        if (!canUseScroll(player, scrollItemStack) || originalItem == null
+                || originalItem.getType().isAir() || originalItem.getAmount() <= 0
+                || EliteItemManager.isEliteMobsItem(originalItem)) return null;
         ItemStack newItem = originalItem.clone();
         int level = getEliteScrollLevel(scrollItemStack);
 
@@ -104,9 +123,6 @@ public class EliteScroll {
         ItemTagger.registerItemSource(null, itemMeta);
 
         newItem.setItemMeta(itemMeta);
-
-        // Soulbind if the scroll was soulbound
-        if (player != null) SoulbindEnchantment.addEnchantment(newItem, player);
 
         // Generate lore once with all data ready
         new EliteItemLore(newItem, false);

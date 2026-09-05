@@ -18,6 +18,8 @@ public class EliteScrollMenuConfig extends MenusConfigFields {
     @Getter
     private static String menuName;
     @Getter
+    private static String scrollNotOwnedMessage;
+    @Getter
     private static int infoSlot;
     @Getter
     private static ItemStack infoButton;
@@ -55,6 +57,9 @@ public class EliteScrollMenuConfig extends MenusConfigFields {
 
     @Override
     public void processAdditionalFields() {
+        scrollNotOwnedMessage = ConfigurationEngine.setString(
+                List.of("Shown when a player tries to use another player's soulbound elite scroll."),
+                file, fileConfiguration, "scrollNotOwnedMessage", "&cYou can't use a scroll soulbound to someone else.", true);
         menuName = ConfigurationEngine.setString(
                 List.of("Sets the display name of the menu"),
                 file, fileConfiguration, "menuName", "&6Elite Scroll Menu", true);

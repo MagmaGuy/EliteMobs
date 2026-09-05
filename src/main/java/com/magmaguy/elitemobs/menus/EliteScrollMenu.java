@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.EliteScrollMenuConfig;
 import com.magmaguy.elitemobs.items.EliteScroll;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -11,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
@@ -46,7 +48,8 @@ public class EliteScrollMenu extends EliteMenu {
         event.getView().getTopInventory().setItem(EliteScrollMenuConfig.getOutputSlot(),
                 EliteScroll.convertVanillaItem(
                         event.getView().getTopInventory().getItem(EliteScrollMenuConfig.getNonEliteItemSlot()),
-                        event.getView().getTopInventory().getItem(EliteScrollMenuConfig.getEliteScrollItemSlot())));
+                        event.getView().getTopInventory().getItem(EliteScrollMenuConfig.getEliteScrollItemSlot()),
+                        (Player) event.getWhoClicked()));
     }
 
     public static class EliteScrollMenuEvents implements Listener {
@@ -85,6 +88,10 @@ public class EliteScrollMenu extends EliteMenu {
 
         private void handleBottomInventory(InventoryClickEvent event) {
             if (EliteScroll.isEliteScroll(event.getCurrentItem())) {
+                if (!EliteScroll.canUseScroll((Player) event.getWhoClicked(), event.getCurrentItem())) {
+                    event.getWhoClicked().sendMessage(ChatColorConverter.convert(EliteScrollMenuConfig.getScrollNotOwnedMessage()));
+                    return;
+                }
                 if (event.getView().getTopInventory().getItem(EliteScrollMenuConfig.getEliteScrollItemSlot()) == null)
                     moveOneItemUp(EliteScrollMenuConfig.getEliteScrollItemSlot(), event);
             } else if (!EliteItemManager.isEliteMobsItem(event.getCurrentItem())) {
@@ -94,7 +101,8 @@ public class EliteScrollMenu extends EliteMenu {
         }
 
         private void confirm(InventoryClickEvent event) {
-            // Only proceed if there is actually an output item to give
+            // Rebuild from the current inputs and actor; a cached preview is not authorization.
+            updateMenu(event);
             if (event.getView().getTopInventory().getItem(EliteScrollMenuConfig.getOutputSlot()) == null) return;
             moveItemDown(event.getView().getTopInventory(), EliteScrollMenuConfig.getOutputSlot(), event.getWhoClicked());
             event.getView().getTopInventory().clear();
@@ -103,6 +111,13 @@ public class EliteScrollMenu extends EliteMenu {
 
         private void cancel(InventoryClickEvent event) {
             event.getWhoClicked().closeInventory();
+        }
+
+        @EventHandler
+        public void onInventoryDrag(InventoryDragEvent event) {
+            if (!menus.contains(event.getView().getTopInventory())) return;
+            int topSize = event.getView().getTopInventory().getSize();
+            if (event.getRawSlots().stream().anyMatch(slot -> slot < topSize)) event.setCancelled(true);
         }
 
         @EventHandler
