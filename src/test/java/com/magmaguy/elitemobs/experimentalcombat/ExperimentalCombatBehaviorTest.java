@@ -2,6 +2,9 @@ package com.magmaguy.elitemobs.experimentalcombat;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
+import com.magmaguy.elitemobs.config.PartyConfig;
+import com.magmaguy.elitemobs.parties.PartyManager;
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
@@ -42,6 +45,7 @@ class ExperimentalCombatBehaviorTest {
     private ExperimentalCombatModule module;
     private EliteEntity target;
     private boolean fullCombatActive;
+    private boolean partyInitialized;
 
     @BeforeEach
     void openCombat() {
@@ -80,11 +84,22 @@ class ExperimentalCombatBehaviorTest {
             if (module != null) module.close();
             if (target != null) target.remove(RemovalReason.SHUTDOWN);
         } finally {
-            DungeonCombatRuntime.shutdownIfInitialized();
-            ActionBarCompositor.shutdown();
-            if (player != null) InstanceProtector.removeProtectedWorld(player.getWorld());
-            MockBukkit.unmock();
-            MetadataHandler.PLUGIN = previousPlugin;
+            try {
+                if (partyInitialized) {
+                    try {
+                        PartyManager.shutdown();
+                        MockBukkit.getMock().getScheduler().waitAsyncTasksFinished();
+                    } finally {
+                        PlayerData.closeConnection();
+                    }
+                }
+            } finally {
+                DungeonCombatRuntime.shutdownIfInitialized();
+                ActionBarCompositor.shutdown();
+                if (player != null) InstanceProtector.removeProtectedWorld(player.getWorld());
+                MockBukkit.unmock();
+                MetadataHandler.PLUGIN = previousPlugin;
+            }
         }
     }
 
@@ -187,14 +202,19 @@ class ExperimentalCombatBehaviorTest {
     @ParameterizedTest
     @CsvSource({"ranger,false,false", "skirmisher,false,true", "elementalist,true,false",
             "pyromancer,true,false", "occultist,true,false"})
-    void nearbyMarkChangesCasterDamageAndRevokesItsModifiersOnClassChange(
-            String form, boolean weakens, boolean grantsSpeed) {
+    void nearbyMarkBenefitsOnlyPartyMembersAndRevokesItsModifiersOnClassChange(
+            String form, boolean weakens, boolean grantsSpeed) throws Exception {
         int level = module.catalog().require(form).band().effectiveStart();
         assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
         var marked = target().getLivingEntity();
         var distant = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 20));
         var bystander = MockBukkit.getMock().addPlayer();
         bystander.teleport(player.getLocation().add(1, 0, 0));
+        var ally = MockBukkit.getMock().addPlayer();
+        ally.teleport(player.getLocation().add(2, 0, 0));
+        openParty(ally);
+        assertTrue(ClassAbilityEligibility.isEligible(ally));
+        assertTrue(ClassAbilityEligibility.isEligible(bystander));
         try {
             assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
             assertTrue(marked.hasPotionEffect(PotionEffectType.GLOWING));
@@ -202,14 +222,23 @@ class ExperimentalCombatBehaviorTest {
             assertFalse(bystander.hasPotionEffect(PotionEffectType.GLOWING));
             assertEquals(grantsSpeed, player.hasPotionEffect(PotionEffectType.SPEED));
             assertTrue(outgoingDamage() > 10D, "The mark must modify actual damage events for its caster");
-            var distantHit = outgoingEvent(distant);
+            var distantHit = outgoingEvent(player, distant);
             Bukkit.getPluginManager().callEvent(distantHit);
             assertEquals(10D, distantHit.getDamage(), "The mark must not become a caster-wide damage buff");
+            var allyHit = outgoingEvent(ally, target());
+            Bukkit.getPluginManager().callEvent(allyHit);
+            assertTrue(allyHit.getDamage() > 10D, "A nearby party member must benefit from the mark");
+            var outsiderHit = outgoingEvent(bystander, target());
+            Bukkit.getPluginManager().callEvent(outsiderHit);
+            assertEquals(10D, outsiderHit.getDamage(), "An eligible non-party player must not benefit");
             assertEquals(weakens, incomingDamage() < 10D);
 
             assertTrue(module.selectForm(player, "spellcaster").accepted());
             assertEquals(10D, outgoingDamage());
             assertEquals(10D, incomingDamage());
+            var retiredAllyHit = outgoingEvent(ally, target());
+            Bukkit.getPluginManager().callEvent(retiredAllyHit);
+            assertEquals(10D, retiredAllyHit.getDamage());
         } finally {
             distant.remove(RemovalReason.SHUTDOWN);
         }
@@ -255,6 +284,31 @@ class ExperimentalCombatBehaviorTest {
 
         assertTrue(module.selectForm(player, "spellcaster").accepted());
         assertEquals(10D, incomingDamage(), "Changing class must revoke the previous ward modifier");
+    }
+
+    @Test
+    void prayerOfMendingHealsTheThreeMostWoundedPartyMembersAndExcludesOutsiders() throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, "priest", 31).applied());
+        var server = MockBukkit.getMock();
+        var first = server.addPlayer();
+        var second = server.addPlayer();
+        var third = server.addPlayer();
+        var outsider = server.addPlayer();
+        for (var member : List.of(first, second, third, outsider))
+            member.teleport(player.getLocation().add(1, 0, 0));
+        openParty(first, second, third);
+        player.setHealth(16D);
+        first.setHealth(2D);
+        second.setHealth(4D);
+        third.setHealth(8D);
+        outsider.setHealth(1D);
+
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        assertEquals(5.017D, first.getHealth(), .000001);
+        assertEquals(7.017D, second.getHealth(), .000001);
+        assertEquals(11.017D, third.getHealth(), .000001);
+        assertEquals(16D, player.getHealth(), "The healthier caster must not displace a wounded ally");
+        assertEquals(1D, outsider.getHealth(), "Low health alone must not make another player a party ally");
     }
 
     @Test
@@ -455,6 +509,33 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(10D, outgoingDamage());
     }
 
+    private void openParty(PlayerMock... members) throws Exception {
+        var config = new org.bukkit.configuration.file.YamlConfiguration();
+        config.set("sidebarEnabled", false);
+        var configFile = configurationDirectory.resolve("Party.yml").toFile();
+        config.save(configFile);
+        new PartyConfig(configFile);
+        partyInitialized = true;
+        PlayerData.initializeDatabaseConnection();
+        var scheduler = MockBukkit.getMock().getScheduler();
+        scheduler.performOneTick();
+        long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(5);
+        while (Bukkit.getOnlinePlayers().stream().anyMatch(member -> !PlayerData.isDataLoaded(member.getUniqueId()))
+                && System.nanoTime() < deadline) Thread.sleep(5);
+        for (var member : Bukkit.getOnlinePlayers())
+            assertTrue(PlayerData.isDataLoaded(member.getUniqueId()), "Timed out loading temporary player data");
+        scheduler.performOneTick();
+        PartyManager.create(player);
+        assertNotNull(PartyManager.getParty(player.getUniqueId()));
+        for (var member : members) {
+            assertTrue(PlayerData.isDataLoaded(member.getUniqueId()));
+            member.addAttachment(MetadataHandler.PLUGIN, "elitemobs.party", true);
+            PartyManager.invite(player, member.getName());
+            PartyManager.accept(member);
+            assertSame(PartyManager.getParty(player.getUniqueId()), PartyManager.getParty(member.getUniqueId()));
+        }
+    }
+
     private EliteEntity target() {
         if (target == null) {
             target = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 3));
@@ -469,14 +550,14 @@ class ExperimentalCombatBehaviorTest {
     }
 
     private EliteMobDamagedByPlayerEvent outgoingEvent() {
-        return outgoingEvent(target());
+        return outgoingEvent(player, target());
     }
 
     @SuppressWarnings("removal")
-    private EliteMobDamagedByPlayerEvent outgoingEvent(EliteEntity victim) {
-        var hit = new EntityDamageByEntityEvent(player, victim.getLivingEntity(),
+    private EliteMobDamagedByPlayerEvent outgoingEvent(PlayerMock attacker, EliteEntity victim) {
+        var hit = new EntityDamageByEntityEvent(attacker, victim.getLivingEntity(),
                 EntityDamageEvent.DamageCause.ENTITY_ATTACK, 10D);
-        return new EliteMobDamagedByPlayerEvent(victim, player, hit, 10D, false, false, 1D);
+        return new EliteMobDamagedByPlayerEvent(victim, attacker, hit, 10D, false, false, 1D);
     }
 
     @SuppressWarnings("removal")

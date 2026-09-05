@@ -130,6 +130,7 @@ dependencies {
     testImplementation 'org.mockbukkit.mockbukkit:mockbukkit-v26.2:4.116.1'
     testImplementation 'io.papermc.paper:paper-api:26.2.build.111-stable'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'org.xerial:sqlite-jdbc:3.32.3'
 }
 
 tasks.named('test') {

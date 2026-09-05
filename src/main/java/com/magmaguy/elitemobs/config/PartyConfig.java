@@ -208,6 +208,10 @@ public class PartyConfig extends ConfigurationFile {
         super("Party.yml");
     }
 
+    public PartyConfig(java.io.File file) {
+        super(file);
+    }
+
     @Override
     public void initializeValues() {
         enabled = ConfigurationEngine.setBoolean(
