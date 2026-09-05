@@ -357,6 +357,83 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(10D, incomingDamage(ally), "Changing the caster's class must revoke the ally's protection");
     }
 
+    @ParameterizedTest
+    @CsvSource({"false", "true"})
+    void seraphChainHealsTheMostWoundedPartyMemberFirstAndStopsOnClassChange(
+            boolean changeClass) throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, "seraph", 91).applied());
+        var server = MockBukkit.getMock();
+        var first = server.addPlayer();
+        var second = server.addPlayer();
+        var outsider = server.addPlayer();
+        for (var member : List.of(first, second, outsider))
+            member.teleport(player.getLocation().add(1, 0, 0));
+        openParty(first, second);
+        player.setHealth(16D);
+        first.setHealth(2D);
+        second.setHealth(8D);
+        outsider.setHealth(1D);
+
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        assertEquals(2D, first.getHealth(), "The chain must run on the scheduler, not heal everyone immediately");
+        server.getScheduler().performOneTick();
+        assertEquals(6.1735D, first.getHealth(), .000001);
+        assertNotNull(first.getPotionEffect(PotionEffectType.ABSORPTION));
+        assertEquals(8D, second.getHealth());
+        assertFalse(second.hasPotionEffect(PotionEffectType.ABSORPTION));
+        assertEquals(16D, player.getHealth());
+        if (changeClass) assertTrue(module.selectForm(player, "spellcaster").accepted());
+        server.getScheduler().performTicks(3);
+        assertEquals(changeClass ? 8D : 12.1735D, second.getHealth(), .000001);
+        assertEquals(!changeClass, second.hasPotionEffect(PotionEffectType.ABSORPTION));
+        assertEquals(16D, player.getHealth());
+        server.getScheduler().performTicks(6);
+        assertEquals(changeClass ? 16D : 20D, player.getHealth());
+        assertEquals(6.1735D, first.getHealth(), .000001, "A chain must visit each recipient only once");
+        assertEquals(1D, outsider.getHealth());
+        assertFalse(outsider.hasPotionEffect(PotionEffectType.ABSORPTION));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"spiritcaller,61,UTILITY,.922,5.3865,17.6915",
+            "soulwarden,91,SIGNATURE,1.964,5.2815,17.7365",
+            "soulwarden,91,UTILITY,1.7185,5.2815,17.7365",
+            "spiritbinder,91,UTILITY,.982,5.2815,17.7365"})
+    void soulLinkHealsProtectsAndSharesActualDamageOnlyWithPartyMembersUntilClassChange(
+            String form, int level, AbilitySlot slot, double healing,
+            double linkedDamage, double casterHealthAfterShare) throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        var server = MockBukkit.getMock();
+        var ally = server.addPlayer();
+        var outsider = server.addPlayer();
+        ally.teleport(player.getLocation().add(1, 0, 0));
+        outsider.teleport(player.getLocation().add(2, 0, 0));
+        openParty(ally);
+        player.setHealth(8D);
+        ally.setHealth(8D);
+        outsider.setHealth(8D);
+
+        assertTrue(module.useAbility(player, slot).successful());
+        for (var member : List.of(player, ally)) {
+            assertEquals(8D + healing, member.getHealth(), .000001);
+            assertNotNull(member.getPotionEffect(PotionEffectType.ABSORPTION));
+            member.removePotionEffect(PotionEffectType.ABSORPTION);
+            member.setAbsorptionAmount(0D);
+        }
+        player.setHealth(20D);
+        assertEquals(linkedDamage, incomingDamage(ally), .000001);
+        assertEquals(casterHealthAfterShare, player.getHealth(), .000001,
+                "The reduced ally hit must actually damage the other linked member");
+        assertEquals(8D, outsider.getHealth());
+        assertFalse(outsider.hasPotionEffect(PotionEffectType.ABSORPTION));
+        assertEquals(10D, incomingDamage(outsider));
+
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        assertEquals(10D, incomingDamage(ally));
+        assertEquals(casterHealthAfterShare, player.getHealth(), .000001,
+                "Retiring the caster must remove the party link as well as its damage reduction");
+    }
+
     @Test
     void prayerOfMendingHealsWithoutGrantingEnoughGraceToRepeat() {
         assertTrue(module.setClassLevelForAdministration(player, "priest", 31).applied());
@@ -367,6 +444,30 @@ class ExperimentalCombatBehaviorTest {
         assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
         assertEquals(11.017, player.getHealth(), 0.000001,
                 "Insufficient Grace must stop the second heal before applying it");
+    }
+
+    @ParameterizedTest
+    @CsvSource({"false", "true"})
+    void spiritcallerEchoUsesEffectiveHealingOnceAndCannotOutliveItsClass(
+            boolean changeClass) {
+        assertTrue(module.setClassLevelForAdministration(player, "spiritcaller", 61).applied());
+        player.setHealth(19.5D);
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        assertEquals(19.5D, player.getHealth(), "Arming the echo must not heal immediately");
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertEquals(20D, player.getHealth());
+        assertNotNull(player.getPotionEffect(PotionEffectType.ABSORPTION));
+        player.setHealth(10D);
+        if (changeClass) assertTrue(module.selectForm(player, "spellcaster").accepted());
+        var scheduler = MockBukkit.getMock().getScheduler();
+        scheduler.performTicks(29);
+        assertEquals(10D, player.getHealth());
+        scheduler.performOneTick();
+        assertEquals(changeClass ? 10D : 10.3169375D, player.getHealth(), .000001,
+                "The echo must scale the actual half-heart healed, excluding overhealing");
+        scheduler.performTicks(30);
+        assertEquals(changeClass ? 10D : 10.3169375D, player.getHealth(), .000001,
+                "A consumed echo must not heal twice");
     }
 
     @Test

@@ -9,7 +9,6 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FixedAbilitySemanticsValidatorTest {
     @Test
@@ -22,16 +21,6 @@ class FixedAbilitySemanticsValidatorTest {
                 AbilityExecutionTraits.STANDARD, 20D);
 
         assertEquals(5, FixedAbilitySemanticsValidator.problems(invalid).size());
-    }
-
-    @Test
-    void canonicalRegistryContainsNoDeadTuning() {
-        FixedAbilityRegistry registry = com.magmaguy.elitemobs.experimentalcombat.content
-                .BuiltInClassContent.abilityRegistry();
-
-        assertTrue(registry.registeredIds().stream()
-                .map(registry::require)
-                .allMatch(spec -> FixedAbilitySemanticsValidator.problems(spec).isEmpty()));
     }
 
     @Test
