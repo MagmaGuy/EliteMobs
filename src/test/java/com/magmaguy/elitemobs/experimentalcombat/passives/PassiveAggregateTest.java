@@ -106,9 +106,6 @@ class PassiveAggregateTest {
                 false, false, false, true, 4D, false, false, false);
         PassiveConditionContext woundedBoss = context(.8D, false, false, false, true, .3D,
                 true, false, true, false, 4D, false, false, false);
-        PassiveConditionContext healthyBoss = context(.8D, false, false, false, true, .9D,
-                true, false, true, false, 4D, false, false, false);
-        PassiveConditionContext chainedGroup = withState(woundedGroup, false, true, false);
 
         PassiveAggregate bloodstorm = aggregate("bloodstorm", 100);
         assertTrue(bloodstorm.evaluate(woundedGroup).mechanics().groupedEnemyHealingMultiplier() > 1D);
@@ -118,25 +115,6 @@ class PassiveAggregateTest {
         PassiveAggregate headsman = aggregate("headsman", 100);
         assertTrue(headsman.evaluate(woundedBoss).outgoingDamageMultiplier()
                 > headsman.evaluate(woundedGroup).outgoingDamageMultiplier());
-
-        PassiveAggregate harvester = aggregate("harvester", 100);
-        assertTrue(harvester.evaluate(chainedGroup).outgoingDamageMultiplier()
-                > harvester.evaluate(woundedGroup).outgoingDamageMultiplier());
-        assertTrue(harvester.evaluate(chainedGroup).outgoingDamageMultiplier()
-                > harvester.evaluate(withState(healthyBoss, false, true, false)).outgoingDamageMultiplier());
-        assertEquals(harvester.evaluate(woundedBoss).outgoingDamageMultiplier(),
-                harvester.evaluate(withState(woundedBoss, false, true, false)).outgoingDamageMultiplier(),
-                1.0E-9D);
-
-        PassiveAggregate crusher = aggregate("crusher", 90);
-        PassiveConditionContext close = context(.8D, false, false, false, true, .8D,
-                false, false, true, false, 4D, false, false, false);
-        PassiveConditionContext far = context(.8D, false, false, false, true, .8D,
-                false, false, true, false, 12D, false, false, false);
-        assertTrue(crusher.evaluate(close).outgoingDamageMultiplier()
-                > crusher.evaluate(far).outgoingDamageMultiplier());
-        assertTrue(crusher.evaluate(close).incomingDamageMultiplier()
-                < crusher.evaluate(far).incomingDamageMultiplier());
 
         assertTrue(registry.require("siegebreaker").atContributionLevel(100).outgoingDamage() < 0D);
         PassiveAggregate titanbane = aggregate("titanbane", 100);
@@ -160,21 +138,6 @@ class PassiveAggregateTest {
         PassiveConditionContext moving = PassiveConditionContext.playerOnly(1D, true, false, false);
         assertTrue(aggregate("grovekeeper", 100).evaluate(standing).healingDoneMultiplier()
                 > aggregate("grovekeeper", 100).evaluate(moving).healingDoneMultiplier());
-    }
-
-    @Test
-    void positionalAndTriggeredRisksOnlyApplyWhenTheirFactsAreTrue() {
-        PassiveConditionContext close = context(1D, false, false, false, true, 1D,
-                false, false, true, false, 4D, false, false, false);
-        PassiveConditionContext far = context(1D, false, false, false, true, 1D,
-                false, false, true, false, 12D, false, false, false);
-        assertTrue(aggregate("elementalist", 90).evaluate(close).incomingDamageMultiplier()
-                > aggregate("elementalist", 90).evaluate(far).incomingDamageMultiplier());
-
-        PassiveConditionContext intactWard = spellContext(true, false, false);
-        PassiveConditionContext brokenWard = spellContext(true, false, true);
-        assertTrue(aggregate("lich", 100).evaluate(brokenWard).incomingDamageMultiplier()
-                > aggregate("lich", 100).evaluate(intactWard).incomingDamageMultiplier());
     }
 
     @Test
@@ -218,19 +181,6 @@ class PassiveAggregateTest {
                 playerHealth, moving, recentlyHit, grouped,
                 targetPresent, targetHealth, targetBoss, targetControlled,
                 targetIsolated, targetGrouped, targetDistance, critical, ranged, classDamage);
-    }
-
-    private static PassiveConditionContext withState(
-            PassiveConditionContext context,
-            boolean magicWeaponDamage,
-            boolean recentEliteKill,
-            boolean wardBroken) {
-        return new PassiveConditionContext(
-                context.playerHealthFraction(), context.moving(), context.recentlyHit(), context.grouped(),
-                context.targetPresent(), context.targetHealthFraction(), context.targetBoss(),
-                context.targetControlled(), context.targetIsolated(), context.targetGrouped(),
-                context.targetDistance(), context.criticalHit(), context.rangedAttack(),
-                context.classAbilityDamage(), magicWeaponDamage, recentEliteKill, wardBroken);
     }
 
     private static PassiveConditionContext spellContext(

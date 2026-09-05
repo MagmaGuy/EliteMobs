@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.experimentalcombat.passives;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext.ClassAbilityDamageDomain;
@@ -26,7 +27,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockbukkit.mockbukkit.MockBukkit;
+import org.mockbukkit.mockbukkit.ServerMock;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
+import org.mockbukkit.mockbukkit.entity.LivingEntityMock;
 import org.mockbukkit.mockbukkit.plugin.PluginMock;
 
 import java.util.List;
@@ -36,6 +39,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClassPassiveBehaviorTest {
+    private ServerMock server;
     private JavaPlugin previousPlugin;
     private PlayerMock player;
     private ClassPassiveRuntime runtime;
@@ -44,7 +48,7 @@ class ClassPassiveBehaviorTest {
 
     @BeforeEach
     void open() {
-        var server = MockBukkit.mock();
+        server = MockBukkit.mock();
         previousPlugin = MetadataHandler.PLUGIN;
         MetadataHandler.PLUGIN = MockBukkit.loadWith(PluginMock.class, new java.io.ByteArrayInputStream("""
                 name: PassiveBehaviorTest
@@ -170,6 +174,54 @@ class ClassPassiveBehaviorTest {
             neighbor.remove(RemovalReason.SHUTDOWN);
         }
         assertEquals(isolated, outgoingDamage(), 0.000001);
+    }
+
+    @Test
+    void tempestArcherNeedsBothMotionAndACrowdAndTakesMoreDamageAfterAHit() {
+        activate("tempest_archer");
+        assertEquals(10.152D, outgoingDamage(), 0.000001);
+        player.setVelocity(new Vector(.2, 0, 0));
+        assertEquals(10.152D, outgoingDamage(), 0.000001, "Motion alone must not grant the crowd bonus");
+        var neighbor = CombatTestEntities.spawnElite(target.getLivingEntity().getLocation().add(1, 0, 0));
+        try {
+            assertEquals(11.004D, outgoingDamage(), 0.000001);
+            player.setVelocity(new Vector());
+            assertEquals(10.152D, outgoingDamage(), 0.000001, "A crowd alone must not grant the motion bonus");
+            assertEquals(10.121D, incomingDamage(), 0.000001);
+            assertEquals(10.76D, incomingDamage(), 0.000001);
+            runtime.discard(player);
+            assertEquals(10.121D, incomingDamage(), 0.000001, "Discard must clear the recent-hit penalty");
+        } finally {
+            neighbor.remove(RemovalReason.SHUTDOWN);
+        }
+    }
+
+    @Test
+    void harvesterKillBonusRequiresItsOwnKillAndAnotherEliteAndClearsOnExit() {
+        activate("harvester");
+        var neighbor = CombatTestEntities.spawnElite(target.getLivingEntity().getLocation().add(1, 0, 0));
+        var victim = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 30));
+        try {
+            assertEquals(10.07D, outgoingDamage(), 0.000001);
+            var dead = (LivingEntityMock) victim.getLivingEntity();
+            dead.setKiller(server.addPlayer());
+            Bukkit.getPluginManager().callEvent(new EliteMobDeathEvent(victim));
+            assertEquals(10.07D, outgoingDamage(), 0.000001, "Another player's kill must not grant the bonus");
+            dead.setKiller(player);
+            Bukkit.getPluginManager().callEvent(new EliteMobDeathEvent(victim));
+            assertEquals(10.78D, outgoingDamage(), 0.000001);
+            neighbor.remove(RemovalReason.SHUTDOWN);
+            assertEquals(9.502D, outgoingDamage(), 0.000001, "A recent kill alone must not grant the crowd bonus");
+            neighbor = CombatTestEntities.spawnElite(target.getLivingEntity().getLocation().add(1, 0, 0));
+            active = false;
+            runtime.reconcile(player, false);
+            active = true;
+            runtime.reconcile(player, true);
+            assertEquals(10.07D, outgoingDamage(), 0.000001, "A new session must not inherit the kill bonus");
+        } finally {
+            neighbor.remove(RemovalReason.SHUTDOWN);
+            victim.remove(RemovalReason.SHUTDOWN);
+        }
     }
 
     @ParameterizedTest
