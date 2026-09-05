@@ -39,6 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /** Applies the resolved passive branch without coupling catalog/progression state to Bukkit events. */
 public final class ClassPassiveRuntime implements Listener {
@@ -54,19 +55,25 @@ public final class ClassPassiveRuntime implements Listener {
             "darkness");
 
     private final Function<UUID, PassiveAggregate> passiveProvider;
+    private final Predicate<Player> combatActive;
     private final Map<UUID, Double> appliedMovementAdjustments = new HashMap<>();
     private final Set<UUID> mechanicsActivePlayers = new HashSet<>();
     private final Set<UUID> applyingControlResistance = new HashSet<>();
     private final PassiveStateTracker state = new PassiveStateTracker();
 
     public ClassPassiveRuntime(Function<UUID, PassiveAggregate> passiveProvider) {
+        this(passiveProvider, ExperimentalCombatRuntime::isActive);
+    }
+
+    ClassPassiveRuntime(Function<UUID, PassiveAggregate> passiveProvider, Predicate<Player> combatActive) {
         this.passiveProvider = Objects.requireNonNull(passiveProvider, "passiveProvider");
+        this.combatActive = Objects.requireNonNull(combatActive, "combatActive");
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerDamagesElite(EliteMobDamagedByPlayerEvent event) {
         Player player = event.getPlayer();
-        if (!ExperimentalCombatRuntime.isActive(player)) return;
+        if (!combatActive.test(player)) return;
         PassiveAggregate passive = passiveProvider.apply(player.getUniqueId());
         boolean classAbilityDamage = CombatDamageContext.isClassAbilityDamageActive();
         Optional<CombatDamageContext.ClassAbilityDamageDomain> classAbilityDomain =
@@ -89,7 +96,7 @@ public final class ClassPassiveRuntime implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEliteDamagesPlayer(PlayerDamagedByEliteMobEvent event) {
         Player player = event.getPlayer();
-        if (!ExperimentalCombatRuntime.isActive(player)) return;
+        if (!combatActive.test(player)) return;
         PassiveAggregate passive = passiveProvider.apply(player.getUniqueId());
         PassiveAggregate.Evaluation evaluation = passive.evaluate(context(
                 player,
@@ -107,7 +114,7 @@ public final class ClassPassiveRuntime implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerHeals(EntityRegainHealthEvent event) {
-        if (!(event.getEntity() instanceof Player player) || !ExperimentalCombatRuntime.isActive(player)) return;
+        if (!(event.getEntity() instanceof Player player) || !combatActive.test(player)) return;
         PassiveAggregate passive = passiveProvider.apply(player.getUniqueId());
         double multiplier = passive.evaluate(playerContext(player)).healingReceivedMultiplier();
         if (Math.abs(multiplier - 1D) < 1.0E-9D) return;
@@ -120,14 +127,14 @@ public final class ClassPassiveRuntime implements Listener {
                 ? event.getEntity() instanceof LivingEntity living ? living : null
                 : event.getEntityDeathEvent().getEntity();
         Player killer = dead == null ? null : dead.getKiller();
-        if (killer != null && ExperimentalCombatRuntime.isActive(killer))
+        if (killer != null && combatActive.test(killer))
             state.recordEliteKill(killer.getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onKnockback(EntityKnockbackByEntityEvent event) {
         if (!(event.getEntity() instanceof Player player)
-                || !ExperimentalCombatRuntime.isActive(player)
+                || !combatActive.test(player)
                 || eliteSource(event.getSourceEntity()) == null) return;
         double multiplier = PassiveRuntimePolicy.knockbackMultiplier(mechanics(player));
         if (Math.abs(multiplier - 1D) < 1.0E-9D) return;
@@ -137,7 +144,7 @@ public final class ClassPassiveRuntime implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPotionEffect(EntityPotionEffectEvent event) {
         if (!(event.getEntity() instanceof Player player)
-                || !ExperimentalCombatRuntime.isActive(player)
+                || !combatActive.test(player)
                 || applyingControlResistance.contains(player.getUniqueId())) return;
         PotionEffect effect = event.getNewEffect();
         if (effect == null
@@ -164,13 +171,13 @@ public final class ClassPassiveRuntime implements Listener {
 
     /** Ability-owned adapters consume only these typed mechanics, never passive display text. */
     public PassiveMechanics mechanics(Player player) {
-        if (player == null || !ExperimentalCombatRuntime.isActive(player)) return PassiveMechanics.NEUTRAL;
+        if (player == null || !combatActive.test(player)) return PassiveMechanics.NEUTRAL;
         return passiveProvider.apply(player.getUniqueId()).evaluate(playerContext(player)).mechanics();
     }
 
     /** Resolves grouped/solo healer clauses at cast time instead of using a stale base aggregate. */
     public double healingDoneMultiplier(Player player) {
-        if (player == null || !ExperimentalCombatRuntime.isActive(player)) return 1D;
+        if (player == null || !combatActive.test(player)) return 1D;
         return passiveProvider.apply(player.getUniqueId())
                 .evaluate(playerContext(player))
                 .healingDoneMultiplier();
@@ -187,7 +194,7 @@ public final class ClassPassiveRuntime implements Listener {
         if (owner == null
                 || target == null
                 || domain == null
-                || !ExperimentalCombatRuntime.isActive(owner)) return 1D;
+                || !combatActive.test(owner)) return 1D;
         PassiveAggregate passive = passiveProvider.apply(owner.getUniqueId());
         return passive.evaluate(context(
                         owner,
@@ -203,7 +210,7 @@ public final class ClassPassiveRuntime implements Listener {
 
     /** Records the transient risk window opened when a class ward actually breaks. */
     public void signalWardBroken(Player player, int durationTicks) {
-        if (player == null || !ExperimentalCombatRuntime.isActive(player) || durationTicks <= 0) return;
+        if (player == null || !combatActive.test(player) || durationTicks <= 0) return;
         state.recordWardBroken(player.getUniqueId(), durationTicks);
     }
 
