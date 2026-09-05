@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.experimentalcombat;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
@@ -23,6 +24,7 @@ import org.bukkit.potion.PotionEffect;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockbukkit.mockbukkit.MockBukkit;
@@ -34,6 +36,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ExperimentalCombatBehaviorTest {
+    @TempDir java.nio.file.Path configurationDirectory;
     private JavaPlugin previousPlugin;
     private PlayerMock player;
     private ExperimentalCombatModule module;
@@ -50,6 +53,7 @@ class ExperimentalCombatBehaviorTest {
                 main: org.mockbukkit.mockbukkit.plugin.PluginMock
                 authors: [Autotester]
                 """.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        new MobCombatSettingsConfig(configurationDirectory.resolve("MobCombatSettings.yml").toFile());
         player = server.addPlayer();
         InstanceProtector.addProtectedWorld(player.getWorld());
         fullCombatActive = false;
@@ -81,6 +85,37 @@ class ExperimentalCombatBehaviorTest {
             if (player != null) InstanceProtector.removeProtectedWorld(player.getWorld());
             MockBukkit.unmock();
             MetadataHandler.PLUGIN = previousPlugin;
+        }
+    }
+
+    @Test
+    void battlemageSignatureDamagesNearbyElitesAndSpendsManaForProtection() {
+        assertTrue(module.setClassLevelForAdministration(player, "battlemage", 61).applied());
+        var enemy = target().getLivingEntity();
+        double healthBefore = enemy.getHealth();
+        var bystander = MockBukkit.getMock().addPlayer();
+        bystander.teleport(player.getLocation().add(1, 0, 0));
+        var distant = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 20));
+        double distantHealth = distant.getLivingEntity().getHealth();
+        try {
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertTrue(enemy.getHealth() < healthBefore, "The cast must actually damage the nearby elite");
+            assertEquals(distantHealth, distant.getLivingEntity().getHealth());
+            assertEquals(20D, bystander.getHealth(), "The cast must not damage another player");
+            assertFalse(bystander.hasPotionEffect(PotionEffectType.ABSORPTION));
+            assertNotNull(player.getPotionEffect(PotionEffectType.ABSORPTION));
+            assertTrue(incomingDamage() < 10D, "The signature must apply its self-protection");
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            double healthBeforeDeniedCast = enemy.getHealth();
+            player.removePotionEffect(PotionEffectType.ABSORPTION);
+            assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful(),
+                    "Two 45-Mana casts must prevent a third cast");
+            assertEquals(healthBeforeDeniedCast, enemy.getHealth());
+            assertFalse(player.hasPotionEffect(PotionEffectType.ABSORPTION));
+            assertTrue(module.selectForm(player, "spellcaster").accepted());
+            assertEquals(10D, incomingDamage());
+        } finally {
+            distant.remove(RemovalReason.SHUTDOWN);
         }
     }
 

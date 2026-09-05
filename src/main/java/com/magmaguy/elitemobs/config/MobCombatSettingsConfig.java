@@ -160,6 +160,10 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
         super("MobCombatSettings.yml");
     }
 
+    public MobCombatSettingsConfig(java.io.File file) {
+        super(file);
+    }
+
     public static void toggleNaturalMobSpawning(boolean enabled) {
         doNaturalMobSpawning = enabled;
         instance.fileConfiguration.set("doNaturalEliteMobSpawning", enabled);
