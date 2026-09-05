@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.experimentalcombat;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime;
 import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
 import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
@@ -12,7 +14,6 @@ import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.magmacore.instance.InstanceProtector;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffectType;
@@ -33,6 +34,7 @@ class ExperimentalCombatBehaviorTest {
     private JavaPlugin previousPlugin;
     private PlayerMock player;
     private ExperimentalCombatModule module;
+    private EliteEntity target;
 
     @BeforeEach
     void openCombat() {
@@ -56,6 +58,7 @@ class ExperimentalCombatBehaviorTest {
     void closeCombat() {
         try {
             if (module != null) module.close();
+            if (target != null) target.remove(RemovalReason.SHUTDOWN);
         } finally {
             DungeonCombatRuntime.shutdownIfInitialized();
             ActionBarCompositor.shutdown();
@@ -119,15 +122,44 @@ class ExperimentalCombatBehaviorTest {
                 "Insufficient Grace must stop the second heal before applying it");
     }
 
+    @ParameterizedTest
+    @CsvSource({"mage,31,11.5085,false", "spellblade,91,11.964,true"})
+    void damageBuffAppliesItsEffectsUntilClassChange(String form, int level, double damage, boolean warcasting) {
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertEquals(damage, outgoingDamage(), 0.000001);
+        assertEquals(warcasting, player.hasPotionEffect(PotionEffectType.ABSORPTION));
+        assertEquals(warcasting, player.hasPotionEffect(PotionEffectType.SPEED));
+        if (warcasting) {
+            assertEquals(98, player.getPotionEffect(PotionEffectType.ABSORPTION).getDuration());
+            assertEquals(0, player.getPotionEffect(PotionEffectType.ABSORPTION).getAmplifier());
+            assertEquals(1, player.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
+        }
+
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        assertEquals(10D, outgoingDamage());
+    }
+
+    private EliteEntity target() {
+        if (target == null) {
+            target = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 3));
+        }
+        return target;
+    }
+
+    private double outgoingDamage() {
+        var event = new EliteMobDamagedByPlayerEvent(target(), player, 10D, false);
+        Bukkit.getPluginManager().callEvent(event);
+        return event.getDamage();
+    }
+
     @SuppressWarnings("removal")
     private double incomingDamage() {
-        var attacker = player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE);
-        var hit = new EntityDamageByEntityEvent(attacker, player,
+        var attacker = target();
+        var hit = new EntityDamageByEntityEvent(attacker.getLivingEntity(), player,
                 EntityDamageEvent.DamageCause.ENTITY_ATTACK, 10D);
-        // Protection is recipient-owned, including after the attacking elite loses its live body.
-        var event = new PlayerDamagedByEliteMobEvent(new EliteEntity(), player, hit, null, 10D);
+        var event = new PlayerDamagedByEliteMobEvent(attacker, player, hit, null, 10D);
         Bukkit.getPluginManager().callEvent(event);
-        attacker.remove();
         return event.getDamage();
     }
 

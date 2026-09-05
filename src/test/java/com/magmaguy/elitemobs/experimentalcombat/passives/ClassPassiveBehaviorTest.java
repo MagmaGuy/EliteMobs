@@ -3,14 +3,18 @@ package com.magmaguy.elitemobs.experimentalcombat.passives;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext.ClassAbilityDamageDomain;
 import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
+import com.magmaguy.elitemobs.experimentalcombat.CombatTestEntities;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ActiveLineageSnapshot;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.util.Vector;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +33,7 @@ class ClassPassiveBehaviorTest {
     private JavaPlugin previousPlugin;
     private PlayerMock player;
     private ClassPassiveRuntime runtime;
+    private EliteEntity target;
     private boolean active;
 
     @BeforeEach
@@ -42,6 +47,7 @@ class ClassPassiveBehaviorTest {
                 authors: [Autotester]
                 """.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
         player = server.addPlayer();
+        target = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 6));
         active = true;
     }
 
@@ -49,6 +55,7 @@ class ClassPassiveBehaviorTest {
     void close() {
         try {
             if (runtime != null) runtime.shutdown();
+            if (target != null) target.remove(RemovalReason.SHUTDOWN);
         } finally {
             MockBukkit.unmock();
             MetadataHandler.PLUGIN = previousPlugin;
@@ -66,12 +73,7 @@ class ClassPassiveBehaviorTest {
     void rootPassiveChangesRealDamageEventsAndRevokesMovementOnExit(
             String form, double outgoing, double incoming, double followingIncoming,
             double movementBeforeHit, double movementAfterHit) {
-        var lineage = BuiltInClassContent.catalog().lineageOf(form);
-        var snapshot = new ActiveLineageSnapshot(form, 1, 1, List.of(form), Map.of(form, 1));
-        var passive = PassiveAggregate.resolve(lineage, snapshot, BuiltInClassContent.passiveRegistry());
-        runtime = new ClassPassiveRuntime(id -> passive, ignored -> active);
-        Bukkit.getPluginManager().registerEvents(runtime, MetadataHandler.PLUGIN);
-        runtime.reconcile(player, true);
+        activate(form);
 
         assertEquals(movementBeforeHit, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), 0.000001);
         assertEquals(outgoing, outgoingDamage(), 0.000001);
@@ -86,21 +88,151 @@ class ClassPassiveBehaviorTest {
         assertEquals(0.1D, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), 0.000001);
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "sniper,10.3035,11.0135,10.101,10.101",
+            "bowmaster,9.6645,11.2265,10.101,10.101",
+            "battlemage,10.3855,9.8885,9.392,10.031",
+            "crusher,10.8115,10.1015,9.1075,9.8175",
+            "elementalist,10,10,10.568,10",
+            "demolitionist,10.081,10.081,10.791,10.081"
+    })
+    void positionalPassiveUsesTheLiveTargetDistance(
+            String form, double nearOutgoing, double farOutgoing, double nearIncoming, double farIncoming) {
+        activate(form);
+        assertEquals(nearOutgoing, outgoingDamage(), 0.000001);
+        assertEquals(nearIncoming, incomingDamage(), 0.000001);
+        assertTrue(target.getLivingEntity().teleport(player.getLocation().add(0, 0, 18)));
+        assertEquals(farOutgoing, outgoingDamage(), 0.000001);
+        assertEquals(farIncoming, incomingDamage(), 0.000001);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "bulwark,9.88,9.88,8.8945,9.7465",
+            "colossus,10.9535,9.5335,8.9655,10.1725",
+            "windrunner,9.584,11.004,10.121,10.121",
+            "grovekeeper,9.85,9.85,9.6548,10.3648"
+    })
+    void movementPassiveReadsPlayerMotion(String form, double standingOutgoing, double movingOutgoing,
+                                          double standingIncoming, double movingIncoming) {
+        activate(form);
+        assertEquals(standingOutgoing, outgoingDamage(), 0.000001);
+        assertEquals(standingIncoming, incomingDamage(), 0.000001);
+        player.setVelocity(new Vector(.2, 0, 0));
+        assertEquals(movingOutgoing, outgoingDamage(), 0.000001);
+        assertEquals(movingIncoming, incomingDamage(), 0.000001);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "bloodrager,4,10.2535,11.6735,10.182,11.105",
+            "reaver,9,10.2535,10.5375,10.182,10.324",
+            "deathless,4,10.1015,10.3855,9.8175,8.6815"
+    })
+    void emergencyPassiveReadsActualPlayerHealth(String form, double health, double healthyOutgoing,
+                                                double woundedOutgoing, double healthyIncoming, double woundedIncoming) {
+        activate(form);
+        assertEquals(healthyOutgoing, outgoingDamage(), 0.000001);
+        assertEquals(healthyIncoming, incomingDamage(), 0.000001);
+        player.setHealth(health);
+        assertEquals(woundedOutgoing, outgoingDamage(), 0.000001);
+        assertEquals(woundedIncoming, incomingDamage(), 0.000001);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"slayer,10.354,11.206", "headsman,10.354,11.632", "harvester,9.502,11.064"})
+    void executionPassiveReadsActualTargetHealth(String form, double healthyDamage, double woundedDamage) {
+        activate(form);
+        assertEquals(healthyDamage, outgoingDamage(), 0.000001);
+        target.getLivingEntity().setHealth(target.getLivingEntity().getHealth() * .4D);
+        assertEquals(woundedDamage, outgoingDamage(), 0.000001);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "inquisitor,11.064,10.354", "bloodstorm,9.8275,10.2535",
+            "raincaller,9.7355,11.0135", "warmonger,9.6855,11.1055", "titanbane,11.49,10.638"
+    })
+    void crowdPassiveFindsAnotherRegisteredElite(String form, double isolated, double grouped) {
+        activate(form);
+        assertEquals(isolated, outgoingDamage(), 0.000001);
+        var neighbor = CombatTestEntities.spawnElite(target.getLivingEntity().getLocation().add(1, 0, 0));
+        try {
+            assertEquals(grouped, outgoingDamage(), 0.000001);
+        } finally {
+            neighbor.remove(RemovalReason.SHUTDOWN);
+        }
+        assertEquals(isolated, outgoingDamage(), 0.000001);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"dragonslayer,11.5815,9.5935", "titanbane,11.49,9.928"})
+    void bossPassiveDistinguishesAnOrdinaryNaturalElite(String form, double boss, double ordinary) {
+        activate(form);
+        assertEquals(boss, outgoingDamage(), 0.000001);
+        target.setNaturalEntity(true);
+        assertEquals(ordinary, outgoingDamage(), 0.000001);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"deadeye,10.3035,11.5815", "dreadnought,10.1015,9.3915"})
+    void criticalPassiveUsesTheDamageEventFlag(String form, double normal, double critical) {
+        activate(form);
+        assertEquals(normal, outgoingDamage(), 0.000001);
+        var event = new EliteMobDamagedByPlayerEvent(target, player, 10D, false, true);
+        Bukkit.getPluginManager().callEvent(event);
+        assertEquals(critical, event.getDamage(), 0.000001);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "mage,spell,10,10.284", "pyromancer,spell,10,10.355",
+            "cryomancer,spell,10,9.929", "summoner,spell,10,9.858",
+            "spiritbinder,spell,10,9.6095", "elementalist,area,10,10.27335",
+            "saboteur,trap,10.081,11.075", "demolitionist,blast,10.081,11.217"
+    })
+    void abilityPassiveAppliesOnlyInsideItsDamageScope(String form, String kind, double ordinary, double ability) {
+        activate(form);
+        var domain = switch (kind) {
+            case "spell" -> ClassAbilityDamageDomain.SINGLE_TARGET_DIRECT;
+            case "area" -> ClassAbilityDamageDomain.AREA_DIRECT;
+            case "trap" -> ClassAbilityDamageDomain.AREA_TRAP;
+            case "blast" -> ClassAbilityDamageDomain.AREA_BLAST;
+            default -> throw new IllegalArgumentException(kind);
+        };
+        assertEquals(ordinary, outgoingDamage(), 0.000001);
+        CombatDamageContext.runClassAbilityDamage(domain,
+                () -> assertEquals(ability, outgoingDamage(), 0.000001));
+        // Summons and ordinary hits must not inherit spell/trap/blast-only modifiers.
+        CombatDamageContext.runClassAbilityDamage(ClassAbilityDamageDomain.SINGLE_TARGET_SUMMON,
+                () -> assertEquals(ordinary, outgoingDamage(), 0.000001));
+        assertEquals(ordinary, outgoingDamage(), 0.000001);
+    }
+
+    private void activate(String form) {
+        var lineage = BuiltInClassContent.catalog().lineageOf(form);
+        // Isolate this form's contribution; progression/inheritance has its own tests.
+        var snapshot = new ActiveLineageSnapshot(form, 1, lineage.activeForm().band().effectiveStart(),
+                List.of(form), Map.of(form, 1));
+        var passive = PassiveAggregate.resolve(lineage, snapshot, BuiltInClassContent.passiveRegistry());
+        runtime = new ClassPassiveRuntime(id -> passive, ignored -> active);
+        Bukkit.getPluginManager().registerEvents(runtime, MetadataHandler.PLUGIN);
+        runtime.reconcile(player, true);
+    }
+
     private double outgoingDamage() {
-        // Root modifiers need no live target. Target-dependent branch traits need separate cases.
-        var event = new EliteMobDamagedByPlayerEvent(new EliteEntity(), player, 10D, false);
+        var event = new EliteMobDamagedByPlayerEvent(target, player, 10D, false);
         Bukkit.getPluginManager().callEvent(event);
         return event.getDamage();
     }
 
     @SuppressWarnings("removal")
     private double incomingDamage() {
-        var attacker = player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE);
-        var hit = new EntityDamageByEntityEvent(attacker, player,
+        var hit = new EntityDamageByEntityEvent(target.getLivingEntity(), player,
                 EntityDamageEvent.DamageCause.ENTITY_ATTACK, 10D);
-        var event = new PlayerDamagedByEliteMobEvent(new EliteEntity(), player, hit, null, 10D);
+        var event = new PlayerDamagedByEliteMobEvent(target, player, hit, null, 10D);
         Bukkit.getPluginManager().callEvent(event);
-        attacker.remove();
         return event.getDamage();
     }
 }

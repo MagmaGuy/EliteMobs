@@ -135,6 +135,14 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
     javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+    def skippedTests = 0
+    afterSuite { descriptor, result ->
+        if (!descriptor.parent) skippedTests = result.skippedTestCount
+    }
+    doLast {
+        if (skippedTests > 0) throw new GradleException(
+                "${skippedTests} tests were skipped; unsupported MockBukkit operations are not passes. See JUnit XML.")
+    }
 }
 
 // Paper 26.2 needs Java 25 only in the test runtime; production remains Java 21.
