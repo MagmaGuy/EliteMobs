@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
 import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
 import com.magmaguy.elitemobs.experimentalcombat.progression.*;
@@ -146,6 +147,92 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(8D + 20D * .14D * 1.0775D * 1.106D, player.getHealth(), 0.000001);
         assertEquals(9.5D, outgoingDamage(), 0.000001,
                 "The same active lineage must also reach the damage event listener");
+    }
+
+    @ParameterizedTest
+    @CsvSource({"guardian,false,false", "bulwark,false,false", "juggernaut,true,false",
+            "dreadnought,true,false", "templar,true,true"})
+    void immunityUtilityRequiresCombatResourceThenCleansesBlocksAndReleasesControl(
+            String form, boolean cleansesPoison, boolean blocksPoison) {
+        int level = module.catalog().require(form).band().effectiveStart();
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(),
+                "Resolve and Fury must be earned before casting");
+        for (int hit = 0; hit < 5; hit++) incomingDamage();
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 0));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 0));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100, 0));
+
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertFalse(player.hasPotionEffect(PotionEffectType.SLOWNESS));
+        assertEquals(!cleansesPoison, player.hasPotionEffect(PotionEffectType.POISON));
+        assertTrue(player.hasPotionEffect(PotionEffectType.NIGHT_VISION));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 1));
+        assertFalse(player.hasPotionEffect(PotionEffectType.SLOWNESS));
+        player.removePotionEffect(PotionEffectType.POISON);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 1));
+        assertEquals(!blocksPoison, player.hasPotionEffect(PotionEffectType.POISON));
+        assertTrue(incomingDamage() < 10D, "The utility must also apply its damage protection");
+
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        assertEquals(10D, incomingDamage());
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 0));
+        assertTrue(player.hasPotionEffect(PotionEffectType.SLOWNESS),
+                "The previous class must not retain immunity after switching");
+    }
+
+    @ParameterizedTest
+    @CsvSource({"bloodrager,true,false", "artillerist,false,true", "windrunner,false,false"})
+    void resourceBurstFundsFurtherCastsAndAppliesTheSkillEffects(
+            String form, boolean fury, boolean strength) {
+        int level = module.catalog().require(form).band().effectiveStart();
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        if (fury) {
+            assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            incomingDamage();
+            incomingDamage(); // Earn 40 Fury through the production damage handler.
+        }
+        // Without the committed resource burst, Fury cannot fund cast two and Focus cannot fund cast three.
+        for (int cast = 0; cast < 3; cast++) {
+            player.removePotionEffect(PotionEffectType.SPEED);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 0));
+            assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            assertTrue(player.hasPotionEffect(PotionEffectType.SPEED));
+            assertEquals(1, player.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
+            assertEquals(!fury, player.hasPotionEffect(PotionEffectType.POISON));
+        }
+        assertEquals(strength, outgoingDamage() > 10D);
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        assertEquals(10D, outgoingDamage());
+    }
+
+    @Test
+    void berserkerSignatureSpendsEarnedFuryForDamageAndSpeedUntilClassChange() {
+        assertTrue(module.setClassLevelForAdministration(player, "berserker", 1).applied());
+        assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        incomingDamage();
+        incomingDamage();
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        assertEquals(11.8045D, outgoingDamage(), 0.000001);
+        assertTrue(player.hasPotionEffect(PotionEffectType.SPEED));
+        assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        assertEquals(10D, outgoingDamage());
+    }
+
+    @Test
+    void demonologistUtilityTradesVulnerabilityForSpellOnlyDamageAndShield() {
+        assertTrue(module.setClassLevelForAdministration(player, "demonologist", 91).applied());
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertTrue(player.hasPotionEffect(PotionEffectType.ABSORPTION));
+        assertEquals(10D, outgoingDamage(), "The spell buff must not increase ordinary weapon damage");
+        CombatDamageContext.runClassAbilityDamage(CombatDamageContext.ClassAbilityDamageDomain.SINGLE_TARGET_DIRECT,
+                () -> assertEquals(12.7005D, outgoingDamage(), 0.000001));
+        assertEquals(12.7005D, incomingDamage(), 0.000001);
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        assertEquals(10D, incomingDamage());
+        CombatDamageContext.runClassAbilityDamage(CombatDamageContext.ClassAbilityDamageDomain.SINGLE_TARGET_DIRECT,
+                () -> assertEquals(10D, outgoingDamage()));
     }
 
     @ParameterizedTest
