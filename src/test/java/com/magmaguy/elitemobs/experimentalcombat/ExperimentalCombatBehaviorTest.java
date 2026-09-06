@@ -277,6 +277,28 @@ class ExperimentalCombatBehaviorTest {
         }
     }
 
+    @Test
+    void justicarWeakensOnlyRecentAttackersInReachUntilClassChange() {
+        assertTrue(module.setClassLevelForAdministration(player, "justicar", 61).applied());
+        for (int hit = 0; hit < 5; hit++) incomingDamage();
+        var uninvolved = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 4));
+        var distant = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 20));
+        try {
+            assertEquals(10D, incomingDamage(player, distant));
+            assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            assertEquals(7.695D, incomingDamage(), .000001);
+            assertEquals(10D, incomingDamage(player, uninvolved),
+                    "A nearby elite that did not attack the caster must not be weakened");
+            assertEquals(10D, incomingDamage(player, distant),
+                    "A recent attacker outside the ability radius must not be weakened");
+            assertTrue(module.selectForm(player, "spellcaster").accepted());
+            assertEquals(10D, incomingDamage());
+        } finally {
+            uninvolved.remove(RemovalReason.SHUTDOWN);
+            distant.remove(RemovalReason.SHUTDOWN);
+        }
+    }
+
     @ParameterizedTest
     @CsvSource({"false,135,1", "true,154,.9302909090909091"})
     void trapperExtendsExistingSlowAndItsPassiveStrengthensControl(
@@ -1047,9 +1069,12 @@ class ExperimentalCombatBehaviorTest {
         return incomingDamage(player);
     }
 
-    @SuppressWarnings("removal")
     private double incomingDamage(PlayerMock victim) {
-        var attacker = target();
+        return incomingDamage(victim, target());
+    }
+
+    @SuppressWarnings("removal")
+    private double incomingDamage(PlayerMock victim, EliteEntity attacker) {
         var hit = new EntityDamageByEntityEvent(attacker.getLivingEntity(), victim,
                 EntityDamageEvent.DamageCause.ENTITY_ATTACK, 10D);
         var event = new PlayerDamagedByEliteMobEvent(attacker, victim, hit, null, 10D);
