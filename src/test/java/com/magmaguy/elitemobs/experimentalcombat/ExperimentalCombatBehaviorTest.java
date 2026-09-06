@@ -73,7 +73,7 @@ class ExperimentalCombatBehaviorTest {
                 new MemoryStore(), Runnable::run);
         progression.load(player.getUniqueId()).join();
         module = new ExperimentalCombatModule(new DungeonCombatRuntime(200, 20), availability -> progression,
-                ignored -> fullCombatActive);
+                ignored -> fullCombatActive, org.bukkit.entity.LivingEntity::damage);
         module.startGameplay();
         ClassAbilityEligibility.install(module::controlsAlwaysAvailable, module::mechanicsActive);
         module.onControlModeChanged(player);

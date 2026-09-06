@@ -97,13 +97,22 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             AbilitySemantics semantics,
             ClassMinionManager.OwnerProfileResolver ownerProfiles,
             ClassMinionManager.MinionDamageEvaluator minionDamageEvaluator) {
+        this(plugin, registry, semantics, ownerProfiles, minionDamageEvaluator, ClassAbilityDamage.NATIVE);
+    }
+
+    public BukkitClassAbilityEngine(
+            Plugin plugin, FixedAbilityRegistry registry, AbilitySemantics semantics,
+            ClassMinionManager.OwnerProfileResolver ownerProfiles,
+            ClassMinionManager.MinionDamageEvaluator minionDamageEvaluator,
+            ClassAbilityDamage.Delivery damageDelivery) {
         this.plugin = Objects.requireNonNull(plugin, "plugin");
         this.semantics = Objects.requireNonNull(semantics, "semantics");
         this.registry = Objects.requireNonNull(registry, "registry");
         this.targeting = new AbilityTargeting(semantics);
         this.modifiers = new TimedCombatModifiers(plugin, semantics);
-        this.states = new AbilityStateRuntime(plugin, semantics, registry);
-        this.effects = new AbilityEffects(semantics, modifiers, states);
+        var damage = new ClassAbilityDamage(damageDelivery);
+        this.states = new AbilityStateRuntime(plugin, semantics, registry, damage);
+        this.effects = new AbilityEffects(semantics, modifiers, states, damage);
         this.controlAttributionLease = ClassControlAttribution.install((caster, target) ->
                 states.hasOwnedTaunt(caster, target) || effects.controlledBy(caster, target));
         this.frenzy = new FrenzyRuntime(plugin);

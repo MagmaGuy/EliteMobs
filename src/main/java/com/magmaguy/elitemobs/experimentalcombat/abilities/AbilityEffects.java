@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.experimentalcombat.ClassAbilityEligibility;
 import com.magmaguy.elitemobs.experimentalcombat.damage.ExperimentalDamageScaling;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
@@ -35,6 +34,7 @@ final class AbilityEffects {
     private static final double DEFAULT_PROTECTION_MULTIPLIER = 0.80D;
     private static final double DEFAULT_STRENGTH_MULTIPLIER = 1.15D;
 
+    private final ClassAbilityDamage damage;
     private final AbilitySemantics semantics;
     private final TimedCombatModifiers modifiers;
     private final AbilityStateRuntime states;
@@ -43,7 +43,8 @@ final class AbilityEffects {
     AbilityEffects(
             AbilitySemantics semantics,
             TimedCombatModifiers modifiers,
-            AbilityStateRuntime states) {
+            AbilityStateRuntime states, ClassAbilityDamage damage) {
+        this.damage = damage;
         this.semantics = semantics;
         this.modifiers = modifiers;
         this.states = states;
@@ -198,7 +199,7 @@ final class AbilityEffects {
                         tuning.damageMultiplier() * states.damageMultiplier(spec, enemy));
                 double retaliationBonus = retaliationAvailable ? availableRetaliation : 0D;
                 amount += retaliationBonus;
-                double dealt = damage(caster, projectile, enemy, amount,
+                double dealt = damage.apply(caster, projectile, enemy, amount,
                         damageDomain(spec, delivery));
                 if (dealt > 0D && retaliationBonus > 0D) {
                     releasedRetaliation = states.consumeRetaliation(caster, spec, enemy);
@@ -580,23 +581,6 @@ final class AbilityEffects {
                 || effects.contains(AbilityEffect.SPEED)
                 || effects.contains(AbilityEffect.STRENGTH)
                 || effects.contains(AbilityEffect.SELF_PROTECT);
-    }
-
-    private static double damage(
-            Player caster,
-            Projectile projectile,
-            LivingEntity target,
-            double amount,
-            CombatDamageContext.ClassAbilityDamageDomain domain) {
-        if (!valid(target) || !Double.isFinite(amount) || amount <= 0D) return 0D;
-        double before = target.getHealth() + target.getAbsorptionAmount();
-        Runnable damage = () -> CombatDamageContext.runClassAbilityDamage(domain,
-                () -> target.damage(amount, projectile == null ? caster : projectile));
-        if (projectile == null) damage.run();
-        else CustomModel.runProjectileDamageBypass(damage);
-        if (!target.isValid()) return Math.min(before, amount);
-        double after = Math.max(0D, target.getHealth()) + Math.max(0D, target.getAbsorptionAmount());
-        return Math.max(0D, before - after);
     }
 
     private static double heal(Player target, double amount) {

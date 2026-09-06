@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime;
 import com.magmaguy.elitemobs.combatsystem.combattag.PlayerCombatState;
 import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.AbilityContribution;
+import com.magmaguy.elitemobs.experimentalcombat.abilities.ClassAbilityDamage;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.AbilityCommitEffects;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.AbilityFailureReason;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.AbilityMechanicModifiers;
@@ -141,6 +142,12 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     ExperimentalCombatModule(PlayerCombatState combatState,
                              Function<ClassContentAvailability, ClassProgressionModule> progressionFactory,
                              Predicate<Player> passiveActive) {
+        this(combatState, progressionFactory, passiveActive, ClassAbilityDamage.NATIVE);
+    }
+
+    ExperimentalCombatModule(PlayerCombatState combatState,
+                             Function<ClassContentAvailability, ClassProgressionModule> progressionFactory,
+                             Predicate<Player> passiveActive, ClassAbilityDamage.Delivery damageDelivery) {
         this.combatState = Objects.requireNonNull(combatState, "combatState");
         this.passiveActive = Objects.requireNonNull(passiveActive, "passiveActive");
         this.magicWeaponIntegration = new ExperimentalMagicWeaponIntegration(MetadataHandler.PLUGIN);
@@ -180,7 +187,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
                     public double healingDoneMultiplier(Player owner) {
                         return passiveRuntime.healingDoneMultiplier(owner);
                     }
-                });
+                }, damageDelivery);
         this.inputRouter = new ClassAbilityInputRouter(MetadataHandler.PLUGIN, this);
     }
 

@@ -66,6 +66,7 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
             PotionEffectType.HUNGER,
             PotionEffectType.UNLUCK);
     private static final long RECENT_ATTACKER_TICKS = 160L;
+    private final ClassAbilityDamage damage;
     private final Plugin plugin;
     private final AbilitySemantics semantics;
     private final FixedAbilityRegistry registry;
@@ -95,7 +96,8 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
     AbilityStateRuntime(
             Plugin plugin,
             AbilitySemantics semantics,
-            FixedAbilityRegistry registry) {
+            FixedAbilityRegistry registry, ClassAbilityDamage damage) {
+        this.damage = damage;
         this.plugin = Objects.requireNonNull(plugin, "plugin");
         this.semantics = Objects.requireNonNull(semantics, "semantics");
         this.registry = Objects.requireNonNull(registry, "registry");
@@ -679,8 +681,8 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                 if (!(nearby instanceof LivingEntity living)
                         || !semantics.canApplyEnemyEffect(
                         player, living, detonationSpec, AbilityEffect.DAMAGE)) continue;
-                double dealt = classAbilityDamage(
-                        player, living, explosionDamage,
+                double dealt = damage.apply(
+                        player, null, living, explosionDamage,
                         CombatDamageContext.ClassAbilityDamageDomain.AREA_BLAST);
                 if (dealt > 0D)
                     observeEffect(AbilityRuntimeObservation.Kind.DAMAGE,
@@ -1135,20 +1137,6 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                 && entity.isValid()
                 && !entity.isDead()
                 && entity.getHealth() > 0D;
-    }
-
-    private static double classAbilityDamage(
-            Player source,
-            LivingEntity target,
-            double amount,
-            CombatDamageContext.ClassAbilityDamageDomain domain) {
-        if (!valid(target) || !Double.isFinite(amount) || amount <= 0D) return 0D;
-        double before = target.getHealth() + target.getAbsorptionAmount();
-        CombatDamageContext.runClassAbilityDamage(domain, () -> target.damage(amount, source));
-        if (!target.isValid()) return Math.min(before, amount);
-        double after = Math.max(0D, target.getHealth())
-                + Math.max(0D, target.getAbsorptionAmount());
-        return Math.max(0D, before - after);
     }
 
     private static double heal(Player target, double amount) {
