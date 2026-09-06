@@ -752,6 +752,38 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(10D, outgoingDamage());
     }
 
+    @ParameterizedTest
+    @CsvSource({"warlord,true,true", "marshal,true,false", "seraph,false,false", "soulwarden,false,false"})
+    void partyPassiveTracksNearbyMembershipThroughDamageEvents(
+            String form, boolean increasesDamage, boolean increasesRisk) throws Exception {
+        fullCombatActive = true;
+        int level = module.catalog().require(form).band().effectiveStart();
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        var server = MockBukkit.getMock();
+        var ally = server.addPlayer();
+        var outsider = server.addPlayer();
+        ally.teleport(player.getLocation().add(1, 0, 0));
+        outsider.teleport(player.getLocation().add(2, 0, 0));
+        double soloOutgoing = outgoingDamage();
+        double soloIncoming = incomingDamage();
+        openParty(ally);
+
+        double groupedOutgoing = outgoingDamage();
+        double groupedIncoming = incomingDamage();
+        if (increasesDamage) assertTrue(groupedOutgoing > soloOutgoing);
+        else assertEquals(soloOutgoing, groupedOutgoing, .000001);
+        if (increasesRisk) assertTrue(groupedIncoming > soloIncoming);
+        else assertTrue(groupedIncoming < soloIncoming);
+
+        assertTrue(ally.teleport(player.getLocation().add(0, 0, 129)));
+        assertEquals(soloOutgoing, outgoingDamage(), .000001);
+        assertEquals(soloIncoming, incomingDamage(), .000001,
+                "A distant party member or nearby outsider must not activate grouped passives");
+        assertTrue(ally.teleport(player.getLocation().add(1, 0, 0)));
+        assertEquals(groupedOutgoing, outgoingDamage(), .000001);
+        assertEquals(groupedIncoming, incomingDamage(), .000001);
+    }
+
     private void openParty(PlayerMock... members) throws Exception {
         var config = new org.bukkit.configuration.file.YamlConfiguration();
         config.set("sidebarEnabled", false);
