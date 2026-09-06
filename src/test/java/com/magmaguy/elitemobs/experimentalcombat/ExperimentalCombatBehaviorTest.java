@@ -1018,6 +1018,13 @@ class ExperimentalCombatBehaviorTest {
         for (var member : List.of(first, second, outsider))
             member.teleport(player.getLocation().add(1, 0, 0));
         openParty(first, second);
+        server.getScheduler().performTicks(20);
+        for (var member : List.of(first, second)) {
+            assertTrue(module.clearSelectedForm(member).accepted());
+            assertNull(module.profile(member.getUniqueId()).orElseThrow().activeLineage());
+        }
+        // Pending support must survive ordinary reconciliation of allies with no selected class.
+        server.getScheduler().performTicks(20 - server.getScheduler().getCurrentTick() % 20);
         player.setHealth(16D);
         first.setHealth(2D);
         second.setHealth(8D);

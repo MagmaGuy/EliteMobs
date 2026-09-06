@@ -111,7 +111,7 @@ final class GuardianFlightManager implements Listener, AutoCloseable {
         if (targetDistance > maximumRange + RANGE_TOLERANCE) return false;
         if (targetDistance > arrivalDistance) {
             Vector initial = GuardianFlightTrajectory.steer(
-                    caster.getVelocity(), target.location().toVector().subtract(center(caster).toVector()));
+                    flightMomentum(caster), target.location().toVector().subtract(center(caster).toVector()));
             if (!collisionClear(caster, initial)) return false;
         }
 
@@ -182,7 +182,7 @@ final class GuardianFlightManager implements Listener, AutoCloseable {
         }
 
         Vector displacement = target.location().toVector().subtract(center(caster).toVector());
-        Vector velocity = GuardianFlightTrajectory.steer(caster.getVelocity(), displacement);
+        Vector velocity = GuardianFlightTrajectory.steer(flightMomentum(caster), displacement);
         if (!collisionClear(caster, velocity)) {
             terminate(session, EndReason.OBSTRUCTED, null);
             return;
@@ -281,6 +281,14 @@ final class GuardianFlightManager implements Listener, AutoCloseable {
     private void terminateForLifecycle(Player player, EndReason reason) {
         Session session = sessions.get(player.getUniqueId());
         if (session != null) terminate(session, reason, null);
+    }
+
+    private static Vector flightMomentum(Player caster) {
+        Vector momentum = caster.getVelocity();
+        // Native gravity leaves downward velocity on grounded players. The floor
+        // already blocks that motion; carrying it into steering creates a false obstruction.
+        if (caster.isOnGround() && momentum.getY() < 0D) momentum.setY(0D);
+        return momentum;
     }
 
     private boolean collisionClear(Player caster, Vector velocity) {

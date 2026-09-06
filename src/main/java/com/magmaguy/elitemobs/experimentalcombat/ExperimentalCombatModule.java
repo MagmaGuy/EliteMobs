@@ -566,17 +566,12 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
 
     private void reconcilePlayer(Player player) {
         Optional<ProfileSnapshot> optional = progression.snapshot(player.getUniqueId());
-        if (optional.isEmpty()) {
-            abilityEngine.deactivate(player);
-            resources.close(player);
-            passiveRuntime.reconcile(player, false);
-            inputRouter.removeFocusItems(player);
-            return;
-        }
-        ActiveLineageSnapshot active = optional.get().activeLineage();
+        ActiveLineageSnapshot active = optional.map(ProfileSnapshot::activeLineage).orElse(null);
         boolean controlsActive = active != null && inputRouter.controlsEnabled(player);
         if (!controlsActive) {
-            abilityEngine.deactivate(player);
+            // Reconciliation ends an existing class session, not a classless ally's lifecycle.
+            // Repeated idle cleanup would invalidate incoming flights and delayed support casts.
+            if (resources.snapshot(player.getUniqueId()).isPresent()) abilityEngine.deactivate(player);
             resources.close(player);
             passiveRuntime.reconcile(player, false);
             inputRouter.removeFocusItems(player);
