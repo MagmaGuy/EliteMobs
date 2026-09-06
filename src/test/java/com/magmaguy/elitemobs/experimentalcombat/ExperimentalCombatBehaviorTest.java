@@ -667,10 +667,11 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"priest,31,false,11.336802,9.5", "hierophant,61,false,13.381253,9.25",
-            "hierophant,61,true,13.839487,9.25"})
+    @CsvSource({"priest,31,SIGNATURE,false,11.336802,9.5", "hierophant,61,SIGNATURE,false,13.381253,9.25",
+            "hierophant,61,SIGNATURE,true,13.839487,9.25", "spiritcaller,61,UTILITY,false,9.1406984,9.45"})
     void healingPassiveChangesRealRecoveryInItsPartyContext(
-            String form, int level, boolean grouped, double healedHealth, double outgoing) throws Exception {
+            String form, int level, AbilitySlot slot, boolean grouped,
+            double healedHealth, double outgoing) throws Exception {
         fullCombatActive = true;
         assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
         if (grouped) {
@@ -679,7 +680,7 @@ class ExperimentalCombatBehaviorTest {
             openParty(ally);
         }
         player.setHealth(8D);
-        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        assertTrue(module.useAbility(player, slot).successful());
         assertEquals(healedHealth, player.getHealth(), 0.000001);
         assertEquals(outgoing, outgoingDamage(), 0.000001,
                 "The same active lineage must also reach the damage event listener");
