@@ -166,6 +166,9 @@ String packagePath = 'com.magmaguy.shaded'
 
 // Relocating a Package
 shadowJar {
+    // Only production classes determine which shaded dependencies the plugin needs.
+    // Test classes use Java 25 and must not enter Shadow's minimizer scan.
+    sourceSetsClassesDirs.setFrom(sourceSets.main.output.classesDirs)
     // Relocate bStats
     relocate 'org.bstats', packagePath + '.bstats'
     relocate 'com.magmaguy.easyminecraftgoals', 'com.magmaguy.elitemobs.easyminecraftgoals'

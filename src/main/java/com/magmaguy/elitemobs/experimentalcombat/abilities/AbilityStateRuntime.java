@@ -828,15 +828,17 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onTeleport(PlayerTeleportEvent event) {
+        // Teleports use a separate Bukkit handler list from ordinary movement.
+        if (!closed && event.getTo() != null) plantedGuards.remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
         if (closed || event.getTo() == null) return;
         Player player = event.getPlayer();
         PlantedGuard guard = livePlanted(player, System.nanoTime());
         if (guard == null) return;
-        if (event instanceof PlayerTeleportEvent) {
-            plantedGuards.remove(player.getUniqueId());
-            return;
-        }
         if (event.getFrom().getX() == event.getTo().getX()
                 && event.getFrom().getY() == event.getTo().getY()
                 && event.getFrom().getZ() == event.getTo().getZ()) return;

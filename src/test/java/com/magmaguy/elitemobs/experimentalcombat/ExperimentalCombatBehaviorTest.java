@@ -243,6 +243,81 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @Test
+    void bulwarkGuardRestrictsOnlyItsCasterAndRetiresOnTeleportOrClassChange() throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, "bulwark", 91).applied());
+        assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        for (int hit = 0; hit < 5; hit++) incomingDamage();
+        var ally = MockBukkit.getMock().addPlayer();
+        ally.teleport(player.getLocation().add(1, 0, 0));
+        openParty(ally);
+        var distant = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 30));
+        try {
+            for (var member : List.of(player, ally)) {
+                member.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 0));
+                member.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 0));
+            }
+            double enemyHealth = target().getLivingEntity().getHealth();
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertEquals(player.getUniqueId(), target().getForcedTargetPlayerId());
+            assertTrue(target().getPowerSuppression().isSuppressed(ElitePowerPauseReason.INTERRUPT));
+            assertNull(distant.getForcedTargetPlayerId());
+            assertFalse(distant.getPowerSuppression().isSuppressed());
+            assertEquals(enemyHealth, target().getLivingEntity().getHealth());
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertFalse(player.hasPotionEffect(PotionEffectType.SLOWNESS));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 1));
+            assertFalse(player.hasPotionEffect(PotionEffectType.SLOWNESS));
+            assertTrue(player.hasPotionEffect(PotionEffectType.POISON));
+            assertTrue(ally.hasPotionEffect(PotionEffectType.SLOWNESS));
+            assertEquals(10D, incomingDamage(ally));
+            assertEquals(2.64075D, incomingDamage(), .000001,
+                    "The planted guard must combine its reduction with the signature's self-protection");
+
+            var origin = player.getLocation();
+            var destination = origin.clone().add(1, 0, 0);
+            destination.setYaw(45F);
+            destination.setPitch(20F);
+            var move = new org.bukkit.event.player.PlayerMoveEvent(player, origin, destination);
+            Bukkit.getPluginManager().callEvent(move);
+            assertEquals(origin.toVector(), move.getTo().toVector());
+            assertEquals(45F, move.getTo().getYaw());
+            assertEquals(20F, move.getTo().getPitch());
+            var allyMove = new org.bukkit.event.player.PlayerMoveEvent(
+                    ally, ally.getLocation(), ally.getLocation().add(1, 0, 0));
+            var allyDestination = allyMove.getTo().clone();
+            Bukkit.getPluginManager().callEvent(allyMove);
+            assertEquals(allyDestination, allyMove.getTo());
+
+            var cancelledTeleport = new org.bukkit.event.player.PlayerTeleportEvent(
+                    player, origin, origin.clone().add(.5, 0, 0));
+            cancelledTeleport.setCancelled(true);
+            Bukkit.getPluginManager().callEvent(cancelledTeleport);
+            assertEquals(2.64075D, incomingDamage(), .000001, "A cancelled teleport must preserve the guard");
+            assertTrue(player.teleport(origin.clone().add(.5, 0, 0)));
+            assertEquals(7.545D, incomingDamage(), .000001,
+                    "Even a short teleport must remove the planted bonus without removing self-protection");
+            assertTrue(player.teleport(origin));
+            assertEquals(7.545D, incomingDamage(), .000001, "Returning to the origin must not revive the guard");
+            for (int hit = 0; hit < 5; hit++) incomingDamage();
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertEquals(2.64075D, incomingDamage(), .000001);
+            assertTrue(module.selectForm(player, "spellcaster").accepted());
+            assertEquals(10D, incomingDamage());
+            assertNull(target().getForcedTargetPlayerId());
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 0));
+            assertTrue(player.hasPotionEffect(PotionEffectType.SLOWNESS));
+            var retiredMove = new org.bukkit.event.player.PlayerMoveEvent(player, origin, destination);
+            Bukkit.getPluginManager().callEvent(retiredMove);
+            assertEquals(destination, retiredMove.getTo());
+            MockBukkit.getMock().getScheduler().performTicks(60);
+            assertFalse(target().getPowerSuppression().isSuppressed(ElitePowerPauseReason.INTERRUPT));
+        } finally {
+            distant.remove(RemovalReason.SHUTDOWN);
+        }
+    }
+
+    @Test
     void reaverSignatureDamagesAndHealsThenRevokesItsLifestealWindowOnClassChange() {
         assertTrue(module.setClassLevelForAdministration(player, "reaver", 61).applied());
         assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
