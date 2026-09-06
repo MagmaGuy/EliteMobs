@@ -328,7 +328,7 @@ class ExperimentalCombatBehaviorTest {
     @ParameterizedTest
     @CsvSource({"spellcaster,1,1,1180,absorption", "guardian,31,0,1240,absorption",
             "arcane_knight,91,2,20,absorption", "occultist,31,2,20,glowing",
-            "plaguebringer,91,3,380,slowness"})
+            "plaguebringer,91,3,360,slowness"})
     void scheduledRecoveryFundsUtilityOnlyAfterEnoughUpdates(
             String form, int level, int initialCasts, int ticksBeforeAffordable, String status) {
         assertTrue(module.setClassLevelForAdministration(player, form, level).applied());

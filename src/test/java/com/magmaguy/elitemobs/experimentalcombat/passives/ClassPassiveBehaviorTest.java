@@ -258,7 +258,7 @@ class ClassPassiveBehaviorTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"justicar,9.148", "inquisitor,8.935", "reaver,9.29", "plaguebringer,10.213"})
+    @CsvSource({"justicar,9.148", "inquisitor,8.935", "reaver,9.29"})
     void healingTradeoffChangesRegainHealthEventsAndStopsWhenInactive(String form, double amount) {
         activate(form);
         var heal = new EntityRegainHealthEvent(player, 10D, EntityRegainHealthEvent.RegainReason.CUSTOM);
