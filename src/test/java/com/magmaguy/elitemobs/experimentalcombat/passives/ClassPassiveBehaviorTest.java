@@ -78,9 +78,13 @@ class ClassPassiveBehaviorTest {
             "berserker,10.2535,10.182,10.182,0.1,0.1",
             "ranger,10.152,10.121,10.334,0.106075,0.096845",
             "cleric,9.75,10,10,0.1,0.1",
-            "spellcaster,10.152,10.08,10.08,0.1,0.1"
+            "spellcaster,10.152,10.08,10.08,0.1,0.1",
+            "shieldbearer,9.6315,9.7465,9.7465,0.099,0.099",
+            "siegebreaker,9.6475,10,10,0.1,0.1",
+            "arbalist,10.3035,10.101,10.101,0.099,0.099",
+            "spellblade,10.303,10.05,10.05,0.101515,0.101515"
     })
-    void rootPassiveChangesRealDamageEventsAndRevokesMovementOnExit(
+    void basePassiveChangesRealDamageEventsAndRevokesMovementOnExit(
             String form, double outgoing, double incoming, double followingIncoming,
             double movementBeforeHit, double movementAfterHit) {
         activate(form);
