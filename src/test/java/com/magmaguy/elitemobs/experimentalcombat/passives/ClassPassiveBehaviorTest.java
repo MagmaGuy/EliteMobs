@@ -82,7 +82,9 @@ class ClassPassiveBehaviorTest {
             "shieldbearer,9.6315,9.7465,9.7465,0.099,0.099",
             "siegebreaker,9.6475,10,10,0.1,0.1",
             "arbalist,10.3035,10.101,10.101,0.099,0.099",
-            "spellblade,10.303,10.05,10.05,0.101515,0.101515"
+            "spellblade,10.303,10.05,10.05,0.101515,0.101515",
+            "artillerist,9.7355,10.101,10.101,0.099,0.099",
+            "demonologist,11.022,10.82,10.82,0.1,0.1"
     })
     void basePassiveChangesRealDamageEventsAndRevokesMovementOnExit(
             String form, double outgoing, double incoming, double followingIncoming,
