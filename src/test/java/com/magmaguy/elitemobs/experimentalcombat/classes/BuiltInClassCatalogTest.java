@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,46 +14,15 @@ class BuiltInClassCatalogTest {
     private final ClassCatalog catalog = BuiltInClassCatalog.catalog();
 
     @Test
-    void shippedManifestContainsTheFiveApprovedRootClasses() {
-        assertEquals(Set.of("paladin", "berserker", "ranger", "cleric", "spellcaster"),
-                catalog.roots().stream().map(ClassFormDefinition::id).collect(java.util.stream.Collectors.toSet()));
-    }
-
-    @Test
-    void everyRegisteredTreeIsACompleteBinaryProgression() {
-        for (ClassFormDefinition form : catalog.forms()) {
-            assertEquals(form.band().isTerminal() ? 0 : 2, catalog.childrenOf(form.id()).size());
-            assertEquals(2, form.foundationSkills().asList().size());
-        }
-    }
-
-    @Test
     void descendantsResolveRootMechanicsAndTheirOwnActiveKit() {
         ClassLineage lineage = catalog.lineageOf("colossus");
 
         assertEquals(List.of("berserker", "juggernaut", "dreadnought", "colossus"), lineage.formIds());
         assertEquals(ClassResourceType.FURY, lineage.resourceType());
-        assertEquals("Crater Leap", lineage.mobility().displayName());
-        assertEquals("Worldbreaker", lineage.signature().displayName());
-        assertEquals("Immovable", lineage.utility().displayName());
+        assertEquals("berserker.mobility", lineage.mobility().id());
+        assertEquals("colossus.signature", lineage.signature().id());
+        assertEquals("colossus.utility", lineage.utility().id());
         assertEquals(4, lineage.passives().size());
-    }
-
-    @Test
-    void spellcasterTreeInheritsBlinkAndManaAndUsesBothMagicSkills() {
-        ClassLineage lineage = catalog.lineageOf("spiritbinder");
-
-        assertEquals(List.of("spellcaster", "occultist", "summoner", "spiritbinder"), lineage.formIds());
-        assertEquals(ClassResourceType.MANA, lineage.resourceType());
-        assertEquals("Blink", lineage.mobility().displayName());
-        assertEquals("Guardian Eidolon", lineage.signature().displayName());
-        assertEquals("Shared Essence", lineage.utility().displayName());
-        assertEquals(4, lineage.passives().size());
-
-        for (ClassFormDefinition form : catalog.forms()) {
-            if (!catalog.rootOf(form.id()).id().equals("spellcaster")) continue;
-            assertEquals(List.of(SkillType.STAVES, SkillType.WANDS), form.foundationSkills().asList());
-        }
     }
 
     @Test

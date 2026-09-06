@@ -547,6 +547,40 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(10D, retiredAllyHit.getDamage());
     }
 
+    @Test
+    void bannerlordUtilityNeedsAnActiveBannerAndSpeedsOnlyNearbyPartyMembers() throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, "bannerlord", 91).applied());
+        for (int hit = 0; hit < 5; hit++) incomingDamage();
+        target().getLivingEntity().teleport(player.getLocation().add(0, 0, 40));
+        var server = MockBukkit.getMock();
+        var ally = server.addPlayer();
+        var distant = server.addPlayer();
+        var outsider = server.addPlayer();
+        ally.teleport(player.getLocation().add(1, 0, 0));
+        outsider.teleport(player.getLocation().add(2, 0, 0));
+        distant.teleport(player.getLocation().add(0, 0, 40));
+        openParty(ally, distant);
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(), "Full Resolve alone is insufficient");
+        player.getWorld().getChunkAt(player.getLocation()).load();
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        for (var member : List.of(player, ally)) member.removePotionEffect(PotionEffectType.SPEED);
+
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        for (var member : List.of(player, ally)) {
+            assertNotNull(member.getPotionEffect(PotionEffectType.SPEED));
+            assertEquals(1, member.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
+        }
+        assertFalse(distant.hasPotionEffect(PotionEffectType.SPEED));
+        assertFalse(outsider.hasPotionEffect(PotionEffectType.SPEED));
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        for (var member : List.of(player, ally)) member.removePotionEffect(PotionEffectType.SPEED);
+        server.getScheduler().performTicks(25);
+        assertFalse(ally.hasPotionEffect(PotionEffectType.SPEED));
+        assertTrue(module.selectForm(player, "bannerlord").accepted());
+        for (int hit = 0; hit < 5; hit++) incomingDamage();
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(), "The old banner cannot survive class change");
+    }
+
     @ParameterizedTest
     @CsvSource({"exorcist,false,3.640733085,9.7265", "mistweaver,true,3.95565312,9.7845"})
     void mixedSignatureDamagesItsEnemySetAndHealsOnlyItsEligiblePartyRecipients(
