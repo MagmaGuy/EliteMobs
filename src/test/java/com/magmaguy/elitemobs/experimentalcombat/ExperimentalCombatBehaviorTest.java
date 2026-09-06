@@ -326,22 +326,26 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"spellcaster,1,1,1180", "guardian,31,0,1240", "arcane_knight,91,2,20"})
-    void scheduledRecoveryFundsAShieldOnlyAfterEnoughUpdates(
-            String form, int level, int initialCasts, int ticksBeforeAffordable) {
+    @CsvSource({"spellcaster,1,1,1180,absorption", "guardian,31,0,1240,absorption",
+            "arcane_knight,91,2,20,absorption", "occultist,31,2,20,glowing",
+            "plaguebringer,91,3,380,slowness"})
+    void scheduledRecoveryFundsUtilityOnlyAfterEnoughUpdates(
+            String form, int level, int initialCasts, int ticksBeforeAffordable, String status) {
         assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        var effect = Objects.requireNonNull(org.bukkit.Registry.EFFECT.get(org.bukkit.NamespacedKey.minecraft(status)));
+        var recipient = effect.equals(PotionEffectType.ABSORPTION) ? player : target().getLivingEntity();
         for (int cast = 0; cast < initialCasts; cast++)
             assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
         assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
-        player.removePotionEffect(PotionEffectType.ABSORPTION);
+        recipient.removePotionEffect(effect);
         var scheduler = MockBukkit.getMock().getScheduler();
         scheduler.performTicks(ticksBeforeAffordable);
         assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
-        assertFalse(player.hasPotionEffect(PotionEffectType.ABSORPTION));
+        assertFalse(recipient.hasPotionEffect(effect));
         scheduler.performOneTick();
         assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful(),
-                "The production update task must earn enough resource for the shield");
-        assertNotNull(player.getPotionEffect(PotionEffectType.ABSORPTION));
+                "The production update task must earn enough resource for the utility");
+        assertNotNull(recipient.getPotionEffect(effect));
         assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
     }
 

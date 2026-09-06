@@ -90,7 +90,9 @@ class ClassPassiveBehaviorTest {
             "arcane_knight,9.9,9.6975,9.6975,0.1,0.1",
             "pathfinder,9.726,10.121,10.121,0.102525,0.102525",
             "trapper,9.584,10.081,10.081,0.101012,0.101012",
-            "spiritcaller,9.85,10.345,10.345,0.0995,0.0995"
+            "spiritcaller,9.85,10.345,10.345,0.0995,0.0995",
+            "occultist,10.2025,10,10,0.1,0.1",
+            "plaguebringer,10.537,10,10,0.09738,0.09738"
     })
     void basePassiveChangesRealDamageEventsAndRevokesMovementOnExit(
             String form, double outgoing, double incoming, double followingIncoming,
@@ -256,7 +258,7 @@ class ClassPassiveBehaviorTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"justicar,9.148", "inquisitor,8.935", "reaver,9.29"})
+    @CsvSource({"justicar,9.148", "inquisitor,8.935", "reaver,9.29", "plaguebringer,10.213"})
     void healingTradeoffChangesRegainHealthEventsAndStopsWhenInactive(String form, double amount) {
         activate(form);
         var heal = new EntityRegainHealthEvent(player, 10D, EntityRegainHealthEvent.RegainReason.CUSTOM);
