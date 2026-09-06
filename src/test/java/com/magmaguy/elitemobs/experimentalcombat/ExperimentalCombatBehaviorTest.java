@@ -481,6 +481,37 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(10D, retiredAllyHit.getDamage());
     }
 
+    @ParameterizedTest
+    @CsvSource({"exorcist,false,3.640733085,9.7265", "mistweaver,true,3.95565312,9.7845"})
+    void mixedSignatureDamagesItsEnemySetAndHealsOnlyItsEligiblePartyRecipients(
+            String form, boolean area, double healing, double outgoing) throws Exception {
+        fullCombatActive = true;
+        assertTrue(module.setClassLevelForAdministration(player, form, 91).applied());
+        var enemy = target().getLivingEntity();
+        var second = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 4));
+        double firstHealth = enemy.getHealth(), secondHealth = second.getLivingEntity().getHealth();
+        var ally = MockBukkit.getMock().addPlayer();
+        var outsider = MockBukkit.getMock().addPlayer();
+        ally.teleport(player.getLocation().add(1, 0, 0));
+        outsider.teleport(player.getLocation().add(2, 0, 0));
+        openParty(ally);
+        player.setHealth(8D);
+        ally.setHealth(4D);
+        outsider.setHealth(3D);
+        try {
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            int damaged = (enemy.getHealth() < firstHealth ? 1 : 0)
+                    + (second.getLivingEntity().getHealth() < secondHealth ? 1 : 0);
+            assertEquals(area ? 2 : 1, damaged);
+            assertEquals(area ? 8D + healing : 8D, player.getHealth(), .000001);
+            assertEquals(4D + healing, ally.getHealth(), .000001);
+            assertEquals(3D, outsider.getHealth(), "An outsider must be neither damaged nor healed");
+            assertEquals(outgoing, outgoingDamage(), .000001);
+        } finally {
+            second.remove(RemovalReason.SHUTDOWN);
+        }
+    }
+
     @Test
     void shepherdFieldFollowsItsCasterScalesWithNearbyAlliesAndStopsOnClassChange() throws Exception {
         fullCombatActive = true;
