@@ -421,17 +421,18 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"shepherd,false,false,false,7.545,10,true", "mistweaver,true,false,false,7.545,10,true",
-            "warlord,true,true,false,10,10,true", "marshal,false,true,false,7.695,10,true",
-            "shieldbearer,false,true,true,7.545,10,true", "strategist,false,true,true,10,10,true",
-            "conqueror,false,true,false,10,11.383,true", "arcane_knight,false,false,true,7.545,10,false"})
-    void partyUtilitySpendsResourceAndBuffsOnlyNearbyMembersUntilClassChange(
-            String form, boolean cleanses, boolean resolve, boolean shields,
+    @CsvSource({"shepherd,UTILITY,false,false,false,7.545,10,true", "mistweaver,UTILITY,true,false,false,7.545,10,true",
+            "warlord,UTILITY,true,true,false,10,10,true", "marshal,UTILITY,false,true,false,7.695,10,true",
+            "shieldbearer,UTILITY,false,true,true,7.545,10,true", "strategist,UTILITY,false,true,true,10,10,true",
+            "conqueror,UTILITY,false,true,false,10,11.383,true", "arcane_knight,UTILITY,false,false,true,7.545,10,false",
+            "strategist,SIGNATURE,false,true,true,10,11.84125,false"})
+    void partyAbilitySpendsResourceAndBuffsOnlyNearbyMembersUntilClassChange(
+            String form, AbilitySlot slot, boolean cleanses, boolean resolve, boolean shields,
             double protectedDamage, double buffedDamage, boolean speeds) throws Exception {
         int level = module.catalog().require(form).band().effectiveStart();
         assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
         if (resolve) {
-            assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            assertFalse(module.useAbility(player, slot).successful());
             for (int hit = 0; hit < 5; hit++) incomingDamage();
         }
         var server = MockBukkit.getMock();
@@ -448,7 +449,7 @@ class ExperimentalCombatBehaviorTest {
             member.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100, 0));
         }
 
-        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertTrue(module.useAbility(player, slot).successful());
         for (var member : List.of(player, ally)) {
             assertEquals(speeds, member.hasPotionEffect(PotionEffectType.SPEED));
             if (speeds) assertEquals(1, member.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
@@ -468,10 +469,10 @@ class ExperimentalCombatBehaviorTest {
             Bukkit.getPluginManager().callEvent(hit);
             assertEquals(10D, hit.getDamage());
         }
-        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertTrue(module.useAbility(player, slot).successful());
         for (var member : List.of(player, ally)) member.removePotionEffect(PotionEffectType.SPEED);
-        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(),
-                "Two 35-resource casts must leave too little for a third");
+        assertFalse(module.useAbility(player, slot).successful(),
+                "Two casts must leave too little resource for a third");
         for (var member : List.of(player, ally)) {
             assertFalse(member.hasPotionEffect(PotionEffectType.SPEED));
             assertEquals(protectedDamage, incomingDamage(member), .000001);
