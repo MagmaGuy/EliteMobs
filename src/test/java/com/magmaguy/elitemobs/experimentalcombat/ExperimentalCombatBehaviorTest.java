@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.ElitePowerPauseReason;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
@@ -195,6 +196,73 @@ class ExperimentalCombatBehaviorTest {
         } finally {
             second.remove(RemovalReason.SHUTDOWN);
             healthy.remove(RemovalReason.SHUTDOWN);
+        }
+    }
+
+    @Test
+    void siegebreakerStrikeEnablesItsFollowupOnlyForBrokenTargetsAndReleasesEffects() throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, "siegebreaker", 91).applied());
+        target().setLevel(91);
+        var enemy = target().getLivingEntity();
+        enemy.getAttribute(Attribute.MAX_HEALTH).setBaseValue(2048D);
+        enemy.setHealth(2048D);
+        var behind = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, -3));
+        double behindHealth = behind.getLivingEntity().getHealth();
+        var ally = MockBukkit.getMock().addPlayer();
+        var outsider = MockBukkit.getMock().addPlayer();
+        ally.teleport(player.getLocation().add(1, 0, 0));
+        outsider.teleport(player.getLocation().add(2, 0, 0));
+        openParty(ally);
+        try {
+            assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertEquals(2048D, enemy.getHealth());
+            assertFalse(target().getPowerSuppression().isSuppressed());
+            for (int hit = 0; hit < 5; hit++) incomingDamage();
+            assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(),
+                    "Full Fury alone must not bypass the defense-break prerequisite");
+            assertFalse(enemy.hasPotionEffect(PotionEffectType.GLOWING));
+
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertTrue(enemy.getHealth() > 0D && enemy.getHealth() < 2048D,
+                    "The matched-level target must survive the strike, health: " + enemy.getHealth());
+            assertTrue(target().getPowerSuppression().isSuppressed(ElitePowerPauseReason.INTERRUPT));
+            assertTrue(incomingDamage() < 10D);
+            assertEquals(behindHealth, behind.getLivingEntity().getHealth());
+            assertFalse(behind.getPowerSuppression().isSuppressed());
+            assertEquals(20D, outsider.getHealth());
+
+            assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            assertTrue(enemy.hasPotionEffect(PotionEffectType.GLOWING));
+            assertFalse(behind.getLivingEntity().hasPotionEffect(PotionEffectType.GLOWING));
+            assertFalse(outsider.hasPotionEffect(PotionEffectType.GLOWING));
+            assertTrue(outgoingDamage() > 10D);
+            var partyHit = outgoingEvent(ally, target());
+            Bukkit.getPluginManager().callEvent(partyHit);
+            assertTrue(partyHit.getDamage() > 10D);
+            for (var hit : List.of(outgoingEvent(outsider, target()), outgoingEvent(player, behind))) {
+                Bukkit.getPluginManager().callEvent(hit);
+                assertEquals(10D, hit.getDamage());
+            }
+            assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            enemy.removePotionEffect(PotionEffectType.GLOWING);
+            assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(),
+                    "The follow-up must spend Fury, even while defense break remains active");
+            assertFalse(enemy.hasPotionEffect(PotionEffectType.GLOWING));
+
+            MockBukkit.getMock().getScheduler().performTicks(61);
+            assertFalse(target().getPowerSuppression().isSuppressed(ElitePowerPauseReason.INTERRUPT));
+            assertTrue(module.selectForm(player, "spellcaster").accepted());
+            assertEquals(10D, incomingDamage());
+            assertEquals(10D, outgoingDamage());
+            var retiredPartyHit = outgoingEvent(ally, target());
+            Bukkit.getPluginManager().callEvent(retiredPartyHit);
+            assertEquals(10D, retiredPartyHit.getDamage());
+            assertTrue(module.setClassLevelForAdministration(player, "siegebreaker", 91).applied());
+            for (int hit = 0; hit < 5; hit++) incomingDamage();
+            assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(),
+                    "Returning to the class must not revive its previous defense-break ownership");
+        } finally {
+            behind.remove(RemovalReason.SHUTDOWN);
         }
     }
 
@@ -579,6 +647,45 @@ class ExperimentalCombatBehaviorTest {
         assertTrue(module.selectForm(player, "bannerlord").accepted());
         for (int hit = 0; hit < 5; hit++) incomingDamage();
         assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(), "The old banner cannot survive class change");
+    }
+
+    @Test
+    void hierophantUtilityCleansesItsPartyInterruptsNearbyElitesAndReleasesOnClose() throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, "hierophant", 61).applied());
+        var ally = MockBukkit.getMock().addPlayer();
+        var outsider = MockBukkit.getMock().addPlayer();
+        var distantAlly = MockBukkit.getMock().addPlayer();
+        ally.teleport(player.getLocation().add(1, 0, 0));
+        outsider.teleport(player.getLocation().add(2, 0, 0));
+        distantAlly.teleport(player.getLocation().add(0, 0, 40));
+        openParty(ally, distantAlly);
+        var enemy = target().getLivingEntity();
+        double healthBefore = enemy.getHealth();
+        var distantEnemy = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 40));
+        for (var member : List.of(player, ally, outsider, distantAlly)) {
+            member.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 0));
+            member.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100, 0));
+        }
+        try {
+            assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            for (var member : List.of(player, ally)) {
+                assertFalse(member.hasPotionEffect(PotionEffectType.POISON));
+                assertTrue(member.hasPotionEffect(PotionEffectType.NIGHT_VISION));
+            }
+            for (var excluded : List.of(outsider, distantAlly))
+                assertTrue(excluded.hasPotionEffect(PotionEffectType.POISON));
+            assertEquals(healthBefore, enemy.getHealth(), "Interruption must not become damage");
+            assertTrue(target().getPowerSuppression().isSuppressed(ElitePowerPauseReason.INTERRUPT));
+            assertFalse(distantEnemy.getPowerSuppression().isSuppressed());
+            assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            ally.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 0));
+            assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            assertTrue(ally.hasPotionEffect(PotionEffectType.POISON), "A refused cast must not cleanse");
+            module.close();
+            assertFalse(target().getPowerSuppression().isSuppressed(ElitePowerPauseReason.INTERRUPT));
+        } finally {
+            distantEnemy.remove(RemovalReason.SHUTDOWN);
+        }
     }
 
     @ParameterizedTest
