@@ -201,7 +201,7 @@ class ExperimentalCombatBehaviorTest {
 
     @ParameterizedTest
     @CsvSource({"ranger,false,false", "skirmisher,false,true", "elementalist,true,false",
-            "pyromancer,true,false", "occultist,true,false"})
+            "pyromancer,true,false", "occultist,true,false", "tempest_archer,false,true"})
     void nearbyMarkBenefitsOnlyPartyMembersAndRevokesItsModifiersOnClassChange(
             String form, boolean weakens, boolean grantsSpeed) throws Exception {
         int level = module.catalog().require(form).band().effectiveStart();
@@ -378,10 +378,19 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"shepherd,false", "mistweaver,true"})
-    void partyUtilitySpendsGraceAndProtectsOnlyNearbyMembersUntilClassChange(
-            String form, boolean cleanses) throws Exception {
-        assertTrue(module.setClassLevelForAdministration(player, form, 91).applied());
+    @CsvSource({"shepherd,false,false,false,7.545,10", "mistweaver,true,false,false,7.545,10",
+            "warlord,true,true,false,10,10", "marshal,false,true,false,7.695,10",
+            "shieldbearer,false,true,true,7.545,10", "strategist,false,true,true,10,10",
+            "conqueror,false,true,false,10,11.383"})
+    void partyUtilitySpendsResourceAndBuffsOnlyNearbyMembersUntilClassChange(
+            String form, boolean cleanses, boolean resolve, boolean shields,
+            double protectedDamage, double buffedDamage) throws Exception {
+        int level = module.catalog().require(form).band().effectiveStart();
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        if (resolve) {
+            assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            for (int hit = 0; hit < 5; hit++) incomingDamage();
+        }
         var server = MockBukkit.getMock();
         var ally = server.addPlayer();
         var distant = server.addPlayer();
@@ -401,23 +410,35 @@ class ExperimentalCombatBehaviorTest {
             assertEquals(1, member.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
             assertEquals(!cleanses, member.hasPotionEffect(PotionEffectType.POISON));
             assertTrue(member.hasPotionEffect(PotionEffectType.NIGHT_VISION));
+            assertEquals(shields, member.hasPotionEffect(PotionEffectType.ABSORPTION));
+            var hit = outgoingEvent(member, target());
+            Bukkit.getPluginManager().callEvent(hit);
+            assertEquals(buffedDamage, hit.getDamage(), .000001);
         }
         for (var excluded : List.of(distant, outsider)) {
             assertFalse(excluded.hasPotionEffect(PotionEffectType.SPEED));
+            assertFalse(excluded.hasPotionEffect(PotionEffectType.ABSORPTION));
             assertTrue(excluded.hasPotionEffect(PotionEffectType.POISON));
             assertEquals(10D, incomingDamage(excluded));
+            var hit = outgoingEvent(excluded, target());
+            Bukkit.getPluginManager().callEvent(hit);
+            assertEquals(10D, hit.getDamage());
         }
         assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
         for (var member : List.of(player, ally)) member.removePotionEffect(PotionEffectType.SPEED);
         assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(),
-                "Two 35-Grace casts must leave too little Grace for a third");
+                "Two 35-resource casts must leave too little for a third");
         for (var member : List.of(player, ally)) {
             assertFalse(member.hasPotionEffect(PotionEffectType.SPEED));
-            assertEquals(7.545D, incomingDamage(member), .000001);
+            assertEquals(protectedDamage, incomingDamage(member), .000001);
         }
         assertTrue(module.selectForm(player, "spellcaster").accepted());
         assertEquals(10D, incomingDamage());
         assertEquals(10D, incomingDamage(ally), "Changing the caster's class must revoke the ally's protection");
+        assertEquals(10D, outgoingDamage());
+        var retiredAllyHit = outgoingEvent(ally, target());
+        Bukkit.getPluginManager().callEvent(retiredAllyHit);
+        assertEquals(10D, retiredAllyHit.getDamage());
     }
 
     @ParameterizedTest(name = "{displayName} [{index}] changeClass={0}")
@@ -584,7 +605,8 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"bloodrager,true,false", "artillerist,false,true", "windrunner,false,false"})
+    @CsvSource({"bloodrager,true,false", "artillerist,false,true", "windrunner,false,false",
+            "tempest_archer,false,true"})
     void resourceBurstFundsFurtherCastsAndAppliesTheSkillEffects(
             String form, boolean fury, boolean strength) {
         int level = module.catalog().require(form).band().effectiveStart();
@@ -594,6 +616,7 @@ class ExperimentalCombatBehaviorTest {
             incomingDamage();
             incomingDamage(); // Earn 40 Fury through the production damage handler.
         }
+        target(); // Targeted resource bursts must have an eligible enemy before casting.
         // Without the committed resource burst, Fury cannot fund cast two and Focus cannot fund cast three.
         for (int cast = 0; cast < 3; cast++) {
             player.removePotionEffect(PotionEffectType.SPEED);
