@@ -160,6 +160,45 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @ParameterizedTest
+    @CsvSource({"false", "true"})
+    void harvesterChainsThroughWoundedEnemiesHealsAndStopsOnClassChange(boolean changeClass) {
+        assertTrue(module.setClassLevelForAdministration(player, "harvester", 91).applied());
+        for (int hit = 0; hit < 3; hit++) incomingDamage();
+        var first = target().getLivingEntity();
+        var second = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 4));
+        var healthy = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 5));
+        try {
+            first.getAttribute(Attribute.MAX_HEALTH).setBaseValue(100D);
+            second.getLivingEntity().getAttribute(Attribute.MAX_HEALTH).setBaseValue(100D);
+            first.setHealth(40D);
+            second.getLivingEntity().setHealth(30D);
+            double healthyBefore = healthy.getLivingEntity().getHealth();
+            player.setHealth(2D);
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertEquals(40D, first.getHealth());
+            var scheduler = MockBukkit.getMock().getScheduler();
+            scheduler.performOneTick();
+            double firstDamage = 40D - first.getHealth();
+            assertEquals(40D, firstDamage);
+            assertEquals(30D, second.getLivingEntity().getHealth());
+            assertEquals(10.8D, player.getHealth(), .000001);
+            if (changeClass) assertTrue(module.selectForm(player, "spellcaster").accepted());
+            scheduler.performTicks(3);
+            double secondDamage = 30D - second.getLivingEntity().getHealth();
+            assertEquals(changeClass ? 0D : 30D, secondDamage);
+            assertEquals(changeClass ? 10.8D : 17.4D, player.getHealth(), .000001,
+                    "Lifesteal must use actual health removed, not the larger overkill damage");
+            scheduler.performTicks(6);
+            assertEquals(40D - firstDamage, first.getHealth());
+            assertEquals(30D - secondDamage, second.getLivingEntity().getHealth());
+            assertEquals(healthyBefore, healthy.getLivingEntity().getHealth());
+        } finally {
+            second.remove(RemovalReason.SHUTDOWN);
+            healthy.remove(RemovalReason.SHUTDOWN);
+        }
+    }
+
+    @ParameterizedTest
     @CsvSource({"reaver,true", "slayer,false"})
     void detectionUtilitySpendsEarnedFuryAndRevealsOnlyEligibleNearbyElites(String form, boolean woundedOnly) {
         int level = module.catalog().require(form).band().effectiveStart();
