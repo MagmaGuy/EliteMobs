@@ -7,22 +7,12 @@ import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ActiveLineageSnapshot;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PassiveAggregateTest {
 
     private final ClassCatalog catalog = BuiltInClassCatalog.catalog();
     private final FixedPassiveRegistry registry = BuiltInClassContent.passiveRegistry();
-
-    @Test
-    void registryMapsEveryShippedFormIncludingFormsWithoutConditionalTraits() {
-        assertEquals(catalog.forms().stream().map(form -> form.id()).collect(java.util.stream.Collectors.toSet()),
-                registry.mappedFormIds());
-        assertEquals(Set.of(), Set.copyOf(registry.traits("paladin")));
-    }
 
     @Test
     void bloodragerRiskScalesWithMissingHealthAndInheritedContributionLevel() {

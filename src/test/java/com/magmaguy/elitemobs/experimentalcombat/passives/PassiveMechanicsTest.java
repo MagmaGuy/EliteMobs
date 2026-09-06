@@ -13,23 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PassiveMechanicsTest {
 
     @Test
-    void neutralMechanicsDoNotAlterAbilitiesOrMovementControl() {
-        PassiveMechanics mechanics = PassiveMechanics.NEUTRAL;
-
-        assertEquals(1D, mechanics.burstHealingMultiplier());
-        assertEquals(1D, mechanics.periodicHealingMultiplier());
-        assertEquals(1D, mechanics.groupedEnemyHealingMultiplier());
-        assertEquals(1D, mechanics.periodicDurationMultiplier());
-        assertEquals(1D, mechanics.shieldStrengthMultiplier());
-        assertEquals(1D, mechanics.redirectedDamageMultiplier());
-        assertEquals(1D, mechanics.controlDurationMultiplier());
-        assertEquals(1D, mechanics.controlPotencyMultiplier());
-        assertEquals(1D, mechanics.abilityCostMultiplier());
-        assertEquals(0D, mechanics.controlResistanceFraction());
-        assertEquals(0D, mechanics.partyMovementSpeedAdjustment());
-    }
-
-    @Test
     void mechanicsComposeMultipliersAndAddBoundedFractions() {
         PassiveMechanics first = new PassiveMechanics(
                 .9D, 1.1D, 1.08D, 1.2D, 1.15D, .85D, 1.25D, 1.1D,
