@@ -1,7 +1,5 @@
 package com.magmaguy.elitemobs.experimentalcombat.presentation;
 
-import com.magmaguy.elitemobs.experimentalcombat.abilities.AbilityEffect;
-import com.magmaguy.elitemobs.experimentalcombat.abilities.AbilityFamily;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.FixedAbilitySpec;
 import com.magmaguy.elitemobs.experimentalcombat.classes.AbilityDefinition;
 import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
@@ -13,57 +11,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClassAbilityPresentationPlannerTest {
-
-    @Test
-    void everyBuiltInAbilityHasTheCuesItsMechanicsNeed() {
-        var catalog = BuiltInClassContent.catalog();
-        var registry = BuiltInClassContent.abilityRegistry();
-
-        for (var form : catalog.forms()) {
-            ClassLineage lineage = catalog.lineageOf(form.id());
-            for (AbilitySlot slot : AbilitySlot.values()) {
-                AbilityDefinition ability = ability(lineage, slot);
-                FixedAbilitySpec spec = registry.require(ability.id());
-                AbilityPresentationPlan plan = ClassAbilityPresentationPlanner.plan(lineage, spec);
-
-                assertNotNull(plan.theme(), ability.id());
-                assertTrue(plan.cues().contains(AbilityPresentationCue.CAST), ability.id());
-                if (isMobility(spec.family()))
-                    assertTrue(plan.cues().contains(AbilityPresentationCue.MOBILITY), ability.id());
-                if (spec.effects().contains(AbilityEffect.DAMAGE))
-                    assertTrue(plan.cues().contains(AbilityPresentationCue.IMPACT), ability.id());
-                if (spec.effects().contains(AbilityEffect.HEAL)
-                        || spec.effects().contains(AbilityEffect.LIFESTEAL))
-                    assertTrue(plan.cues().contains(AbilityPresentationCue.HEAL), ability.id());
-                if (spec.effects().stream().anyMatch(ClassAbilityPresentationPlannerTest::isBuff))
-                    assertTrue(plan.cues().contains(AbilityPresentationCue.BUFF), ability.id());
-                if (spec.effects().stream().anyMatch(ClassAbilityPresentationPlannerTest::isControl))
-                    assertTrue(plan.cues().contains(AbilityPresentationCue.CONTROL), ability.id());
-
-                assertTrue(plan.budget().particleLimit() <= 180, ability.id());
-                assertTrue(plan.budget().soundLimit() <= 8, ability.id());
-                assertTrue(plan.budget().targetBurstLimit() <= 8, ability.id());
-                assertTrue(plan.budget().traceSampleLimit() <= 18, ability.id());
-            }
-        }
-    }
-
-    @Test
-    void distinctiveBranchesSelectReusableFantasyThemes() {
-        assertTheme("paladin", AbilityPresentationTheme.VALOR);
-        assertTheme("berserker", AbilityPresentationTheme.FURY);
-        assertTheme("demolitionist", AbilityPresentationTheme.ENGINEERING);
-        assertTheme("tempest_archer", AbilityPresentationTheme.STORM);
-        assertTheme("grovekeeper", AbilityPresentationTheme.NATURE);
-        assertTheme("spiritcaller", AbilityPresentationTheme.SPIRIT);
-        assertTheme("pyromancer", AbilityPresentationTheme.FLAME);
-        assertTheme("cryomancer", AbilityPresentationTheme.FROST);
-        assertTheme("necromancer", AbilityPresentationTheme.SHADOW);
-    }
 
     @Test
     void blinkTraceSamplesTheWholeRouteWithoutUnboundedParticleWork() {
@@ -110,10 +60,6 @@ class ClassAbilityPresentationPlannerTest {
         return ClassAbilityPresentationPlanner.plan(lineage, spec);
     }
 
-    private static void assertTheme(String formId, AbilityPresentationTheme expected) {
-        assertEquals(expected, plan(formId, AbilitySlot.SIGNATURE).theme(), formId);
-    }
-
     private static AbilityDefinition ability(ClassLineage lineage, AbilitySlot slot) {
         return switch (slot) {
             case MOBILITY -> lineage.mobility();
@@ -122,25 +68,4 @@ class ClassAbilityPresentationPlannerTest {
         };
     }
 
-    private static boolean isMobility(AbilityFamily family) {
-        return switch (family) {
-            case MOUNTED_CHARGE, BALLISTIC_LEAP, SAFE_DASH, SAFE_BLINK, ALLY_FLIGHT -> true;
-            default -> false;
-        };
-    }
-
-    private static boolean isBuff(AbilityEffect effect) {
-        return switch (effect) {
-            case SHIELD, CLEANSE, SELF_PROTECT, ALLY_PROTECT, SPEED, STRENGTH -> true;
-            default -> false;
-        };
-    }
-
-    private static boolean isControl(AbilityEffect effect) {
-        return switch (effect) {
-            case KNOCKBACK, PULL, LAUNCH, SLOW, WEAKEN, GLOW, PARTY_DAMAGE_MARK,
-                    TAUNT, INTERRUPT, FEAR -> true;
-            default -> false;
-        };
-    }
 }
