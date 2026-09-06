@@ -481,6 +481,41 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(10D, retiredAllyHit.getDamage());
     }
 
+    @Test
+    void shepherdFieldFollowsItsCasterScalesWithNearbyAlliesAndStopsOnClassChange() throws Exception {
+        fullCombatActive = true;
+        assertTrue(module.setClassLevelForAdministration(player, "shepherd", 91).applied());
+        var server = MockBukkit.getMock();
+        var ally = server.addPlayer();
+        var outsider = server.addPlayer();
+        ally.teleport(player.getLocation().add(0, 0, 130));
+        outsider.teleport(ally.getLocation().add(1, 0, 0));
+        openParty(ally);
+        for (var member : List.of(player, ally, outsider)) member.setHealth(8D);
+        assertTrue(player.getLocation().getChunk().load());
+        assertTrue(ally.getLocation().getChunk().load());
+        var cast = module.useAbility(player, AbilitySlot.SIGNATURE);
+        assertTrue(cast.successful(), cast.toString());
+        assertEquals(9.4953896D, player.getHealth(), .000001);
+        assertEquals(8D, ally.getHealth());
+        assertNotNull(player.getPotionEffect(PotionEffectType.ABSORPTION));
+
+        assertTrue(player.teleport(ally.getLocation().add(1, 0, 0)));
+        server.getScheduler().performTicks(22);
+        assertEquals(9.4953896D, player.getHealth(), .000001);
+        server.getScheduler().performOneTick();
+        assertEquals(11.3774527475D, player.getHealth(), .000001);
+        assertEquals(9.8820631475D, ally.getHealth(), .000001);
+        assertNotNull(ally.getPotionEffect(PotionEffectType.ABSORPTION));
+        assertEquals(8D, outsider.getHealth());
+        assertFalse(outsider.hasPotionEffect(PotionEffectType.ABSORPTION));
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        server.getScheduler().performTicks(120);
+        assertEquals(11.3774527475D, player.getHealth(), .000001);
+        assertEquals(9.8820631475D, ally.getHealth(), .000001,
+                "Changing class must stop every remaining healing pulse");
+    }
+
     @ParameterizedTest(name = "{displayName} [{index}] changeClass={0}")
     @CsvSource({"false", "true"})
     void seraphChainHealsTheMostWoundedPartyMemberFirstAndStopsOnClassChange(

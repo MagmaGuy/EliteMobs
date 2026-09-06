@@ -98,13 +98,7 @@ class PassiveAggregateTest {
     }
 
     @Test
-    void groupHealersAndLifewardenUseHealingMechanicsInsteadOfDefenseSubstitutes() {
-        PassiveConditionContext grouped = PassiveConditionContext.playerOnly(1D, false, false, true);
-        PassiveConditionContext solo = PassiveConditionContext.playerOnly(1D, false, false, false);
-
-        assertTrue(aggregate("shepherd", 100).evaluate(grouped).healingDoneMultiplier()
-                > aggregate("shepherd", 100).evaluate(solo).healingDoneMultiplier());
-
+    void grovekeeperStandingIncreasesHealingThroughput() {
         PassiveConditionContext standing = PassiveConditionContext.playerOnly(1D, false, false, false);
         PassiveConditionContext moving = PassiveConditionContext.playerOnly(1D, true, false, false);
         assertTrue(aggregate("grovekeeper", 100).evaluate(standing).healingDoneMultiplier()
