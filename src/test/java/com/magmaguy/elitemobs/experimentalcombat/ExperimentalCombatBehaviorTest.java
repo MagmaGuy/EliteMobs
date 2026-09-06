@@ -965,6 +965,41 @@ class ExperimentalCombatBehaviorTest {
                 "The same active lineage must also reach the damage event listener");
     }
 
+    @Test
+    void templarPassiveTradesDamageForHealingAndStopsWhenCombatEnds() throws Exception {
+        int level = module.catalog().require("templar").band().effectiveStart();
+        assertTrue(module.setClassLevelForAdministration(player, "templar", level).applied());
+        assertTrue(target().getLivingEntity().teleport(player.getLocation().add(0, 0, 20)));
+        var ally = MockBukkit.getMock().addPlayer();
+        ally.teleport(player.getLocation().add(1, 0, 0));
+        openParty(ally);
+        double baselineHealing = 0D;
+        for (int phase = 0; phase < 3; phase++) {
+            fullCombatActive = phase == 1;
+            module.onControlModeChanged(player);
+            for (int hit = 0; hit < 5; hit++) incomingDamage();
+            ally.setHealth(8D);
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            double healing = ally.getHealth() - 8D;
+            assertTrue(healing > 0D && ally.getHealth() < 20D,
+                    "The comparison needs effective healing without the health cap");
+            if (phase == 0) baselineHealing = healing;
+            if (fullCombatActive) {
+                assertEquals(1.039D, healing / baselineHealing, .000001,
+                        "Level-91 Templar adds 1.42% healing to its inherited 2.48% benefit");
+                assertEquals(9.3825D, outgoingDamage(), .000001,
+                        "The healing benefit must retain Templar's own damage tradeoff");
+                assertTrue(incomingDamage() < 10D, "The defensive lineage must reach incoming damage events");
+                assertTrue(player.getAttribute(Attribute.MOVEMENT_SPEED).getValue() < .1D);
+            } else {
+                assertEquals(baselineHealing, healing, .000001);
+                assertEquals(10D, outgoingDamage());
+                assertEquals(10D, incomingDamage());
+                assertEquals(.1D, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), .000001);
+            }
+        }
+    }
+
     @ParameterizedTest
     @CsvSource({"guardian,false,false", "bulwark,false,false", "juggernaut,true,false",
             "dreadnought,true,false", "templar,true,true"})
