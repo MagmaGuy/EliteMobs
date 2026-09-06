@@ -1229,6 +1229,43 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @ParameterizedTest
+    @CsvSource({"conqueror,61,.71", "tyrant,91,2.714"})
+    void controlPassiveRequiresTheCastersRealTauntAndExpiresWithIt(
+            String form, int level, double controlBonus) throws Exception {
+        fullCombatActive = true;
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        var elite = target();
+        elite.setLevel(level);
+        elite.setMaxHealth();
+        var enemy = (org.bukkit.entity.Mob) elite.getLivingEntity();
+        enemy.setHealth(enemy.getAttribute(Attribute.MAX_HEALTH).getValue());
+        double ordinary = outgoingDamage();
+        enemy.setTarget(player);
+        assertEquals(ordinary, outgoingDamage(), .000001,
+                "Ordinary mob aggro must not activate a controlled-target passive");
+        for (int hit = 0; hit < 5; hit++) incomingDamage();
+
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        assertEquals(player.getUniqueId(), elite.getForcedTargetPlayerId());
+        // Conqueror adds 7.1%. Tyrant adds inherited 10.1% and 11.36%, replacing a 5.68% penalty.
+        assertEquals(ordinary + controlBonus, outgoingDamage(), .000001);
+        enemy.setTarget(MockBukkit.getMock().addPlayer());
+        assertEquals(ordinary + controlBonus, outgoingDamage(), .000001,
+                "Control ownership must come from the cast, not the mob's aggro target");
+
+        // These leases use monotonic elapsed time, not scheduler ticks. Keep the wait bounded.
+        long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(8);
+        while (outgoingDamage() > ordinary + .000001 && System.nanoTime() < deadline) {
+            Thread.sleep(25L);
+            MockBukkit.getMock().getScheduler().performOneTick();
+        }
+        assertEquals(ordinary, outgoingDamage(), .000001, "Expired taunts must release the passive bonus");
+        fullCombatActive = false;
+        module.onControlModeChanged(player);
+        assertEquals(10D, outgoingDamage(), .000001);
+    }
+
+    @ParameterizedTest
     @CsvSource({"guardian,false,false", "bulwark,false,false", "juggernaut,true,false",
             "dreadnought,true,false", "templar,true,true"})
     void immunityUtilityRequiresCombatResourceThenCleansesBlocksAndReleasesControl(

@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.experimentalcombat.abilities;
 import com.magmaguy.elitemobs.experimentalcombat.classes.AbilityDefinition;
 import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassLineage;
-import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
 import com.magmaguy.elitemobs.experimentalcombat.ClassAbilityEligibility;
 import com.magmaguy.elitemobs.experimentalcombat.constructs.ClassAbilityConstructRuntime;
 import com.magmaguy.elitemobs.experimentalcombat.constructs.ClassConstructVisualRegistry;
@@ -68,37 +67,6 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
     private final Map<UUID, Set<BukkitTask>> tasksByCaster = new HashMap<>();
     private final Map<UUID, SanctuaryAnchor> sanctuaryAnchors = new HashMap<>();
     private boolean closed;
-
-    public BukkitClassAbilityEngine(Plugin plugin, AbilitySemantics semantics) {
-        this(plugin, BuiltInClassContent.abilityRegistry(), semantics, player -> Optional.empty(),
-                ClassMinionManager.MinionDamageEvaluator.NEUTRAL);
-    }
-
-    public BukkitClassAbilityEngine(
-            Plugin plugin,
-            FixedAbilityRegistry registry,
-            AbilitySemantics semantics) {
-        this(plugin, registry, semantics, player -> Optional.empty(),
-                ClassMinionManager.MinionDamageEvaluator.NEUTRAL);
-    }
-
-    public BukkitClassAbilityEngine(
-            Plugin plugin,
-            FixedAbilityRegistry registry,
-            AbilitySemantics semantics,
-            ClassMinionManager.OwnerProfileResolver ownerProfiles) {
-        this(plugin, registry, semantics, ownerProfiles,
-                ClassMinionManager.MinionDamageEvaluator.NEUTRAL);
-    }
-
-    public BukkitClassAbilityEngine(
-            Plugin plugin,
-            FixedAbilityRegistry registry,
-            AbilitySemantics semantics,
-            ClassMinionManager.OwnerProfileResolver ownerProfiles,
-            ClassMinionManager.MinionDamageEvaluator minionDamageEvaluator) {
-        this(plugin, registry, semantics, ownerProfiles, minionDamageEvaluator, ClassAbilityDamage.NATIVE);
-    }
 
     public BukkitClassAbilityEngine(
             Plugin plugin, FixedAbilityRegistry registry, AbilitySemantics semantics,
