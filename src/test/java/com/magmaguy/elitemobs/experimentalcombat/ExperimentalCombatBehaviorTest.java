@@ -104,13 +104,18 @@ class ExperimentalCombatBehaviorTest {
         }
     }
 
-    @Test
-    void paladinSignatureSpendsResolveToTauntWithoutDamageAndRevokesProtectionOnClassChange() {
-        assertTrue(module.selectForm(player, "paladin").accepted());
+    @ParameterizedTest(name = "{displayName} [{index}] {0}")
+    @CsvSource({"paladin,1,true,10", "warlord,31,false,11.293"})
+    void tauntingSignaturesSpendResolveWithoutDamageAndRetireTheirPartyModifiers(
+            String form, int level, boolean protectsCaster, double outgoing) throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
         var elite = target();
         var enemy = (org.bukkit.entity.Mob) elite.getLivingEntity();
         var rival = MockBukkit.getMock().addPlayer();
         rival.teleport(player.getLocation().add(1, 0, 0));
+        var outsider = MockBukkit.getMock().addPlayer();
+        outsider.teleport(player.getLocation().add(2, 0, 0));
+        openParty(rival);
         elite.addThreat(rival, 1000D);
         assertEquals(rival, enemy.getTarget());
         double healthBefore = enemy.getHealth();
@@ -134,12 +139,25 @@ class ExperimentalCombatBehaviorTest {
             assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful(),
                     "Two casts must exhaust Resolve despite the taunt resource return");
             assertEquals(threatBeforeDeniedCast, elite.getAggro().get(player));
-            assertTrue(incomingDamage() < 10D);
+            assertEquals(protectsCaster, incomingDamage() < 10D);
             assertEquals(10D, incomingDamage(rival), "Protection belongs only to the caster");
+            for (var member : List.of(player, rival)) {
+                var hit = outgoingEvent(member, elite);
+                Bukkit.getPluginManager().callEvent(hit);
+                assertEquals(outgoing, hit.getDamage(), .000001);
+            }
+            var outsiderHit = outgoingEvent(outsider, elite);
+            Bukkit.getPluginManager().callEvent(outsiderHit);
+            assertEquals(10D, outsiderHit.getDamage());
 
             assertTrue(module.selectForm(player, "spellcaster").accepted());
             assertNull(elite.getForcedTargetPlayerId(), "Changing class must retire its taunt lease");
             assertEquals(10D, incomingDamage());
+            for (var member : List.of(player, rival)) {
+                var hit = outgoingEvent(member, elite);
+                Bukkit.getPluginManager().callEvent(hit);
+                assertEquals(10D, hit.getDamage(), .000001);
+            }
         } finally {
             distant.remove(RemovalReason.SHUTDOWN);
         }
@@ -705,10 +723,10 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @Test
-    void bannerlordUtilityNeedsAnActiveBannerAndSpeedsOnlyNearbyPartyMembers() throws Exception {
+    void bannerlordFieldFollowsCasterBuffsPartyAndOwnsUtilityWindow() throws Exception {
         assertTrue(module.setClassLevelForAdministration(player, "bannerlord", 91).applied());
+        assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
         for (int hit = 0; hit < 5; hit++) incomingDamage();
-        target().getLivingEntity().teleport(player.getLocation().add(0, 0, 40));
         var server = MockBukkit.getMock();
         var ally = server.addPlayer();
         var distant = server.addPlayer();
@@ -717,25 +735,64 @@ class ExperimentalCombatBehaviorTest {
         outsider.teleport(player.getLocation().add(2, 0, 0));
         distant.teleport(player.getLocation().add(0, 0, 40));
         openParty(ally, distant);
-        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(), "Full Resolve alone is insufficient");
-        player.getWorld().getChunkAt(player.getLocation()).load();
-        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
-        for (var member : List.of(player, ally)) member.removePotionEffect(PotionEffectType.SPEED);
+        var distantEnemy = CombatTestEntities.spawnElite(distant.getLocation().add(0, 0, 3));
+        try {
+            double enemyHealth = target().getLivingEntity().getHealth();
+            target().addThreat(outsider, 1000D);
+            assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(), "Full Resolve alone is insufficient");
+            player.getWorld().getChunkAt(player.getLocation()).load();
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertEquals(player.getUniqueId(), target().getForcedTargetPlayerId());
+            assertEquals(player, ((org.bukkit.entity.Mob) target().getLivingEntity()).getTarget());
+            assertNull(distantEnemy.getForcedTargetPlayerId());
+            assertEquals(enemyHealth, target().getLivingEntity().getHealth());
+            assertTrue(target().getDamagers().isEmpty());
+            for (var member : List.of(player, ally, distant, outsider)) {
+                var hit = outgoingEvent(member, target());
+                Bukkit.getPluginManager().callEvent(hit);
+                assertEquals(member == player || member == ally ? 11.7185D : 10D, hit.getDamage(), .000001);
+            }
+            assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful(),
+                    "One banner must spend enough Resolve to prevent immediate replacement");
+            for (var member : List.of(player, ally)) member.removePotionEffect(PotionEffectType.SPEED);
+            assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            for (var member : List.of(player, ally)) {
+                assertNotNull(member.getPotionEffect(PotionEffectType.SPEED));
+                assertEquals(1, member.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
+                member.removePotionEffect(PotionEffectType.SPEED);
+            }
+            assertFalse(distant.hasPotionEffect(PotionEffectType.SPEED));
+            assertFalse(outsider.hasPotionEffect(PotionEffectType.SPEED));
 
-        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
-        for (var member : List.of(player, ally)) {
-            assertNotNull(member.getPotionEffect(PotionEffectType.SPEED));
-            assertEquals(1, member.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
+            player.teleport(distant.getLocation());
+            player.getWorld().getChunkAt(player.getLocation()).load();
+            server.getScheduler().performTicks(25);
+            assertEquals(player.getUniqueId(), distantEnemy.getForcedTargetPlayerId(),
+                    "The next banner pulse must target enemies near the caster's new location");
+            assertNotNull(distant.getPotionEffect(PotionEffectType.SPEED));
+            var newlyBuffedHit = outgoingEvent(distant, distantEnemy);
+            Bukkit.getPluginManager().callEvent(newlyBuffedHit);
+            assertEquals(11.7185D, newlyBuffedHit.getDamage(), .000001);
+            assertFalse(ally.hasPotionEffect(PotionEffectType.SPEED), "The old location must not keep receiving pulses");
+            assertFalse(outsider.hasPotionEffect(PotionEffectType.SPEED));
+
+            assertTrue(module.selectForm(player, "spellcaster").accepted());
+            for (var elite : List.of(target(), distantEnemy)) assertNull(elite.getForcedTargetPlayerId());
+            for (var member : List.of(player, ally, distant)) {
+                member.removePotionEffect(PotionEffectType.SPEED);
+                var hit = outgoingEvent(member, distantEnemy);
+                Bukkit.getPluginManager().callEvent(hit);
+                assertEquals(10D, hit.getDamage());
+            }
+            server.getScheduler().performTicks(25);
+            for (var member : List.of(player, ally, distant)) assertFalse(member.hasPotionEffect(PotionEffectType.SPEED));
+            assertNull(distantEnemy.getForcedTargetPlayerId(), "A retired field must not taunt on a later pulse");
+            assertTrue(module.selectForm(player, "bannerlord").accepted());
+            for (int hit = 0; hit < 5; hit++) incomingDamage();
+            assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(), "The old banner cannot survive class change");
+        } finally {
+            distantEnemy.remove(RemovalReason.SHUTDOWN);
         }
-        assertFalse(distant.hasPotionEffect(PotionEffectType.SPEED));
-        assertFalse(outsider.hasPotionEffect(PotionEffectType.SPEED));
-        assertTrue(module.selectForm(player, "spellcaster").accepted());
-        for (var member : List.of(player, ally)) member.removePotionEffect(PotionEffectType.SPEED);
-        server.getScheduler().performTicks(25);
-        assertFalse(ally.hasPotionEffect(PotionEffectType.SPEED));
-        assertTrue(module.selectForm(player, "bannerlord").accepted());
-        for (int hit = 0; hit < 5; hit++) incomingDamage();
-        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(), "The old banner cannot survive class change");
     }
 
     @Test
