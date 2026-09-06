@@ -297,11 +297,13 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"spellcaster,1,true,1180", "guardian,31,false,1240"})
+    @CsvSource({"spellcaster,1,1,1180", "guardian,31,0,1240", "arcane_knight,91,2,20"})
     void scheduledRecoveryFundsAShieldOnlyAfterEnoughUpdates(
-            String form, int level, boolean initiallyAffordable, int ticksBeforeAffordable) {
+            String form, int level, int initialCasts, int ticksBeforeAffordable) {
         assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
-        assertEquals(initiallyAffordable, module.useAbility(player, AbilitySlot.UTILITY).successful());
+        for (int cast = 0; cast < initialCasts; cast++)
+            assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
         player.removePotionEffect(PotionEffectType.ABSORPTION);
         var scheduler = MockBukkit.getMock().getScheduler();
         scheduler.performTicks(ticksBeforeAffordable);
