@@ -87,7 +87,9 @@ class ClassPassiveBehaviorTest {
             "demonologist,11.022,10.82,10.82,0.1,0.1",
             "bannerlord,9.8535,10.05,10.05,0.10051,0.10051",
             "champion,10.2535,10.182,10.182,0.1,0.1",
-            "arcane_knight,9.9,9.6975,9.6975,0.1,0.1"
+            "arcane_knight,9.9,9.6975,9.6975,0.1,0.1",
+            "pathfinder,9.726,10.121,10.121,0.102525,0.102525",
+            "trapper,9.584,10.081,10.081,0.101012,0.101012"
     })
     void basePassiveChangesRealDamageEventsAndRevokesMovementOnExit(
             String form, double outgoing, double incoming, double followingIncoming,

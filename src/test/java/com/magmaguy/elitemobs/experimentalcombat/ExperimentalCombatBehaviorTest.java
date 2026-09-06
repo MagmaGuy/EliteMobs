@@ -69,7 +69,7 @@ class ExperimentalCombatBehaviorTest {
         for (var skill : SkillType.values()) levels.put(skill, 100);
         var progression = new ClassProgressionModule(BuiltInClassContent.catalog(),
                 id -> Optional.of(new FoundationLevelSnapshot(id, levels)),
-                new MemoryStore(player.getUniqueId()), Runnable::run);
+                new MemoryStore(), Runnable::run);
         progression.load(player.getUniqueId()).join();
         module = new ExperimentalCombatModule(new DungeonCombatRuntime(200, 20), availability -> progression,
                 ignored -> fullCombatActive);
@@ -841,6 +841,37 @@ class ExperimentalCombatBehaviorTest {
         assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
     }
 
+    @Test
+    void pathfinderAuraReachesNearbyPartyMembersWithoutStackingAndClearsOnExit() throws Exception {
+        fullCombatActive = true;
+        assertTrue(module.setClassLevelForAdministration(player, "pathfinder", 91).applied());
+        double solo = player.getAttribute(Attribute.MOVEMENT_SPEED).getValue();
+        var server = MockBukkit.getMock();
+        var ally = server.addPlayer();
+        var outsider = server.addPlayer();
+        ally.teleport(player.getLocation().add(1, 0, 0));
+        outsider.teleport(player.getLocation().add(2, 0, 0));
+        openParty(ally);
+        server.getScheduler().performTicks(21);
+        assertTrue(module.setClassLevelForAdministration(ally, "ranger", 1).applied());
+        assertEquals(solo + .00284D, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), .000001);
+        assertEquals(.108915D, ally.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), .000001);
+        assertEquals(.1D, outsider.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), .000001);
+
+        assertTrue(module.setClassLevelForAdministration(ally, "pathfinder", 91).applied());
+        server.getScheduler().performTicks(20);
+        for (var member : List.of(player, ally))
+            assertEquals(solo + .00284D, member.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), .000001,
+                    "Two equal Pathfinder auras must not stack");
+        assertTrue(ally.teleport(player.getLocation().add(0, 0, 129)));
+        server.getScheduler().performTicks(20);
+        for (var member : List.of(player, ally))
+            assertEquals(solo, member.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), .000001);
+        module.close();
+        for (var member : List.of(player, ally))
+            assertEquals(.1D, member.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), .000001);
+    }
+
     private void openParty(PlayerMock... members) throws Exception {
         var config = new org.bukkit.configuration.file.YamlConfiguration();
         config.set("sidebarEnabled", false);
@@ -907,21 +938,22 @@ class ExperimentalCombatBehaviorTest {
     }
 
     private static final class MemoryStore implements ClassProgressionStore {
-        private StoredClassProfile profile;
-        private final Map<String, StoredClassProgress> progress = new HashMap<>();
+        private final Map<UUID, StoredClassProfile> profiles = new HashMap<>();
+        private final Map<UUID, Map<String, StoredClassProgress>> progress = new HashMap<>();
 
-        MemoryStore(UUID playerId) {
-            profile = new StoredClassProfile(playerId, "spellcaster", InputProfile.DEFAULT.storedId(),
-                    StoredClassProfile.DEFAULT_FOCUS_SLOT, BuiltInClassContent.PERSISTENCE_VERSION);
+        private Map<String, StoredClassProgress> rows(UUID id) {
+            return progress.computeIfAbsent(id, ignored -> new HashMap<>());
         }
-
-        public StoredClassProfile loadOrCreateProfile(UUID id, int version) { return profile; }
-        public List<StoredClassProgress> loadAllProgress(UUID id) { return List.copyOf(progress.values()); }
+        public StoredClassProfile loadOrCreateProfile(UUID id, int version) {
+            return profiles.computeIfAbsent(id, ignored -> new StoredClassProfile(id, "spellcaster",
+                    InputProfile.DEFAULT.storedId(), StoredClassProfile.DEFAULT_FOCUS_SLOT, version));
+        }
+        public List<StoredClassProgress> loadAllProgress(UUID id) { return List.copyOf(rows(id).values()); }
         public StoredClassProgress loadProgressOrZero(UUID id, String form, int version) {
-            return progress.getOrDefault(form, StoredClassProgress.zero(id, form, version));
+            return rows(id).getOrDefault(form, StoredClassProgress.zero(id, form, version));
         }
-        public void saveProfile(StoredClassProfile value) { profile = value; }
-        public void saveProgress(StoredClassProgress value) { progress.put(value.formId(), value); }
+        public void saveProfile(StoredClassProfile value) { profiles.put(value.playerId(), value); }
+        public void saveProgress(StoredClassProgress value) { rows(value.playerId()).put(value.formId(), value); }
         public void savePlayerAggregate(StoredClassProfile value, Collection<StoredClassProgress> rows) {
             saveProfile(value);
             rows.forEach(this::saveProgress);

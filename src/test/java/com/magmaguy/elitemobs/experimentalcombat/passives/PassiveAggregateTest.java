@@ -56,9 +56,6 @@ class PassiveAggregateTest {
         PassiveMechanics dreadnought = aggregate("dreadnought", 90)
                 .evaluate(PassiveConditionContext.playerOnly(1D, false, false, false))
                 .mechanics();
-        PassiveMechanics pathfinder = aggregate("pathfinder", 100)
-                .evaluate(PassiveConditionContext.playerOnly(1D, true, false, true))
-                .mechanics();
         PassiveMechanics lifewarden = aggregate("lifewarden", 90)
                 .evaluate(PassiveConditionContext.playerOnly(1D, false, false, true))
                 .mechanics();
@@ -71,7 +68,6 @@ class PassiveAggregateTest {
         assertTrue(aegis.shieldStrengthMultiplier() > 1D);
         assertTrue(juggernaut.controlResistanceFraction() > 0D);
         assertTrue(dreadnought.controlResistanceFraction() > juggernaut.controlResistanceFraction());
-        assertTrue(pathfinder.partyMovementSpeedAdjustment() > 0D);
         assertTrue(lifewarden.periodicDurationMultiplier() > 1D);
         assertTrue(lifewarden.burstHealingMultiplier() < 1D);
         assertTrue(oracle.shieldStrengthMultiplier() > 1D);
