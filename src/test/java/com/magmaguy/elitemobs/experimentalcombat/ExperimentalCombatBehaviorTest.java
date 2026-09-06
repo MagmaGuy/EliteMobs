@@ -277,6 +277,35 @@ class ExperimentalCombatBehaviorTest {
         }
     }
 
+    @ParameterizedTest
+    @CsvSource({"false,135,1", "true,154,.9302909090909091"})
+    void trapperExtendsExistingSlowAndItsPassiveStrengthensControl(
+            boolean passives, int addedDuration, double movementMultiplier) {
+        fullCombatActive = passives;
+        assertTrue(module.setClassLevelForAdministration(player, "trapper", 91).applied());
+        var enemy = target().getLivingEntity();
+        enemy.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 80, 2));
+        var movement = enemy.getAttribute(Attribute.MOVEMENT_SPEED);
+        double before = movement.getValue();
+        var outsider = MockBukkit.getMock().addPlayer();
+        outsider.teleport(player.getLocation().add(1, 0, 0));
+
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertEquals(80 + addedDuration, enemy.getPotionEffect(PotionEffectType.SLOWNESS).getDuration());
+        assertEquals(2, enemy.getPotionEffect(PotionEffectType.SLOWNESS).getAmplifier());
+        assertEquals(before * movementMultiplier, movement.getValue(), .000001);
+        assertTrue(enemy.hasPotionEffect(PotionEffectType.GLOWING));
+        assertFalse(outsider.hasPotionEffect(PotionEffectType.SLOWNESS));
+        assertFalse(outsider.hasPotionEffect(PotionEffectType.GLOWING));
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertEquals(80 + addedDuration * 2, enemy.getPotionEffect(PotionEffectType.SLOWNESS).getDuration());
+        assertEquals(before * movementMultiplier, movement.getValue(), .000001,
+                "Recasting must extend the slow without stacking its passive strength");
+        module.close();
+        assertEquals(before, movement.getValue(), .000001,
+                "Closing combat must release the extra movement modifier");
+    }
+
     @Test
     void manaWardAppliesShieldAndSpendsManaBeforeAnotherCast() {
         assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
