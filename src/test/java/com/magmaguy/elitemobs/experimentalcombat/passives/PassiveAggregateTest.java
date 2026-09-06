@@ -44,12 +44,6 @@ class PassiveAggregateTest {
 
     @Test
     void typedMechanicsScaleAndInheritAcrossTheirClassLineages() {
-        PassiveMechanics guardian = aggregate("guardian", 60)
-                .evaluate(PassiveConditionContext.playerOnly(1D, false, false, true))
-                .mechanics();
-        PassiveMechanics aegis = aggregate("aegis", 90)
-                .evaluate(PassiveConditionContext.playerOnly(1D, false, false, true))
-                .mechanics();
         PassiveMechanics juggernaut = aggregate("juggernaut", 60)
                 .evaluate(PassiveConditionContext.playerOnly(1D, false, false, false))
                 .mechanics();
@@ -63,9 +57,6 @@ class PassiveAggregateTest {
                 .evaluate(PassiveConditionContext.playerOnly(1D, false, false, true))
                 .mechanics();
 
-        assertTrue(guardian.redirectedDamageMultiplier() < 1D);
-        assertTrue(aegis.redirectedDamageMultiplier() < guardian.redirectedDamageMultiplier());
-        assertTrue(aegis.shieldStrengthMultiplier() > 1D);
         assertTrue(juggernaut.controlResistanceFraction() > 0D);
         assertTrue(dreadnought.controlResistanceFraction() > juggernaut.controlResistanceFraction());
         assertTrue(lifewarden.periodicDurationMultiplier() > 1D);

@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.experimentalcombat;
 
+import org.bukkit.attribute.Attribute;
+
 import com.magmaguy.elitemobs.mobconstructor.ElitePowerPauseReason;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
@@ -152,8 +154,15 @@ class CombatProtectionBehaviorTest extends CombatBehaviorFixture {
                 "Retiring the caster must remove the party link as well as its damage reduction");
     }
 
-    @Test
-    void shieldbearerRedirectsDamageFromOnlyTheTwoWeakestNearbyAlliesUntilClassChange() throws Exception {
+    @ParameterizedTest
+    @CsvSource({"false,1.848525,2", "true,1.422969807299,3"})
+    void shieldbearerRedirectsDamageFromOnlyTheTwoWeakestNearbyAlliesUntilClassChange(
+            boolean passivesActive, double redirectedCost, int shieldAmplifier) throws Exception {
+        fullCombatActive = passivesActive;
+        // Party members retain their default Spellcaster passive when combat is active.
+        double ordinaryDamage = passivesActive ? 10.08D : 10D;
+        double protectedDamage = passivesActive ? 7.60536D : 7.545D;
+        double redirectedDamage = passivesActive ? 4.943484D : 4.90425D;
         assertTrue(module.setClassLevelForAdministration(player, "shieldbearer", 91).applied());
         for (int hit = 0; hit < 5; hit++) incomingDamage();
         var server = MockBukkit.getMock();
@@ -166,6 +175,10 @@ class CombatProtectionBehaviorTest extends CombatBehaviorFixture {
             member.teleport(player.getLocation().add(1, 0, 0));
         distant.teleport(player.getLocation().add(40, 0, 0));
         openParty(healthy, weakest, secondWeakest, distant);
+        // An 80-health ally makes Aegis' inherited shield increase cross a
+        // potion-strength threshold. MockBukkit does not consume absorption.
+        for (var member : List.of(healthy, weakest, secondWeakest))
+            member.getAttribute(Attribute.MAX_HEALTH).setBaseValue(80D);
         healthy.setHealth(12D);
         weakest.setHealth(4D);
         secondWeakest.setHealth(8D);
@@ -173,24 +186,28 @@ class CombatProtectionBehaviorTest extends CombatBehaviorFixture {
         outsider.setHealth(1D);
 
         assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        for (var member : List.of(healthy, weakest, secondWeakest))
+            assertEquals(shieldAmplifier, member.getPotionEffect(PotionEffectType.ABSORPTION).getAmplifier());
+        assertEquals(passivesActive, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue() < .1D);
         for (var member : List.of(player, healthy, weakest, secondWeakest)) {
             assertTrue(member.hasPotionEffect(PotionEffectType.ABSORPTION));
             member.removePotionEffect(PotionEffectType.ABSORPTION);
             member.setAbsorptionAmount(0D);
         }
-        assertEquals(7.545D, incomingDamage(healthy), .000001);
+        assertEquals(protectedDamage, incomingDamage(healthy), .000001);
         assertEquals(20D, player.getHealth());
-        assertEquals(4.90425D, incomingDamage(weakest), .000001);
-        assertEquals(18.151475D, player.getHealth(), .000001);
-        assertEquals(4.90425D, incomingDamage(secondWeakest), .000001);
-        assertEquals(16.30295D, player.getHealth(), .000001);
+        assertEquals(redirectedDamage, incomingDamage(weakest), .000001);
+        // Guardian and Aegis both reduce this actual inherited redirect cost.
+        assertEquals(20D - redirectedCost, player.getHealth(), .000001);
+        assertEquals(redirectedDamage, incomingDamage(secondWeakest), .000001);
+        assertEquals(20D - 2D * redirectedCost, player.getHealth(), .000001);
         for (var excluded : List.of(distant, outsider)) {
             assertFalse(excluded.hasPotionEffect(PotionEffectType.ABSORPTION));
-            assertEquals(10D, incomingDamage(excluded));
+            assertEquals(ordinaryDamage, incomingDamage(excluded));
         }
         assertTrue(module.selectForm(player, "spellcaster").accepted());
-        for (var member : List.of(healthy, weakest, secondWeakest)) assertEquals(10D, incomingDamage(member));
-        assertEquals(16.30295D, player.getHealth(), .000001);
+        for (var member : List.of(healthy, weakest, secondWeakest)) assertEquals(ordinaryDamage, incomingDamage(member));
+        assertEquals(20D - 2D * redirectedCost, player.getHealth(), .000001);
     }
 
     @ParameterizedTest

@@ -1,14 +1,9 @@
 package com.magmaguy.elitemobs.experimentalcombat.passives;
 
-import com.magmaguy.elitemobs.skills.SkillType;
 import org.junit.jupiter.api.Test;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PassiveMechanicsTest {
 
@@ -47,27 +42,4 @@ class PassiveMechanicsTest {
                 PassiveRuntimePolicy.controlDurationTicks(PotionEffect.INFINITE_DURATION, mechanics));
     }
 
-    @Test
-    void spellIdentityIncludesOnlyClassAbilitiesAndTheTwoMagicWeapons() {
-        assertTrue(PassiveRuntimePolicy.isSpellDamage(true, null));
-        assertTrue(PassiveRuntimePolicy.isSpellDamage(false, SkillType.WANDS));
-        assertTrue(PassiveRuntimePolicy.isSpellDamage(false, SkillType.STAVES));
-        assertFalse(PassiveRuntimePolicy.isSpellDamage(false, SkillType.SWORDS));
-        assertFalse(PassiveRuntimePolicy.isSpellDamage(false, null));
-    }
-
-    @Test
-    void partyMovementUsesTheStrongestNearbyAuraWithoutStackingOrSoloLeakage() {
-        PassiveMechanics weaker = new PassiveMechanics(
-                1D, 1D, 1D, 1D, 1D, 1D, 1D, 1D, 0D, .04D);
-        PassiveMechanics stronger = new PassiveMechanics(
-                1D, 1D, 1D, 1D, 1D, 1D, 1D, 1D, 0D, .07D);
-
-        assertEquals(.07D,
-                PassiveRuntimePolicy.partyMovementAdjustment(List.of(weaker, stronger), true),
-                1.0E-9D);
-        assertEquals(0D,
-                PassiveRuntimePolicy.partyMovementAdjustment(List.of(stronger), false),
-                1.0E-9D);
-    }
 }
