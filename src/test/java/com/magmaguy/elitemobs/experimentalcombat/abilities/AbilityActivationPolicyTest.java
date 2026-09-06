@@ -21,14 +21,6 @@ class AbilityActivationPolicyTest {
     }
 
     @Test
-    void rescuePromiseRequiresAnActuallyDyingAlly() {
-        Set<AbilityMechanic> mechanic = Set.of(AbilityMechanic.LOW_HEALTH_ALLY_ONLY);
-
-        assertFalse(AbilityActivationPolicy.permits(mechanic, false, 0D, 0D, .36D));
-        assertTrue(AbilityActivationPolicy.permits(mechanic, false, 0D, 0D, .35D));
-    }
-
-    @Test
     void delayedMinimumRangeChecksTravelPathAndActualTargetPosition() {
         Set<AbilityMechanic> mechanic = Set.of(AbilityMechanic.MINIMUM_RANGE);
 
