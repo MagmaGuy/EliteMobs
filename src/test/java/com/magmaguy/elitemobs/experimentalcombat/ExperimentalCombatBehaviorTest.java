@@ -386,13 +386,13 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"shepherd,false,false,false,7.545,10", "mistweaver,true,false,false,7.545,10",
-            "warlord,true,true,false,10,10", "marshal,false,true,false,7.695,10",
-            "shieldbearer,false,true,true,7.545,10", "strategist,false,true,true,10,10",
-            "conqueror,false,true,false,10,11.383"})
+    @CsvSource({"shepherd,false,false,false,7.545,10,true", "mistweaver,true,false,false,7.545,10,true",
+            "warlord,true,true,false,10,10,true", "marshal,false,true,false,7.695,10,true",
+            "shieldbearer,false,true,true,7.545,10,true", "strategist,false,true,true,10,10,true",
+            "conqueror,false,true,false,10,11.383,true", "arcane_knight,false,false,true,7.545,10,false"})
     void partyUtilitySpendsResourceAndBuffsOnlyNearbyMembersUntilClassChange(
             String form, boolean cleanses, boolean resolve, boolean shields,
-            double protectedDamage, double buffedDamage) throws Exception {
+            double protectedDamage, double buffedDamage, boolean speeds) throws Exception {
         int level = module.catalog().require(form).band().effectiveStart();
         assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
         if (resolve) {
@@ -415,7 +415,8 @@ class ExperimentalCombatBehaviorTest {
 
         assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
         for (var member : List.of(player, ally)) {
-            assertEquals(1, member.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
+            assertEquals(speeds, member.hasPotionEffect(PotionEffectType.SPEED));
+            if (speeds) assertEquals(1, member.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
             assertEquals(!cleanses, member.hasPotionEffect(PotionEffectType.POISON));
             assertTrue(member.hasPotionEffect(PotionEffectType.NIGHT_VISION));
             assertEquals(shields, member.hasPotionEffect(PotionEffectType.ABSORPTION));
