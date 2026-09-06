@@ -574,6 +574,37 @@ class ExperimentalCombatBehaviorTest {
                 "Changing class must stop every remaining healing pulse");
     }
 
+    @Test
+    void pathfinderFieldStaysAtItsCastLocationAndStopsRefreshingAlliesOnClassChange() throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, "pathfinder", 91).applied());
+        var server = MockBukkit.getMock();
+        var ally = server.addPlayer();
+        var outsider = server.addPlayer();
+        ally.teleport(player.getLocation().add(1, 0, 0));
+        outsider.teleport(player.getLocation().add(2, 0, 0));
+        openParty(ally);
+        player.getLocation().getChunk().load();
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        for (var member : List.of(player, ally)) {
+            assertTrue(member.hasPotionEffect(PotionEffectType.SPEED));
+            member.removePotionEffect(PotionEffectType.SPEED);
+        }
+        assertFalse(outsider.hasPotionEffect(PotionEffectType.SPEED));
+        player.teleport(player.getLocation().add(40, 0, 0));
+        server.getScheduler().performTicks(19);
+        assertFalse(ally.hasPotionEffect(PotionEffectType.SPEED));
+        server.getScheduler().performOneTick();
+        assertNotNull(ally.getPotionEffect(PotionEffectType.SPEED));
+        assertEquals(1, ally.getPotionEffect(PotionEffectType.SPEED).getAmplifier());
+        assertFalse(player.hasPotionEffect(PotionEffectType.SPEED));
+        assertFalse(outsider.hasPotionEffect(PotionEffectType.SPEED));
+
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        ally.removePotionEffect(PotionEffectType.SPEED);
+        server.getScheduler().performTicks(120);
+        assertFalse(ally.hasPotionEffect(PotionEffectType.SPEED));
+    }
+
     @ParameterizedTest(name = "{displayName} [{index}] changeClass={0}")
     @CsvSource({"false", "true"})
     void seraphChainHealsTheMostWoundedPartyMemberFirstAndStopsOnClassChange(
