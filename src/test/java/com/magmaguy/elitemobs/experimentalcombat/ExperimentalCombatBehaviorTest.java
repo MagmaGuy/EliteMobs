@@ -630,6 +630,47 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @Test
+    void shieldbearerRedirectsDamageFromOnlyTheTwoWeakestNearbyAlliesUntilClassChange() throws Exception {
+        assertTrue(module.setClassLevelForAdministration(player, "shieldbearer", 91).applied());
+        for (int hit = 0; hit < 5; hit++) incomingDamage();
+        var server = MockBukkit.getMock();
+        var healthy = server.addPlayer();
+        var weakest = server.addPlayer();
+        var secondWeakest = server.addPlayer();
+        var distant = server.addPlayer();
+        var outsider = server.addPlayer();
+        for (var member : List.of(healthy, weakest, secondWeakest, outsider))
+            member.teleport(player.getLocation().add(1, 0, 0));
+        distant.teleport(player.getLocation().add(40, 0, 0));
+        openParty(healthy, weakest, secondWeakest, distant);
+        healthy.setHealth(12D);
+        weakest.setHealth(4D);
+        secondWeakest.setHealth(8D);
+        distant.setHealth(1D);
+        outsider.setHealth(1D);
+
+        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        for (var member : List.of(player, healthy, weakest, secondWeakest)) {
+            assertTrue(member.hasPotionEffect(PotionEffectType.ABSORPTION));
+            member.removePotionEffect(PotionEffectType.ABSORPTION);
+            member.setAbsorptionAmount(0D);
+        }
+        assertEquals(7.545D, incomingDamage(healthy), .000001);
+        assertEquals(20D, player.getHealth());
+        assertEquals(4.90425D, incomingDamage(weakest), .000001);
+        assertEquals(18.151475D, player.getHealth(), .000001);
+        assertEquals(4.90425D, incomingDamage(secondWeakest), .000001);
+        assertEquals(16.30295D, player.getHealth(), .000001);
+        for (var excluded : List.of(distant, outsider)) {
+            assertFalse(excluded.hasPotionEffect(PotionEffectType.ABSORPTION));
+            assertEquals(10D, incomingDamage(excluded));
+        }
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
+        for (var member : List.of(healthy, weakest, secondWeakest)) assertEquals(10D, incomingDamage(member));
+        assertEquals(16.30295D, player.getHealth(), .000001);
+    }
+
+    @Test
     void prayerOfMendingSpendsGraceAndRecoversThroughScheduledUpdates() {
         assertTrue(module.setClassLevelForAdministration(player, "priest", 31).applied());
         player.setHealth(8D);
