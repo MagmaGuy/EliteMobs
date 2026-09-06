@@ -105,6 +105,47 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @Test
+    void paladinSignatureSpendsResolveToTauntWithoutDamageAndRevokesProtectionOnClassChange() {
+        assertTrue(module.selectForm(player, "paladin").accepted());
+        var elite = target();
+        var enemy = (org.bukkit.entity.Mob) elite.getLivingEntity();
+        var rival = MockBukkit.getMock().addPlayer();
+        rival.teleport(player.getLocation().add(1, 0, 0));
+        elite.addThreat(rival, 1000D);
+        assertEquals(rival, enemy.getTarget());
+        double healthBefore = enemy.getHealth();
+        var distant = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 20));
+        try {
+            assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertNull(elite.getForcedTargetPlayerId());
+            for (int hit = 0; hit < 5; hit++) incomingDamage();
+
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertEquals(player.getUniqueId(), elite.getForcedTargetPlayerId());
+            assertEquals(player, enemy.getTarget(), "Taunt must override the higher-threat opponent");
+            assertTrue(elite.getAggro().getOrDefault(player, 0D) > 0D);
+            assertEquals(healthBefore, enemy.getHealth());
+            assertTrue(elite.getDamagers().isEmpty(), "Taunt must not invent damage or kill credit");
+            assertNull(distant.getForcedTargetPlayerId());
+            assertTrue(distant.getAggro().isEmpty());
+
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            double threatBeforeDeniedCast = elite.getAggro().get(player);
+            assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful(),
+                    "Two casts must exhaust Resolve despite the taunt resource return");
+            assertEquals(threatBeforeDeniedCast, elite.getAggro().get(player));
+            assertTrue(incomingDamage() < 10D);
+            assertEquals(10D, incomingDamage(rival), "Protection belongs only to the caster");
+
+            assertTrue(module.selectForm(player, "spellcaster").accepted());
+            assertNull(elite.getForcedTargetPlayerId(), "Changing class must retire its taunt lease");
+            assertEquals(10D, incomingDamage());
+        } finally {
+            distant.remove(RemovalReason.SHUTDOWN);
+        }
+    }
+
+    @Test
     void battlemageSignatureDamagesNearbyElitesAndSpendsManaForProtection() {
         assertTrue(module.setClassLevelForAdministration(player, "battlemage", 61).applied());
         var enemy = target().getLivingEntity();
