@@ -176,6 +176,54 @@ class ExperimentalCombatBehaviorTest {
         }
     }
 
+    @ParameterizedTest(name = "{displayName} [{index}] {0}")
+    @CsvSource({"spellblade,false", "arcane_knight,true"})
+    void interruptingStrikesSelectEnemiesSpendManaAndReleaseTimedControl(
+            String form, boolean radialAndWeakening) {
+        assertTrue(module.setClassLevelForAdministration(player, form, 91).applied());
+        var front = target();
+        var behind = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, -3));
+        var distant = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 25));
+        var bystander = MockBukkit.getMock().addPlayer();
+        bystander.teleport(player.getLocation().add(0, 0, 2));
+        try {
+            for (var elite : List.of(front, behind, distant)) {
+                elite.setLevel(91);
+                elite.getLivingEntity().getAttribute(Attribute.MAX_HEALTH).setBaseValue(2048D);
+                elite.getLivingEntity().setHealth(2048D);
+            }
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertTrue(front.getLivingEntity().getHealth() < 2048D);
+            assertTrue(front.getPowerSuppression().isSuppressed(ElitePowerPauseReason.INTERRUPT));
+            assertEquals(radialAndWeakening, behind.getLivingEntity().getHealth() < 2048D,
+                    "Spellblade selects forward enemies; Arcane Knight also hits behind the caster");
+            assertEquals(radialAndWeakening,
+                    behind.getPowerSuppression().isSuppressed(ElitePowerPauseReason.INTERRUPT));
+            assertEquals(2048D, distant.getLivingEntity().getHealth());
+            assertFalse(distant.getPowerSuppression().isSuppressed());
+            assertEquals(20D, bystander.getHealth());
+            assertEquals(radialAndWeakening, incomingDamage() < 10D);
+            assertEquals(radialAndWeakening, incomingDamage(player, behind) < 10D);
+            assertEquals(10D, incomingDamage(player, distant));
+
+            assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            double healthBeforeDeniedCast = front.getLivingEntity().getHealth();
+            assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+            assertEquals(healthBeforeDeniedCast, front.getLivingEntity().getHealth(),
+                    "Insufficient Mana must reject the strike before it deals damage");
+            assertTrue(module.selectForm(player, "spellcaster").accepted());
+            for (var elite : List.of(front, behind, distant))
+                assertEquals(10D, incomingDamage(player, elite));
+            MockBukkit.getMock().getScheduler().performTicks(60);
+            for (var elite : List.of(front, behind, distant))
+                assertFalse(elite.getPowerSuppression().isSuppressed(ElitePowerPauseReason.INTERRUPT),
+                        "The strike's timed interruption must expire without retaining a power lock");
+        } finally {
+            behind.remove(RemovalReason.SHUTDOWN);
+            distant.remove(RemovalReason.SHUTDOWN);
+        }
+    }
+
     @Test
     void reaverSignatureDamagesAndHealsThenRevokesItsLifestealWindowOnClassChange() {
         assertTrue(module.setClassLevelForAdministration(player, "reaver", 61).applied());
