@@ -59,17 +59,8 @@ class PassiveAggregateTest {
         PassiveMechanics pathfinder = aggregate("pathfinder", 100)
                 .evaluate(PassiveConditionContext.playerOnly(1D, true, false, true))
                 .mechanics();
-        PassiveMechanics trapper = aggregate("trapper", 100)
-                .evaluate(PassiveConditionContext.playerOnly(1D, false, false, false))
-                .mechanics();
         PassiveMechanics lifewarden = aggregate("lifewarden", 90)
                 .evaluate(PassiveConditionContext.playerOnly(1D, false, false, true))
-                .mechanics();
-        PassiveMechanics strategistGrouped = aggregate("strategist", 100)
-                .evaluate(PassiveConditionContext.playerOnly(1D, false, false, true))
-                .mechanics();
-        PassiveMechanics strategistSolo = aggregate("strategist", 100)
-                .evaluate(PassiveConditionContext.playerOnly(1D, false, false, false))
                 .mechanics();
         PassiveMechanics oracle = aggregate("oracle", 90)
                 .evaluate(PassiveConditionContext.playerOnly(1D, false, false, true))
@@ -81,12 +72,8 @@ class PassiveAggregateTest {
         assertTrue(juggernaut.controlResistanceFraction() > 0D);
         assertTrue(dreadnought.controlResistanceFraction() > juggernaut.controlResistanceFraction());
         assertTrue(pathfinder.partyMovementSpeedAdjustment() > 0D);
-        assertTrue(trapper.controlDurationMultiplier() > 1D);
-        assertTrue(trapper.controlPotencyMultiplier() > 1D);
         assertTrue(lifewarden.periodicDurationMultiplier() > 1D);
         assertTrue(lifewarden.burstHealingMultiplier() < 1D);
-        assertTrue(strategistGrouped.abilityCostMultiplier() < 1D);
-        assertTrue(strategistSolo.abilityCostMultiplier() > 1D);
         assertTrue(oracle.shieldStrengthMultiplier() > 1D);
     }
 

@@ -824,6 +824,23 @@ class ExperimentalCombatBehaviorTest {
         assertEquals(groupedIncoming, incomingDamage(), .000001);
     }
 
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void strategistFundsAnExtraCastOnlyWithANearbyPartyMember(boolean nearby) throws Exception {
+        fullCombatActive = true;
+        assertTrue(module.setClassLevelForAdministration(player, "strategist", 91).applied());
+        for (int hit = 0; hit < 10; hit++) incomingDamage();
+        var ally = MockBukkit.getMock().addPlayer();
+        assertTrue(ally.teleport(player.getLocation().add(0, 0, nearby ? 1 : 129)));
+        openParty(ally);
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
+        player.removePotionEffect(PotionEffectType.SPEED);
+        assertEquals(nearby, module.useAbility(player, AbilitySlot.UTILITY).successful());
+        assertEquals(nearby, player.hasPotionEffect(PotionEffectType.SPEED));
+        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+    }
+
     private void openParty(PlayerMock... members) throws Exception {
         var config = new org.bukkit.configuration.file.YamlConfiguration();
         config.set("sidebarEnabled", false);
