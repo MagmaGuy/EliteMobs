@@ -245,10 +245,15 @@ class ExperimentalCombatBehaviorTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"necromancer,61,8.27125", "plaguebringer,91,7.7905"})
+    @CsvSource({"necromancer,61,8.27125,false", "plaguebringer,91,7.7905,false",
+            "tyrant,91,10,true"})
     void areaDebuffSlowsAndWeakensEnemiesWithoutAffectingBystanders(
-            String form, int level, double weakenedDamage) {
+            String form, int level, double weakenedDamage, boolean reveals) {
         assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        if (reveals) {
+            assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
+            for (int hit = 0; hit < 5; hit++) incomingDamage();
+        }
         var enemy = target().getLivingEntity();
         var distant = CombatTestEntities.spawnElite(player.getLocation().add(0, 0, 20));
         var bystander = MockBukkit.getMock().addPlayer();
@@ -256,8 +261,11 @@ class ExperimentalCombatBehaviorTest {
         try {
             assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
             assertNotNull(enemy.getPotionEffect(PotionEffectType.SLOWNESS));
+            assertEquals(reveals, enemy.hasPotionEffect(PotionEffectType.GLOWING));
             assertFalse(distant.getLivingEntity().hasPotionEffect(PotionEffectType.SLOWNESS));
+            assertFalse(distant.getLivingEntity().hasPotionEffect(PotionEffectType.GLOWING));
             assertFalse(bystander.hasPotionEffect(PotionEffectType.SLOWNESS));
+            assertFalse(bystander.hasPotionEffect(PotionEffectType.GLOWING));
             assertFalse(player.hasPotionEffect(PotionEffectType.SLOWNESS));
             assertEquals(weakenedDamage, incomingDamage(), .000001);
             assertEquals(10D, outgoingDamage(), "Weakening must not become a caster damage buff");
