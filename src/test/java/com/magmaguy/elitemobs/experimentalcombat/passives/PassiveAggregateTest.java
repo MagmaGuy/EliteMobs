@@ -53,15 +53,11 @@ class PassiveAggregateTest {
         PassiveMechanics lifewarden = aggregate("lifewarden", 90)
                 .evaluate(PassiveConditionContext.playerOnly(1D, false, false, true))
                 .mechanics();
-        PassiveMechanics oracle = aggregate("oracle", 90)
-                .evaluate(PassiveConditionContext.playerOnly(1D, false, false, true))
-                .mechanics();
 
         assertTrue(juggernaut.controlResistanceFraction() > 0D);
         assertTrue(dreadnought.controlResistanceFraction() > juggernaut.controlResistanceFraction());
         assertTrue(lifewarden.periodicDurationMultiplier() > 1D);
         assertTrue(lifewarden.burstHealingMultiplier() < 1D);
-        assertTrue(oracle.shieldStrengthMultiplier() > 1D);
     }
 
     @Test

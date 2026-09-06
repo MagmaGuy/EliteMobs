@@ -74,6 +74,7 @@ class CombatHealingBehaviorTest extends CombatBehaviorFixture {
     @CsvSource({"false", "true"})
     void seraphChainHealsTheMostWoundedPartyMemberFirstAndStopsOnClassChange(
             boolean changeClass) throws Exception {
+        fullCombatActive = true;
         assertTrue(module.setClassLevelForAdministration(player, "seraph", 91).applied());
         var server = MockBukkit.getMock();
         var first = server.addPlayer();
@@ -90,26 +91,31 @@ class CombatHealingBehaviorTest extends CombatBehaviorFixture {
         // Pending support must survive ordinary reconciliation of allies with no selected class.
         server.getScheduler().performTicks(20 - server.getScheduler().getCurrentTick() % 20);
         player.setHealth(16D);
+        // This health pool makes Oracle's inherited barrier bonus cross a potion tier.
+        first.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).setBaseValue(100D);
         first.setHealth(2D);
         second.setHealth(8D);
         outsider.setHealth(1D);
 
+        assertEquals(9.12D, incomingDamage(), .000001, "Oracle and Seraph defend the grouped caster");
+        assertEquals(9.2D, outgoingDamage(), .000001, "The healing lineage retains its attack penalty");
         assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
         assertEquals(2D, first.getHealth(), "The chain must run on the scheduler, not heal everyone immediately");
         server.getScheduler().performOneTick();
-        assertEquals(6.1735D, first.getHealth(), .000001);
+        assertEquals(28.9482895D, first.getHealth(), .000001);
         assertNotNull(first.getPotionEffect(PotionEffectType.ABSORPTION));
+        assertEquals(1, first.getPotionEffect(PotionEffectType.ABSORPTION).getAmplifier());
         assertEquals(8D, second.getHealth());
         assertFalse(second.hasPotionEffect(PotionEffectType.ABSORPTION));
         assertEquals(16D, player.getHealth());
         if (changeClass) assertTrue(module.selectForm(player, "spellcaster").accepted());
         server.getScheduler().performTicks(3);
-        assertEquals(changeClass ? 8D : 12.1735D, second.getHealth(), .000001);
+        assertEquals(changeClass ? 8D : 13.3896579D, second.getHealth(), .000001);
         assertEquals(!changeClass, second.hasPotionEffect(PotionEffectType.ABSORPTION));
         assertEquals(16D, player.getHealth());
         server.getScheduler().performTicks(6);
         assertEquals(changeClass ? 16D : 20D, player.getHealth());
-        assertEquals(6.1735D, first.getHealth(), .000001, "A chain must visit each recipient only once");
+        assertEquals(28.9482895D, first.getHealth(), .000001, "A chain must visit each recipient only once");
         assertEquals(1D, outsider.getHealth());
         assertFalse(outsider.hasPotionEffect(PotionEffectType.ABSORPTION));
     }
