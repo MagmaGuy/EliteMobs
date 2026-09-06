@@ -102,8 +102,6 @@ class PassiveAggregateTest {
         PassiveConditionContext grouped = PassiveConditionContext.playerOnly(1D, false, false, true);
         PassiveConditionContext solo = PassiveConditionContext.playerOnly(1D, false, false, false);
 
-        assertTrue(aggregate("hierophant", 90).evaluate(grouped).healingDoneMultiplier()
-                > aggregate("hierophant", 90).evaluate(solo).healingDoneMultiplier());
         assertTrue(aggregate("shepherd", 100).evaluate(grouped).healingDoneMultiplier()
                 > aggregate("shepherd", 100).evaluate(solo).healingDoneMultiplier());
 

@@ -600,15 +600,22 @@ class ExperimentalCombatBehaviorTest {
                 "A consumed echo must not heal twice");
     }
 
-    @Test
-    void prayerOfMendingUsesInheritedPassivesWhenFullCombatIsActive() {
+    @ParameterizedTest
+    @CsvSource({"priest,31,false,11.336802,9.5", "hierophant,61,false,13.381253,9.25",
+            "hierophant,61,true,13.839487,9.25"})
+    void healingPassiveChangesRealRecoveryInItsPartyContext(
+            String form, int level, boolean grouped, double healedHealth, double outgoing) throws Exception {
         fullCombatActive = true;
-        assertTrue(module.setClassLevelForAdministration(player, "priest", 31).applied());
+        assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+        if (grouped) {
+            var ally = MockBukkit.getMock().addPlayer();
+            ally.teleport(player.getLocation().add(1, 0, 0));
+            openParty(ally);
+        }
         player.setHealth(8D);
         assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
-        // Rank-31 Priest: 14% heal, rank scale 1.0775, Cleric/Priest passives +10.6%.
-        assertEquals(8D + 20D * .14D * 1.0775D * 1.106D, player.getHealth(), 0.000001);
-        assertEquals(9.5D, outgoingDamage(), 0.000001,
+        assertEquals(healedHealth, player.getHealth(), 0.000001);
+        assertEquals(outgoing, outgoingDamage(), 0.000001,
                 "The same active lineage must also reach the damage event listener");
     }
 
