@@ -700,6 +700,11 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             //Set the final damage value
             event.setDamage(EntityDamageEvent.DamageModifier.BASE, newDamage);
+            // Setting BASE does not recalculate Bukkit's original absorption allocation.
+            // Allocate the current shield against the final elite hit, not the raw vanilla hit.
+            if (event.isApplicable(EntityDamageEvent.DamageModifier.ABSORPTION))
+                event.setDamage(EntityDamageEvent.DamageModifier.ABSORPTION,
+                        -Math.min(player.getAbsorptionAmount(), Math.max(0D, newDamage)));
 
             //Deal with the player getting killed todo: this is a bit busted, fix
             if (player.getHealth() - event.getDamage() <= 0)
