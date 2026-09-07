@@ -571,6 +571,12 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
         track(caster.getUniqueId(), task);
     }
 
+    private void observeProjectileImpact(Player caster, FixedAbilitySpec spec, int selectedEnemies) {
+        semantics.observe(new AbilityRuntimeObservation(AbilityRuntimeObservation.Kind.PROJECTILE_IMPACT,
+                caster.getUniqueId(), null, spec.id(), selectedEnemies, 0, 1,
+                spec.effects(), spec.executionTraits().mechanics()));
+    }
+
     private void applyBombardmentImpact(
             Player caster,
             FixedAbilitySpec spec,
@@ -582,6 +588,7 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 .filter(enemy -> enemy.getLocation().distanceSquared(impact) <= impactRadius * impactRadius)
                 .limit(1)
                 .toList();
+        observeProjectileImpact(caster, spec, target.size());
         if (!target.isEmpty()) {
             AbilityContribution contribution = applyProjectileAndPresent(
                     presentation,
@@ -637,6 +644,7 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                     Location location = origin.clone().add(impact.offsetX(), .15D, impact.offsetZ());
                     AbilityTargeting.TargetSelection selection = targeting.selectArea(
                             caster, spec, location, impact.blastRadius());
+                    observeProjectileImpact(caster, spec, selection.enemies().size());
                     AbilityContribution contribution = applyProjectileAndPresent(
                             presentation, caster, spec, selection, effectiveLevel);
                     if (contribution.isMeaningful())

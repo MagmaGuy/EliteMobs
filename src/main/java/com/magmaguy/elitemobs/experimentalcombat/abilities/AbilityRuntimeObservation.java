@@ -74,6 +74,8 @@ public record AbilityRuntimeObservation(
         CONSTRUCT_SPAWNED,
         CONSTRUCT_CLEARED,
         FIELD_PULSE,
+        // One delivery; amount counts its selected enemies, including zero for a miss.
+        PROJECTILE_IMPACT,
         CAST_FAILED,
         RESOURCE_SPENT,
         RESOURCE_GAINED,
