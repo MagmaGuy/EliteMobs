@@ -75,6 +75,13 @@ final class FearLeaseRegistry<K, S> implements AutoCloseable {
         }
     }
 
+    void clearSource(UUID source) {
+        for (K target : new ArrayList<>(entries.keySet())) {
+            Entry<S> entry = entries.get(target);
+            if (entry.source.equals(source)) remove(target, entry);
+        }
+    }
+
     void remove(K target) {
         Entry<S> entry = entries.get(target);
         if (entry != null) remove(target, entry);

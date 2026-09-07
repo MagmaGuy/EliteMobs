@@ -95,7 +95,7 @@ final class AbilityEffects {
         if (elite == null) return;
         if (spec.effects().contains(AbilityEffect.INTERRUPT)
                 && authorized(caster, target, spec, AbilityEffect.INTERRUPT)) {
-            crowdControl.interrupt(elite, Math.min(40, duration));
+            crowdControl.interrupt(caster, elite, Math.min(40, duration));
         }
         if (spec.effects().contains(AbilityEffect.FEAR)
                 && authorized(caster, target, spec, AbilityEffect.FEAR)) {
@@ -277,7 +277,7 @@ final class AbilityEffects {
                     && authorized(caster, enemy, spec, AbilityEffect.INTERRUPT)) {
                 EliteEntity elite = EntityTracker.getEliteMobEntity(enemy);
                 if (crowdControl.interrupt(
-                        elite, Math.max(10, Math.min(60, controlDuration))))
+                        caster, elite, Math.max(10, Math.min(60, controlDuration))))
                     appliedControls.add(AbilityEffect.INTERRUPT);
             }
             if (effects.contains(AbilityEffect.FEAR)
@@ -526,6 +526,10 @@ final class AbilityEffects {
 
         return new AbilityContribution(totalDamage, totalHealing, 0, threat,
                 controlledEnemies, supportedAllies, 0);
+    }
+
+    void clearSource(UUID sourceId) {
+        crowdControl.clearSource(sourceId);
     }
 
     void close() {

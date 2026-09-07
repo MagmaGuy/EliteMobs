@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RootLeaseRegistryTest {
+class SourceSuppressionLeaseRegistryTest {
     @Test
     void rootsAreSourceOwnedAndExtensionCannotStealAnotherCastersLease() {
-        RootLeaseRegistry<String, String> roots = new RootLeaseRegistry<>();
+        SourceSuppressionLeaseRegistry<String, String> roots = new SourceSuppressionLeaseRegistry<>();
         FakeLease lease = new FakeLease();
         AtomicInteger opens = new AtomicInteger();
 
@@ -32,6 +32,9 @@ class RootLeaseRegistryTest {
 
         roots.maintain(21L, ignored -> true);
         assertTrue(roots.activeTargets().contains("elite"));
+        roots.apply("elite", "second", 25L, FakeLease::new);
+        roots.maintain(29L, ignored -> true);
+        assertFalse(lease.closed);
         roots.maintain(30L, ignored -> true);
         assertTrue(lease.closed);
         assertTrue(roots.activeTargets().isEmpty());
@@ -40,17 +43,38 @@ class RootLeaseRegistryTest {
 
     @Test
     void removalAndCloseAlwaysReleaseSuppressionLease() {
-        RootLeaseRegistry<String, String> roots = new RootLeaseRegistry<>();
+        SourceSuppressionLeaseRegistry<String, String> roots = new SourceSuppressionLeaseRegistry<>();
         FakeLease removed = new FakeLease();
-        FakeLease closed = new FakeLease();
+        FakeLease closed = new FakeLease(), invalid = new FakeLease();
+        roots.apply("invalid", "caster", 50L, () -> invalid);
         roots.apply("removed", "caster", 50L, () -> removed);
         roots.apply("closed", "caster", 50L, () -> closed);
 
+        roots.maintain(1L, target -> !target.equals("invalid"));
+        assertTrue(invalid.closed);
         roots.remove("removed");
         roots.close();
 
         assertTrue(removed.closed);
         assertTrue(closed.closed);
+    }
+
+    @Test
+    void clearingOneSourcePreservesOtherSourcesAndReleasesItsLastLease() {
+        SourceSuppressionLeaseRegistry<String, String> roots = new SourceSuppressionLeaseRegistry<>();
+        FakeLease shared = new FakeLease(), sole = new FakeLease();
+        roots.apply("shared", "first", 50L, () -> shared);
+        roots.apply("shared", "second", 60L, FakeLease::new);
+        roots.apply("sole", "first", 50L, () -> sole);
+
+        roots.clearSource("first");
+        assertFalse(roots.ownedBy("shared", "first"));
+        assertTrue(roots.ownedBy("shared", "second"));
+        assertFalse(shared.closed);
+        assertTrue(sole.closed);
+        roots.clearSource("second");
+        assertTrue(shared.closed);
+        assertTrue(roots.activeTargets().isEmpty());
     }
 
     private static final class FakeLease implements AutoCloseable {

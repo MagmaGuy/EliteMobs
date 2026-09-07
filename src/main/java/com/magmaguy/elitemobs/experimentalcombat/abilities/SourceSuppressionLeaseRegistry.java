@@ -9,8 +9,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-/** Owns one suppression lease per target and independently expiring roots per caster. */
-final class RootLeaseRegistry<K, S> implements AutoCloseable {
+/** Owns one suppression lease per target and independently expiring controls per caster. */
+final class SourceSuppressionLeaseRegistry<K, S> implements AutoCloseable {
     private final Map<K, Entry<S>> entries = new LinkedHashMap<>();
 
     boolean apply(K target, S source, long expiresAtTick,
@@ -64,6 +64,14 @@ final class RootLeaseRegistry<K, S> implements AutoCloseable {
     boolean ownedBy(K target, S source) {
         Entry<S> entry = entries.get(target);
         return entry != null && entry.expiryBySource.containsKey(source);
+    }
+
+    void clearSource(S source) {
+        for (K target : new ArrayList<>(entries.keySet())) {
+            Entry<S> entry = entries.get(target);
+            entry.expiryBySource.remove(source);
+            if (entry.expiryBySource.isEmpty()) remove(target, entry);
+        }
     }
 
     void remove(K target) {

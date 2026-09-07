@@ -39,9 +39,9 @@ final class EliteCrowdControlRuntime implements Listener, AutoCloseable {
     private static final String SLOW_POTENCY_KEY = "experimental_control_potency";
 
     private final FearLeaseRegistry<UUID, Location> fearLeases = new FearLeaseRegistry<>();
-    private final TimedSuppressionLeaseRegistry<UUID> interruptLeases =
-            new TimedSuppressionLeaseRegistry<>();
-    private final RootLeaseRegistry<UUID, UUID> rootLeases = new RootLeaseRegistry<>();
+    private final SourceSuppressionLeaseRegistry<UUID, UUID> interruptLeases =
+            new SourceSuppressionLeaseRegistry<>();
+    private final SourceSuppressionLeaseRegistry<UUID, UUID> rootLeases = new SourceSuppressionLeaseRegistry<>();
     private final Map<UUID, Map<UUID, SlowPotencyLease>> slowPotencyLeases = new HashMap<>();
     private final Map<UUID, Double> appliedSlowAdjustments = new HashMap<>();
     private final NamespacedKey slowPotencyKey;
@@ -73,13 +73,14 @@ final class EliteCrowdControlRuntime implements Listener, AutoCloseable {
                 () -> open(adapter, target, threat));
     }
 
-    boolean interrupt(EliteEntity elite, int durationTicks) {
-        if (closed || elite == null || durationTicks <= 0) return false;
+    boolean interrupt(Player caster, EliteEntity elite, int durationTicks) {
+        if (closed || caster == null || elite == null || durationTicks <= 0) return false;
         LivingEntity target = elite.getLivingEntity();
-        if (!valid(target)) return false;
+        if (!validPlayer(caster) || !valid(target)) return false;
         long expiresAt = saturatedAdd(currentTick, durationTicks);
         return interruptLeases.apply(
                 target.getUniqueId(),
+                caster.getUniqueId(),
                 expiresAt,
                 () -> elite.getPowerSuppression().acquire(ElitePowerPauseReason.INTERRUPT));
     }
@@ -138,6 +139,19 @@ final class EliteCrowdControlRuntime implements Listener, AutoCloseable {
             interruptLeases.remove(entity.getUniqueId());
             rootLeases.remove(entity.getUniqueId());
             clearSlowPotency(entity.getUniqueId(), entity instanceof LivingEntity living ? living : null);
+        }
+    }
+
+    void clearSource(UUID sourceId) {
+        fearLeases.clearSource(sourceId);
+        rootLeases.clearSource(sourceId);
+        interruptLeases.clearSource(sourceId);
+        for (UUID targetId : slowPotencyLeases.keySet().toArray(UUID[]::new)) {
+            if (slowPotencyLeases.get(targetId).remove(sourceId) == null) continue;
+            Entity entity = Bukkit.getEntity(targetId);
+            if (slowPotencyLeases.get(targetId).isEmpty() || !(entity instanceof LivingEntity))
+                clearSlowPotency(targetId, entity instanceof LivingEntity living ? living : null);
+            else refreshSlowPotency((LivingEntity) entity);
         }
     }
 

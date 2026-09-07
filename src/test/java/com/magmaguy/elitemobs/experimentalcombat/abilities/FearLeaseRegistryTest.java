@@ -90,6 +90,24 @@ class FearLeaseRegistryTest {
         assertEquals(0, registry.size());
     }
 
+    @Test
+    void deactivationClosesOnlyTheCurrentOwnersFear() {
+        FearLeaseRegistry<String, String> registry = new FearLeaseRegistry<>();
+        UUID first = UUID.randomUUID(), second = UUID.randomUUID();
+        FakeHandle owned = new FakeHandle(), transferred = new FakeHandle();
+        registry.apply("owned", first, "first", 100L, () -> Optional.of(owned));
+        registry.apply("transferred", first, "first", 100L, () -> Optional.of(transferred));
+        registry.apply("transferred", second, "second", 100L, Optional::empty);
+
+        registry.clearSource(first);
+        assertEquals(1, owned.closeCalls);
+        assertFalse(transferred.closed);
+        assertTrue(registry.ownedBy("transferred", second));
+        registry.clearSource(second);
+        assertEquals(1, transferred.closeCalls);
+        assertEquals(0, registry.size());
+    }
+
     private static final class FakeHandle implements FearLeaseRegistry.Redirectable<String> {
         private String lastSource;
         private boolean closed;

@@ -1568,6 +1568,7 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
         divineSteeds.deactivate(player);
         projectileCarriers.deactivate(player);
         frenzy.clear(player);
+        effects.clearSource(casterId);
         modifiers.clearSource(casterId);
         modifiers.clearTarget(casterId);
         states.clearSource(casterId);
