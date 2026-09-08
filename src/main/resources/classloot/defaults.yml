@@ -153,6 +153,153 @@ profiles:
             level: 1
             chance: 0.1
         rareEnchantments: {}
+      DPS_HELMETS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 2
+            chance: 1.0
+          PROTECTION:
+            level: 1
+            chance: 0.35
+          UNBREAKING:
+            level: 1
+            chance: 0.15
+          SMITE:
+            level: 2
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_CHESTPLATES:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 2
+            chance: 1.0
+          PROTECTION:
+            level: 1
+            chance: 0.35
+          UNBREAKING:
+            level: 1
+            chance: 0.15
+          SMITE:
+            level: 2
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_LEGGINGS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 2
+            chance: 1.0
+          PROTECTION:
+            level: 1
+            chance: 0.35
+          UNBREAKING:
+            level: 1
+            chance: 0.15
+          SMITE:
+            level: 2
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_BOOTS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 2
+            chance: 1.0
+          PROTECTION:
+            level: 1
+            chance: 0.35
+          UNBREAKING:
+            level: 1
+            chance: 0.15
+          SMITE:
+            level: 2
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_HELMETS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 2
+            chance: 1.0
+          UNBREAKING:
+            level: 1
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 2
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 2
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_CHESTPLATES:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 2
+            chance: 1.0
+          UNBREAKING:
+            level: 1
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 2
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 2
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_LEGGINGS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 2
+            chance: 1.0
+          UNBREAKING:
+            level: 1
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 2
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 2
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_BOOTS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 2
+            chance: 1.0
+          UNBREAKING:
+            level: 1
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 2
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 2
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      SHIELDS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 2
+            chance: 1.0
+          UNBREAKING:
+            level: 1
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
     MINIBOSS:
       SWORDS:
         primaryEnchantment: SHARPNESS
@@ -326,6 +473,192 @@ profiles:
             level: 1
             chance: 0.25
         rareEnchantments: {}
+      DPS_HELMETS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 3
+            chance: 1.0
+          PROTECTION:
+            level: 1
+            chance: 0.5
+          UNBREAKING:
+            level: 1
+            chance: 0.55
+          SMITE:
+            level: 3
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 2
+            chance: 0.35
+          RESPIRATION:
+            level: 1
+            chance: 0.15
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_CHESTPLATES:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 3
+            chance: 1.0
+          PROTECTION:
+            level: 1
+            chance: 0.5
+          UNBREAKING:
+            level: 1
+            chance: 0.55
+          SMITE:
+            level: 3
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 2
+            chance: 0.35
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_LEGGINGS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 4
+            chance: 1.0
+          PROTECTION:
+            level: 1
+            chance: 0.5
+          UNBREAKING:
+            level: 1
+            chance: 0.55
+          SMITE:
+            level: 3
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 2
+            chance: 0.35
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_BOOTS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 3
+            chance: 1.0
+          PROTECTION:
+            level: 1
+            chance: 0.5
+          UNBREAKING:
+            level: 1
+            chance: 0.65
+          SMITE:
+            level: 3
+            chance: 0.65
+          BANE_OF_ARTHROPODS:
+            level: 2
+            chance: 0.35
+          FEATHER_FALLING:
+            level: 4
+            chance: 0.25
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_HELMETS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 2
+            chance: 1.0
+          UNBREAKING:
+            level: 2
+            chance: 0.25
+          FIRE_PROTECTION:
+            level: 2
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 2
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 2
+            chance: 0.55
+          RESPIRATION:
+            level: 1
+            chance: 0.15
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_CHESTPLATES:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 3
+            chance: 1.0
+          UNBREAKING:
+            level: 2
+            chance: 0.25
+          FIRE_PROTECTION:
+            level: 2
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 2
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 3
+            chance: 0.6
+          THORNS:
+            level: 3
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_LEGGINGS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 2
+            chance: 1.0
+          UNBREAKING:
+            level: 2
+            chance: 0.25
+          FIRE_PROTECTION:
+            level: 2
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 2
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 2
+            chance: 0.55
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_BOOTS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 3
+            chance: 1.0
+          UNBREAKING:
+            level: 2
+            chance: 0.25
+          FIRE_PROTECTION:
+            level: 2
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 2
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 2
+            chance: 0.55
+          FEATHER_FALLING:
+            level: 4
+            chance: 0.25
+        rareEnchantments: {}
+        potionEffects: []
+      SHIELDS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 3
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.6
+        rareEnchantments: {}
+        potionEffects: []
     BOSS:
       SWORDS:
         primaryEnchantment: SHARPNESS
@@ -523,6 +856,195 @@ profiles:
             level: 1
             chance: 0.4
         rareEnchantments: {}
+      DPS_HELMETS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 5
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.6
+          SMITE:
+            level: 4
+            chance: 0.7
+          BANE_OF_ARTHROPODS:
+            level: 4
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_CHESTPLATES:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 5
+            chance: 1.0
+          PROTECTION:
+            level: 2
+            chance: 0.9
+          UNBREAKING:
+            level: 3
+            chance: 0.6
+          SMITE:
+            level: 4
+            chance: 0.8
+          BANE_OF_ARTHROPODS:
+            level: 4
+            chance: 0.7
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_LEGGINGS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 5
+            chance: 1.0
+          PROTECTION:
+            level: 2
+            chance: 0.9
+          UNBREAKING:
+            level: 3
+            chance: 0.7
+          SMITE:
+            level: 4
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 4
+            chance: 0.6
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_BOOTS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 5
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.85
+          UNBREAKING:
+            level: 3
+            chance: 0.6
+          SMITE:
+            level: 4
+            chance: 0.5
+          BANE_OF_ARTHROPODS:
+            level: 4
+            chance: 0.4
+          FEATHER_FALLING:
+            level: 4
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_HELMETS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 5
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.6
+          FIRE_PROTECTION:
+            level: 4
+            chance: 0.5
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.6
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.85
+          THORNS:
+            level: 1
+            chance: 0.1
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_CHESTPLATES:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 5
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.6
+          FIRE_PROTECTION:
+            level: 4
+            chance: 0.55
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.55
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.6
+          THORNS:
+            level: 1
+            chance: 0.1
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_LEGGINGS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 5
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.6
+          FIRE_PROTECTION:
+            level: 4
+            chance: 0.55
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.45
+          PROJECTILE_PROTECTION:
+            level: 3
+            chance: 0.55
+          THORNS:
+            level: 1
+            chance: 0.1
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_BOOTS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 5
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.65
+          FIRE_PROTECTION:
+            level: 3
+            chance: 0.65
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.55
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.65
+          THORNS:
+            level: 1
+            chance: 0.1
+          FEATHER_FALLING:
+            level: 5
+            chance: 0.55
+        rareEnchantments: {}
+        potionEffects: []
+      SHIELDS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 5
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.9
+        rareEnchantments: {}
+        potionEffects: []
   HARD:
     TRASH:
       SWORDS:
@@ -664,6 +1186,153 @@ profiles:
             level: 2
             chance: 0.1
         rareEnchantments: {}
+      DPS_HELMETS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 3
+            chance: 1.0
+          PROTECTION:
+            level: 2
+            chance: 0.55
+          UNBREAKING:
+            level: 2
+            chance: 0.15
+          SMITE:
+            level: 3
+            chance: 0.4
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_CHESTPLATES:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 3
+            chance: 1.0
+          PROTECTION:
+            level: 2
+            chance: 0.55
+          UNBREAKING:
+            level: 2
+            chance: 0.15
+          SMITE:
+            level: 4
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_LEGGINGS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 3
+            chance: 1.0
+          PROTECTION:
+            level: 2
+            chance: 0.55
+          UNBREAKING:
+            level: 2
+            chance: 0.15
+          SMITE:
+            level: 3
+            chance: 0.4
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_BOOTS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 3
+            chance: 1.0
+          PROTECTION:
+            level: 2
+            chance: 0.65
+          UNBREAKING:
+            level: 2
+            chance: 0.15
+          SMITE:
+            level: 3
+            chance: 0.4
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_HELMETS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 3
+            chance: 1.0
+          UNBREAKING:
+            level: 2
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 3
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 3
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_CHESTPLATES:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 3
+            chance: 1.0
+          UNBREAKING:
+            level: 2
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 3
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 3
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_LEGGINGS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 3
+            chance: 1.0
+          UNBREAKING:
+            level: 2
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 3
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 3
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_BOOTS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 3
+            chance: 1.0
+          UNBREAKING:
+            level: 2
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 3
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 3
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      SHIELDS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 3
+            chance: 1.0
+          UNBREAKING:
+            level: 1
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
     MINIBOSS:
       SWORDS:
         primaryEnchantment: SHARPNESS
@@ -837,6 +1506,177 @@ profiles:
             level: 2
             chance: 0.25
         rareEnchantments: {}
+      DPS_HELMETS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 5
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.65
+          UNBREAKING:
+            level: 2
+            chance: 0.55
+          SMITE:
+            level: 4
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 3
+            chance: 0.35
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_CHESTPLATES:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 5
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.55
+          UNBREAKING:
+            level: 2
+            chance: 0.55
+          SMITE:
+            level: 4
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 3
+            chance: 0.35
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_LEGGINGS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 5
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.55
+          UNBREAKING:
+            level: 2
+            chance: 0.55
+          SMITE:
+            level: 4
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 3
+            chance: 0.35
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_BOOTS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 4
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.55
+          UNBREAKING:
+            level: 2
+            chance: 0.65
+          SMITE:
+            level: 4
+            chance: 0.65
+          BANE_OF_ARTHROPODS:
+            level: 3
+            chance: 0.35
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_HELMETS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 3
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.25
+          FIRE_PROTECTION:
+            level: 3
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 3
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 3
+            chance: 0.55
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_CHESTPLATES:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 4
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.25
+          FIRE_PROTECTION:
+            level: 3
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 3
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.6
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_LEGGINGS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 3
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.25
+          FIRE_PROTECTION:
+            level: 3
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 3
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 3
+            chance: 0.55
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_BOOTS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 4
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.25
+          FIRE_PROTECTION:
+            level: 3
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 3
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 3
+            chance: 0.55
+        rareEnchantments: {}
+        potionEffects: []
+      SHIELDS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 4
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
     BOSS:
       SWORDS:
         primaryEnchantment: SHARPNESS
@@ -1049,6 +1889,195 @@ profiles:
             level: 2
             chance: 0.4
         rareEnchantments: {}
+      DPS_HELMETS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 7
+            chance: 1.0
+          PROTECTION:
+            level: 4
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.7
+          SMITE:
+            level: 5
+            chance: 0.7
+          BANE_OF_ARTHROPODS:
+            level: 5
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_CHESTPLATES:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 7
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.9
+          UNBREAKING:
+            level: 4
+            chance: 0.6
+          SMITE:
+            level: 6
+            chance: 0.8
+          BANE_OF_ARTHROPODS:
+            level: 5
+            chance: 0.7
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_LEGGINGS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 7
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.9
+          UNBREAKING:
+            level: 4
+            chance: 0.7
+          SMITE:
+            level: 6
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 5
+            chance: 0.6
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_BOOTS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 7
+            chance: 1.0
+          PROTECTION:
+            level: 4
+            chance: 0.85
+          UNBREAKING:
+            level: 4
+            chance: 0.65
+          SMITE:
+            level: 6
+            chance: 0.5
+          BANE_OF_ARTHROPODS:
+            level: 5
+            chance: 0.4
+          FEATHER_FALLING:
+            level: 5
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_HELMETS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 7
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.6
+          FIRE_PROTECTION:
+            level: 5
+            chance: 0.5
+          BLAST_PROTECTION:
+            level: 6
+            chance: 0.6
+          PROJECTILE_PROTECTION:
+            level: 5
+            chance: 0.85
+          THORNS:
+            level: 2
+            chance: 0.15
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_CHESTPLATES:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 7
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.7
+          FIRE_PROTECTION:
+            level: 5
+            chance: 0.55
+          BLAST_PROTECTION:
+            level: 5
+            chance: 0.55
+          PROJECTILE_PROTECTION:
+            level: 5
+            chance: 0.6
+          THORNS:
+            level: 2
+            chance: 0.15
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_LEGGINGS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 6
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.6
+          FIRE_PROTECTION:
+            level: 5
+            chance: 0.55
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.55
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.55
+          THORNS:
+            level: 2
+            chance: 0.15
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_BOOTS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 7
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.65
+          FIRE_PROTECTION:
+            level: 4
+            chance: 0.65
+          BLAST_PROTECTION:
+            level: 5
+            chance: 0.55
+          PROJECTILE_PROTECTION:
+            level: 5
+            chance: 0.65
+          THORNS:
+            level: 2
+            chance: 0.15
+          FEATHER_FALLING:
+            level: 6
+            chance: 0.55
+        rareEnchantments: {}
+        potionEffects: []
+      SHIELDS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 7
+            chance: 1.0
+          UNBREAKING:
+            level: 5
+            chance: 0.9
+        rareEnchantments: {}
+        potionEffects: []
   MYTHIC:
     TRASH:
       SWORDS:
@@ -1190,6 +2219,153 @@ profiles:
             level: 2
             chance: 0.1
         rareEnchantments: {}
+      DPS_HELMETS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 5
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.55
+          UNBREAKING:
+            level: 3
+            chance: 0.2
+          SMITE:
+            level: 5
+            chance: 0.2
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_CHESTPLATES:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 4
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.55
+          UNBREAKING:
+            level: 3
+            chance: 0.2
+          SMITE:
+            level: 5
+            chance: 0.2
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_LEGGINGS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 4
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.55
+          UNBREAKING:
+            level: 3
+            chance: 0.2
+          SMITE:
+            level: 5
+            chance: 0.2
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_BOOTS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 5
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.65
+          UNBREAKING:
+            level: 3
+            chance: 0.2
+          SMITE:
+            level: 5
+            chance: 0.2
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_HELMETS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 4
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_CHESTPLATES:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 4
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_LEGGINGS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 4
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_BOOTS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 4
+            chance: 1.0
+          UNBREAKING:
+            level: 3
+            chance: 0.15
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      SHIELDS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 4
+            chance: 1.0
+          UNBREAKING:
+            level: 2
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
     MINIBOSS:
       SWORDS:
         primaryEnchantment: SHARPNESS
@@ -1363,6 +2539,177 @@ profiles:
             level: 2
             chance: 0.25
         rareEnchantments: {}
+      DPS_HELMETS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 7
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.65
+          UNBREAKING:
+            level: 3
+            chance: 0.55
+          SMITE:
+            level: 5
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 4
+            chance: 0.35
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_CHESTPLATES:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 7
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.55
+          UNBREAKING:
+            level: 3
+            chance: 0.55
+          SMITE:
+            level: 5
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 4
+            chance: 0.35
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_LEGGINGS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 7
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.55
+          UNBREAKING:
+            level: 3
+            chance: 0.55
+          SMITE:
+            level: 5
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 4
+            chance: 0.35
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_BOOTS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 6
+            chance: 1.0
+          PROTECTION:
+            level: 3
+            chance: 0.55
+          UNBREAKING:
+            level: 3
+            chance: 0.65
+          SMITE:
+            level: 6
+            chance: 0.65
+          BANE_OF_ARTHROPODS:
+            level: 4
+            chance: 0.35
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_HELMETS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 5
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.2
+          FIRE_PROTECTION:
+            level: 5
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_CHESTPLATES:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 6
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.2
+          FIRE_PROTECTION:
+            level: 5
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_LEGGINGS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 4
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.2
+          FIRE_PROTECTION:
+            level: 5
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_BOOTS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 6
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.2
+          FIRE_PROTECTION:
+            level: 5
+            chance: 0.2
+          BLAST_PROTECTION:
+            level: 4
+            chance: 0.25
+          PROJECTILE_PROTECTION:
+            level: 4
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
+      SHIELDS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 7
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
     BOSS:
       SWORDS:
         primaryEnchantment: SHARPNESS
@@ -1569,3 +2916,192 @@ profiles:
           MULTICAST:
             level: 3
             chance: 0.01
+      DPS_HELMETS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 10
+            chance: 1.0
+          PROTECTION:
+            level: 5
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.7
+          SMITE:
+            level: 7
+            chance: 0.7
+          BANE_OF_ARTHROPODS:
+            level: 6
+            chance: 0.5
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_CHESTPLATES:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 10
+            chance: 1.0
+          PROTECTION:
+            level: 5
+            chance: 0.9
+          UNBREAKING:
+            level: 6
+            chance: 0.6
+          SMITE:
+            level: 8
+            chance: 0.8
+          BANE_OF_ARTHROPODS:
+            level: 6
+            chance: 0.7
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_LEGGINGS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 10
+            chance: 1.0
+          PROTECTION:
+            level: 4
+            chance: 0.9
+          UNBREAKING:
+            level: 5
+            chance: 0.7
+          SMITE:
+            level: 7
+            chance: 0.6
+          BANE_OF_ARTHROPODS:
+            level: 6
+            chance: 0.6
+        rareEnchantments: {}
+        potionEffects: []
+      DPS_BOOTS:
+        primaryEnchantment: SHARPNESS
+        enchantments:
+          SHARPNESS:
+            level: 10
+            chance: 1.0
+          PROTECTION:
+            level: 5
+            chance: 0.85
+          UNBREAKING:
+            level: 5
+            chance: 0.65
+          SMITE:
+            level: 8
+            chance: 0.5
+          BANE_OF_ARTHROPODS:
+            level: 6
+            chance: 0.4
+          FEATHER_FALLING:
+            level: 6
+            chance: 0.3
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_HELMETS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 9
+            chance: 1.0
+          UNBREAKING:
+            level: 6
+            chance: 0.6
+          FIRE_PROTECTION:
+            level: 6
+            chance: 0.5
+          BLAST_PROTECTION:
+            level: 7
+            chance: 0.6
+          PROJECTILE_PROTECTION:
+            level: 6
+            chance: 0.85
+          THORNS:
+            level: 3
+            chance: 0.15
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_CHESTPLATES:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 10
+            chance: 1.0
+          UNBREAKING:
+            level: 5
+            chance: 0.7
+          FIRE_PROTECTION:
+            level: 6
+            chance: 0.55
+          BLAST_PROTECTION:
+            level: 6
+            chance: 0.55
+          PROJECTILE_PROTECTION:
+            level: 6
+            chance: 0.6
+          THORNS:
+            level: 3
+            chance: 0.15
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_LEGGINGS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 8
+            chance: 1.0
+          UNBREAKING:
+            level: 5
+            chance: 0.6
+          FIRE_PROTECTION:
+            level: 6
+            chance: 0.55
+          BLAST_PROTECTION:
+            level: 5
+            chance: 0.55
+          PROJECTILE_PROTECTION:
+            level: 6
+            chance: 0.55
+          THORNS:
+            level: 3
+            chance: 0.15
+        rareEnchantments: {}
+        potionEffects: []
+      TANK_BOOTS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 10
+            chance: 1.0
+          UNBREAKING:
+            level: 4
+            chance: 0.65
+          FIRE_PROTECTION:
+            level: 5
+            chance: 0.65
+          BLAST_PROTECTION:
+            level: 6
+            chance: 0.55
+          PROJECTILE_PROTECTION:
+            level: 8
+            chance: 0.65
+          THORNS:
+            level: 3
+            chance: 0.15
+          FEATHER_FALLING:
+            level: 7
+            chance: 0.55
+        rareEnchantments: {}
+        potionEffects: []
+      SHIELDS:
+        primaryEnchantment: PROTECTION
+        enchantments:
+          PROTECTION:
+            level: 10
+            chance: 1.0
+          UNBREAKING:
+            level: 8
+            chance: 0.9
+        rareEnchantments: {}
+        potionEffects: []

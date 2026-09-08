@@ -1,11 +1,13 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.items.ClassLootProfile;
-import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.items.ClassLootFamily;
 import com.magmaguy.magmacore.config.ConfigurationFile;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +21,7 @@ import java.util.Objects;
 public class ClassLootSettingsConfig extends ConfigurationFile {
     public enum Difficulty { NORMAL, HARD, MYTHIC }
     public enum Rank { TRASH, MINIBOSS, BOSS }
-    private record Key(Difficulty difficulty, Rank rank, SkillType skill) {}
+    private record Key(Difficulty difficulty, Rank rank, ClassLootFamily family) {}
     private static Map<Key, ClassLootProfile> profiles = Map.of();
     private static Map<String, Difficulty> difficultyIds = Map.of();
     private static Map<Rank, Double> chances = Map.of();
@@ -54,17 +56,17 @@ public class ClassLootSettingsConfig extends ConfigurationFile {
         for (Rank rank : Rank.values()) {
             dropChances.put(rank, number(fileConfiguration, "dropChance." + rank,
                     defaults.getDouble("dropChance." + rank), 0, 1));
-            for (Difficulty difficulty : Difficulty.values()) for (SkillType skill : SkillType.values()) {
-                if (skill == SkillType.ARMOR) continue;
-                String path = "profiles." + difficulty + "." + rank + "." + skill;
+            for (Difficulty difficulty : Difficulty.values()) for (ClassLootFamily family : ClassLootFamily.values()) {
+                String path = "profiles." + difficulty + "." + rank + "." + family;
                 String primary = Objects.toString(fileConfiguration.get(path + ".primaryEnchantment"), "")
                         .toLowerCase(Locale.ROOT);
-                if (!ClassLootProfile.supports(skill, primary) || ClassLootProfile.nativeEnchantment(primary) == null) {
+                if (!ClassLootProfile.supports(family, primary) || ClassLootProfile.nativeEnchantment(primary) == null) {
                     Logger.warn("Invalid class-loot primary at " + path + "; using bundled primary.");
                     primary = defaults.getString(path + ".primaryEnchantment").toLowerCase(Locale.ROOT);
                 }
-                parsed.put(new Key(difficulty, rank, skill), new ClassLootProfile(primary,
-                        rules(path + ".enchantments", skill), rules(path + ".rareEnchantments", skill)));
+                parsed.put(new Key(difficulty, rank, family), new ClassLootProfile(primary,
+                        rules(path + ".enchantments", family), rules(path + ".rareEnchantments", family),
+                        potionEffects(path + ".potionEffects")));
             }
         }
         profiles = Map.copyOf(parsed);
@@ -78,13 +80,13 @@ public class ClassLootSettingsConfig extends ConfigurationFile {
                 "Disabled enchantments and zero budgets remain disabled."));
     }
 
-    private java.util.List<ClassLootProfile.Rule> rules(String path, SkillType skill) {
+    private java.util.List<ClassLootProfile.Rule> rules(String path, ClassLootFamily family) {
         var section = fileConfiguration.getConfigurationSection(path);
         var result = new ArrayList<ClassLootProfile.Rule>();
         if (section == null) return result;
         for (String name : section.getKeys(false)) {
             String key = name.toLowerCase(Locale.ROOT);
-            if (!ClassLootProfile.supports(skill, key)) {
+            if (!ClassLootProfile.supports(family, key)) {
                 Logger.warn("Unsupported class-loot enchantment " + path + "." + name + "; skipped.");
                 continue;
             }
@@ -93,6 +95,28 @@ public class ClassLootSettingsConfig extends ConfigurationFile {
             result.add(new ClassLootProfile.Rule(key, level, chance));
         }
         return result;
+    }
+
+    private java.util.List<String> potionEffects(String path) {
+        var result = new ArrayList<String>();
+        for (String raw : fileConfiguration.getStringList(path)) {
+            try {
+                String[] fields = raw.split(",");
+                if (fields.length != 4) throw new IllegalArgumentException("expected EFFECT,amplifier,target,method");
+                for (int i = 0; i < fields.length; i++) fields[i] = fields[i].strip().toUpperCase(Locale.ROOT);
+                fields[0] = LegacyValueConverter.parsePotionEffect(fields[0]);
+                if (Registry.EFFECT.get(NamespacedKey.minecraft(fields[0].toLowerCase(Locale.ROOT))) == null)
+                    throw new IllegalArgumentException("unknown potion effect");
+                int amplifier = Integer.parseInt(fields[1]);
+                if (amplifier < 0 || amplifier > 255) throw new IllegalArgumentException("amplifier must be 0..255");
+                com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect.Target.valueOf(fields[2]);
+                com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect.ApplicationMethod.valueOf(fields[3]);
+                result.add(String.join(",", fields));
+            } catch (RuntimeException exception) {
+                Logger.warn("Invalid ClassLootSettings " + path + " entry '" + raw + "': " + exception.getMessage() + "; skipped.");
+            }
+        }
+        return java.util.List.copyOf(result);
     }
 
     private static double number(ConfigurationSection section, String path, double fallback, double min, double max) {
@@ -120,8 +144,8 @@ public class ClassLootSettingsConfig extends ConfigurationFile {
         return difficultyIds.getOrDefault(String.valueOf(id), forDifficultyId(resolvedId));
     }
     public static double dropChance(Rank rank) { return chances.getOrDefault(rank, 0D); }
-    public static ClassLootProfile profile(Difficulty difficulty, Rank rank, SkillType skill) {
-        return profiles.get(new Key(difficulty, rank, skill));
+    public static ClassLootProfile profile(Difficulty difficulty, Rank rank, ClassLootFamily family) {
+        return profiles.get(new Key(difficulty, rank, family));
     }
     public static double budgetFraction() { return budgetFraction; }
     public static int minimumPrimaryLevel() { return minimumPrimaryLevel; }

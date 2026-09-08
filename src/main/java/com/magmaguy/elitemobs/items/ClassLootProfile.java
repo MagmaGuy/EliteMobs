@@ -13,10 +13,16 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 /** Immutable, resolved loot policy. Configuration parsing and death-event delivery live elsewhere. */
-public record ClassLootProfile(String primary, List<Rule> enchantments, List<Rule> rareEnchantments) {
+public record ClassLootProfile(String primary, List<Rule> enchantments, List<Rule> rareEnchantments,
+                               List<String> potionEffects) {
     public ClassLootProfile {
         enchantments = List.copyOf(enchantments);
         rareEnchantments = List.copyOf(rareEnchantments);
+        potionEffects = List.copyOf(potionEffects);
+    }
+
+    public ClassLootProfile(String primary, List<Rule> enchantments, List<Rule> rareEnchantments) {
+        this(primary, enchantments, rareEnchantments, List.of());
     }
 
     public record Rule(String key, int level, double chance) {}
@@ -49,6 +55,22 @@ public record ClassLootProfile(String primary, List<Rule> enchantments, List<Rul
 
     public static Enchantment nativeEnchantment(String key) {
         return Enchantment.getByKey(NamespacedKey.minecraft(key.toLowerCase(Locale.ROOT)));
+    }
+
+    public static boolean supports(ClassLootFamily family, String key) {
+        if (family.isWeapon()) return supports(family.skill(), key);
+        // EM counts damage enchantments from worn armor and the offhand, too.
+        if (Set.of("sharpness", "smite", "bane_of_arthropods").contains(key)) return true;
+        if (Set.of("unbreaking", "mending", "vanishing_curse", "protection").contains(key)) return true;
+        if (family == ClassLootFamily.SHIELDS) return false;
+        if (Set.of("fire_protection", "blast_protection", "projectile_protection", "thorns", "binding_curse").contains(key))
+            return true;
+        return switch (family.slot()) {
+            case "HELMET" -> Set.of("aqua_affinity", "respiration").contains(key);
+            case "LEGGINGS" -> key.equals("swift_sneak");
+            case "BOOTS" -> Set.of("feather_falling", "depth_strider", "frost_walker", "soul_speed").contains(key);
+            default -> false;
+        };
     }
 
     /** Deliberate EM affinities, including Power on crossbows and Sharpness on melee families. */

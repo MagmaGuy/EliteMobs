@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
+import com.magmaguy.elitemobs.items.ClassLootFamily;
+
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -235,7 +237,7 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     private String classLootRank = "AUTO";
     @Getter
-    private final Map<SkillType, ClassLootItem> classLootItems = new EnumMap<>(SkillType.class);
+    private final Map<ClassLootFamily, ClassLootItem> classLootItems = new EnumMap<>(ClassLootFamily.class);
     @Getter
     private double scale = 1D;
     @Getter
@@ -561,12 +563,12 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     private void processClassLootItems() {
         migrateClassLootPresentation();
         classLootItems.clear();
-        for (SkillType skill : SkillType.getWeaponSkills()) {
-            String path = "classLootItems." + skill.name();
+        for (ClassLootFamily family : ClassLootFamily.values()) {
+            String path = "classLootItems." + family.name();
             String itemName = processString(path + ".name", ClassLootItem.DEFAULT.name(),
                     ClassLootItem.DEFAULT.name(), false);
             List<String> itemLore = processStringList(path + ".lore", List.of(), List.of(), false);
-            classLootItems.put(skill, new ClassLootItem(
+            classLootItems.put(family, new ClassLootItem(
                     translatable(filename, path + ".name", itemName),
                     translatable(filename, path + ".lore", itemLore)));
         }
