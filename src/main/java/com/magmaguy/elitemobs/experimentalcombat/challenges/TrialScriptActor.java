@@ -80,6 +80,9 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         LuaTable table = new LuaTable();
         table.set("player", participantTable(instance, player));
         table.set("matched_hit", LuaValue.valueOf(matchedHit));
+        table.set("active", new VarArgFunction() {
+            @Override public Varargs invoke(Varargs args) { return LuaValue.valueOf(!closed && boss.exists() && player.isOnline()); }
+        });
         table.set("position", method(table, args -> LuaTableSupport.locationToTable(body().getLocation())));
         table.set("tick", method(table, args -> { maintain(); return LuaValue.valueOf(ticks); }));
         table.set("say", method(table, args -> {
@@ -148,6 +151,11 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
             return LuaValue.NIL;
         }));
         table.set("slow_player", method(table, args -> { effects().slow(player, args.checkdouble(1), args.checkint(2)); return LuaValue.NIL; }));
+        table.set("clear_player_slow", method(table, args -> { if (effects != null) effects.clearMovement(player); return LuaValue.NIL; }));
+        table.set("magic_weapon", method(table, args -> {
+            boss.getLivingEntity().getEquipment().setItemInMainHand(TrialEquipment.magic(TrialEquipment.Magic.valueOf(args.checkjstring(1))));
+            return LuaValue.NIL;
+        }));
         table.set("cleanse", method(table, args -> {
             LivingEntity target = effectTarget(args.checkjstring(1));
             if (target != null) effects().cleanse(target, args.optboolean(2, false), args.optint(3, 0));
@@ -361,7 +369,8 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         // The visible stand uses an ordinary living damage carrier, so its authored hit budget
         // does not depend on vanilla armor stands' special break-on-attack behavior.
         EntityType type = prop ? EntityType.HUSK : EntityType.valueOf(args.optjstring(5, "HUSK"));
-        if (!Set.of(EntityType.HUSK, EntityType.SKELETON, EntityType.WOLF, EntityType.IRON_GOLEM, EntityType.WITHER_SKELETON).contains(type))
+        if (!Set.of(EntityType.HUSK, EntityType.SKELETON, EntityType.WOLF, EntityType.IRON_GOLEM, EntityType.WITHER_SKELETON,
+                EntityType.BLAZE, EntityType.VEX).contains(type))
             throw new IllegalArgumentException("Unsupported trial actor type " + type);
         var fields = new CustomBossesConfigFields("trial_actor_" + id + ".yml", type, true,
                 args.optjstring(4, "&fSparring partner"), Integer.toString(boss.getLevel()));
@@ -406,6 +415,14 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         Vector velocity = body().getVelocity();
         if (velocity.lengthSquared() > .001 && !movement.clear(body(), body().getLocation().add(velocity)))
             body().setVelocity(new Vector(0, Math.min(0, velocity.getY()), 0));
+        for (var actor : actors.values()) {
+            if (!actor.exists()) continue;
+            var entity = actor.getLivingEntity();
+            if (!bounds.contains(entity.getLocation())) { actor.remove(RemovalReason.EFFECT_TIMEOUT); continue; }
+            Vector travel = entity.getVelocity();
+            if (travel.lengthSquared() > .001 && !movement.clear(entity, entity.getLocation().add(travel)))
+                entity.setVelocity(new Vector(0, Math.min(0, travel.getY()), 0));
+        }
     }
 
     private Entity body() { return steed == null ? boss.getLivingEntity() : steed; }
@@ -513,9 +530,10 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         return value;
     }
 
-    private static VarArgFunction method(LuaTable owner, Function<Varargs, LuaValue> callback) {
+    private VarArgFunction method(LuaTable owner, Function<Varargs, LuaValue> callback) {
         return new VarArgFunction() {
             @Override public Varargs invoke(Varargs args) {
+                if (closed) return LuaValue.NIL;
                 return callback.apply(args.narg() > 0 && args.arg1().raweq(owner) ? args.subargs(2) : args);
             }
         };

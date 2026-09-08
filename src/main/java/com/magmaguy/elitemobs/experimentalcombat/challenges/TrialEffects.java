@@ -53,6 +53,11 @@ final class TrialEffects implements Listener, AutoCloseable {
         slows.put(entity,new Slow(fraction,tick+duration));
     }
 
+    void clearMovement(LivingEntity entity) {
+        slows.remove(entity);
+        clearSlow(entity);
+    }
+
     private void clearSlow(LivingEntity entity) {
         AttributeInstance movement=entity.getAttribute(Attribute.MOVEMENT_SPEED);
         if (movement!=null) for (AttributeModifier modifier : movement.getModifiers())

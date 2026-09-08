@@ -11,3 +11,4 @@ voice:
   halfway: Another angle. The string will give you the same warning.
   victory: You moved when the shot could no longer follow. Cleanly read.
   defeat: You chose a direction before I chose mine.
+armorColor: '456549'

@@ -11,3 +11,4 @@ voice:
   halfway: You noticed the fuse. Keep a way out before it starts.
   victory: You answered both warnings. That is how you outlive a trap.
   defeat: The impact was the first warning. The fuse was the second.
+armorColor: '456549'

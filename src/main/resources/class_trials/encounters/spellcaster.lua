@@ -3,11 +3,11 @@ local function bolt(c,s)
 end
 local function ward(c,s)
  return {
-   T.wait(28,function(c,s) c.boss:set_equipment('HAND','WOODEN_SPEAR',{unbreakable=true}); c.trial:pose('cast'); T.sound(c,'BLOCK_AMETHYST_BLOCK_RESONATE',.8) end,
+   T.wait(28,function(c,s) c.trial:magic_weapon('STAFF'); c.trial:pose('cast'); T.sound(c,'BLOCK_AMETHYST_BLOCK_RESONATE',.8) end,
      function(c,s,t) if t%4==0 then for i=1,3 do local a=i*math.pi*2/3; T.point(c,T.offset(c.trial:position(),math.cos(a)*1.2,.5+i*.2,math.sin(a)*1.2),T.gold) end end end,
      function(c,s) s.ward=2*c.trial.matched_hit; s.wardActive=true end),
    T.wait(80,nil,function(c,s,t) if s.wardActive and t%5==0 then T.draw(c,T.circle(c.trial:position(),1.3),T.gold) end end,
-     function(c,s) s.ward=0; s.wardActive=false; c.boss:set_equipment('HAND','BLAZE_ROD',{unbreakable=true}) end),
+     function(c,s) s.ward=0; s.wardActive=false; c.trial:magic_weapon('WAND') end),
    T.rest(26)
  }
 end
@@ -26,8 +26,9 @@ return T.encounter{
    if c.trial:damaged_actor()~='boss' or not s.wardActive then return end
    local incoming=c.event.damage_amount; local absorbed=math.min(incoming,s.ward); s.ward=s.ward-absorbed; c.event.set_damage_amount(incoming-absorbed)
    if s.ward<=0 then
-     s.wardActive=false; c.boss:set_equipment('HAND','BLAZE_ROD',{unbreakable=true}); T.sound(c,'BLOCK_GLASS_BREAK',1.2); c.trial:say('Exactly. A ward has a limit.')
+     s.wardActive=false; c.trial:magic_weapon('WAND'); T.sound(c,'BLOCK_GLASS_BREAK',1.2); c.trial:say('Exactly. A ward has a limit.')
      T.start(c,s,'ward',{T.rest(50,1.2)},360)
    end
  end
 }
+

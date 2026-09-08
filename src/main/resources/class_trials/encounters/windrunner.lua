@@ -1,7 +1,10 @@
 local function route(c,s)
  local p,points; local progress=0; local group=R.group(s,'strafe')
  local function move(c,s)
-  progress=math.min(100,progress+1); local index=math.min(#points,1+math.floor(progress/5)); c.trial:step(points[index],.12,true,true)
+  progress=math.min(100,progress+1); local index=math.min(#points,1+math.floor(progress/5))
+  if T.distance(c.trial:position(),points[index])>.2 and not c.trial:step(points[index],.12,true,true) then
+   c.trial:clear_projectiles(group); T.fizzle(c); T.interrupt(c,s,{T.rest(60)}); s.ready.volley=s.tick+340; return
+  end
   if s.tick%5==0 then for i=1,#points-1 do T.point(c,points[i],R.feather) end end
  end
  local seq={T.wait(28,function(c,s)

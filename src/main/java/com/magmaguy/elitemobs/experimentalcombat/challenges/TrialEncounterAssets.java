@@ -14,14 +14,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /** Bundled authored content, validated as one catalog through the existing Lua power loader. */
-final class TrialEncounterAssets {
+public final class TrialEncounterAssets {
     record Encounter(String id, String title, String skin, double healthMultiplier,
-                     Map<EquipmentSlot, Material> equipment, String opening, String halfway,
+                     Map<EquipmentSlot, Material> equipment, TrialEquipment.Magic magicWeapon, org.bukkit.Color armorColor, String opening, String halfway,
                      String victory, String defeat, LuaPowerManager.Registration registration) {
         Encounter { equipment = Map.copyOf(equipment); }
     }
     private static Map<String, Encounter> loaded = Map.of();
     private TrialEncounterAssets() {}
+
+    public static synchronized void initialize() {
+        if (!loaded.isEmpty()) return;
+        try { loadAll(); }
+        catch (RuntimeException failure) { Logger.warn(failure.getMessage()); }
+    }
+
+    public static synchronized void shutdown() {
+        loaded.values().forEach(encounter -> encounter.registration().close());
+        loaded = Map.of();
+    }
 
     static synchronized Encounter require(String id) {
         if (loaded.isEmpty()) loadAll();
@@ -31,7 +42,6 @@ final class TrialEncounterAssets {
     }
 
     private static void loadAll() {
-        TrialPoses.validate();
         Map<String, Encounter> pending = new LinkedHashMap<>();
         List<LuaPowerManager.Registration> registrations = new ArrayList<>();
         try {
@@ -55,6 +65,9 @@ final class TrialEncounterAssets {
                     equipment.put(EquipmentSlot.valueOf(slot), material);
                 }
                 if (!equipment.containsKey(EquipmentSlot.HAND)) throw new IllegalArgumentException("Missing weapon in " + metadataPath);
+                String magicName = metadata.getString("magicWeapon");
+                TrialEquipment.Magic magic = magicName == null ? null : TrialEquipment.Magic.valueOf(magicName);
+                org.bukkit.Color armorColor = org.bukkit.Color.fromRGB(Integer.parseInt(required(metadata, "armorColor"), 16));
                 double health = metadata.getDouble("healthMultiplier", 10 + form.band().depth());
                 if (!Double.isFinite(health) || health < 1 || health > 15) throw new IllegalArgumentException("Invalid health in " + metadataPath);
                 String source = support + "\n" + text("mobility/" + root + ".lua")
@@ -63,7 +76,7 @@ final class TrialEncounterAssets {
                         new File("bundled/class_trials/encounters/" + id + ".lua"), source, null, PowerType.UNIQUE);
                 registrations.add(registration);
                 if (!registration.hookKeys().contains("on_game_tick")) throw new IllegalArgumentException("No authored timeline in " + id);
-                pending.put(id, new Encounter(id, required(metadata, "title"), skin, health, equipment,
+                pending.put(id, new Encounter(id, required(metadata, "title"), skin, health, equipment, magic, armorColor,
                         required(metadata, "voice.opening"), required(metadata, "voice.halfway"),
                         required(metadata, "voice.victory"), required(metadata, "voice.defeat"), registration));
             }

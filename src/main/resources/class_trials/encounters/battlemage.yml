@@ -12,3 +12,5 @@ voice:
   halfway: Another angle. The sword still has to finish its swing.
   victory: You separated the spell's promise from the blade's reach.
   defeat: You could have crossed behind the committed sweep.
+armorColor: '705799'
+magicWeapon: WAND

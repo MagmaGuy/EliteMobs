@@ -12,3 +12,5 @@ voice:
   halfway: Watch the return to my companion. That is where the pulse begins.
   victory: You found the cast before the guard could answer it.
   defeat: The pulse needed time and nearby company. You could deny either.
+armorColor: '705799'
+magicWeapon: WAND

@@ -62,6 +62,7 @@ final class TrialProjectiles implements Listener, AutoCloseable {
         if (!casts.containsKey(group) && casts.size()>=128) { projectile.remove(); return; }
         if (projectile instanceof AbstractArrow arrow) arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         projectile.setPersistent(false);
+        if (projectile instanceof Snowball snowball) snowball.setItem(new org.bukkit.inventory.ItemStack(Material.AMETHYST_SHARD));
         missiles.put(projectile.getUniqueId(), new Missile(projectile, damage, group, cap, tick+lifetime));
         casts.computeIfAbsent(group, ignored -> new Cast()).expires=tick+200;
     }
@@ -140,7 +141,7 @@ final class TrialProjectiles implements Listener, AutoCloseable {
             player.spawnParticle(Particle.CLOUD,event.getHitEntity().getLocation().add(0,1,0),5,.2,.3,.2,0);
             return;
         }
-        Location point=event.getEntity().getLocation();
+        Location point=impactLocation(event);
         boolean playerHit=event.getHitEntity()==player;
         double damage=0;
         if (playerHit && !closed && boss.exists() && canDamage.getAsBoolean()) {
@@ -157,6 +158,17 @@ final class TrialProjectiles implements Listener, AutoCloseable {
         Cast cast=casts.get(missile.group); if (cast==null) return;
         // A successful contact remains observable even if another arrow in the fan misses later.
         if (cast.impact==null || playerHit) cast.impact=new Impact(point,playerHit,damage);
+    }
+    private Location impactLocation(ProjectileHitEvent event) {
+        Location origin=event.getEntity().getLocation();
+        Vector velocity=event.getEntity().getVelocity();
+        if (velocity.lengthSquared()<.0001) return origin;
+        double reach=velocity.length()+2;
+        Vector direction=velocity.clone().normalize();
+        org.bukkit.util.RayTraceResult hit=null;
+        if (event.getHitBlock()!=null) hit=event.getHitBlock().rayTrace(origin,direction,reach,FluidCollisionMode.NEVER);
+        else if (event.getHitEntity()!=null) hit=event.getHitEntity().getBoundingBox().rayTrace(origin.toVector(),direction,reach);
+        return hit==null ? origin : hit.getHitPosition().toLocation(origin.getWorld());
     }
     private void discard(Missile missile) {
         missiles.remove(missile.entity.getUniqueId()); retired.put(missile.entity.getUniqueId(),tick+2);

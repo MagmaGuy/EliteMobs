@@ -425,6 +425,7 @@ public class EliteMobs extends JavaPlugin {
         EventsRegistrer.registerEvents();
         PatrolService.initialize();
         PatrolEditor.initialize();
+        com.magmaguy.elitemobs.experimentalcombat.challenges.TrialEncounterAssets.initialize();
 
         //Launch the local data cache
         initializationContext.step("Player Database");
@@ -785,6 +786,7 @@ public class EliteMobs extends JavaPlugin {
         DungeonInstance.shutdown();
         ArenaInstance.shutdown();
         LuaPowerManager.shutdown();
+        com.magmaguy.elitemobs.experimentalcombat.challenges.TrialEncounterAssets.shutdown();
         NPCScriptManager.shutdown();
         // Final pass memory leak fixes
         ElitePower.shutdown();

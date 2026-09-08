@@ -12,3 +12,5 @@ voice:
   halfway: I have moved. Notice which part of the spell has not.
   victory: You accounted for the second cast before it surprised you.
   defeat: The afterimage was still drawing when you stopped moving.
+armorColor: '705799'
+magicWeapon: WAND

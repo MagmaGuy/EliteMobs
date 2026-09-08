@@ -8,7 +8,7 @@ function M.move(c,s,anchor)
       local origin=c.trial:position()
       if not target or t<18 then local x,z=T.direction(origin,anchor or c.trial.player:get_location()); local distance=anchor and math.min(8,math.max(0,T.distance(origin,anchor)-1.5)) or 8; target=T.offset(origin,x*distance,0,z*distance); c.trial:face(target,4) end
       lane=T.lane(origin,target,2.8); if t%4==0 then T.draw(c,lane) end
-    end,function(c,s) valid=valid and c.trial:safe_destination(target,true,false)~=nil end),
+    end,function(c,s) valid=valid and c.trial:safe_destination(target,true,false)~=nil; if not valid then T.fizzle(c) end end),
     T.wait(20,nil,function(c,s,t)
       if not valid then return end
       if T.distance(c.trial:position(),target)>.5 then valid=c.trial:step(target,.65,true,false) else c.trial:stop() end

@@ -21,7 +21,7 @@ end
 local amber={particle='DUST',red=255,green=185,blue=65,amount=1}
 local gold={particle='DUST',red=255,green=235,blue=150,amount=1}
 T.amber=amber; T.gold=gold
-function T.point(c,p,particle) c.world:spawn_particle_at_location(T.offset(p,0,.12,0),particle or amber,1) end
+function T.point(c,p,particle) if c.trial:active() then c.world:spawn_particle_at_location(T.offset(p,0,.12,0),particle or amber,1) end end
 function T.draw(c,g,particle)
   if g.kind=='circle' then
     for i=0,27 do local a=i*math.pi*2/28; T.point(c,T.offset(g.p,math.cos(a)*g.r,0,math.sin(a)*g.r),particle) end
@@ -37,8 +37,9 @@ function T.draw(c,g,particle)
   end
 end
 function T.damageScale(c) return c.state.outgoing or 1 end
-function T.hit(c,g,amount) return T.contains(g,c.trial.player:get_location()) and c.trial:damage(amount*T.damageScale(c)) end
-function T.sound(c,name,pitch) c.boss:play_sound_at_self(name,.65,pitch or 1) end
+function T.hit(c,g,amount) return c.trial:active() and T.contains(g,c.trial.player:get_location()) and c.trial:damage(amount*T.damageScale(c)) and c.trial:active() end
+function T.sound(c,name,pitch) if c.trial:active() then c.boss:play_sound_at_self(name,.65,pitch or 1) end end
+function T.fizzle(c) T.sound(c,'BLOCK_AMETHYST_BLOCK_HIT',.5); if c.trial:active() then T.draw(c,T.circle(c.trial:position(),.7),{particle='DUST',red=150,green=150,blue=150,amount=1}) end end
 function T.wait(ticks,begin,frame,finish) assert(ticks>=1); return {ticks=ticks,begin=begin,frame=frame,finish=finish} end
 function T.untilDone(ticks,begin,frame,finish,done) local step=T.wait(ticks,begin,frame,finish); step.done=done; return step end
 function T.rest(ticks,exposure)
@@ -107,13 +108,13 @@ function T.advance(c,s)
   local cast=s.cast; if not cast then return end
   local step=cast.steps[cast.index]
   if cast.elapsed==0 and step.begin then step.begin(c,s) end
-  if s.cast~=cast then return end
+  if s.cast~=cast or not c.trial:active() then return end
   if step.frame then step.frame(c,s,cast.elapsed) end
-  if s.cast~=cast then return end
+  if s.cast~=cast or not c.trial:active() then return end
   cast.elapsed=cast.elapsed+1
   if cast.elapsed>=step.ticks or (step.done and step.done(c,s)) then
     if step.finish then step.finish(c,s) end
-    if s.cast~=cast then return end
+    if s.cast~=cast or not c.trial:active() then return end
     cast.index=cast.index+1; cast.elapsed=0
     if cast.index>#cast.steps then s.ready[cast.key]=s.tick+cast.cooldown; s.cast=nil; c.trial:pose('idle') end
   end
@@ -122,9 +123,11 @@ function T.encounter(spec)
   assert(type(spec.choose)=='function' and type(spec.init)=='function','Encounter needs authored initialization and ordering')
   return {api_version=1,
     on_game_tick=function(c)
+      if not c.trial:active() then return end
       local s=c.state; s.tick=c.trial:tick()
       if not s.initialized then s.initialized=true; s.ready={}; s.phase=1; s.exposure=1; s.nextChoice=40; c.boss:set_ai_enabled(false); spec.init(c,s) end
       if spec.passive then spec.passive(c,s) end
+      if not c.trial:active() then return end
       if s.cast then T.advance(c,s); return end
       if s.phase==1 and c.boss:get_health()<=c.boss:get_maximum_health()*.5 then s.phase=2; s.nextChoice=s.tick+40; s.phasePending=true end
       if s.tick<s.nextChoice then return end

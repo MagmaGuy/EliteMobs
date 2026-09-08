@@ -184,6 +184,9 @@ public class LuaElitePower extends ElitePower {
         if (instance != null && !instance.isClosed()) {
             return;
         }
+        // An owned encounter observes failure and closes through its admission lifecycle.
+        // A later damage event must not silently restart its state before that check runs.
+        if (suppliedActor != null && instance != null && instance.isClosed()) return;
         try {
             scriptableBoss = suppliedActor == null ? new ScriptableBoss(ownerEntity) : suppliedActor;
             instance = new ScriptInstance(luaPowerConfigFields.getLuaPowerDefinition(), scriptableBoss);

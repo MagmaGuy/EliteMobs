@@ -12,3 +12,5 @@ voice:
   halfway: One pattern understood. Now keep it in mind while I add another.
   victory: You stopped chasing the light and started reading the caster. Good.
   defeat: You moved at the flash. Listen for the breath before it.
+armorColor: '705799'
+magicWeapon: WAND
