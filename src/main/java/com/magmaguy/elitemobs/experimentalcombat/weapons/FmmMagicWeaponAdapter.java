@@ -77,7 +77,8 @@ final class FmmMagicWeaponAdapter
             return;
         }
         if (elite == null) {
-            application.apply(request.balance().standaloneDamage());
+            application.apply(request.balance().standaloneDamage()
+                    * EliteItemManager.getEliteDamageEnchantmentMultiplier(request.weapon()));
             return;
         }
 
