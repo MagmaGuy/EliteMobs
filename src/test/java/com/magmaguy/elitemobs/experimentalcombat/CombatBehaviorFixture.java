@@ -176,8 +176,14 @@ abstract class CombatBehaviorFixture {
             return progress.computeIfAbsent(id, ignored -> new HashMap<>());
         }
         public StoredClassProfile loadOrCreateProfile(UUID id, int version) {
-            return profiles.computeIfAbsent(id, ignored -> new StoredClassProfile(id, "spellcaster",
-                    InputProfile.DEFAULT.storedId(), StoredClassProfile.DEFAULT_FOCUS_SLOT, version));
+            return profiles.computeIfAbsent(id, ignored -> {
+                // Skill behavior starts after root trials; unlocking classes is
+                // a separate feature. New party members need the same baseline.
+                for (var root : BuiltInClassContent.catalog().roots())
+                    rows(id).put(root.id(), new StoredClassProgress(id, root.id(), 0, version, true));
+                return new StoredClassProfile(id, "spellcaster", InputProfile.DEFAULT.storedId(),
+                        StoredClassProfile.DEFAULT_FOCUS_SLOT, version);
+            });
         }
         public List<StoredClassProgress> loadAllProgress(UUID id) { return List.copyOf(rows(id).values()); }
         public StoredClassProgress loadProgressOrZero(UUID id, String form, int version) {
