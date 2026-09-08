@@ -235,6 +235,16 @@ public class ItemQualityColorizer {
 
     private static int maxRankCalculator(ItemStack itemStack) {
 
+        if (com.magmaguy.elitemobs.skills.WeaponIdentityResolver.isMagicWeapon(itemStack)) {
+            int magicRank = 0;
+            for (Enchantment enchantment : EnchantmentGenerator.supportedMagicEnchantments()) {
+                var settings = EnchantmentsConfig.getEnchantment(enchantment);
+                if (settings != null && settings.isEnabled() && settings.isEnabledForProcedurallyGeneratedItems())
+                    magicRank += settings.getMaxLevel();
+            }
+            return magicRank;
+        }
+
         int maxRank = 0;
 
         Material material = itemStack.getType();

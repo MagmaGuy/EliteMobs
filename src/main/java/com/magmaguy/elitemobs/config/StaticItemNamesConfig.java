@@ -43,6 +43,10 @@ public class StaticItemNamesConfig extends ConfigurationFile {
     private static List<String> maceNames;
     @Getter
     private static List<String> spearNames;
+    @Getter
+    private static List<String> staffNames;
+    @Getter
+    private static List<String> wandNames;
 
     // Loot preview display names and labels
     @Getter
@@ -80,6 +84,12 @@ public class StaticItemNamesConfig extends ConfigurationFile {
         initTridentNames();
         initCrossbowNames();
         initMaceNames();
+        staffNames = ConfigurationEngine.setList(file, fileConfiguration, "staffNames", new ArrayList<>(List.of(
+                "Staff of the First Flame", "Ashwood Crook", "The Lamplighter", "Cinderkeeper",
+                "Staff of Embers", "Pilgrim's Pyre", "The Hearthwarden", "Charred Oak Staff")), true);
+        wandNames = ConfigurationEngine.setList(file, fileConfiguration, "wandNames", new ArrayList<>(List.of(
+                "Wand of the Wayward Star", "Silverthorn Wand", "The Spellwright's Quill", "Moonwood Wand",
+                "The Apprentice's Secret", "Witchhazel Wand", "The Astronomer's Pointer", "Wand of Echoes")), true);
         if (!VersionChecker.serverVersionOlderThan(21, 11))
             initSpearNames();
 

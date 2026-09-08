@@ -36,12 +36,11 @@ public class EnchantmentGenerator {
             return generateEnchantments(level, material, meta);
         // Magic attacks support damage and native durability enchantments. Arrow-only effects
         // must not be advertised on a projectile which does not implement them.
-        HashMap<Enchantment, Integer> result = generateEnchantments(level, Material.BOW, meta.clone());
-        result.keySet().removeIf(enchantment -> enchantment != Enchantment.POWER
-                && enchantment != Enchantment.UNBREAKING && enchantment != Enchantment.MENDING
-                && enchantment != Enchantment.VANISHING_CURSE);
-        generateEnchantments(meta, result);
-        return result;
+        return generateEnchantments(level, Material.BOW, meta, true);
+    }
+
+    public static List<Enchantment> supportedMagicEnchantments() {
+        return List.of(Enchantment.POWER, Enchantment.UNBREAKING, Enchantment.MENDING, Enchantment.VANISHING_CURSE);
     }
 
     public static ItemMeta generateEnchantments(ItemMeta itemMeta, HashMap<Enchantment, Integer> enchantmentMap) {
@@ -69,6 +68,11 @@ public class EnchantmentGenerator {
     This only gathers the list of enchantments to be applied
      */
     public static HashMap<Enchantment, Integer> generateEnchantments(double itemTier, Material material, ItemMeta itemMeta) {
+        return generateEnchantments(itemTier, material, itemMeta, false);
+    }
+
+    private static HashMap<Enchantment, Integer> generateEnchantments(
+            double itemTier, Material material, ItemMeta itemMeta, boolean magicWeapon) {
 
         HashMap<Enchantment, Integer> enchantmentMap = new HashMap<>();
 
@@ -85,7 +89,10 @@ public class EnchantmentGenerator {
         Primary enchantments get instantly validated and applies since there is only one per item type
         Secondary enchantments get added to a common pool to be randomized later
          */
-        switch (material) {
+        if (magicWeapon) {
+            for (Enchantment enchantment : supportedMagicEnchantments())
+                validEnchantments.putAll(validateEnchantments(enchantment.getKey().getKey()));
+        } else switch (material) {
             case TRIDENT:
                 if (ThreadLocalRandom.current().nextDouble() < 0.5)
                     validEnchantments.putAll(validateEnchantments("LOYALTY"));

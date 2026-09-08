@@ -81,7 +81,7 @@ public class LootTables implements Listener {
             if (eliteEntity instanceof CustomBossEntity boss && ClassLootCoverage.enabled(boss)) {
                 boolean partyLoot = PartyManager.shouldUsePartyLoot(player, eliteEntity);
                 ItemStack baseline = ClassLootCoverage.generate(boss, Math.max(1, (int) itemLevel), partyLoot ? null : player);
-                if (!partyLoot || !SharedLootTable.addPartyLoot(eliteEntity, player, baseline))
+                if (baseline != null && (!partyLoot || !SharedLootTable.addPartyLoot(eliteEntity, player, baseline)))
                     deliverGeneratedItem(player, eliteEntity.getLocation(), baseline);
             }
 

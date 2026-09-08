@@ -176,89 +176,35 @@ public class ItemConstructor {
      * @return The constructed ItemStack, or null if material is invalid
      */
     public static ItemStack constructItemWithMaterial(Material material, int level, Player player, boolean showItemWorth) {
-        if (material == null) return null;
-
-        // Construct initial item
-        ItemStack itemStack = ItemStackGenerator.generateItemStack(material);
-
-        // Set the item level
-        EliteItemManager.setEliteLevel(itemStack, level);
-
-        // Get meta
-        ItemMeta itemMeta = itemStack.getItemMeta();
-
-        // Generate item enchantments based on level
-        HashMap<Enchantment, Integer> enchantmentMap = EnchantmentGenerator.generateEnchantments(level, material, itemMeta);
-
-        // Generate custom enchantments based on level
-        HashMap<String, Integer> customEnchantmentMap = EnchantmentGenerator.generateCustomEnchantments(level, material);
-
-        // Generate item name
-        itemMeta.setDisplayName(NameGenerator.generateName(material));
-
-        // Colorize with MMO colors
-        itemStack.setItemMeta(itemMeta);
-        ItemQualityColorizer.dropQualityColorizer(itemStack);
-
-        // Apply level-based custom skins
-        EliteItemSkins.applyLevelBasedSkin(itemStack, level);
-
-        return commonFeatures(itemStack, null, player, enchantmentMap, customEnchantmentMap, showItemWorth, true);
+        return material == null ? null : constructProceduralItem(
+                ProceduralItemType.vanilla(material), level, null, player, showItemWorth);
     }
 
-    /*
-    For procedurally generated items
-     */
     public static ItemStack constructItem(double itemTier, EliteEntity killedMob, Player player, boolean showItemWorth) {
+        return constructProceduralItem(MaterialGenerator.generateItemType(itemTier), itemTier,
+                killedMob, player, showItemWorth);
+    }
 
-        /*
-        Generate material
-         */
-        Material itemMaterial = MaterialGenerator.generateMaterial(itemTier);
-        if (itemMaterial == null) return null;
-        /*
-        Construct initial item
-         */
-        ItemStack itemStack = ItemStackGenerator.generateItemStack(itemMaterial);
-        /*
-        Set the item level
-         */
-        EliteItemManager.setEliteLevel(itemStack, (int) Math.round(itemTier));
-        /*
-        Get meta
-         */
+    public static ItemStack constructProceduralItem(ProceduralItemType type, double itemTier,
+                                                   EliteEntity killedMob, Player player, boolean showItemWorth) {
+        if (type == null || !type.isAvailable()) return null;
+        int level = (int) Math.round(itemTier);
+        ItemStack itemStack = ItemStackGenerator.generateItemStack(type.material());
+        EliteItemManager.setEliteLevel(itemStack, level);
         ItemMeta itemMeta = itemStack.getItemMeta();
-
-         /*
-        Generate item enchantments
-        Note: This only gets a list of enchantments to be applied later at the lore stage
-         */
-        HashMap<Enchantment, Integer> enchantmentMap = EnchantmentGenerator.generateEnchantments(itemTier, itemMaterial, itemMeta);
-
-        /*
-        Generate custom enchantments
-        Note: This only gets a list of enchantments to be applied later at the lore stage
-         */
-        HashMap<String, Integer> customEnchantmentMap = EnchantmentGenerator.generateCustomEnchantments(itemTier, itemMaterial);
-
-        /*
-        Generate item name
-         */
-        itemMeta.setDisplayName(NameGenerator.generateName(itemMaterial));
-
-        /*
-        Colorize with MMO colors
-         */
+        HashMap<Enchantment, Integer> enchantmentMap = EnchantmentGenerator.generateEnchantments(
+                itemTier, type.material(), type.magicSkill(), itemMeta);
+        // Custom combat enchantments currently apply only to the vanilla combat path.
+        HashMap<String, Integer> customEnchantmentMap = type.magicSkill() == null
+                ? EnchantmentGenerator.generateCustomEnchantments(itemTier, type.material()) : new HashMap<>();
+        itemMeta.setDisplayName(NameGenerator.generateName(type));
         itemStack.setItemMeta(itemMeta);
+
+        if (type.magicSkill() == null) EliteItemSkins.applyLevelBasedSkin(itemStack, level);
+        else if (!type.applyMagicData(itemStack)) return null;
         ItemQualityColorizer.dropQualityColorizer(itemStack);
 
-        /*
-        Apply level-based custom skins for procedurally generated items
-         */
-        EliteItemSkins.applyLevelBasedSkin(itemStack, (int) Math.round(itemTier));
-
         return commonFeatures(itemStack, killedMob, player, enchantmentMap, customEnchantmentMap, showItemWorth, true);
-
     }
 
     private static ItemStack commonFeatures(ItemStack itemStack,

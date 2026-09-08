@@ -17,6 +17,10 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
     @Getter
     private static double customEnchantmentChance;
     @Getter
+    private static boolean stavesEnabled;
+    @Getter
+    private static boolean wandsEnabled;
+    @Getter
     private static ProceduralItemGenerationSettingsConfig instance;
 
     public ProceduralItemGenerationSettingsConfig() {
@@ -45,6 +49,8 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
 
         doProceduralItemDrops = ConfigurationEngine.setBoolean(fileConfiguration, "dropProcedurallyGeneratedItems", true);
         customEnchantmentChance = ConfigurationEngine.setDouble(fileConfiguration, "customEnchantmentsChance", 0.5);
+        stavesEnabled = ConfigurationEngine.setBoolean(fileConfiguration, "validWeapons.STAVES", true);
+        wandsEnabled = ConfigurationEngine.setBoolean(fileConfiguration, "validWeapons.WANDS", true);
 
         addMaterial(Material.DIAMOND_HELMET);
         addMaterial(Material.DIAMOND_CHESTPLATE);

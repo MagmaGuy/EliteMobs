@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.custombosses.ClassLootItem;
-import com.magmaguy.elitemobs.experimentalcombat.weapons.ExperimentalMagicWeaponItems;
 import com.magmaguy.elitemobs.items.itemconstructor.EnchantmentGenerator;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.items.itemconstructor.ProceduralItemType;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
@@ -29,7 +29,9 @@ public final class ClassLootCoverage {
 
     public static ItemStack generate(CustomBossEntity boss, int level, Player owner) {
         List<Family> supported = new ArrayList<>();
-        for (Family family : Family.values()) if (family.material() != null) supported.add(family);
+        for (Family family : Family.values())
+            if (family.material() != null && (family.magicType() == null || family.magicType().isAvailable()))
+                supported.add(family);
         Family family = supported.get(ThreadLocalRandom.current().nextInt(supported.size()));
         var fields = boss.getCustomBossesConfigFields();
         String bossName = fields.getName().replace("$bossLevel", "").replace("$minibossLevel", "")
@@ -45,14 +47,12 @@ public final class ClassLootCoverage {
         SkillType explicit = family.skill == SkillType.STAVES || family.skill == SkillType.WANDS ? family.skill : null;
         var enchantments = EnchantmentGenerator.generateEnchantments(level, material, explicit,
                 new ItemStack(material).getItemMeta());
-        String model = switch (family.skill) {
-            case STAVES -> ExperimentalMagicWeaponItems.STAFF_FMM_ITEM_ID;
-            case WANDS -> ExperimentalMagicWeaponItems.WAND_FMM_ITEM_ID;
-            default -> null;
-        };
+        ProceduralItemType magicType = family.magicType();
+        String model = magicType == null ? null : magicType.fmmItemId();
         ItemStack item = ItemConstructor.constructItem(level, name, material, enchantments, new HashMap<>(),
                 List.of(), lore, boss, owner, false, null, null, true,
                 "class_coverage_" + family.skill.name().toLowerCase(java.util.Locale.ROOT), null, explicit, model);
+        if (magicType != null && !magicType.applyMagicData(item)) return null;
         if (WeaponIdentityResolver.progressionSkill(item) != family.skill)
             throw new IllegalStateException("Class loot lost its " + family.skill + " identity");
         return item;
@@ -79,8 +79,14 @@ public final class ClassLootCoverage {
             this.materialName = materialName;
         }
         Material material() {
-            Material material = Material.getMaterial(materialName);
-            return material == null && skill == SkillType.STAVES ? Material.STICK : material;
+            return magicType() == null ? Material.getMaterial(materialName) : magicType().material();
+        }
+        ProceduralItemType magicType() {
+            return switch (skill) {
+                case STAVES -> ProceduralItemType.STAFF;
+                case WANDS -> ProceduralItemType.WAND;
+                default -> null;
+            };
         }
     }
 }

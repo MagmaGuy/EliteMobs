@@ -27,6 +27,14 @@ public class NameGenerator {
         return names.get(ThreadLocalRandom.current().nextInt(names.size()));
     }
 
+    public static String generateName(ProceduralItemType type) {
+        if (type.magicSkill() == null) return generateName(type.material());
+        boolean staff = type.magicSkill() == com.magmaguy.elitemobs.skills.SkillType.STAVES;
+        List<String> names = staff ? StaticItemNamesConfig.getStaffNames() : StaticItemNamesConfig.getWandNames();
+        if (names == null || names.isEmpty()) return staff ? "Staff" : "Wand";
+        return names.get(ThreadLocalRandom.current().nextInt(names.size()));
+    }
+
     private static List<String> getNameListForMaterial(Material material) {
         switch (material) {
             case DIAMOND_SWORD:

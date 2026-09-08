@@ -82,18 +82,17 @@ public class ProceduralShopMenu {
 
     private static void shopContents(Inventory shopInventory, Player player) {
         for (int i : validSlots) {
-            // Generate a random material first
-            Material material = MaterialGenerator.generateRandomMaterial();
-            if (material == null) continue;
+            var itemType = MaterialGenerator.generateRandomItemType();
+            if (itemType == null) continue;
 
             // Determine the skill type for this material
-            SkillType skillType = SkillType.fromMaterialIncludingArmor(material);
+            SkillType skillType = itemType.skill();
 
             // Calculate item level based on player's skill level for this item type
             int itemLevel = calculateItemLevel(player, skillType);
 
             // Construct item with the specific material and calculated level
-            ItemStack itemStack = ItemConstructor.constructItemWithMaterial(material, itemLevel, player, true);
+            ItemStack itemStack = ItemConstructor.constructProceduralItem(itemType, itemLevel, null, player, true);
             if (itemStack == null) continue;
 
             new EliteItemLore(itemStack, true);

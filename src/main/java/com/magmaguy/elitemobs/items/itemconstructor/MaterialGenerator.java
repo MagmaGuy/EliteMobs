@@ -15,7 +15,7 @@ import static org.bukkit.Material.*;
 
 public class MaterialGenerator {
 
-    private static final ArrayList<Material> validProceduralMaterials = new ArrayList();
+    private static final ArrayList<Material> validProceduralMaterials = new ArrayList<>();
 
     public static Material generateMaterial(Material material) {
 
@@ -36,10 +36,30 @@ public class MaterialGenerator {
     }
 
     public static Material generateMaterial(double itemTier) {
+        List<Material> materials = materialsForTier(itemTier);
+        return materials.isEmpty() ? null : materials.get(ThreadLocalRandom.current().nextInt(materials.size()));
+    }
 
-        List<Material> localValidMaterials = (List<Material>) validProceduralMaterials.clone();
+    public static ProceduralItemType generateItemType(double itemTier) {
+        return chooseItemType(materialsForTier(itemTier));
+    }
 
-        if (localValidMaterials.isEmpty()) initializeValidProceduralMaterials();
+    public static ProceduralItemType generateRandomItemType() {
+        if (validProceduralMaterials.isEmpty()) initializeValidProceduralMaterials();
+        return chooseItemType(validProceduralMaterials);
+    }
+
+    private static ProceduralItemType chooseItemType(List<Material> materials) {
+        List<ProceduralItemType> types = new ArrayList<>(materials.size() + 2);
+        for (Material material : materials) types.add(ProceduralItemType.vanilla(material));
+        if (ProceduralItemType.STAFF.isAvailable()) types.add(ProceduralItemType.STAFF);
+        if (ProceduralItemType.WAND.isAvailable()) types.add(ProceduralItemType.WAND);
+        return types.isEmpty() ? null : types.get(ThreadLocalRandom.current().nextInt(types.size()));
+    }
+
+    private static List<Material> materialsForTier(double itemTier) {
+        if (validProceduralMaterials.isEmpty()) initializeValidProceduralMaterials();
+        List<Material> localValidMaterials = new ArrayList<>(validProceduralMaterials);
 
         if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL + ItemSettingsConfig.getMinimumProcedurallyGeneratedDiamondLootLevelPlusSeven())
             localValidMaterials.remove(TRIDENT);
@@ -136,9 +156,7 @@ public class MaterialGenerator {
             } catch (NoSuchFieldError ignored) {}
         }
 
-        if (localValidMaterials.isEmpty()) return null;
-
-        return localValidMaterials.get(ThreadLocalRandom.current().nextInt(localValidMaterials.size()));
+        return localValidMaterials;
 
     }
 
@@ -149,18 +167,20 @@ public class MaterialGenerator {
         if (ProceduralItemGenerationSettingsConfig.getValidMaterials().isEmpty()) {
             ProceduralItemGenerationSettingsConfig.getInstance().cacheMaterials();
             if (ProceduralItemGenerationSettingsConfig.getValidMaterials().isEmpty()) {
-                Logger.warn("No valid materials detected for the procedural item settings. If you are trying to disable" +
+                if (!ProceduralItemGenerationSettingsConfig.isStavesEnabled()
+                        && !ProceduralItemGenerationSettingsConfig.isWandsEnabled())
+                    Logger.warn("No valid materials detected for the procedural item settings. If you are trying to disable" +
                         " them, use the 'dropProcedurallyGeneratedItems' option instead. Warn the developer.");
                 return;
             }
         }
 
         for (String string : ProceduralItemGenerationSettingsConfig.getValidMaterials()) {
-            try {
-                validProceduralMaterials.add(getMaterial(string));
-            } catch (Exception e) {
+            Material material = getMaterial(string);
+            if (material != null && material.isItem() && !material.isAir())
+                validProceduralMaterials.add(material);
+            else
                 Logger.info("Invalid material type detected: " + string);
-            }
         }
 
     }
