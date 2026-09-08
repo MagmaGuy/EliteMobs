@@ -60,8 +60,8 @@ import java.util.UUID;
  * Interprets every Experimental Combat control method concurrently without owning combat behavior.
  *
  * <p>Java players press F, then use hotbar keys 1, 2 or 3 without changing the held item; a second
- * plain F selects mobility directly, and left click, right click or jump inside the open chord
- * select mobility, signature and utility. Outside EliteMobs combat content, a sneak-held double-F
+ * plain F selects mobility directly. Inside the open chord, left click selects signature, while
+ * right click or jump selects utility. Outside EliteMobs combat content, a sneak-held double-F
  * in quick succession toggles that class-control layer for the session, while a single sneak-held
  * F stays a vanilla hand swap. The Focus item works for any player holding one and is recognized
  * solely through a plugin-owned persistent-data tag; the stored input profile only chooses which
@@ -277,7 +277,7 @@ public final class ClassAbilityInputRouter implements Listener {
     }
 
     /**
-     * Chord-window mouse bindings: left click selects mobility, right click selects signature.
+     * Chord-window mouse bindings: left click selects signature, right click selects utility.
      *
      * <p>Air-click interact events are born with {@code useInteractedBlock=DENY}, which Bukkit
      * reports as cancelled — {@code ignoreCancelled} would make this handler deaf to air clicks.</p>
@@ -360,7 +360,7 @@ public final class ClassAbilityInputRouter implements Listener {
         if (isFocusItem(event.getPlayerItem())) event.setCancelled(true);
     }
 
-    /** Cancels the vanilla melee hit when it is a chord mobility selection or the Focus item's left-click binding. */
+    /** Cancels the vanilla melee hit when it is a chord signature selection or the Focus item's left-click binding. */
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onAttack(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
@@ -549,13 +549,13 @@ public final class ClassAbilityInputRouter implements Listener {
         ActionBarCompositor.show(
                 player,
                 ActionBarCompositor.Source.ABILITY_INPUT,
-                ChatColor.GRAY + "[" + (heldSlot == 0 ? "7" : "1") + "/LMB] "
+                ChatColor.GRAY + "[" + (heldSlot == 0 ? "7" : "1") + "/F] "
                         + ChatColor.WHITE
                         + input.abilityName(player, AbilitySlot.MOBILITY)
-                        + ChatColor.GRAY + "  [" + (heldSlot == 1 ? "8" : "2") + "/RMB] "
+                        + ChatColor.GRAY + "  [" + (heldSlot == 1 ? "8" : "2") + "/LMB] "
                         + ChatColor.WHITE
                         + input.abilityName(player, AbilitySlot.SIGNATURE)
-                        + ChatColor.GRAY + "  [" + (heldSlot == 2 ? "9" : "3") + "/Jump] "
+                        + ChatColor.GRAY + "  [" + (heldSlot == 2 ? "9" : "3") + "/RMB/Jump] "
                         + ChatColor.WHITE
                         + input.abilityName(player, AbilitySlot.UTILITY),
                 ClassAbilityGestureState.CHORD_WINDOW_TICKS + 1L);
@@ -607,8 +607,7 @@ public final class ClassAbilityInputRouter implements Listener {
         String header = ClassPresentationTheme.gradient(
                 ClassPresentationTheme.PURPLE, "Class Controls");
         String message = switch (action) {
-            case TOGGLED_ON -> header + " &8» &aON &8- &7F for abilities &8(&7F+1/2/3, clicks,"
-                    + " jump&8)";
+            case TOGGLED_ON -> header + " &8» &aON &8- &7F,F: Mobility | F+LMB: Signature | F+RMB: Utility";
             case TOGGLED_OFF -> header + " &8» &cOFF &8- &7F swaps hands again";
             case TOGGLE_BLOCKED -> header + " &8» &cBLOCKED &8- &7outside EliteMobs worlds";
             default -> null;

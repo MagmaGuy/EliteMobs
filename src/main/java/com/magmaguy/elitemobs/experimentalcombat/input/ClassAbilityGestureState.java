@@ -8,8 +8,8 @@ import java.util.Objects;
  * <p>F opens a short selection window. A second plain F inside that window selects mobility.
  * Hotbar keys 1, 2 and 3 select mobility, signature and utility. Keys 7, 8 and 9 mirror those
  * bindings so a player can still activate the ability assigned to their already-selected slot,
- * which a vanilla client does not report as a slot change. Left click, right click and jump are
- * equivalent in-window selections for mobility, signature and utility. The state contains no
+ * which a vanilla client does not report as a slot change. Left click selects signature;
+ * right click and jump select utility inside the window. The state contains no
  * Bukkit objects, which keeps timing and precedence testable without a server.</p>
  */
 public final class ClassAbilityGestureState {
@@ -35,14 +35,14 @@ public final class ClassAbilityGestureState {
         return new Transition(new ClassAbilityGestureState(currentTick), Outcome.CHORD_OPENED);
     }
 
-    /** Resolves a left click while the F chord is open: it selects mobility. */
+    /** Resolves a left click while the F chord is open: it selects signature. */
     public Transition leftClick(long currentTick) {
-        return inWindowSelection(currentTick, Outcome.MOBILITY);
+        return inWindowSelection(currentTick, Outcome.SIGNATURE);
     }
 
-    /** Resolves a right click while the F chord is open: it selects signature. */
+    /** Resolves a right click while the F chord is open: it selects utility. */
     public Transition rightClick(long currentTick) {
-        return inWindowSelection(currentTick, Outcome.SIGNATURE);
+        return inWindowSelection(currentTick, Outcome.UTILITY);
     }
 
     /** Resolves a jump while the F chord is open: it selects utility. */

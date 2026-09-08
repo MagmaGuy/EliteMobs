@@ -166,26 +166,26 @@ class ClassAbilityInputRouterTest {
     }
 
     @Test
-    void leftClickInsideTheOpenChordExecutesMobility() {
+    void leftClickInsideTheOpenChordExecutesSignature() {
         router.onSwapHands(new PlayerSwapHandItemsEvent(player, null, null));
         PlayerInteractEvent click = new PlayerInteractEvent(
                 player, Action.LEFT_CLICK_AIR, null, null, BlockFace.SELF);
         router.onChordInteract(click);
 
-        assertEquals(List.of(AbilitySlot.MOBILITY), input.usedSlots);
+        assertEquals(List.of(AbilitySlot.SIGNATURE), input.usedSlots);
         // A null-block interact event is born with useInteractedBlock=DENY, so the item result is
         // the only honest cancellation signal.
         assertEquals(Event.Result.DENY, click.useItemInHand());
     }
 
     @Test
-    void rightClickInsideTheOpenChordExecutesSignature() {
+    void rightClickInsideTheOpenChordExecutesUtility() {
         router.onSwapHands(new PlayerSwapHandItemsEvent(player, null, null));
         PlayerInteractEvent click = new PlayerInteractEvent(
                 player, Action.RIGHT_CLICK_AIR, null, null, BlockFace.SELF);
         router.onChordInteract(click);
 
-        assertEquals(List.of(AbilitySlot.SIGNATURE), input.usedSlots);
+        assertEquals(List.of(AbilitySlot.UTILITY), input.usedSlots);
         assertEquals(Event.Result.DENY, click.useItemInHand());
     }
 

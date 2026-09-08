@@ -123,18 +123,18 @@ final class ClassMenuPresenter {
         String signature = active == null ? "Signature" : active.signature().displayName();
         String utility = active == null ? "Utility" : active.utility().displayName();
         List<String> body = List.of(
-                ClassMenuStyle.section(ClassMenuStyle.BLUE, "F then 1")
+                ClassMenuStyle.section(ClassMenuStyle.BLUE, "F, F")
                         + " &8• &f" + mobility,
-                ClassMenuStyle.section(ClassMenuStyle.ORANGE, "F then 2")
+                ClassMenuStyle.section(ClassMenuStyle.ORANGE, "F + LMB")
                         + " &8• &f" + signature,
-                ClassMenuStyle.section(ClassMenuStyle.GREEN, "F then 3")
+                ClassMenuStyle.section(ClassMenuStyle.GREEN, "F + RMB")
                         + " &8• &f" + utility,
                 ClassMenuStyle.section(ClassMenuStyle.PURPLE, "Class Focus")
                         + " &8• &7The item fallback uses the same three abilities.");
 
         List<ClassMenuPresentation.ActionView> actions = List.of(
                 inputAction(view, InputProfile.JAVA_HOTBAR_LAYER, "Use F Ability Layer",
-                        "&7Press F, then choose ability 1, 2 or 3."),
+                        "&7Press F, then F, left-click or right-click."),
                 inputAction(view, InputProfile.FOCUS_ITEM, "Use Class Focus",
                         "&7Use one item to choose an ability."),
                 new ClassMenuPresentation.ActionView(

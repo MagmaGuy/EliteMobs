@@ -649,7 +649,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
                 ? BuiltInClassContent.resourceDefinitions().get(lineage.resourceType()).maximum()
                 : resource.maximum();
         String controls = activeInputProfile(player) == InputProfile.JAVA_HOTBAR_LAYER
-                ? "&7F then 1/2/3, clicks or jump"
+                ? "&7F,F: Mobility | F+LMB: Signature | F+RMB: Utility"
                 : "&7Focus item";
         String compact = healthDisplay + " &8| &e" + resourceName(lineage.resourceType())
                 + " " + Math.round(amount) + "/" + Math.round(maximum);

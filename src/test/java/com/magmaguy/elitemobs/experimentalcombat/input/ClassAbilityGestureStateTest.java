@@ -44,8 +44,8 @@ class ClassAbilityGestureStateTest {
         ClassAbilityGestureState.Transition rightClick = open.rightClick(303);
         ClassAbilityGestureState.Transition jump = open.jump(303);
 
-        assertEquals(MOBILITY, leftClick.outcome());
-        assertEquals(SIGNATURE, rightClick.outcome());
+        assertEquals(SIGNATURE, leftClick.outcome());
+        assertEquals(UTILITY, rightClick.outcome());
         assertEquals(UTILITY, jump.outcome());
         assertTrue(leftClick.consumesInput());
         assertTrue(rightClick.consumesInput());
