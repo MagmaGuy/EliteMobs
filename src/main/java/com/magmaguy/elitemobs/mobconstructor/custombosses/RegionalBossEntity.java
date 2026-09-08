@@ -233,6 +233,9 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
                 if (phaseBossEntity != null) phaseBossEntity.silentReset();
                 ticksBeforeRespawn = 0;
                 clearPersistedRespawnTime();
+                // A new encounter must not inherit the previous actor's cached death health.
+                // Chunk/world restoration uses spawn directly and retains its saved health.
+                health = null;
                 //Reminder: this might not spawn a living entity as it gets queued for when the chunk loads
                 regionalBossEntity.spawn(spawnContext);
                 regionalBossEntity.clearDamagers();
@@ -255,6 +258,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         respawnTask.cancel();
         ticksBeforeRespawn = 0;
         clearPersistedRespawnTime();
+        health = null;
         spawn(false);
         clearDamagers();
     }
