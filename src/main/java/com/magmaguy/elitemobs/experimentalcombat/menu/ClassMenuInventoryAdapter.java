@@ -69,8 +69,8 @@ final class ClassMenuInventoryAdapter implements ClassMenuRenderer, Listener {
     }
 
     @Override
-    public void showForm(Player player, ClassMenuView view, ClassMenuView.FormView form) {
-        ClassMenuPresentation page = ClassMenuPresenter.form(view, form);
+    public void showForm(Player player, ClassMenuView view, ClassMenuView.FormView form, boolean showAllClasses) {
+        ClassMenuPresentation page = ClassMenuPresenter.form(view, form, showAllClasses);
         Inventory inventory = inventory(player, "&6Class: " + form.displayName());
         InventorySession session = new InventorySession(player.getUniqueId());
 

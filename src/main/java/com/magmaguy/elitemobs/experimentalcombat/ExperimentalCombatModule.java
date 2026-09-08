@@ -256,6 +256,12 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         return progression.completeChallenge(player.getUniqueId(), formId);
     }
 
+    /** Refreshes the awarded selection after the trial has removed its participant. */
+    public void onClassTrialEnded(Player player) {
+        reconcileRunLock(player);
+        reconcileAfterClassSelection(player);
+    }
+
     @Override
     public boolean mechanicsActive(Player player) {
         return inputRouter.controlsEnabled(player);
@@ -616,9 +622,11 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     }
 
     private boolean mayChangeRunSelection(Player player) {
-        if (PlayerData.getMatchInstance(player) instanceof DungeonInstance) {
+        if (PlayerData.getMatchInstance(player) instanceof DungeonInstance
+                || PlayerData.getMatchInstance(player) instanceof
+                com.magmaguy.elitemobs.experimentalcombat.challenges.ClassChallengeInstance) {
             player.sendMessage(ChatColorConverter.convert(
-                    "&cYour class and input profile are locked until this dungeon run ends."));
+                    "&cYour class and input profile are locked until this run ends."));
             return false;
         }
         if (combatState.isInCombat(player.getUniqueId())) {

@@ -18,6 +18,7 @@ import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,6 +43,7 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
     private boolean halfway;
     private int elapsedTicks;
     private boolean feeCharged;
+    private boolean classUnlocked;
 
     public java.util.UUID runId() { return runId; }
 
@@ -200,8 +202,8 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
         if (event.getEliteEntity() != instructor || closing || state != InstancedRegionState.ONGOING
                 || !challenger.isOnline() || !players.contains(challenger)) return;
         if (ExperimentalCombatModule.get().completeChallenge(challenger, trial.form().id())) {
+            classUnlocked = true;
             say(trial.victory());
-            tell(challenger, "&aUnlocked " + trial.form().displayName() + "! Select it in /em class.");
             victory();
         } else {
             tell(challenger, "&cYour class data became unavailable. Contact an administrator about this victory.");
@@ -240,6 +242,14 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
             super.destroyMatch();
         } finally {
             container.release(this);
+        }
+        if (classUnlocked && challenger.isOnline() && ExperimentalCombatModule.isInitialized()) {
+            ExperimentalCombatModule.get().onClassTrialEnded(challenger);
+            tell(challenger, "&aUnlocked and activated " + trial.form().displayName() + "!");
+            challenger.sendTitle(ChatColorConverter.convert("&6Class Unlocked!"),
+                    ChatColorConverter.convert("&f" + trial.form().displayName() + " &ais now active"),
+                    10, 70, 20);
+            challenger.playSound(challenger.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f);
         }
     }
 

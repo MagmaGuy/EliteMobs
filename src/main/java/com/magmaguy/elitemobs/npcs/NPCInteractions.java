@@ -50,7 +50,7 @@ public class NPCInteractions implements Listener {
             case CLASS_TRAINER:
                 if (player.hasPermission("elitemobs.command") && npcEntity.getNPCsConfigFields().getClassRoot() != null)
                     Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () ->
-                            com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu.openForm(
+                            com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu.openTrainer(
                                     player, npcEntity.getNPCsConfigFields().getClassRoot()));
                 break;
             case GUILD_GREETER:

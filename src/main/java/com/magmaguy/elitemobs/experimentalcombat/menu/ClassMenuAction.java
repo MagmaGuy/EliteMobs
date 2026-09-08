@@ -13,13 +13,21 @@ sealed interface ClassMenuAction {
     record OpenControls() implements ClassMenuAction {
     }
 
-    record OpenForm(String formId) implements ClassMenuAction {
+    record OpenForm(String formId, boolean showAllClasses) implements ClassMenuAction {
+        OpenForm(String formId) {
+            this(formId, true);
+        }
+
         public OpenForm {
             Objects.requireNonNull(formId, "formId");
         }
     }
 
-    record SelectForm(String formId) implements ClassMenuAction {
+    record SelectForm(String formId, boolean showAllClasses) implements ClassMenuAction {
+        SelectForm(String formId) {
+            this(formId, true);
+        }
+
         public SelectForm {
             Objects.requireNonNull(formId, "formId");
         }

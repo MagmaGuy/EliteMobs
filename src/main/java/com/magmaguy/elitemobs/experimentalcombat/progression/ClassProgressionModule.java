@@ -894,7 +894,7 @@ public final class ClassProgressionModule {
         }
     }
 
-    /** Called only by the owning trial after its instructor's actual death event. */
+    /** Unlocks and selects the form after the owning trial's instructor actually dies. */
     public boolean completeChallenge(UUID playerId, String formId) {
         CachedPlayer state = readyState(playerId);
         if (state == null || catalog.find(formId).isEmpty()) return false;
@@ -902,6 +902,11 @@ public final class ClassProgressionModule {
             if (!isReady(state)) return false;
             if (state.challenges.add(formId))
                 enqueueProgressSave(playerId, state, formId, state.progressXp.getOrDefault(formId, 0L));
+            if (!formId.equals(state.profile.selectedFormId())) {
+                state.profile = new StoredClassProfile(playerId, formId, state.profile.selectedInputId(),
+                        state.profile.focusSlot(), catalogVersion);
+                enqueueProfileSave(playerId, state);
+            }
             return true;
         }
     }

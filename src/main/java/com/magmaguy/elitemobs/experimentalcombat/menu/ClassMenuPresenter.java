@@ -49,6 +49,10 @@ final class ClassMenuPresenter {
     }
 
     static ClassMenuPresentation form(ClassMenuView view, ClassMenuView.FormView form) {
+        return form(view, form, true);
+    }
+
+    static ClassMenuPresentation form(ClassMenuView view, ClassMenuView.FormView form, boolean showAllClasses) {
         List<String> body = new ArrayList<>();
         if (form.lineage().size() > 1) {
             body.add("&7Path &8• " + String.join(" &8> ", form.lineage().stream()
@@ -63,6 +67,8 @@ final class ClassMenuPresenter {
             body.add(ClassMenuStyle.state(form));
         }
         body.add(skillsLine(form));
+        if (showAllClasses && form.challengeEligible())
+            body.add("&eTalk to this class's trainer to enter its trial.");
         if (!form.unlocked()) {
             for (ClassMenuView.BlockerView blocker : form.blockers())
                 body.add(ClassMenuStyle.blockerText(blocker));
@@ -89,11 +95,11 @@ final class ClassMenuPresenter {
                     ClassMenuPresentation.Tone.NAVIGATION,
                     "← " + ClassMenuStyle.themed(parent, parent.displayName()),
                     "&7Back to the previous class.",
-                    new ClassMenuAction.OpenForm(parent.id())));
+                    new ClassMenuAction.OpenForm(parent.id(), showAllClasses)));
         }
         for (ClassMenuView.FormLink childLink : form.children()) {
             ClassMenuView.FormView child = view.requireForm(childLink.id());
-            actions.add(formAction(child, ClassMenuPresentation.ActionKind.FORM));
+            actions.add(formAction(child, ClassMenuPresentation.ActionKind.FORM, showAllClasses));
         }
         if (form.unlocked() && !form.selected() && !view.runLocked()) {
             actions.add(new ClassMenuPresentation.ActionView(
@@ -101,9 +107,9 @@ final class ClassMenuPresenter {
                     ClassMenuPresentation.Tone.CONTROL,
                     ClassMenuStyle.section(ClassMenuStyle.GREEN, "Activate " + form.displayName()),
                     "&7Make this your active class.",
-                    new ClassMenuAction.SelectForm(form.id())));
+                    new ClassMenuAction.SelectForm(form.id(), showAllClasses)));
         }
-        if (form.challengeEligible() && !view.runLocked()) {
+        if (!showAllClasses && form.challengeEligible() && !view.runLocked()) {
             String fee = com.magmaguy.elitemobs.economy.EconomyHandler.formatCurrency(form.challengeFee());
             actions.add(new ClassMenuPresentation.ActionView(
                     ClassMenuPresentation.ActionKind.SELECT,
@@ -113,7 +119,7 @@ final class ClassMenuPresenter {
                             + ". Costs " + fee + " coins when combat begins. Defeat unlocks " + form.displayName() + ".",
                     new ClassMenuAction.Challenge(form.id(), form.challengeFee())));
         }
-        actions.add(new ClassMenuPresentation.ActionView(
+        if (showAllClasses) actions.add(new ClassMenuPresentation.ActionView(
                 ClassMenuPresentation.ActionKind.OVERVIEW,
                 ClassMenuPresentation.Tone.NAVIGATION,
                 "← " + ClassMenuStyle.section(ClassMenuStyle.GOLD, "All Classes"),
@@ -166,6 +172,13 @@ final class ClassMenuPresenter {
     private static ClassMenuPresentation.ActionView formAction(
             ClassMenuView.FormView form,
             ClassMenuPresentation.ActionKind kind) {
+        return formAction(form, kind, true);
+    }
+
+    private static ClassMenuPresentation.ActionView formAction(
+            ClassMenuView.FormView form,
+            ClassMenuPresentation.ActionKind kind,
+            boolean showAllClasses) {
         ClassMenuPresentation.Tone tone;
         if (!form.unlocked()) tone = ClassMenuPresentation.Tone.LOCKED;
         else if (form.active()) tone = ClassMenuPresentation.Tone.ACTIVE;
@@ -175,7 +188,7 @@ final class ClassMenuPresenter {
                 tone,
                 ClassMenuStyle.formButtonLabel(form),
                 ClassMenuStyle.formTooltip(form),
-                new ClassMenuAction.OpenForm(form.id()));
+                new ClassMenuAction.OpenForm(form.id(), showAllClasses));
     }
 
     private static ClassMenuPresentation.ActionView inputAction(

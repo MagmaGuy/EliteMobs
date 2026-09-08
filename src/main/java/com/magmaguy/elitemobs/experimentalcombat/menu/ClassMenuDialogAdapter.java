@@ -18,8 +18,8 @@ final class ClassMenuDialogAdapter implements ClassMenuRenderer {
     }
 
     @Override
-    public void showForm(Player player, ClassMenuView view, ClassMenuView.FormView form) {
-        show(player, ClassMenuPresenter.form(view, form));
+    public void showForm(Player player, ClassMenuView view, ClassMenuView.FormView form, boolean showAllClasses) {
+        show(player, ClassMenuPresenter.form(view, form, showAllClasses));
     }
 
     @Override

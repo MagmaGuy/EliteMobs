@@ -36,6 +36,10 @@ final class ClassMenuCoordinator {
     }
 
     void openForm(Player player, String formId) {
+        openForm(player, formId, true);
+    }
+
+    void openForm(Player player, String formId, boolean showAllClasses) {
         project(player).ifPresent(view -> {
             ClassMenuView.FormView form = view.forms().get(formId);
             if (form == null) {
@@ -44,7 +48,7 @@ final class ClassMenuCoordinator {
                 return;
             }
             tokens.beginPage(player.getUniqueId());
-            renderer(player).showForm(player, view, form);
+            renderer(player).showForm(player, view, form, showAllClasses);
         });
     }
 
@@ -66,8 +70,8 @@ final class ClassMenuCoordinator {
         switch (action) {
             case ClassMenuAction.OpenOverview ignored -> open(player);
             case ClassMenuAction.OpenControls ignored -> openControls(player);
-            case ClassMenuAction.OpenForm openForm -> openForm(player, openForm.formId());
-            case ClassMenuAction.SelectForm selectForm -> selectForm(player, selectForm.formId());
+            case ClassMenuAction.OpenForm openForm -> openForm(player, openForm.formId(), openForm.showAllClasses());
+            case ClassMenuAction.SelectForm selectForm -> selectForm(player, selectForm.formId(), selectForm.showAllClasses());
             case ClassMenuAction.Challenge challenge ->
                     com.magmaguy.elitemobs.experimentalcombat.challenges.ClassChallengeInstance.admit(
                             player, challenge.formId(), challenge.quotedFee());
@@ -112,7 +116,7 @@ final class ClassMenuCoordinator {
                 skill -> PlayerData.getSkillLevel(player.getUniqueId(), skill)));
     }
 
-    private void selectForm(Player player, String formId) {
+    private void selectForm(Player player, String formId, boolean showAllClasses) {
         if (!ExperimentalCombatModule.isInitialized()) {
             open(player);
             return;
@@ -139,7 +143,7 @@ final class ClassMenuCoordinator {
                     : "&cThat class form is still locked.");
             case INVALID_FOCUS_SLOT -> send(player, "&cThat class could not be activated.");
         }
-        openForm(player, formId);
+        openForm(player, formId, showAllClasses);
     }
 
     private void selectInput(Player player, InputProfile inputProfile) {

@@ -40,6 +40,11 @@ public final class ClassSelectionMenu {
         COORDINATOR.openForm(Objects.requireNonNull(player, "player"), formId);
     }
 
+    /** Opens a trainer branch without navigation to the full class roster. */
+    public static void openTrainer(Player player, String rootId) {
+        COORDINATOR.openForm(Objects.requireNonNull(player, "player"), rootId, false);
+    }
+
     /** Commands which must be registered alongside the ordinary /em commands. */
     public static Collection<AdvancedCommand> commands() {
         return COMMANDS;
