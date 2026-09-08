@@ -410,6 +410,7 @@ public class EventsRegistrer {
         if (!DungeonsConfig.isEnableDungeonFoodRegeneration() && !ExperimentalCombatConfig.isEnabled()) return;
 
         DungeonCombatRuntime dungeonCombatRuntime = new DungeonCombatRuntime();
+        CombatLevelDisplay.setCombatState(dungeonCombatRuntime);
         register(dungeonCombatRuntime);
         dungeonCombatRuntime.start();
 

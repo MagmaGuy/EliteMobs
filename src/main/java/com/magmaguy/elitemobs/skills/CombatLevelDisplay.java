@@ -3,10 +3,14 @@ package com.magmaguy.elitemobs.skills;
 import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.combatsystem.combattag.PlayerCombatState;
 import com.magmaguy.elitemobs.config.SkillsConfig;
+import com.magmaguy.elitemobs.experimentalcombat.CombatHealthFormatter;
 import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -19,6 +23,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -37,7 +42,40 @@ public class CombatLevelDisplay implements Listener {
 
     private static final float DEFAULT_Y_TRANSLATION = 0.5f;
     private static final float BEDROCK_Y_TRANSLATION_BONUS = 1.0f;
-    private static final Map<UUID, FakeText> playerDisplays = new ConcurrentHashMap<>();
+    private static final Map<UUID, PlayerDisplay> playerDisplays = new ConcurrentHashMap<>();
+    private static PlayerCombatState combatState;
+    private static BukkitTask refreshTask;
+
+    public static void setCombatState(PlayerCombatState state) {
+        combatState = state;
+    }
+
+    private static final class PlayerDisplay {
+        private final FakeText display;
+        private String text;
+        private boolean healthVisible;
+
+        private PlayerDisplay(FakeText display, String text, boolean healthVisible) {
+            this.display = display;
+            this.text = text;
+            this.healthVisible = healthVisible;
+        }
+    }
+
+    private static boolean shouldShowHealth(Player player) {
+        return !player.isDead() && combatState != null
+                && combatState.isInCombat(player.getUniqueId());
+    }
+
+    private static String renderText(Player player, boolean showHealth) {
+        String identity = PlayerIdentityLabelRenderer.render(player.getUniqueId());
+        if (!showHealth) return identity;
+        AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
+        double current = player.getHealth();
+        double maximum = maxHealth == null ? current : maxHealth.getValue();
+        return "&c❤ " + CombatHealthFormatter.format(current) + "/"
+                + CombatHealthFormatter.format(maximum) + "\n&r" + identity;
+    }
 
     /**
      * Creates a combat level display for a player.
@@ -55,8 +93,10 @@ public class CombatLevelDisplay implements Listener {
         removeDisplay(player);
 
         // Create the FakeText display at the player's location (will be mounted)
+        boolean showHealth = shouldShowHealth(player);
+        String text = renderText(player, showHealth);
         FakeText fakeText = NMSManager.getAdapter().fakeTextBuilder()
-                .text(ChatColorConverter.convert(PlayerIdentityLabelRenderer.render(player.getUniqueId())))
+                .text(ChatColorConverter.convert(text))
                 .billboard(Display.Billboard.CENTER)
                 .shadow(true)
                 .seeThrough(false)
@@ -64,7 +104,7 @@ public class CombatLevelDisplay implements Listener {
                 .viewerFilter(viewer -> canSeeNameTag(player, viewer))
                 .build(player.getLocation());
 
-        playerDisplays.put(player.getUniqueId(), fakeText);
+        playerDisplays.put(player.getUniqueId(), new PlayerDisplay(fakeText, text, showHealth));
 
         // Attach to the player - this mounts and registers with the global tracker
         // which handles visibility, world changes, respawns, etc. automatically
@@ -102,9 +142,9 @@ public class CombatLevelDisplay implements Listener {
      * @param player The player to remove the display from
      */
     public static void removeDisplay(Player player) {
-        FakeText fakeText = playerDisplays.remove(player.getUniqueId());
-        if (fakeText != null) {
-            fakeText.detach(); // Unregisters from tracker and hides from all viewers
+        PlayerDisplay display = playerDisplays.remove(player.getUniqueId());
+        if (display != null) {
+            display.display.detach(); // Unregisters from tracker and hides from all viewers
         }
     }
 
@@ -119,9 +159,15 @@ public class CombatLevelDisplay implements Listener {
             return;
         }
 
-        FakeText fakeText = playerDisplays.get(player.getUniqueId());
-        if (fakeText != null) {
-            fakeText.setText(ChatColorConverter.convert(PlayerIdentityLabelRenderer.render(player.getUniqueId())));
+        PlayerDisplay display = playerDisplays.get(player.getUniqueId());
+        if (display != null) {
+            boolean showHealth = shouldShowHealth(player);
+            String text = renderText(player, showHealth);
+            if (!text.equals(display.text)) {
+                display.display.setText(ChatColorConverter.convert(text));
+                display.text = text;
+            }
+            display.healthVisible = showHealth;
         } else {
             // Recreate if missing
             createDisplay(player);
@@ -145,10 +191,13 @@ public class CombatLevelDisplay implements Listener {
      * Called on plugin shutdown.
      */
     public static void shutdown() {
-        for (FakeText fakeText : playerDisplays.values()) {
-            if (fakeText != null) {
-                fakeText.detach();
-            }
+        if (refreshTask != null) {
+            refreshTask.cancel();
+            refreshTask = null;
+        }
+        combatState = null;
+        for (PlayerDisplay display : playerDisplays.values()) {
+            display.display.detach();
         }
         playerDisplays.clear();
     }
@@ -158,15 +207,29 @@ public class CombatLevelDisplay implements Listener {
      * Called on plugin startup.
      */
     public static void initialize() {
+        shutdown();
         // Delay initialization to ensure players are fully loaded
-        new BukkitRunnable() {
+        refreshTask = new BukkitRunnable() {
+            private boolean initialized;
+
             @Override
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    createDisplay(player);
+                    if (!initialized) {
+                        createDisplay(player);
+                        continue;
+                    }
+                    PlayerDisplay display = playerDisplays.get(player.getUniqueId());
+                    if (display == null) {
+                        // Bed, world-change and respawn handlers own recreation after
+                        // passenger synchronization; the refresh must not race them.
+                        continue;
+                    }
+                    if (display.healthVisible || shouldShowHealth(player)) updateDisplay(player);
                 }
+                initialized = true;
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20L);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20L, 5L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
