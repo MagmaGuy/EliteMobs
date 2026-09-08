@@ -51,6 +51,8 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
     @Getter
     private static String enchantmentLimitMessage;
     @Getter
+    private static String incompatibleEnchantmentMessage;
+    @Getter
     private static String missingItemsMessage;
 
 
@@ -144,6 +146,8 @@ public class ItemEnchantmentMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         luckyTicketInfoButton = ItemStackSerializer.deserialize("luckyTicketInfoButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(luckyTicketInfoButton, CustomModelsConfig.boxInput);
+        incompatibleEnchantmentMessage = ConfigurationEngine.setString(file, fileConfiguration,
+                "incompatibleEnchantmentMessage", "&cThat enchantment cannot be used on this item.", true);
         enchantmentLimitMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when a player attempts to enchant an item beyond the configured maximum enchantment level of any enchantment."),
                 file,

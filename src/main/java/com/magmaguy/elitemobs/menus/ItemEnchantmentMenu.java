@@ -192,7 +192,10 @@ public class ItemEnchantmentMenu extends EliteMenu {
                     event.getInventory().getItem(ITEM_SLOT) != null &&
                     !UpgradeSystem.isValidUpgrade(event.getView().getTopInventory().getItem(ITEM_SLOT),
                             event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT))) {
-                event.getWhoClicked().sendMessage(ItemEnchantmentMenuConfig.getEnchantmentLimitMessage());
+                event.getWhoClicked().sendMessage(UpgradeSystem.isCompatibleBook(
+                        event.getInventory().getItem(ITEM_SLOT), event.getInventory().getItem(ENCHANTED_BOOK_SLOT))
+                        ? ItemEnchantmentMenuConfig.getEnchantmentLimitMessage()
+                        : ItemEnchantmentMenuConfig.getIncompatibleEnchantmentMessage());
                 event.getWhoClicked().closeInventory();
             }
         }
@@ -243,6 +246,18 @@ public class ItemEnchantmentMenu extends EliteMenu {
         }
 
         private void confirm(InventoryClickEvent event) {
+            ItemStack input = event.getInventory().getItem(ITEM_SLOT);
+            ItemStack book = event.getInventory().getItem(ENCHANTED_BOOK_SLOT);
+            if (input == null || book == null) {
+                event.getWhoClicked().sendMessage(ItemEnchantmentMenuConfig.getMissingItemsMessage());
+                return;
+            }
+            if (!UpgradeSystem.isValidUpgrade(input, book)) {
+                event.getWhoClicked().sendMessage(UpgradeSystem.isCompatibleBook(input, book)
+                        ? ItemEnchantmentMenuConfig.getEnchantmentLimitMessage()
+                        : ItemEnchantmentMenuConfig.getIncompatibleEnchantmentMessage());
+                return;
+            }
             double price = price(event.getView().getTopInventory());
             if (EconomyHandler.checkCurrency(event.getWhoClicked().getUniqueId()) < price) {
                 event.getWhoClicked().sendMessage(SpecialItemSystemsConfig.getInsufficientFundsMessage()

@@ -34,7 +34,8 @@ public class ScalableItemConstructor {
                 customItem.getCustomItemsConfigFields().getName(),
                 customItem.getCustomItemsConfigFields().getMaterial(),
                 newEnchantmentList,
-                customItem.getCustomEnchantments(),
+                com.magmaguy.elitemobs.items.itemconstructor.EnchantmentGenerator.withProceduralCustomEnchantments(
+                        itemTier, customItem.getCustomItemsConfigFields(), customItem.getCustomEnchantments()),
                 customItem.getPotionEffects(),
                 customItem.getCustomItemsConfigFields().getLore(),
                 eliteEntity,
@@ -112,7 +113,8 @@ public class ScalableItemConstructor {
                 customItem.getCustomItemsConfigFields().getName(),
                 customItem.getCustomItemsConfigFields().getMaterial(),
                 newEnchantmentList,
-                customItem.getCustomEnchantments(),
+                com.magmaguy.elitemobs.items.itemconstructor.EnchantmentGenerator.withProceduralCustomEnchantments(
+                        adjustedItemLevel, customItem.getCustomItemsConfigFields(), customItem.getCustomEnchantments()),
                 customItem.getPotionEffects(),
                 customItem.getCustomItemsConfigFields().getLore(),
                 eliteEntity,

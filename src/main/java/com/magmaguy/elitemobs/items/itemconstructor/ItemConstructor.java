@@ -45,6 +45,10 @@ public class ItemConstructor {
                                           String scriptedItem,
                                           SkillType weaponType,
                                           String fmmItemModel) {
+        if (weaponType == SkillType.STAVES || weaponType == SkillType.WANDS) {
+            enchantments = new HashMap<>(enchantments);
+            enchantments.remove(Enchantment.PUNCH);
+        }
         /*
         Construct initial item
          */
@@ -194,9 +198,9 @@ public class ItemConstructor {
         ItemMeta itemMeta = itemStack.getItemMeta();
         HashMap<Enchantment, Integer> enchantmentMap = EnchantmentGenerator.generateEnchantments(
                 itemTier, type.material(), type.magicSkill(), itemMeta);
-        // Custom combat enchantments currently apply only to the vanilla combat path.
         HashMap<String, Integer> customEnchantmentMap = type.magicSkill() == null
-                ? EnchantmentGenerator.generateCustomEnchantments(itemTier, type.material()) : new HashMap<>();
+                ? EnchantmentGenerator.generateCustomEnchantments(itemTier, type.material())
+                : com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment.generate(itemTier, type.magicSkill());
         itemMeta.setDisplayName(NameGenerator.generateName(type));
         itemStack.setItemMeta(itemMeta);
 

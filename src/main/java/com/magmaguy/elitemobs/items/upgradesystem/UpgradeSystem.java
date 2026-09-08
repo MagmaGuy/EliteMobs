@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.EnchantedSourceEnchantment;
+import com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment;
 import com.magmaguy.elitemobs.items.itemconstructor.EnchantmentGenerator;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -19,11 +20,13 @@ public class UpgradeSystem {
     }
 
     public static ItemStack upgrade(ItemStack originalItemToUpgrade, ItemStack enchantedBook) {
+        if (!isCompatibleBook(originalItemToUpgrade, enchantedBook))
+            throw new IllegalArgumentException("The book contains enchantments incompatible with this item");
         ItemStack itemToUpgrade = originalItemToUpgrade.clone();
         ItemMeta itemMeta = itemToUpgrade.getItemMeta();
         Map<NamespacedKey, Integer> currentEnchantments = ItemTagger.getItemEnchantments(itemToUpgrade);
         Map<NamespacedKey, Integer> bookEnchantments = ItemTagger.getItemEnchantments(enchantedBook);
-        Map<NamespacedKey, Integer> newMap = new HashMap<>();
+        Map<NamespacedKey, Integer> newMap = new HashMap<>(currentEnchantments);
         //Remove the enchantment that makes this a book, it's non-transferable
         bookEnchantments.remove(new NamespacedKey(MetadataHandler.PLUGIN, EnchantedSourceEnchantment.key));
 
@@ -52,7 +55,7 @@ public class UpgradeSystem {
         //get custom enchantments
         HashMap<String, Integer> customEnchantments = new HashMap<>();
         for (Map.Entry<NamespacedKey, Integer> entrySet : newMap.entrySet())
-            if (!vanillaEnchantments.containsKey(entrySet.getKey()))
+            if (!vanillaEnchantmentsNamespaced.containsKey(entrySet.getKey()))
                 customEnchantments.put(entrySet.getKey().getKey(), entrySet.getValue());
 
         ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
@@ -63,10 +66,23 @@ public class UpgradeSystem {
     }
 
     public static boolean isValidUpgrade(ItemStack originalItemToUpgrade, ItemStack enchantedBook) {
+        if (!isCompatibleBook(originalItemToUpgrade, enchantedBook)) return false;
         ItemStack finalItemStack = upgrade(originalItemToUpgrade, enchantedBook);
         Map<EnchantmentsConfigFields, Integer> currentEnchantments = ItemTagger.getItemEnchantmentConfigFields(finalItemStack);
         for (Map.Entry<EnchantmentsConfigFields, Integer> entry : currentEnchantments.entrySet())
-            if (entry.getValue() > entry.getKey().getMaxEnchantmentLevel()) return false;
+            if (entry.getKey() == null || entry.getValue() > entry.getKey().getMaxEnchantmentLevel()
+                    || (MagicWeaponEnchantment.KEYS.contains(entry.getKey().getFilename().replace(".yml", ""))
+                    && entry.getValue() > 3)) return false;
+        return true;
+    }
+
+    public static boolean isCompatibleBook(ItemStack item, ItemStack book) {
+        if (item == null || book == null) return false;
+        Map<NamespacedKey, Integer> additions = ItemTagger.getItemEnchantments(book);
+        additions.remove(new NamespacedKey(MetadataHandler.PLUGIN, EnchantedSourceEnchantment.key));
+        if (additions.isEmpty()) return false;
+        for (NamespacedKey key : additions.keySet())
+            if (!MagicWeaponEnchantment.compatible(item, key)) return false;
         return true;
     }
 

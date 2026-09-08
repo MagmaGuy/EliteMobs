@@ -17,6 +17,16 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class EnchantmentGenerator {
 
+    public static HashMap<String, Integer> withProceduralCustomEnchantments(int level,
+            com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields fields,
+            HashMap<String, Integer> authored) {
+        HashMap<String, Integer> result = new HashMap<>(authored);
+        if (fields.isProceduralEnchantments())
+            com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment.generate(level, fields.getWeaponType())
+                    .forEach((key, value) -> result.merge(key, value, Math::max));
+        return result;
+    }
+
     public static HashMap<Enchantment, Integer> withProceduralEnchantments(int level,
             com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields fields,
             HashMap<Enchantment, Integer> authored) {

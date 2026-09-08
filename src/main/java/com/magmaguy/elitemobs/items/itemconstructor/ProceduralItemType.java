@@ -43,7 +43,8 @@ public record ProceduralItemType(Material material, SkillType magicSkill) {
         if (magicSkill == SkillType.WANDS && !ProceduralItemGenerationSettingsConfig.isWandsEnabled()) return false;
         if (!Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")) return false;
         try {
-            return MagicWeaponAPI.isOperational() && MagicWeaponAPI.isBuiltInWeapon(fmmItemId());
+            return MagicWeaponAPI.capabilityVersion() >= 4 && MagicWeaponAPI.isOperational()
+                    && MagicWeaponAPI.isBuiltInWeapon(fmmItemId());
         } catch (LinkageError incompatibleFmm) {
             return false;
         }
