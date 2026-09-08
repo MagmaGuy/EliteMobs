@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.experimentalcombat;
 
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.experimentalcombat.classes.ClassFormDefinition;
 import com.magmaguy.elitemobs.experimentalcombat.presentation.ClassPresentationTheme;
 import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.skills.SkillType;
@@ -44,24 +45,32 @@ public final class ClassWeaponAffinity implements Listener {
         boolean classWeapon = module.activeClassSkills(player).contains(weaponSkill);
         event.setDamage(event.getDamage()
                 * (classWeapon ? CLASS_WEAPON_MULTIPLIER : OFF_CLASS_WEAPON_MULTIPLIER));
-        if (!classWeapon) warnOffClassWeapon(player);
+        if (!classWeapon) warnOffClassWeapon(player, module);
     }
 
-    private void warnOffClassWeapon(Player player) {
+    private void warnOffClassWeapon(Player player, ExperimentalCombatModule module) {
         long now = System.currentTimeMillis();
         Long previous = lastWarnings.get(player.getUniqueId());
         if (previous != null && now - previous < WARNING_INTERVAL_MILLIS) return;
+        ClassFormDefinition form = module.profile(player.getUniqueId())
+                .flatMap(profile -> profile.optionalActiveLineage())
+                .map(active -> module.catalog().require(active.activeFormId()))
+                .orElse(null);
+        if (form == null) return;
         lastWarnings.put(player.getUniqueId(), now);
         String header = ClassPresentationTheme.gradient(ClassPresentationTheme.RED, "Off-class weapon");
+        String bonus = "&f" + form.foundationSkills().first().getDisplayName()
+                + " &7and &f" + form.foundationSkills().second().getDisplayName()
+                + " &7deal &a10% more damage &7with &f" + form.displayName() + "&7.";
         ActionBarCompositor.show(
                 player,
                 ActionBarCompositor.Source.AFFINITY_WARNING,
                 ChatColorConverter.convert(
-                        header + " &8» &c-10% damage&7. Your class weapons hit &a+10%&7."));
+                        header + " &8» &c-10% damage&7. " + bonus));
         if (chatWarnedThisSession.add(player.getUniqueId()))
             player.sendMessage(ChatColorConverter.convert(
                     header + " &8» &7This weapon does not match your class: &c-10% damage&7."
-                            + " Class weapons hit &a+10%&7."));
+                            + " " + bonus));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
