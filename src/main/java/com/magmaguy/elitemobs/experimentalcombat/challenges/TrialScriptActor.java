@@ -52,6 +52,7 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
     private TrialEffects effects;
     private LuaTable trial;
     private long ticks;
+    private long playerGraceUntil;
     private boolean closed;
     private boolean transferring;
     private final org.bukkit.NamespacedKey controlKey = new org.bukkit.NamespacedKey(MetadataHandler.PLUGIN, "trial_control_guard");
@@ -131,9 +132,20 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         table.set("damage", method(table, args -> {
             double amount = bounded(args.checkdouble(1), 0, 2);
             double before = player.getHealth() + player.getAbsorptionAmount();
-            if (!closed && bounds.contains(player.getLocation()) && boss.getLivingEntity().hasLineOfSight(player))
+            if (!closed && ticks >= playerGraceUntil && bounds.contains(player.getLocation()) && boss.getLivingEntity().hasLineOfSight(player))
                 CombatDamageContext.runEliteToPlayerMultiplier(amount, () -> player.damage(1, boss.getLivingEntity()));
             return LuaValue.valueOf(player.getHealth() + player.getAbsorptionAmount() < before);
+        }));
+        table.set("player_grace", method(table, args -> {
+            playerGraceUntil = Math.max(playerGraceUntil, ticks + (int) bounded(args.checkint(1), 0, 120));
+            return LuaValue.NIL;
+        }));
+        table.set("launch_player", method(table, args -> {
+            double lift = bounded(args.optdouble(1, .25), 0, .35);
+            for (double y = .25; y <= 1.5; y += .25)
+                if (!movement.clear(player, player.getLocation().add(0, y, 0))) return LuaValue.FALSE;
+            player.setVelocity(new Vector(0, lift, 0));
+            return LuaValue.TRUE;
         }));
         table.set("face", method(table, args -> {
             Location target = location(args.arg1());
@@ -207,9 +219,10 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
             var actor = actors.get(args.checkjstring(1));
             if (actor == null || !actor.exists()) return LuaValue.FALSE;
             Location target = location(args.arg(2));
-            if (!movement.straight(actor.getLivingEntity(), target, true, true)) return LuaValue.FALSE;
+            if (!movement.straight(actor.getLivingEntity(), target, true, args.optboolean(4, true))) return LuaValue.FALSE;
             Vector direction = target.toVector().subtract(actor.getLocation().toVector());
-            if (direction.lengthSquared() > .01) actor.getLivingEntity().setVelocity(direction.normalize().multiply(.15));
+            double speed = Math.min(bounded(args.optdouble(3, .15), 0, .8), direction.length());
+            if (direction.lengthSquared() > .01) actor.getLivingEntity().setVelocity(direction.normalize().multiply(speed));
             return LuaValue.TRUE;
         }));
         table.set("remove_actor", method(table, args -> {
@@ -220,7 +233,7 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         table.set("actor_damage", method(table, args -> {
             var actor = actors.get(args.checkjstring(1));
             double amount = bounded(args.optdouble(2, .2), 0, 1);
-            if (actor == null || !actor.exists() || actor.getLocation().distanceSquared(player.getLocation()) > 3 * 3
+            if (ticks < playerGraceUntil || actor == null || !actor.exists() || actor.getLocation().distanceSquared(player.getLocation()) > 3 * 3
                     || !actor.getLivingEntity().hasLineOfSight(player)) return LuaValue.FALSE;
             double before = player.getHealth() + player.getAbsorptionAmount();
             actor.getLivingEntity().swingMainHand();
@@ -304,6 +317,7 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         actor.setNormalizedCombat();
         actor.spawn(spawn, true);
         if (!actor.exists()) return LuaValue.NIL;
+        if (!movement.standing(actor.getLivingEntity(), spawn)) { actor.remove(RemovalReason.EFFECT_TIMEOUT); return LuaValue.NIL; }
         actors.put(id, actor);
         actor.getLivingEntity().setAI(false);
         return new ScriptableBoss(actor).buildContextTable(instance);
@@ -402,7 +416,7 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         if (missile == null) return;
         event.setCancelled(true);
         removeMissile(missile);
-        if (closed || event.getHitEntity() != player || !boss.exists()) return;
+        if (closed || ticks < playerGraceUntil || event.getHitEntity() != player || !boss.exists()) return;
         double spent = hitBudgets.getOrDefault(missile.group, 0D);
         double damage = Math.min(missile.damage, Math.max(0, missile.cap - spent));
         if (damage <= 0) return;

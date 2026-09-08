@@ -90,7 +90,7 @@ function T.melee(c,s,options)
   return {
     T.wait(options.windup or 16,function(c,s) c.trial:pose('draw'); T.sound(c,'BLOCK_WOODEN_BUTTON_CLICK_ON',.8) end,
       function(c,s,t)
-        if t<(options.windup or 16)-8 then c.trial:face(c.trial.player:get_location(),5) end
+        if t<(options.windup or 16)-8 then c.trial:face(c.trial.player:get_location(),5*(s.turnRate or 1)) end
         if not g or t<(options.windup or 16)-8 then g=T.cone(c.boss:get_location(),c.trial.player:get_location(),options.radius or 3,options.angle or 70) end
         if t%4==0 then T.draw(c,g) end
       end,function(c,s) c.trial:pose('swing'); T.sound(c,'ENTITY_PLAYER_ATTACK_SWEEP'); local hit=T.hit(c,g,options.damage or .45); if options.result then options.result(c,s,hit) end end),
@@ -144,7 +144,7 @@ function T.approach(c,s,range)
   if math.abs(d-range)<1 then return false end
   local x,z=T.direction(p,target); local travel=math.min(3,math.abs(d-range)); if d<range then travel=-travel end
   local destination=T.offset(p,x*travel,0,z*travel)
-  T.start(c,s,'position',{T.wait(12,nil,function(c,s) c.trial:face(target,4); c.trial:step(destination,.22,true,true) end),T.rest(4)},0)
+  T.start(c,s,'position',{T.wait(12,nil,function(c,s) c.trial:face(target,4*(s.turnRate or 1)); c.trial:step(destination,.22,true,true) end),T.rest(4)},0)
   return true
 end
 function T.basic(c,s,kind)
