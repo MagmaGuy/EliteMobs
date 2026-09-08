@@ -5,6 +5,8 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.api.PlayerDataLoadedEvent;
+import com.magmaguy.elitemobs.api.instanced.MatchStartEvent;
+import com.magmaguy.elitemobs.api.instanced.MatchLeaveEvent;
 import com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime;
 import com.magmaguy.elitemobs.combatsystem.combattag.PlayerCombatState;
 import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
@@ -39,6 +41,7 @@ import com.magmaguy.elitemobs.experimentalcombat.passives.PassiveAggregate;
 import com.magmaguy.elitemobs.experimentalcombat.passives.PassiveMechanics;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ActiveLineageSnapshot;
 import com.magmaguy.elitemobs.experimentalcombat.presentation.ClassHudPresentation;
+import com.magmaguy.elitemobs.experimentalcombat.presentation.ClassSkillTutorial;
 import com.magmaguy.elitemobs.experimentalcombat.progression.AwardResult;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ClassProgressionModule;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ClassContentAvailability;
@@ -120,6 +123,8 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
             new ClassResourceController(BuiltInClassContent.resourceDefinitions());
     private final ClassParticipationTracker participation = new ClassParticipationTracker();
     private final ClassHudPresentation hudPresentation = new ClassHudPresentation();
+    private final ClassSkillTutorial skillTutorial = new ClassSkillTutorial();
+    private final Set<UUID> practicingPlayers = new java.util.HashSet<>();
     private final AbilityRuntimeEvidenceLedger abilityEvidence = new AbilityRuntimeEvidenceLedger();
     private final FixedAbilityRegistry abilityRegistry = BuiltInClassContent.abilityRegistry();
     private final FixedPassiveRegistry passiveRegistry;
@@ -293,7 +298,12 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
 
     @Override
     public boolean controlsAlwaysAvailable(Player player) {
-        return DungeonCombatRuntime.isEligiblePlayer(player);
+        return isWaitingForMatch(player) || DungeonCombatRuntime.isEligiblePlayer(player);
+    }
+
+    private static boolean isWaitingForMatch(Player player) {
+        var match = PlayerData.getMatchInstance(player);
+        return match != null && match.isWaitingPlayer(player);
     }
 
     @Override
@@ -397,6 +407,8 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         ClassLineage lineage = catalog.lineageOf(active.activeFormId());
         FixedAbilitySpec abilitySpec = abilityRegistry.require(abilityId(lineage, slot));
         double abilityCost = abilityCost(player, abilitySpec);
+        reconcilePlayer(player);
+        boolean practicing = isWaitingForMatch(player);
         if (!resources.canAfford(player, abilityCost)) {
             observeFailedCast(player, abilitySpec);
             ClassResourceController.Snapshot resource = resources.snapshot(player.getUniqueId()).orElse(null);
@@ -421,23 +433,24 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         abilityEvidence.record(new AbilityRuntimeObservation(
                 AbilityRuntimeObservation.Kind.RESOURCE_SPENT,
                 player.getUniqueId(), null, abilitySpec.id(),
-                abilityCost, 0, 1,
+                practicing ? 0D : abilityCost, 0, 1,
                 Set.of(), abilitySpec.executionTraits().mechanics()));
         if (commitEffects.resourceGrant() > 0D) {
             abilityEvidence.record(new AbilityRuntimeObservation(
                     AbilityRuntimeObservation.Kind.RESOURCE_GAINED,
                     player.getUniqueId(), null, abilitySpec.id(),
-                    commitEffects.resourceGrant(), 0, 1,
+                    practicing ? 0D : commitEffects.resourceGrant(), 0, 1,
                     Set.of(), abilitySpec.executionTraits().mechanics()));
         }
         abilityEvidence.record(new AbilityRuntimeObservation(
                 AbilityRuntimeObservation.Kind.RESOURCE_DELTA,
                 player.getUniqueId(), null, abilitySpec.id(),
-                commitEffects.resourceGrant() - abilityCost,
+                practicing ? 0D : commitEffects.resourceGrant() - abilityCost,
                 0, 1, Set.of(), abilitySpec.executionTraits().mechanics()));
         recordAbilityContribution(player, result.abilityId(), result.contribution());
         sendCastFeedback(player, ClassAbilityActivationFeedback.message(
                 lineage, slot, abilitySpec, active.activeEffectiveLevel()));
+        skillTutorial.successfulCast(player, progression, slot);
         return result;
     }
 
@@ -562,6 +575,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         ActiveLineageSnapshot active = optional.map(ProfileSnapshot::activeLineage).orElse(null);
         boolean controlsActive = active != null && inputRouter.controlsEnabled(player);
         if (!controlsActive) {
+            endLobbyPractice(player);
             // Reconciliation ends an existing class session, not a classless ally's lifecycle.
             // Repeated idle cleanup would invalidate incoming flights and delayed support casts.
             if (resources.snapshot(player.getUniqueId()).isPresent()) abilityEngine.deactivate(player);
@@ -574,6 +588,33 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         if (!resources.isOpen(player.getUniqueId(), resourceType, runToken))
             resources.open(player, resourceType, runToken);
         passiveRuntime.reconcile(player, passiveActive.test(player));
+        boolean waiting = isWaitingForMatch(player);
+        if (waiting) {
+            practicingPlayers.add(player.getUniqueId());
+            resources.setPracticeMode(player, true);
+            if (fLayerSupported(player))
+                ActionBarCompositor.show(player, ActionBarCompositor.Source.CONTEXT_HINT,
+                        ChatColorConverter.convert(ClassSkillTutorial.CONTROLS));
+        } else endLobbyPractice(player);
+        if (fLayerSupported(player)) skillTutorial.prompt(player, progression, waiting);
+    }
+
+    private void endLobbyPractice(Player player) {
+        resources.setPracticeMode(player, false);
+        if (!practicingPlayers.remove(player.getUniqueId())) return;
+        abilityEngine.deactivate(player);
+        hudPresentation.discard(player.getUniqueId());
+        ActionBarCompositor.clear(player, ActionBarCompositor.Source.CONTEXT_HINT);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onMatchStart(MatchStartEvent event) {
+        event.getInstance().getPlayers().forEach(this::endLobbyPractice);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onMatchLeave(MatchLeaveEvent event) {
+        endLobbyPractice(event.getPlayer());
     }
 
     private void reconcileAfterClassSelection(Player player) {
@@ -631,9 +672,10 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         double maximum = resource == null
                 ? BuiltInClassContent.resourceDefinitions().get(lineage.resourceType()).maximum()
                 : resource.maximum();
-        String controls = "&7F,F: Mobility | F+LMB: Signature | F+RMB: Utility";
+        String controls = ClassSkillTutorial.CONTROLS;
         String compact = healthDisplay + " &8| &e" + resourceName(lineage.resourceType())
                 + " " + Math.round(amount) + "/" + Math.round(maximum);
+        if (isWaitingForMatch(player)) return compact;
         String reminder = "&b[" + active.activeEffectiveLevel() + "] "
                 + lineage.activeForm().displayName() + " &8| " + controls;
         return hudPresentation.render(player.getUniqueId(),
@@ -805,6 +847,8 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
+        endLobbyPractice(player);
+        skillTutorial.discard(playerId);
         hudPresentation.discard(playerId);
         boolean retainRunState = progression.snapshot(playerId)
                 .map(ProfileSnapshot::lockedRunId)
@@ -842,6 +886,10 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         abilityEngine.close();
         resources.shutdown();
         hudPresentation.clear();
+        skillTutorial.clear();
+        for (Player player : Bukkit.getOnlinePlayers())
+            ActionBarCompositor.clear(player, ActionBarCompositor.Source.CONTEXT_HINT);
+        practicingPlayers.clear();
         participation.clearAll();
         observedRunIds.clear();
         lastCapWarning.clear();

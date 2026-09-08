@@ -51,7 +51,9 @@ public final class ActionBarCompositor implements Listener {
         SKILL_FEEDBACK(300, 60, Encoding.LEGACY),
         LOOT(200, 60, Encoding.LEGACY),
         ECONOMY(200, 60, Encoding.LEGACY),
-        CLASS_HUD(100, -1L, Encoding.LEGACY);
+        CLASS_HUD(100, -1L, Encoding.LEGACY),
+        /** Persistent controls appended to the winning message instead of competing with feedback. */
+        CONTEXT_HINT(0, -1L, Encoding.LEGACY);
 
         private static final long PERSISTENT = -1;
 
@@ -253,19 +255,26 @@ public final class ActionBarCompositor implements Listener {
             return;
         }
 
+        Entry hint = state.entries.get(Source.CONTEXT_HINT);
+        String suffix = hint == null || hint == winner ? "" : " §8| §r" + hint.message;
+        String message = winner.message + suffix;
         boolean payloadChanged = !state.hasRenderedMessage
-                || !winner.message.equals(state.lastMessage)
+                || !message.equals(state.lastMessage)
                 || winner.source.encoding != state.lastEncoding;
         boolean keepaliveDue = currentTick - state.lastSentAtTick >= KEEPALIVE_INTERVAL_TICKS;
         if (!payloadChanged && !keepaliveDue) return;
 
         if (winner.source.encoding == Encoding.LEGACY)
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(winner.message));
-        else
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(winner.message));
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+        else {
+            TextComponent payload = new TextComponent(winner.message);
+            if (!suffix.isEmpty())
+                for (var component : TextComponent.fromLegacyText(suffix)) payload.addExtra(component);
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, payload);
+        }
 
         state.hasRenderedMessage = true;
-        state.lastMessage = winner.message;
+        state.lastMessage = message;
         state.lastEncoding = winner.source.encoding;
         state.lastSentAtTick = currentTick;
     }

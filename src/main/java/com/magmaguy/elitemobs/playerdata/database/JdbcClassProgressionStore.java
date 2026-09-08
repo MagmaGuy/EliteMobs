@@ -36,7 +36,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
             }
 
             try (PreparedStatement statement = connection.prepareStatement(
-                    "SELECT SelectedFormId, SelectedInputId, CatalogVersion FROM "
+                    "SELECT SelectedFormId, SelectedInputId, CatalogVersion, TutorialSkillsUsed FROM "
                             + PROFILE_TABLE + " WHERE PlayerUUID = ?")) {
                 statement.setString(1, playerId.toString());
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -86,10 +86,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
         Objects.requireNonNull(profile, "profile");
         synchronized (PlayerDataRepository.monitor()) {
             try (PreparedStatement statement = connection().prepareStatement(upsertProfileSql())) {
-                statement.setString(1, profile.playerId().toString());
-                setNullableString(statement, 2, profile.selectedFormId());
-                setNullableString(statement, 3, profile.selectedInputId());
-                statement.setInt(4, profile.catalogVersion());
+                bindProfile(statement, profile);
                 statement.executeUpdate();
             }
         }
@@ -169,7 +166,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
                 playerId,
                 resultSet.getString("SelectedFormId"),
                 resultSet.getString("SelectedInputId"),
-                resultSet.getInt("CatalogVersion"));
+                resultSet.getInt("CatalogVersion"), resultSet.getInt("TutorialSkillsUsed"));
     }
 
     private static StoredClassProgress readProgress(UUID playerId, ResultSet resultSet) throws SQLException {
@@ -192,6 +189,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
         setNullableString(statement, 2, profile.selectedFormId());
         setNullableString(statement, 3, profile.selectedInputId());
         statement.setInt(4, profile.catalogVersion());
+        statement.setInt(5, profile.tutorialSkillsUsed());
     }
 
     private static void bindProgress(PreparedStatement statement, StoredClassProgress progress)
@@ -212,17 +210,17 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
 
     private static String upsertProfileSql() {
         String insert = "INSERT INTO " + PROFILE_TABLE
-                + " (PlayerUUID, SelectedFormId, SelectedInputId, CatalogVersion) VALUES (?, ?, ?, ?)";
+                + " (PlayerUUID, SelectedFormId, SelectedInputId, CatalogVersion, TutorialSkillsUsed) VALUES (?, ?, ?, ?, ?)";
         if (DatabaseConfig.isUseMySQL()) {
             return insert + " ON DUPLICATE KEY UPDATE"
                     + " SelectedFormId = VALUES(SelectedFormId),"
                     + " SelectedInputId = VALUES(SelectedInputId),"
-                    + " CatalogVersion = VALUES(CatalogVersion)";
+                    + " CatalogVersion = VALUES(CatalogVersion), TutorialSkillsUsed = VALUES(TutorialSkillsUsed)";
         }
         return insert + " ON CONFLICT(PlayerUUID) DO UPDATE SET"
                 + " SelectedFormId = excluded.SelectedFormId,"
                 + " SelectedInputId = excluded.SelectedInputId,"
-                + " CatalogVersion = excluded.CatalogVersion";
+                + " CatalogVersion = excluded.CatalogVersion, TutorialSkillsUsed = excluded.TutorialSkillsUsed";
     }
 
     private static String upsertProgressSql() {

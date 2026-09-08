@@ -98,6 +98,7 @@ public class GenerateDatabase {
                         + "PlayerUUID VARCHAR(36) PRIMARY KEY NOT NULL, "
                         + "SelectedFormId VARCHAR(64), "
                         + "SelectedInputId VARCHAR(64), "
+                        + "TutorialSkillsUsed INTEGER NOT NULL DEFAULT 0, "
                         + "CatalogVersion INTEGER NOT NULL DEFAULT 0"
                         + ")");
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS "
@@ -109,6 +110,14 @@ public class GenerateDatabase {
                         + "CatalogVersion INTEGER NOT NULL DEFAULT 0, "
                         + "PRIMARY KEY (PlayerUUID, FormId)"
                         + ")");
+                boolean hasTutorialColumn;
+                try (var columns = PlayerDataRepository.connection().getMetaData().getColumns(
+                        null, null, JdbcClassProgressionStore.PROFILE_TABLE, "TutorialSkillsUsed")) {
+                    hasTutorialColumn = columns.next();
+                }
+                if (!hasTutorialColumn)
+                    statement.executeUpdate("ALTER TABLE " + JdbcClassProgressionStore.PROFILE_TABLE
+                            + " ADD TutorialSkillsUsed INTEGER NOT NULL DEFAULT 0");
                 boolean hasChallengeColumn;
                 try (var columns = PlayerDataRepository.connection().getMetaData().getColumns(
                         null, null, JdbcClassProgressionStore.PROGRESS_TABLE, "ChallengeCompleted")) {

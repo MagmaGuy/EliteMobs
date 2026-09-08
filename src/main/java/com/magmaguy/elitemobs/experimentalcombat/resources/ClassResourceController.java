@@ -135,6 +135,14 @@ public final class ClassResourceController {
         if (state != null) set(state, state.amount + amount);
     }
 
+    /** Waiting-room practice keeps every resource mutation at capacity until the match starts. */
+    public void setPracticeMode(Player player, boolean enabled) {
+        ResourceState state = states.get(player.getUniqueId());
+        if (state == null) return;
+        state.practiceMode = enabled;
+        if (enabled) set(state, rules(state.type).maximum());
+    }
+
     /** Grants an explicit class-mechanic resource burst, clamped by the active resource rules. */
     public void grant(Player player, double amount) {
         if (!Double.isFinite(amount) || amount <= 0D) return;
@@ -225,7 +233,7 @@ public final class ClassResourceController {
 
     private void set(ResourceState state, double amount) {
         double maximum = rules(state.type).maximum();
-        double bounded = Math.max(0D, Math.min(maximum, amount));
+        double bounded = state.practiceMode ? maximum : Math.max(0D, Math.min(maximum, amount));
         if (Math.abs(bounded - state.amount) < 1.0E-9D) return;
         state.amount = bounded;
     }
@@ -251,6 +259,7 @@ public final class ClassResourceController {
         private final ClassResourceType type;
         private final UUID runToken;
         private boolean suspended;
+        private boolean practiceMode;
         private double amount;
         private long recoveryBlockedUntil;
         private long lastDamageTick;

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.experimentalcombat.progression;
 
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassCatalog;
+import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassFormDefinition;
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassLineage;
 import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
@@ -193,6 +194,31 @@ public final class ClassProgressionModule {
         }
     }
 
+    public Optional<SkillTutorialProgress> tutorialProgress(UUID playerId) {
+        CachedPlayer state = readyState(playerId);
+        if (state == null) return Optional.empty();
+        synchronized (state.monitor) {
+            if (!isReady(state)) return Optional.empty();
+            return Optional.of(new SkillTutorialProgress(state.profile.tutorialSkillsUsed()));
+        }
+    }
+
+    /** Records a successful cast once, using the same ordered persistence queue as class selections. */
+    public Optional<SkillTutorialProgress> recordTutorialSkill(UUID playerId, AbilitySlot slot) {
+        CachedPlayer state = readyState(playerId);
+        if (state == null) return Optional.empty();
+        synchronized (state.monitor) {
+            if (!isReady(state)) return Optional.empty();
+            SkillTutorialProgress current = new SkillTutorialProgress(state.profile.tutorialSkillsUsed());
+            if (current.hasUsed(slot)) return Optional.empty();
+            SkillTutorialProgress updated = current.withUsed(slot);
+            state.profile = new StoredClassProfile(playerId, state.profile.selectedFormId(),
+                    state.profile.selectedInputId(), catalogVersion, updated.usedSkills());
+            enqueueProfileSave(playerId, state);
+            return Optional.of(updated);
+        }
+    }
+
     /** Drops loaded profile state. The run lock remains until its matching instance unlocks it. */
     public void unload(UUID playerId) {
         Objects.requireNonNull(playerId, "playerId");
@@ -231,7 +257,7 @@ public final class ClassProgressionModule {
                     playerId,
                     formId,
                     state.profile.selectedInputId(),
-                    catalogVersion);
+                    catalogVersion, state.profile.tutorialSkillsUsed());
             enqueueProfileSave(playerId, state);
             return new SelectionResult(SelectionResult.Status.APPLIED,
                     snapshotLocked(playerId, state, levels));
@@ -253,7 +279,7 @@ public final class ClassProgressionModule {
                     playerId,
                     null,
                     state.profile.selectedInputId(),
-                    catalogVersion);
+                    catalogVersion, state.profile.tutorialSkillsUsed());
             enqueueProfileSave(playerId, state);
             return new SelectionResult(SelectionResult.Status.APPLIED,
                     snapshotLocked(playerId, state, levels));
@@ -276,7 +302,7 @@ public final class ClassProgressionModule {
                     playerId,
                     state.profile.selectedFormId(),
                     inputProfile.storedId(),
-                    catalogVersion);
+                    catalogVersion, state.profile.tutorialSkillsUsed());
             enqueueProfileSave(playerId, state);
             return new SelectionResult(SelectionResult.Status.APPLIED,
                     snapshotLocked(playerId, state, levels));
@@ -499,7 +525,7 @@ public final class ClassProgressionModule {
                     playerId,
                     formId,
                     state.profile.selectedInputId(),
-                    catalogVersion);
+                    catalogVersion, state.profile.tutorialSkillsUsed());
             StoredClassProfile persistedProfile = state.profile;
             trackPersistence(playerId, state, submitInternal(() -> {
                 store.savePlayerAggregate(persistedProfile, persistedRows);
@@ -543,7 +569,8 @@ public final class ClassProgressionModule {
             }
             boolean selectionCleared = forgotten.contains(state.profile.selectedFormId());
             if (selectionCleared)
-                state.profile = new StoredClassProfile(playerId, null, state.profile.selectedInputId(), catalogVersion);
+                state.profile = new StoredClassProfile(playerId, null, state.profile.selectedInputId(),
+                        catalogVersion, state.profile.tutorialSkillsUsed());
             StoredClassProfile profile = state.profile;
             List<StoredClassProgress> persistedRows = List.copyOf(rows);
             trackPersistence(playerId, state, submitInternal(() -> {
@@ -606,7 +633,7 @@ public final class ClassProgressionModule {
                         playerId,
                         null,
                         state.profile.selectedInputId(),
-                        catalogVersion);
+                        catalogVersion, state.profile.tutorialSkillsUsed());
             }
             StoredClassProfile persistedProfile = state.profile;
             List<StoredClassProgress> rows = List.copyOf(persistedRows);
@@ -745,7 +772,7 @@ public final class ClassProgressionModule {
                 playerId,
                 selectedFormId,
                 inputProfile.storedId(),
-                catalogVersion);
+                catalogVersion, stored.tutorialSkillsUsed());
     }
 
     private void requireSupportedCatalogVersion(int storedVersion, String recordName) {
@@ -906,7 +933,7 @@ public final class ClassProgressionModule {
                 enqueueProgressSave(playerId, state, formId, state.progressXp.getOrDefault(formId, 0L));
             if (!formId.equals(state.profile.selectedFormId())) {
                 state.profile = new StoredClassProfile(playerId, formId, state.profile.selectedInputId(),
-                        catalogVersion);
+                        catalogVersion, state.profile.tutorialSkillsUsed());
                 enqueueProfileSave(playerId, state);
             }
             return true;

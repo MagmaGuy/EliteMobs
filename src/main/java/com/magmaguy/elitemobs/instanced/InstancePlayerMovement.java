@@ -28,8 +28,8 @@ public final class InstancePlayerMovement {
     /**
      * Moves a player without weakening instance escape protection.
      *
-     * <p>When the player belongs to an instance, both endpoints must remain in that same ongoing
-     * instance and the player must be an active participant. Other Bukkit listeners may still
+     * <p>When the player belongs to an instance, both endpoints must remain in that same
+     * instance and the player must be an active participant playing or waiting to start. Other Bukkit listeners may still
      * cancel the teleport.</p>
      */
     public static boolean teleportWithinWorld(
@@ -48,7 +48,8 @@ public final class InstancePlayerMovement {
         if (instance != null) {
             if (instance.world == null
                     || !instance.world.equals(sourceWorld)
-                    || instance.state != MatchInstance.InstancedRegionState.ONGOING
+                    || !(instance.state == MatchInstance.InstancedRegionState.ONGOING
+                         || instance.isWaitingPlayer(player))
                     || !instance.players.contains(player)
                     || !instance.isInRegion(player.getLocation())
                     || !instance.isInRegion(destination))
@@ -92,7 +93,8 @@ public final class InstancePlayerMovement {
             MatchInstance current = PlayerData.getMatchInstance(event.getPlayer());
             if (current != authorization.instance()) return false;
             if (current == null) return true;
-            return current.state == MatchInstance.InstancedRegionState.ONGOING
+            return (current.state == MatchInstance.InstancedRegionState.ONGOING
+                    || current.isWaitingPlayer(event.getPlayer()))
                     && current.players.contains(event.getPlayer())
                     && current.world != null
                     && current.world.getUID().equals(authorization.worldId())

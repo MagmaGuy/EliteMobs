@@ -152,6 +152,17 @@ public abstract class MatchInstance {
         return !isDefunct() && !destroyingMatch && state == InstancedRegionState.WAITING;
     }
 
+    /** Admitted players whose entry task has reached the lobby, including the start countdown. */
+    public final boolean isWaitingPlayer(Player player) {
+        return player != null && player.isOnline() && !player.isDead()
+                && !isDefunct() && !destroyingMatch
+                && (state == InstancedRegionState.WAITING || state == InstancedRegionState.STARTING)
+                && PlayerData.getMatchInstance(player) == this
+                && players.contains(player) && !spectators.contains(player)
+                && playerLives.containsKey(player)
+                && player.getWorld().equals(lobbyLocation == null ? world : lobbyLocation.getWorld());
+    }
+
     /** Acquired after all cancellable admission preflights, before player registration. */
     protected boolean reserveAdmission() { return true; }
 
