@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.combatsystem.combattag;
 
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
+import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.magmacore.instance.InstanceProtector;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -50,8 +50,9 @@ public final class DungeonFoodRegeneration {
 
     static boolean isInEligibleCombatContent(Player player) {
         return matchesCombatContent(
-                PlayerData.getMatchInstance(player) instanceof DungeonInstance,
-                InstanceProtector.isProtectedWorld(player.getWorld()));
+                PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeon
+                        && player.getWorld().equals(dungeon.getWorld()),
+                EliteMobsWorld.isEliteMobsWorld(player.getWorld().getUID()));
     }
 
     static boolean matchesCombatContent(boolean activeDungeonInstance, boolean eliteProtectedWorld) {

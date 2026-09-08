@@ -38,6 +38,10 @@ final class ExperimentalFoodItems {
     }
 
     static void preparePlayerInventory(Player player) {
+        if (!ExperimentalCombatRuntime.isActive(player)) {
+            restorePlayerInventory(player);
+            return;
+        }
         adaptInventory(player.getInventory());
     }
 

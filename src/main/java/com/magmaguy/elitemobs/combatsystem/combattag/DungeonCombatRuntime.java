@@ -62,6 +62,10 @@ public final class DungeonCombatRuntime implements Listener, PlayerCombatState {
         return DungeonFoodRegeneration.isEligibleDungeonPlayer(player);
     }
 
+    public static boolean isInManagedCombatWorld(Player player) {
+        return DungeonFoodRegeneration.isInEligibleCombatContent(player);
+    }
+
     public void start() {
         if (updateTask != null)
             throw new IllegalStateException("Dungeon combat runtime is already running.");

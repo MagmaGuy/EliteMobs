@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime;
 import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
 import com.magmaguy.elitemobs.experimentalcombat.passives.ClassPassiveRuntime;
+import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,6 +19,7 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 
 /**
  * Removes persistent attribute state left behind by a crash or forced process termination.
@@ -29,6 +31,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public final class ExperimentalCombatStateRecovery implements Listener {
 
     public static void reconcile(Player player) {
+        if (ExperimentalCombatConfig.isEnabled()
+                && !DungeonCombatRuntime.isInManagedCombatWorld(player))
+            ArmorSkillHealthBonus.applyHealthBonus(player);
         if (ExperimentalCombatRuntime.isActive(player)) return;
         if (ExperimentalCombatConfig.isEnabled() && DungeonCombatRuntime.isEligiblePlayer(player)) return;
         clearOwnedState(player);
@@ -51,6 +56,12 @@ public final class ExperimentalCombatStateRecovery implements Listener {
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
             if (player.isOnline()) reconcile(player);
         });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        // Also recover stale item/attribute state when the runtime is disabled.
+        reconcile(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

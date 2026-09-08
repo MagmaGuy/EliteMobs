@@ -53,15 +53,15 @@ class DungeonFoodRegenerationTest {
     }
 
     @Test
-    void protectedWorldEligibilityDoesNotDependOnGameMode() {
+    void genericWorldProtectionDoesNotEnableEliteMobsCombatRules() {
         World protectedWorld = world(WORLD_ID);
         InstanceProtector.addProtectedWorld(protectedWorld);
 
         for (GameMode gameMode : GameMode.values()) {
-            assertTrue(
+            assertFalse(
                     DungeonFoodRegeneration.isEligibleDungeonPlayer(
                             player(gameMode, protectedWorld, true, false)),
-                    () -> gameMode + " players must be eligible in an EliteMobs-protected world");
+                    () -> gameMode + " players must not qualify from generic world protection alone");
         }
     }
 

@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.skills;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime;
+import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import org.bukkit.NamespacedKey;
@@ -34,7 +36,7 @@ public class ArmorSkillHealthBonus {
     public static void applyHealthBonus(Player player) {
         if (player == null || !player.isOnline()) return;
 
-        if (SkillsConfig.isWorldExcludedFromSkills(player)) {
+        if (!isHealthBonusWorld(player)) {
             removeHealthBonus(player);
             resetPlayerHealthDisplay(player);
             clampHealthToCurrentMaxHealth(player);
@@ -156,7 +158,7 @@ public class ArmorSkillHealthBonus {
     public static double getBonusHealth(Player player) {
         if (player == null) return 0;
         if (!SkillsConfig.isArmorSkillHealthBonusEnabled()) return 0;
-        if (SkillsConfig.isWorldExcludedFromSkills(player)) return 0;
+        if (!isHealthBonusWorld(player)) return 0;
 
         long armorXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
         int armorLevel = SkillXPCalculator.levelFromTotalXP(armorXP);
@@ -179,8 +181,14 @@ public class ArmorSkillHealthBonus {
      * World exclusions disable armor skill health in the same way as disabling the mechanic.
      */
     public static double getConfiguredMaxHealthForPlayer(Player player, int armorLevel) {
-        if (SkillsConfig.isWorldExcludedFromSkills(player)) return VANILLA_MAX_HEALTH;
+        if (!isHealthBonusWorld(player)) return VANILLA_MAX_HEALTH;
         return getConfiguredMaxHealthForArmorLevel(armorLevel);
+    }
+
+    private static boolean isHealthBonusWorld(Player player) {
+        return !SkillsConfig.isWorldExcludedFromSkills(player)
+                && (!ExperimentalCombatConfig.isEnabled()
+                || DungeonCombatRuntime.isInManagedCombatWorld(player));
     }
 
     public static int getBonusHearts(Player player) {

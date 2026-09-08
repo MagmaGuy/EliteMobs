@@ -72,7 +72,9 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
     }
 
     public static boolean isActive(Player player) {
-        return instance != null && instance.activePlayers.containsKey(player.getUniqueId());
+        return instance != null && ExperimentalCombatConfig.isEnabled()
+                && DungeonCombatRuntime.isEligiblePlayer(player)
+                && instance.activePlayers.containsKey(player.getUniqueId());
     }
 
     public static void shutdownIfInitialized() {
@@ -140,7 +142,8 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
         boolean shouldBeActive = ExperimentalCombatConfig.isEnabled()
                 && DungeonCombatRuntime.isEligiblePlayer(player);
         boolean isActive = activePlayers.containsKey(player.getUniqueId());
-        if (isActive && player.isDead()) return;
+        if (isActive && player.isDead() && ExperimentalCombatConfig.isEnabled()
+                && DungeonCombatRuntime.isInManagedCombatWorld(player)) return;
         if (shouldBeActive && !isActive) {
             enter(player);
         } else if (!shouldBeActive && isActive) {
@@ -277,6 +280,10 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
         for (UUID playerId : activePlayers.keySet().toArray(UUID[]::new)) {
             Player player = Bukkit.getPlayer(playerId);
             if (player == null || !player.isOnline() || player.isDead()) continue;
+            if (!isActive(player)) {
+                reconcilePlayer(player, false);
+                continue;
+            }
             if (player.getFoodLevel() != ExperimentalCombatRules.SERVER_FOOD_LEVEL
                     || player.getSaturation() != 0F
                     || player.getExhaustion() != 0F)
@@ -455,6 +462,13 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
+        // Restore the vanilla baseline before destination-world food or healing
+        // events can run. Entering another managed world may wait for its setup.
+        if (!DungeonCombatRuntime.isEligiblePlayer(player)) {
+            if (activePlayers.containsKey(player.getUniqueId())) leave(player);
+            else ExperimentalCombatStateRecovery.reconcile(player);
+            return;
+        }
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
             if (player.isOnline()) reconcilePlayer(player, true);
         });
