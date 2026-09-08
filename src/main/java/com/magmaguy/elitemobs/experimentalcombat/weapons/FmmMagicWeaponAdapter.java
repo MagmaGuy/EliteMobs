@@ -5,8 +5,6 @@ import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatEnemyAuthorization;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime;
 import com.magmaguy.elitemobs.experimentalcombat.damage.ExperimentalDamageScaling;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -95,8 +93,8 @@ final class FmmMagicWeaponAdapter
     @Override
     public boolean isTargetEligible(MagicTargetRequest request) {
         Objects.requireNonNull(request, "request");
-        return magicWeaponControlsActive(request.attacker())
-                && ExperimentalCombatEnemyAuthorization.canTargetWithMagicWeapon(
+        // Weapon impacts are independent of the player's class controls and world baseline.
+        return ExperimentalCombatEnemyAuthorization.canTargetWithMagicWeapon(
                 request.attacker(), request.target());
     }
 
@@ -110,13 +108,6 @@ final class FmmMagicWeaponAdapter
             // Fall through to the plugin-neutral classification.
         }
         return MagicAttackResolver.defaultTargetPriority(request.target());
-    }
-
-    /** Magic weapons follow class controls: EliteMobs worlds always, elsewhere via the toggle. */
-    private static boolean magicWeaponControlsActive(org.bukkit.entity.Player attacker) {
-        if (ExperimentalCombatRuntime.isActive(attacker)) return true;
-        return ExperimentalCombatModule.isInitialized()
-                && ExperimentalCombatModule.get().mechanicsActive(attacker);
     }
 
     private double scaledDamage(
