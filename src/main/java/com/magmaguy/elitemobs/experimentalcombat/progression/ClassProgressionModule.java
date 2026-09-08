@@ -516,6 +516,45 @@ public final class ClassProgressionModule {
         }
     }
 
+    /** Revokes a form and all descendants, preserving its ancestors and sibling branches. */
+    public ClassProgressionForgetResult forgetForAdministration(UUID playerId, String formId) {
+        Objects.requireNonNull(playerId, "playerId");
+        Objects.requireNonNull(formId, "formId");
+        if (catalog.find(formId).isEmpty())
+            return new ClassProgressionForgetResult(ClassProgressionForgetResult.Status.UNKNOWN_FORM, 0, false);
+        CachedPlayer state = readyState(playerId);
+        if (state == null)
+            return new ClassProgressionForgetResult(ClassProgressionForgetResult.Status.NOT_READY, 0, false);
+        synchronized (state.monitor) {
+            if (!isReady(state))
+                return new ClassProgressionForgetResult(ClassProgressionForgetResult.Status.NOT_READY, 0, false);
+            if (runSelections.containsKey(playerId))
+                return new ClassProgressionForgetResult(ClassProgressionForgetResult.Status.RUN_LOCKED, 0, false);
+
+            Set<String> forgotten = new HashSet<>();
+            List<StoredClassProgress> rows = new ArrayList<>();
+            for (ClassFormDefinition form : catalog.forms()) {
+                if (!catalog.lineageOf(form.id()).formIds().contains(formId)) continue;
+                forgotten.add(form.id());
+                state.progressXp.put(form.id(), 0L);
+                state.challenges.remove(form.id());
+                // Explicit false rows also override legacy databases whose column defaults to true.
+                rows.add(new StoredClassProgress(playerId, form.id(), 0L, catalogVersion, false));
+            }
+            boolean selectionCleared = forgotten.contains(state.profile.selectedFormId());
+            if (selectionCleared)
+                state.profile = new StoredClassProfile(playerId, null, state.profile.selectedInputId(), catalogVersion);
+            StoredClassProfile profile = state.profile;
+            List<StoredClassProgress> persistedRows = List.copyOf(rows);
+            trackPersistence(playerId, state, submitInternal(() -> {
+                store.savePlayerAggregate(profile, persistedRows);
+                return null;
+            }));
+            return new ClassProgressionForgetResult(
+                    ClassProgressionForgetResult.Status.APPLIED, forgotten.size(), selectionCleared);
+        }
+    }
+
     /**
      * Permission-gated tester fixture backing {@code /em loot debug}: scales every class tree to
      * one effective level. Forms whose band contains the level are set to it exactly, their
@@ -823,8 +862,9 @@ public final class ClassProgressionModule {
             long parentXpAtCap = xpAtLocalCap(parent, parent.localProgressionCap(levels::get));
             int parentLocalLevel = localLevelFromXp(parent,
                     Math.min(progressXp.getOrDefault(parent.id(), 0L), parentXpAtCap));
-            if (parentLocalLevel < 30)
-                blockers.add(UnlockBlocker.parentLocalLevel(parent.id(), parentLocalLevel, 30));
+            int completedParentLevel = parent.band().toLocalLevel(parent.band().effectiveEnd());
+            if (parentLocalLevel < completedParentLevel)
+                blockers.add(UnlockBlocker.parentLocalLevel(parent.id(), parentLocalLevel, completedParentLevel));
         }
 
         List<UnlockBlocker> result = List.copyOf(blockers);

@@ -163,8 +163,8 @@ final class ClassMenuProjector {
         ClassFormDefinition requiredForm = catalog.require(blocker.formId());
         return new ClassMenuView.BlockerView(
                 requiredForm.displayName(),
-                blocker.requiredLevel(),
-                blocker.currentLevel(),
+                requiredForm.band().toEffectiveLevel(blocker.requiredLevel()),
+                blocker.currentLevel() == 0 ? 0 : requiredForm.band().toEffectiveLevel(blocker.currentLevel()),
                 catalog.lineageOf(requiredForm.id()).resourceType().displayName());
     }
 

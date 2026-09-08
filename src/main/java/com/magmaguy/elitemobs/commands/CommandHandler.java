@@ -171,6 +171,7 @@ public class CommandHandler {
             emCommand.registerCommand(new ExperimentalClassInfoCommand());
             emCommand.registerCommand(new ExperimentalClassSelectCommand());
             emCommand.registerCommand(new ExperimentalClassTestSetCommand());
+            emCommand.registerCommand(new ExperimentalClassTestForgetCommand());
             ClassSelectionMenu.commands().forEach(emCommand::registerCommand);
             GuildTrainingMenu.commands().forEach(emCommand::registerCommand);
         }

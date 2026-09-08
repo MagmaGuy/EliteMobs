@@ -54,8 +54,10 @@ final class ExperimentalClassCommandSupport {
             send(player, "  &f" + root.displayName() + " &8(&7" + root.id() + "&8) - " + state);
         }
         send(player, "&e/em class info <class> &7details &8| &e/em class select <class> &7select");
-        if (player.hasPermission("elitemobs.experimentalcombat.admin"))
+        if (player.hasPermission("elitemobs.experimentalcombat.admin")) {
             send(player, "&dTester admin: &f/em class test set <player> <class> <effectiveLevel>");
+            send(player, "&dForget a branch: &f/em class test forget <player> <class>");
+        }
     }
 
     static void showForm(Player player, String formId) {
@@ -148,9 +150,10 @@ final class ExperimentalClassCommandSupport {
                     + blocker.skillType().getDisplayName() + "&c. You are level &f"
                     + blocker.currentLevel() + "&c.";
         ClassFormDefinition parent = catalog().require(blocker.formId());
-        return "&cYou need to be level &f" + blocker.requiredLevel() + "&c in &f"
-                + parent.displayName() + "&c. You are level &f"
-                + blocker.currentLevel() + "&c.";
+        return "&cMax out &f" + parent.displayName() + " &cat level &f"
+                + parent.band().toEffectiveLevel(blocker.requiredLevel()) + "&c before branching. "
+                + "You are level &f" + (blocker.currentLevel() == 0 ? 0
+                : parent.band().toEffectiveLevel(blocker.currentLevel())) + "&c.";
     }
 
     static void send(Player player, String message) {

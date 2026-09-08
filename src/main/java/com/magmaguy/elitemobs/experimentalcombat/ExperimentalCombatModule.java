@@ -42,6 +42,7 @@ import com.magmaguy.elitemobs.experimentalcombat.progression.AwardResult;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ClassProgressionModule;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ClassContentAvailability;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ClassProgressionSetResult;
+import com.magmaguy.elitemobs.experimentalcombat.progression.ClassProgressionForgetResult;
 import com.magmaguy.elitemobs.experimentalcombat.progression.InputProfile;
 import com.magmaguy.elitemobs.experimentalcombat.progression.FoundationLevelSnapshot;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ProfileSnapshot;
@@ -340,6 +341,17 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         if (result.applied()) {
             reconcileAfterClassSelection(player);
         }
+        return result;
+    }
+
+    /** Resets one subtree and immediately releases any affected active class mechanics. */
+    public ClassProgressionForgetResult forgetClassForAdministration(Player player, String formId) {
+        if (PlayerData.getMatchInstance(player) != null)
+            return new ClassProgressionForgetResult(ClassProgressionForgetResult.Status.RUN_LOCKED, 0, false);
+        reconcileRunLock(player);
+        ClassProgressionForgetResult result = progression.forgetForAdministration(player.getUniqueId(), formId);
+        if (result.status() == ClassProgressionForgetResult.Status.APPLIED && result.selectionCleared())
+            reconcileAfterClassSelection(player);
         return result;
     }
 
