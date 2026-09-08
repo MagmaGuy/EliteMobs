@@ -14,10 +14,8 @@ public record StoredClassProfile(
         UUID playerId,
         String selectedFormId,
         String selectedInputId,
-        Integer focusSlot,
         int catalogVersion) {
 
-    public static final int DEFAULT_FOCUS_SLOT = 8;
 
     public StoredClassProfile {
         Objects.requireNonNull(playerId, "playerId");

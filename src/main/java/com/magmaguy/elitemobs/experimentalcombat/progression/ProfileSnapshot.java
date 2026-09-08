@@ -12,7 +12,6 @@ public record ProfileSnapshot(
         UUID playerId,
         String selectedFormId,
         InputProfile selectedInputProfile,
-        int focusSlot,
         int catalogVersion,
         UUID lockedRunId,
         RunSelection lockedRunSelection,

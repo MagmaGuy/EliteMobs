@@ -229,19 +229,6 @@ class ClassAbilityInputRouterTest {
         assertEquals(1, actionBars.size());
     }
 
-    @Test
-    void everyInputMethodStaysActiveOnTheFocusItemProfile() {
-        // Input profiles choose which controls are granted and advertised, never which ones are
-        // accepted: the F chord and hotbar selection must keep working for a focus-profile player.
-        input.activeProfile = InputProfile.FOCUS_ITEM;
-        router.onSwapHands(new PlayerSwapHandItemsEvent(player, null, null));
-        PlayerItemHeldEvent selection = new PlayerItemHeldEvent(player, 4, 1);
-        router.onAbilityHotbarSelection(selection);
-
-        assertEquals(List.of(AbilitySlot.SIGNATURE), input.usedSlots);
-        assertTrue(selection.isCancelled());
-    }
-
     private static <T> T proxy(Class<T> type, InvocationHandler handler) {
         return type.cast(Proxy.newProxyInstance(
                 type.getClassLoader(),

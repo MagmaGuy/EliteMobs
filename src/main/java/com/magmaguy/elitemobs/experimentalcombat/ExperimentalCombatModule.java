@@ -55,8 +55,6 @@ import com.magmaguy.elitemobs.experimentalcombat.resources.ClassResourceControll
 import com.magmaguy.elitemobs.experimentalcombat.weapons.ExperimentalMagicWeaponIntegration;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.parties.Party;
-import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.elitemobs.playerdata.database.JdbcClassProgressionStore;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
@@ -305,7 +303,6 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
 
     @Override
     public InputProfile activeInputProfile(Player player) {
-        if (GeyserDetector.bedrockPlayer(player)) return InputProfile.FOCUS_ITEM;
         return progression.snapshot(player.getUniqueId())
                 .map(ProfileSnapshot::activeInputProfile)
                 .orElse(InputProfile.DEFAULT);
@@ -363,27 +360,6 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
             reconcileAfterClassSelection(player);
         }
         return result;
-    }
-
-    public SelectionResult selectInput(Player player, InputProfile inputProfile) {
-        if (!mayChangeRunSelection(player))
-            return new SelectionResult(SelectionResult.Status.LOCKED_FORM,
-                    progression.snapshot(player.getUniqueId()).orElse(null));
-        InputProfile supportedProfile = GeyserDetector.bedrockPlayer(player)
-                ? InputProfile.FOCUS_ITEM
-                : inputProfile;
-        SelectionResult result = progression.selectInputProfile(player.getUniqueId(), supportedProfile);
-        if (result.accepted()) {
-            if (supportedProfile == InputProfile.FOCUS_ITEM && mechanicsActive(player))
-                giveFocusItem(player);
-            else if (supportedProfile != InputProfile.FOCUS_ITEM)
-                inputRouter.removeFocusItems(player);
-        }
-        return result;
-    }
-
-    public SelectionResult selectFocusSlot(Player player, int slot) {
-        return progression.selectFocusSlot(player.getUniqueId(), slot);
     }
 
     @Override
@@ -489,13 +465,6 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         return participation.participants(elite);
     }
 
-    public ClassAbilityInputRouter.FocusItemGiveResult giveFocusItem(Player player) {
-        int preferredSlot = progression.snapshot(player.getUniqueId())
-                .map(ProfileSnapshot::focusSlot)
-                .orElse(8);
-        return inputRouter.giveFocusItem(player, preferredSlot);
-    }
-
     private void load(Player player) {
         progression.load(player.getUniqueId()).whenComplete((snapshot, failure) ->
                 Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
@@ -509,27 +478,9 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
                         return;
                     }
                     progressionFailureWarnings.remove(player.getUniqueId());
-                    if (GeyserDetector.bedrockPlayer(player)
-                            && snapshot.selectedInputProfile() != InputProfile.FOCUS_ITEM) {
-                        progression.selectInputProfile(player.getUniqueId(), InputProfile.FOCUS_ITEM);
-                    }
                     CombatLevelDisplay.updateDisplay(player);
                     reconcileRunLock(player);
                     reconcilePlayer(player);
-                    if (GeyserDetector.bedrockPlayer(player)
-                            && mechanicsActive(player)) {
-                        ClassAbilityInputRouter.FocusItemGiveResult focusResult = giveFocusItem(player);
-                        if (focusResult.status() == ClassAbilityInputRouter.FocusItemGiveStatus.INVENTORY_FULL) {
-                            player.sendMessage(ChatColorConverter.convert(
-                                    "&cBedrock Class Focus controls are selected, but your inventory is full. Free a slot and run &f/em class focus&c."));
-                        } else if (focusResult.status() == ClassAbilityInputRouter.FocusItemGiveStatus.INVALID_PREFERRED_SLOT) {
-                            player.sendMessage(ChatColorConverter.convert(
-                                    "&cYour saved Class Focus slot is invalid. Please report this to the developer."));
-                        } else {
-                            player.sendMessage(ChatColorConverter.convert(
-                                    "&eBedrock detected: your universal Class Focus controls are enabled automatically."));
-                        }
-                    }
                 }));
     }
 
@@ -600,7 +551,6 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
             if (resources.snapshot(player.getUniqueId()).isPresent()) abilityEngine.deactivate(player);
             resources.close(player);
             passiveRuntime.reconcile(player, false);
-            inputRouter.removeFocusItems(player);
             return;
         }
         ClassResourceType resourceType = catalog.lineageOf(active.activeFormId()).resourceType();
@@ -608,8 +558,6 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         if (!resources.isOpen(player.getUniqueId(), resourceType, runToken))
             resources.open(player, resourceType, runToken);
         passiveRuntime.reconcile(player, passiveActive.test(player));
-        if (optional.get().activeInputProfile() == InputProfile.FOCUS_ITEM
-                && !inputRouter.hasFocusItem(player)) giveFocusItem(player);
     }
 
     private void reconcileAfterClassSelection(Player player) {
@@ -667,9 +615,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         double maximum = resource == null
                 ? BuiltInClassContent.resourceDefinitions().get(lineage.resourceType()).maximum()
                 : resource.maximum();
-        String controls = activeInputProfile(player) == InputProfile.JAVA_HOTBAR_LAYER
-                ? "&7F,F: Mobility | F+LMB: Signature | F+RMB: Utility"
-                : "&7Focus item";
+        String controls = "&7F,F: Mobility | F+LMB: Signature | F+RMB: Utility";
         String compact = healthDisplay + " &8| &e" + resourceName(lineage.resourceType())
                 + " " + Math.round(amount) + "/" + Math.round(maximum);
         String reminder = "&b[" + active.activeEffectiveLevel() + "] "

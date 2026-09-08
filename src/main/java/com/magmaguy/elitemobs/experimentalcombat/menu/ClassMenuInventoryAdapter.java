@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.experimentalcombat.menu;
 
-import com.magmaguy.elitemobs.experimentalcombat.progression.InputProfile;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Bukkit;
@@ -126,20 +125,8 @@ final class ClassMenuInventoryAdapter implements ClassMenuRenderer, Listener {
         inventory.setItem(4, item(Material.WRITABLE_BOOK,
                 ClassMenuStyle.title("Ability Controls"), page.bodyLines()));
 
-        int inputIndex = 0;
-        int[] inputSlots = {20, 24};
         for (ClassMenuPresentation.ActionView action : page.actions()) {
             switch (action.kind()) {
-                case INPUT -> {
-                    if (inputIndex >= inputSlots.length) continue;
-                    Material material = action.action() instanceof ClassMenuAction.SelectInput selectInput
-                            && selectInput.profile() == InputProfile.JAVA_HOTBAR_LAYER
-                            ? Material.IRON_SWORD : Material.BLAZE_ROD;
-                    action(inventory, session, inputSlots[inputIndex++], material,
-                            action.label(), tooltipLore(action), player, action.action());
-                }
-                case RECOVER_FOCUS -> action(inventory, session, 31, Material.ENDER_EYE,
-                        action.label(), tooltipLore(action), player, action.action());
                 case OVERVIEW -> action(inventory, session, 49, Material.ARROW,
                         action.label(), tooltipLore(action), player, action.action());
                 default -> {

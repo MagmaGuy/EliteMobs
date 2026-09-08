@@ -38,8 +38,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public final class ClassProgressionModule {
 
-    public static final int MIN_FOCUS_SLOT = 0;
-    public static final int MAX_FOCUS_SLOT = 8;
 
     private static final AtomicInteger THREAD_SEQUENCE = new AtomicInteger();
 
@@ -233,7 +231,6 @@ public final class ClassProgressionModule {
                     playerId,
                     formId,
                     state.profile.selectedInputId(),
-                    state.profile.focusSlot(),
                     catalogVersion);
             enqueueProfileSave(playerId, state);
             return new SelectionResult(SelectionResult.Status.APPLIED,
@@ -256,7 +253,6 @@ public final class ClassProgressionModule {
                     playerId,
                     null,
                     state.profile.selectedInputId(),
-                    state.profile.focusSlot(),
                     catalogVersion);
             enqueueProfileSave(playerId, state);
             return new SelectionResult(SelectionResult.Status.APPLIED,
@@ -280,7 +276,6 @@ public final class ClassProgressionModule {
                     playerId,
                     state.profile.selectedFormId(),
                     inputProfile.storedId(),
-                    state.profile.focusSlot(),
                     catalogVersion);
             enqueueProfileSave(playerId, state);
             return new SelectionResult(SelectionResult.Status.APPLIED,
@@ -288,33 +283,7 @@ public final class ClassProgressionModule {
         }
     }
 
-    public SelectionResult selectFocusSlot(UUID playerId, int focusSlot) {
-        Objects.requireNonNull(playerId, "playerId");
-        CachedPlayer state = readyState(playerId);
-        if (state == null) return new SelectionResult(SelectionResult.Status.NOT_READY, null);
-
-        synchronized (state.monitor) {
-            if (!isReady(state)) return new SelectionResult(SelectionResult.Status.NOT_READY, null);
-            Map<SkillType, Integer> levels = captureFoundationLevels(playerId);
-            if (!isValidFocusSlot(focusSlot))
-                return new SelectionResult(SelectionResult.Status.INVALID_FOCUS_SLOT,
-                        snapshotLocked(playerId, state, levels));
-            if (Objects.equals(focusSlot, state.profile.focusSlot()))
-                return new SelectionResult(SelectionResult.Status.UNCHANGED,
-                        snapshotLocked(playerId, state, levels));
-            state.profile = new StoredClassProfile(
-                    playerId,
-                    state.profile.selectedFormId(),
-                    state.profile.selectedInputId(),
-                    focusSlot,
-                    catalogVersion);
-            enqueueProfileSave(playerId, state);
-            return new SelectionResult(SelectionResult.Status.APPLIED,
-                    snapshotLocked(playerId, state, levels));
-        }
-    }
-
-    /** Locks form and input only. Focus-slot edits remain live and apply to later input handling. */
+    /** Locks the selected class and its controls for this run. */
     public RunLockResult lockRun(UUID playerId, UUID runId) {
         Objects.requireNonNull(playerId, "playerId");
         Objects.requireNonNull(runId, "runId");
@@ -530,7 +499,6 @@ public final class ClassProgressionModule {
                     playerId,
                     formId,
                     state.profile.selectedInputId(),
-                    state.profile.focusSlot(),
                     catalogVersion);
             StoredClassProfile persistedProfile = state.profile;
             trackPersistence(playerId, state, submitInternal(() -> {
@@ -599,7 +567,6 @@ public final class ClassProgressionModule {
                         playerId,
                         null,
                         state.profile.selectedInputId(),
-                        state.profile.focusSlot(),
                         catalogVersion);
             }
             StoredClassProfile persistedProfile = state.profile;
@@ -735,14 +702,10 @@ public final class ClassProgressionModule {
 
         InputProfile inputProfile = InputProfile.fromStoredId(stored.selectedInputId())
                 .orElse(InputProfile.DEFAULT);
-        int focusSlot = stored.focusSlot() != null && isValidFocusSlot(stored.focusSlot())
-                ? stored.focusSlot()
-                : StoredClassProfile.DEFAULT_FOCUS_SLOT;
         return new StoredClassProfile(
                 playerId,
                 selectedFormId,
                 inputProfile.storedId(),
-                focusSlot,
                 catalogVersion);
     }
 
@@ -798,7 +761,6 @@ public final class ClassProgressionModule {
                 playerId,
                 state.profile.selectedFormId(),
                 selectedInputProfile(state.profile),
-                state.profile.focusSlot(),
                 catalogVersion,
                 lockedRun == null ? null : lockedRun.runId(),
                 runSelection,
@@ -904,7 +866,7 @@ public final class ClassProgressionModule {
                 enqueueProgressSave(playerId, state, formId, state.progressXp.getOrDefault(formId, 0L));
             if (!formId.equals(state.profile.selectedFormId())) {
                 state.profile = new StoredClassProfile(playerId, formId, state.profile.selectedInputId(),
-                        state.profile.focusSlot(), catalogVersion);
+                        catalogVersion);
                 enqueueProfileSave(playerId, state);
             }
             return true;
@@ -1086,10 +1048,6 @@ public final class ClassProgressionModule {
             throw new IllegalArgumentException("Class XP resolves outside the " + form.band()
                     + " band at effective level " + effectiveLevel);
         return form.band().toLocalLevel(effectiveLevel);
-    }
-
-    private static boolean isValidFocusSlot(int focusSlot) {
-        return focusSlot >= MIN_FOCUS_SLOT && focusSlot <= MAX_FOCUS_SLOT;
     }
 
     private <T> CompletableFuture<T> submitPersistence(Callable<T> task) {

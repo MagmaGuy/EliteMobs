@@ -14,7 +14,6 @@ import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.entity.Player;
 
-import java.util.Locale;
 
 final class ExperimentalClassCommandSupport {
 
@@ -45,8 +44,7 @@ final class ExperimentalClassCommandSupport {
                     + profile.activeLineage().activeEffectiveLevel()
                     + (profile.lockedRunSelection() == null ? "" : " &c(run locked)"));
         }
-        send(player, "&7Controls: &f" + ExperimentalCombatModule.get().activeInputProfile(player).storedId()
-                + " &8| &7Focus slot: &f" + (profile.focusSlot() + 1));
+        send(player, "&7Controls: &fF,F &7Mobility | &fF+LMB &7Signature | &fF+RMB &7Utility");
         send(player, "&7Root classes:");
         for (ClassFormDefinition root : catalog().roots()) {
             FormProgressSnapshot progress = profile.forms().get(root.id());
@@ -56,7 +54,6 @@ final class ExperimentalClassCommandSupport {
             send(player, "  &f" + root.displayName() + " &8(&7" + root.id() + "&8) - " + state);
         }
         send(player, "&e/em class info <class> &7details &8| &e/em class select <class> &7select");
-        send(player, "&e/em class input <java_hotbar_layer|focus_item> &7controls &8| &e/em class focus &7item");
         if (player.hasPermission("elitemobs.experimentalcombat.admin"))
             send(player, "&dTester admin: &f/em class test set <player> <class> <effectiveLevel>");
     }
@@ -140,19 +137,6 @@ final class ExperimentalClassCommandSupport {
                         send(player, formatBlocker(blocker));
                 }
             }
-            case INVALID_FOCUS_SLOT -> send(player, "&cFocus slot must be between 1 and 9.");
-        }
-    }
-
-    static void reportInputSelection(Player player, SelectionResult result) {
-        switch (result.status()) {
-            case APPLIED -> send(player, "&aClass controls set to &f"
-                    + result.snapshot().selectedInputProfile().storedId() + "&a.");
-            case UNCHANGED -> send(player, "&7That control profile is already selected.");
-            case NOT_READY -> send(player, "&eYour class profile is still loading.");
-            case LOCKED_FORM -> send(player, "&cYour control profile is locked for this dungeon run.");
-            case UNKNOWN_FORM, INVALID_FOCUS_SLOT -> send(player,
-                    "&cThat control profile could not be selected. Please report this to the developer.");
         }
     }
 

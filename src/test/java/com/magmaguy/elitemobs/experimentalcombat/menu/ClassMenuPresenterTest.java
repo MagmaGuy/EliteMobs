@@ -264,7 +264,6 @@ class ClassMenuPresenterTest {
                 view.runLockSummary(),
                 view.selectedInput(),
                 view.activeInput(),
-                view.focusSlot(),
                 view.roots().stream().map(root -> forms.get(root.id())).toList(),
                 forms);
     }

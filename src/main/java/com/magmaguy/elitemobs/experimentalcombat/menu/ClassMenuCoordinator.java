@@ -1,10 +1,7 @@
 package com.magmaguy.elitemobs.experimentalcombat.menu;
 
-import com.magmaguy.elitemobs.experimentalcombat.ClassAbilityEligibility;
 import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
-import com.magmaguy.elitemobs.experimentalcombat.input.ClassAbilityInputRouter;
 import com.magmaguy.elitemobs.experimentalcombat.presentation.ClassPresentationTheme;
-import com.magmaguy.elitemobs.experimentalcombat.progression.InputProfile;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ProfileSnapshot;
 import com.magmaguy.elitemobs.experimentalcombat.progression.SelectionResult;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -75,8 +72,6 @@ final class ClassMenuCoordinator {
             case ClassMenuAction.Challenge challenge ->
                     com.magmaguy.elitemobs.experimentalcombat.challenges.ClassChallengeInstance.admit(
                             player, challenge.formId(), challenge.quotedFee());
-            case ClassMenuAction.SelectInput selectInput -> selectInput(player, selectInput.profile());
-            case ClassMenuAction.GiveFocusItem ignored -> giveFocusItem(player);
             case ClassMenuAction.DeactivateClass ignored -> deactivateClass(player);
         }
     }
@@ -141,55 +136,8 @@ final class ClassMenuCoordinator {
                     && result.snapshot().lockedRunSelection() != null
                     ? "&cYour class is locked until this dungeon run ends."
                     : "&cThat class form is still locked.");
-            case INVALID_FOCUS_SLOT -> send(player, "&cThat class could not be activated.");
         }
         openForm(player, formId, showAllClasses);
-    }
-
-    private void selectInput(Player player, InputProfile inputProfile) {
-        if (!ExperimentalCombatModule.isInitialized()) {
-            open(player);
-            return;
-        }
-        SelectionResult result = ExperimentalCombatModule.get().selectInput(player, inputProfile);
-        switch (result.status()) {
-            case APPLIED -> send(player, "&aClass controls set to &f"
-                    + ClassMenuText.inputName(result.snapshot().selectedInputProfile()) + "&a.");
-            case UNCHANGED -> send(player, "&7You are already using that control scheme.");
-            case NOT_READY -> send(player, "&eYour class profile is still loading.");
-            case LOCKED_FORM -> send(player, "&cYour controls are locked until this dungeon run ends.");
-            case UNKNOWN_FORM, INVALID_FOCUS_SLOT -> send(player,
-                    "&cThat control scheme could not be applied. Please report this to the developer.");
-        }
-        openControls(player);
-    }
-
-    private void giveFocusItem(Player player) {
-        if (!ExperimentalCombatModule.isInitialized()) {
-            open(player);
-            return;
-        }
-        if (!ClassAbilityEligibility.isEligible(player)) {
-            send(player, "&cClass controls are not active here.");
-            openControls(player);
-            return;
-        }
-        ClassAbilityInputRouter.FocusItemGiveResult result = ExperimentalCombatModule.get().giveFocusItem(player);
-        switch (result.status()) {
-            case GIVEN_TO_PREFERRED_SLOT -> send(player,
-                    "&aClass Focus placed in hotbar slot &f" + (result.slot() + 1) + "&a.");
-            case GIVEN_TO_FALLBACK_SLOT -> send(player,
-                    "&eYour preferred slot was occupied; Class Focus was placed in inventory slot &f"
-                            + (result.slot() + 1) + "&e without replacing anything.");
-            case ALREADY_PRESENT -> send(player, result.slot() < 0
-                    ? "&7You already have a Class Focus on your cursor."
-                    : "&7You already have a Class Focus in inventory slot &f" + (result.slot() + 1) + "&7.");
-            case INVENTORY_FULL -> send(player,
-                    "&cYour inventory is full. Free a slot and use &f/em class focus&c again.");
-            case INVALID_PREFERRED_SLOT -> send(player,
-                    "&cYour saved Focus slot is invalid. Please report this to the developer.");
-        }
-        openControls(player);
     }
 
     private ClassMenuRenderer renderer(Player player) {

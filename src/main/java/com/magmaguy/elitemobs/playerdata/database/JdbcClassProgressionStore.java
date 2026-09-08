@@ -36,7 +36,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
             }
 
             try (PreparedStatement statement = connection.prepareStatement(
-                    "SELECT SelectedFormId, SelectedInputId, FocusSlot, CatalogVersion FROM "
+                    "SELECT SelectedFormId, SelectedInputId, CatalogVersion FROM "
                             + PROFILE_TABLE + " WHERE PlayerUUID = ?")) {
                 statement.setString(1, playerId.toString());
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -89,9 +89,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
                 statement.setString(1, profile.playerId().toString());
                 setNullableString(statement, 2, profile.selectedFormId());
                 setNullableString(statement, 3, profile.selectedInputId());
-                if (profile.focusSlot() == null) statement.setNull(4, Types.INTEGER);
-                else statement.setInt(4, profile.focusSlot());
-                statement.setInt(5, profile.catalogVersion());
+                statement.setInt(4, profile.catalogVersion());
                 statement.executeUpdate();
             }
         }
@@ -167,13 +165,10 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
     }
 
     private static StoredClassProfile readProfile(UUID playerId, ResultSet resultSet) throws SQLException {
-        int focusSlotValue = resultSet.getInt("FocusSlot");
-        Integer focusSlot = resultSet.wasNull() ? null : focusSlotValue;
         return new StoredClassProfile(
                 playerId,
                 resultSet.getString("SelectedFormId"),
                 resultSet.getString("SelectedInputId"),
-                focusSlot,
                 resultSet.getInt("CatalogVersion"));
     }
 
@@ -196,9 +191,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
         statement.setString(1, profile.playerId().toString());
         setNullableString(statement, 2, profile.selectedFormId());
         setNullableString(statement, 3, profile.selectedInputId());
-        if (profile.focusSlot() == null) statement.setNull(4, Types.INTEGER);
-        else statement.setInt(4, profile.focusSlot());
-        statement.setInt(5, profile.catalogVersion());
+        statement.setInt(4, profile.catalogVersion());
     }
 
     private static void bindProgress(PreparedStatement statement, StoredClassProgress progress)
@@ -219,18 +212,16 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
 
     private static String upsertProfileSql() {
         String insert = "INSERT INTO " + PROFILE_TABLE
-                + " (PlayerUUID, SelectedFormId, SelectedInputId, FocusSlot, CatalogVersion) VALUES (?, ?, ?, ?, ?)";
+                + " (PlayerUUID, SelectedFormId, SelectedInputId, CatalogVersion) VALUES (?, ?, ?, ?)";
         if (DatabaseConfig.isUseMySQL()) {
             return insert + " ON DUPLICATE KEY UPDATE"
                     + " SelectedFormId = VALUES(SelectedFormId),"
                     + " SelectedInputId = VALUES(SelectedInputId),"
-                    + " FocusSlot = VALUES(FocusSlot),"
                     + " CatalogVersion = VALUES(CatalogVersion)";
         }
         return insert + " ON CONFLICT(PlayerUUID) DO UPDATE SET"
                 + " SelectedFormId = excluded.SelectedFormId,"
                 + " SelectedInputId = excluded.SelectedInputId,"
-                + " FocusSlot = excluded.FocusSlot,"
                 + " CatalogVersion = excluded.CatalogVersion";
     }
 

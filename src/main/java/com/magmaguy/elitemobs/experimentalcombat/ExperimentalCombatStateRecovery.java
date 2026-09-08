@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
 import com.magmaguy.elitemobs.experimentalcombat.passives.ClassPassiveRuntime;
 import com.magmaguy.elitemobs.skills.ArmorSkillHealthBonus;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,17 +21,23 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 /**
- * Removes persistent attribute state left behind by a crash or forced process termination.
+ * Removes retired control items and persistent state left behind by interrupted combat sessions.
  *
  * <p>Normal exits are restored from the live runtime baseline. This listener is intentionally
  * registered even while Experimental Combat is disabled, because a disabled build must still be
  * able to recover a player saved by an earlier enabled build.</p>
  */
 public final class ExperimentalCombatStateRecovery implements Listener {
+    private static final NamespacedKey RETIRED_FOCUS_KEY =
+            NamespacedKey.fromString("elitemobs:experimental_combat_focus");
 
     public static void reconcile(Player player) {
+        removeRetiredControls(player);
         if (ExperimentalCombatConfig.isEnabled()
                 && !DungeonCombatRuntime.isInManagedCombatWorld(player))
             ArmorSkillHealthBonus.applyHealthBonus(player);
@@ -45,6 +52,7 @@ public final class ExperimentalCombatStateRecovery implements Listener {
     }
 
     private static void clearOwnedState(Player player) {
+        removeRetiredControls(player);
         ExperimentalFoodItems.restorePlayerInventory(player);
         ExperimentalCombatRuntime.clearPersistedState(player);
         ClassPassiveRuntime.clearPersistedState(player);
@@ -90,11 +98,19 @@ public final class ExperimentalCombatStateRecovery implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDrop(PlayerDropItemEvent event) {
+        if (isRetiredControl(event.getItemDrop().getItemStack())) {
+            event.getItemDrop().remove();
+            return;
+        }
         ExperimentalFoodItems.restoreDroppedItem(event.getItemDrop());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onItemSpawn(ItemSpawnEvent event) {
+        if (isRetiredControl(event.getEntity().getItemStack())) {
+            event.getEntity().remove();
+            return;
+        }
         ExperimentalFoodItems.restoreDroppedItem(event.getEntity());
     }
 
@@ -106,12 +122,14 @@ public final class ExperimentalCombatStateRecovery implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent event) {
+        event.getDrops().removeIf(ExperimentalCombatStateRecovery::isRetiredControl);
         for (org.bukkit.inventory.ItemStack drop : event.getDrops())
             ExperimentalFoodItems.restoreItem(drop);
     }
 
     private static void refreshAfterInventoryMutation(Player player, org.bukkit.inventory.Inventory topInventory) {
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+            removeRetiredControls(topInventory);
             ExperimentalFoodItems.restoreInventory(topInventory);
             ExperimentalFoodItems.restoreItem(player.getItemOnCursor());
             refreshPlayerInventory(player);
@@ -120,9 +138,27 @@ public final class ExperimentalCombatStateRecovery implements Listener {
 
     private static void refreshPlayerInventory(Player player) {
         if (!player.isOnline()) return;
+        removeRetiredControls(player);
         if (ExperimentalCombatRuntime.isActive(player))
             ExperimentalFoodItems.preparePlayerInventory(player);
         else
             ExperimentalFoodItems.restorePlayerInventory(player);
+    }
+
+    // Migration only: retired synthetic controls must never turn into usable vanilla nether stars.
+    private static boolean isRetiredControl(ItemStack item) {
+        return item != null && item.hasItemMeta() && item.getItemMeta().getPersistentDataContainer().has(
+                RETIRED_FOCUS_KEY, PersistentDataType.BYTE);
+    }
+
+    private static void removeRetiredControls(Inventory inventory) {
+        for (int slot = 0; slot < inventory.getSize(); slot++)
+            if (isRetiredControl(inventory.getItem(slot))) inventory.setItem(slot, null);
+    }
+
+    private static void removeRetiredControls(Player player) {
+        removeRetiredControls(player.getInventory());
+        removeRetiredControls(player.getEnderChest());
+        if (isRetiredControl(player.getItemOnCursor())) player.setItemOnCursor(null);
     }
 }

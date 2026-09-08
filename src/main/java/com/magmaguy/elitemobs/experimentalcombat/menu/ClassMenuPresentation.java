@@ -28,8 +28,6 @@ record ClassMenuPresentation(
         PARENT,
         SELECT,
         CONTROLS,
-        INPUT,
-        RECOVER_FOCUS,
         OVERVIEW,
         DEACTIVATE
     }

@@ -10,8 +10,7 @@ public record SelectionResult(Status status, ProfileSnapshot snapshot) {
         UNCHANGED,
         NOT_READY,
         UNKNOWN_FORM,
-        LOCKED_FORM,
-        INVALID_FOCUS_SLOT
+        LOCKED_FORM
     }
 
     public boolean accepted() {

@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
-import com.magmaguy.elitemobs.experimentalcombat.progression.StoredClassProfile;
 import com.magmaguy.magmacore.util.Logger;
 
 import java.sql.DatabaseMetaData;
@@ -99,7 +98,6 @@ public class GenerateDatabase {
                         + "PlayerUUID VARCHAR(36) PRIMARY KEY NOT NULL, "
                         + "SelectedFormId VARCHAR(64), "
                         + "SelectedInputId VARCHAR(64), "
-                        + "FocusSlot INTEGER DEFAULT " + StoredClassProfile.DEFAULT_FOCUS_SLOT + ", "
                         + "CatalogVersion INTEGER NOT NULL DEFAULT 0"
                         + ")");
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS "

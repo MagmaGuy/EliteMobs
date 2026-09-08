@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.experimentalcombat.menu;
 
-import com.magmaguy.elitemobs.experimentalcombat.progression.InputProfile;
 
 import java.util.Objects;
 
@@ -31,15 +30,6 @@ sealed interface ClassMenuAction {
         public SelectForm {
             Objects.requireNonNull(formId, "formId");
         }
-    }
-
-    record SelectInput(InputProfile profile) implements ClassMenuAction {
-        public SelectInput {
-            Objects.requireNonNull(profile, "profile");
-        }
-    }
-
-    record GiveFocusItem() implements ClassMenuAction {
     }
 
     record Challenge(String formId, double quotedFee) implements ClassMenuAction {

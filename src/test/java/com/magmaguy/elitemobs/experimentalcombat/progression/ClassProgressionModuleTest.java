@@ -106,7 +106,6 @@ class ClassProgressionModuleTest {
                         playerId,
                         "guardian",
                         InputProfile.DEFAULT.storedId(),
-                        StoredClassProfile.DEFAULT_FOCUS_SLOT,
                         BuiltInClassContent.PERSISTENCE_VERSION),
                 new StoredClassProgress(
                         playerId,
@@ -141,7 +140,6 @@ class ClassProgressionModuleTest {
                         playerId,
                         "paladin",
                         InputProfile.DEFAULT.storedId(),
-                        StoredClassProfile.DEFAULT_FOCUS_SLOT,
                         BuiltInClassContent.PERSISTENCE_VERSION),
                 new StoredClassProgress(
                         playerId,
@@ -302,7 +300,6 @@ class ClassProgressionModuleTest {
                     playerId,
                     null,
                     InputProfile.DEFAULT.storedId(),
-                    StoredClassProfile.DEFAULT_FOCUS_SLOT,
                     BuiltInClassContent.PERSISTENCE_VERSION));
         }
 

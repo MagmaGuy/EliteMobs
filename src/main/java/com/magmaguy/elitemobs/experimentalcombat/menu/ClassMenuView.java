@@ -16,7 +16,6 @@ record ClassMenuView(
         String runLockSummary,
         InputProfile selectedInput,
         InputProfile activeInput,
-        int focusSlot,
         List<FormView> roots,
         Map<String, FormView> forms) {
 

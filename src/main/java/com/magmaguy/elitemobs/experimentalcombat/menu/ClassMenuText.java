@@ -12,7 +12,6 @@ final class ClassMenuText {
     static String inputName(InputProfile profile) {
         return switch (profile) {
             case JAVA_HOTBAR_LAYER -> "F ability layer";
-            case FOCUS_ITEM -> "Class Focus item";
         };
     }
 

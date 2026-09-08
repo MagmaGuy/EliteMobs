@@ -3,10 +3,9 @@ package com.magmaguy.elitemobs.experimentalcombat.progression;
 import java.util.Arrays;
 import java.util.Optional;
 
-/** The two supported Experimental Combat input layouts. */
+/** The supported Experimental Combat input layout. */
 public enum InputProfile {
-    JAVA_HOTBAR_LAYER("java_hotbar_layer"),
-    FOCUS_ITEM("focus_item");
+    JAVA_HOTBAR_LAYER("java_hotbar_layer");
 
     public static final InputProfile DEFAULT = JAVA_HOTBAR_LAYER;
 

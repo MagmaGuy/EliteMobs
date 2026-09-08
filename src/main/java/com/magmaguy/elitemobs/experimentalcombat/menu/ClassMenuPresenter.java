@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.experimentalcombat.menu;
 
-import com.magmaguy.elitemobs.experimentalcombat.progression.InputProfile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +33,7 @@ final class ClassMenuPresenter {
                 ClassMenuPresentation.ActionKind.CONTROLS,
                 ClassMenuPresentation.Tone.CONTROL,
                 ClassMenuStyle.section(ClassMenuStyle.TEAL, "Ability Controls"),
-                "&7Choose how your three abilities are activated.",
+                "&7View the controls for your three abilities.",
                 new ClassMenuAction.OpenControls()));
         if (activeForm != null) {
             actions.add(new ClassMenuPresentation.ActionView(
@@ -144,21 +143,9 @@ final class ClassMenuPresenter {
                 ClassMenuStyle.section(ClassMenuStyle.ORANGE, "F + LMB")
                         + " &8• &f" + signature,
                 ClassMenuStyle.section(ClassMenuStyle.GREEN, "F + RMB")
-                        + " &8• &f" + utility,
-                ClassMenuStyle.section(ClassMenuStyle.PURPLE, "Class Focus")
-                        + " &8• &7The item fallback uses the same three abilities.");
+                        + " &8• &f" + utility);
 
         List<ClassMenuPresentation.ActionView> actions = List.of(
-                inputAction(view, InputProfile.JAVA_HOTBAR_LAYER, "Use F Ability Layer",
-                        "&7Press F, then F, left-click or right-click."),
-                inputAction(view, InputProfile.FOCUS_ITEM, "Use Class Focus",
-                        "&7Use one item to choose an ability."),
-                new ClassMenuPresentation.ActionView(
-                        ClassMenuPresentation.ActionKind.RECOVER_FOCUS,
-                        ClassMenuPresentation.Tone.CONTROL,
-                        ClassMenuStyle.section(ClassMenuStyle.TEAL, "Recover Class Focus"),
-                        "&7Returns the Focus without replacing another item.",
-                        new ClassMenuAction.GiveFocusItem()),
                 new ClassMenuPresentation.ActionView(
                         ClassMenuPresentation.ActionKind.OVERVIEW,
                         ClassMenuPresentation.Tone.NAVIGATION,
@@ -191,22 +178,6 @@ final class ClassMenuPresenter {
                 new ClassMenuAction.OpenForm(form.id(), showAllClasses));
     }
 
-    private static ClassMenuPresentation.ActionView inputAction(
-            ClassMenuView view,
-            InputProfile profile,
-            String label,
-            String tooltip) {
-        boolean active = view.activeInput() == profile;
-        String profileName = label.startsWith("Use ") ? label.substring(4) : label;
-        return new ClassMenuPresentation.ActionView(
-                ClassMenuPresentation.ActionKind.INPUT,
-                active ? ClassMenuPresentation.Tone.ACTIVE : ClassMenuPresentation.Tone.CONTROL,
-                active
-                        ? ClassMenuStyle.section(ClassMenuStyle.GREEN, "Using " + profileName)
-                        : ClassMenuStyle.section(ClassMenuStyle.TEAL, label),
-                tooltip,
-                new ClassMenuAction.SelectInput(profile));
-    }
 
     private static String skillsLine(ClassMenuView.FormView form) {
         StringJoiner skills = new StringJoiner(" &8• ");

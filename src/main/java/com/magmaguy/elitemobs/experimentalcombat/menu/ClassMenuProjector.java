@@ -67,7 +67,6 @@ final class ClassMenuProjector {
                 runLockSummary,
                 profile.selectedInputProfile(),
                 profile.activeInputProfile(),
-                profile.focusSlot(),
                 catalog.roots().stream().map(root -> forms.get(root.id())).toList(),
                 forms);
     }

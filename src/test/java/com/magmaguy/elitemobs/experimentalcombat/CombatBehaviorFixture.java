@@ -182,7 +182,7 @@ abstract class CombatBehaviorFixture {
                 for (var root : BuiltInClassContent.catalog().roots())
                     rows(id).put(root.id(), new StoredClassProgress(id, root.id(), 0, version, true));
                 return new StoredClassProfile(id, "spellcaster", InputProfile.DEFAULT.storedId(),
-                        StoredClassProfile.DEFAULT_FOCUS_SLOT, version);
+                        version);
             });
         }
         public List<StoredClassProgress> loadAllProgress(UUID id) { return List.copyOf(rows(id).values()); }
