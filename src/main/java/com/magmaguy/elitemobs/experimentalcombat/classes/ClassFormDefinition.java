@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.experimentalcombat.classes;
 import com.magmaguy.elitemobs.skills.SkillType;
 
 import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.ToIntFunction;
 import java.util.regex.Pattern;
@@ -19,7 +20,8 @@ public record ClassFormDefinition(
         RootClassKit rootKit,
         AbilityDefinition signature,
         AbilityDefinition utility,
-        PassiveDefinition passive) {
+        PassiveDefinition passive,
+        List<SkillType> weaponAffinities) {
     private static final Pattern ID_PATTERN = Pattern.compile("[a-z][a-z0-9_]*");
     private static final int PERSISTED_ID_MAX_LENGTH = 64;
 
@@ -31,6 +33,10 @@ public record ClassFormDefinition(
         signature = requireSlot(signature, AbilitySlot.SIGNATURE);
         utility = requireSlot(utility, AbilitySlot.UTILITY);
         passive = Objects.requireNonNull(passive, "passive");
+        weaponAffinities = List.copyOf(weaponAffinities);
+        if (weaponAffinities.isEmpty() || weaponAffinities.contains(SkillType.ARMOR)
+                || weaponAffinities.stream().distinct().count() != weaponAffinities.size())
+            throw new IllegalArgumentException("Weapon affinities require distinct weapon skills");
 
         if (band.isRoot()) {
             if (parentId != null) throw new IllegalArgumentException("Root form " + id + " must not have a parent");
@@ -50,7 +56,7 @@ public record ClassFormDefinition(
             AbilityDefinition utility,
             PassiveDefinition passive) {
         return new ClassFormDefinition(id, displayName, ClassBand.ROOT, null, foundationSkills, rootKit,
-                signature, utility, passive);
+                signature, utility, passive, foundationWeapons(foundationSkills));
     }
 
     public static ClassFormDefinition specialization(
@@ -64,7 +70,17 @@ public record ClassFormDefinition(
             PassiveDefinition passive) {
         if (band == ClassBand.ROOT) throw new IllegalArgumentException("A specialization cannot use the root band");
         return new ClassFormDefinition(id, displayName, band, parentId, foundationSkills, null,
-                signature, utility, passive);
+                signature, utility, passive, foundationWeapons(foundationSkills));
+    }
+
+    /** Explicit weapon bonuses may differ from the skills used to level this form. */
+    public ClassFormDefinition withWeaponAffinities(SkillType... weapons) {
+        return new ClassFormDefinition(id, displayName, band, parentId, foundationSkills, rootKit,
+                signature, utility, passive, List.of(weapons));
+    }
+
+    private static List<SkillType> foundationWeapons(FoundationSkillPair skills) {
+        return skills.asList().stream().filter(skill -> skill != SkillType.ARMOR).toList();
     }
 
     public Optional<String> optionalParentId() {

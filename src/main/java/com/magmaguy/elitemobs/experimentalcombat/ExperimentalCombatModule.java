@@ -265,12 +265,12 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         return !GeyserDetector.bedrockPlayer(player);
     }
 
-    /** Foundation skill pair of the active form; empty without an active class. */
-    public Set<SkillType> activeClassSkills(Player player) {
+    /** Weapon affinities of the active form; empty without an active class. */
+    public Set<SkillType> activeClassWeaponAffinities(Player player) {
         return progression.snapshot(player.getUniqueId())
                 .flatMap(ProfileSnapshot::optionalActiveLineage)
                 .map(active -> Set.copyOf(
-                        catalog.require(active.activeFormId()).foundationSkills().asList()))
+                        catalog.require(active.activeFormId()).weaponAffinities()))
                 .orElse(Set.of());
     }
 

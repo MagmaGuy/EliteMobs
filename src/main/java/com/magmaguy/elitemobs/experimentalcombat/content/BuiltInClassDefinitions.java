@@ -25,7 +25,8 @@ final class BuiltInClassDefinitions {
                         "Divine Steed", "Ride an armored steed and taunt foes struck.",
                         "Provoke", "Taunt nearby foes and gain defense.",
                         "Repulse", "Blast nearby foes away.",
-                        "Take less damage, but deal less."),
+                        "Take less damage, but deal less.")
+                        .withWeaponAffinities(SkillType.SWORDS, SkillType.MACES),
 
                 form("guardian", "Guardian", ClassBand.LEVEL_31, "paladin", SkillType.ARMOR, SkillType.SPEARS,
                         "Intercession", "Redirect ally damage and taunt attackers.",

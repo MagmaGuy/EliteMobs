@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Encourages playing the active class's weapons: class weapons hit elites 10% harder and
@@ -42,7 +43,7 @@ public final class ClassWeaponAffinity implements Listener {
         SkillType weaponSkill = WeaponIdentityResolver.progressionSkill(
                 player.getInventory().getItemInMainHand());
         if (weaponSkill == null) return; // bare hands and non-weapons stay neutral
-        boolean classWeapon = module.activeClassSkills(player).contains(weaponSkill);
+        boolean classWeapon = module.activeClassWeaponAffinities(player).contains(weaponSkill);
         event.setDamage(event.getDamage()
                 * (classWeapon ? CLASS_WEAPON_MULTIPLIER : OFF_CLASS_WEAPON_MULTIPLIER));
         if (!classWeapon) warnOffClassWeapon(player, module);
@@ -59,8 +60,8 @@ public final class ClassWeaponAffinity implements Listener {
         if (form == null) return;
         lastWarnings.put(player.getUniqueId(), now);
         String header = ClassPresentationTheme.gradient(ClassPresentationTheme.RED, "Off-class weapon");
-        String bonus = "&f" + form.foundationSkills().first().getDisplayName()
-                + " &7and &f" + form.foundationSkills().second().getDisplayName()
+        String bonus = "&f" + form.weaponAffinities().stream()
+                .map(SkillType::getDisplayName).collect(Collectors.joining(" &7and &f"))
                 + " &7deal &a10% more damage &7with &f" + form.displayName() + "&7.";
         ActionBarCompositor.show(
                 player,
