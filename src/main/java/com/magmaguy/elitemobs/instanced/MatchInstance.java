@@ -39,6 +39,9 @@ import java.util.Map;
 public abstract class MatchInstance {
 
     protected static final HashSet<MatchInstance> instances = new HashSet<>();
+    /** Distinguishes successive matches that reuse the same world and physical region. */
+    @Getter
+    private final java.util.UUID runtimeId = java.util.UUID.randomUUID();
     @Getter
     protected final HashMap<Block, InstanceDeathLocation> deathBanners = new HashMap<>();
     @Getter
@@ -161,6 +164,15 @@ public abstract class MatchInstance {
                 && players.contains(player) && !spectators.contains(player)
                 && playerLives.containsKey(player)
                 && player.getWorld().equals(lobbyLocation == null ? world : lobbyLocation.getWorld());
+    }
+
+    /** Transport may move an admitted participant within this match, never across its boundary. */
+    public final boolean authorizesTransport(Player player, Location destination) {
+        return !isDefunct() && !destroyingMatch && player != null && destination != null
+                && players.contains(player) && PlayerData.getMatchInstance(player) == this
+                && (state == InstancedRegionState.ONGOING || isWaitingPlayer(player))
+                && world != null && world.equals(player.getWorld()) && world.equals(destination.getWorld())
+                && isInRegion(player.getLocation()) && isInRegion(destination);
     }
 
     /** Acquired after all cancellable admission preflights, before player registration. */

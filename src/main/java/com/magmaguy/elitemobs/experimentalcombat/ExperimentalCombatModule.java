@@ -390,6 +390,10 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
 
     @Override
     public AbilityResult useAbility(Player player, AbilitySlot slot) {
+        if (com.magmaguy.elitemobs.transport.TransportModule.isInTransit(player)) {
+            sendFeedback(player, "&eClass skills are unavailable during transport.");
+            return AbilityResult.failure("transport." + slot.name().toLowerCase(Locale.ROOT), AbilityFailureReason.INVALID_PLAYER);
+        }
         Optional<ProfileSnapshot> optionalProfile = progression.snapshot(player.getUniqueId());
         if (!mechanicsActive(player) || optionalProfile.isEmpty()) {
             sendFeedback(player, "&cClass controls are not active here.");

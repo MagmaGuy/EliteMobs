@@ -264,6 +264,7 @@ public class EliteMobs extends JavaPlugin {
                     EventsRegistrer.registerPostInitializationEvents();
                     EliteLuaPowerServiceModule.initialize();
                     EliteMindServiceModule.initialize();
+                    com.magmaguy.elitemobs.transport.TransportModule.initialize();
                     Bukkit.getPluginManager().callEvent(new EliteMobsInitializedEvent());
                     Logger.info("EliteMobs fully initialized!");
                     NightbreakPluginUpdater.autoDownloadPluginUpdateIfEnabled(this, NIGHTBREAK_PLUGIN_SPEC);
@@ -632,6 +633,7 @@ public class EliteMobs extends JavaPlugin {
         GuildTrainingMenu.shutdown();
         MagmaCore.requestInitializationShutdown(this);
         PatrolEditor.shutdown();
+        com.magmaguy.elitemobs.transport.TransportModule.shutdown();
         PatrolService.shutdown();
         // Physical class servants and portal surfaces must be removed while their native Mind
         // runtime is still available.

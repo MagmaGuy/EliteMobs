@@ -92,6 +92,8 @@ public class NPCsConfigFields extends CustomConfigFields {
     @Setter
     private List<String> scripts = new ArrayList<>();
     @Getter
+    private List<String> transportRoutes = new ArrayList<>();
+    @Getter
     private PatrolRoute patrolRoute;
 
     public NPCsConfigFields(String fileName,
@@ -192,6 +194,7 @@ public class NPCsConfigFields extends CustomConfigFields {
         this.scale = processDouble("scale", scale, 1, false);
         this.syncMovement = processBoolean("syncMovement", syncMovement, false, true);
         this.scripts = processStringList("scripts", scripts, new ArrayList<>(), false);
+        this.transportRoutes = processStringList("transportRoutes", transportRoutes, new ArrayList<>(), false);
         try {
             this.patrolRoute = PatrolRoute.parse(fileConfiguration);
         } catch (IllegalArgumentException exception) {

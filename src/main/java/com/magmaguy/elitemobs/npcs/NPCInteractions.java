@@ -49,6 +49,11 @@ public class NPCInteractions implements Listener {
         npcEntity.runScripts(ScriptableNPC.ON_INTERACT, null, player);
 
         switch (npcEntity.getNPCsConfigFields().getInteractionType()) {
+            case TRANSPORT:
+                var transport = com.magmaguy.elitemobs.transport.TransportModule.get();
+                if (transport != null) Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN,
+                        () -> transport.openDestinations(player, npcEntity));
+                break;
             case CLASS_TRAINER:
                 if (player.hasPermission("elitemobs.command") && npcEntity.getNPCsConfigFields().getClassRoot() != null)
                     Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () ->
@@ -291,6 +296,7 @@ public class NPCInteractions implements Listener {
 
     public enum NPCInteractionType {
         CLASS_TRAINER,
+        TRANSPORT,
         GUILD_GREETER,
         CHAT,
         CUSTOM_SHOP,
