@@ -26,7 +26,7 @@ public abstract class ClassTrainerConfig extends NPCsConfigFields {
     }
 
     public static String disguise(String root) {
-        return "player ag_class_" + root + " setskin "
+        return "player " + root + " setskin "
                 + SKINS.getAsJsonObject(root).getAsJsonObject("profile");
     }
 

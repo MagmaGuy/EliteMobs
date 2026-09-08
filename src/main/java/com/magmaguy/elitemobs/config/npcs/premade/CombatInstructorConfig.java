@@ -30,7 +30,7 @@ public class CombatInstructorConfig extends NPCsConfigFields {
                         "Press F twice to move.\\nF + left-click: Signature.\\nF + right-click: Utility.",
                         "Health and class energy\\nappear above your hotbar.\\nWatch both in a fight.",
                         "Mana refills over time.\\nBerserkers build Fury\\nby dealing and taking hits.",
-                        "Paladins recover faster\\nnear elites. Clerics need\\nother players nearby.",
+                        "Paladins recover faster\\nnear elites; Clerics recover\\nfaster near players.",
                         "Rangers regain Focus\\nfaster after five seconds\\nwithout taking damage.",
                         "Wands seek elites first.\\nWalls and other creatures\\ncan block their shots.",
                         "Staff fireballs burst\\non impact. Aim at\\nclustered enemies.",

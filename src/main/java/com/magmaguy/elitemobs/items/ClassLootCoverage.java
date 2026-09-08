@@ -22,7 +22,8 @@ public final class ClassLootCoverage {
     private ClassLootCoverage() {}
 
     public static boolean enabled(CustomBossEntity boss) {
-        return boss.getCustomBossesConfigFields().isClassLoot();
+        return boss.getCustomBossesConfigFields().isClassLoot()
+                && !boss.getCustomBossesConfigFields().isReinforcement() && !boss.isReinforcementOrMount();
     }
 
     public static ItemStack generate(CustomBossEntity boss, int level, Player owner) {
