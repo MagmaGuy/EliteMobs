@@ -761,7 +761,6 @@ public class EliteMobs extends JavaPlugin {
         CombatLevelDisplay.shutdown();
         com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime.shutdownIfInitialized();
         HealthDisplayCoordinator.shutdown();
-        com.magmaguy.elitemobs.presentation.experience.ExperienceBarLease.shutdown();
         com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor.shutdown();
         com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime.shutdownIfInitialized();
         com.magmaguy.elitemobs.utils.BossBarOrderManager.shutdown();

@@ -15,7 +15,6 @@ import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
 import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatSuggestion;
 import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatStateRecovery;
 import com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu;
-import com.magmaguy.elitemobs.presentation.experience.ExperienceBarLeaseListener;
 import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
@@ -418,7 +417,6 @@ public class EventsRegistrer {
             ExperimentalCombatRuntime experimentalCombatRuntime =
                     new ExperimentalCombatRuntime(dungeonCombatRuntime);
             register(experimentalCombatRuntime);
-            register(new ExperienceBarLeaseListener());
             experimentalCombatRuntime.start();
             ExperimentalCombatModule.initialize(dungeonCombatRuntime);
         }

@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.experimentalcombat.classes;
 
 /**
- * Root-class resource shown through the client-side XP bar while Experimental Combat is active.
+ * Root-class resource shown in the Experimental Combat action-bar HUD.
  */
 public enum ClassResourceType {
     RESOLVE("Resolve", "Resolve recovers slowly and grows in frontline combat."),

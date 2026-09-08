@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.experimentalcombat.resources;
 
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassResourceType;
-import com.magmaguy.elitemobs.presentation.experience.ExperienceBarLease;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
@@ -14,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-/** Owns fixed class-resource rules and their client-only XP-bar leases. */
+/** Owns fixed class-resource rules and run-scoped resource amounts. */
 public final class ClassResourceController {
     private final Map<ClassResourceType, ClassResourceDefinition> resourceDefinitions;
     private final Map<UUID, ResourceState> states = new HashMap<>();
@@ -39,48 +38,41 @@ public final class ClassResourceController {
     }
 
     /**
-     * Opens the HUD for one combat context. A suspended state resumes only for the same run token;
+     * Opens resources for one combat context. A suspended state resumes only for the same run token;
      * entering another instance cannot inherit the previous run's resource economy.
      */
     public void open(Player player, ClassResourceType type, UUID runToken) {
         ResourceState existing = states.get(player.getUniqueId());
         if (existing != null && existing.type == type && Objects.equals(existing.runToken, runToken)) {
-            if (existing.lease != null) existing.lease.close();
-            existing.lease = ExperienceBarLease.acquire(player, "experimental_combat_resource");
-            render(existing);
+            existing.suspended = false;
             return;
         }
         close(player);
         double initial = rules(type).initialAmount();
-        ExperienceBarLease lease = ExperienceBarLease.acquire(player, "experimental_combat_resource");
-        ResourceState state = new ResourceState(type, runToken, initial, 0L, lease);
+        ResourceState state = new ResourceState(type, runToken, initial, 0L);
         states.put(player.getUniqueId(), state);
-        render(state);
     }
 
     public void close(Player player) {
-        ResourceState state = states.remove(player.getUniqueId());
-        if (state != null && state.lease != null) state.lease.close();
+        states.remove(player.getUniqueId());
     }
 
     public void discard(Player player) {
-        ResourceState state = states.remove(player.getUniqueId());
-        if (state != null) ExperienceBarLease.discard(player);
+        states.remove(player.getUniqueId());
     }
 
-    /** Detaches the client HUD while retaining the exact run-scoped amount for reconnect. */
+    /** Pauses resources while retaining the exact run-scoped amount for reconnect. */
     public void suspend(Player player) {
         ResourceState state = states.get(player.getUniqueId());
         if (state == null) return;
-        ExperienceBarLease.discard(player);
-        state.lease = null;
+        state.suspended = true;
     }
 
     public void tick(Iterable<? extends Player> players, Predicate<UUID> inCombat) {
         currentTick += 20L;
         for (Player player : players) {
             ResourceState state = states.get(player.getUniqueId());
-            if (state == null) continue;
+            if (state == null || state.suspended) continue;
             boolean playerInCombat = inCombat.test(player.getUniqueId());
             ClassResourceDefinition rules = rules(state.type);
             double delta = playerInCombat ? rules.inCombatTickDelta() : rules.outOfCombatTickDelta();
@@ -168,18 +160,16 @@ public final class ClassResourceController {
 
     public boolean isOpen(UUID playerId, ClassResourceType type) {
         ResourceState state = states.get(playerId);
-        return state != null && state.type == type && state.lease != null;
+        return state != null && state.type == type && !state.suspended;
     }
 
     public boolean isOpen(UUID playerId, ClassResourceType type, UUID runToken) {
         ResourceState state = states.get(playerId);
         return state != null && state.type == type && Objects.equals(state.runToken, runToken)
-                && state.lease != null;
+                && !state.suspended;
     }
 
     public void shutdown() {
-        for (ResourceState state : states.values())
-            if (state.lease != null) state.lease.close();
         states.clear();
     }
 
@@ -198,13 +188,6 @@ public final class ClassResourceController {
         double bounded = Math.max(0D, Math.min(maximum, amount));
         if (Math.abs(bounded - state.amount) < 1.0E-9D) return;
         state.amount = bounded;
-        render(state);
-    }
-
-    private void render(ResourceState state) {
-        double maximum = rules(state.type).maximum();
-        if (state.lease != null)
-            state.lease.render(state.amount / maximum, (int) Math.round(state.amount));
     }
 
     private ClassResourceDefinition rules(ClassResourceType type) {
@@ -227,7 +210,7 @@ public final class ClassResourceController {
     private static final class ResourceState {
         private final ClassResourceType type;
         private final UUID runToken;
-        private ExperienceBarLease lease;
+        private boolean suspended;
         private double amount;
         private long recoveryBlockedUntil;
 
@@ -235,13 +218,11 @@ public final class ClassResourceController {
                 ClassResourceType type,
                 UUID runToken,
                 double amount,
-                long recoveryBlockedUntil,
-                ExperienceBarLease lease) {
+                long recoveryBlockedUntil) {
             this.type = type;
             this.runToken = runToken;
             this.amount = amount;
             this.recoveryBlockedUntil = recoveryBlockedUntil;
-            this.lease = lease;
         }
     }
 }
