@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import com.magmaguy.elitemobs.pathfinding.patrol.PatrolRoute;
 import com.magmaguy.elitemobs.powers.scripts.caching.EliteScriptBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.loading.ScriptValueNormalizer;
+import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -230,10 +231,7 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Setter
     private boolean classLoot;
     @Getter
-    private final java.util.Map<String, String> classLootNames = new java.util.LinkedHashMap<>();
-    @Getter
-    @Setter
-    private List<String> classLootLore = List.of();
+    private final Map<SkillType, ClassLootItem> classLootItems = new EnumMap<>(SkillType.class);
     @Getter
     private double scale = 1D;
     @Getter
@@ -455,14 +453,7 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         boolean baselineBoss = bossType == BossType.BOSS || bossType == BossType.MINIBOSS
                 || bossType == BossType.EVENT || (bossType == BossType.NORMAL && healthMultiplier > 1);
         classLoot = processBoolean("classLoot", baselineBoss, false, false);
-        classLootLore = translatable(filename, "classLootLore",
-                processStringList("classLootLore", classLootLore, List.of(), false));
-        classLootNames.clear();
-        for (com.magmaguy.elitemobs.skills.SkillType skill : com.magmaguy.elitemobs.skills.SkillType.getWeaponSkills()) {
-            String key = "classLootNames." + skill.name();
-            classLootNames.put(skill.name(), translatable(filename, key,
-                    processString(key, "&6$boss's $weapon", "&6$boss's $weapon", false)));
-        }
+        processClassLootItems();
 
         this.scale = processDouble("scale", scale, 1, false);
         this.silent = processBoolean("silent", silent, false, false);
@@ -553,6 +544,35 @@ public class CustomBossesConfigFields extends CustomConfigFields {
                 "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
                 "&aSlayers: $players",
                 "&e&l---------------------------------------------"));
+    }
+
+    private void processClassLootItems() {
+        migrateClassLootPresentation();
+        classLootItems.clear();
+        for (SkillType skill : SkillType.getWeaponSkills()) {
+            String path = "classLootItems." + skill.name();
+            String itemName = processString(path + ".name", ClassLootItem.DEFAULT.name(),
+                    ClassLootItem.DEFAULT.name(), false);
+            List<String> itemLore = processStringList(path + ".lore", List.of(), List.of(), false);
+            classLootItems.put(skill, new ClassLootItem(
+                    translatable(filename, path + ".name", itemName),
+                    translatable(filename, path + ".lore", itemLore)));
+        }
+    }
+
+    /** One-way upgrade of the early flat format; explicit per-item values always win. */
+    private void migrateClassLootPresentation() {
+        boolean hasLegacyLore = fileConfiguration.isList("classLootLore");
+        for (SkillType skill : SkillType.getWeaponSkills()) {
+            String path = "classLootItems." + skill.name();
+            String legacyName = "classLootNames." + skill.name();
+            if (!fileConfiguration.contains(path + ".name") && fileConfiguration.isString(legacyName))
+                fileConfiguration.set(path + ".name", fileConfiguration.getString(legacyName));
+            if (!fileConfiguration.contains(path + ".lore") && hasLegacyLore)
+                fileConfiguration.set(path + ".lore", fileConfiguration.getStringList("classLootLore"));
+        }
+        fileConfiguration.set("classLootNames", null);
+        fileConfiguration.set("classLootLore", null);
     }
 
     public void saveFile() {

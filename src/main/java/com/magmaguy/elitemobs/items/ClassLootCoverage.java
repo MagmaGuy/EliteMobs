@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.items;
 
+import com.magmaguy.elitemobs.config.custombosses.ClassLootItem;
 import com.magmaguy.elitemobs.experimentalcombat.weapons.ExperimentalMagicWeaponItems;
 import com.magmaguy.elitemobs.items.itemconstructor.EnchantmentGenerator;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
@@ -35,10 +36,10 @@ public final class ClassLootCoverage {
                 .replace("$normalLevel", "").replace("$eventBossLevel", "").replace("$reinforcementLevel", "")
                 .replace("$level", Integer.toString(boss.getLevel()));
         bossName = ChatColor.stripColor(ChatColorConverter.convert(bossName)).strip();
-        String template = fields.getClassLootNames().getOrDefault(family.skill.name(), "&6$boss's $weapon");
-        String name = template.replace("$boss", bossName).replace("$weapon", family.label);
+        ClassLootItem presentation = fields.getClassLootItems().getOrDefault(family.skill, ClassLootItem.DEFAULT);
+        String name = presentation.name().replace("$boss", bossName).replace("$weapon", family.label);
         String finalBossName = bossName;
-        List<String> lore = fields.getClassLootLore().stream().map(line ->
+        List<String> lore = presentation.lore().stream().map(line ->
                 line.replace("$boss", finalBossName).replace("$weapon", family.label)).toList();
         Material material = family.material();
         SkillType explicit = family.skill == SkillType.STAVES || family.skill == SkillType.WANDS ? family.skill : null;
