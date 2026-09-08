@@ -37,6 +37,8 @@ public enum ClassLootFamily {
     }
 
     public SkillType skill() { return skill; }
+    public enum Category { WEAPONS, ARMOR, SHIELDS }
+    public Category category() { return isWeapon() ? Category.WEAPONS : this == SHIELDS ? Category.SHIELDS : Category.ARMOR; }
     public String label() { return label; }
     public boolean isWeapon() { return skill != null; }
     public String slot() { return materialName.substring(materialName.lastIndexOf('_') + 1); }

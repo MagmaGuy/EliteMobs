@@ -27,6 +27,7 @@ import java.util.Map;
 public class EliteCustomLootEntry extends CustomLootEntry implements Serializable {
     @Getter
     private String filename = null;
+    public List<String> getDifficultyIDs() { return difficultyIDs == null ? null : List.copyOf(difficultyIDs); }
     private List<String> difficultyIDs = null;
     private final String configFilename;
 
@@ -336,5 +337,11 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     @Override
     public ItemStack previewDrop(int itemTier, Player player) {
         return generateItemStack(itemTier, player, null);
+    }
+
+    /** Administrator-selected level, without the previewer's progression cap. Fixed/limited item rules still apply. */
+    public ItemStack previewDropAtLevel(int level, Player player) {
+        CustomItem item = generateCustomItem();
+        return item == null ? null : item.generateItemStackExact(level, player, null);
     }
 }

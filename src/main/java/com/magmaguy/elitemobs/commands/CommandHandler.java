@@ -55,6 +55,10 @@ public class CommandHandler {
         emCommand.registerCommand(new KillTypeRadiusCommand());
         emCommand.registerCommand(new LootDebugLimitedCommand());
         emCommand.registerCommand(new LootDebugCommand());
+        emCommand.registerCommand(new LootPreviewCommand(false, false));
+        emCommand.registerCommand(new LootPreviewCommand(false, true));
+        emCommand.registerCommand(new LootPreviewCommand(true, false));
+        emCommand.registerCommand(new LootPreviewCommand(true, true));
         emCommand.registerCommand(new MoneyAddCommand());
         emCommand.registerCommand(new MoneyAddAllCommand());
         emCommand.registerCommand(new MoneySetCommand());

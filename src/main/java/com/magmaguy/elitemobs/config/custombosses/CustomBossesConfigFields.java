@@ -239,6 +239,8 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     private final Map<ClassLootFamily, ClassLootItem> classLootItems = new EnumMap<>(ClassLootFamily.class);
     @Getter
+    private List<String> classLootPresentationIssues = List.of();
+    @Getter
     private double scale = 1D;
     @Getter
     @Setter
@@ -563,15 +565,30 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     private void processClassLootItems() {
         migrateClassLootPresentation();
         classLootItems.clear();
+        List<String> issues = new ArrayList<>();
+        var presentation = fileConfiguration.getConfigurationSection("classLootItems");
+        if (presentation != null) for (String key : presentation.getKeys(false)) {
+            try { ClassLootFamily.valueOf(key); }
+            catch (IllegalArgumentException invalid) { issues.add("classLootItems." + key + " (unknown family)"); }
+        }
         for (ClassLootFamily family : ClassLootFamily.values()) {
             String path = "classLootItems." + family.name();
-            String itemName = processString(path + ".name", ClassLootItem.DEFAULT.name(),
-                    ClassLootItem.DEFAULT.name(), false);
-            List<String> itemLore = processStringList(path + ".lore", List.of(), List.of(), false);
+            Object rawName = fileConfiguration.get(path + ".name");
+            Object rawLore = fileConfiguration.get(path + ".lore");
+            boolean validName = rawName instanceof String text && !text.isBlank();
+            boolean validLore = rawLore instanceof List<?> lines && lines.stream().allMatch(String.class::isInstance);
+            if (!validName) issues.add(path + ".name (missing, blank or invalid)");
+            if (!validLore) issues.add(path + ".lore (missing or invalid; use [] for intentionally empty lore)");
+            String itemName = validName ? (String) rawName : ClassLootItem.DEFAULT.name();
+            List<String> itemLore = validLore ? fileConfiguration.getStringList(path + ".lore") : List.of();
             classLootItems.put(family, new ClassLootItem(
                     translatable(filename, path + ".name", itemName),
                     translatable(filename, path + ".lore", itemLore)));
         }
+        classLootPresentationIssues = List.copyOf(issues);
+        if (classLoot && isEnabled() && !issues.isEmpty())
+            Logger.warn("[ClassLoot presentation] " + filename + ": " + String.join("; ", issues)
+                    + ". Missing/invalid fields use generic names or empty lore. Loot remains enabled.");
     }
 
     /** One-way upgrade of the early flat format; explicit per-item values always win. */
