@@ -52,7 +52,7 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
     private static final String HEALTH_MODIFIER_KEY = "experimental_combat_health";
     private static final String ENTRY_WARNING =
             "&6&lExperimental Combat &7is active here. You are testing unfinished combat and class systems; &fplease send feedback to the developer&7. This feature will live, evolve, or die by tester feedback.";
-    private static final String COMBAT_STARTED = "&cIn combat &8- &7passive healing paused";
+    private static final String COMBAT_STARTED = "&cEntering combat!";
     private static final String COMBAT_ENDED = "&aOut of combat &8- &7slow healing resumed";
 
     private static ExperimentalCombatRuntime instance;
@@ -433,7 +433,8 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
             ActionBarCompositor.show(
                     player,
                     ActionBarCompositor.Source.COMBAT_TRANSITION,
-                    ChatColorConverter.convert(COMBAT_STARTED));
+                    ChatColorConverter.convert(COMBAT_STARTED),
+                    ActionBarCompositor.readingDurationTicks(COMBAT_STARTED));
     }
 
     @Override
