@@ -7,13 +7,14 @@ function T.distance(a,b) return math.sqrt((a.x-b.x)^2+(a.z-b.z)^2) end
 function T.direction(a,b) local d=T.distance(a,b); if d<0.001 then return 0,1 end; return (b.x-a.x)/d,(b.z-a.z)/d end
 function T.circle(p,r,inner) return {kind='circle',p=T.copy(p),r=r,inner=inner or 0} end
 function T.cone(p,target,r,degrees) local x,z=T.direction(p,target); return {kind='cone',p=T.copy(p),r=r,x=x,z=z,angle=math.rad(degrees/2)} end
+function T.arc(p,target,r,inner,degrees) local g=T.cone(p,target,r,degrees); g.kind='arc'; g.inner=inner; return g end
 function T.lane(p,target,width) local x,z=T.direction(p,target); return {kind='lane',p=T.copy(p),q=T.copy(target),r=width/2,x=x,z=z,length=T.distance(p,target)} end
 function T.contains(g,p)
   if math.abs(p.y-g.p.y)>3 then return false end
   local x,z=p.x-g.p.x,p.z-g.p.z
   local d=math.sqrt(x*x+z*z)
   if g.kind=='circle' then return d<=g.r and d>=g.inner end
-  if g.kind=='cone' then return d<=g.r and (d<0.05 or (x*g.x+z*g.z)/d>=math.cos(g.angle)) end
+  if g.kind=='cone' or g.kind=='arc' then return d<=g.r and d>=(g.inner or 0) and (d<0.05 or (x*g.x+z*g.z)/d>=math.cos(g.angle)) end
   local along=x*g.x+z*g.z
   return along>=0 and along<=g.length and math.abs(x*g.z-z*g.x)<=g.r
 end
@@ -25,15 +26,18 @@ function T.draw(c,g,particle)
   if g.kind=='circle' then
     for i=0,27 do local a=i*math.pi*2/28; T.point(c,T.offset(g.p,math.cos(a)*g.r,0,math.sin(a)*g.r),particle) end
     if g.inner>0 then for i=0,23 do local a=i*math.pi*2/24; T.point(c,T.offset(g.p,math.cos(a)*g.inner,0,math.sin(a)*g.inner),particle) end end
-  elseif g.kind=='cone' then
+  elseif g.kind=='cone' or g.kind=='arc' then
     local base=math.atan2(g.z,g.x)
     for i=0,18 do local a=base-g.angle+2*g.angle*i/18; T.point(c,T.offset(g.p,math.cos(a)*g.r,0,math.sin(a)*g.r),particle) end
-    for i=0,8 do for _,a in ipairs({base-g.angle,base+g.angle}) do T.point(c,T.offset(g.p,math.cos(a)*g.r*i/8,0,math.sin(a)*g.r*i/8),particle) end end
+    if g.kind=='arc' then
+      for i=0,18 do local a=base-g.angle+2*g.angle*i/18; T.point(c,T.offset(g.p,math.cos(a)*g.inner,0,math.sin(a)*g.inner),particle) end
+    else for i=0,8 do for _,a in ipairs({base-g.angle,base+g.angle}) do T.point(c,T.offset(g.p,math.cos(a)*g.r*i/8,0,math.sin(a)*g.r*i/8),particle) end end end
   else
     for i=0,18 do for _,side in ipairs({-1,1}) do T.point(c,T.offset(g.p,g.x*g.length*i/18+g.z*g.r*side,0,g.z*g.length*i/18-g.x*g.r*side),particle) end end
   end
 end
-function T.hit(c,g,amount) return T.contains(g,c.trial.player:get_location()) and c.trial:damage(amount) end
+function T.damageScale(c) return c.state.outgoing or 1 end
+function T.hit(c,g,amount) return T.contains(g,c.trial.player:get_location()) and c.trial:damage(amount*T.damageScale(c)) end
 function T.sound(c,name,pitch) c.boss:play_sound_at_self(name,.65,pitch or 1) end
 function T.wait(ticks,begin,frame,finish) assert(ticks>=1); return {ticks=ticks,begin=begin,frame=frame,finish=finish} end
 function T.rest(ticks,exposure)
@@ -49,7 +53,7 @@ function T.shot(c,s,kind,target,speed,damage,group,cap)
   local x,z=T.direction(p,target)
   local origin=T.copy(p)
   local projectile=c.boss:summon_projectile(kind,origin,target,speed,{gravity=false,persistent=false,spawn_at_origin=true,track=false})
-  if projectile then c.trial:own_projectile(projectile,damage,group,cap) end
+  if projectile then c.trial:own_projectile(projectile,damage*T.damageScale(c),group,cap*T.damageScale(c)) end
 end
 function T.fan(c,s,target,angles,damage,group,cap)
   local origin=c.boss:get_eye_location()
@@ -102,10 +106,13 @@ function T.advance(c,s)
   local cast=s.cast; if not cast then return end
   local step=cast.steps[cast.index]
   if cast.elapsed==0 and step.begin then step.begin(c,s) end
+  if s.cast~=cast then return end
   if step.frame then step.frame(c,s,cast.elapsed) end
+  if s.cast~=cast then return end
   cast.elapsed=cast.elapsed+1
   if cast.elapsed>=step.ticks then
     if step.finish then step.finish(c,s) end
+    if s.cast~=cast then return end
     cast.index=cast.index+1; cast.elapsed=0
     if cast.index>#cast.steps then s.ready[cast.key]=s.tick+cast.cooldown; s.cast=nil; c.trial:pose('idle') end
   end
@@ -125,6 +132,7 @@ function T.encounter(spec)
     on_boss_damaged_by_player=function(c)
       local s=c.state; if not s.initialized then return end
       if c.trial:is_transfer() then return end
+      if (s.playerWeakUntil or 0)>s.tick then c.event.multiply_damage_amount(1-(s.playerWeakness or .15)) end
       if c.trial:damaged_actor()=='boss' then c.event.multiply_damage_amount(s.exposure or 1) end
       if spec.damaged then spec.damaged(c,s) end
     end
@@ -148,7 +156,7 @@ end
 function T.spawnAlly(c,s,id,offset,weapon,health,type)
   local p=T.offset(c.trial:position(),offset,0,3)
   local actor=c.trial:spawn_actor(id,p,health or 3,'&fSparring '..id,type or 'HUSK')
-  if actor then actor:set_equipment('HAND',weapon or 'IRON_SWORD',{unbreakable=true}); s.allies=s.allies or {}; s.allies[id]={ready=s.tick+40,windup=nil} end
+  if actor then actor:set_equipment('HAND',weapon or 'IRON_SWORD',{unbreakable=true}); s.allies=s.allies or {}; s.allies[id]={ready=s.tick+40,windup=nil,bow=weapon=='BOW'} end
   return actor
 end
 function T.allies(c,s)
@@ -157,17 +165,49 @@ function T.allies(c,s)
     local actor=c.trial:actor(id)
     if actor then
       local p=actor:get_location(); local target=c.trial.player:get_location(); local d=T.distance(p,target)
+      if (s.alliesPausedUntil or 0)>s.tick or (state.pausedUntil or 0)>s.tick then
+        state.windup=nil
+      elseif state.bow then
+        if state.windup then
+          if s.tick%4==0 then T.draw(c,T.lane(p,T.offset(state.target,0,-1,0),.3)) end
+          if s.tick>=state.windup then c.trial:actor_arrow(id,state.target,.2*(state.damage or 1)); state.windup=nil; state.ready=s.tick+60 end
+        elseif s.tick>=state.ready and d<=24 then
+          state.target=T.offset(target,0,1,0); state.windup=s.tick+(state.tell or 24); actor:play_sound_at_self('BLOCK_NOTE_BLOCK_HARP',.4,1.2)
+        end
+      else
       if d<3.5 then close=close+1 end
       if state.windup then
-        if s.tick%5==0 then T.draw(c,state.shape,T.gold) end
-        if s.tick>=state.windup then if T.contains(state.shape,target) then c.trial:actor_damage(id,.2) end; state.windup=nil; state.ready=s.tick+60 end
+        if s.tick%5==0 then T.draw(c,state.shape) end
+        if s.tick>=state.windup then if T.contains(state.shape,target) then c.trial:actor_damage(id,.2*(state.damage or 1)) end; state.windup=nil; state.ready=s.tick+60 end
       elseif d<3 and close<=2 and s.tick>=state.ready then
-        state.shape=T.cone(p,target,3,70); state.windup=s.tick+20; actor:play_sound_at_self('BLOCK_WOODEN_BUTTON_CLICK_ON',.4,.8)
+        state.shape=T.cone(p,target,3,70); state.windup=s.tick+(state.tell or 20); actor:play_sound_at_self('BLOCK_WOODEN_BUTTON_CLICK_ON',.4,.8)
       elseif d>3 and s.tick%5==0 and close<2 then
         local x,z=T.direction(p,target); c.trial:actor_step(id,T.offset(target,-x*2.5,0,-z*2.5))
       end
+      end
     end
   end
+end
+function T.lockout(steps,key,cooldown)
+ return T.append(steps,{T.wait(1,nil,nil,function(c,s) s.ready[key]=s.tick+cooldown end)})
+end
+
+function T.alive(c,ids)
+  local result={}; for _,id in ipairs(ids) do local actor=c.trial:actor(id); if actor then result[#result+1]={id=id,actor=actor} end end
+  return result
+end
+function T.weak(c,s,ticks,fraction)
+  s.playerWeakUntil=s.tick+ticks; s.playerWeakness=fraction or .15
+end
+function T.rotate(p,target,degrees,distance)
+  local x,z=T.direction(p,target); local a=math.rad(degrees)
+  return T.offset(p,(x*math.cos(a)-z*math.sin(a))*distance,0,(x*math.sin(a)+z*math.cos(a))*distance)
+end
+function T.budgetHit(c,s,g,amount,budget)
+  local remaining=math.max(0,budget.cap-budget.spent)
+  local hit=remaining>0 and T.hit(c,g,math.min(amount,remaining))
+  if hit then budget.spent=budget.spent+math.min(amount,remaining) end
+  return hit
 end
 function T.tether(c,a,b,particle)
   for i=0,16 do local q=T.copy(a); q.x=a.x+(b.x-a.x)*i/16; q.y=a.y+1+(b.y-a.y)*i/16; q.z=a.z+(b.z-a.z)*i/16; T.point(c,q,particle or T.gold) end

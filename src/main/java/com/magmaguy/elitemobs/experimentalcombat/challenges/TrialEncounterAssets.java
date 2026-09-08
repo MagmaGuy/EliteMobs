@@ -57,7 +57,8 @@ final class TrialEncounterAssets {
                 if (!equipment.containsKey(EquipmentSlot.HAND)) throw new IllegalArgumentException("Missing weapon in " + metadataPath);
                 double health = metadata.getDouble("healthMultiplier", 10 + form.band().depth());
                 if (!Double.isFinite(health) || health < 1 || health > 15) throw new IllegalArgumentException("Invalid health in " + metadataPath);
-                String source = support + "\n" + text("mobility/" + root + ".lua") + "\n" + text("encounters/" + id + ".lua");
+                String source = support + "\n" + text("mobility/" + root + ".lua")
+                        + "\n" + optionalText("powers/" + root + ".lua") + "\n" + text("encounters/" + id + ".lua");
                 var registration = LuaPowerManager.registerLuaPower("class_trial_" + id + ".lua",
                         new File("bundled/class_trials/encounters/" + id + ".lua"), source, null, PowerType.UNIQUE);
                 registrations.add(registration);
@@ -87,5 +88,11 @@ final class TrialEncounterAssets {
 
     private static String text(String path) throws java.io.IOException {
         try (var input = stream(path)) { return new String(input.readAllBytes(), StandardCharsets.UTF_8); }
+    }
+
+    private static String optionalText(String path) throws java.io.IOException {
+        try (var input = TrialEncounterAssets.class.getResourceAsStream("/class_trials/" + path)) {
+            return input == null ? "" : new String(input.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 }

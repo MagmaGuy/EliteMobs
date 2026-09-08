@@ -80,9 +80,9 @@ final class TrialProjectileWalls implements Listener, AutoCloseable {
     }
 
     private boolean blocks(Location from, Location to) {
-        for (Panel panel : panels.values()) {
-            Location hit = panel.intersection(from, to);
-            if (hit == null) continue;
+        List<Location> hits = panels.values().stream().map(panel -> panel.intersection(from, to))
+                .filter(Objects::nonNull).sorted(Comparator.comparingDouble(from::distanceSquared)).toList();
+        for (Location hit : hits) {
             Vector direction = hit.toVector().subtract(from.toVector());
             double distance = direction.length();
             if (distance > .001) {

@@ -6,7 +6,7 @@ function M.move(c,s,anchor)
     T.wait(20,function(c,s) valid=c.trial:mount(); T.sound(c,'ENTITY_HORSE_AMBIENT',.85) end),
     T.wait(30,function(c,s) target=nil; hit=false end,function(c,s,t)
       local origin=c.trial:position()
-      if not target or t<18 then local x,z=T.direction(origin,anchor or c.trial.player:get_location()); target=T.offset(origin,x*8,0,z*8); c.trial:face(target,4) end
+      if not target or t<18 then local x,z=T.direction(origin,anchor or c.trial.player:get_location()); local distance=anchor and math.min(8,math.max(0,T.distance(origin,anchor)-1.5)) or 8; target=T.offset(origin,x*distance,0,z*distance); c.trial:face(target,4) end
       lane=T.lane(origin,target,2.8); if t%4==0 then T.draw(c,lane) end
     end,function(c,s) valid=valid and c.trial:safe_destination(target,true,false)~=nil end),
     T.wait(20,nil,function(c,s,t)
