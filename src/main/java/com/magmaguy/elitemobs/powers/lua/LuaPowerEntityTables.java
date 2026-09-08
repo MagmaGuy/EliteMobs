@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.api.ScriptZoneLeaveEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.PreventMountExploit;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.instanced.InstanceEffectPolicy;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.magmacore.scripting.ScriptDefinition;
@@ -692,13 +693,13 @@ final class LuaPowerEntityTables {
             return LuaValue.valueOf(EquipmentDamageRuntime.damage(livingEntity, slot, amount));
         }));
         entityTable.set("set_fire_ticks", method(entityTable, args -> {
-            if (livingEntity != null && livingEntity.isValid()) {
+            if (InstanceEffectPolicy.canAffect(eliteEntity, livingEntity)) {
                 livingEntity.setFireTicks(args.checkint(1));
             }
             return LuaValue.NIL;
         }));
         entityTable.set("add_visual_freeze_ticks", method(entityTable, args -> {
-            if (livingEntity != null && livingEntity.isValid()) {
+            if (InstanceEffectPolicy.canAffect(eliteEntity, livingEntity)) {
                 livingEntity.setFreezeTicks(livingEntity.getFreezeTicks() + args.optint(1, 1));
             }
             return LuaValue.NIL;

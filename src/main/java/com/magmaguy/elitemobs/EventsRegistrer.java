@@ -328,7 +328,6 @@ public class EventsRegistrer {
         //register quests
         register(new KillObjective.KillObjectiveEvents());
         register(new CustomFetchObjective.CustomFetchObjectiveEvents());
-        register(new DialogObjective.DialogObjectiveEvents());
         register(new ArenaObjective.ArenaObjectiveEvents());
         register(new QuestAcceptEvent.QuestAcceptEventHandler());
         register(new QuestCompleteEvent.QuestCompleteEventHandler());

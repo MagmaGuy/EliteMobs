@@ -1,16 +1,11 @@
 package com.magmaguy.elitemobs.quests.objectives;
 
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import lombok.Getter;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
 import java.util.List;
 
@@ -39,20 +34,15 @@ public class DialogObjective extends Objective {
         return true;
     }
 
-    public static class DialogObjectiveEvents implements Listener {
-        @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-        public void onInteract(PlayerInteractAtEntityEvent event) {
-            NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());
-            if (npcEntity == null) return;
-            for (Quest quest : PlayerData.getQuests(event.getPlayer().getUniqueId()))
-                for (Objective objective : quest.getQuestObjectives().getObjectives())
-                    if (objective instanceof DialogObjective &&
-                            ((DialogObjective) objective).getNpcFilename().equals(npcEntity.getNPCsConfigFields().getFilename()))
-                        if (((DialogObjective) objective).checkProgress(event.getPlayer(), quest.getQuestObjectives())) {
-                            event.setCancelled(true);
-                        }
-
-        }
+    /** Consumes an NPC interaction when it advances dialogue, before opening the NPC's menu. */
+    public static boolean progressAtNPC(Player player, NPCEntity npcEntity) {
+        boolean progressed = false;
+        for (Quest quest : List.copyOf(PlayerData.getQuests(player.getUniqueId())))
+            for (Objective objective : quest.getQuestObjectives().getObjectives())
+                if (objective instanceof DialogObjective dialogue
+                        && dialogue.getNpcFilename().equals(npcEntity.getNPCsConfigFields().getFilename()))
+                    progressed |= dialogue.checkProgress(player, quest.getQuestObjectives());
+        return progressed;
     }
 
 }

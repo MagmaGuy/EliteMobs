@@ -83,15 +83,18 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
             tell(player, "&eThe arena is in use. Wait for the current group or class trial to finish.");
             return;
         }
-        if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
-            tell(player, "&cClass instructors require LibsDisguises to be installed.");
-            return;
-        }
         if (EconomyHandler.checkCurrency(player.getUniqueId()) < quotedFee) {
             tell(player, "&cThis attempt costs " + EconomyHandler.formatCurrency(quotedFee) + " coins.");
             return;
         }
-        ClassTrialDefinition trial = ClassTrialDefinition.forForm(formId);
+        ClassTrialDefinition trial;
+        try {
+            trial = ClassTrialDefinition.forForm(formId);
+        } catch (RuntimeException failure) {
+            Logger.warn("Could not prepare class trial " + formId + ": " + failure.getMessage());
+            tell(player, "&cThis instructor's trial is unavailable. Ask an administrator to check its required content. You were not charged.");
+            return;
+        }
         ClassChallengeInstance run = new ClassChallengeInstance(league.getContainer(), player, trial, quotedFee);
         try {
             if (run.isDefunct() || !InstancePlayerManager.addNewPlayers(java.util.List.of(player), run,
@@ -110,6 +113,7 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
     }
 
     @Override protected boolean isInRegion(Location location) { return container.contains(location); }
+    @Override protected Location participantExitLocation(Player player) { return previousLocationOrExit(player); }
     @Override public boolean isAcceptingNewPlayers() {
         return !closing && super.isAcceptingNewPlayers() && container.availableTo(this);
     }

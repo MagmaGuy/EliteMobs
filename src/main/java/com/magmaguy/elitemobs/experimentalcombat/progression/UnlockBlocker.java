@@ -63,7 +63,7 @@ public record UnlockBlocker(
 
     public static UnlockBlocker classChallenge(String formId) {
         return new UnlockBlocker(Kind.CLASS_CHALLENGE, formId, null, 0, 0,
-                "Complete the solo instructor challenge.");
+                "Defeat this class's instructor in a solo trial.");
     }
 
     public Optional<SkillType> optionalSkillType() {

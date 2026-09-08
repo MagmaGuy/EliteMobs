@@ -17,7 +17,6 @@ public record ClassTrialDefinition(ClassFormDefinition form, String root,
     public static ClassTrialDefinition forForm(String formId) {
         var lineage = BuiltInClassContent.catalog().lineageOf(formId);
         var encounter = TrialEncounterAssets.require(formId);
-        TrialPoses.validate();
         // Existing admission resolves this definition before charging the attempt fee.
         if (encounter.magicWeapon() != null) TrialEquipment.magic(encounter.magicWeapon());
         return new ClassTrialDefinition(lineage.activeForm(), lineage.root().id(),
@@ -35,7 +34,7 @@ public record ClassTrialDefinition(ClassFormDefinition form, String root,
         boss.setAi(false);
         boss.setMovementSpeedAttribute(root.equals("ranger") ? .29 : .24);
         boss.setFollowDistance(70);
-        boss.setDisguise(ClassTrainerConfig.disguise(encounter.skin()));
+        if (TrialPoses.available()) boss.setDisguise(ClassTrainerConfig.disguise(encounter.skin()));
         boss.setDropsEliteMobsLoot(false);
         boss.setDropsVanillaLoot(false);
         boss.setDropsRandomLoot(false);

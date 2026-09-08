@@ -15,8 +15,6 @@ import com.magmaguy.magmacore.scripting.tables.LuaTableSupport;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.shaded.luaj.vm2.*;
 import com.magmaguy.shaded.luaj.vm2.lib.VarArgFunction;
-import me.libraryaddict.disguise.DisguiseAPI;
-import me.libraryaddict.disguise.disguisetypes.watchers.LivingWatcher;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -385,8 +383,10 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         fields.setClassLoot(false);
         fields.setPowers(List.of());
         fields.setUniqueLootList(List.of());
-        if (prop) fields.setDisguise("ARMOR_STAND");
-        else if (type == EntityType.HUSK) fields.setDisguise(boss.getCustomBossesConfigFields().getDisguise());
+        if (TrialPoses.available()) {
+            if (prop) fields.setDisguise("ARMOR_STAND");
+            else if (type == EntityType.HUSK) fields.setDisguise(boss.getCustomBossesConfigFields().getDisguise());
+        }
         CustomBossEntity actor = new CustomBossEntity(fields);
         actor.setSummoningEntity(boss);
         actor.setNormalizedCombat();
@@ -450,10 +450,7 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
 
     private void pose(String pose) {
         if (pose.equals("swing")) boss.getLivingEntity().swingMainHand();
-        var disguise = DisguiseAPI.getDisguise(boss.getLivingEntity());
-        if (disguise != null && disguise.getWatcher() instanceof LivingWatcher watcher) {
-            TrialPoses.apply(watcher, pose.equals("draw") || pose.equals("cast"), pose.equals("guard"));
-        }
+        TrialPoses.apply(boss.getLivingEntity(), pose.equals("draw") || pose.equals("cast"), pose.equals("guard"));
     }
 
     boolean owns(CustomBossEntity entity) { return entity == boss || actors.containsValue(entity); }

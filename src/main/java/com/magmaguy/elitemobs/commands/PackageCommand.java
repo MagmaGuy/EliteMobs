@@ -34,6 +34,7 @@ public class PackageCommand {
         packContents("custombosses");
         packContents("customevents");
         packContents("npcs");
+        packContents("npc_scripts");
         packContents("customitems");
         packContents("customquests");
         packContents("customarenas");

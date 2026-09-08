@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootEntry;
 import com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -38,6 +39,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -187,7 +189,30 @@ public class QuestTracking {
         List<Location> locations = new ArrayList<>();
         if (npcFilename == null) return locations;
         NPCsConfigFields npcsConfigFields = NPCsConfig.getNpcEntities().get(npcFilename);
-        if (npcsConfigFields == null) return locations;
+        if (npcsConfigFields == null || !npcsConfigFields.isEnabled()) return locations;
+        // Runtime NPCs carry the cloned world and their current patrol position.
+        for (var npc : EntityTracker.getNpcEntities().values()) {
+            if (!npcFilename.equals(npc.getNPCsConfigFields().getFilename())) continue;
+            Location location = npc.getPersistentLocation();
+            if (location != null && player.getWorld().equals(location.getWorld()))
+                addLocation(locations, location);
+        }
+        if (!locations.isEmpty()) return locations;
+        if (npcsConfigFields.isInstanced()) {
+            // NPCs may not have materialized yet. Resolve their authored coordinates only
+            // against this player's matching dungeon, never another party's copy or blueprint.
+            if (PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeon
+                    && player.getWorld().equals(dungeon.getWorld())) {
+                List<String> authored = new ArrayList<>();
+                if (npcsConfigFields.getLocations() != null) authored.addAll(npcsConfigFields.getLocations());
+                if (npcsConfigFields.getSpawnLocation() != null) authored.add(npcsConfigFields.getSpawnLocation());
+                for (String raw : authored)
+                    if (raw != null && !raw.isBlank() && dungeon.getContentPackagesConfigFields().getWorldName()
+                            .equals(ConfigurationLocation.worldName(raw)))
+                        addLocation(locations, ConfigurationLocation.serializeWithInstance(dungeon.getWorld(), raw));
+            }
+            return locations;
+        }
         addLocationStrings(locations, npcsConfigFields.getLocations());
         addLocationString(locations, npcsConfigFields.getSpawnLocation());
         return locations;
@@ -309,16 +334,16 @@ public class QuestTracking {
         else {
             World world = null;
             boolean locationsOutOfBounds = false;
-            List<ObjectiveDestinations> tempDestinations = new ArrayList<>(objectiveDestinations);
-            for (ObjectiveDestinations destinations : tempDestinations)
-                for (Location location : destinations.getDestinations())
-                    if (location != null && location.getWorld() != null) {
-                        world = location.getWorld();
-                        if (world.equals(player.getWorld())) {
-                            locationsOutOfBounds = true;
-                            break;
-                        }
+            List<Location> destinations = questIsDone ? new ArrayList<>(turnInNPCs)
+                    : objectiveDestinations.stream().flatMap(objective -> objective.getDestinations().stream()).toList();
+            for (Location location : destinations)
+                if (location != null && location.getWorld() != null) {
+                    world = location.getWorld();
+                    if (world.equals(player.getWorld())) {
+                        locationsOutOfBounds = true;
+                        break;
                     }
+                }
 
             if (!locationsOutOfBounds) {
                 if (world != null) {
@@ -396,6 +421,14 @@ public class QuestTracking {
     }
 
     public static class QuestTrackingEvents implements Listener {
+        @EventHandler
+        public void onWorldChanged(PlayerChangedWorldEvent event) {
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                QuestTracking tracking = getPlayerTrackingQuests().get(event.getPlayer().getUniqueId());
+                if (tracking != null) tracking.updateLocations(tracking.getQuest());
+            });
+        }
+
         @EventHandler
         public void onPlayerLogout(PlayerQuitEvent event) {
             QuestTracking questTracking = getPlayerTrackingQuests().get(event.getPlayer().getUniqueId());

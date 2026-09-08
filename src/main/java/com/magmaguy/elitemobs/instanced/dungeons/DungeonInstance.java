@@ -45,6 +45,11 @@ import java.util.*;
 import java.util.function.BooleanSupplier;
 
 public class DungeonInstance extends MatchInstance {
+    @Override
+    protected Location participantExitLocation(Player player) {
+        return previousLocationOrExit(player);
+    }
+
     @Getter
     private static final Set<DungeonInstance> dungeonInstances = new HashSet<>();
 

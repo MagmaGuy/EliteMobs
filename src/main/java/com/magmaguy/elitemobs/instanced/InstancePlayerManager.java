@@ -236,12 +236,7 @@ public class InstancePlayerManager {
         //Teleport the player out
         if (player.isOnline()) {
             MatchInstance.MatchInstanceEvents.teleportBypass = true;
-            if (matchInstance instanceof DungeonInstance) {
-                Location location = matchInstance.previousPlayerLocations.get(player);
-                if (location != null) player.teleport(location);
-                else player.teleport(matchInstance.exitLocation);
-            } else
-                player.teleport(matchInstance.exitLocation);
+            player.teleport(matchInstance.participantExitLocation(player));
         }
 
         //End the match if there are no players left because they all died
@@ -257,6 +252,11 @@ public class InstancePlayerManager {
 
     public static void playerDeath(MatchInstance matchInstance, Player player) {
         if (!matchInstance.players.contains(player)) return;
+        // Lethal damage is cancelled, so Bukkit's normal death effect cleanup never runs.
+        for (var effect : player.getActivePotionEffects()) player.removePotionEffect(effect.getType());
+        player.setFireTicks(0);
+        player.setFreezeTicks(0);
+        player.setFallDistance(0);
         AlternativeDurabilityLoss.doDurabilityLoss(player);
         AttributeManager.setAttribute(player, "generic_max_health", AttributeManager.getAttributeBaseValue(player, "generic_max_health"));
         matchInstance.players.remove(player);
@@ -338,12 +338,7 @@ public class InstancePlayerManager {
             fireLeaveEvents(matchInstance, player);
         player.setGameMode(GameMode.SURVIVAL);
         MatchInstance.MatchInstanceEvents.teleportBypass = true;
-        if (matchInstance instanceof DungeonInstance) {
-            Location location = matchInstance.previousPlayerLocations.get(player);
-            if (location != null) player.teleport(location);
-            else player.teleport(matchInstance.exitLocation);
-        } else
-            player.teleport(matchInstance.exitLocation);
+        player.teleport(matchInstance.participantExitLocation(player));
         PlayerData.setMatchInstance(player, null);
         matchInstance.playerLives.remove(player);
         if (matchInstance.getDeathLocationByPlayer(player) != null)

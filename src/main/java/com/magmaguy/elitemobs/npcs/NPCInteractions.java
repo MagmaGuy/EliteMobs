@@ -11,6 +11,7 @@ import com.magmaguy.elitemobs.npcs.scripts.ScriptableNPC;
 import com.magmaguy.elitemobs.pathfinding.patrol.PatrolEditor;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestInteractionHandler;
+import com.magmaguy.elitemobs.quests.objectives.DialogObjective;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
@@ -44,6 +45,7 @@ public class NPCInteractions implements Listener {
         cooldowns.add(playerUUID);
         Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> cooldowns.remove(playerUUID), 1);
 
+        if (DialogObjective.progressAtNPC(player, npcEntity)) return;
         npcEntity.runScripts(ScriptableNPC.ON_INTERACT, null, player);
 
         switch (npcEntity.getNPCsConfigFields().getInteractionType()) {

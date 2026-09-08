@@ -481,7 +481,7 @@ public class ScriptAction {
     private void runPotionEffect(ScriptActionData scriptActionData) {
         PotionEffect effect = new PotionEffect(blueprint.getPotionEffectType(), blueprint.getDuration().getValue(), blueprint.getAmplifier().getValue());
         getTargets(scriptActionData).forEach(target -> {
-            if (target.isValid()) {
+            if (com.magmaguy.elitemobs.instanced.InstanceEffectPolicy.canAffect(scriptActionData.getEliteEntity(), target)) {
                 target.addPotionEffect(effect);
             }
         });
@@ -590,7 +590,9 @@ public class ScriptAction {
      */
     private void runSetOnFire(ScriptActionData scriptActionData) {
         int duration = blueprint.getDuration().getValue();
-        getTargets(scriptActionData).forEach(target -> target.setFireTicks(duration));
+        getTargets(scriptActionData).stream()
+                .filter(target -> com.magmaguy.elitemobs.instanced.InstanceEffectPolicy.canAffect(scriptActionData.getEliteEntity(), target))
+                .forEach(target -> target.setFireTicks(duration));
     }
 
     /**
@@ -600,7 +602,9 @@ public class ScriptAction {
      */
     private void runVisualFreeze(ScriptActionData scriptActionData) {
         int freezeTicks = blueprint.getAmount().getValue().intValue();
-        getTargets(scriptActionData).forEach(target -> target.setFreezeTicks(target.getFreezeTicks() + freezeTicks));
+        getTargets(scriptActionData).stream()
+                .filter(target -> com.magmaguy.elitemobs.instanced.InstanceEffectPolicy.canAffect(scriptActionData.getEliteEntity(), target))
+                .forEach(target -> target.setFreezeTicks(target.getFreezeTicks() + freezeTicks));
     }
 
     /**

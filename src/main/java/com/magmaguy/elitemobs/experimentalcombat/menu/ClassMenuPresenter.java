@@ -66,11 +66,10 @@ final class ClassMenuPresenter {
             body.add(ClassMenuStyle.state(form));
         }
         body.add(skillsLine(form));
-        if (showAllClasses && form.challengeEligible())
-            body.add("&eTalk to this class's trainer to enter its trial.");
         if (!form.unlocked()) {
             for (ClassMenuView.BlockerView blocker : form.blockers())
                 body.add(ClassMenuStyle.blockerText(blocker));
+            body.addAll(List.of(ClassMenuStyle.trialInstructions(form).split("\n")));
         }
         body.add(ClassMenuStyle.themed(form, form.resourceName())
                 + " &8• &7" + form.resourceDescription());
@@ -115,7 +114,7 @@ final class ClassMenuPresenter {
                     ClassMenuPresentation.Tone.CONTROL,
                     "&6Challenge Instructor · " + fee + " coins",
                     "&7Solo trial, level " + form.band().skillUnlockLevel()
-                            + ". Costs " + fee + " coins when combat begins. Defeat unlocks " + form.displayName() + ".",
+                            + ". Costs " + fee + " coins when combat begins. Win to unlock and activate " + form.displayName() + ".",
                     new ClassMenuAction.Challenge(form.id(), form.challengeFee())));
         }
         if (showAllClasses) actions.add(new ClassMenuPresentation.ActionView(

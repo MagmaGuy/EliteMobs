@@ -1,32 +1,55 @@
 package com.magmaguy.elitemobs.experimentalcombat.challenges;
 
-import me.libraryaddict.disguise.disguisetypes.watchers.LivingWatcher;
+import com.magmaguy.magmacore.util.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
 
 import java.lang.reflect.Method;
 
-/** LibsDisguises' optional modern pose API, resolved once instead of linking older supported builds. */
+/** Optional disguise presentation; no LibsDisguises classes are linked by the combat actor. */
 final class TrialPoses {
-    private static Method mainHand;
-    private static Method offHand;
+    private static boolean warned;
     private TrialPoses() {}
 
-    static void validate() {
-        if (mainHand != null && offHand != null) return;
+    static boolean available() {
+        return Bukkit.getPluginManager().isPluginEnabled("LibsDisguises");
+    }
+
+    static void apply(LivingEntity entity, boolean main, boolean off) {
+        if (!available()) return;
         try {
-            mainHand = LivingWatcher.class.getMethod("setMainHandRaised", boolean.class);
-            offHand = LivingWatcher.class.getMethod("setOffhandRaised", boolean.class);
-        } catch (ReflectiveOperationException failure) {
-            throw new IllegalStateException("Authored class trials require LibsDisguises with raised-hand poses", failure);
+            DisguisePoses.apply(entity, main, off);
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError failure) {
+            if (!warned) {
+                warned = true;
+                Logger.warn("Class-trial disguise poses are unavailable; combat continues with ordinary animations: "
+                        + failure.getMessage());
+            }
         }
     }
 
-    static void apply(LivingWatcher watcher, boolean main, boolean off) {
-        validate();
-        try {
-            mainHand.invoke(watcher, main);
-            offHand.invoke(watcher, off);
-        } catch (ReflectiveOperationException failure) {
-            throw new IllegalStateException("LibsDisguises could not apply a trial pose", failure);
+    /** Loaded only after the optional plugin is enabled. Older versions can omit the pose API. */
+    private static final class DisguisePoses {
+        private static final Method MAIN = poseMethod("setMainHandRaised");
+        private static final Method OFF = poseMethod("setOffhandRaised");
+
+        private static Method poseMethod(String name) {
+            try {
+                return me.libraryaddict.disguise.disguisetypes.watchers.LivingWatcher.class
+                        .getMethod(name, boolean.class);
+            } catch (NoSuchMethodException unavailable) {
+                return null;
+            }
+        }
+
+        private static void apply(LivingEntity entity, boolean main, boolean off)
+                throws ReflectiveOperationException {
+            var disguise = me.libraryaddict.disguise.DisguiseAPI.getDisguise(entity);
+            if (disguise == null) return;
+            var watcher = disguise.getWatcher();
+            if (!(watcher instanceof me.libraryaddict.disguise.disguisetypes.watchers.LivingWatcher)) return;
+            if (MAIN != null) MAIN.invoke(watcher, main);
+            if (OFF != null) OFF.invoke(watcher, off);
         }
     }
 }

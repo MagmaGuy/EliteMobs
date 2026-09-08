@@ -198,6 +198,18 @@ public abstract class MatchInstance {
         InstancePlayerManager.removePlayer(player, this);
     }
 
+    /** Participant exits are independent of the boundary used to eject intruders. */
+    protected Location participantExitLocation(Player player) {
+        return exitLocation;
+    }
+
+    protected Location previousLocationOrExit(Player player) {
+        Location previous = previousPlayerLocations.get(player);
+        if (previous == null || previous.getWorld() == null
+                || Bukkit.getWorld(previous.getWorld().getUID()) != previous.getWorld()) return exitLocation;
+        return previous.clone();
+    }
+
     public void playerDeath(Player player) {
         InstancePlayerManager.playerDeath(this, player);
     }

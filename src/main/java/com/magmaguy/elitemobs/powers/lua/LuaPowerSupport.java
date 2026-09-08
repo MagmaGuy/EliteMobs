@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.powers.lua;
 
 import com.magmaguy.elitemobs.combatsystem.ScaledCombatRewardResolver;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.instanced.InstanceEffectPolicy;
 import com.magmaguy.magmacore.util.TemporaryBlockManager;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
 import com.magmaguy.elitemobs.items.ItemLootShower;
@@ -202,7 +203,7 @@ final class LuaPowerSupport {
     }
 
     void applyPotionEffect(LivingEntity livingEntity, String effectKey, int duration, int amplifier) {
-        if (livingEntity == null || !livingEntity.isValid()) {
+        if (!InstanceEffectPolicy.canAffect(eliteEntity, livingEntity)) {
             return;
         }
         PotionEffectType potionEffectType = PotionEffectType.getByName(effectKey.toUpperCase(Locale.ROOT));
