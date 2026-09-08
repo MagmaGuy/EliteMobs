@@ -88,6 +88,10 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         }));
         table.set("inside", method(table, args -> LuaValue.valueOf(bounds.contains(location(args.arg1())))));
         table.set("line_of_sight", method(table, args -> LuaValue.valueOf(boss.getLivingEntity().hasLineOfSight(player))));
+        table.set("actor_los", method(table, args -> {
+            LivingEntity from = effectTarget(args.checkjstring(1)), to = effectTarget(args.checkjstring(2));
+            return LuaValue.valueOf(from != null && to != null && from.getWorld() == to.getWorld() && from.hasLineOfSight(to));
+        }));
         table.set("push", method(table, args -> {
             Location source = location(args.arg1());
             double strength = bounded(args.checkdouble(2), -.4, .4);
@@ -316,15 +320,21 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         table.set("transfer_damage", method(table, args -> {
             // An existing normalized damage amount is transferred directly, never normalized a second time.
             double damage = bounded(args.checkdouble(1), 0, boss.getMaxHealth());
-            if (damage > 0 && boss.exists() && !transferring) transferDamage(damage);
+            if (damage > 0 && boss.exists() && !transferring) transferDamage(boss.getLivingEntity(), damage);
+            return LuaValue.NIL;
+        }));
+        table.set("transfer_to", method(table, args -> {
+            LivingEntity target = effectTarget(args.checkjstring(1));
+            if (target == player) throw new IllegalArgumentException("Redistribution only targets owned trial actors");
+            double damage = bounded(args.checkdouble(2), 0, boss.getMaxHealth());
+            if (target != null && damage > 0 && !transferring) transferDamage(target, damage);
             return LuaValue.NIL;
         }));
         table.set("is_transfer", method(table, args -> LuaValue.valueOf(transferring)));
         return table;
     }
 
-    private void transferDamage(double damage) {
-        LivingEntity target = boss.getLivingEntity();
+    private void transferDamage(LivingEntity target, double damage) {
         int previousTicks = target.getNoDamageTicks();
         double previousDamage = target.getLastDamage();
         transferring = true;

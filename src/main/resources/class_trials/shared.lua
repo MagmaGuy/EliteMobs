@@ -132,7 +132,7 @@ function T.encounter(spec)
     end,
     on_boss_damaged_by_player=function(c)
       local s=c.state; if not s.initialized then return end
-      if c.trial:is_transfer() then return end
+      if c.trial:is_transfer() then if spec.transferred then spec.transferred(c,s) end; return end
       if (s.playerWeakUntil or 0)>s.tick then c.event.multiply_damage_amount(1-(s.playerWeakness or .15)) end
       if c.trial:damaged_actor()=='boss' then c.event.multiply_damage_amount(s.exposure or 1) end
       if spec.damaged then spec.damaged(c,s) end

@@ -90,6 +90,9 @@ final class LuaPowerEntityTables {
         LuaTable eventTable = new LuaTable();
         if (event instanceof EliteDamageEvent eliteDamageEvent) {
             eventTable.set("damage_amount", LuaValue.valueOf(eliteDamageEvent.getDamage()));
+            eventTable.set("get_damage_amount", new VarArgFunction() {
+                @Override public Varargs invoke(Varargs args) { return LuaValue.valueOf(eliteDamageEvent.getDamage()); }
+            });
             if (event instanceof EliteMobDamagedEvent eliteMobDamagedEvent) {
                 eventTable.set("damage_cause", LuaValue.valueOf(eliteMobDamagedEvent.getEntityDamageEvent().getCause().name()));
             } else if (event instanceof EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent) {

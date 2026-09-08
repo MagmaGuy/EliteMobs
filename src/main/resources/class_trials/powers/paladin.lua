@@ -31,7 +31,7 @@ function P.damage(c,s)
  c.event.multiply_damage_amount(reduction)
  local link=s.links[id]
  if link and link.untilTick>s.tick and T.distance(c.trial:position(),actor:get_location())<=link.range then
-  local transfer=c.event.damage_amount*reduction*link.fraction
+  local transfer=c.event.get_damage_amount()*link.fraction
   c.event.multiply_damage_amount(1-link.fraction); c.trial:transfer_damage(transfer)
  end
 end

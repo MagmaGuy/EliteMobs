@@ -802,7 +802,8 @@ public class EliteEntity {
         EliteMobHealEvent eliteMobHealEvent = new EliteMobHealEvent(this, healAmount);
         new EventCaller(eliteMobHealEvent);
         if (eliteMobHealEvent.isCancelled()) return;
-        setHealth(health + healAmount);
+        // The cached value can still be the pre-hit health until the next sync.
+        setHealth(getHealth() + healAmount);
     }
 
     public void fullHeal() {
