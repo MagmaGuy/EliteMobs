@@ -1,0 +1,13 @@
+id: warmonger
+title: Noise Is Not Direction
+skin: berserker
+equipment:
+  HAND: IRON_AXE
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: A battlefield is loud. Noise does not get to choose your feet.
+  halfway: More noise. The opening is still there.
+  victory: You heard everything and obeyed only what mattered.
+  defeat: Watch the shoulders through the shouting.

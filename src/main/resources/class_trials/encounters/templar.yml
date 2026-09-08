@@ -1,0 +1,14 @@
+id: templar
+title: Mercy in the Reckoning
+skin: paladin
+equipment:
+  HAND: MACE
+  CHEST: IRON_CHESTPLATE
+  LEGS: IRON_LEGGINGS
+  FEET: IRON_BOOTS
+  OFF_HAND: SHIELD
+voice:
+  opening: A reckoning should leave someone better able to stand.
+  halfway: Watch my companion. The next blow is meant for more than you.
+  victory: You denied the strike without losing sight of its purpose.
+  defeat: The bell can be stopped. You need not wait for it to finish.

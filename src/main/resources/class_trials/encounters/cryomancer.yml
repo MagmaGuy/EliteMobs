@@ -1,0 +1,14 @@
+id: cryomancer
+title: Where the Snow Thins
+skin: spellcaster
+equipment:
+  HAND: WOODEN_SPEAR
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+  OFF_HAND: BOOK
+voice:
+  opening: Snow conceals less than people think. Look where it thins.
+  halfway: A new wind. Find the clear side before it settles.
+  victory: Patient, and observant. The cold had very little to work with.
+  defeat: The clear sector was a path to the barrier, not just a place to wait.

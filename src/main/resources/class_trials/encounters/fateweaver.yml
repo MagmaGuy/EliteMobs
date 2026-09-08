@@ -1,0 +1,13 @@
+id: fateweaver
+title: One Thread Rewritten
+skin: cleric
+equipment:
+  HAND: IRON_SPEAR
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: One thread may be rewritten. That does not make the cloth unbreakable.
+  halfway: The knot is only in one place. Follow the thread.
+  victory: You saw what could be changed, and what could not.
+  defeat: The golden knot held one promise. There were other choices beside it.

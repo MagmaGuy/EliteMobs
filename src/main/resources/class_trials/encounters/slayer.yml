@@ -1,0 +1,13 @@
+id: slayer
+title: Do Not Offer the Finish
+skin: berserker
+equipment:
+  HAND: IRON_SWORD
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: A wounded foe is dangerous. Haste makes that easy to forget.
+  halfway: The finish is tempting. Show me you will not offer it.
+  victory: You denied the last stroke and took your own.
+  defeat: Being hurt did not remove the opening. Panic hid it.

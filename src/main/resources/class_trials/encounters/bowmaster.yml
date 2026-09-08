@@ -1,0 +1,13 @@
+id: bowmaster
+title: One Flight, One Line
+skin: ranger
+equipment:
+  HAND: BOW
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: Three targets can share one mistake. Do not stand in their line.
+  halfway: The line has moved. The lesson has not.
+  victory: You saw a flight path where others would see separate targets.
+  defeat: Those targets were pierced. They were never shelter.

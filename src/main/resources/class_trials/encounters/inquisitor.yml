@@ -1,0 +1,13 @@
+id: inquisitor
+title: No Rushed Verdict
+skin: paladin
+equipment:
+  HAND: IRON_SWORD
+  CHEST: IRON_CHESTPLATE
+  LEGS: IRON_LEGGINGS
+  FEET: IRON_BOOTS
+voice:
+  opening: A verdict is only as sound as the opening that supports it.
+  halfway: Now I will test whether haste makes you predictable.
+  victory: You gave me no clean sentence. Well contested.
+  defeat: The seal warned you. The blade still had to reach you.

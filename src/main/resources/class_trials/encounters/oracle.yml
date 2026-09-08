@@ -1,0 +1,13 @@
+id: oracle
+title: See the Rescue Coming
+skin: cleric
+equipment:
+  HAND: TRIDENT
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: Seeing danger coming does not make every answer the right one.
+  halfway: You can see my preparation too. Choose what you want it to answer.
+  victory: You made the future less certain by choosing well in the present.
+  defeat: You did not have to break the ward before turning your attention to me.

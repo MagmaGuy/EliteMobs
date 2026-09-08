@@ -1,0 +1,13 @@
+id: champion
+title: The Honest Duel
+skin: paladin
+equipment:
+  HAND: IRON_SWORD
+  CHEST: IRON_CHESTPLATE
+  LEGS: IRON_LEGGINGS
+  FEET: IRON_BOOTS
+voice:
+  opening: No ranks behind me. No wall between us. Read the blade.
+  halfway: You know the rhythm. Watch which hand begins it.
+  victory: A fair opening, well taken. You have earned this.
+  defeat: The last swing was the commitment. That was your opening.

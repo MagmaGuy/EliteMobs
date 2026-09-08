@@ -1,0 +1,14 @@
+id: spiritbinder
+title: Separate the Guardians
+skin: spellcaster
+equipment:
+  HAND: BLAZE_ROD
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+  OFF_HAND: BOOK
+voice:
+  opening: Protection is a relationship. Watch the distance it can survive.
+  halfway: We have moved apart. That is a choice you can use.
+  victory: You found the point where shared strength became a strained bond.
+  defeat: The lantern and the tether both gave you a way to separate us.

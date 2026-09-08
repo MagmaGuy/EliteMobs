@@ -1,0 +1,13 @@
+id: grovekeeper
+title: The Garden's Edge
+skin: cleric
+equipment:
+  HAND: IRON_HOE
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: A garden protects what grows within it. It still needs an open gate.
+  halfway: New roots. Look for the path I have left you.
+  victory: You found the edge without losing sight of the roots.
+  defeat: The gate was open, and the roots were within reach.

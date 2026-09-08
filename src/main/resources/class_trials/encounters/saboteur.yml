@@ -1,0 +1,13 @@
+id: saboteur
+title: The Second Warning
+skin: ranger
+equipment:
+  HAND: CROSSBOW
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: A bolt can finish its flight before it finishes its work.
+  halfway: You noticed the fuse. Keep a way out before it starts.
+  victory: You answered both warnings. That is how you outlive a trap.
+  defeat: The impact was the first warning. The fuse was the second.

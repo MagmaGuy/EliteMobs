@@ -1,0 +1,13 @@
+id: bloodstorm
+title: Leave the Red Ground
+skin: berserker
+equipment:
+  HAND: IRON_HOE
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: The storm feeds where it stands. Choose where we fight.
+  halfway: You took my ground. I will have to earn new ground.
+  victory: You moved the fight, and the storm ran dry.
+  defeat: You kept me standing in the very thing that sustained me.

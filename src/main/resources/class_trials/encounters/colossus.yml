@@ -1,0 +1,13 @@
+id: colossus
+title: The Cost of Commitment
+skin: berserker
+equipment:
+  HAND: MACE
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: All this weight goes somewhere. Find where it does not.
+  halfway: I am committing everything. You should not.
+  victory: You understood the price of that swing, and collected it.
+  defeat: When the ground began to split, my direction was already chosen.

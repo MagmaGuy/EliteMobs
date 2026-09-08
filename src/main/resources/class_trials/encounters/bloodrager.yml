@@ -1,0 +1,13 @@
+id: bloodrager
+title: Heat Without Haste
+skin: berserker
+equipment:
+  HAND: IRON_AXE
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: Feeling the heat is easy. Keeping your hands steady is the work.
+  halfway: Less blood. More fire. More openings, too!
+  victory: You kept your head while I tried to take it off. That will do!
+  defeat: You matched my temper when you needed to read my shoulders.

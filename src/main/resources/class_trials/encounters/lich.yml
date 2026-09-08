@@ -1,0 +1,14 @@
+id: lich
+title: An Anchor Can Be Broken
+skin: necromancer
+equipment:
+  HAND: WOODEN_SPEAR
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+  OFF_HAND: BOOK
+voice:
+  opening: Immortality is an arrangement. Find the other party.
+  halfway: Yes, the urn matters. I had hoped you would be less observant.
+  victory: You read the terms and terminated the agreement. Adequate.
+  defeat: The thread led to my insurance. You were free to cancel it.

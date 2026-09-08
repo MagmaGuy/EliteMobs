@@ -1,0 +1,13 @@
+id: juggernaut
+title: Weight and Distance
+skin: berserker
+equipment:
+  HAND: MACE
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: You will not move me easily. You can still move yourself.
+  halfway: The weight is coming to you. Read the landing.
+  victory: You made every heavy step cost me time.
+  defeat: Do not spend the whole warning trying to push me away.

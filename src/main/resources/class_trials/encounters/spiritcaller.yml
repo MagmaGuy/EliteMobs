@@ -1,0 +1,13 @@
+id: spiritcaller
+title: Hear the Echo End
+skin: cleric
+equipment:
+  HAND: MACE
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: A kindness can echo. Listen for where the first voice leaves it.
+  halfway: I can move. The echo I left behind cannot.
+  victory: You heard both the voice and the silence that followed.
+  defeat: The echo had a place, a delay, and a focus you could reach.

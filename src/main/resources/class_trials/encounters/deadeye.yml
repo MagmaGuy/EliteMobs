@@ -1,0 +1,13 @@
+id: deadeye
+title: One Perfect Shot
+skin: ranger
+equipment:
+  HAND: BOW
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: One shot. You will have more than one chance to read it.
+  halfway: I have changed the angle, not the promise.
+  victory: A perfect shot still needs someone standing in its path.
+  defeat: The last note of the draw meant the direction was fixed.

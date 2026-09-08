@@ -34,6 +34,7 @@ public class LuaElitePower extends ElitePower {
     private final LuaPowerConfigFields luaPowerConfigFields;
     private ScriptInstance instance = null;
     private ScriptableBoss scriptableBoss = null;
+    private ScriptableBoss suppliedActor;
     private final Map<String, Long> successfulEventHooks = new LinkedHashMap<>();
     private final Map<String, Long> failedEventHooks = new LinkedHashMap<>();
     private long acceptedMindActions;
@@ -151,6 +152,17 @@ public class LuaElitePower extends ElitePower {
         initializeInstance(true);
     }
 
+    /** Starts the same power runtime with an owner adapter supplying encounter-specific context. */
+    public void startRuntimeOrThrow(ScriptableBoss actor) {
+        if (actor == null || actor.getEliteEntity() != getOwnerEntity())
+            throw new IllegalArgumentException("Lua actor must wrap this power's owner");
+        if (instance != null) throw new IllegalStateException("Lua power already started");
+        suppliedActor = actor;
+        initializeInstance(true);
+    }
+
+    public boolean isRuntimeActive() { return instance != null && !instance.isClosed(); }
+
     /** Freezes this runtime without discarding its Lua VM, state table, or owned callbacks. */
     public void setRuntimePaused(boolean paused) {
         setRuntimePauseReason(ElitePowerPauseReason.MIND_SERVICE, paused);
@@ -173,7 +185,7 @@ public class LuaElitePower extends ElitePower {
             return;
         }
         try {
-            scriptableBoss = new ScriptableBoss(ownerEntity);
+            scriptableBoss = suppliedActor == null ? new ScriptableBoss(ownerEntity) : suppliedActor;
             instance = new ScriptInstance(luaPowerConfigFields.getLuaPowerDefinition(), scriptableBoss);
             // Bootstrap the Lua VM + tick registration now (on_spawn arrives later as a separate
             // EliteMobSpawnEvent), so a tick-only boss script still starts its on_game_tick loop.

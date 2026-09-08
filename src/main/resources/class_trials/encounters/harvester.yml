@@ -1,0 +1,13 @@
+id: harvester
+title: Break the Chain
+skin: berserker
+equipment:
+  HAND: IRON_HOE
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: A harvest follows a line. Remove what the line depends on.
+  halfway: Two more links. I suspect you know what to do with them.
+  victory: You broke the chain before it reached you.
+  defeat: The next destination was drawn before I moved.

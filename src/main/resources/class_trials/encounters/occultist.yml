@@ -1,0 +1,14 @@
+id: occultist
+title: What the Shadow Outlines
+skin: spellcaster
+equipment:
+  HAND: WOODEN_SPEAR
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+  OFF_HAND: BOOK
+voice:
+  opening: Darkness is useful because people stop looking carefully.
+  halfway: You are still looking. Let us change what you are looking at.
+  victory: You saw the outline and ignored the theatrics. Sensible.
+  defeat: The dark center was not the important part. Its edges were.

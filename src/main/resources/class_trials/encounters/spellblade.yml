@@ -1,0 +1,14 @@
+id: spellblade
+title: The Gap Between Cuts
+skin: spellcaster
+equipment:
+  HAND: BLAZE_ROD
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+  OFF_HAND: BOOK
+voice:
+  opening: Quick hands still need a rhythm. Listen for the gap.
+  halfway: Keep the rhythm. I am changing only where it begins.
+  victory: You let the last thrust pass and answered the space it left.
+  defeat: Retreating down the line kept all three thrusts in play.

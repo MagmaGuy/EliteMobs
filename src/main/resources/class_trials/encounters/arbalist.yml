@@ -1,0 +1,13 @@
+id: arbalist
+title: The Empty Crossbow
+skin: ranger
+equipment:
+  HAND: CROSSBOW
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: A loaded crossbow commands respect. An empty one asks for time.
+  halfway: Another position. You know what the reload costs me.
+  victory: You spent my reload better than I did.
+  defeat: Once the bolt passed, there was nothing left in the crossbow.

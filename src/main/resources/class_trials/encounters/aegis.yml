@@ -1,0 +1,14 @@
+id: aegis
+title: A Shield Has Edges
+skin: paladin
+equipment:
+  HAND: IRON_SWORD
+  CHEST: IRON_CHESTPLATE
+  LEGS: IRON_LEGGINGS
+  FEET: IRON_BOOTS
+  OFF_HAND: SHIELD
+voice:
+  opening: You see a wall. Look for its edges.
+  halfway: A shield that never moves protects very little.
+  victory: You made me choose what I could no longer cover.
+  defeat: Do not keep feeding arrows into a shield. Change the angle.

@@ -1,0 +1,13 @@
+id: titanbane
+title: Stop the Charge
+skin: berserker
+equipment:
+  HAND: IRON_SPEAR
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: A larger enemy commits more weight. Give that weight a limit.
+  halfway: Now watch the anchor as closely as the giant.
+  victory: You found what held the exchange together, and broke it.
+  defeat: The chain marked the thrust. It also gave you something to break.

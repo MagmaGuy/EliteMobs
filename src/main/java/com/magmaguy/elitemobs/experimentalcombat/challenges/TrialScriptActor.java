@@ -1,0 +1,367 @@
+package com.magmaguy.elitemobs.experimentalcombat.challenges;
+
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
+import com.magmaguy.elitemobs.combatsystem.LevelScaling;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.instanced.arena.ArenaContainer;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.powers.lua.LuaElitePower;
+import com.magmaguy.elitemobs.powers.lua.ScriptableBoss;
+import com.magmaguy.magmacore.scripting.ScriptInstance;
+import com.magmaguy.magmacore.scripting.tables.LuaTableSupport;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.shaded.luaj.vm2.*;
+import com.magmaguy.shaded.luaj.vm2.lib.VarArgFunction;
+import me.libraryaddict.disguise.DisguiseAPI;
+import me.libraryaddict.disguise.disguisetypes.watchers.LivingWatcher;
+import org.bukkit.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+
+import java.util.*;
+import java.util.function.Function;
+
+/** Supplies a known challenger and run-owned physical actors to the normal boss Lua runtime. */
+final class TrialScriptActor extends ScriptableBoss implements Listener {
+    private record Missile(Projectile entity, double damage, String group, double cap, long expires) {}
+    private final CustomBossEntity boss;
+    private final Player player;
+    private final ArenaContainer bounds;
+    private final TrialMovement movement;
+    private final Map<UUID, Missile> missiles = new HashMap<>();
+    private final Map<UUID, Long> retiredMissiles = new HashMap<>();
+    private final Map<String, Double> hitBudgets = new HashMap<>();
+    private final Map<String, CustomBossEntity> actors = new LinkedHashMap<>();
+    private final LuaElitePower power;
+    private final double matchedHit;
+    private Horse steed;
+    private TrialProjectileWalls walls;
+    private LuaTable trial;
+    private ScriptInstance runtime;
+    private long ticks;
+    private boolean closed;
+    private boolean transferring;
+
+    TrialScriptActor(CustomBossEntity boss, Player player, ArenaContainer bounds, LuaElitePower power) {
+        super(boss);
+        this.boss = boss;
+        this.player = player;
+        this.bounds = bounds;
+        this.power = power;
+        movement = new TrialMovement(bounds, player);
+        matchedHit = LevelScaling.calculateBaseDamageToElite(boss.getLevel());
+        Bukkit.getPluginManager().registerEvents(this, MetadataHandler.PLUGIN);
+    }
+
+    @Override public LuaValue resolveExtraContext(String key, ScriptInstance instance) {
+        if (key.equals("trial")) {
+            runtime = instance;
+            if (trial == null) trial = buildTrialTable(instance);
+            return trial;
+        }
+        return super.resolveExtraContext(key, instance);
+    }
+
+    private LuaTable buildTrialTable(ScriptInstance instance) {
+        LuaTable table = new LuaTable();
+        table.set("player", participantTable(instance, player));
+        table.set("matched_hit", LuaValue.valueOf(matchedHit));
+        table.set("position", method(table, args -> LuaTableSupport.locationToTable(body().getLocation())));
+        table.set("tick", method(table, args -> { maintain(); return LuaValue.valueOf(ticks); }));
+        table.set("say", method(table, args -> {
+            player.sendMessage(ChatColorConverter.convert("&6" + boss.getName() + " &8» &f" + args.checkjstring(1)));
+            return LuaValue.NIL;
+        }));
+        table.set("inside", method(table, args -> LuaValue.valueOf(bounds.contains(location(args.arg1())))));
+        table.set("line_of_sight", method(table, args -> LuaValue.valueOf(boss.getLivingEntity().hasLineOfSight(player))));
+        table.set("pose", method(table, args -> { pose(args.checkjstring(1)); return LuaValue.NIL; }));
+        table.set("damage", method(table, args -> {
+            double amount = bounded(args.checkdouble(1), 0, 2);
+            double before = player.getHealth() + player.getAbsorptionAmount();
+            if (!closed && bounds.contains(player.getLocation()) && boss.getLivingEntity().hasLineOfSight(player))
+                CombatDamageContext.runEliteToPlayerMultiplier(amount, () -> player.damage(1, boss.getLivingEntity()));
+            return LuaValue.valueOf(player.getHealth() + player.getAbsorptionAmount() < before);
+        }));
+        table.set("face", method(table, args -> {
+            Location target = location(args.arg1());
+            Location origin = body().getLocation();
+            double yaw = Math.toDegrees(Math.atan2(-(target.getX() - origin.getX()), target.getZ() - origin.getZ()));
+            double delta = (yaw - origin.getYaw() + 540) % 360 - 180;
+            double limit = bounded(args.optdouble(2, 5), 0, 20);
+            boss.getLivingEntity().setRotation((float) (origin.getYaw() + Math.max(-limit, Math.min(limit, delta))), 0);
+            if (steed != null) steed.setRotation(boss.getLivingEntity().getLocation().getYaw(), 0);
+            return LuaValue.NIL;
+        }));
+        table.set("safe_destination", method(table, args -> {
+            Location target = location(args.arg1());
+            return movement.straight(body(), target, args.optboolean(2, true), args.optboolean(3, true))
+                    ? LuaTableSupport.locationToTable(target) : LuaValue.NIL;
+        }));
+        table.set("blink", method(table, args -> {
+            Location target = location(args.arg1());
+            if (!movement.straight(body(), target, true, true)) return LuaValue.FALSE;
+            return LuaValue.valueOf(body().teleport(target));
+        }));
+        table.set("step", method(table, args -> {
+            Location target = location(args.arg1());
+            boolean grounded = args.optboolean(3, true);
+            if (!movement.straight(body(), target, grounded, args.optboolean(4, true))) return LuaValue.FALSE;
+            Vector direction = target.toVector().subtract(body().getLocation().toVector());
+            double speed = Math.min(bounded(args.optdouble(2, .25), 0, .8), direction.length());
+            if (direction.lengthSquared() > .001) body().setVelocity(direction.normalize().multiply(speed));
+            return LuaValue.TRUE;
+        }));
+        table.set("leap", method(table, args -> LuaValue.valueOf(movement.leap(body(), location(args.arg1()), args.optint(2, 22)))));
+        table.set("stop", method(table, args -> { if (body().isValid()) body().setVelocity(new Vector()); return LuaValue.NIL; }));
+        table.set("mount", method(table, args -> { mount(); return LuaValue.valueOf(steed != null); }));
+        table.set("dismount", method(table, args -> { dismount(); return LuaValue.NIL; }));
+        table.set("wall", method(table, args -> {
+            Location center = location(args.arg(2));
+            if (!bounds.contains(center)) return LuaValue.FALSE;
+            if (walls == null) walls = new TrialProjectileWalls(player);
+            walls.add(args.checkjstring(1), center, location(args.arg(3)), args.optdouble(4, 5), args.optint(5, 100), ticks);
+            return LuaValue.TRUE;
+        }));
+        table.set("remove_wall", method(table, args -> { if (walls != null) walls.remove(args.checkjstring(1)); return LuaValue.NIL; }));
+        table.set("own_projectile", method(table, args -> {
+            Entity entity = reference(args.arg1());
+            if (!(entity instanceof Projectile projectile)) throw new IllegalArgumentException("Expected a physical projectile");
+            if (missiles.size() >= 48) { projectile.remove(); return LuaValue.NIL; }
+            String group = args.checkjstring(3);
+            if (group.length() > 80) throw new IllegalArgumentException("Projectile group name too long");
+            double damage = bounded(args.checkdouble(2), 0, 2);
+            double cap = bounded(args.optdouble(4, damage), 0, 3);
+            if (projectile instanceof AbstractArrow arrow) arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
+            projectile.setPersistent(false);
+            missiles.put(projectile.getUniqueId(), new Missile(projectile, damage, group, cap, ticks + 100));
+            return LuaValue.NIL;
+        }));
+        table.set("group_damage", method(table, args -> LuaValue.valueOf(hitBudgets.getOrDefault(args.checkjstring(1), 0D))));
+        table.set("forget_group", method(table, args -> { hitBudgets.remove(args.checkjstring(1)); return LuaValue.NIL; }));
+        table.set("spawn_actor", method(table, args -> spawnActor(instance, args)));
+        table.set("actor", method(table, args -> {
+            var actor = actors.get(args.checkjstring(1));
+            return actor == null || !actor.exists() ? LuaValue.NIL : new ScriptableBoss(actor).buildContextTable(instance);
+        }));
+        table.set("actor_step", method(table, args -> {
+            var actor = actors.get(args.checkjstring(1));
+            if (actor == null || !actor.exists()) return LuaValue.FALSE;
+            Location target = location(args.arg(2));
+            if (!movement.straight(actor.getLivingEntity(), target, true, true)) return LuaValue.FALSE;
+            Vector direction = target.toVector().subtract(actor.getLocation().toVector());
+            if (direction.lengthSquared() > .01) actor.getLivingEntity().setVelocity(direction.normalize().multiply(.15));
+            return LuaValue.TRUE;
+        }));
+        table.set("remove_actor", method(table, args -> {
+            CustomBossEntity actor = actors.remove(args.checkjstring(1));
+            if (actor != null && actor.exists()) actor.remove(RemovalReason.EFFECT_TIMEOUT);
+            return LuaValue.NIL;
+        }));
+        table.set("actor_damage", method(table, args -> {
+            var actor = actors.get(args.checkjstring(1));
+            double amount = bounded(args.optdouble(2, .2), 0, 1);
+            if (actor == null || !actor.exists() || actor.getLocation().distanceSquared(player.getLocation()) > 3 * 3
+                    || !actor.getLivingEntity().hasLineOfSight(player)) return LuaValue.FALSE;
+            double before = player.getHealth() + player.getAbsorptionAmount();
+            actor.getLivingEntity().swingMainHand();
+            CombatDamageContext.runEliteToPlayerMultiplier(amount, () -> player.damage(1, actor.getLivingEntity()));
+            return LuaValue.valueOf(player.getHealth() + player.getAbsorptionAmount() < before);
+        }));
+        table.set("damaged_actor", method(table, args -> {
+            if (!(instance.getCurrentEvent() instanceof EliteMobDamagedByPlayerEvent event)) return LuaValue.NIL;
+            if (event.getEliteMobEntity() == boss) return LuaValue.valueOf("boss");
+            return actors.entrySet().stream().filter(entry -> entry.getValue() == event.getEliteMobEntity())
+                    .findFirst().<LuaValue>map(entry -> LuaValue.valueOf(entry.getKey())).orElse(LuaValue.NIL);
+        }));
+        table.set("transfer_damage", method(table, args -> {
+            // An existing normalized damage amount is transferred directly, never normalized a second time.
+            double damage = bounded(args.checkdouble(1), 0, boss.getMaxHealth());
+            if (damage > 0 && boss.exists() && !transferring) transferDamage(damage);
+            return LuaValue.NIL;
+        }));
+        table.set("is_transfer", method(table, args -> LuaValue.valueOf(transferring)));
+        return table;
+    }
+
+    private void transferDamage(double damage) {
+        LivingEntity target = boss.getLivingEntity();
+        int previousTicks = target.getNoDamageTicks();
+        double previousDamage = target.getLastDamage();
+        transferring = true;
+        try {
+            target.setNoDamageTicks(0);
+            CombatDamageContext.runPlayerToEliteBypass(CombatDamageContext.currentPlayerToEliteSource().orElse(null),
+                    () -> target.damage(damage, player));
+        } finally {
+            transferring = false;
+            if (target.isValid() && !target.isDead()) {
+                target.setNoDamageTicks(previousTicks);
+                target.setLastDamage(previousDamage);
+            }
+        }
+    }
+
+    private LuaValue spawnActor(ScriptInstance instance, Varargs args) {
+        String id = args.checkjstring(1);
+        if (actors.containsKey(id) || actors.size() >= 8) return LuaValue.NIL;
+        Location spawn = location(args.arg(2));
+        if (!movement.standing(boss.getLivingEntity(), spawn)) return LuaValue.NIL;
+        double healthHits = bounded(args.optdouble(3, 3), .5, 8);
+        EntityType type = EntityType.valueOf(args.optjstring(5, "HUSK"));
+        if (!Set.of(EntityType.HUSK, EntityType.SKELETON, EntityType.WOLF, EntityType.IRON_GOLEM, EntityType.WITHER_SKELETON).contains(type))
+            throw new IllegalArgumentException("Unsupported trial actor type " + type);
+        var fields = new CustomBossesConfigFields("trial_actor_" + id + ".yml", type, true,
+                args.optjstring(4, "&fSparring partner"), Integer.toString(boss.getLevel()));
+        fields.setHealthMultiplier(healthHits / LevelScaling.TARGET_HITS_TO_KILL_MOB);
+        fields.setNormalizedCombat(true);
+        fields.setDamageMultiplier(1);
+        fields.setAi(false);
+        fields.setDropsEliteMobsLoot(false);
+        fields.setDropsVanillaLoot(false);
+        fields.setDropsRandomLoot(false);
+        fields.setDropsSkillXP(false);
+        fields.setClassLoot(false);
+        fields.setPowers(List.of());
+        fields.setUniqueLootList(List.of());
+        if (type == EntityType.HUSK) fields.setDisguise(boss.getCustomBossesConfigFields().getDisguise());
+        CustomBossEntity actor = new CustomBossEntity(fields);
+        actor.setSummoningEntity(boss);
+        actor.setNormalizedCombat();
+        actor.spawn(spawn, true);
+        if (!actor.exists()) return LuaValue.NIL;
+        actors.put(id, actor);
+        actor.getLivingEntity().setAI(false);
+        return new ScriptableBoss(actor).buildContextTable(instance);
+    }
+
+    private void maintain() {
+        ticks++;
+        if (closed || !boss.exists() || !player.isOnline()) return;
+        missiles.values().removeIf(missile -> {
+            if (missile.entity.isValid() && ticks < missile.expires && bounds.contains(missile.entity.getLocation())) return false;
+            removeMissile(missile);
+            return true;
+        });
+        retiredMissiles.values().removeIf(expiry -> ticks >= expiry);
+        if (walls != null) walls.tick(ticks);
+        if (ticks % 2 == 0) for (Missile missile : missiles.values())
+            if (missile.entity instanceof Snowball)
+                player.spawnParticle(Particle.DUST, missile.entity.getLocation(), 2, .03, .03, .03, 0,
+                        new Particle.DustOptions(Color.fromRGB(160, 120, 255), .8F));
+        if (hitBudgets.size() > 128) hitBudgets.keySet().removeIf(group -> missiles.values().stream().noneMatch(m -> m.group.equals(group)));
+        // Recheck actual physics, including external pushes, against the same read-only bounds.
+        if (!bounds.contains(body().getLocation())) throw new IllegalStateException("Trial actor left its bounds");
+        Vector velocity = body().getVelocity();
+        if (velocity.lengthSquared() > .001 && !movement.clear(body(), body().getLocation().add(velocity)))
+            body().setVelocity(new Vector(0, Math.min(0, velocity.getY()), 0));
+    }
+
+    private Entity body() { return steed == null ? boss.getLivingEntity() : steed; }
+
+    private void mount() {
+        if (steed != null) return;
+        Horse candidate = boss.getLocation().getWorld().spawn(boss.getLocation(), Horse.class, horse -> {
+            horse.setAdult(); horse.setTamed(true); horse.setAI(false); horse.setInvulnerable(true);
+            horse.setPersistent(false); horse.setCollidable(false);
+            horse.getInventory().setSaddle(new ItemStack(Material.SADDLE));
+            horse.getInventory().setArmor(new ItemStack(Material.GOLDEN_HORSE_ARMOR));
+        });
+        if (!movement.standing(candidate, candidate.getLocation()) || !candidate.addPassenger(boss.getLivingEntity())) {
+            candidate.remove(); return;
+        }
+        steed = candidate;
+    }
+
+    private void dismount() {
+        if (steed == null) return;
+        if (boss.getLivingEntity() != null) boss.getLivingEntity().leaveVehicle();
+        steed.remove();
+        steed = null;
+    }
+
+    private void pose(String pose) {
+        if (pose.equals("swing")) boss.getLivingEntity().swingMainHand();
+        var disguise = DisguiseAPI.getDisguise(boss.getLivingEntity());
+        if (disguise != null && disguise.getWatcher() instanceof LivingWatcher watcher) {
+            TrialPoses.apply(watcher, pose.equals("draw") || pose.equals("cast"), pose.equals("guard"));
+        }
+    }
+
+    boolean owns(CustomBossEntity entity) { return entity == boss || actors.containsValue(entity); }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void helperDamage(EliteMobDamagedByPlayerEvent event) {
+        if (!closed && event.getEliteMobEntity() instanceof CustomBossEntity actor && actor != boss && owns(actor))
+            power.check(event, boss, event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void suppressNativeMissileDamage(EntityDamageByEntityEvent event) {
+        UUID id = event.getDamager().getUniqueId();
+        if (missiles.containsKey(id) || retiredMissiles.containsKey(id)) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void projectileHit(ProjectileHitEvent event) {
+        Missile missile = missiles.remove(event.getEntity().getUniqueId());
+        if (missile == null) return;
+        event.setCancelled(true);
+        removeMissile(missile);
+        if (closed || event.getHitEntity() != player || !boss.exists()) return;
+        double spent = hitBudgets.getOrDefault(missile.group, 0D);
+        double damage = Math.min(missile.damage, Math.max(0, missile.cap - spent));
+        if (damage <= 0) return;
+        hitBudgets.put(missile.group, spent + damage);
+        CombatDamageContext.runEliteToPlayerMultiplier(damage, () -> player.damage(1, boss.getLivingEntity()));
+    }
+
+    @Override public void onShutdown() {
+        if (closed) return;
+        closed = true;
+        HandlerList.unregisterAll(this);
+        missiles.values().forEach(this::removeMissile);
+        missiles.clear();
+        retiredMissiles.clear();
+        hitBudgets.clear();
+        dismount();
+        if (walls != null) walls.close();
+        if (boss.exists()) { pose("idle"); boss.getLivingEntity().setVelocity(new Vector()); }
+        actors.values().forEach(actor -> { if (actor.exists()) actor.remove(RemovalReason.ARENA_RESET); });
+        actors.clear();
+    }
+
+    private Location location(LuaValue value) {
+        return LuaTableSupport.tableToLocation(value.checktable(), boss.getLocation().getWorld());
+    }
+
+    private void removeMissile(Missile missile) {
+        retiredMissiles.put(missile.entity.getUniqueId(), ticks + 2);
+        com.magmaguy.elitemobs.entitytracker.EntityTracker.unregisterProjectileEntity(missile.entity);
+        missile.entity.remove();
+    }
+
+    private Entity reference(LuaValue value) {
+        String id = value.checktable().get("__bukkit_uuid").optjstring(value.get("uuid").optjstring(""));
+        return Bukkit.getEntity(UUID.fromString(id));
+    }
+
+    private static double bounded(double value, double min, double max) {
+        if (!Double.isFinite(value) || value < min || value > max) throw new IllegalArgumentException("Trial value outside bounds");
+        return value;
+    }
+
+    private static VarArgFunction method(LuaTable owner, Function<Varargs, LuaValue> callback) {
+        return new VarArgFunction() {
+            @Override public Varargs invoke(Varargs args) {
+                return callback.apply(args.narg() > 0 && args.arg1().raweq(owner) ? args.subargs(2) : args);
+            }
+        };
+    }
+}

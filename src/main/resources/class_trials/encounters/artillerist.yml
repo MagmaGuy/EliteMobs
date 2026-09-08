@@ -1,0 +1,13 @@
+id: artillerist
+title: Count the Mechanism
+skin: ranger
+equipment:
+  HAND: CROSSBOW
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: Count the mechanism. Four bolts, then work to do.
+  halfway: You have noticed the pause. Now notice what I use to shorten it.
+  victory: A fine machine is still only as ready as its supply.
+  defeat: You waited through the reload beside the thing that improved it.

@@ -1,0 +1,14 @@
+id: paladin
+title: The Oath Holds
+skin: paladin
+equipment:
+  HAND: MACE
+  CHEST: IRON_CHESTPLATE
+  LEGS: IRON_LEGGINGS
+  FEET: IRON_BOOTS
+  OFF_HAND: SHIELD
+voice:
+  opening: A shield buys time. Show me what you do with it.
+  halfway: Good. Now hold your nerve when the line moves.
+  victory: You found the opening without abandoning your ground. Take the oath.
+  defeat: You watched the shield and missed the rider. We can practice again.

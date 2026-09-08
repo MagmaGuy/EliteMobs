@@ -1,0 +1,14 @@
+id: arcane_knight
+title: Break the Cast, Keep the Guard
+skin: spellcaster
+equipment:
+  HAND: BLAZE_ROD
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+  OFF_HAND: SHIELD
+voice:
+  opening: A guard can answer a spell. It must still be raised in time.
+  halfway: Watch the return to my companion. That is where the pulse begins.
+  victory: You found the cast before the guard could answer it.
+  defeat: The pulse needed time and nearby company. You could deny either.

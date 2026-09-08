@@ -1,0 +1,14 @@
+id: summoner
+title: Who Gives the Order
+skin: spellcaster
+equipment:
+  HAND: BLAZE_ROD
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+  OFF_HAND: BOOK
+voice:
+  opening: A summon is a companion with a task. Watch who gives the order.
+  halfway: We will try another angle. The command still needs its focus.
+  victory: You understood the partnership, and interrupted it intelligently.
+  defeat: The sigil was helping the wolf more than another hurried swing helped you.

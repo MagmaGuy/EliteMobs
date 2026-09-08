@@ -1,0 +1,13 @@
+id: cleric
+title: A Place to Recover
+skin: cleric
+equipment:
+  HAND: MACE
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: Watch where healing comes from. You can answer it without haste.
+  halfway: Well timed. Now follow the light to the one who needs it.
+  victory: You saw the whole fight, not just the person before you. That is the gift.
+  defeat: Take a breath. You can step out, choose your moment, and begin again.

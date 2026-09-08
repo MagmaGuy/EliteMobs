@@ -1,0 +1,13 @@
+id: windrunner
+title: End of the Strafe
+skin: ranger
+equipment:
+  HAND: BOW
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: A swift path still has an end. Meet me there.
+  halfway: You found the end once. Read the new curve.
+  victory: You spent fewer steps to arrive at the better place.
+  defeat: Chasing every shot kept you behind every turn.

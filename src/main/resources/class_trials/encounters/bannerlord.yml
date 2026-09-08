@@ -1,0 +1,13 @@
+id: bannerlord
+title: Keep Pace
+skin: paladin
+equipment:
+  HAND: IRON_SPEAR
+  CHEST: IRON_CHESTPLATE
+  LEGS: IRON_LEGGINGS
+  FEET: IRON_BOOTS
+voice:
+  opening: A standard can move. Its people still have to keep up.
+  halfway: Stay with me, cadets. Challenger, make that difficult.
+  victory: You found the distance a promise could not cover.
+  defeat: You retreated with our march. Try crossing it.

@@ -1,0 +1,13 @@
+id: seraph
+title: The Reach of Mercy
+skin: cleric
+equipment:
+  HAND: IRON_SPEAR
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: Mercy travels from one person to the next. Watch what joins them.
+  halfway: I will begin from the other side. Follow the notes.
+  victory: You understood the distance between each act of care.
+  defeat: The middle thread was holding the whole chain together.

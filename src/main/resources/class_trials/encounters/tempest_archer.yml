@@ -1,0 +1,13 @@
+id: tempest_archer
+title: The Returning Wind
+skin: ranger
+equipment:
+  HAND: BOW
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: Wind bends a flight. It does not make the whole sky dangerous.
+  halfway: Read the curves again. Their beginning has moved.
+  victory: You found the quiet air between the flights.
+  defeat: The arrows curved along the trails I showed you.

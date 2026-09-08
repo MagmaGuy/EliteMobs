@@ -1,0 +1,14 @@
+id: pyromancer
+title: Leave the Kindling
+skin: pyromancer
+equipment:
+  HAND: WOODEN_SPEAR
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+  OFF_HAND: BOOK
+voice:
+  opening: Fire is very persuasive. You are still allowed to leave.
+  halfway: You have learned to leave the heat. Now consider its source.
+  victory: A fine answer. No wasted steps, and very little singeing.
+  defeat: The brazier fed the flame. It was not merely decoration.

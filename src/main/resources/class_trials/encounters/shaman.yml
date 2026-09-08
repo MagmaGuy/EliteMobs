@@ -1,0 +1,13 @@
+id: shaman
+title: Beyond the Tether
+skin: cleric
+equipment:
+  HAND: TRIDENT
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+voice:
+  opening: A current can carry strength only while its course remains open.
+  halfway: The source is there. The tether still has a limit.
+  victory: You found where the current could no longer flow.
+  defeat: The totem could be broken; the tether could be stretched.

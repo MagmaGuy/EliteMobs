@@ -1,0 +1,14 @@
+id: elementalist
+title: Three Different Answers
+skin: spellcaster
+equipment:
+  HAND: WOODEN_SPEAR
+  CHEST: LEATHER_CHESTPLATE
+  LEGS: LEATHER_LEGGINGS
+  FEET: LEATHER_BOOTS
+  OFF_HAND: BOOK
+voice:
+  opening: Three elements. Three questions. One answer will not suit them all.
+  halfway: A different order. Read the runes before the first release.
+  victory: You changed your answer when the question changed.
+  defeat: The runes gave you the order; the shapes gave you the response.

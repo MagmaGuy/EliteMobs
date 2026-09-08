@@ -1,0 +1,14 @@
+id: bulwark
+title: The Unbroken Line
+skin: paladin
+equipment:
+  HAND: MACE
+  CHEST: IRON_CHESTPLATE
+  LEGS: IRON_LEGGINGS
+  FEET: IRON_BOOTS
+  OFF_HAND: SHIELD
+voice:
+  opening: This line will hold. You need not cross it head-on.
+  halfway: A new line. The same mistake will still cost you.
+  victory: You knew when strength was simply facing the wrong way.
+  defeat: My shield covered the front. The rest of me was still there.
