@@ -625,6 +625,14 @@ public class DungeonInstance extends MatchInstance {
         PersistentObjectHandler.removeForWorld(worldUUID);
     }
 
+    public String getResolvedDifficultyID() {
+        return contentPackagesConfigFields.getDifficultyResolver().resolveSelected(difficultyID);
+    }
+
+    public boolean matchesDifficulty(List<String> filter, String source) {
+        return contentPackagesConfigFields.getDifficultyResolver().matches(filter, difficultyID, source);
+    }
+
     private void setDifficulty(String difficultyName) {
         if (difficultyName == null) return;
         if (contentPackagesConfigFields.getDifficulties() == null ||
@@ -637,7 +645,7 @@ public class DungeonInstance extends MatchInstance {
                 break;
             }
         if (difficulty == null) {
-            Logger.warn("Failed to set difficulty " + difficulty + " for instanced dungeon " + contentPackagesConfigFields.getFilename());
+            Logger.warn("Failed to set difficulty " + difficultyName + " for instanced dungeon " + contentPackagesConfigFields.getFilename());
             return;
         }
 

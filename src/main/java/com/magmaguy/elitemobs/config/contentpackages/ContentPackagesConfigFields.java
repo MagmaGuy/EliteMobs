@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.config.contentpackages;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
+import com.magmaguy.elitemobs.instanced.dungeons.DifficultyResolver;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -18,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 public class ContentPackagesConfigFields extends CustomConfigFields {
+
+    @Getter
+    private DifficultyResolver difficultyResolver;
 
     @Getter
     @Setter
@@ -354,12 +358,16 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         if (fileConfiguration.contains("difficulties"))
             this.difficulties = (List<Map<String, Object>>) fileConfiguration.getList("difficulties");
         else fileConfiguration.addDefault("difficulties", difficulties);
+        // Detect authored names before translation so locale changes cannot change loot tiers.
+        difficultyResolver = new DifficultyResolver(filename, difficulties);
         // Wrap in mutable copies — both YAML getList() and List.of()/Map.of() from
         // premade constructors return immutable collections
         if (this.difficulties != null) {
             List<Map<String, Object>> mutableDifficulties = new ArrayList<>();
             for (int i = 0; i < this.difficulties.size(); i++) {
                 Map<String, Object> difficulty = new HashMap<>(this.difficulties.get(i));
+                if (difficulty.get("id") == null)
+                    difficulty.put("id", difficultyResolver.resolve(difficulty.get("name")));
                 if (difficulty.containsKey("name"))
                     difficulty.put("name", TranslationsConfig.add(filename, "difficulties." + i + ".name", (String) difficulty.get("name")));
                 mutableDifficulties.add(difficulty);

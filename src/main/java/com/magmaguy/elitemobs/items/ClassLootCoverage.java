@@ -61,7 +61,8 @@ public final class ClassLootCoverage {
         if (!"AUTO".equals(override))
             return ClassLootSettingsConfig.difficulty(override, ClassLootSettingsConfig.defaultDifficulty());
         if (boss instanceof InstancedBossEntity instanced && instanced.getDungeonInstance() != null)
-            return ClassLootSettingsConfig.forDifficultyId(instanced.getDungeonInstance().getDifficultyID());
+            return ClassLootSettingsConfig.forDifficultyId(instanced.getDungeonInstance().getDifficultyID(),
+                    instanced.getDungeonInstance().getResolvedDifficultyID());
         return ClassLootSettingsConfig.defaultDifficulty();
     }
 

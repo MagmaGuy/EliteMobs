@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.instanced.dungeons.DifficultyResolver;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.BonusCoins;
 import com.magmaguy.elitemobs.powers.meta.CustomSummonPower;
@@ -61,17 +62,17 @@ public class ElitePowerParser {
                 }
 
                 if (customBossEntity instanceof InstancedBossEntity instancedBossEntity) {
-                    List<String> difficulties = new ArrayList<>();
+                    List<String> difficulties = null;
                     for (Map.Entry<?, ?> entry : map.entrySet()) {
                         if (((String) entry.getKey()).equalsIgnoreCase("difficultyID")) {
-                            difficulties = MapListInterpreter.parseStringList((String) entry.getKey(), entry.getValue(), customBossesConfigFields.getFilename());
+                            difficulties = DifficultyResolver.parseFilter(entry.getValue(), customBossesConfigFields.getFilename());
                             break;
                         }
                     }
                     //If the boss is in an instanced dungeon with difficulties and the difficulty doesn't match, skip assigning that power
-                    if (!difficulties.isEmpty() &&
+                    if (difficulties != null &&
                             instancedBossEntity.getDungeonInstance() != null && //Annoyingly this has to be done in two passes for the instanced bosses due to initialization
-                            !difficulties.contains(instancedBossEntity.getDungeonInstance().getDifficultyID()))
+                            !instancedBossEntity.getDungeonInstance().matchesDifficulty(difficulties, customBossesConfigFields.getFilename()))
                         continue;
                 }
 

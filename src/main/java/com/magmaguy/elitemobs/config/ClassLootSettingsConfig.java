@@ -115,6 +115,10 @@ public class ClassLootSettingsConfig extends ConfigurationFile {
     public static boolean enabled() { return enabled; }
     public static Difficulty defaultDifficulty() { return defaultDifficulty; }
     public static Difficulty forDifficultyId(Object id) { return difficultyIds.getOrDefault(String.valueOf(id), defaultDifficulty); }
+    public static Difficulty forDifficultyId(Object id, Object resolvedId) {
+        // Explicit administrator mappings take precedence over package naming conventions.
+        return difficultyIds.getOrDefault(String.valueOf(id), forDifficultyId(resolvedId));
+    }
     public static double dropChance(Rank rank) { return chances.getOrDefault(rank, 0D); }
     public static ClassLootProfile profile(Difficulty difficulty, Rank rank, SkillType skill) {
         return profiles.get(new Key(difficulty, rank, skill));

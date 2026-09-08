@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.PluginState;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DifficultyResolver;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -26,10 +27,12 @@ import java.util.Map;
 public class EliteCustomLootEntry extends CustomLootEntry implements Serializable {
     @Getter
     private String filename = null;
-    private String difficultyID = null;
+    private List<String> difficultyIDs = null;
+    private final String configFilename;
 
     public EliteCustomLootEntry(List<CustomLootEntry> entries, String rawString, String configFilename) {
         super();
+        this.configFilename = configFilename;
         //old format
         if (!rawString.contains("filename=")) {
             parseLegacyFormat(rawString, configFilename);
@@ -46,6 +49,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     }
 
     public EliteCustomLootEntry(List<CustomLootEntry> entries, Map<?, ?> configMap, String configFilename) {
+        this.configFilename = configFilename;
         for (Map.Entry<?, ?> mapEntry : configMap.entrySet()) {
             String key = (String) mapEntry.getKey();
             switch (key.toLowerCase(Locale.ROOT)) {
@@ -53,7 +57,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
                 case "chance" ->
                         super.setChance(MapListInterpreter.parseDouble(key, mapEntry.getValue(), configFilename));
                 case "difficultyid" ->
-                        difficultyID = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);
+                        difficultyIDs = DifficultyResolver.parseFilter(mapEntry.getValue(), configFilename);
                 case "permission" ->
                         super.setPermission(MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename));
                 case "amount" -> setAmount(MapListInterpreter.parseInteger(key, mapEntry.getValue(), configFilename));
@@ -93,6 +97,9 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         for (String string : rawString.split(":")) {
             String[] strings = string.split("=");
             switch (strings[0].toLowerCase(Locale.ROOT)) {
+                case "difficultyid":
+                    difficultyIDs = DifficultyResolver.parseFilter(strings.length > 1 ? strings[1] : null, configFilename);
+                    break;
                 case "filename":
                     try {
                         this.filename = strings[1];
@@ -263,14 +270,11 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     }
 
     private boolean isGroupLoot(int itemTier, Player player, EliteEntity eliteEntity) {
-        if (difficultyID != null) {
+        if (difficultyIDs != null) {
             MatchInstance matchInstance = PlayerData.getMatchInstance(player);
-            String dungeonDifficultyID = null;
-            if (matchInstance instanceof DungeonInstance dungeonInstance)
-                dungeonDifficultyID = dungeonInstance.getDifficultyID();
-            if (dungeonDifficultyID != null) {
+            if (matchInstance instanceof DungeonInstance dungeonInstance) {
                 // Beyond this point the item is for an instanced dungeon. A mismatched difficulty suppresses it.
-                if (!dungeonDifficultyID.equals(difficultyID)) return true;
+                if (!dungeonInstance.matchesDifficulty(difficultyIDs, configFilename)) return true;
                 addGroupLoot(CustomItem.limitItemLevel(player, itemTier), eliteEntity);
                 return true;
             }
