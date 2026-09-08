@@ -1,9 +1,9 @@
 -- Windstep: lateral repositioning; all following shots retain their own draw time.
 M.cooldown=280
-function M.move(c,s,anchor)
+function M.move(c,s,anchor,warning)
   local target,valid
   return {
-    T.wait(16,function(c,s)
+    T.wait(warning or 16,function(c,s)
       local p=c.trial:position(); local x,z=T.direction(p,c.trial.player:get_location()); local side=s.windSide or 1; s.windSide=-side
       target=anchor or T.offset(p,-z*4*side,0,x*4*side); valid=c.trial:safe_destination(target,true,true)~=nil
       if not valid then target=T.offset(p,z*4*side,0,-x*4*side); valid=c.trial:safe_destination(target,true,true)~=nil end

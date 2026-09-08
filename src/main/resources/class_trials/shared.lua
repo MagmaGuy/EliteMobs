@@ -40,6 +40,7 @@ function T.damageScale(c) return c.state.outgoing or 1 end
 function T.hit(c,g,amount) return T.contains(g,c.trial.player:get_location()) and c.trial:damage(amount*T.damageScale(c)) end
 function T.sound(c,name,pitch) c.boss:play_sound_at_self(name,.65,pitch or 1) end
 function T.wait(ticks,begin,frame,finish) assert(ticks>=1); return {ticks=ticks,begin=begin,frame=frame,finish=finish} end
+function T.untilDone(ticks,begin,frame,finish,done) local step=T.wait(ticks,begin,frame,finish); step.done=done; return step end
 function T.rest(ticks,exposure)
   return T.wait(ticks,function(c,s) c.trial:pose('idle'); c.trial:stop(); s.exposure=exposure or 1 end,nil,function(c,s) s.exposure=1 end)
 end
@@ -110,7 +111,7 @@ function T.advance(c,s)
   if step.frame then step.frame(c,s,cast.elapsed) end
   if s.cast~=cast then return end
   cast.elapsed=cast.elapsed+1
-  if cast.elapsed>=step.ticks then
+  if cast.elapsed>=step.ticks or (step.done and step.done(c,s)) then
     if step.finish then step.finish(c,s) end
     if s.cast~=cast then return end
     cast.index=cast.index+1; cast.elapsed=0
@@ -144,11 +145,11 @@ function T.approach(c,s,range)
   if math.abs(d-range)<1 then return false end
   local x,z=T.direction(p,target); local travel=math.min(3,math.abs(d-range)); if d<range then travel=-travel end
   local destination=T.offset(p,x*travel,0,z*travel)
-  T.start(c,s,'position',{T.wait(12,nil,function(c,s) c.trial:face(target,4*(s.turnRate or 1)); c.trial:step(destination,.22,true,true) end),T.rest(4)},0)
+  T.start(c,s,'position',{T.wait(12,nil,function(c,s) c.trial:face(target,4*(s.turnRate or 1)); c.trial:step(destination,s.approachSpeed or .22,true,true) end),T.rest(4)},0)
   return true
 end
 function T.basic(c,s,kind)
-  if T.approach(c,s,kind=='melee' and 2.5 or 9) then return end
+  if (kind=='melee' or T.distance(c.trial:position(),c.trial.player:get_location())>12) and T.approach(c,s,kind=='melee' and 2.5 or 9) then return end
   if not T.ready(s,'basic') then s.nextChoice=s.tick+5; return end
   if kind=='melee' then T.start(c,s,'basic',T.melee(c,s,{damage=.45,windup=16,recovery=18}),50)
   else T.start(c,s,'basic',T.aimShot(c,s,{kind=kind=='bow' and 'ARROW' or 'SNOWBALL',damage=.35,windup=20,lock=8,recovery=20,speed=.85}),60) end

@@ -22,7 +22,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -31,15 +30,12 @@ import java.util.function.Function;
 
 /** Supplies a known challenger and run-owned physical actors to the normal boss Lua runtime. */
 final class TrialScriptActor extends ScriptableBoss implements Listener {
-    private record Missile(Projectile entity, double damage, String group, double cap, long expires) {}
     private record Survival(String actor, String key, long expires, int protectionTicks) {}
     private final CustomBossEntity boss;
     private final Player player;
     private final ArenaContainer bounds;
     private final TrialMovement movement;
-    private final Map<UUID, Missile> missiles = new HashMap<>();
-    private final Map<UUID, Long> retiredMissiles = new HashMap<>();
-    private final Map<String, Double> hitBudgets = new HashMap<>();
+    private final TrialProjectiles projectiles;
     private final Map<String, CustomBossEntity> actors = new LinkedHashMap<>();
     private final Map<String, Survival> survival = new HashMap<>();
     private final Set<String> spentSurvival = new HashSet<>();
@@ -64,6 +60,10 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         this.bounds = bounds;
         this.power = power;
         movement = new TrialMovement(bounds, player);
+        projectiles = new TrialProjectiles(boss, player, bounds,
+                () -> !closed && ticks >= playerGraceUntil,
+                uuid -> actors.values().stream().filter(actor -> actor.exists()
+                        && actor.getLivingEntity().getUniqueId().equals(uuid)).findFirst().orElse(null));
         matchedHit = LevelScaling.calculateBaseDamageToElite(boss.getLevel());
         Bukkit.getPluginManager().registerEvents(this, MetadataHandler.PLUGIN);
     }
@@ -100,6 +100,25 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
             return LuaValue.TRUE;
         }));
         table.set("pose", method(table, args -> { pose(args.checkjstring(1)); return LuaValue.NIL; }));
+        table.set("crossbow", method(table, args -> {
+            var equipment = boss.getLivingEntity().getEquipment();
+            if (equipment == null) return LuaValue.NIL;
+            ItemStack item = equipment.getItemInMainHand();
+            if (item.getItemMeta() instanceof org.bukkit.inventory.meta.CrossbowMeta meta) {
+                meta.setChargedProjectiles(args.checkboolean(1) ? List.of(new ItemStack(Material.ARROW)) : List.of());
+                item.setItemMeta(meta); equipment.setItemInMainHand(item);
+            }
+            return LuaValue.NIL;
+        }));
+        table.set("ground", method(table, args -> {
+            Location point = location(args.arg1());
+            if (!bounds.contains(point)) return LuaValue.NIL;
+            var hit = point.getWorld().rayTraceBlocks(point.clone().add(0, 1, 0), new Vector(0,-1,0), 9,
+                    FluidCollisionMode.NEVER, true);
+            if (hit == null) return LuaValue.NIL;
+            Location ground = hit.getHitPosition().toLocation(point.getWorld()).add(0,.01,0);
+            return movement.standing(boss.getLivingEntity(), ground) ? LuaTableSupport.locationToTable(ground) : LuaValue.NIL;
+        }));
         table.set("control_guard", method(table, args -> {
             controlGuard(args.checkboolean(1));
             return LuaValue.NIL;
@@ -124,6 +143,7 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
                     Objects.requireNonNull(org.bukkit.potion.PotionEffectType.getByName(args.checkjstring(2))), args.checkint(3), args.optint(4, 0));
             return LuaValue.NIL;
         }));
+        table.set("slow_player", method(table, args -> { effects().slow(player, args.checkdouble(1), args.checkint(2)); return LuaValue.NIL; }));
         table.set("cleanse", method(table, args -> {
             LivingEntity target = effectTarget(args.checkjstring(1));
             if (target != null) effects().cleanse(target, args.optboolean(2, false), args.optint(3, 0));
@@ -198,18 +218,45 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         table.set("own_projectile", method(table, args -> {
             Entity entity = reference(args.arg1());
             if (!(entity instanceof Projectile projectile)) throw new IllegalArgumentException("Expected a physical projectile");
-            if (missiles.size() >= 48) { projectile.remove(); return LuaValue.NIL; }
             String group = args.checkjstring(3);
-            if (group.length() > 80) throw new IllegalArgumentException("Projectile group name too long");
             double damage = bounded(args.checkdouble(2), 0, 2);
             double cap = bounded(args.optdouble(4, damage), 0, 3);
-            if (projectile instanceof AbstractArrow arrow) arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
-            projectile.setPersistent(false);
-            missiles.put(projectile.getUniqueId(), new Missile(projectile, damage, group, cap, ticks + 100));
+            projectiles.own(projectile, damage, group, cap, args.optint(5, 100));
             return LuaValue.NIL;
         }));
-        table.set("group_damage", method(table, args -> LuaValue.valueOf(hitBudgets.getOrDefault(args.checkjstring(1), 0D))));
-        table.set("forget_group", method(table, args -> { hitBudgets.remove(args.checkjstring(1)); return LuaValue.NIL; }));
+        table.set("group_damage", method(table, args -> LuaValue.valueOf(projectiles.spent(args.checkjstring(1)))));
+        table.set("projectile_count", method(table, args -> LuaValue.valueOf(projectiles.count(args.checkjstring(1)))));
+        table.set("forget_group", method(table, args -> { projectiles.forget(args.checkjstring(1)); return LuaValue.NIL; }));
+        table.set("clear_projectiles", method(table, args -> { projectiles.clear(args.checkjstring(1)); return LuaValue.NIL; }));
+        table.set("projectile_result", method(table, args -> {
+            TrialProjectiles.Impact impact = projectiles.consume(args.checkjstring(1));
+            if (impact == null) return LuaValue.NIL;
+            LuaTable result = new LuaTable();
+            result.set("location", LuaTableSupport.locationToTable(impact.location()));
+            result.set("hit_player", LuaValue.valueOf(impact.hitPlayer()));
+            result.set("damage", LuaValue.valueOf(impact.damage()));
+            return result;
+        }));
+        table.set("arrow", method(table, args -> {
+            LuaTable options = args.arg(7).opttable(new LuaTable());
+            List<CustomBossEntity> penetrate = new ArrayList<>();
+            LuaValue values = options.get("penetrate");
+            if (values.istable()) for (int i=1; i<=values.length(); i++) {
+                CustomBossEntity prop = actors.get(values.get(i).checkjstring());
+                if (prop != null) penetrate.add(prop);
+            }
+            Projectile arrow = projectiles.arrow(location(args.arg1()), location(args.arg(2)), args.checkdouble(3),
+                    args.checkdouble(4), args.checkjstring(5), args.checkdouble(6),
+                    options.get("lifetime").optint(48), penetrate, options.get("gravity").optboolean(false));
+            return LuaValue.valueOf(arrow != null);
+        }));
+        table.set("curve_arrow", method(table, args -> {
+            LuaTable values = args.checktable(1);
+            List<Location> points = new ArrayList<>();
+            for (int i=1; i<=values.length(); i++) points.add(location(values.get(i)));
+            projectiles.curve(points, args.checkdouble(2), args.checkjstring(3), args.checkdouble(4));
+            return LuaValue.NIL;
+        }));
         table.set("spawn_actor", method(table, args -> spawnActor(instance, args)));
         table.set("actor", method(table, args -> {
             var actor = actors.get(args.checkjstring(1));
@@ -224,6 +271,11 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
             double speed = Math.min(bounded(args.optdouble(3, .15), 0, .8), direction.length());
             if (direction.lengthSquared() > .01) actor.getLivingEntity().setVelocity(direction.normalize().multiply(speed));
             return LuaValue.TRUE;
+        }));
+        table.set("actor_leap", method(table, args -> {
+            var actor = actors.get(args.checkjstring(1));
+            return LuaValue.valueOf(actor != null && actor.exists()
+                    && movement.leap(actor.getLivingEntity(), location(args.arg(2)), args.optint(3, 20)));
         }));
         table.set("remove_actor", method(table, args -> {
             CustomBossEntity actor = actors.remove(args.checkjstring(1));
@@ -245,14 +297,14 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
             if (actor == null || !actor.exists()) return LuaValue.FALSE;
             Location origin = actor.getLivingEntity().getEyeLocation();
             Vector direction = location(args.arg(2)).toVector().subtract(origin.toVector());
-            if (direction.lengthSquared() < .001 || missiles.size() >= 48) return LuaValue.FALSE;
+            if (direction.lengthSquared() < .001) return LuaValue.FALSE;
             double damage = bounded(args.optdouble(3, .2), 0, 1);
             Arrow arrow = origin.getWorld().spawnArrow(origin, direction.normalize(), .7f, 0);
             arrow.setShooter(actor.getLivingEntity());
             arrow.setGravity(false);
             arrow.setPersistent(false);
             arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
-            missiles.put(arrow.getUniqueId(), new Missile(arrow, damage, "helper_" + ticks + "_" + args.checkjstring(1), damage, ticks + 100));
+            projectiles.own(arrow, damage, "helper_" + ticks + "_" + args.checkjstring(1), damage, 100);
             return LuaValue.TRUE;
         }));
         table.set("damaged_actor", method(table, args -> {
@@ -295,8 +347,11 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         Location spawn = location(args.arg(2));
         if (!movement.standing(boss.getLivingEntity(), spawn)) return LuaValue.NIL;
         double healthHits = bounded(args.optdouble(3, 3), .5, 8);
-        EntityType type = EntityType.valueOf(args.optjstring(5, "HUSK"));
-        if (!Set.of(EntityType.HUSK, EntityType.SKELETON, EntityType.WOLF, EntityType.IRON_GOLEM, EntityType.WITHER_SKELETON, EntityType.ARMOR_STAND).contains(type))
+        boolean prop = args.optjstring(5, "HUSK").equals("ARMOR_STAND");
+        // The visible stand uses an ordinary living damage carrier, so its authored hit budget
+        // does not depend on vanilla armor stands' special break-on-attack behavior.
+        EntityType type = prop ? EntityType.HUSK : EntityType.valueOf(args.optjstring(5, "HUSK"));
+        if (!Set.of(EntityType.HUSK, EntityType.SKELETON, EntityType.WOLF, EntityType.IRON_GOLEM, EntityType.WITHER_SKELETON).contains(type))
             throw new IllegalArgumentException("Unsupported trial actor type " + type);
         var fields = new CustomBossesConfigFields("trial_actor_" + id + ".yml", type, true,
                 args.optjstring(4, "&fSparring partner"), Integer.toString(boss.getLevel()));
@@ -311,7 +366,8 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         fields.setClassLoot(false);
         fields.setPowers(List.of());
         fields.setUniqueLootList(List.of());
-        if (type == EntityType.HUSK) fields.setDisguise(boss.getCustomBossesConfigFields().getDisguise());
+        if (prop) fields.setDisguise("ARMOR_STAND");
+        else if (type == EntityType.HUSK) fields.setDisguise(boss.getCustomBossesConfigFields().getDisguise());
         CustomBossEntity actor = new CustomBossEntity(fields);
         actor.setSummoningEntity(boss);
         actor.setNormalizedCombat();
@@ -320,27 +376,21 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         if (!movement.standing(actor.getLivingEntity(), spawn)) { actor.remove(RemovalReason.EFFECT_TIMEOUT); return LuaValue.NIL; }
         actors.put(id, actor);
         actor.getLivingEntity().setAI(false);
+        if (prop) {
+            var resistance = actor.getLivingEntity().getAttribute(org.bukkit.attribute.Attribute.KNOCKBACK_RESISTANCE);
+            if (resistance != null) resistance.setBaseValue(1);
+        }
         return new ScriptableBoss(actor).buildContextTable(instance);
     }
 
     private void maintain() {
         ticks++;
         if (closed || !boss.exists() || !player.isOnline()) return;
-        missiles.values().removeIf(missile -> {
-            if (missile.entity.isValid() && ticks < missile.expires && bounds.contains(missile.entity.getLocation())) return false;
-            removeMissile(missile);
-            return true;
-        });
-        retiredMissiles.values().removeIf(expiry -> ticks >= expiry);
+        projectiles.tick(ticks);
         survival.values().removeIf(ward -> ticks >= ward.expires);
         protectedActors.values().removeIf(expiry -> ticks >= expiry);
         if (walls != null) walls.tick(ticks);
         if (effects != null) effects.tick(ticks);
-        if (ticks % 2 == 0) for (Missile missile : missiles.values())
-            if (missile.entity instanceof Snowball)
-                player.spawnParticle(Particle.DUST, missile.entity.getLocation(), 2, .03, .03, .03, 0,
-                        new Particle.DustOptions(Color.fromRGB(160, 120, 255), .8F));
-        if (hitBudgets.size() > 128) hitBudgets.keySet().removeIf(group -> missiles.values().stream().noneMatch(m -> m.group.equals(group)));
         // Recheck actual physics, including external pushes, against the same read-only bounds.
         if (!bounds.contains(body().getLocation())) throw new IllegalStateException("Trial actor left its bounds");
         Vector velocity = body().getVelocity();
@@ -404,34 +454,11 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
             power.check(event, boss, event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void suppressNativeMissileDamage(EntityDamageByEntityEvent event) {
-        UUID id = event.getDamager().getUniqueId();
-        if (missiles.containsKey(id) || retiredMissiles.containsKey(id)) event.setCancelled(true);
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void projectileHit(ProjectileHitEvent event) {
-        Missile missile = missiles.remove(event.getEntity().getUniqueId());
-        if (missile == null) return;
-        event.setCancelled(true);
-        removeMissile(missile);
-        if (closed || ticks < playerGraceUntil || event.getHitEntity() != player || !boss.exists()) return;
-        double spent = hitBudgets.getOrDefault(missile.group, 0D);
-        double damage = Math.min(missile.damage, Math.max(0, missile.cap - spent));
-        if (damage <= 0) return;
-        hitBudgets.put(missile.group, spent + damage);
-        CombatDamageContext.runEliteToPlayerMultiplier(damage, () -> player.damage(1, boss.getLivingEntity()));
-    }
-
     @Override public void onShutdown() {
         if (closed) return;
         closed = true;
         HandlerList.unregisterAll(this);
-        missiles.values().forEach(this::removeMissile);
-        missiles.clear();
-        retiredMissiles.clear();
-        hitBudgets.clear();
+        projectiles.close();
         survival.clear(); spentSurvival.clear(); survivalNotifications.clear(); protectedActors.clear();
         dismount();
         if (walls != null) walls.close();
@@ -464,12 +491,6 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         if (!active) existing.ifPresent(attribute::removeModifier);
         else if (existing.isEmpty()) attribute.addModifier(new org.bukkit.attribute.AttributeModifier(controlKey, 1,
                 org.bukkit.attribute.AttributeModifier.Operation.ADD_NUMBER, org.bukkit.inventory.EquipmentSlotGroup.ANY));
-    }
-
-    private void removeMissile(Missile missile) {
-        retiredMissiles.put(missile.entity.getUniqueId(), ticks + 2);
-        com.magmaguy.elitemobs.entitytracker.EntityTracker.unregisterProjectileEntity(missile.entity);
-        missile.entity.remove();
     }
 
     private Entity reference(LuaValue value) {

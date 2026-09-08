@@ -5,6 +5,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.attribute.*;
 import org.bukkit.potion.*;
 
 import java.util.*;
@@ -15,6 +18,9 @@ final class TrialEffects implements Listener, AutoCloseable {
     private record Applied(PotionEffect effect, PotionEffect previous, long start) {}
     private final Map<Key, Applied> applied = new HashMap<>();
     private final Map<LivingEntity, Long> protection = new HashMap<>();
+    private record Slow(double fraction, long expires) {}
+    private final Map<LivingEntity, Slow> slows = new HashMap<>();
+    private final org.bukkit.NamespacedKey slowKey = new org.bukkit.NamespacedKey(MetadataHandler.PLUGIN, "trial_slow");
     private long tick;
     private static final Set<PotionEffectType> HARMFUL = Set.of(PotionEffectType.SLOWNESS,
             PotionEffectType.WEAKNESS, PotionEffectType.POISON, PotionEffectType.WITHER,
@@ -28,6 +34,38 @@ final class TrialEffects implements Listener, AutoCloseable {
         protection.entrySet().removeIf(entry -> !entry.getKey().isValid() || now >= entry.getValue());
         applied.entrySet().removeIf(entry -> !entry.getKey().entity.isValid()
                 || now >= entry.getValue().start + entry.getValue().effect.getDuration());
+        slows.entrySet().removeIf(entry -> {
+            if (entry.getKey().isValid() && now < entry.getValue().expires) return false;
+            clearSlow(entry.getKey()); return true;
+        });
+    }
+
+    void slow(LivingEntity entity, double fraction, int duration) {
+        if (!Double.isFinite(fraction) || fraction<=0 || fraction>1 || duration<1 || duration>120)
+            throw new IllegalArgumentException("Invalid trial movement effect");
+        AttributeInstance movement=entity.getAttribute(Attribute.MOVEMENT_SPEED);
+        if (movement==null) return;
+        Slow previous=slows.get(entity);
+        if (previous!=null && previous.fraction>fraction && previous.expires>tick) return;
+        clearSlow(entity);
+        movement.addModifier(new AttributeModifier(slowKey,-fraction,AttributeModifier.Operation.MULTIPLY_SCALAR_1,
+                org.bukkit.inventory.EquipmentSlotGroup.ANY));
+        slows.put(entity,new Slow(fraction,tick+duration));
+    }
+
+    private void clearSlow(LivingEntity entity) {
+        AttributeInstance movement=entity.getAttribute(Attribute.MOVEMENT_SPEED);
+        if (movement!=null) for (AttributeModifier modifier : movement.getModifiers())
+            if (modifier.getKey().equals(slowKey)) movement.removeModifier(modifier);
+    }
+
+    @EventHandler(priority=EventPriority.HIGH,ignoreCancelled=true)
+    public void rootedMovement(PlayerMoveEvent event) {
+        Slow slow=slows.get(event.getPlayer());
+        if (event instanceof PlayerTeleportEvent || slow==null || slow.fraction<1 || tick>=slow.expires || event.getTo()==null) return;
+        // A half-second snare stops horizontal travel while preserving look direction and vertical physics.
+        var destination=event.getTo().clone(); destination.setX(event.getFrom().getX()); destination.setZ(event.getFrom().getZ());
+        event.setTo(destination);
     }
 
     void apply(LivingEntity entity, PotionEffectType type, int duration, int amplifier) {
@@ -61,6 +99,7 @@ final class TrialEffects implements Listener, AutoCloseable {
 
     @Override public void close() {
         HandlerList.unregisterAll(this);
+        slows.keySet().forEach(this::clearSlow); slows.clear();
         for (var entry : applied.entrySet()) {
             Key key = entry.getKey(); Applied owned = entry.getValue();
             PotionEffect current = key.entity.getPotionEffect(key.type);
