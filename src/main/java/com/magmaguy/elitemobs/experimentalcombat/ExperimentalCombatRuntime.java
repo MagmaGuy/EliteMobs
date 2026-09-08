@@ -297,7 +297,7 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
         String maximum = maxHealth == null
                 ? current
                 : CombatHealthFormatter.format(maxHealth.getValue());
-        return "&cHP " + current + "/" + maximum + " &8| &7No active class &8| &e/em class";
+        return "&cHP " + current + "/" + maximum;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

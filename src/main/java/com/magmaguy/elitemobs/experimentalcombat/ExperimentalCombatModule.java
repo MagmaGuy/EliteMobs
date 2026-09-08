@@ -37,6 +37,7 @@ import com.magmaguy.elitemobs.experimentalcombat.passives.FixedPassiveRegistry;
 import com.magmaguy.elitemobs.experimentalcombat.passives.PassiveAggregate;
 import com.magmaguy.elitemobs.experimentalcombat.passives.PassiveMechanics;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ActiveLineageSnapshot;
+import com.magmaguy.elitemobs.experimentalcombat.presentation.ClassHudPresentation;
 import com.magmaguy.elitemobs.experimentalcombat.progression.AwardResult;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ClassProgressionModule;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ClassContentAvailability;
@@ -115,6 +116,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     private final ClassResourceController resources =
             new ClassResourceController(BuiltInClassContent.resourceDefinitions());
     private final ClassParticipationTracker participation = new ClassParticipationTracker();
+    private final ClassHudPresentation hudPresentation = new ClassHudPresentation();
     private final AbilityRuntimeEvidenceLedger abilityEvidence = new AbilityRuntimeEvidenceLedger();
     private final FixedAbilityRegistry abilityRegistry = BuiltInClassContent.abilityRegistry();
     private final FixedPassiveRegistry passiveRegistry;
@@ -627,30 +629,36 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
 
     private String renderHud(Player player) {
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-        String currentHealth = CombatHealthFormatter.format(player.getHealth());
-        String maximumHealth = maxHealth == null
-                ? currentHealth
-                : CombatHealthFormatter.format(maxHealth.getValue());
+        double health = player.getHealth();
+        double maximumHealth = maxHealth == null ? health : maxHealth.getValue();
+        String healthDisplay = "&cHP " + CombatHealthFormatter.format(health)
+                + "/" + CombatHealthFormatter.format(maximumHealth);
         Optional<ProfileSnapshot> optional = progression.snapshot(player.getUniqueId());
         if (optional.isEmpty() || optional.get().activeLineage() == null)
-            return "&cHP " + currentHealth + "/" + maximumHealth + " &8| &7No active class &8| &e/em class";
+            return hudPresentation.render(player.getUniqueId(),
+                    new ClassHudPresentation.Vitals(health, maximumHealth,
+                            player.getAbsorptionAmount(), 0D, 0D, null),
+                    healthDisplay, "&7No active class &8| &e/em class", System.nanoTime());
 
         ProfileSnapshot profile = optional.get();
         ActiveLineageSnapshot active = profile.activeLineage();
         ClassLineage lineage = catalog.lineageOf(active.activeFormId());
         ClassResourceController.Snapshot resource = resources.snapshot(player.getUniqueId()).orElse(null);
-        int amount = resource == null ? 0 : (int) Math.round(resource.amount());
-        int maximum = (int) Math.round(resource == null
+        double amount = resource == null ? 0D : resource.amount();
+        double maximum = resource == null
                 ? BuiltInClassContent.resourceDefinitions().get(lineage.resourceType()).maximum()
-                : resource.maximum());
+                : resource.maximum();
         String controls = activeInputProfile(player) == InputProfile.JAVA_HOTBAR_LAYER
                 ? "&7F then 1/2/3, clicks or jump"
                 : "&7Focus item";
-        return "&cHP " + currentHealth + "/" + maximumHealth
-                + " &8| &b[" + active.activeEffectiveLevel() + "] "
-                + lineage.activeForm().displayName()
-                + " &8| &e" + resourceName(lineage.resourceType()) + " " + amount + "/" + maximum
-                + " &8| " + controls;
+        String compact = healthDisplay + " &8| &e" + resourceName(lineage.resourceType())
+                + " " + Math.round(amount) + "/" + Math.round(maximum);
+        String reminder = "&b[" + active.activeEffectiveLevel() + "] "
+                + lineage.activeForm().displayName() + " &8| " + controls;
+        return hudPresentation.render(player.getUniqueId(),
+                new ClassHudPresentation.Vitals(health, maximumHealth,
+                        player.getAbsorptionAmount(), amount, maximum, active.activeFormId()),
+                compact, reminder, System.nanoTime());
     }
 
     private PassiveAggregate passivesFor(UUID playerId) {
@@ -774,6 +782,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
+        hudPresentation.discard(player.getUniqueId());
         abilityEngine.deactivate(player);
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
             if (!player.isOnline() || instance != this) return;
@@ -784,6 +793,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
+        hudPresentation.discard(player.getUniqueId());
         abilityEngine.deactivate(player);
         resources.discard(player);
         passiveRuntime.discard(player);
@@ -793,6 +803,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
+        hudPresentation.discard(playerId);
         boolean retainRunState = progression.snapshot(playerId)
                 .map(ProfileSnapshot::lockedRunId)
                 .isPresent();
@@ -828,6 +839,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         for (Player player : Bukkit.getOnlinePlayers()) abilityEngine.deactivate(player);
         abilityEngine.close();
         resources.shutdown();
+        hudPresentation.clear();
         participation.clearAll();
         observedRunIds.clear();
         lastCapWarning.clear();
