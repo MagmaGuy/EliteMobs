@@ -121,7 +121,10 @@ public final class EliteMobsAbilitySemantics implements AbilitySemantics {
 
     @Override
     public Collection<Player> alliesOf(Player caster) {
-        List<Player> nearbyParty = PartyManager.getNearbyMembers(caster, caster.getLocation());
+        var casterMatch = com.magmaguy.elitemobs.playerdata.database.PlayerData.getMatchInstance(caster);
+        List<Player> nearbyParty = PartyManager.getNearbyMembers(caster, caster.getLocation()).stream()
+                .filter(ally -> com.magmaguy.elitemobs.playerdata.database.PlayerData.getMatchInstance(ally) == casterMatch)
+                .toList();
         if (nearbyParty.stream().anyMatch(player -> player.getUniqueId().equals(caster.getUniqueId())))
             return nearbyParty;
         java.util.ArrayList<Player> allies = new java.util.ArrayList<>(nearbyParty.size() + 1);

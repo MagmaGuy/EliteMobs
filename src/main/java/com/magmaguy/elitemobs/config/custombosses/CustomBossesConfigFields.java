@@ -224,7 +224,16 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     private String onKillMessage;
     @Getter
+    @Setter
     private BossType bossType = BossType.NORMAL;
+    @Getter
+    @Setter
+    private boolean classLoot;
+    @Getter
+    private final java.util.Map<String, String> classLootNames = new java.util.LinkedHashMap<>();
+    @Getter
+    @Setter
+    private List<String> classLootLore = List.of();
     @Getter
     private double scale = 1D;
     @Getter
@@ -441,6 +450,18 @@ public class CustomBossesConfigFields extends CustomConfigFields {
             this.bossType = BossType.valueOf(bossTypeString.toUpperCase(Locale.ROOT));
         } catch (Exception e) {
             Logger.warn("Boss type for boss " + filename + " is not a valid boss type!");
+        }
+
+        boolean baselineBoss = bossType == BossType.BOSS || bossType == BossType.MINIBOSS
+                || bossType == BossType.EVENT || (bossType == BossType.NORMAL && healthMultiplier > 1);
+        classLoot = processBoolean("classLoot", baselineBoss, false, false);
+        classLootLore = translatable(filename, "classLootLore",
+                processStringList("classLootLore", classLootLore, List.of(), false));
+        classLootNames.clear();
+        for (com.magmaguy.elitemobs.skills.SkillType skill : com.magmaguy.elitemobs.skills.SkillType.getWeaponSkills()) {
+            String key = "classLootNames." + skill.name();
+            classLootNames.put(skill.name(), translatable(filename, key,
+                    processString(key, "&6$boss's $weapon", "&6$boss's $weapon", false)));
         }
 
         this.scale = processDouble("scale", scale, 1, false);

@@ -11,7 +11,12 @@ public record StoredClassProgress(
         UUID playerId,
         String formId,
         long xp,
-        int catalogVersion) {
+        int catalogVersion,
+        boolean challengeCompleted) {
+
+    public StoredClassProgress(UUID playerId, String formId, long xp, int catalogVersion) {
+        this(playerId, formId, xp, catalogVersion, false);
+    }
 
     public StoredClassProgress {
         Objects.requireNonNull(playerId, "playerId");

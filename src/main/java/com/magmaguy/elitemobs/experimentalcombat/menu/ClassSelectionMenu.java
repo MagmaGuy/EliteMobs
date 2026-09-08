@@ -36,6 +36,10 @@ public final class ClassSelectionMenu {
         COORDINATOR.open(Objects.requireNonNull(player, "player"));
     }
 
+    public static void openForm(Player player, String formId) {
+        COORDINATOR.openForm(Objects.requireNonNull(player, "player"), formId);
+    }
+
     /** Commands which must be registered alongside the ordinary /em commands. */
     public static Collection<AdvancedCommand> commands() {
         return COMMANDS;

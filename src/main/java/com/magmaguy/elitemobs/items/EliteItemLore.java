@@ -242,8 +242,8 @@ public class EliteItemLore {
             }
 
             if (string.contains("$itemMaxDurability")) {
-                if (itemStack.getType().getMaxDurability() <= 0 || itemMeta.isUnbreakable()) continue;
-                string = stringReplacer(string, "$itemMaxDurability", itemStack.getType().getMaxDurability());
+                if (com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack) <= 0 || itemMeta.isUnbreakable()) continue;
+                string = stringReplacer(string, "$itemMaxDurability", com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack));
             }
 
             string = stringReplacer(string, "$itemMaterial", materialDisplayName(itemStack.getType()));

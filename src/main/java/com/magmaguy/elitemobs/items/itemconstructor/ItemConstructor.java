@@ -130,6 +130,7 @@ public class ItemConstructor {
             }
         }
 
+        com.magmaguy.elitemobs.items.ItemDurability.prepareMagicWeapon(itemStack);
         return commonFeatures(itemStack, eliteEntity, player, enchantments, customEnchantments, showItemWorth, soulbound);
     }
 

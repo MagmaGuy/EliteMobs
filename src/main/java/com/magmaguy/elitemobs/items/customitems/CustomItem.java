@@ -538,7 +538,8 @@ public class CustomItem {
                         itemLevel,
                         customItemsConfigFields.getName(),
                         customItemsConfigFields.getMaterial(),
-                        getEnchantments(),
+                        com.magmaguy.elitemobs.items.itemconstructor.EnchantmentGenerator.withProceduralEnchantments(
+                                itemLevel, customItemsConfigFields, getEnchantments()),
                         getCustomEnchantments(),
                         getPotionEffects(),
                         customItemsConfigFields.getLore(),

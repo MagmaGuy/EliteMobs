@@ -78,6 +78,13 @@ public class LootTables implements Listener {
             if (eliteEntity.getPower("bonus_coins.yml") == null)
                 new ItemLootShower(itemLevel, eliteLevel, eliteEntity.getUnsyncedLivingEntity().getLocation(), player);
 
+            if (eliteEntity instanceof CustomBossEntity boss && ClassLootCoverage.enabled(boss)) {
+                boolean partyLoot = PartyManager.shouldUsePartyLoot(player, eliteEntity);
+                ItemStack baseline = ClassLootCoverage.generate(boss, Math.max(1, (int) itemLevel), partyLoot ? null : player);
+                if (!partyLoot || !SharedLootTable.addPartyLoot(eliteEntity, player, baseline))
+                    deliverGeneratedItem(player, eliteEntity.getLocation(), baseline);
+            }
+
             if (!(eliteEntity.isRandomLoot())) continue;
 
             // Skill-based gear restriction now handles equipping, not drops

@@ -80,6 +80,7 @@ public final class ExperimentalMagicWeaponItems {
                         "&7Right-click to launch a slow area fireball.",
                         "&8Scales with Staves and item level."));
         fields.setWeaponType(SkillType.STAVES);
+        fields.setProceduralEnchantments(true);
         fields.setFmmItemModel(STAFF_FMM_ITEM_ID);
         fields.setScalability(CustomItem.Scalability.SCALABLE);
         fields.setItemType(CustomItem.ItemType.CUSTOM);
@@ -99,6 +100,7 @@ public final class ExperimentalMagicWeaponItems {
                         "&7Missiles arc upward and sideways toward their target.",
                         "&8Scales with Wands and item level."));
         fields.setWeaponType(SkillType.WANDS);
+        fields.setProceduralEnchantments(true);
         fields.setFmmItemModel(WAND_FMM_ITEM_ID);
         fields.setScalability(CustomItem.Scalability.SCALABLE);
         fields.setItemType(CustomItem.ItemType.CUSTOM);

@@ -55,6 +55,9 @@ public class CustomItemsConfigFields extends CustomConfigFields {
     private String fmmItemModel = null;
     @Getter
     @Setter
+    private boolean proceduralEnchantments = false;
+    @Getter
+    @Setter
     private String permission = "";
     @Getter
     @Setter
@@ -111,8 +114,13 @@ public class CustomItemsConfigFields extends CustomConfigFields {
         this.customModelID = processString("customModelV2", customModelID, null, false);
         this.equipmentModelID = processString("equipmentModelID", equipmentModelID, null, false);
         this.scriptedItem = processString("scriptedItem", scriptedItem, null, false);
-        // Experimental magic-weapon identity and presentation remain code-owned until the
-        // baseline has been tested. Deliberately do not expose either value to YAML yet.
+        this.weaponType = processEnum("weaponType", weaponType, null, SkillType.class, false);
+        if (weaponType != null && weaponType != SkillType.STAVES && weaponType != SkillType.WANDS) {
+            Logger.warn("Item " + filename + ": weaponType accepts STAVES or WANDS; other weapons use their material.");
+            weaponType = null;
+        }
+        this.fmmItemModel = processString("fmmItemModel", fmmItemModel, null, false);
+        this.proceduralEnchantments = processBoolean("proceduralEnchantments", proceduralEnchantments, false, false);
         this.permission = processString("permission", permission, "", false);
         this.level = processInt("level", level, 0, false);
         this.soulbound = processBoolean("soulbound", soulbound, true, false);

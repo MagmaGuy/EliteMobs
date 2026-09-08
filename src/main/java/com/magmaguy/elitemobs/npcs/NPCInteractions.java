@@ -47,6 +47,12 @@ public class NPCInteractions implements Listener {
         npcEntity.runScripts(ScriptableNPC.ON_INTERACT, null, player);
 
         switch (npcEntity.getNPCsConfigFields().getInteractionType()) {
+            case CLASS_TRAINER:
+                if (player.hasPermission("elitemobs.command") && npcEntity.getNPCsConfigFields().getClassRoot() != null)
+                    Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () ->
+                            com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu.openForm(
+                                    player, npcEntity.getNPCsConfigFields().getClassRoot()));
+                break;
             case GUILD_GREETER:
                 if (player.hasPermission("elitemobs.skill.npc")) {
                     new BukkitRunnable() {
@@ -282,6 +288,7 @@ public class NPCInteractions implements Listener {
     }
 
     public enum NPCInteractionType {
+        CLASS_TRAINER,
         GUILD_GREETER,
         CHAT,
         CUSTOM_SHOP,

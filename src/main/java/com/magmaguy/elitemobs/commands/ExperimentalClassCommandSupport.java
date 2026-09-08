@@ -157,7 +157,7 @@ final class ExperimentalClassCommandSupport {
     }
 
     private static String formatBlocker(UnlockBlocker blocker) {
-        if (blocker.kind() == UnlockBlocker.Kind.CONTENT_REQUIREMENT)
+        if (blocker.optionalReason().isPresent())
             return "&c" + blocker.reason();
         if (blocker.kind() == UnlockBlocker.Kind.FOUNDATION_SKILL)
             return "&cYou need level &f" + blocker.requiredLevel() + "&c in &f"

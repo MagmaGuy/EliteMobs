@@ -14,6 +14,10 @@ public class CustomArenasConfigFields extends CustomConfigFields {
 
     @Getter
     @Setter
+    private String arenaContainer;
+
+    @Getter
+    @Setter
     private String arenaName;
     @Getter
     @Setter
@@ -72,6 +76,7 @@ public class CustomArenasConfigFields extends CustomConfigFields {
 
     @Override
     public void processConfigFields() {
+        arenaContainer = processString("arenaContainer", arenaContainer, null, false);
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.arenaName = translatable(filename, "arenaName", processString("arenaName", arenaName, "Default name", false));
         this.corner1 = processString("corner1", corner1, null, false);

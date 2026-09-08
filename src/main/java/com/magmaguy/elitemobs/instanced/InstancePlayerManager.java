@@ -86,6 +86,7 @@ public class InstancePlayerManager {
         // anything changed during the batch preflight instead of admitting only part of a party.
         if (!authorization.getAsBoolean()
                 || !canAdmitPlayers(playersToAdd, matchInstance, true)) return false;
+        if (!matchInstance.reserveAdmission()) return false;
 
         LinkedHashMap<UUID, Location> previousLocations = new LinkedHashMap<>();
         for (Player player : playersToAdd)
@@ -105,6 +106,7 @@ public class InstancePlayerManager {
         } catch (RuntimeException exception) {
             entryTasks.forEach(BukkitTask::cancel);
             rollbackRegistrations(playersToAdd, matchInstance);
+            matchInstance.abortAdmission();
             Logger.warn("Failed to schedule an instance-entry batch: " + exception.getMessage());
             return false;
         }
@@ -305,7 +307,10 @@ public class InstancePlayerManager {
     }
 
     public static void addSpectator(MatchInstance matchInstance, Player player, boolean wasPlayer) {
+        if (!matchInstance.isAcceptingSpectator(player, wasPlayer)) return;
         if (!wasPlayer && !fireJoinEvent(matchInstance, player)) return;
+        if (!matchInstance.isAcceptingSpectator(player, wasPlayer)
+                || !matchInstance.reserveAdmission()) return;
 
         if (!wasPlayer) matchInstance.previousPlayerLocations.put(player, player.getLocation());
         matchInstance.participants.add(player);

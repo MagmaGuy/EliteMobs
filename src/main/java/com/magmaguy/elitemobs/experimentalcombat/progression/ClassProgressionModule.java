@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -220,7 +222,7 @@ public final class ClassProgressionModule {
             if (candidate.isEmpty())
                 return new SelectionResult(SelectionResult.Status.UNKNOWN_FORM,
                         snapshotLocked(playerId, state, levels));
-            if (!isUnlocked(candidate.get(), state.progressXp, levels, new HashMap<>()))
+            if (!isUnlocked(candidate.get(), state.progressXp, state.challenges, levels, new HashMap<>()))
                 return new SelectionResult(SelectionResult.Status.LOCKED_FORM,
                         snapshotLocked(playerId, state, levels));
             if (formId.equals(state.profile.selectedFormId()))
@@ -334,7 +336,7 @@ public final class ClassProgressionModule {
                 return new RunLockResult(RunLockResult.Status.NO_SELECTED_FORM, runId, null);
             ClassFormDefinition form = catalog.find(formId).orElse(null);
             Map<SkillType, Integer> levels = captureFoundationLevels(playerId);
-            if (form == null || !isUnlocked(form, state.progressXp, levels, new HashMap<>()))
+            if (form == null || !isUnlocked(form, state.progressXp, state.challenges, levels, new HashMap<>()))
                 return new RunLockResult(RunLockResult.Status.FORM_LOCKED, runId, null);
 
             RunSelection selection = new RunSelection(formId, selectedInputProfile(state.profile));
@@ -403,7 +405,7 @@ public final class ClassProgressionModule {
 
             ClassFormDefinition form = catalog.find(formId).orElse(null);
             Map<SkillType, Integer> levels = captureFoundationLevels(playerId);
-            if (form == null || !isUnlocked(form, state.progressXp, levels, new HashMap<>()))
+            if (form == null || !isUnlocked(form, state.progressXp, state.challenges, levels, new HashMap<>()))
                 return lockedAward(formId, requestedXp, form, state.progressXp, levels);
 
             int localCap = form.localProgressionCap(levels::get);
@@ -520,8 +522,9 @@ public final class ClassProgressionModule {
                 int localLevel = lineageForm.band().toLocalLevel(visibleLevel);
                 long xp = xpAtLocalCap(lineageForm, localLevel);
                 state.progressXp.put(lineageForm.id(), xp);
+                state.challenges.add(lineageForm.id());
                 persistedRows.add(new StoredClassProgress(
-                        playerId, lineageForm.id(), xp, catalogVersion));
+                        playerId, lineageForm.id(), xp, catalogVersion, true));
             }
             state.profile = new StoredClassProfile(
                     playerId,
@@ -582,7 +585,9 @@ public final class ClassProgressionModule {
                     }
                 }
                 state.progressXp.put(form.id(), xp);
-                persistedRows.add(new StoredClassProgress(playerId, form.id(), xp, catalogVersion));
+                boolean granted = form.band().effectiveStart() <= effectiveLevel;
+                if (granted) state.challenges.add(form.id()); else state.challenges.remove(form.id());
+                persistedRows.add(new StoredClassProgress(playerId, form.id(), xp, catalogVersion, granted));
             }
             String selectedFormId = state.profile.selectedFormId();
             boolean selectionInvalid = selectedFormId != null
@@ -665,6 +670,7 @@ public final class ClassProgressionModule {
         List<StoredClassProgress> storedProgress = store.loadAllProgress(playerId);
         Map<SkillType, Integer> levels = captureFoundationLevels(playerId);
         Map<String, Long> progressXp = new HashMap<>();
+        Set<String> challenges = new HashSet<>();
         List<StoredClassProgress> repairedProgress = new ArrayList<>();
 
         for (StoredClassProgress progress : storedProgress) {
@@ -682,14 +688,15 @@ public final class ClassProgressionModule {
             if (progressXp.putIfAbsent(form.id(), progress.xp()) != null)
                 throw new IllegalStateException("Progression store returned duplicate form " + form.id());
 
+            if (progress.challengeCompleted()) challenges.add(form.id());
             long normalizedXp = normalizePersistedXp(form, progress.xp());
             progressXp.put(form.id(), normalizedXp);
             if (normalizedXp != progress.xp())
                 repairedProgress.add(new StoredClassProgress(
-                        playerId, form.id(), normalizedXp, catalogVersion));
+                        playerId, form.id(), normalizedXp, catalogVersion, progress.challengeCompleted()));
         }
 
-        StoredClassProfile repairedProfile = repairProfile(playerId, storedProfile, progressXp, levels);
+        StoredClassProfile repairedProfile = repairProfile(playerId, storedProfile, progressXp, challenges, levels);
         if (!repairedProgress.isEmpty() || !repairedProfile.equals(storedProfile))
             store.savePlayerAggregate(repairedProfile, repairedProgress);
 
@@ -699,6 +706,8 @@ public final class ClassProgressionModule {
             state.profile = repairedProfile;
             state.progressXp.clear();
             state.progressXp.putAll(progressXp);
+            state.challenges.clear();
+            state.challenges.addAll(challenges);
             state.readiness = ProgressionReadiness.READY;
             return snapshotLocked(playerId, state, levels);
         }
@@ -708,6 +717,7 @@ public final class ClassProgressionModule {
             UUID playerId,
             StoredClassProfile stored,
             Map<String, Long> progressXp,
+            Set<String> challenges,
             Map<SkillType, Integer> levels) {
         String selectedFormId = stored.selectedFormId();
         ClassFormDefinition selectedForm = null;
@@ -720,7 +730,7 @@ public final class ClassProgressionModule {
                 throw new IllegalStateException("Stored class profile selects " + classification
                         + " form id " + selectedFormId + " without a catalog migration");
             }
-            if (!isUnlocked(selectedForm, progressXp, levels, new HashMap<>())) selectedFormId = null;
+            if (!isUnlocked(selectedForm, progressXp, challenges, levels, new HashMap<>())) selectedFormId = null;
         }
 
         InputProfile inputProfile = InputProfile.fromStoredId(stored.selectedInputId())
@@ -753,7 +763,7 @@ public final class ClassProgressionModule {
         Map<String, List<UnlockBlocker>> unlocks = new HashMap<>();
         for (ClassFormDefinition form : catalog.forms()) {
             List<UnlockBlocker> unlockBlockers = unlockBlockers(
-                    form, state.progressXp, levels, unlocks);
+                    form, state.progressXp, state.challenges, levels, unlocks);
             boolean unlocked = unlockBlockers.isEmpty();
             int localCap = unlocked ? form.localProgressionCap(levels::get) : 0;
             int effectiveCap = unlocked ? form.effectiveProgressionCap(levels::get) : 0;
@@ -814,20 +824,24 @@ public final class ClassProgressionModule {
     private boolean isUnlocked(
             ClassFormDefinition form,
             Map<String, Long> progressXp,
+            Set<String> challenges,
             Map<SkillType, Integer> levels,
             Map<String, List<UnlockBlocker>> memo) {
-        return unlockBlockers(form, progressXp, levels, memo).isEmpty();
+        return unlockBlockers(form, progressXp, challenges, levels, memo).isEmpty();
     }
 
     private List<UnlockBlocker> unlockBlockers(
             ClassFormDefinition form,
             Map<String, Long> progressXp,
+            Set<String> challenges,
             Map<SkillType, Integer> levels,
             Map<String, List<UnlockBlocker>> memo) {
         List<UnlockBlocker> known = memo.get(form.id());
         if (known != null) return known;
 
         List<UnlockBlocker> blockers = new ArrayList<>();
+        if (!challenges.contains(form.id()))
+            blockers.add(UnlockBlocker.classChallenge(form.id()));
         if (form.band().isRoot()) {
             contentAvailability.unavailableReason(form.id())
                     .map(reason -> UnlockBlocker.contentRequirement(form.id(), reason))
@@ -843,7 +857,7 @@ public final class ClassProgressionModule {
 
         if (!form.band().isRoot()) {
             ClassFormDefinition parent = catalog.require(form.parentId());
-            blockers.addAll(unlockBlockers(parent, progressXp, levels, memo));
+            blockers.addAll(unlockBlockers(parent, progressXp, challenges, levels, memo));
             long parentXpAtCap = xpAtLocalCap(parent, parent.localProgressionCap(levels::get));
             int parentLocalLevel = localLevelFromXp(parent,
                     Math.min(progressXp.getOrDefault(parent.id(), 0L), parentXpAtCap));
@@ -865,6 +879,33 @@ public final class ClassProgressionModule {
         return snapshot.levels();
     }
 
+    /** Eligibility excludes only this form's trial, never its parent's requirements. */
+    public boolean canChallenge(UUID playerId, String formId) {
+        CachedPlayer state = readyState(playerId);
+        ClassFormDefinition form = catalog.find(formId).orElse(null);
+        if (state == null || form == null) return false;
+        synchronized (state.monitor) {
+            if (!isReady(state) || state.challenges.contains(formId) || runSelections.containsKey(playerId))
+                return false;
+            return unlockBlockers(form, state.progressXp, state.challenges,
+                    captureFoundationLevels(playerId), new HashMap<>()).stream()
+                    .allMatch(blocker -> blocker.kind() == UnlockBlocker.Kind.CLASS_CHALLENGE
+                            && blocker.formId().equals(formId));
+        }
+    }
+
+    /** Called only by the owning trial after its instructor's actual death event. */
+    public boolean completeChallenge(UUID playerId, String formId) {
+        CachedPlayer state = readyState(playerId);
+        if (state == null || catalog.find(formId).isEmpty()) return false;
+        synchronized (state.monitor) {
+            if (!isReady(state)) return false;
+            if (state.challenges.add(formId))
+                enqueueProgressSave(playerId, state, formId, state.progressXp.getOrDefault(formId, 0L));
+            return true;
+        }
+    }
+
     private void enqueueProfileSave(UUID playerId, CachedPlayer state) {
         StoredClassProfile profile = state.profile;
         trackPersistence(playerId, state, submitInternal(() -> {
@@ -874,7 +915,7 @@ public final class ClassProgressionModule {
     }
 
     private void enqueueProgressSave(UUID playerId, CachedPlayer state, String formId, long xp) {
-        StoredClassProgress progress = new StoredClassProgress(playerId, formId, xp, catalogVersion);
+        StoredClassProgress progress = new StoredClassProgress(playerId, formId, xp, catalogVersion, state.challenges.contains(formId));
         trackPersistence(playerId, state, submitInternal(() -> {
             store.saveProgress(progress);
             return null;
@@ -1069,6 +1110,7 @@ public final class ClassProgressionModule {
         private final Object monitor = new Object();
         private final CompletableFuture<ProfileSnapshot> loadFuture = new CompletableFuture<>();
         private final Map<String, Long> progressXp = new HashMap<>();
+        private final Set<String> challenges = new HashSet<>();
         private volatile ProgressionReadiness readiness = ProgressionReadiness.LOADING;
         private volatile Throwable failure;
         // A later successful tail must never hide an earlier failed save from flush(playerId).

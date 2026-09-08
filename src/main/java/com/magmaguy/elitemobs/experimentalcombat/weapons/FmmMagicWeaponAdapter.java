@@ -25,7 +25,7 @@ import java.util.Objects;
 /** FMM-linked implementation loaded only after the optional plugin is present. */
 final class FmmMagicWeaponAdapter
         implements ExperimentalMagicWeaponIntegration.Connection, MagicAttackResolver {
-    private static final int REQUIRED_CAPABILITY_VERSION = 2;
+    private static final int REQUIRED_CAPABILITY_VERSION = 3;
 
     private final Plugin owner;
     private volatile boolean registered;
@@ -64,6 +64,7 @@ final class FmmMagicWeaponAdapter
         Objects.requireNonNull(request, "request");
         Objects.requireNonNull(application, "application");
 
+        if (EliteItemManager.isOnLastDamage(request.weapon())) return;
         SkillType progressionSkill = progressionSkill(request.attackKind().weaponKind());
         EliteEntity elite;
         try {
@@ -88,6 +89,13 @@ final class FmmMagicWeaponAdapter
             damage = request.balance().standaloneDamage();
         }
         applyWithEliteMobsBypass(request, progressionSkill, damage, application);
+    }
+
+    @Override
+    public boolean canAttack(org.bukkit.entity.Player player, ItemStack weapon,
+                             com.magmaguy.freeminecraftmodels.api.magic.MagicAttackKind attackKind) {
+        com.magmaguy.elitemobs.items.ItemDurability.prepareMagicWeapon(weapon);
+        return !EliteItemManager.isOnLastDamage(weapon);
     }
 
     @Override
@@ -131,7 +139,7 @@ final class FmmMagicWeaponAdapter
                 skillLevel,
                 itemLevel,
                 basePower,
-                carrierMaterial);
+                carrierMaterial) * EliteItemManager.getEliteDamageEnchantmentMultiplier(weapon);
     }
 
     private static void applyWithEliteMobsBypass(

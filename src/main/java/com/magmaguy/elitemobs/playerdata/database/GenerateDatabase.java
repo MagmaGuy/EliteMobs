@@ -107,9 +107,20 @@ public class GenerateDatabase {
                         + "PlayerUUID VARCHAR(36) NOT NULL, "
                         + "FormId VARCHAR(64) NOT NULL, "
                         + "XP BIGINT NOT NULL DEFAULT 0, "
+                        + "ChallengeCompleted INTEGER NOT NULL DEFAULT 0, "
                         + "CatalogVersion INTEGER NOT NULL DEFAULT 0, "
                         + "PRIMARY KEY (PlayerUUID, FormId)"
                         + ")");
+                boolean hasChallengeColumn;
+                try (var columns = PlayerDataRepository.connection().getMetaData().getColumns(
+                        null, null, JdbcClassProgressionStore.PROGRESS_TABLE, "ChallengeCompleted")) {
+                    hasChallengeColumn = columns.next();
+                }
+                // One DDL operation preserves legacy rows even if startup is interrupted.
+                // New progress inserts always bind their explicit completion flag.
+                if (!hasChallengeColumn)
+                    statement.executeUpdate("ALTER TABLE " + JdbcClassProgressionStore.PROGRESS_TABLE
+                            + " ADD ChallengeCompleted INTEGER NOT NULL DEFAULT 1");
             }
         }
     }

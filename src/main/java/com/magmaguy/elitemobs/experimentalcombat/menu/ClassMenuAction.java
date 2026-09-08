@@ -34,6 +34,9 @@ sealed interface ClassMenuAction {
     record GiveFocusItem() implements ClassMenuAction {
     }
 
+    record Challenge(String formId, double quotedFee) implements ClassMenuAction {
+    }
+
     record DeactivateClass() implements ClassMenuAction {
     }
 }

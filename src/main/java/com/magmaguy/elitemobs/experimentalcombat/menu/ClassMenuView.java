@@ -41,6 +41,8 @@ record ClassMenuView(
             String displayName,
             ClassBand band,
             boolean unlocked,
+            boolean challengeEligible,
+            double challengeFee,
             boolean selected,
             boolean active,
             List<String> lineage,

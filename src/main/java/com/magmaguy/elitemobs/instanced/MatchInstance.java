@@ -152,6 +152,14 @@ public abstract class MatchInstance {
         return !isDefunct() && !destroyingMatch && state == InstancedRegionState.WAITING;
     }
 
+    /** Acquired after all cancellable admission preflights, before player registration. */
+    protected boolean reserveAdmission() { return true; }
+
+    /** Releases an admission reservation if registration could not finish. */
+    protected void abortAdmission() {}
+
+    protected boolean isAcceptingSpectator(Player player, boolean wasPlayer) { return true; }
+
     /**
      * True only when both the active participant and a prospective combat target remain inside
      * this ongoing instance. This is the public policy seam for mechanics that must not reach

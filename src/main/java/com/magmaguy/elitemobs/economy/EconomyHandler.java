@@ -43,6 +43,32 @@ public class EconomyHandler {
     }
 
 
+    /** Checked purchase path. Call on the server thread with loaded player data. */
+    public static boolean tryWithdraw(UUID user, double amount) {
+        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Economy purchase off server thread");
+        if (!Double.isFinite(amount) || amount < 0) throw new IllegalArgumentException("Invalid purchase price");
+        if (VaultCompatibility.VAULT_ENABLED) {
+            var economy = VaultCompatibility.getEconomy();
+            return economy != null && economy.withdrawPlayer(Bukkit.getOfflinePlayer(user), amount).transactionSuccess();
+        }
+        double balance = checkCurrency(user);
+        if (balance < amount) return false;
+        PlayerData.setCurrency(user, Round.twoDecimalPlaces(balance - amount));
+        return true;
+    }
+
+    /** Returns an aborted purchase without diverting the refund into gambling debt. */
+    public static boolean refundPayment(UUID user, double amount) {
+        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Economy refund off server thread");
+        if (!Double.isFinite(amount) || amount < 0) throw new IllegalArgumentException("Invalid refund");
+        if (VaultCompatibility.VAULT_ENABLED) {
+            var economy = VaultCompatibility.getEconomy();
+            return economy != null && economy.depositPlayer(Bukkit.getOfflinePlayer(user), amount).transactionSuccess();
+        }
+        PlayerData.setCurrency(user, Round.twoDecimalPlaces(checkCurrency(user) + amount));
+        return true;
+    }
+
     public static void subtractCurrency(UUID user, double amount) {
         if (VaultCompatibility.VAULT_ENABLED) {
             VaultCompatibility.subtractCurrency(user, amount);

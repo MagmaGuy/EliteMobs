@@ -68,6 +68,9 @@ final class ClassMenuCoordinator {
             case ClassMenuAction.OpenControls ignored -> openControls(player);
             case ClassMenuAction.OpenForm openForm -> openForm(player, openForm.formId());
             case ClassMenuAction.SelectForm selectForm -> selectForm(player, selectForm.formId());
+            case ClassMenuAction.Challenge challenge ->
+                    com.magmaguy.elitemobs.experimentalcombat.challenges.ClassChallengeInstance.admit(
+                            player, challenge.formId(), challenge.quotedFee());
             case ClassMenuAction.SelectInput selectInput -> selectInput(player, selectInput.profile());
             case ClassMenuAction.GiveFocusItem ignored -> giveFocusItem(player);
             case ClassMenuAction.DeactivateClass ignored -> deactivateClass(player);

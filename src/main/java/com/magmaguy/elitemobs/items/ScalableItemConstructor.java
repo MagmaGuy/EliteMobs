@@ -25,8 +25,10 @@ public class ScalableItemConstructor {
     }
 
     public static ItemStack constructScalableItem(int itemTier, CustomItem customItem, Player player, EliteEntity eliteEntity) {
-        if (!customItem.getPermission().isEmpty() && !player.hasPermission(customItem.getPermission())) return null;
+        if (player != null && !customItem.getPermission().isEmpty() && !player.hasPermission(customItem.getPermission())) return null;
         HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments());
+        newEnchantmentList = com.magmaguy.elitemobs.items.itemconstructor.EnchantmentGenerator.withProceduralEnchantments(
+                itemTier, customItem.getCustomItemsConfigFields(), newEnchantmentList);
         return ItemConstructor.constructItem(
                 itemTier,
                 customItem.getCustomItemsConfigFields().getName(),
@@ -102,6 +104,8 @@ public class ScalableItemConstructor {
         int adjustedItemLevel = Math.min(itemTier, customItem.getItemLevel());
 
         HashMap<Enchantment, Integer> newEnchantmentList = updateDynamicEnchantments(customItem.getEnchantments());
+        newEnchantmentList = com.magmaguy.elitemobs.items.itemconstructor.EnchantmentGenerator.withProceduralEnchantments(
+                adjustedItemLevel, customItem.getCustomItemsConfigFields(), newEnchantmentList);
 
         return ItemConstructor.constructItem(
                 adjustedItemLevel,

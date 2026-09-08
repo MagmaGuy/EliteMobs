@@ -179,7 +179,7 @@ public class ItemLootShower {
         }.runTaskTimer(MetadataHandler.PLUGIN, 2, 2);
     }
 
-    private int getCurrencyAmount(double eliteMobTier) {
+    public static int getCurrencyAmount(double eliteMobTier) {
         return (int) (eliteMobTier / 2D * EconomySettingsConfig.getCurrencyShowerMultiplier());
     }
 

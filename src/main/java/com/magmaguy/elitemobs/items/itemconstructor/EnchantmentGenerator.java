@@ -17,6 +17,33 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class EnchantmentGenerator {
 
+    public static HashMap<Enchantment, Integer> withProceduralEnchantments(int level,
+            com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields fields,
+            HashMap<Enchantment, Integer> authored) {
+        HashMap<Enchantment, Integer> result = new HashMap<>(authored);
+        if (fields.isProceduralEnchantments()) {
+            var generated = generateEnchantments(level, fields.getMaterial(), fields.getWeaponType(),
+                    new org.bukkit.inventory.ItemStack(fields.getMaterial()).getItemMeta());
+            generated.forEach((enchantment, value) -> result.merge(enchantment, value, Math::max));
+        }
+        return result;
+    }
+
+    public static HashMap<Enchantment, Integer> generateEnchantments(
+            double level, Material material, com.magmaguy.elitemobs.skills.SkillType weaponType, ItemMeta meta) {
+        if (weaponType != com.magmaguy.elitemobs.skills.SkillType.STAVES
+                && weaponType != com.magmaguy.elitemobs.skills.SkillType.WANDS)
+            return generateEnchantments(level, material, meta);
+        // Magic attacks support damage and native durability enchantments. Arrow-only effects
+        // must not be advertised on a projectile which does not implement them.
+        HashMap<Enchantment, Integer> result = generateEnchantments(level, Material.BOW, meta.clone());
+        result.keySet().removeIf(enchantment -> enchantment != Enchantment.POWER
+                && enchantment != Enchantment.UNBREAKING && enchantment != Enchantment.MENDING
+                && enchantment != Enchantment.VANISHING_CURSE);
+        generateEnchantments(meta, result);
+        return result;
+    }
+
     public static ItemMeta generateEnchantments(ItemMeta itemMeta, HashMap<Enchantment, Integer> enchantmentMap) {
         for (Map.Entry<Enchantment, Integer> entry : enchantmentMap.entrySet()) {
             if (entry == null) continue;

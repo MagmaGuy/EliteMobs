@@ -1,0 +1,128 @@
+{
+  "paladin": {
+    "title": "Golden Paladin V4",
+    "author": "Entium",
+    "source": "https://www.minecraftskins.com/skin/21796575/golden-paladin-v4/",
+    "credit": null,
+    "variant": "classic",
+    "profile": {
+      "properties": [
+        {
+          "name": "textures",
+          "signature": "bbPhZk/R+KT+rxW8PqCrkE+Xe0yVCWVqHrDyd4scH31qnivy6qdAhi+FosARu+7WFVU3hhIRmCaxroJzyJ9/mST5WMIuKAb2Ebhbu/caKQ0+NoUVnaOsuHJm8gIs9qVeW4Vc28IqTufU/sxEM0wJMxcyLhja99gp/r6WUbkvEOAM+LjeKmEgKrEvuXC5CWphJDkO8WapkcmZsMPKdxuEF2EtpPH96nsus6UABBiBSG0cYw76mdGAyn2hBJJfVvtevwDkWYH3/uqLMWPsPHNnhevGKvWIVV4oQcFllYR6xIKTyehsRFK61KToWWyqhOqAUv9fQX8kgxO+h7xUZ+yGmK6cMdW9ZuQgz92A9rLEujPSAdZ0DKSAd3T9PFMvzU0MZf6ARIG9kmwnhlzeeq6TAv47GclV/5kJ2MgxUlT57wAKT3MvVaps4NPmy9YSOl06y/C38al4ziGggCqS3+IvGSiLmaQrEIcDCUWg0wO1YiAIV/v+p8NX8MqbxC1PYKxH+LIsZnzXPRme7uB2IlLp5s3KetKZkYWpej0FThxLqvLf0Im9e0QIVwmAWW6FKpqZsE6hFEsw52tIMk2t0ssnx5NPRkE/LkEPsGDZBeV9bH5b5Ta5FEGr5bSeMG2ntpqp91YUbqrFVKjqMT6G7+L4LoxSl3YqKIAryw/XX68JHpI=",
+          "value": "ewogICJ0aW1lc3RhbXAiIDogMTcwODM1ODc5NDU2NCwKICAicHJvZmlsZUlkIiA6ICI4ZGUyNDAzYTEyMjU0ZmFkOTM1OTYxYWFlYmQwNGUyOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJkZXNydHB1bWEiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjRiNjhkMTIxZGY1Y2MwNzhhYjE0MjQ4MTdiODI5NTIxNmI5MTIxODA5MWZhMzJiODQ3NDM4MDBiM2E5NmIzMiIKICAgIH0KICB9Cn0="
+        }
+      ],
+      "name": "Unknown",
+      "id": "06c27c63-b8c3-4215-a26c-7b98b915a8d9"
+    }
+  },
+  "berserker": {
+    "title": "Inga-Half Orc",
+    "author": "NervyYew1585",
+    "source": "https://www.minecraftskins.com/skin/20294950/inga-half-orc/",
+    "credit": null,
+    "variant": "slim",
+    "profile": {
+      "properties": [
+        {
+          "name": "textures",
+          "signature": "BKotVLYFrSJHP4M2rqpc+AIRRrGDn67BUY6t8EBlkxmEW1jV1aQPAwFi6DhST8/WWC5GUmavmbgHcyMvyPsvwA6ImGhEx6MsOOqQ9rYPf9o6NJcLbIxOgV19tN/MwhjrPYhvxlbFxiDW2Jyljedo98txBs1mG1cBUQmJMstFmmEL08S4W2F4NX2vOzDlDWXCkMK3U84NkqrdUIPgHZMGPVzXAolAyTehBwnIhJG9Hey/Q1uP2dvGnmDjijI/Nq5JOsaCOJnmzuE8drKL9xg2EIxZ8/yGfuVaq21SaQ3x1DKYUDVdqiP+fbS2O/bhPjy7oIzADmu+tP+r51qNilHxy1n1grPQF5psZejw2GTn1+32HQtVrajMeqJjFTdcR7kE63QYx141ZrrM2YyjHLpbby7NQhL8wyONZuTejL1tyL8Mgm30jzPjMMFEASCibZYTUCsEViCM+eymuHvmIvRAGs09rotF6uzSfIhBR8dCIa7QTbdm2V7YOd7kmMliv9UAX5MrOTgTflMeC65xmf8OM4N8rI7zodhGoxlz+n8Qnokun1KtHp6iyhYakRmfcmUV0G31qKeEZxmbiN18xIUTJS/0a3z0r9L99XIOT+saOaGpVHdytJVjoMjjj+xWH4p/YldrfEHGF3YvBJ4ivJF4x07+JtG+vV+omweUZs2DVt4=",
+          "value": "ewogICJ0aW1lc3RhbXAiIDogMTY2NTAxNzE2NzQ3NywKICAicHJvZmlsZUlkIiA6ICJmMTA0NzMxZjljYTU0NmI0OTkzNjM4NTlkZWY5N2NjNiIsCiAgInByb2ZpbGVOYW1lIiA6ICJ6aWFkODciLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjAwODA2ZDhhMjFhM2JiMTZiYzY3YmE0MjI5ODA2NjA4ZGUyZWU2NTI5NTc3MjJmOTk0NGQzYmZiNWEzMjVhZCIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+        }
+      ],
+      "name": "Unknown",
+      "id": "eea1b118-f2b2-44be-b419-1c621553069d"
+    }
+  },
+  "ranger": {
+    "title": "Sniffer, the Wild Tracker",
+    "author": "Nighthearted",
+    "source": "https://www.minecraftskins.com/skin/20942451/sniffer--the-wild-tracker/",
+    "credit": null,
+    "variant": "classic",
+    "profile": {
+      "properties": [
+        {
+          "name": "textures",
+          "signature": "W+aEanlj0BflKuA55M1u4gbHusYMeugKvo0LwiOS3QjMNaUmdgmkSdazhBEoQRYzNKHqJqJvCuea56d9ZaoWd+ftLYz+L+iq7c1A9hZlm6dj52RCEAKX+X5OfXg8EvAH/c9w3b44RhZ9J3d4ZUC/g2RDg1QJ5m/D5kg+ZP6e/MWP9OKwVjpqreRIf5ey67qHEWKL/923m4G+PH7uzaPhIHRANogDEUnGS1mf1mvWt2ptGtogaixrJcPer7jwup3RVEFYe05AN2sQq2sj4HoeuY2ims5ISTGvAGv5ig9Ey4C8x9kTjBNVaRzfb6f8mHV1H/kEtgrGN3OM08gYWZw23M7QlYGH95USIHG3j1mr3K38BjyS+U23nBJw+KE1zRbZ55FJ/8C+/Gl+IvxECNw8Pzv8Fh8LNK1n4NgtQXSWDGvTmF3RTrS11RzsDKU7O4O+K/XauS+haBLpz99dWI19xxRT6la2x2eEnxctUqMHCH+hn2lUQswbfurBm+OszmPRs6qMoB4dwfXMID5gLbVx5y8dupGjVaZ61RB6n0wI5tKzauo0zRGTH4ZB5sCNk0qjrpKRiElooEFK0+ymzyMIW5hpeloms85d9SftfOgLP7/XI+7Za7mOJ0ILZKrhrjHpoUOPyry6m9Wczx6nsvP+lkrh6sMHVDyz6VcI9CfcY9A=",
+          "value": "ewogICJ0aW1lc3RhbXAiIDogMTY4NjE4MTc0ODY5MiwKICAicHJvZmlsZUlkIiA6ICIzY2YzYjgzNzhkYjc0ZDZlYmIxMDFjMDYzZmQ1MjVjNyIsCiAgInByb2ZpbGVOYW1lIiA6ICJSeW9yaTE2IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2E1NmEzOTUxM2NhNGQ4MGFhNjJhNmU1MjFkY2NkY2MwNTA5NjE0MWM5ZDlhNmIzYTcyNjc3NjUwYmQxMjczNmYiCiAgICB9CiAgfQp9"
+        }
+      ],
+      "name": "Unknown",
+      "id": "5ab97c9a-090f-4492-92c5-e9423cbde89b"
+    }
+  },
+  "cleric": {
+    "title": "Fantasy Elf Cleric",
+    "author": "WildWolfJG",
+    "source": "https://www.minecraftskins.com/skin/23699388/fantasy-elf-cleric/",
+    "credit": "Face adapted from LadyLam; source description also credits Shardz7777770.",
+    "variant": "slim",
+    "profile": {
+      "properties": [
+        {
+          "name": "textures",
+          "signature": "B0dr1n8olcSQ4TrOFpfZIy7oEGLsFaIk8tBc/VOBJeNtxjWENyNQO3JD/CurAUOjwqQEB9UtoKC5sjboiABdYTd9zH/C/Vxr7SNE5lp0M5lhejnaBMOtHgiZbFeZAJF4LuG3jDXQhmrO+4cuA1yGrUiWA+k8o2SJd5NN0UQtpqN+LbQe37/yQ1ocd8IYLnolM1Wb7rT+bt9YrnvBj2wPDSvhu1JdhMdH2JeF+nGje7xbnYkQPS7+KibLwJ7JAAn63OJkfkwL+cjjnc9v4pDIphldYd36Q6ikQxqrtvk6nC+3oZe6+QITmINoQWEJq181fz3I1DiFmkULJhvLrcPNnmbAnbjxXwdCKrbD3DpQMyCWsSUNV8cTGXmxhxDycnZIS3WTCXnynQ7hRxujrNJrMgFfeAcMeztQ3/fisluQ3qgzXVdOjkfXqHUkHF7oJ6uV313SSN/YD8Dua3MDjh+rCJxZCwThgGDcEcwa6ATbhDxfs1g3cKgLSvLIdfVGCR4KShzjG9wVeXas77FHjCtDGCneIkV0Tll1ijU9c4VyCw91K1zhNql3Q5X/2yzy2XZFgXEQB6NinkhRgWWGRTGQnKh+rY90TuYBIIe9g5YezniS01fIe7pFNAzhfc0xOigXd7IbtdI181U+nOAG0lLPiF0SXGEjHpstriOPkHmn8bU=",
+          "value": "ewogICJ0aW1lc3RhbXAiIDogMTc2NjIwNDc0MjU2MCwKICAicHJvZmlsZUlkIiA6ICIzY2I3YTA3YWY3ZjM0ZWZiYTlkNGI4ODQ3NDM4Mzc0ZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJaZW4xXzAwMSIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS85ZWQ4Mjc5ZjZjNDZmNDdkODQwMTZlM2U3NDhiNDg4ZTI3Y2VhMDI1NjhkODdjNDc1N2FmYTFmOWU2M2I2MjE5IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
+        }
+      ],
+      "name": "Unknown",
+      "id": "b968d4a0-1d14-4f50-ba77-5053d9a731e1"
+    }
+  },
+  "spellcaster": {
+    "title": "Sage of the Sea",
+    "author": "thiccsnail",
+    "source": "https://www.minecraftskins.com/skin/13771437/sage-of-the-sea/",
+    "credit": null,
+    "variant": "classic",
+    "profile": {
+      "properties": [
+        {
+          "name": "textures",
+          "signature": "d3Sr/7aOrVxTyHKrMklZaloLBU3wM/v23J5Fh5WYIu29NURq1WqTms8XK+RTlpBBDWBY/LQVr1kwSjbnjIpWGx2fTgghhqmh3wge7AvHurvUNBWyQUqkINDbq5lVTjFA43ijuQFZz/yteSdFUSLCMYP80Z+rGN442mqsBwqyOIlRwhJz/YMPCSJk4l6C4CnPu3h8CFNy8WacrrOpRI4d+mc01eDisviBU3s6sreVc6x4g2xHpDDOvT1Kjao/wkiAE17yYrT/aWS8aeGFBSR6ft7aszEMlDKW5vGgelWTkane2WIRedwu8+9BixBDEdqbCsy6fvhFdERSz5/JudNCZ2RyDvKTpPTIQZS0PBqoQc400G6g03A9RibqTlB5GoV40/P27sQDDo23WCXobXje0S1dgfsrIysWo0jyN8qWPdhQ2eb0CP72yqsGdr4bWaiqHsa4/qLArPul3V6B6qCrR859MXPK59Eg6iFj5quTcJPVXwpcPs9Hfx9lGk9tMN+uUoycIO5G96+j9uk68XXiyHSwzd6U73pEZXapFG5U9dBN4Pj8oQkf2pqGRza+FWm40X6d8eFA8v+EMUIh82xV50jHXbHl2XmrujlvcDzSBTEK7LAVQprNUwFCZ7a2II3qPeiTkkMYQcJBkm9Ce5MP3Qvl9vUl0KC76fTACqA6aKc=",
+          "value": "ewogICJ0aW1lc3RhbXAiIDogMTcxMzAwMzAzNjc1NiwKICAicHJvZmlsZUlkIiA6ICI2YzdjZWFjNTdjM2Q0ZTdmYWI3MTc3YTRkMDhlMGU2MSIsCiAgInByb2ZpbGVOYW1lIiA6ICJNRzE0MSIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS84ZjFjZmJhOTkxYTdmODdjMWFlMDZkMjE0ZjQ0YzQ0OGUzNmMzY2JiMDM1OGQ0MGFmZmQyNzUyM2FlNGMzZDBjIgogICAgfQogIH0KfQ=="
+        }
+      ],
+      "name": "Unknown",
+      "id": "d270803a-a0f9-4a5b-98b2-b26179d0dc55"
+    }
+  },
+  "necromancer": {
+    "title": "Dreygyr the Necromancer",
+    "variant": "classic",
+    "profile": {
+      "id": "e68c6d7855a94380acd466c79d74c152",
+      "properties": [
+        {
+          "signature": "CO1HEObkpsvC2baMAvVxJwWHcJZtK4E1bqzaeJZGQCLBidiZzrKP8xxbCVL/6LVY6cM+Ij5RaAWQn4EK+ZaVCLXZrEh1B5Iie1A7O55amnAGm+AZdPjEHsE/pKFNB3kEekzidu5rgm2QEqbi2hUhLGL6/ZqXIw6Eo0Sbrf5b/kAmp+RwNFVCmOMLCFN3fi164xmwNDrUp9IM4+MZWAozsAyQve/HkmehUPHNFBP4R2OmbNkvYviRbOFBS06p3RIL/1bnpIdWKsHzfmHfAT8fP/Tld5km7FTrFlhMuUuBovu6mKN3otVfQbJNE8/uTyDZlkhuAwUYehh1SE1OZaIJ99pcbNU7ULFlIofBLY2JOY9WCtnxi1doXE6wTD+IumJFcO9q2KoYtlOHQg8acoG0cTmoZkuW6hcnnv8NTQlyjyoEP9on9yDm9pdNCAFtSTIDYFMS7DF4b+fM1DhbQ7q9yVh5Z6cB/Y4+8ehvFhyWaRbDBP1764N4/g4UvFnnqIcEtZ9YDWECmSa8e9lcI3LEs45cp03NiPOMaiNBIjX0qlvrdYZrDCtfw3y7xGM+HYcfbcOCEz9Kx+6lwp9nZ3sfRRDQoWR94nL+o/aT7N95xqTTX0+eC4s6Yf0i+QkD/v3CufokallBoeTwFBKjrwahoEJ+8xLCzTs4iWXSm7HHqBY=",
+          "value": "ewogICJ0aW1lc3RhbXAiIDogMTY5MTg2OTgxMDg4NSwKICAicHJvZmlsZUlkIiA6ICJmNWYyNDcyZGVhNDY0ODJhYWUwNDllYjM2ODE5ODU0NiIsCiAgInByb2ZpbGVOYW1lIiA6ICJEZXRhaWxlcnMiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTI3YTVmODdjODYzYWFhMWNiMWE4Yjg2ZTc1OTAyODBhMGM3NzQ4YjNjZTA4NzA5NTVkOWY5MjUyZGE2NmRjNCIKICAgIH0KICB9Cn0=",
+          "name": "textures"
+        }
+      ],
+      "name": "Unknown"
+    },
+    "author": "Nighthearted",
+    "source": "https://www.minecraftskins.com/skin/21887345/dreygyr-the-necromancer/",
+    "credit": "Commission for Dreygyr by Nighthearted"
+  },
+  "pyromancer": {
+    "source": "https://www.minecraftskins.com/skin/13768185/flame-lord/",
+    "credit": "Skin by thiccsnail",
+    "title": "Flame Lord",
+    "profile": {
+      "id": "f9670902d2234f5eb2074fe196fca90d",
+      "name": "Unknown",
+      "properties": [
+        {
+          "value": "ewogICJ0aW1lc3RhbXAiIDogMTcyNjYwMjU5MjkwOCwKICAicHJvZmlsZUlkIiA6ICJjYmYxNGIxMGJhNWU0NzgwYjIyNmFiNmQzOTUxODk4YiIsCiAgInByb2ZpbGVOYW1lIiA6ICJFZ2d5QnV0dG9uMjQxMSIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS84MGMwNGE4MDkyYTYzMWRjNjdjMzExOTY0NDJkZTQzOWRhNWRiYzBjM2MxMDgyNjc4MWE1ZjU5MWQ0OGJmYzgyIgogICAgfQogIH0KfQ==",
+          "name": "textures",
+          "signature": "xCWm51ZHZctPpusNJ2JHaCku9XGuadtmLh4MEtV3x6hWzLzy5Si+xSl2/cqENiBuJjr5PS6Quf5XsyWPcJJAbUx57HP6m6rbmXh0wp2xG9koVlIwGEVGzOeoBhbPnUxlSQQJ8WvaT7SuS0mpdN1SK5gr/0vD8UbiTtBJ+vUc0kVD6Fc27BwDS38XMSbXQ+3mcc5ShQs876t/XUCVtUiC+pYF8TSRC4bFMMssTROjqUGgN7Cq0UoIyw3hj2Y4Uak5L/tL452jNpkdLqxTF0EuMO120EdkAD0HUJzWAQQ7SufQGLhbR4tsjCotd9cjoIshDJLOz5HO8CtelYxze97Xe/zJggPkYLR8I4NTy6bxbmWVX+l7WOnnfkQpfktkuu1hAkPT/k3aDcEZQtj11G/NzBr+Mk4T9niX29Wz+RAHsIXUBSqqR7Erj/i+k/a6xxhGmXnZ0hmD9xcEZBWfad0uYSxki+MbjFAu5pNaSQTrIEFzD+xnXrefIg2iOEuyPCClB21ZfJXqwRUFowx8vepL72nI88JQIX49G0N0WStyD6PSLx423uCBMjtRIk7ShbfAQQGsE5Sr8h49tg9KeGPltYOHmMJoxbnCWTBc7Q+GUCaJzXLCSCAq+uJk/dJoqNZEqmwy42ZkJyzWH8ns0lim7tURMVPqrmVUZcMeKD+EYBk="
+        }
+      ]
+    },
+    "author": "thiccsnail",
+    "variant": "classic"
+  }
+}

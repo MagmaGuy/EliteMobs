@@ -103,6 +103,16 @@ final class ClassMenuPresenter {
                     "&7Make this your active class.",
                     new ClassMenuAction.SelectForm(form.id())));
         }
+        if (form.challengeEligible() && !view.runLocked()) {
+            String fee = com.magmaguy.elitemobs.economy.EconomyHandler.formatCurrency(form.challengeFee());
+            actions.add(new ClassMenuPresentation.ActionView(
+                    ClassMenuPresentation.ActionKind.SELECT,
+                    ClassMenuPresentation.Tone.CONTROL,
+                    "&6Challenge Instructor · " + fee + " coins",
+                    "&7Solo trial, level " + form.band().skillUnlockLevel()
+                            + ". Costs " + fee + " coins when combat begins. Defeat unlocks " + form.displayName() + ".",
+                    new ClassMenuAction.Challenge(form.id(), form.challengeFee())));
+        }
         actions.add(new ClassMenuPresentation.ActionView(
                 ClassMenuPresentation.ActionKind.OVERVIEW,
                 ClassMenuPresentation.Tone.NAVIGATION,

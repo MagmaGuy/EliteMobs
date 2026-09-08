@@ -23,7 +23,7 @@ public class AlternativeDurabilityLoss implements Listener {
     //these values are percentual
     private static double durabilityLoss(ItemStack itemStack) {
         boolean isWeaponMaterial = EliteItemManager.isWeapon(itemStack);
-        int maxDurability = itemStack.getType().getMaxDurability() > (isWeaponMaterial ? 2000 : 1000) ? (isWeaponMaterial ? 2000 : 1000) : itemStack.getType().getMaxDurability();
+        int maxDurability = com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack) > (isWeaponMaterial ? 2000 : 1000) ? (isWeaponMaterial ? 2000 : 1000) : com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack);
         double baseModifier = isWeaponMaterial ? 2000 : 1000;
         double durabilityLoss = ((baseModifier - maxDurability) / baseModifier) * ItemSettingsConfig.getEliteDurabilityMultiplier();
         double durabilityLevel = 1 + (ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.UNBREAKING.getKey()) / 4d);
@@ -36,8 +36,8 @@ public class AlternativeDurabilityLoss implements Listener {
         if (!itemStack.hasItemMeta()) return false;
         if (!ItemTagger.isEliteItem(itemStack)) return false;
         if (!(itemStack.getItemMeta() instanceof Damageable)) return false;
-        if (itemStack.getType().getMaxDurability() == 0) return false;
-        return ((Damageable) itemStack.getItemMeta()).getDamage() + 1 >= itemStack.getType().getMaxDurability();
+        if (com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack) == 0) return false;
+        return ((Damageable) itemStack.getItemMeta()).getDamage() + 1 >= com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack);
     }
 
     public static void doDurabilityLoss(Player player) {
@@ -46,12 +46,13 @@ public class AlternativeDurabilityLoss implements Listener {
         itemsList.add(player.getInventory().getItemInMainHand());
         itemsList.add(player.getInventory().getItemInOffHand());
 
-        for (ItemStack itemStack : itemsList)
+        for (ItemStack itemStack : itemsList) {
+            com.magmaguy.elitemobs.items.ItemDurability.prepareMagicWeapon(itemStack);
             if (itemStack != null &&
-                    itemStack.getType().getMaxDurability() != 0 &&
+                    com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack) != 0 &&
                     EliteItemManager.isEliteMobsItem(itemStack) &&
                     itemStack.getItemMeta() instanceof Damageable damageable) {
-                int maxDurability = itemStack.getType().getMaxDurability();
+                int maxDurability = com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack);
                 int durabilityLoss = (int) (maxDurability * durabilityLoss(itemStack));
                 int currentDurability = damageable.getDamage();
                 int newDurability = currentDurability + durabilityLoss;
@@ -65,6 +66,7 @@ public class AlternativeDurabilityLoss implements Listener {
                         itemStack.setAmount(0);
                     }
             }
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)

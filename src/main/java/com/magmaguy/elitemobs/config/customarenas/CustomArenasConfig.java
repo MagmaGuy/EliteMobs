@@ -15,8 +15,9 @@ public class CustomArenasConfig extends CustomConfig {
         for (String key : super.getCustomConfigFieldsHashMap().keySet())
             if (super.getCustomConfigFieldsHashMap().get(key).isEnabled()) {
                 customArenas.put(key, (CustomArenasConfigFields) super.getCustomConfigFieldsHashMap().get(key));
-                ArenaInstance.initializeArena((CustomArenasConfigFields) super.getCustomConfigFieldsHashMap().get(key));
             }
+        // Resolve shared containers only after every run definition is registered.
+        customArenas.values().forEach(ArenaInstance::initializeArena);
     }
 
     public static CustomArenasConfigFields getCustomArena(String string) {

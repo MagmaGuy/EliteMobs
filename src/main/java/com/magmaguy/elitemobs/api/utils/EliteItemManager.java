@@ -271,6 +271,7 @@ public class EliteItemManager {
     }
 
     public static boolean isWeapon(@Nullable ItemStack itemStack) {
+        if (com.magmaguy.elitemobs.skills.WeaponIdentityResolver.isMagicWeapon(itemStack)) return true;
         if (itemStack == null) return false;
         //Wooden axe stats are so bad they can't even get detected properly
         if (itemStack.getType().equals(Material.WOODEN_AXE) || itemStack.getType().equals(Material.CROSSBOW))
@@ -314,8 +315,8 @@ public class EliteItemManager {
         if (!itemStack.hasItemMeta()) return false;
         if (!ItemTagger.isEliteItem(itemStack)) return false;
         if (!(itemStack.getItemMeta() instanceof Damageable damageable)) return false;
-        if (itemStack.getType().getMaxDurability() == 0) return false;
-        return damageable.getDamage() + 1 >= itemStack.getType().getMaxDurability();
+        if (com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack) == 0) return false;
+        return damageable.getDamage() + 1 >= com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack);
     }
 
     public static void setEliteLevel(@Nullable ItemStack itemStack, int level) {

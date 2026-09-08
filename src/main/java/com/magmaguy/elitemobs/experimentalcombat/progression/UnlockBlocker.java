@@ -17,7 +17,8 @@ public record UnlockBlocker(
     public enum Kind {
         FOUNDATION_SKILL,
         PARENT_LOCAL_LEVEL,
-        CONTENT_REQUIREMENT
+        CONTENT_REQUIREMENT,
+        CLASS_CHALLENGE
     }
 
     public UnlockBlocker {
@@ -25,11 +26,12 @@ public record UnlockBlocker(
         Objects.requireNonNull(formId, "formId");
         if (formId.isBlank()) throw new IllegalArgumentException("formId must not be blank");
         if (currentLevel < 0) throw new IllegalArgumentException("currentLevel must not be negative");
-        if (kind != Kind.CONTENT_REQUIREMENT && requiredLevel < 1)
+        boolean explained = kind == Kind.CONTENT_REQUIREMENT || kind == Kind.CLASS_CHALLENGE;
+        if (!explained && requiredLevel < 1)
             throw new IllegalArgumentException("requiredLevel must be positive");
         if ((kind == Kind.FOUNDATION_SKILL) != (skillType != null))
             throw new IllegalArgumentException("Only foundation-skill blockers have a skill type");
-        if ((kind == Kind.CONTENT_REQUIREMENT) != (reason != null))
+        if (explained != (reason != null))
             throw new IllegalArgumentException("Only content blockers have a reason");
         if (reason != null && reason.isBlank())
             throw new IllegalArgumentException("Content blocker reason must not be blank");
@@ -57,6 +59,11 @@ public record UnlockBlocker(
         return new UnlockBlocker(
                 Kind.CONTENT_REQUIREMENT, rootFormId, null, 0, 0,
                 Objects.requireNonNull(reason, "reason"));
+    }
+
+    public static UnlockBlocker classChallenge(String formId) {
+        return new UnlockBlocker(Kind.CLASS_CHALLENGE, formId, null, 0, 0,
+                "Complete the solo instructor challenge.");
     }
 
     public Optional<SkillType> optionalSkillType() {

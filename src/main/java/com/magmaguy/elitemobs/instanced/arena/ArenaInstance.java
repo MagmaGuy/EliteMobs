@@ -17,7 +17,7 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.mythicmobs.MythicMobsInterface;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.magmacore.scripting.zones.Cylinder;
+
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -31,7 +31,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
+
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,6 +41,7 @@ public class ArenaInstance extends MatchInstance {
 
     @Getter
     private static final HashMap<String, ArenaInstance> arenaInstances = new HashMap<>();
+    private static final Map<String, ArenaContainer> containers = new HashMap<>();
 
     // Arenas whose configured worlds aren't loaded yet. On every WorldLoadEvent we
     // try to drain matches whose corner1 world name equals the freshly-loaded
@@ -52,6 +53,7 @@ public class ArenaInstance extends MatchInstance {
     public static void shutdown() {
         arenaInstances.clear();
         pendingArenas.clear();
+        containers.clear();
     }
 
     @Getter
@@ -60,62 +62,32 @@ public class ArenaInstance extends MatchInstance {
     private final HashMap<Integer, String> waveMessage = new HashMap<>();
     @Getter
     private final HashMap<Player, Double> roundDamage = new HashMap<>();
-    protected HashMap<String, Location> spawnPoints = new HashMap<>();
+
     @Getter
     private CustomArenasConfigFields customArenasConfigFields;
     @Getter
     private ArenaWaves arenaWaves;
-    private int minX;
-    private int maxX;
-    private int minY;
-    private int maxY;
-    private int minZ;
-    private int maxZ;
-    private boolean cylindricalArena;
+    @Getter
+    private final ArenaContainer container;
     @Getter
     private int currentWave = 0;
     @Getter
     private ArenaState arenaState = ArenaState.IDLE;
-    private Cylinder cylinder;
+
     private int highestArenaMobLevel = -1;
 
     public ArenaInstance(CustomArenasConfigFields customArenasConfigFields, Location corner1, Location corner2, Location startLocation, Location exitLocation) {
-        super(startLocation, exitLocation, customArenasConfigFields.getMinimumPlayerCount(), customArenasConfigFields.getMaximumPlayerCount());
+        this(customArenasConfigFields, new ArenaContainer(customArenasConfigFields, corner1, corner2, startLocation, exitLocation));
+    }
+
+    public ArenaInstance(CustomArenasConfigFields customArenasConfigFields, ArenaContainer container) {
+        super(container.start(), container.exit(), customArenasConfigFields.getMinimumPlayerCount(), customArenasConfigFields.getMaximumPlayerCount());
+        this.container = container;
         if (cancelled) return;
-        this.cylindricalArena = customArenasConfigFields.isCylindricalArena();
-
-        super.lobbyLocation = customArenasConfigFields.getTeleportLocation();
-
-        if (corner1.getX() < corner2.getX()) {
-            minX = (int) corner1.getX();
-            maxX = (int) corner2.getX();
-        } else {
-            minX = (int) corner2.getX();
-            maxX = (int) corner1.getX();
-        }
-
-        if (corner1.getY() < corner2.getY()) {
-            minY = (int) corner1.getY();
-            maxY = (int) corner2.getY();
-        } else {
-            minY = (int) corner2.getY();
-            maxY = (int) corner1.getY();
-        }
-
-        if (corner1.getZ() < corner2.getZ()) {
-            minZ = (int) corner1.getZ();
-            maxZ = (int) corner2.getZ();
-        } else {
-            minZ = (int) corner2.getZ();
-            maxZ = (int) corner1.getZ();
-        }
-        this.world = corner1.getWorld();
+        super.lobbyLocation = container.lobby();
+        this.world = container.start().getWorld();
         this.state = InstancedRegionState.WAITING;
 
-        if (cylindricalArena)
-            cylinder = new Cylinder(new Vector((maxX - minX) / 2D + minX, minY, (maxZ - minZ) / 2D + minZ), (Math.abs(maxX - minX)) / 2D, maxY - minY);
-
-        addSpawnPoints(customArenasConfigFields.getSpawnPoints());
         this.customArenasConfigFields = customArenasConfigFields;
         this.arenaWaves = new ArenaWaves(customArenasConfigFields.getBossList());
 
@@ -165,10 +137,18 @@ public class ArenaInstance extends MatchInstance {
                     () -> initializeArena(customArenasConfigFields));
             return;
         }
-        Location corner1 = ConfigurationLocation.serialize(customArenasConfigFields.getCorner1());
-        Location corner2 = ConfigurationLocation.serialize(customArenasConfigFields.getCorner2());
-        Location startLocation = ConfigurationLocation.serialize(customArenasConfigFields.getStartLocation());
-        Location exitLocation = ConfigurationLocation.serialize(customArenasConfigFields.getExitLocation());
+        if (arenaInstances.containsKey(customArenasConfigFields.getFilename())) return;
+        CustomArenasConfigFields geometry;
+        try {
+            geometry = geometryDefinition(customArenasConfigFields);
+        } catch (IllegalArgumentException failure) {
+            Logger.warn(failure.getMessage());
+            return;
+        }
+        Location corner1 = ConfigurationLocation.serialize(geometry.getCorner1());
+        Location corner2 = ConfigurationLocation.serialize(geometry.getCorner2());
+        Location startLocation = ConfigurationLocation.serialize(geometry.getStartLocation());
+        Location exitLocation = ConfigurationLocation.serialize(geometry.getExitLocation());
         if (corner1 == null || corner2 == null || startLocation == null || exitLocation == null) {
             //Logger.warn("Failed to correctly initialize arena " + customArenasConfigFields.getFilename() + " due to invalid locations for corner1/corner2/startLocation/exitLocation");
             return;
@@ -179,14 +159,30 @@ public class ArenaInstance extends MatchInstance {
             // the corner1 world name; ArenaInstanceEvents.onWorldLoad will retry as worlds
             // come up. Without this, the arena is silently dropped and NPCs reporting it as
             // their target fail with "Invalid arena name!" until /em reload is run.
-            String worldName = extractWorldName(customArenasConfigFields.getCorner1());
+            String worldName = extractWorldName(geometry.getCorner1());
             if (worldName != null) {
                 pendingArenas.computeIfAbsent(worldName.toLowerCase(Locale.ROOT), k -> new ArrayList<>())
                         .add(customArenasConfigFields);
             }
             return;
         }
-        new ArenaInstance(customArenasConfigFields, corner1, corner2, startLocation, exitLocation);
+        ArenaContainer container = containers.computeIfAbsent(geometry.getFilename(), ignored ->
+                new ArenaContainer(geometry, corner1, corner2, startLocation, exitLocation));
+        new ArenaInstance(customArenasConfigFields, container);
+    }
+
+    private static CustomArenasConfigFields geometryDefinition(CustomArenasConfigFields definition) {
+        java.util.Set<String> visited = new HashSet<>();
+        while (true) {
+            if (!visited.add(definition.getFilename()))
+                throw new IllegalArgumentException("Cyclic arenaContainer reference: " + visited);
+            String reference = definition.getArenaContainer();
+            if (reference == null || reference.isBlank()) return definition;
+            var parent = com.magmaguy.elitemobs.config.customarenas.CustomArenasConfig.getCustomArena(reference);
+            if (parent == null)
+                throw new IllegalArgumentException("Unknown arenaContainer '" + reference + "' in " + definition.getFilename());
+            definition = parent;
+        }
     }
 
     /**
@@ -202,34 +198,33 @@ public class ArenaInstance extends MatchInstance {
         return configurationLocationString.substring(0, comma).trim();
     }
 
-    public void addSpawnPoints(List<String> rawSpawnPoints) {
-        for (String string : rawSpawnPoints) {
-            String[] splitEntry = string.split(":");
-            String name = "";
-            String location = "";
-            for (String subString : splitEntry) {
-                String[] splitSubEntry = subString.split("=");
-                switch (splitSubEntry[0].toLowerCase(Locale.ROOT)) {
-                    case "name":
-                        name = splitSubEntry[1];
-                        break;
-                    case "location":
-                        location = splitSubEntry[1];
-                        break;
-                    default:
-                        Logger.warn("Invalid entry for the spawn points of instanced content: " + splitSubEntry[0]);
-                        break;
-                }
-            }
-            spawnPoints.put(name, ConfigurationLocation.serialize(location));
-        }
+    @Override
+    protected boolean isInRegion(Location location) {
+        return container.contains(location);
     }
 
     @Override
-    protected boolean isInRegion(Location location) {
-        if (!cylindricalArena)
-            return location.getWorld().equals(world) && minX <= location.getX() && maxX >= location.getX() && minY <= location.getY() && maxY >= location.getY() && minZ <= location.getZ() && maxZ >= location.getZ();
-        else return location.getWorld().equals(world) && cylinder.contains(location);
+    public boolean isAcceptingNewPlayers() {
+        return !resetting && super.isAcceptingNewPlayers() && container.availableTo(this);
+    }
+
+    @Override
+    protected boolean reserveAdmission() { return container.acquire(this); }
+
+    @Override
+    protected void abortAdmission() {
+        if (players.isEmpty() && spectators.isEmpty()) container.release(this);
+    }
+
+    @Override
+    protected boolean isAcceptingSpectator(Player player, boolean wasPlayer) {
+        return !isDefunct() && container.availableTo(this);
+    }
+
+    @Override
+    public void removeSpectator(Player player) {
+        super.removeSpectator(player);
+        if (state == InstancedRegionState.WAITING) abortAdmission();
     }
 
     @Override
@@ -258,8 +253,9 @@ public class ArenaInstance extends MatchInstance {
             delayBetweenWaves *= 2;
         }
 
+        long scheduledRun = runGeneration;
         Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {
-            if (arenaState == ArenaState.IDLE) return;
+            if (scheduledRun != runGeneration || arenaState == ArenaState.IDLE) return;
             String title = ArenasConfig.getWaveTitle();
             String subtitle = ArenasConfig.getWaveSubtitle();
             if (title == null) title = "";
@@ -313,7 +309,7 @@ public class ArenaInstance extends MatchInstance {
                 customBossEntity.setEliteLoot(false);
                 customBossEntity.setVanillaLoot(false);
                 customBossEntity.setRandomLoot(false);
-                customBossEntity.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()), true);
+                customBossEntity.spawn(container.spawnPoint(arenaEntity.getSpawnPointName()), true);
                 if (customBossEntity.getLevel() > highestArenaMobLevel)
                     highestArenaMobLevel = customBossEntity.getLevel();
                 if (!customBossEntity.exists()) {
@@ -324,7 +320,7 @@ public class ArenaInstance extends MatchInstance {
             } else {
                 //MythicMobs integration
                 try {
-                    Entity mythicMob = MythicMobsInterface.spawn(spawnPoints.get(arenaEntity.getSpawnPointName()), arenaEntity.getBossfile(), arenaEntity.getLevel());
+                    Entity mythicMob = MythicMobsInterface.spawn(container.spawnPoint(arenaEntity.getSpawnPointName()), arenaEntity.getBossfile(), arenaEntity.getLevel());
                     if (mythicMob != null) nonEliteMobsEntities.add(mythicMob);
                     else
                         Logger.warn("Failed to spawn MythicMobs entity '" + arenaEntity.getBossfile() + "' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " because MythicMobs did not recognize the name of the entity!");
@@ -378,16 +374,32 @@ public class ArenaInstance extends MatchInstance {
         } else
             participants.forEach(player -> player.sendTitle(ArenasConfig.getDefeatTitle().replace("$wave", currentWave + ""), ArenasConfig.getDefeatSubtitle().replace("$wave", currentWave + ""), 20, 20 * 10, 20));
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, this::destroyMatch, customArenasConfigFields.getDelayBetweenWaves());
+        long endingRun = runGeneration;
+        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {
+            if (endingRun == runGeneration) destroyMatch();
+        }, customArenasConfigFields.getDelayBetweenWaves());
     }
+
+    private long runGeneration;
+    private boolean resetting;
 
     @Override
     protected void destroyMatch() {
-        super.destroyMatch();
+        if (resetting) return;
+        resetting = true;
+        runGeneration++;
+        try {
         arenaState = ArenaState.IDLE;
         currentWave = 0;
-        customBosses.forEach(customBoss -> customBoss.remove(RemovalReason.ARENA_RESET));
+        new HashSet<>(customBosses).forEach(customBoss -> customBoss.remove(RemovalReason.ARENA_RESET));
         customBosses.clear();
+        nonEliteMobsEntities.forEach(Entity::remove);
+        nonEliteMobsEntities.clear();
+        super.destroyMatch();
+        container.release(this);
+        } finally {
+            resetting = false;
+        }
     }
 
     private enum ArenaState {

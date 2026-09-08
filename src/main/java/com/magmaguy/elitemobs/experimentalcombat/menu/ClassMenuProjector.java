@@ -110,6 +110,10 @@ final class ClassMenuProjector {
                 form.displayName(),
                 form.band(),
                 progress.unlocked(),
+                !progress.unlocked() && !profile.optionalLockedRunId().isPresent()
+                        && progress.unlockBlockers().stream().allMatch(blocker ->
+                        blocker.kind() == UnlockBlocker.Kind.CLASS_CHALLENGE && blocker.formId().equals(form.id())),
+                com.magmaguy.elitemobs.experimentalcombat.challenges.ClassChallengeInstance.fee(form),
                 form.id().equals(selectedFormId),
                 form.id().equals(activeFormId),
                 lineage.forms().stream().map(ClassFormDefinition::displayName).toList(),
@@ -142,7 +146,7 @@ final class ClassMenuProjector {
     }
 
     private static ClassMenuView.BlockerView blockerView(ClassCatalog catalog, UnlockBlocker blocker) {
-        if (blocker.kind() == UnlockBlocker.Kind.CONTENT_REQUIREMENT) {
+        if (blocker.optionalReason().isPresent()) {
             return new ClassMenuView.BlockerView(
                     catalog.require(blocker.formId()).displayName(),
                     0,

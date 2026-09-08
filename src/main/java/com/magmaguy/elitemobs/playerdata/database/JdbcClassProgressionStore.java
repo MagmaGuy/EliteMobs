@@ -52,7 +52,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
     public List<StoredClassProgress> loadAllProgress(UUID playerId) throws SQLException {
         Objects.requireNonNull(playerId, "playerId");
         synchronized (PlayerDataRepository.monitor()) {
-            String sql = "SELECT FormId, XP, CatalogVersion FROM " + PROGRESS_TABLE
+            String sql = "SELECT FormId, XP, CatalogVersion, ChallengeCompleted FROM " + PROGRESS_TABLE
                     + " WHERE PlayerUUID = ? ORDER BY FormId";
             try (PreparedStatement statement = connection().prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
@@ -69,7 +69,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
     public StoredClassProgress loadProgressOrZero(UUID playerId, String formId, int catalogVersion) throws SQLException {
         StoredClassProgress zero = StoredClassProgress.zero(playerId, formId, catalogVersion);
         synchronized (PlayerDataRepository.monitor()) {
-            String sql = "SELECT FormId, XP, CatalogVersion FROM " + PROGRESS_TABLE
+            String sql = "SELECT FormId, XP, CatalogVersion, ChallengeCompleted FROM " + PROGRESS_TABLE
                     + " WHERE PlayerUUID = ? AND FormId = ?";
             try (PreparedStatement statement = connection().prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
@@ -106,6 +106,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
                 statement.setString(2, progress.formId());
                 statement.setLong(3, progress.xp());
                 statement.setInt(4, progress.catalogVersion());
+                statement.setBoolean(5, progress.challengeCompleted());
                 statement.executeUpdate();
             }
         }
@@ -181,7 +182,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
                 playerId,
                 resultSet.getString("FormId"),
                 resultSet.getLong("XP"),
-                resultSet.getInt("CatalogVersion"));
+                resultSet.getInt("CatalogVersion"), resultSet.getBoolean("ChallengeCompleted"));
     }
 
     private static void setNullableString(PreparedStatement statement, int parameter, String value)
@@ -206,6 +207,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
         statement.setString(2, progress.formId());
         statement.setLong(3, progress.xp());
         statement.setInt(4, progress.catalogVersion());
+        statement.setBoolean(5, progress.challengeCompleted());
     }
 
     private static String insertProfileIfAbsentSql() {
@@ -234,15 +236,15 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
 
     private static String upsertProgressSql() {
         String insert = "INSERT INTO " + PROGRESS_TABLE
-                + " (PlayerUUID, FormId, XP, CatalogVersion) VALUES (?, ?, ?, ?)";
+                + " (PlayerUUID, FormId, XP, CatalogVersion, ChallengeCompleted) VALUES (?, ?, ?, ?, ?)";
         if (DatabaseConfig.isUseMySQL()) {
             return insert + " ON DUPLICATE KEY UPDATE"
                     + " XP = VALUES(XP),"
-                    + " CatalogVersion = VALUES(CatalogVersion)";
+                    + " CatalogVersion = VALUES(CatalogVersion), ChallengeCompleted = VALUES(ChallengeCompleted)";
         }
         return insert + " ON CONFLICT(PlayerUUID, FormId) DO UPDATE SET"
                 + " XP = excluded.XP,"
-                + " CatalogVersion = excluded.CatalogVersion";
+                + " CatalogVersion = excluded.CatalogVersion, ChallengeCompleted = excluded.ChallengeCompleted";
     }
 
     private static Connection connection() throws SQLException {

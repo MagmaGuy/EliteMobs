@@ -248,6 +248,14 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         return progression.snapshot(playerId);
     }
 
+    public boolean canChallenge(Player player, String formId) {
+        return progression.canChallenge(player.getUniqueId(), formId);
+    }
+
+    public boolean completeChallenge(Player player, String formId) {
+        return progression.completeChallenge(player.getUniqueId(), formId);
+    }
+
     @Override
     public boolean mechanicsActive(Player player) {
         return inputRouter.controlsEnabled(player);
@@ -549,6 +557,9 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
                 ? instance
                 : null;
         UUID runId = dungeonInstance == null ? null : player.getWorld().getUID();
+        if (PlayerData.getMatchInstance(player) instanceof
+                com.magmaguy.elitemobs.experimentalcombat.challenges.ClassChallengeInstance trial)
+            runId = trial.runId();
         UUID lockedRunId = progression.snapshot(playerId)
                 .map(ProfileSnapshot::lockedRunId)
                 .orElse(null);

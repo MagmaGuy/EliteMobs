@@ -72,6 +72,9 @@ public class NPCsConfigFields extends CustomConfigFields {
     private String arenaFilename;
     @Getter
     @Setter
+    private String classRoot;
+    @Getter
+    @Setter
     private List<String> locations = new ArrayList<>();
     @Getter
     @Setter
@@ -183,6 +186,7 @@ public class NPCsConfigFields extends CustomConfigFields {
         this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);
         this.customModel = processString("customModel", customModel, null, false);
         this.arenaFilename = processString("arena", arenaFilename, null, false);
+        this.classRoot = processString("classRoot", classRoot, null, false);
         this.command = processString("command", command, null, false);
         this.instanced = processBoolean("instanced", instanced, false, false);
         this.scale = processDouble("scale", scale, 1, false);
