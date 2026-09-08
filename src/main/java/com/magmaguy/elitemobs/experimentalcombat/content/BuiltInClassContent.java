@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.experimentalcombat.passives.FixedPassiveRegistry;
 import com.magmaguy.elitemobs.experimentalcombat.passives.PassiveProfile;
 import com.magmaguy.elitemobs.experimentalcombat.resources.ClassResourceDefinition;
 import com.magmaguy.elitemobs.experimentalcombat.resources.ClassResourceDefinition.NearbyRecoveryBonus;
+import com.magmaguy.elitemobs.experimentalcombat.resources.ClassResourceDefinition.DamageFreeRecoveryBonus;
 import com.magmaguy.elitemobs.experimentalcombat.resources.FuryCombatBudget;
 
 import java.util.ArrayList;
@@ -21,13 +22,14 @@ import java.util.Set;
 /** Immutable assembly and factory for the complete built-in class-system baseline. */
 public final class BuiltInClassContent {
     private static final double BASELINE_MAX_RESOURCE = 100D;
-    private static final long FOCUS_RECOVERY_DELAY_TICKS = 60L;
     private static final double MANA_IN_COMBAT_PER_SECOND = BASELINE_MAX_RESOURCE / 60D;
     private static final double MANA_OUT_OF_COMBAT_PER_SECOND = MANA_IN_COMBAT_PER_SECOND;
     // Mana is the 100% baseline. Every positive passive recovery rate derives from it.
     private static final int RESOLVE_MANA_RATE_PERCENT = 66;
-    private static final int FOCUS_MANA_RATE_PERCENT = 720;
+    private static final int FOCUS_MANA_RATE_PERCENT = 85;
     private static final int GRACE_MANA_RATE_PERCENT = 66;
+    private static final DamageFreeRecoveryBonus RANGER_FOCUSED_RECOVERY =
+            new DamageFreeRecoveryBonus(100L, 110D / FOCUS_MANA_RATE_PERCENT);
     private static final NearbyRecoveryBonus PALADIN_NEARBY_ELITE_RECOVERY =
             new NearbyRecoveryBonus(NearbyRecoveryBonus.Target.ELITES, 15D, .20D, 5);
     private static final NearbyRecoveryBonus CLERIC_NEARBY_PLAYER_RECOVERY =
@@ -48,7 +50,7 @@ public final class BuiltInClassContent {
                     resource(ClassResourceType.RESOLVE,
                             0D, manaRelativeRecovery(MANA_IN_COMBAT_PER_SECOND, RESOLVE_MANA_RATE_PERCENT),
                             manaRelativeRecovery(MANA_OUT_OF_COMBAT_PER_SECOND, RESOLVE_MANA_RATE_PERCENT),
-                            0D, 45D, 0D, 0L, 0D, 40D, 5D, 25D, PALADIN_NEARBY_ELITE_RECOVERY)),
+                            0D, 45D, 0D, 0L, 0D, 40D, 5D, 25D, PALADIN_NEARBY_ELITE_RECOVERY, DamageFreeRecoveryBonus.NONE)),
             new ClassTreeContribution(
                     "berserker",
                     BuiltInClassDefinitions.berserkerTree(),
@@ -58,7 +60,7 @@ public final class BuiltInClassContent {
                             0D, 0D, -15D,
                             FuryCombatBudget.DEALT_GAIN_PER_HEALTH_EQUIVALENT,
                             FuryCombatBudget.RECEIVED_GAIN_PER_HEALTH_EQUIVALENT,
-                            0D, 0L, 0D, 0D, 0D, 0D, NearbyRecoveryBonus.NONE)),
+                            0D, 0L, 0D, 0D, 0D, 0D, NearbyRecoveryBonus.NONE, DamageFreeRecoveryBonus.NONE)),
             new ClassTreeContribution(
                     "ranger",
                     BuiltInClassDefinitions.rangerTree(),
@@ -69,7 +71,7 @@ public final class BuiltInClassContent {
                             manaRelativeRecovery(MANA_IN_COMBAT_PER_SECOND, FOCUS_MANA_RATE_PERCENT),
                             manaRelativeRecovery(MANA_OUT_OF_COMBAT_PER_SECOND, FOCUS_MANA_RATE_PERCENT),
                             0D, 0D, -20D,
-                            FOCUS_RECOVERY_DELAY_TICKS, 0D, 0D, 0D, 0D, NearbyRecoveryBonus.NONE)),
+                            0L, 0D, 0D, 0D, 0D, NearbyRecoveryBonus.NONE, RANGER_FOCUSED_RECOVERY)),
             new ClassTreeContribution(
                     "cleric",
                     BuiltInClassDefinitions.clericTree(),
@@ -79,7 +81,7 @@ public final class BuiltInClassContent {
                             BASELINE_MAX_RESOURCE,
                             manaRelativeRecovery(MANA_IN_COMBAT_PER_SECOND, GRACE_MANA_RATE_PERCENT),
                             manaRelativeRecovery(MANA_OUT_OF_COMBAT_PER_SECOND, GRACE_MANA_RATE_PERCENT),
-                            0D, 0D, 0D, 0L, 30D, 0D, 0D, 0D, CLERIC_NEARBY_PLAYER_RECOVERY)),
+                            0D, 0D, 0D, 0L, 30D, 0D, 0D, 0D, CLERIC_NEARBY_PLAYER_RECOVERY, DamageFreeRecoveryBonus.NONE)),
             new ClassTreeContribution(
                     "spellcaster",
                     BuiltInClassDefinitions.spellcasterTree(),
@@ -88,7 +90,7 @@ public final class BuiltInClassContent {
                     resource(ClassResourceType.MANA,
                             BASELINE_MAX_RESOURCE, MANA_IN_COMBAT_PER_SECOND,
                             MANA_OUT_OF_COMBAT_PER_SECOND,
-                            0D, 0D, 0D, 0L, 0D, 0D, 0D, 0D, NearbyRecoveryBonus.NONE)));
+                            0D, 0D, 0D, 0L, 0D, 0D, 0D, 0D, NearbyRecoveryBonus.NONE, DamageFreeRecoveryBonus.NONE)));
 
     private static final List<ClassFormDefinition> FORMS = aggregateForms();
     private static final Map<String, FixedAbilitySpec> ABILITIES = aggregateAbilities();
@@ -167,7 +169,8 @@ public final class BuiltInClassContent {
             double preventedDamageHealthEquivalentGain,
             double tauntGainPerEnemy,
             double tauntGainCap,
-            NearbyRecoveryBonus nearbyRecoveryBonus) {
+            NearbyRecoveryBonus nearbyRecoveryBonus,
+            DamageFreeRecoveryBonus damageFreeRecoveryBonus) {
         return new ClassResourceDefinition(
                 type,
                 BASELINE_MAX_RESOURCE,
@@ -182,7 +185,8 @@ public final class BuiltInClassContent {
                 preventedDamageHealthEquivalentGain,
                 tauntGainPerEnemy,
                 tauntGainCap,
-                nearbyRecoveryBonus);
+                nearbyRecoveryBonus,
+                damageFreeRecoveryBonus);
     }
 
     private static <V> void putUnique(Map<String, V> target, String id, V value, String type) {

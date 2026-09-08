@@ -56,6 +56,7 @@ public final class ClassResourceController {
         close(player);
         double initial = rules(type).initialAmount();
         ResourceState state = new ResourceState(type, runToken, initial, 0L);
+        state.lastDamageTick = currentTick;
         states.put(player.getUniqueId(), state);
     }
 
@@ -84,6 +85,8 @@ public final class ClassResourceController {
             ClassResourceDefinition rules = rules(state.type);
             double delta = playerInCombat ? rules.inCombatTickDelta() : rules.outOfCombatTickDelta();
             if (currentTick < state.recoveryBlockedUntil && delta > 0D) delta = 0D;
+            if (delta > 0D)
+                delta *= rules.damageFreeRecoveryBonus().multiplierAfter(currentTick - state.lastDamageTick);
             if (delta > 0D && state.amount < rules.maximum())
                 delta *= nearbyRecoveryMultiplier(player, rules.nearbyRecoveryBonus());
             set(state, state.amount + delta);
@@ -156,6 +159,12 @@ public final class ClassResourceController {
             set(state, state.amount + rules.damageReceivedFlatChange());
         if (rules.recoveryDelayAfterDamageTicks() > 0L)
             state.recoveryBlockedUntil = currentTick + rules.recoveryDelayAfterDamageTicks();
+    }
+
+    /** Every accepted damage source interrupts damage-free recovery, including environmental damage. */
+    public void observeDamage(Player player) {
+        ResourceState state = states.get(player.getUniqueId());
+        if (state != null && !state.suspended) state.lastDamageTick = currentTick;
     }
 
     public void onEffectiveHealing(Player player, double healthRestored) {
@@ -243,6 +252,7 @@ public final class ClassResourceController {
         private boolean suspended;
         private double amount;
         private long recoveryBlockedUntil;
+        private long lastDamageTick;
 
         private ResourceState(
                 ClassResourceType type,

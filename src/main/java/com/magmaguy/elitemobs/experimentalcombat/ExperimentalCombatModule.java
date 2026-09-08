@@ -769,6 +769,13 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         resources.onDamageReceived(event.getPlayer(), event.getDamage());
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerTakesDamage(org.bukkit.event.entity.EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player player
+                && mechanicsActive(player) && event.getFinalDamage() > 0D)
+            resources.observeDamage(player);
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEliteDeath(EliteMobDeathEvent event) {
         participation.clear(event.getEliteEntity());

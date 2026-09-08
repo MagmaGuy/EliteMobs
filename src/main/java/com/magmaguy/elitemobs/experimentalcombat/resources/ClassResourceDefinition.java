@@ -19,7 +19,8 @@ public record ClassResourceDefinition(
         double preventedDamageHealthEquivalentGain,
         double tauntGainPerEnemy,
         double tauntGainCap,
-        NearbyRecoveryBonus nearbyRecoveryBonus) {
+        NearbyRecoveryBonus nearbyRecoveryBonus,
+        DamageFreeRecoveryBonus damageFreeRecoveryBonus) {
 
     public ClassResourceDefinition {
         type = Objects.requireNonNull(type, "type");
@@ -39,6 +40,20 @@ public record ClassResourceDefinition(
         requireFiniteNonNegative(tauntGainPerEnemy, "tauntGainPerEnemy");
         requireFiniteNonNegative(tauntGainCap, "tauntGainCap");
         nearbyRecoveryBonus = Objects.requireNonNull(nearbyRecoveryBonus, "nearbyRecoveryBonus");
+        damageFreeRecoveryBonus = Objects.requireNonNull(damageFreeRecoveryBonus, "damageFreeRecoveryBonus");
+    }
+
+    public record DamageFreeRecoveryBonus(long requiredTicks, double multiplier) {
+        public static final DamageFreeRecoveryBonus NONE = new DamageFreeRecoveryBonus(0L, 1D);
+
+        public DamageFreeRecoveryBonus {
+            if (requiredTicks < 0L) throw new IllegalArgumentException("requiredTicks must not be negative");
+            requireFinitePositive(multiplier, "multiplier");
+        }
+
+        public double multiplierAfter(long ticksWithoutDamage) {
+            return ticksWithoutDamage > requiredTicks ? multiplier : 1D;
+        }
     }
 
     /** Additive bonuses to passive recovery, with a spherical range and bounded entity count. */

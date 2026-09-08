@@ -6,7 +6,7 @@ package com.magmaguy.elitemobs.experimentalcombat.classes;
 public enum ClassResourceType {
     RESOLVE("Resolve", "Resolve recovers faster near elites and grows in frontline combat."),
     FURY("Fury", "Dealing or taking damage grants Fury; it fades out of combat."),
-    FOCUS("Focus", "Focus recovers over time; taking damage delays recovery."),
+    FOCUS("Focus", "Focus recovers at 85% of mana recovery, rising to 110% after over 5 seconds without taking damage."),
     GRACE("Grace", "Grace recovers faster near other players and grows from effective healing."),
     MANA("Mana", "Mana recovers steadily in and out of combat.");
 
