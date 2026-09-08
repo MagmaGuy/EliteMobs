@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 /** Owns the literal, short-lived horse summoned by the Paladin mobility ability. */
 final class DivineSteedManager implements Listener, AutoCloseable {
     private static final double MAXIMUM_HEALTH = 30D;
-    private static final double MOVEMENT_SPEED = .20D;
+    private static final double MOVEMENT_SPEED = .24D;
     private static final double JUMP_STRENGTH = .72D;
     private static final int LANDING_GRACE_TICKS = 20;
 

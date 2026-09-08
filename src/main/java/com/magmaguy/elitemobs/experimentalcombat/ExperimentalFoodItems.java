@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.experimentalcombat;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.easyminecraftgoals.NMSManager;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Item;
@@ -22,8 +23,9 @@ import java.util.Set;
  *
  * <p>The vanilla client will not start using ordinary food at 20 hunger, so changing only the
  * server-side food level is insufficient. While a player is in Experimental Combat, food in that
- * player's inventory receives an {@code always_edible} food component. The original component is
- * stored on the stack and restored whenever the stack leaves player custody or the mode ends.</p>
+ * player's inventory receives an {@code always_edible} food component and twice its original
+ * consumption duration. Original values are stored on the stack and restored whenever it leaves
+ * player custody or the mode ends. Native consumption effects and animations remain intact.</p>
  */
 final class ExperimentalFoodItems {
 
@@ -32,6 +34,8 @@ final class ExperimentalFoodItems {
     private static final String NUTRITION = "experimental_combat_food_nutrition";
     private static final String SATURATION = "experimental_combat_food_saturation";
     private static final String ALWAYS_EDIBLE = "experimental_combat_food_always_edible";
+    private static final String CONSUMPTION_SECONDS = "experimental_combat_food_consumption_seconds";
+    private static final float CONSUMPTION_TIME_MULTIPLIER = 2F;
     private static final Map<Material, FoodSnapshot> VANILLA_FOOD = vanillaFoodProperties();
 
     private ExperimentalFoodItems() {
@@ -70,6 +74,9 @@ final class ExperimentalFoodItems {
         NamespacedKey marker = key(MARKER);
         if (!data.has(marker, PersistentDataType.BYTE)) return false;
 
+        Float originalSeconds = data.get(key(CONSUMPTION_SECONDS), PersistentDataType.FLOAT);
+        if (originalSeconds != null && NMSManager.getAdapter() == null) return false;
+
         boolean defaultComponent = byteValue(data, DEFAULT_COMPONENT) != 0;
         Integer nutrition = data.get(key(NUTRITION), PersistentDataType.INTEGER);
         Float saturation = data.get(key(SATURATION), PersistentDataType.FLOAT);
@@ -85,7 +92,11 @@ final class ExperimentalFoodItems {
             food.setCanAlwaysEat(alwaysEdible);
             meta.setFood(food);
         }
-        stack.setItemMeta(meta);
+        ItemStack restored = stack.clone();
+        restored.setItemMeta(meta);
+        if (originalSeconds != null)
+            restored = NMSManager.getAdapter().withConsumptionSeconds(restored, originalSeconds);
+        stack.setItemMeta(restored.getItemMeta());
         return true;
     }
 
@@ -101,21 +112,32 @@ final class ExperimentalFoodItems {
         ItemMeta meta = stack.getItemMeta();
         if (meta == null) return false;
         FoodSnapshot food = effectiveFood(stack, meta);
-        if (food == null || food.alwaysEdible()) return false;
+        if (food == null || NMSManager.getAdapter() == null) return false;
         PersistentDataContainer data = meta.getPersistentDataContainer();
-        if (data.has(key(MARKER), PersistentDataType.BYTE)) return false;
+        if (data.has(key(CONSUMPTION_SECONDS), PersistentDataType.FLOAT)) return false;
+        float originalSeconds = NMSManager.getAdapter().getConsumptionSeconds(stack);
+        if (originalSeconds < 0F) return false;
+        float adaptedSeconds = originalSeconds * CONSUMPTION_TIME_MULTIPLIER;
+        if (!Float.isFinite(adaptedSeconds)) return false;
 
-        data.set(key(MARKER), PersistentDataType.BYTE, (byte) 1);
-        data.set(key(DEFAULT_COMPONENT), PersistentDataType.BYTE, meta.hasFood() ? (byte) 0 : (byte) 1);
-        data.set(key(NUTRITION), PersistentDataType.INTEGER, food.nutrition());
-        data.set(key(SATURATION), PersistentDataType.FLOAT, food.saturation());
-        data.set(key(ALWAYS_EDIBLE), PersistentDataType.BYTE, food.alwaysEdible() ? (byte) 1 : (byte) 0);
+        // Keep pre-upgrade food snapshots intact when adding duration to an older adapted stack.
+        if (!data.has(key(MARKER), PersistentDataType.BYTE)) {
+            data.set(key(MARKER), PersistentDataType.BYTE, (byte) 1);
+            data.set(key(DEFAULT_COMPONENT), PersistentDataType.BYTE, meta.hasFood() ? (byte) 0 : (byte) 1);
+            data.set(key(NUTRITION), PersistentDataType.INTEGER, food.nutrition());
+            data.set(key(SATURATION), PersistentDataType.FLOAT, food.saturation());
+            data.set(key(ALWAYS_EDIBLE), PersistentDataType.BYTE, food.alwaysEdible() ? (byte) 1 : (byte) 0);
+        }
+        data.set(key(CONSUMPTION_SECONDS), PersistentDataType.FLOAT, originalSeconds);
         FoodComponent adapted = meta.getFood();
         adapted.setNutrition(food.nutrition());
         adapted.setSaturation(food.saturation());
         adapted.setCanAlwaysEat(true);
         meta.setFood(adapted);
-        stack.setItemMeta(meta);
+        ItemStack timed = stack.clone();
+        timed.setItemMeta(meta);
+        timed = NMSManager.getAdapter().withConsumptionSeconds(timed, adaptedSeconds);
+        stack.setItemMeta(timed.getItemMeta());
         return true;
     }
 
@@ -221,6 +243,7 @@ final class ExperimentalFoodItems {
         data.remove(key(NUTRITION));
         data.remove(key(SATURATION));
         data.remove(key(ALWAYS_EDIBLE));
+        data.remove(key(CONSUMPTION_SECONDS));
     }
 
     private static NamespacedKey key(String value) {
