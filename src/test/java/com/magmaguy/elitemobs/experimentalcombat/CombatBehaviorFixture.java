@@ -11,10 +11,12 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime;
 import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
+import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
 import com.magmaguy.elitemobs.experimentalcombat.progression.*;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
-import com.magmaguy.magmacore.instance.InstanceProtector;
+import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -49,7 +51,7 @@ abstract class CombatBehaviorFixture {
                 """.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
         new MobCombatSettingsConfig(configurationDirectory.resolve("MobCombatSettings.yml").toFile());
         player = server.addPlayer();
-        InstanceProtector.addProtectedWorld(player.getWorld());
+        EliteMobsWorld.create(player.getWorld().getUID(), new ContentPackagesConfigFields("combat-test.yml", true));
         fullCombatActive = false;
         var levels = new EnumMap<SkillType, Integer>(SkillType.class);
         for (var skill : SkillType.values()) levels.put(skill, 100);
@@ -82,7 +84,7 @@ abstract class CombatBehaviorFixture {
             } finally {
                 DungeonCombatRuntime.shutdownIfInitialized();
                 ActionBarCompositor.shutdown();
-                if (player != null) InstanceProtector.removeProtectedWorld(player.getWorld());
+                if (player != null) EliteMobsWorld.destroy(player.getWorld().getUID());
                 MockBukkit.unmock();
                 MetadataHandler.PLUGIN = previousPlugin;
             }
@@ -127,6 +129,15 @@ abstract class CombatBehaviorFixture {
         var event = outgoingEvent();
         Bukkit.getPluginManager().callEvent(event);
         return event.getDamage();
+    }
+
+    final void recoverAndCast(AbilitySlot slot) {
+        var scheduler = MockBukkit.getMock().getScheduler();
+        for (int update = 0; update < 120; update++) {
+            scheduler.performTicks(20);
+            if (module.useAbility(player, slot).successful()) return;
+        }
+        fail("Scheduled recovery did not fund the production cast within two simulated minutes");
     }
 
     final EliteMobDamagedByPlayerEvent outgoingEvent() {

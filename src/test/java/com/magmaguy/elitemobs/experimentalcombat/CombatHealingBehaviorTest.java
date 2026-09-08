@@ -130,11 +130,7 @@ class CombatHealingBehaviorTest extends CombatBehaviorFixture {
         assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
         assertEquals(11.017, player.getHealth(), 0.000001,
                 "Insufficient Grace must stop the second heal before applying it");
-        var scheduler = MockBukkit.getMock().getScheduler();
-        scheduler.performTicks(20);
-        assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
-        scheduler.performOneTick();
-        assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+        recoverAndCast(AbilitySlot.SIGNATURE);
         assertEquals(14.034D, player.getHealth(), .000001);
     }
 

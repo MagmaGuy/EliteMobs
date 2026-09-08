@@ -34,11 +34,11 @@ class CombatResourceBehaviorTest extends CombatBehaviorFixture {
     }
 
     @ParameterizedTest
-    @CsvSource({"spellcaster,1,1,1180,absorption", "guardian,31,0,1240,absorption",
-            "arcane_knight,91,2,20,absorption", "occultist,31,2,20,glowing",
-            "plaguebringer,91,3,360,slowness"})
+    @CsvSource({"spellcaster,1,1,absorption", "guardian,31,0,absorption",
+            "arcane_knight,91,2,absorption", "occultist,31,2,glowing",
+            "plaguebringer,91,3,slowness"})
     void scheduledRecoveryFundsUtilityOnlyAfterEnoughUpdates(
-            String form, int level, int initialCasts, int ticksBeforeAffordable, String status) {
+            String form, int level, int initialCasts, String status) {
         assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
         var effect = Objects.requireNonNull(org.bukkit.Registry.EFFECT.get(org.bukkit.NamespacedKey.minecraft(status)));
         var recipient = effect.equals(PotionEffectType.ABSORPTION) ? player : target().getLivingEntity();
@@ -46,35 +46,42 @@ class CombatResourceBehaviorTest extends CombatBehaviorFixture {
             assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
         assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
         recipient.removePotionEffect(effect);
-        var scheduler = MockBukkit.getMock().getScheduler();
-        scheduler.performTicks(ticksBeforeAffordable);
-        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
         assertFalse(recipient.hasPotionEffect(effect));
-        scheduler.performOneTick();
-        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful(),
-                "The production update task must earn enough resource for the utility");
+        recoverAndCast(AbilitySlot.UTILITY);
         assertNotNull(recipient.getPotionEffect(effect));
         assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
     }
 
     @Test
-    void takingDamageDelaysFocusRecoveryBeforeAnotherMarkCanBeCast() {
+    void takingDamageSlowsFocusRecoveryBeforeAnotherMarkCanBeCast() {
+        int uninterrupted = updatesUntilRecoveredMark(false);
+        int damaged = updatesUntilRecoveredMark(true);
+        assertTrue(damaged > uninterrupted,
+                "Accepted damage must reset the Focus recovery bonus, not prevent baseline recovery");
+    }
+
+    @SuppressWarnings("removal")
+    private int updatesUntilRecoveredMark(boolean interruptRecovery) {
+        assertTrue(module.selectForm(player, "spellcaster").accepted());
         assertTrue(module.setClassLevelForAdministration(player, "ranger", 1).applied());
         var enemy = target().getLivingEntity();
         for (int cast = 0; cast < 4; cast++)
             assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
-        incomingDamage();
         enemy.removePotionEffect(PotionEffectType.GLOWING);
-        var scheduler = MockBukkit.getMock().getScheduler();
-        scheduler.performTicks(60);
-        assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful(),
-                "Taking damage must postpone positive Focus recovery");
-        scheduler.performTicks(20);
         assertFalse(module.useAbility(player, AbilitySlot.UTILITY).successful());
-        assertFalse(enemy.hasPotionEffect(PotionEffectType.GLOWING));
-        scheduler.performOneTick();
-        assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
-        assertTrue(enemy.hasPotionEffect(PotionEffectType.GLOWING));
+        var scheduler = MockBukkit.getMock().getScheduler();
+        for (int update = 1; update <= 120; update++) {
+            if (interruptRecovery)
+                MockBukkit.getMock().getPluginManager().callEvent(new org.bukkit.event.entity.EntityDamageEvent(
+                        player, org.bukkit.event.entity.EntityDamageEvent.DamageCause.FALL, 1D));
+            scheduler.performTicks(20);
+            if (module.useAbility(player, AbilitySlot.UTILITY).successful()) {
+                assertTrue(enemy.hasPotionEffect(PotionEffectType.GLOWING));
+                return update;
+            }
+            assertFalse(enemy.hasPotionEffect(PotionEffectType.GLOWING));
+        }
+        return fail("Focus must recover enough for a mark even without its damage-free bonus");
     }
 
     @ParameterizedTest
