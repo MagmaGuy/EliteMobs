@@ -1,8 +1,14 @@
 package com.magmaguy.elitemobs.experimentalcombat.resources;
 
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassResourceType;
+import com.magmaguy.elitemobs.experimentalcombat.resources.ClassResourceDefinition.NearbyRecoveryBonus;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.EnumSet;
@@ -68,6 +74,7 @@ public final class ClassResourceController {
         state.suspended = true;
     }
 
+    /** Runs once per second; nearby-entity queries share this cadence with resource recovery. */
     public void tick(Iterable<? extends Player> players, Predicate<UUID> inCombat) {
         currentTick += 20L;
         for (Player player : players) {
@@ -77,8 +84,31 @@ public final class ClassResourceController {
             ClassResourceDefinition rules = rules(state.type);
             double delta = playerInCombat ? rules.inCombatTickDelta() : rules.outOfCombatTickDelta();
             if (currentTick < state.recoveryBlockedUntil && delta > 0D) delta = 0D;
+            if (delta > 0D && state.amount < rules.maximum())
+                delta *= nearbyRecoveryMultiplier(player, rules.nearbyRecoveryBonus());
             set(state, state.amount + delta);
         }
+    }
+
+    private static double nearbyRecoveryMultiplier(Player player, NearbyRecoveryBonus recovery) {
+        if (recovery.maximumEntities() == 0) return 1D;
+        Location center = player.getLocation();
+        double radius = recovery.radius();
+        double radiusSquared = radius * radius;
+        int count = 0;
+        for (Entity candidate : player.getWorld().getNearbyEntities(center, radius, radius, radius)) {
+            if (candidate == player || !(candidate instanceof LivingEntity living)
+                    || living.isDead() || !living.isValid()) continue;
+            if (living.getLocation().distanceSquared(center) > radiusSquared) continue;
+            boolean matches = switch (recovery.target()) {
+                case ELITES -> EntityTracker.getEliteMobEntity(living) != null;
+                case OTHER_PLAYERS -> living instanceof Player nearbyPlayer && nearbyPlayer.isOnline()
+                        && nearbyPlayer.getGameMode() != GameMode.SPECTATOR && !nearbyPlayer.hasMetadata("NPC");
+            };
+            if (!matches) continue;
+            if (++count >= recovery.maximumEntities()) break;
+        }
+        return recovery.multiplier(count);
     }
 
     public boolean trySpend(Player player, double amount) {

@@ -4,10 +4,10 @@ package com.magmaguy.elitemobs.experimentalcombat.classes;
  * Root-class resource shown in the Experimental Combat action-bar HUD.
  */
 public enum ClassResourceType {
-    RESOLVE("Resolve", "Resolve recovers slowly and grows in frontline combat."),
+    RESOLVE("Resolve", "Resolve recovers faster near elites and grows in frontline combat."),
     FURY("Fury", "Dealing or taking damage grants Fury; it fades out of combat."),
     FOCUS("Focus", "Focus recovers over time; taking damage delays recovery."),
-    GRACE("Grace", "Gain Grace over time and from real healing, not overhealing."),
+    GRACE("Grace", "Grace recovers faster near other players and grows from effective healing."),
     MANA("Mana", "Mana recovers steadily in and out of combat.");
 
     private final String displayName;

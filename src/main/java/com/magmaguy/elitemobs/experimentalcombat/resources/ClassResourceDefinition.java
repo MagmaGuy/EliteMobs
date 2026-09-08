@@ -18,7 +18,8 @@ public record ClassResourceDefinition(
         double healingHealthEquivalentGain,
         double preventedDamageHealthEquivalentGain,
         double tauntGainPerEnemy,
-        double tauntGainCap) {
+        double tauntGainCap,
+        NearbyRecoveryBonus nearbyRecoveryBonus) {
 
     public ClassResourceDefinition {
         type = Objects.requireNonNull(type, "type");
@@ -37,6 +38,30 @@ public record ClassResourceDefinition(
         requireFiniteNonNegative(preventedDamageHealthEquivalentGain, "preventedDamageHealthEquivalentGain");
         requireFiniteNonNegative(tauntGainPerEnemy, "tauntGainPerEnemy");
         requireFiniteNonNegative(tauntGainCap, "tauntGainCap");
+        nearbyRecoveryBonus = Objects.requireNonNull(nearbyRecoveryBonus, "nearbyRecoveryBonus");
+    }
+
+    /** Additive bonuses to passive recovery, with a spherical range and bounded entity count. */
+    public record NearbyRecoveryBonus(Target target, double radius, double bonusPerEntity, int maximumEntities) {
+        public enum Target { ELITES, OTHER_PLAYERS }
+
+        public static final NearbyRecoveryBonus NONE = new NearbyRecoveryBonus(Target.ELITES, 0D, 0D, 0);
+
+        public NearbyRecoveryBonus {
+            target = Objects.requireNonNull(target, "target");
+            requireFiniteNonNegative(radius, "radius");
+            requireFiniteNonNegative(bonusPerEntity, "bonusPerEntity");
+            if (maximumEntities < 0)
+                throw new IllegalArgumentException("maximumEntities must not be negative");
+            if (maximumEntities > 0) {
+                requireFinitePositive(radius, "radius");
+                requireFinitePositive(bonusPerEntity, "bonusPerEntity");
+            }
+        }
+
+        public double multiplier(int nearbyEntities) {
+            return 1D + Math.min(maximumEntities, Math.max(0, nearbyEntities)) * bonusPerEntity;
+        }
     }
 
     private static void requireFinitePositive(double value, String name) {
