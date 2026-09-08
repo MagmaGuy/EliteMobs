@@ -18,7 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /** Serializes access to the player database and owns its connection and ordered write queue. */
 final class PlayerDataRepository {
 
-    private static final Object MONITOR = new Object();
+    private static final Object JDBC_MONITOR = new Object();
+    private static final Object PLAYER_STATE_MONITOR = new Object();
+    private static final Object QUEUE_MONITOR = new Object();
     private static final Object SCORE_RANKING_MONITOR = new Object();
     private static final Deque<DatabaseUpdate> pendingUpdates = new ArrayDeque<>();
     private static final Map<UUID, Integer> cachedScores = new ConcurrentHashMap<>();
@@ -31,12 +33,18 @@ final class PlayerDataRepository {
     private PlayerDataRepository() {
     }
 
-    static Object monitor() {
-        return MONITOR;
+    /** Short-lived player-state coordination. Never perform JDBC work while holding this lock. */
+    static Object stateMonitor() {
+        return PLAYER_STATE_MONITOR;
+    }
+
+    /** Serializes every use of the shared connection, including class-progression transactions. */
+    static Object jdbcMonitor() {
+        return JDBC_MONITOR;
     }
 
     static Connection connection() throws Exception {
-        synchronized (MONITOR) {
+        synchronized (JDBC_MONITOR) {
             File databaseFile = new File(MetadataHandler.PLUGIN.getDataFolder(), "data/" + PlayerData.getDATABASE_NAME());
             if (connection == null || connection.isClosed()) {
                 if (!DatabaseConfig.isUseMySQL()) {
@@ -57,7 +65,7 @@ final class PlayerDataRepository {
     }
 
     static boolean readPlayer(UUID playerId, ResultSetReader reader) throws Exception {
-        synchronized (MONITOR) {
+        synchronized (JDBC_MONITOR) {
             String sql = "SELECT * FROM " + PlayerData.getPLAYER_DATA_TABLE_NAME() + " WHERE PlayerUUID = ?";
             try (PreparedStatement statement = connection().prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
@@ -71,7 +79,7 @@ final class PlayerDataRepository {
     }
 
     static void insertNewPlayer(UUID playerId, String playerName) throws Exception {
-        synchronized (MONITOR) {
+        synchronized (JDBC_MONITOR) {
             String sql = "INSERT INTO " + PlayerData.getPLAYER_DATA_TABLE_NAME() + " ("
                     + "PlayerUUID, DisplayName, CurrencyV2, CurrencyCents, Score, Kills, HighestLevelKilled,"
                     + " Deaths, QuestsCompleted, DungeonsCompleted, SkillXP_ARMOR, SkillXP_SWORDS, SkillXP_AXES, SkillXP_BOWS,"
@@ -89,7 +97,7 @@ final class PlayerDataRepository {
 
     static void enqueueUpdate(UUID playerId, String column, Object value) {
         validateColumn(column);
-        synchronized (MONITOR) {
+        synchronized (QUEUE_MONITOR) {
             pendingUpdates.addLast(new DatabaseUpdate(playerId, column, value));
             if (drainScheduled) return;
             drainScheduled = true;
@@ -103,7 +111,7 @@ final class PlayerDataRepository {
 
     static void updateNow(UUID playerId, String column, Object value) {
         validateColumn(column);
-        synchronized (MONITOR) {
+        synchronized (JDBC_MONITOR) {
             executeUpdate(new DatabaseUpdate(playerId, column, value));
         }
     }
@@ -159,7 +167,7 @@ final class PlayerDataRepository {
 
     private static void loadScoreRankingCache(long loadGeneration) {
         Map<UUID, Integer> loadedScores = new HashMap<>();
-        synchronized (MONITOR) {
+        synchronized (JDBC_MONITOR) {
             String sql = "SELECT PlayerUUID, COALESCE(Score, 0) AS ScoreValue FROM "
                     + PlayerData.getPLAYER_DATA_TABLE_NAME();
             try (PreparedStatement statement = connection().prepareStatement(sql);
@@ -189,7 +197,7 @@ final class PlayerDataRepository {
     }
 
     static void migrateCurrencyToCents() {
-        synchronized (MONITOR) {
+        synchronized (JDBC_MONITOR) {
             try (Statement statement = connection().createStatement()) {
                 int currencyRows = statement.executeUpdate("UPDATE " + PlayerData.getPLAYER_DATA_TABLE_NAME()
                         + " SET CurrencyCents = CAST(ROUND(CurrencyV2 * 100) AS INTEGER)"
@@ -207,7 +215,7 @@ final class PlayerDataRepository {
     }
 
     static void importLegacy(Collection<LegacyPlayerData> legacyPlayers) throws Exception {
-        synchronized (MONITOR) {
+        synchronized (JDBC_MONITOR) {
             Connection database = connection();
             boolean oldAutoCommit = database.getAutoCommit();
             database.setAutoCommit(false);
@@ -240,7 +248,7 @@ final class PlayerDataRepository {
     }
 
     static void close() {
-        synchronized (MONITOR) {
+        synchronized (JDBC_MONITOR) {
             drainUpdatesLocked();
             try {
                 if (connection != null) connection.close();
@@ -248,7 +256,6 @@ final class PlayerDataRepository {
                 Logger.warn("Could not correctly close database connection.");
             } finally {
                 connection = null;
-                drainScheduled = false;
                 synchronized (SCORE_RANKING_MONITOR) {
                     scoreRankingLoadGeneration++;
                     cachedScores.clear();
@@ -260,19 +267,24 @@ final class PlayerDataRepository {
     }
 
     private static void drainUpdates() {
-        synchronized (MONITOR) {
+        synchronized (JDBC_MONITOR) {
             drainUpdatesLocked();
-            drainScheduled = false;
-            if (!pendingUpdates.isEmpty()) {
-                drainScheduled = true;
-                Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, PlayerDataRepository::drainUpdates);
-            }
         }
     }
 
     private static void drainUpdatesLocked() {
-        DatabaseUpdate update;
-        while ((update = pendingUpdates.pollFirst()) != null) executeUpdate(update);
+        while (true) {
+            DatabaseUpdate update;
+            synchronized (QUEUE_MONITOR) {
+                update = pendingUpdates.pollFirst();
+                if (update == null) {
+                    drainScheduled = false;
+                    return;
+                }
+            }
+            // Neither state updates nor enqueueing wait for this JDBC operation.
+            executeUpdate(update);
+        }
     }
 
     private static void executeUpdate(DatabaseUpdate update) {
@@ -289,7 +301,7 @@ final class PlayerDataRepository {
 
     private static <T> T query(UUID playerId, String column, ColumnReader<T> reader, T fallback, String type) {
         validateColumn(column);
-        synchronized (MONITOR) {
+        synchronized (JDBC_MONITOR) {
             String sql = "SELECT " + column + " FROM " + PlayerData.getPLAYER_DATA_TABLE_NAME() + " WHERE PlayerUUID = ?";
             try (PreparedStatement statement = connection().prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());

@@ -158,22 +158,29 @@ public class PlayerData {
                     boolean exists = PlayerDataRepository.readPlayer(uuid, resultSet -> readExistingData(uuid, resultSet));
                     if (!exists) writeNewData(uuid, playerName);
 
-                    synchronized (PlayerDataRepository.monitor()) {
-                        List<DeferredDatabaseValue> deferred = deferredDatabaseValues.remove(uuid);
-                        if (deferred != null && !deferred.isEmpty()) {
-                            for (DeferredDatabaseValue value : deferred)
-                                PlayerDataRepository.updateNow(uuid, value.column(), value.value());
-                            PlayerDataRepository.readPlayer(uuid, resultSet -> readExistingData(uuid, resultSet));
+                    while (true) {
+                        List<DeferredDatabaseValue> deferred;
+                        synchronized (PlayerDataRepository.stateMonitor()) {
+                            if (!loadingPlayers.contains(uuid)) return;
+                            deferred = deferredDatabaseValues.remove(uuid);
+                            if (deferred == null || deferred.isEmpty()) {
+                                databaseDataLoaded = true;
+                                playerDataHashMap.put(uuid, PlayerData.this);
+                                loadingPlayers.remove(uuid);
+                                break;
+                            }
                         }
-                        databaseDataLoaded = true;
-                        playerDataHashMap.put(uuid, PlayerData.this);
-                        loadingPlayers.remove(uuid);
+                        // New writes are deferred into the next batch while this one is persisted.
+                        // Publish only after all batches are replayed, without blocking state access on SQL.
+                        for (DeferredDatabaseValue value : deferred)
+                            PlayerDataRepository.updateNow(uuid, value.column(), value.value());
+                        PlayerDataRepository.readPlayer(uuid, resultSet -> readExistingData(uuid, resultSet));
                     }
                 } catch (Exception e) {
                     Logger.warn("Something went wrong while generating a new player entry. This is bad! Tell the dev.");
                     Logger.warn(e.getClass().getName() + ": " + e.getMessage());
                     playerDataHashMap.remove(uuid, PlayerData.this);
-                    synchronized (PlayerDataRepository.monitor()) {
+                    synchronized (PlayerDataRepository.stateMonitor()) {
                         loadingPlayers.remove(uuid);
                         deferredDatabaseValues.remove(uuid);
                     }
@@ -403,7 +410,7 @@ public class PlayerData {
     public static void setDatabaseValue(UUID uuid, String key, Object value) {
         if ("Score".equals(key) && value instanceof Number number)
             PlayerDataRepository.updateCachedScore(uuid, number.intValue());
-        synchronized (PlayerDataRepository.monitor()) {
+        synchronized (PlayerDataRepository.stateMonitor()) {
             if (loadingPlayers.contains(uuid)) {
                 deferredDatabaseValues.computeIfAbsent(uuid, ignored -> new ArrayList<>())
                         .add(new DeferredDatabaseValue(key, value));
@@ -818,12 +825,12 @@ public class PlayerData {
     }
 
     public static void closeConnection() {
-        synchronized (PlayerDataRepository.monitor()) {
+        synchronized (PlayerDataRepository.stateMonitor()) {
             playerDataHashMap.clear();
             loadingPlayers.clear();
             deferredDatabaseValues.clear();
-            PlayerDataRepository.close();
         }
+        PlayerDataRepository.close();
     }
 
     private void readExistingData(UUID uuid, ResultSet resultSet) throws Exception {

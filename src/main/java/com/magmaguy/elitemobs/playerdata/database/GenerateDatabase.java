@@ -91,7 +91,7 @@ public class GenerateDatabase {
     }
 
     private static void createExperimentalCombatTables() throws Exception {
-        synchronized (PlayerDataRepository.monitor()) {
+        synchronized (PlayerDataRepository.jdbcMonitor()) {
             try (Statement statement = PlayerDataRepository.connection().createStatement()) {
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS "
                         + JdbcClassProgressionStore.PROFILE_TABLE + " ("

@@ -27,7 +27,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
         Objects.requireNonNull(playerId, "playerId");
         if (catalogVersion < 0) throw new IllegalArgumentException("catalogVersion must not be negative");
 
-        synchronized (PlayerDataRepository.monitor()) {
+        synchronized (PlayerDataRepository.jdbcMonitor()) {
             Connection connection = connection();
             try (PreparedStatement statement = connection.prepareStatement(insertProfileIfAbsentSql())) {
                 statement.setString(1, playerId.toString());
@@ -51,7 +51,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
     @Override
     public List<StoredClassProgress> loadAllProgress(UUID playerId) throws SQLException {
         Objects.requireNonNull(playerId, "playerId");
-        synchronized (PlayerDataRepository.monitor()) {
+        synchronized (PlayerDataRepository.jdbcMonitor()) {
             String sql = "SELECT FormId, XP, CatalogVersion, ChallengeCompleted FROM " + PROGRESS_TABLE
                     + " WHERE PlayerUUID = ? ORDER BY FormId";
             try (PreparedStatement statement = connection().prepareStatement(sql)) {
@@ -68,7 +68,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
     @Override
     public StoredClassProgress loadProgressOrZero(UUID playerId, String formId, int catalogVersion) throws SQLException {
         StoredClassProgress zero = StoredClassProgress.zero(playerId, formId, catalogVersion);
-        synchronized (PlayerDataRepository.monitor()) {
+        synchronized (PlayerDataRepository.jdbcMonitor()) {
             String sql = "SELECT FormId, XP, CatalogVersion, ChallengeCompleted FROM " + PROGRESS_TABLE
                     + " WHERE PlayerUUID = ? AND FormId = ?";
             try (PreparedStatement statement = connection().prepareStatement(sql)) {
@@ -84,7 +84,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
     @Override
     public void saveProfile(StoredClassProfile profile) throws SQLException {
         Objects.requireNonNull(profile, "profile");
-        synchronized (PlayerDataRepository.monitor()) {
+        synchronized (PlayerDataRepository.jdbcMonitor()) {
             try (PreparedStatement statement = connection().prepareStatement(upsertProfileSql())) {
                 bindProfile(statement, profile);
                 statement.executeUpdate();
@@ -95,7 +95,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
     @Override
     public void saveProgress(StoredClassProgress progress) throws SQLException {
         Objects.requireNonNull(progress, "progress");
-        synchronized (PlayerDataRepository.monitor()) {
+        synchronized (PlayerDataRepository.jdbcMonitor()) {
             try (PreparedStatement statement = connection().prepareStatement(upsertProgressSql())) {
                 statement.setString(1, progress.playerId().toString());
                 statement.setString(2, progress.formId());
@@ -121,7 +121,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
                 throw new IllegalArgumentException("Aggregate contains mixed catalog versions");
         }
 
-        synchronized (PlayerDataRepository.monitor()) {
+        synchronized (PlayerDataRepository.jdbcMonitor()) {
             Connection connection = connection();
             if (!connection.getAutoCommit())
                 throw new SQLException("Class progression aggregate requires an idle auto-commit connection");
