@@ -19,6 +19,7 @@ public class CustomBossDeath implements Listener {
 
     private static void doLoot(CustomBossEntity customBossEntity) {
         if (customBossEntity.isTriggeredAntiExploit()) return;
+        com.magmaguy.elitemobs.items.ClassLootCoverage.dropLoot(customBossEntity);
         if (customBossEntity.customBossesConfigFields.getUniqueLootList() == null ||
                 customBossEntity.customBossesConfigFields.getUniqueLootList().isEmpty()) return;
 

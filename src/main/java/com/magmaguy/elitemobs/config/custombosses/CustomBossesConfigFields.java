@@ -231,6 +231,10 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Setter
     private boolean classLoot;
     @Getter
+    private String classLootDifficulty = "AUTO";
+    @Getter
+    private String classLootRank = "AUTO";
+    @Getter
     private final Map<SkillType, ClassLootItem> classLootItems = new EnumMap<>(SkillType.class);
     @Getter
     private double scale = 1D;
@@ -450,9 +454,17 @@ public class CustomBossesConfigFields extends CustomConfigFields {
             Logger.warn("Boss type for boss " + filename + " is not a valid boss type!");
         }
 
-        boolean baselineBoss = bossType == BossType.BOSS || bossType == BossType.MINIBOSS
-                || bossType == BossType.EVENT || (bossType == BossType.NORMAL && healthMultiplier > 1);
-        classLoot = processBoolean("classLoot", baselineBoss, false, false);
+        classLoot = processBoolean("classLoot", bossType != BossType.REINFORCEMENT, false, false);
+        classLootDifficulty = processString("classLootDifficulty", "AUTO", "AUTO", false).toUpperCase(Locale.ROOT);
+        classLootRank = processString("classLootRank", "AUTO", "AUTO", false).toUpperCase(Locale.ROOT);
+        if (!Set.of("AUTO", "NORMAL", "HARD", "MYTHIC").contains(classLootDifficulty)) {
+            Logger.warn("Invalid classLootDifficulty in " + filename + "; using AUTO.");
+            classLootDifficulty = "AUTO";
+        }
+        if (!Set.of("AUTO", "TRASH", "MINIBOSS", "BOSS").contains(classLootRank)) {
+            Logger.warn("Invalid classLootRank in " + filename + "; using AUTO.");
+            classLootRank = "AUTO";
+        }
         processClassLootItems();
 
         this.scale = processDouble("scale", scale, 1, false);

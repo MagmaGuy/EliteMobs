@@ -157,6 +157,7 @@ public class EliteMobs extends JavaPlugin {
         new DefaultConfig();
         new ItemSettingsConfig();
         new ProceduralItemGenerationSettingsConfig();
+        new ClassLootSettingsConfig();
         new StaticItemNamesConfig();
         PotionEffectsConfig.initializeConfigs();
         new EconomySettingsConfig();

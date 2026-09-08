@@ -10,9 +10,10 @@ public final class IgnitionConfig extends EnchantmentsConfigFields {
     public IgnitionConfig() { super("ignition", true, "Ignition", 3, 14, true, 3); }
 
     @Override public void processAdditionalFields() {
-        baseTicks = Math.max(0, Math.min(200, processInt("baseFireTicks", 20, 20, false)));
-        ticksPerLevel = Math.max(0, Math.min(60, processInt("fireTicksPerLevel", 20, 20, false)));
-        generationChance = Math.max(0, Math.min(1, processDouble("generationChance", .30, .30, false)));
+        baseTicks = Math.max(0, Math.min(200, processInt("baseFireTicks", 20, 20, true)));
+        ticksPerLevel = Math.max(0, Math.min(60, processInt("fireTicksPerLevel", 20, 20, true)));
+        generationChance = Math.max(0, Math.min(1, processDouble("generationChance", .30, .30, true)));
+        if (!Double.isFinite(generationChance)) generationChance = .30;
     }
 
     public static int fireTicks(int level) { return level <= 0 ? 0 : Math.min(200, baseTicks + ticksPerLevel * Math.min(3, level)); }
