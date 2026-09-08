@@ -143,10 +143,11 @@ public final class ClassResourceController {
     }
 
     public void onDamageDealt(Player player, double actualDamage) {
+        if (!Double.isFinite(actualDamage) || actualDamage <= 0D) return;
         ResourceState state = states.get(player.getUniqueId());
-        if (state == null) return;
-        double gain = rules(state.type).damageDealtHealthEquivalentGain();
-        if (gain > 0D) gainScaledToHealth(player, state, actualDamage, gain);
+        if (state == null || state.suspended) return;
+        double gain = rules(state.type).damageDealtFlatGain();
+        if (gain > 0D) set(state, state.amount + gain);
     }
 
     public void onDamageReceived(Player player, double actualDamage) {

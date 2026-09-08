@@ -10,7 +10,6 @@ import com.magmaguy.elitemobs.experimentalcombat.passives.PassiveProfile;
 import com.magmaguy.elitemobs.experimentalcombat.resources.ClassResourceDefinition;
 import com.magmaguy.elitemobs.experimentalcombat.resources.ClassResourceDefinition.NearbyRecoveryBonus;
 import com.magmaguy.elitemobs.experimentalcombat.resources.ClassResourceDefinition.DamageFreeRecoveryBonus;
-import com.magmaguy.elitemobs.experimentalcombat.resources.FuryCombatBudget;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +25,7 @@ public final class BuiltInClassContent {
     private static final double MANA_OUT_OF_COMBAT_PER_SECOND = MANA_IN_COMBAT_PER_SECOND;
     // Mana is the 100% baseline. Every positive passive recovery rate derives from it.
     private static final int RESOLVE_MANA_RATE_PERCENT = 66;
+    private static final int FURY_MANA_RATE_PERCENT = 55;
     private static final int FOCUS_MANA_RATE_PERCENT = 85;
     private static final int GRACE_MANA_RATE_PERCENT = 66;
     private static final DamageFreeRecoveryBonus RANGER_FOCUSED_RECOVERY =
@@ -57,9 +57,9 @@ public final class BuiltInClassContent {
                     FixedAbilityRegistry.berserkerDefinitions(),
                     FixedPassiveRegistry.berserkerDefinitions(),
                     resource(ClassResourceType.FURY,
-                            0D, 0D, -15D,
-                            FuryCombatBudget.DEALT_GAIN_PER_HEALTH_EQUIVALENT,
-                            FuryCombatBudget.RECEIVED_GAIN_PER_HEALTH_EQUIVALENT,
+                            0D, manaRelativeRecovery(MANA_IN_COMBAT_PER_SECOND, FURY_MANA_RATE_PERCENT),
+                            manaRelativeRecovery(MANA_OUT_OF_COMBAT_PER_SECOND, FURY_MANA_RATE_PERCENT),
+                            10D, 40D,
                             0D, 0L, 0D, 0D, 0D, 0D, NearbyRecoveryBonus.NONE, DamageFreeRecoveryBonus.NONE)),
             new ClassTreeContribution(
                     "ranger",
@@ -161,7 +161,7 @@ public final class BuiltInClassContent {
             double initialAmount,
             double inCombatTickDelta,
             double outOfCombatTickDelta,
-            double damageDealtHealthEquivalentGain,
+            double damageDealtFlatGain,
             double damageReceivedHealthEquivalentGain,
             double damageReceivedFlatChange,
             long recoveryDelayAfterDamageTicks,
@@ -177,7 +177,7 @@ public final class BuiltInClassContent {
                 initialAmount,
                 inCombatTickDelta,
                 outOfCombatTickDelta,
-                damageDealtHealthEquivalentGain,
+                damageDealtFlatGain,
                 damageReceivedHealthEquivalentGain,
                 damageReceivedFlatChange,
                 recoveryDelayAfterDamageTicks,

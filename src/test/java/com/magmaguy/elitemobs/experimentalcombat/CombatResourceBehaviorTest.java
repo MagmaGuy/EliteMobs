@@ -112,15 +112,12 @@ class CombatResourceBehaviorTest extends CombatBehaviorFixture {
     }
 
     @Test
-    void berserkerSignatureNeedsFuryThatHasNotDecayedThenAppliesDamageAndSpeedUntilClassChange() {
+    void berserkerSignatureRetainsEarnedFuryOutOfCombatThenAppliesDamageAndSpeedUntilClassChange() {
         assertTrue(module.setClassLevelForAdministration(player, "berserker", 1).applied());
         assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
         incomingDamage();
         incomingDamage();
         MockBukkit.getMock().getScheduler().performOneTick();
-        assertFalse(module.useAbility(player, AbilitySlot.SIGNATURE).successful(),
-                "An out-of-combat update must decay Fury below this cast's cost");
-        incomingDamage();
         assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
         assertEquals(11.8045D, outgoingDamage(), 0.000001);
         assertTrue(player.hasPotionEffect(PotionEffectType.SPEED));

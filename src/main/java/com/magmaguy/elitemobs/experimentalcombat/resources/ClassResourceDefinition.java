@@ -11,7 +11,7 @@ public record ClassResourceDefinition(
         double initialAmount,
         double inCombatTickDelta,
         double outOfCombatTickDelta,
-        double damageDealtHealthEquivalentGain,
+        double damageDealtFlatGain,
         double damageReceivedHealthEquivalentGain,
         double damageReceivedFlatChange,
         long recoveryDelayAfterDamageTicks,
@@ -30,7 +30,7 @@ public record ClassResourceDefinition(
             throw new IllegalArgumentException("initialAmount must not exceed maximum");
         requireFinite(inCombatTickDelta, "inCombatTickDelta");
         requireFinite(outOfCombatTickDelta, "outOfCombatTickDelta");
-        requireFiniteNonNegative(damageDealtHealthEquivalentGain, "damageDealtHealthEquivalentGain");
+        requireFiniteNonNegative(damageDealtFlatGain, "damageDealtFlatGain");
         requireFiniteNonNegative(damageReceivedHealthEquivalentGain, "damageReceivedHealthEquivalentGain");
         requireFinite(damageReceivedFlatChange, "damageReceivedFlatChange");
         if (recoveryDelayAfterDamageTicks < 0L)

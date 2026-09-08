@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.api.PlayerDataLoadedEvent;
 import com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime;
 import com.magmaguy.elitemobs.combatsystem.combattag.PlayerCombatState;
 import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.AbilityContribution;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.ClassAbilityDamage;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.AbilityCommitEffects;
@@ -68,12 +69,15 @@ import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -738,6 +742,20 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     public void onPlayerDamagesElite(EliteMobDamagedByPlayerEvent event) {
         if (!mechanicsActive(event.getPlayer()) || event.getDamage() <= 0D) return;
         resources.onDamageDealt(event.getPlayer(), event.getDamage());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerDamagesNonElite(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof LivingEntity target) || target instanceof ArmorStand
+                || target.hasMetadata("NPC") || EntityTracker.getNPCEntity(target) != null
+                || event.getFinalDamage() <= 0D) return;
+        // Elite hits already award resources through their normalized combat event.
+        if (EntityTracker.getEliteMobEntity(target) != null) return;
+        Player attacker = event.getDamager() instanceof Player player ? player
+                : event.getDamager() instanceof Projectile projectile
+                && projectile.getShooter() instanceof Player shooter ? shooter : null;
+        if (attacker == null || attacker.equals(target) || !mechanicsActive(attacker)) return;
+        resources.onDamageDealt(attacker, event.getFinalDamage());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
