@@ -14,6 +14,6 @@ public class EliteWolfConfig extends MobPropertiesConfigFields {
                 "[$level] Elite Wolf",
                 new ArrayList<>(List.of("$entity tore $player apart!",
                         "$player was torn to shreds by $entity!")),
-                6);
+                6, 8);
     }
 }

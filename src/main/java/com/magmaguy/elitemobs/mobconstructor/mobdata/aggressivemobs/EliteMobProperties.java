@@ -1,139 +1,115 @@
 package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 
+import com.magmaguy.elitemobs.api.mind.EliteMindBodyLocomotion;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.EliteMobPowersConfig;
+import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
+import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
-import lombok.Getter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.Map;
 
-public abstract class EliteMobProperties extends PluginMobProperties {
+/** Runtime properties and resolved power pools derived from the canonical per-type configuration. */
+public final class EliteMobProperties extends PluginMobProperties {
+    private static Map<EntityType, EliteMobProperties> eliteMobData = Map.of();
+    private final MobPropertiesConfigFields config;
+    private final HashSet<PowersConfigFields> validMajorPowers;
+    private final HashSet<PowersConfigFields> validDefensivePowers;
+    private final HashSet<PowersConfigFields> validOffensivePowers;
+    private final HashSet<PowersConfigFields> validMiscellaneousPowers;
 
-    /*
-    This class only defines sets of mostly config-based data to be used by the EliteMobEntity.java class
-     */
-
-    public static HashSet<EliteMobProperties> eliteMobData = new HashSet<>();
-    @Getter
-    private final HashSet<PowersConfigFields> validMajorPowers = new HashSet<>();
-    @Getter
-    private final HashSet<PowersConfigFields> validDefensivePowers = EliteMobPowersConfig.getDefensivePowerFields();
-    @Getter
-    private final HashSet<PowersConfigFields> validOffensivePowers = EliteMobPowersConfig.getOffensivePowerFields();
-    @Getter
-    private final HashSet<PowersConfigFields> validMiscellaneousPowers = EliteMobPowersConfig.getMiscellaneousPowerFields();
-
-    public static void initializeEliteMobValues() {
-        new EliteBlaze();
-        new EliteCaveSpider();
-        new EliteCreeper();
-        new EliteDrowned();
-        new EliteElderGuardian();
-        new EliteGuardian();
-        new EliteEnderman();
-        new EliteIronGolem();
-        new ElitePhantom();
-        new EliteZombifiedPiglin();
-        new ElitePillager();
-        new EliteSilverfish();
-        new EliteSkeleton();
-        new EliteSpider();
-        new EliteWitch();
-        new EliteWitherSkeleton();
-        new EliteZombie();
-        new EliteEndermite();
-        new EliteEvoker();
-        new EliteStray();
-        new EliteHusk();
-        new EliteIllusioner();
-        new EliteVex();
-        new EliteVindicator();
-        new ElitePolarBear();
-        new EliteRavager();
-        new EliteGhast();
-        new EliteZoglin();
-        new ElitePiglin();
-        new EliteHoglin();
-        new ElitePiglinBrute();
-        new EliteBee();
-        new EliteWolf();
-        new EliteEnderDragon();
-        new EliteShulker();
-        new EliteKillerBunny();
-        new EliteGoat();
-        new EliteLlama();
-        new EliteWarden();
-        new EliteSlime();
-        new EliteMagmaCube();
-        new EliteBogged();
-        new EliteBreeze();
-        new EliteWither();
-
-        eliteMobData.forEach(EliteMobProperties::applyConfiguredPowerSettings);
-    }
-
-    public static void shutdown() {
-        eliteMobData.clear();
-    }
-
-    public static boolean isValidEliteMobType(Entity entity) {
-        if (entity instanceof LivingEntity)
-            return isValidEliteMobType(entity.getType());
-        return false;
-    }
-
-    public static boolean isValidEliteMobType(EntityType entityType) {
-        for (EliteMobProperties eliteMobProperties : eliteMobData)
-            if (eliteMobProperties.getEntityType().equals(entityType))
-                if (eliteMobProperties.isEnabled)
-                    return true;
-        return false;
-    }
-
-    public static EliteMobProperties getPluginData(EntityType entityType) {
-        for (EliteMobProperties eliteMobProperties : eliteMobData)
-            if (eliteMobProperties.getEntityType().equals(entityType))
-                return eliteMobProperties;
-        return null;
-    }
-
-    public static double getBaselineDamage(EntityType entityType, EliteEntity eliteEntity) {
-        if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
-            return MobCombatSettingsConfig.getNormalizedBaselineDamage();
-        return getPluginData(entityType).baseDamage;
-    }
-
-    public static EliteMobProperties getPluginData(Entity entity) {
-        return getPluginData(entity.getType());
-    }
-
-    public static HashSet<EntityType> getValidMobTypes() {
-        HashSet<EntityType> livingEntities = new HashSet<>();
-        for (EliteMobProperties eliteMobProperties : eliteMobData)
-            livingEntities.add(eliteMobProperties.getEntityType());
-        return livingEntities;
-    }
-
-    public void addMajorPower(String powerName) {
-        PowersConfigFields powersConfigFields = PowersConfig.getPower(powerName);
-        if (powersConfigFields != null && powersConfigFields.isEnabled())
-            validMajorPowers.add(powersConfigFields);
-    }
-
-    private void applyConfiguredPowerSettings() {
-        validMajorPowers.addAll(EliteMobPowersConfig.getMajorPowerFields(entityType));
+    private EliteMobProperties(MobPropertiesConfigFields config) {
+        super(config.isEnabled(), config.getName(), config.getEntityType(),
+                config.getDefaultMaxHealth(), config.getBaseDamage());
+        this.config = config;
+        validMajorPowers = EliteMobPowersConfig.getMajorPowerFields(entityType);
+        validDefensivePowers = EliteMobPowersConfig.getDefensivePowerFields();
+        validOffensivePowers = EliteMobPowersConfig.getOffensivePowerFields();
+        validMiscellaneousPowers = EliteMobPowersConfig.getMiscellaneousPowerFields();
         HashSet<PowersConfigFields> disabledPowers = EliteMobPowersConfig.getDisabledPowerFields(entityType);
         validMajorPowers.removeAll(disabledPowers);
         validDefensivePowers.removeAll(disabledPowers);
         validOffensivePowers.removeAll(disabledPowers);
         validMiscellaneousPowers.removeAll(disabledPowers);
+    }
+
+    public static void initializeEliteMobValues() {
+        Map<EntityType, EliteMobProperties> loaded = new EnumMap<>(EntityType.class);
+        MobPropertiesConfig.getMobProperties().forEach((type, config) -> loaded.put(type, new EliteMobProperties(config)));
+        eliteMobData = Collections.unmodifiableMap(loaded);
+    }
+
+    public static void shutdown() {
+        eliteMobData = Map.of();
+    }
+
+    /** Historical natural-conversion predicate; authored eligibility does not depend on isEnabled. */
+    public static boolean isValidEliteMobType(Entity entity) {
+        return entity instanceof Mob && isValidEliteMobType(entity.getType());
+    }
+
+    public static boolean isValidEliteMobType(EntityType entityType) {
+        EliteMobProperties properties = getPluginData(entityType);
+        return properties != null && properties.isEnabled();
+    }
+
+    public static EliteMobProperties getPluginData(EntityType entityType) {
+        return entityType == null ? null : eliteMobData.get(entityType);
+    }
+
+    public static double getBaselineDamage(EntityType entityType, EliteEntity eliteEntity) {
+        if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.isNormalizedCombat())
+            return MobCombatSettingsConfig.getNormalizedBaselineDamage();
+        EliteMobProperties properties = getPluginData(entityType);
+        if (properties == null) throw new IllegalArgumentException("No elite properties for " + entityType);
+        return properties.baseDamage;
+    }
+
+    public static EliteMobProperties getPluginData(Entity entity) {
+        return entity == null ? null : getPluginData(entity.getType());
+    }
+
+    public static HashSet<EntityType> getValidMobTypes() {
+        return new HashSet<>(eliteMobData.keySet());
+    }
+
+    public String getBehavior() {
+        return config.getBehavior();
+    }
+
+    public EliteMindBodyLocomotion getLocomotion() {
+        return config.getLocomotion();
+    }
+
+    public HashSet<PowersConfigFields> getValidMajorPowers() {
+        return new HashSet<>(validMajorPowers);
+    }
+
+    public HashSet<PowersConfigFields> getValidDefensivePowers() {
+        return new HashSet<>(validDefensivePowers);
+    }
+
+    public HashSet<PowersConfigFields> getValidOffensivePowers() {
+        return new HashSet<>(validOffensivePowers);
+    }
+
+    public HashSet<PowersConfigFields> getValidMiscellaneousPowers() {
+        return new HashSet<>(validMiscellaneousPowers);
+    }
+
+    public void addMajorPower(String powerName) {
+        PowersConfigFields power = PowersConfig.getPower(powerName);
+        if (power != null && power.isEnabled()) validMajorPowers.add(power);
     }
 
     public void removeOffensivePower(String filename) {
@@ -143,5 +119,4 @@ public abstract class EliteMobProperties extends PluginMobProperties {
     public void removeDefensivePower(String filename) {
         validDefensivePowers.remove(PowersConfig.getPower(filename));
     }
-
 }

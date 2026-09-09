@@ -4,6 +4,8 @@ import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.easyminecraftgoals.PathfindingHandle;
 import com.magmaguy.easyminecraftgoals.PathfindingStatus;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -313,7 +315,10 @@ final class PatrolController {
             state = PatrolRuntimeState.HELD;
             return;
         }
-        if (!body.hasAI() || body instanceof Mob mob && !mob.isAware()) {
+        EliteEntity elite = EntityTracker.getEliteMobEntity(body);
+        boolean aiEnabled = elite == null ? body.hasAI() : elite.isAIEnabled();
+        boolean aware = elite == null ? !(body instanceof Mob mob) || mob.isAware() : elite.isAware();
+        if (!aiEnabled || !aware) {
             aiHeld = true;
             clearDestination();
             state = PatrolRuntimeState.AI_OFF;

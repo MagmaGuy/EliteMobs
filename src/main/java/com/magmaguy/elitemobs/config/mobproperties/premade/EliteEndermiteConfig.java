@@ -12,6 +12,6 @@ public class EliteEndermiteConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &7Endermite",
                 List.of("$entity &cis to $player &cwhat David is to Goliath!"),
-                3);
+                3, 8);
     }
 }

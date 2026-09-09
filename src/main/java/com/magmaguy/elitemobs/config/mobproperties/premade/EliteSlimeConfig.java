@@ -12,6 +12,6 @@ public class EliteSlimeConfig extends MobPropertiesConfigFields {
                 true,
                 "&2Lvl &2$level &fElite &2Slime",
                 List.of("$player was squished by $entity&f!"),
-                6);
+                6, 16);
     }
 }

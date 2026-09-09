@@ -14,6 +14,6 @@ public class EliteWitherSkeletonConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &8Wither Skeleton",
                 new ArrayList<>(List.of("$entity's &carrows withered away $player&c!",
                         "$entity's &chas withered $player &caway!")),
-                12);
+                12, 20);
     }
 }

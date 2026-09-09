@@ -15,6 +15,6 @@ public class ElitePhantomConfig extends MobPropertiesConfigFields {
                 new ArrayList<>(List.of("$player &cjust had a bad nightmare about $entity&c!",
                         "$player &cwill be having nightmares about $entity&c!",
                         "$entity &chas taught $player &cthe value of sleep!")),
-                9);
+                9, 20);
     }
 }

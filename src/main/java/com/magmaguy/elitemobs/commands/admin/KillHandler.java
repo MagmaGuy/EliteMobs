@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -24,7 +24,7 @@ public class KillHandler {
     }
 
     public static void killEntityType(CommandSender commandSender, EntityType entityType) {
-        if (EliteMobProperties.getValidMobTypes().contains(entityType)) {
+        if (MobPropertiesConfig.isEligible(entityType)) {
             int counter = 0;
             for (EliteEntity eliteEntity : new ArrayList<>(EntityTracker.getEliteMobEntities().values())) {
                 if (eliteEntity.getLivingEntity() == null || !eliteEntity.getLivingEntity().getType().equals(entityType)) continue;

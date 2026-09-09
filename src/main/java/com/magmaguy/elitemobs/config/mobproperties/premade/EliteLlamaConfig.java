@@ -14,6 +14,6 @@ public class EliteLlamaConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &5Llama",
                 new ArrayList<>(List.of("$player &cwas spit on by $entity&c!",
                         "$player &cwas made $entity&c angry!")),
-                1);
+                1, 30);
     }
 }

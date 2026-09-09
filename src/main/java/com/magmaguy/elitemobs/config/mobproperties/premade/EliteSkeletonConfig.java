@@ -14,6 +14,6 @@ public class EliteSkeletonConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &fSkeleton",
                 new ArrayList<>(List.of("$player &cbecame $entity's &cpin cushion!",
                         "$entity &cwanted to see $player's &cbones!")),
-                5);
+                5, 20);
     }
 }

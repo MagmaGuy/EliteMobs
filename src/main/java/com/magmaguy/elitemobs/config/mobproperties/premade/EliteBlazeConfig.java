@@ -12,6 +12,6 @@ public class EliteBlazeConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &eBlaze",
                 List.of("$player &cwas lit ablaze by $entity!"),
-                9);
+                9, 20);
     }
 }

@@ -12,6 +12,6 @@ public class EliteStrayConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &bStray",
                 List.of("$player &cwas led astray by $entity&c!"),
-                5);
+                5, 20);
     }
 }

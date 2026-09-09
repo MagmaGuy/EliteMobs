@@ -12,6 +12,6 @@ public class EliteVexConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &bVex",
                 List.of("$entity &chas vexed $player&c!"),
-                13);
+                13, 14);
     }
 }

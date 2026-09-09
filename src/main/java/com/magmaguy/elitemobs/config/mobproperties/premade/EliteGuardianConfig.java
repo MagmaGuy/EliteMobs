@@ -12,6 +12,6 @@ public class EliteGuardianConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &3Guardian",
                 List.of("$entity &cprevented $player &cfrom exploring the depths!"),
-                9);
+                9, 30);
     }
 }

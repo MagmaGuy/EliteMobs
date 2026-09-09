@@ -15,6 +15,6 @@ public class EliteEndermanConfig extends MobPropertiesConfigFields {
                 new ArrayList<>(List.of("$entity &csent $player &cinto the void!",
                         "$player &clooked at $entity &cwrong!",
                         "$player &cand $entity &cbecame best friends!")),
-                10);
+                10, 40);
     }
 }

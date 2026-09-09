@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.collateralminecraftchanges;
 
+import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -18,7 +19,8 @@ public class EnderDragonUnstuck implements Listener {
         if (event.getEliteMobEntity() == null) return;
         if (event.getEliteMobEntity().getLivingEntity() == null) return;
         if (!event.getEliteMobEntity().getLivingEntity().getType().equals(EntityType.ENDER_DRAGON)) return;
-        event.getEliteMobEntity().getLivingEntity().setAI(true);
+        if (NMSManager.isEnabled() && NMSManager.getAdapter().isMindBody(event.getEliteMobEntity().getLivingEntity())) return;
+        event.getEliteMobEntity().setAIEnabled(true);
         ((EnderDragon) event.getEliteMobEntity().getLivingEntity()).setPhase(EnderDragon.Phase.LEAVE_PORTAL);
     }
 

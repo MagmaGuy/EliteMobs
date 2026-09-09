@@ -12,6 +12,6 @@ public class EliteBoggedConfig extends MobPropertiesConfigFields {
                 true,
                 "&2Lvl &2$level &2Elite &eBogged",
                 List.of("$player &cwas poisoned by $entity!"),
-                5);
+                5, 16);
     }
 }

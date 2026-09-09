@@ -5,11 +5,20 @@ import org.bukkit.entity.EntityType;
 
 public abstract class PluginMobProperties {
 
-    public boolean isEnabled;
-    public String name;
-    public EntityType entityType;
-    public double defaultMaxHealth;
-    public double baseDamage;
+    public final boolean isEnabled;
+    public final String name;
+    public final EntityType entityType;
+    public final double defaultMaxHealth;
+    public final double baseDamage;
+
+    protected PluginMobProperties(boolean isEnabled, String name, EntityType entityType,
+                                  double defaultMaxHealth, double baseDamage) {
+        this.isEnabled = isEnabled;
+        this.name = name;
+        this.entityType = entityType;
+        this.defaultMaxHealth = defaultMaxHealth;
+        this.baseDamage = baseDamage;
+    }
 
     public static void initializePluginMobValues() {
         EliteMobProperties.initializeEliteMobValues();

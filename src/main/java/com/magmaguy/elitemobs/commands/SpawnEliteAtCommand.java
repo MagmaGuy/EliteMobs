@@ -5,7 +5,6 @@ import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import com.magmaguy.magmacore.command.arguments.*;
-import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public class SpawnEliteAtCommand extends AdvancedCommand {
         addArgument("x", new DoubleCommandArgument("<x>"));
         addArgument("y", new DoubleCommandArgument("<y>"));
         addArgument("z", new DoubleCommandArgument("<z>"));
-        addArgument("entityType", new EntityTypeCommandArgument());
+        addArgument("entityType", new EliteEntityTypeCommandArgument());
         addArgument("level", new IntegerCommandArgument("<level>"));
         addVarargsArgument("powers", new ListStringCommandArgument(ElitePower.getElitePowers().keySet().stream().toList(), "<powers>"));
         setUsage("/em spawn eliteAt <world> <x> <y> <z> <entityType> <level> <power1> <power2> <power3> <...>");
@@ -34,7 +33,7 @@ public class SpawnEliteAtCommand extends AdvancedCommand {
         Optional<String> powers = (powersArg == null || powersArg.isBlank()) ? Optional.empty() : Optional.of(powersArg.trim());
         SpawnCommand.spawnEliteEntityTypeCommand(
                 commandData.getPlayerSender(),
-                EntityType.valueOf(commandData.getStringArgument("entityType")),
+                EliteEntityTypeCommandArgument.parse(commandData.getStringArgument("entityType")),
                 commandData.getStringArgument("world"),
                 new Vector(
                         commandData.getIntegerArgument("x"),

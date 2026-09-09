@@ -12,6 +12,6 @@ public class EliteEnderDragon extends MobPropertiesConfigFields {
                 false,
                 "&fLvl &2$level &fElite &5Ender Dragon",
                 List.of("$entity &chas ended $player!"),
-                7);
+                7, 200);
     }
 }

@@ -12,6 +12,6 @@ public class EliteSilverfishConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &7Silverfish",
                 List.of("$player &cmistook $entity &cfor a stone block!"),
-                1);
+                1, 8);
     }
 }

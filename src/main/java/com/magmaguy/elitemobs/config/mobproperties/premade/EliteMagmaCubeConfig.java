@@ -13,6 +13,6 @@ public class EliteMagmaCubeConfig extends MobPropertiesConfigFields {
                 true,
                 "&2Lvl &2$level &fElite &6Magma Cube",
                 new ArrayList<>(List.of("$player was incinerated by $entity&f!", "$player got too close to $entity&f!")),
-                6);
+                6, 16);
     }
 }

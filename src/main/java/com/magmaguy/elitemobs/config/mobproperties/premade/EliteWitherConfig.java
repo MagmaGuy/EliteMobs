@@ -14,6 +14,6 @@ public class EliteWitherConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &7Elite &5Wither",
                 new ArrayList<>(List.of("$player &cangered $entity&c!",
                         "$player &chas met $entity's &cfury!")),
-                12);
+                12, 300);
     }
 }

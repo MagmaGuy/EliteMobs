@@ -329,7 +329,10 @@ final class LuaPowerEntityTables {
         entity.set("is_valid", LuaValue.valueOf(livingEntity.isValid()));
         addVehicleMethods(entity, livingEntity);
         entity.set("is_alive", method(entity, args -> LuaValue.valueOf(isAlive(livingEntity))));
-        entity.set("is_ai_enabled", method(entity, args -> LuaValue.valueOf(livingEntity.hasAI())));
+        entity.set("is_ai_enabled", method(entity, args -> {
+            EliteEntity elite = resolveAiOwner(livingEntity);
+            return LuaValue.valueOf(elite == null ? livingEntity.hasAI() : elite.isAIEnabled());
+        }));
         entity.set("is_frozen", method(entity, args -> {
             EliteEntity elite = EntityTracker.getEliteMobEntity(livingEntity);
             if (elite instanceof CustomBossEntity customBoss) {
@@ -446,12 +449,12 @@ final class LuaPowerEntityTables {
         entity.set("set_awareness_enabled", method(entity, args -> {
             if (livingEntity instanceof Mob mob) {
                 boolean aware = args.checkboolean(1);
-                mob.setAware(aware);
+                setAwarenessState(mob, aware);
                 int duration = args.optint(2, 0);
                 if (duration > 0) {
                     GameClock.scheduleLater(duration, () -> {
                         if (mob.isValid()) {
-                            mob.setAware(!aware);
+                            setAwarenessState(mob, !aware);
                         }
                     });
                 }
@@ -619,14 +622,33 @@ final class LuaPowerEntityTables {
         if (livingEntity == null) {
             return;
         }
-        livingEntity.setAI(targetValue);
+        setAiState(livingEntity, targetValue);
         if (duration > 0) {
             GameClock.scheduleLater(duration, () -> {
                 if (livingEntity.isValid()) {
-                    livingEntity.setAI(!targetValue);
+                    setAiState(livingEntity, !targetValue);
                 }
             });
         }
+    }
+
+    private void setAiState(LivingEntity livingEntity, boolean enabled) {
+        EliteEntity elite = resolveAiOwner(livingEntity);
+        if (elite == null) livingEntity.setAI(enabled);
+        else elite.setAIEnabled(enabled);
+    }
+
+    private void setAwarenessState(Mob mob, boolean aware) {
+        EliteEntity elite = resolveAiOwner(mob);
+        if (elite == null) mob.setAware(aware);
+        else elite.setAware(aware);
+    }
+
+    private EliteEntity resolveAiOwner(LivingEntity body) {
+        // Bootstrap and on_spawn run before the accepted actor enters EntityTracker.
+        if (eliteEntity.getLivingEntity() == body || eliteEntity.getUnsyncedLivingEntity() == body)
+            return eliteEntity;
+        return EntityTracker.getEliteMobEntity(body);
     }
 
     private float resolveVolume(Varargs args) {

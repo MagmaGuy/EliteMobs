@@ -12,6 +12,6 @@ public class EliteBeeConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &eBee",
                 List.of("$player &cwas stung by $entity!"),
-                3);
+                3, 10);
     }
 }

@@ -14,6 +14,6 @@ public class EliteSpiderConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &7Spider",
                 new ArrayList<>(List.of("$player &cbecame entangled in $entity's &cweb!",
                         "$entity &chas devoured $player&c!")),
-                3);
+                3, 16);
     }
 }

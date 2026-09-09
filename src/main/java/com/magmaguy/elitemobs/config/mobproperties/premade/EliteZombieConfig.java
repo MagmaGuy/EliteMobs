@@ -14,6 +14,6 @@ public class EliteZombieConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &2Zombie",
                 new ArrayList<>(List.of("$player &cwas devoured by $entity&c!",
                         "$entity &cgot to $player's &cbrains!")),
-                5);
+                5, 20);
     }
 }

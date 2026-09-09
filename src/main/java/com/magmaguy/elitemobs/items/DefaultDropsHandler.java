@@ -19,8 +19,6 @@ import java.util.List;
  */
 public class DefaultDropsHandler implements Listener {
 
-    private final List<ItemStack> wornItems = new ArrayList<>();
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDeath(EliteMobDeathEvent event) {
 
@@ -34,7 +32,7 @@ public class DefaultDropsHandler implements Listener {
         if (mobLevel > ItemSettingsConfig.getMaxLevelForDefaultLootMultiplier())
             mobLevel = ItemSettingsConfig.getMaxLevelForDefaultLootMultiplier();
 
-        inventoryItemsConstructor((LivingEntity) event.getEntity());
+        List<ItemStack> wornItems = inventoryItemsConstructor((LivingEntity) event.getEntity());
 
         if (ItemSettingsConfig.getDefaultLootMultiplier() != 0) {
             for (ItemStack itemStack : droppedItems) {
@@ -64,8 +62,9 @@ public class DefaultDropsHandler implements Listener {
 
 
     private List<ItemStack> inventoryItemsConstructor(LivingEntity entity) {
-
+        List<ItemStack> wornItems = new ArrayList<>();
         EntityEquipment equipment = entity.getEquipment();
+        if (equipment == null) return wornItems;
 
         if (equipment.getItemInMainHand() != null && !equipment.getItemInMainHand().getType().equals(Material.AIR))
             wornItems.add(equipment.getItemInMainHand());

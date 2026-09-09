@@ -1,17 +1,13 @@
 package com.magmaguy.elitemobs.mobconstructor;
 
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
+import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import org.bukkit.entity.EntityType;
 
-import java.util.Arrays;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
- * Defaults for native Mind carriers that do not belong to the historical natural-elite catalog.
- * Exact Mind power loadouts may use every living carrier without fabricating a parallel mob-data
- * registry; native health is preserved and the fallback name remains deterministic.
+ * Resolves catalog defaults against the native body's health before elite scaling.
  */
 final class NativeMindActorDefaults {
 
@@ -22,15 +18,12 @@ final class NativeMindActorDefaults {
 
     static String nameTemplate(EntityType entityType) {
         Objects.requireNonNull(entityType, "entityType");
-        String readableType = Arrays.stream(entityType.name().toLowerCase(Locale.ROOT).split("_"))
-                .filter(part -> !part.isEmpty())
-                .map(part -> Character.toUpperCase(part.charAt(0)) + part.substring(1))
-                .collect(Collectors.joining(" "));
-        return "&fLvl &2$level &fElite &2" + readableType;
+        return MobPropertiesConfig.defaultNameTemplate(entityType);
     }
 
     static double baseHealth(EliteMobProperties properties, double nativeBaseHealth) {
-        if (properties != null) {
+        if (properties != null && Double.isFinite(properties.getDefaultMaxHealth())
+                && properties.getDefaultMaxHealth() > 0.0D) {
             return properties.getDefaultMaxHealth();
         }
         if (Double.isFinite(nativeBaseHealth) && nativeBaseHealth > 0.0D) {
@@ -45,8 +38,7 @@ final class NativeMindActorDefaults {
             boolean randomized) {
         if (randomized && properties == null) {
             throw new IllegalArgumentException(
-                    "Randomized EliteMobs powers require configured mob properties for carrier "
-                            + entityType + "; use an exact Mind power loadout instead");
+                    "No configured elite properties for carrier " + entityType);
         }
     }
 }

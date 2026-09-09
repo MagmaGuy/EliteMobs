@@ -12,6 +12,6 @@ public class EliteWardenConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &3Warden",
                 List.of("$entity &csensed $player &cwas nearby!"),
-                45);
+                45, 500);
     }
 }

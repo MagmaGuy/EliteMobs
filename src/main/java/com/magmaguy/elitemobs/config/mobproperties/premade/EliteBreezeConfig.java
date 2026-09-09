@@ -12,6 +12,6 @@ public class EliteBreezeConfig extends MobPropertiesConfigFields {
                 true,
                 "&2Lvl &2$level &2Elite &eBreeze",
                 List.of("$player &cwas blown away by $entity!"),
-                1.5);
+                1.5, 30);
     }
 }

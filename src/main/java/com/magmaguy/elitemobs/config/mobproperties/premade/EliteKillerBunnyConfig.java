@@ -14,6 +14,6 @@ public class EliteKillerBunnyConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &cKiller Rabbit",
                 new ArrayList<>(List.of("$entity &cmade $player &cgo live in a farm upstate!",
                         "$entity &ceducated $player using a stick and not a carrot!")),
-                12);
+                12, 3);
     }
 }

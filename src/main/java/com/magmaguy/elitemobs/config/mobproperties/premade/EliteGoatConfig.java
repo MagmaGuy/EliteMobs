@@ -16,6 +16,6 @@ public class EliteGoatConfig extends MobPropertiesConfigFields {
                         "$player &cwas run over by $entity&c!",
                         "$player &cwas trampled by $entity&c!",
                         "$player &cgot $entity&c horns!")),
-                3);
+                3, 10);
     }
 }

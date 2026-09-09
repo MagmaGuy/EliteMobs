@@ -14,6 +14,6 @@ public class ElitePiglinBruteConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &cPiglin Brute",
                 new ArrayList<>(List.of("$entity &ctenderized $player!",
                         "$entity &cbrutalized $player!")),
-                19.5);
+                19.5, 50);
     }
 }

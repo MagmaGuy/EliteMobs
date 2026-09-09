@@ -12,6 +12,6 @@ public class EliteRavagerConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &6Ravager",
                 List.of("$entity &cshowed $player &cwho's in charge!"),
-                18);
+                18, 100);
     }
 }

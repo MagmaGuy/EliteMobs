@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
 import com.magmaguy.elitemobs.npcs.scripts.NPCScriptManager;
 import com.magmaguy.elitemobs.npcs.scripts.ScriptableNPC;
 import com.magmaguy.elitemobs.pathfinding.patrol.PatrolService;
+import com.magmaguy.elitemobs.tagger.PersistentTagger;
 import com.magmaguy.magmacore.scripting.ScriptDefinition;
 import com.magmaguy.magmacore.scripting.ScriptHook;
 import com.magmaguy.magmacore.scripting.ScriptInstance;
@@ -257,6 +258,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         String displayName = ChatColorConverter.convert(npCsConfigFields.getName());
         boolean disguiseQueued = queueDisguise(displayName);
         villager = effectiveSpawnLocation.getWorld().spawn(effectiveSpawnLocation, Villager.class, villagerInstance -> {
+            // CreatureSpawnEvent runs before world.spawn returns and before tracker publication.
+            PersistentTagger.tagNPC(villagerInstance, uuid);
             villagerInstance.setAI(false);
             // Patrols enable AI for navigation; NPC bodies must still never push or be pushed by players.
             villagerInstance.setCollidable(false);

@@ -14,6 +14,6 @@ public class EliteHoglinConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &dHoglin",
                 new ArrayList<>(List.of("$player &cmessed with the $entity &cand got the horns!",
                         "$entity &cgot $player's &cbacon!")),
-                8);
+                8, 40);
     }
 }

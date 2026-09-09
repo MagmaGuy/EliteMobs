@@ -14,6 +14,6 @@ public class EliteZoglinConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &dZoglin",
                 new ArrayList<>(List.of("$player &cmessed with the $entity &cand got the horns!",
                         "$entity &cgot $player's &cbacon!")),
-                12);
+                12, 40);
     }
 }

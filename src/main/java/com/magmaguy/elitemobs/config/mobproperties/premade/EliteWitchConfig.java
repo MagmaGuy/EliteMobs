@@ -14,6 +14,6 @@ public class EliteWitchConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &5Witch",
                 new ArrayList<>(List.of("$player &cbecame $entity's &ctest subject!",
                         "$player &chas been bewitched by $entity&c!")),
-                6);
+                6, 26);
     }
 }

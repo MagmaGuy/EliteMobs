@@ -114,7 +114,7 @@ public class ZombieNecronomiconSupport implements Listener {
                 return;
             }
 
-            owner.setAI(false);
+            eliteEntity.setAIEnabled(false);
             ensurePresentation();
             reinforcementController = new BukkitRunnable() {
                 @Override
@@ -135,12 +135,12 @@ public class ZombieNecronomiconSupport implements Listener {
             // Preserve the original running cap: the controller can spawn exactly one mob each
             // 60-tick pass while the live reinforcement count is below 11.
             if (reinforcements.size() >= 11) {
-                owner.setAI(true);
+                eliteEntity.setAIEnabled(true);
                 stopPresentation();
                 return;
             }
 
-            owner.setAI(false);
+            eliteEntity.setAIEnabled(false);
             ensurePresentation();
             spawnOneReinforcement(owner);
         }
@@ -183,7 +183,7 @@ public class ZombieNecronomiconSupport implements Listener {
 
         private void ensurePresentation() {
             LivingEntity owner = eliteEntity.getLivingEntity();
-            if (owner == null || !owner.isValid() || owner.hasAI()) return;
+            if (owner == null || !owner.isValid() || eliteEntity.isAIEnabled()) return;
             startNameController(owner);
             if (MobCombatSettingsConfig.isEnableWarningVisualEffects()) startVisualController(owner);
         }
@@ -202,7 +202,7 @@ public class ZombieNecronomiconSupport implements Listener {
             nameController = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!owner.isValid() || owner.hasAI()) {
+                    if (!owner.isValid() || eliteEntity.isAIEnabled()) {
                         stopPresentation();
                         return;
                     }
@@ -221,7 +221,7 @@ public class ZombieNecronomiconSupport implements Listener {
 
                 @Override
                 public void run() {
-                    if (!owner.isValid() || owner.hasAI()) {
+                    if (!owner.isValid() || eliteEntity.isAIEnabled()) {
                         stopPresentation();
                         return;
                     }
@@ -255,7 +255,7 @@ public class ZombieNecronomiconSupport implements Listener {
             cancelTask(reinforcementController);
             reinforcementController = null;
             LivingEntity owner = eliteEntity.getLivingEntity();
-            if (owner != null && owner.isValid()) owner.setAI(true);
+            if (owner != null && owner.isValid()) eliteEntity.setAIEnabled(true);
             stopPresentation();
         }
 
@@ -276,7 +276,7 @@ public class ZombieNecronomiconSupport implements Listener {
             stopPresentation();
 
             LivingEntity owner = eliteEntity.getLivingEntity();
-            if (owner != null && owner.isValid()) owner.setAI(true);
+            if (owner != null && owner.isValid()) eliteEntity.setAIEnabled(true);
 
             if (cullReinforcements) {
                 for (CustomBossEntity reinforcement : new ArrayList<>(reinforcements))

@@ -14,6 +14,6 @@ public class EliteZombiefiedPiglin extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &6Zombified Piglin",
                 new ArrayList<>(List.of("$player &cwas mobbed to death by $entity&c!",
                         "$entity &cgot $player's &cbacon!")),
-                12);
+                12, 20);
     }
 }

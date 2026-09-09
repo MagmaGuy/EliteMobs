@@ -12,6 +12,6 @@ public class EliteShulkerConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &5Shulker",
                 List.of("$entity &cshowed $player &cnew heights!"),
-                4);
+                4, 30);
     }
 }

@@ -14,6 +14,6 @@ public class EliteDrownedConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &3Drowned",
                 new ArrayList<>(List.of("$player &chas been brought down to the depths by $entity!",
                         "$player &chas been drowned by $entity!")),
-                4);
+                4, 20);
     }
 }

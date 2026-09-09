@@ -12,6 +12,6 @@ public class EliteCaveSpiderConfig extends MobPropertiesConfigFields {
                 true,
                 "&fLvl &2$level &fElite &3Cave Spider",
                 List.of("$player &cbecame entangled in $entity's &cweb!"),
-                3);
+                3, 12);
     }
 }

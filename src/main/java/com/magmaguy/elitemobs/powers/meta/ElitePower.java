@@ -157,7 +157,7 @@ public class ElitePower {
         if (event.isCancelled()) return false;
         if (event.getEliteMobEntity().getPowerSuppression().isSuppressed()) return false;
         if (event.getEliteMobEntity().getLivingEntity() == null) return false;
-        if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
+        if (!event.getEliteMobEntity().isAIActive()) return false;
         if (ignoreGlobalCooldown) return true;
         if (elitePower.isInGlobalCooldown()) return false;
         return !event.getEliteMobEntity().isInCooldown();
@@ -167,7 +167,7 @@ public class ElitePower {
         if (event.isCancelled()) return false;
         if (event.getEliteMobEntity().getPowerSuppression().isSuppressed()) return false;
         if (event.getEliteMobEntity().getLivingEntity() == null) return false;
-        if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
+        if (!event.getEliteMobEntity().isAIActive()) return false;
         if (elitePower.isInGlobalCooldown()) return false;
         if (elitePower.isInCooldown(event.getEliteMobEntity())) return false;
         return !event.getEliteMobEntity().isInCooldown();
@@ -177,7 +177,7 @@ public class ElitePower {
         if (event.isCancelled()) return false;
         if (event.getEliteMobEntity().getPowerSuppression().isSuppressed()) return false;
         if (event.getEliteMobEntity().getLivingEntity() == null) return false;
-        if (!event.getEliteMobEntity().getLivingEntity().hasAI()) return false;
+        if (!event.getEliteMobEntity().isAIActive()) return false;
         if (elitePower.isInGlobalCooldown()) return false;
         return !event.getEliteMobEntity().isInCooldown();
     }

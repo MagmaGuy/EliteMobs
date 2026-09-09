@@ -14,6 +14,6 @@ public class ElitePiglinConfig extends MobPropertiesConfigFields {
                 "&fLvl &2$level &fElite &ePiglin",
                 new ArrayList<>(List.of("$entity &cwill fetch a good price for $player's remains!",
                         "$entity &ctaught $player &cthe value of gold!")),
-                13);
+                13, 16);
     }
 }
