@@ -1295,6 +1295,7 @@ public class EliteEntity {
     }
 
     public void addReinforcement(Entity entity) {
+        nonEliteReinforcementEntities.removeIf(existing -> !existing.isValid());
         this.nonEliteReinforcementEntities.add(entity);
     }
 

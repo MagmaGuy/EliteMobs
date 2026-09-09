@@ -34,7 +34,6 @@ public class LuaElitePower extends ElitePower {
     private final LuaPowerConfigFields luaPowerConfigFields;
     private ScriptInstance instance = null;
     private ScriptableBoss scriptableBoss = null;
-    private ScriptableBoss suppliedActor;
     private final Map<String, Long> successfulEventHooks = new LinkedHashMap<>();
     private final Map<String, Long> failedEventHooks = new LinkedHashMap<>();
     private long acceptedMindActions;
@@ -166,15 +165,6 @@ public class LuaElitePower extends ElitePower {
         initializeInstance(true);
     }
 
-    /** Starts the same power runtime with an owner adapter supplying encounter-specific context. */
-    public void startRuntimeOrThrow(ScriptableBoss actor) {
-        if (actor == null || actor.getEliteEntity() != getOwnerEntity())
-            throw new IllegalArgumentException("Lua actor must wrap this power's owner");
-        if (instance != null) throw new IllegalStateException("Lua power already started");
-        suppliedActor = actor;
-        initializeInstance(true);
-    }
-
     public boolean isRuntimeActive() { return instance != null && !instance.isClosed(); }
 
     /** Freezes this runtime without discarding its Lua VM, state table, or owned callbacks. */
@@ -198,11 +188,15 @@ public class LuaElitePower extends ElitePower {
         if (instance != null && !instance.isClosed()) {
             return;
         }
-        // An owned encounter observes failure and closes through its admission lifecycle.
-        // A later damage event must not silently restart its state before that check runs.
-        if (suppliedActor != null && instance != null && instance.isClosed()) return;
+        // Script failures close the retained instance. Do not silently reset its state
+        // on the next damage hook. Deliberate owner teardown uses closeRuntime(), which
+        // clears the reference and permits normal body rehydration to start afresh.
+        if (instance != null && instance.isClosed()) {
+            if (failFast) throw new IllegalStateException("Lua power previously failed: " + getFileName());
+            return;
+        }
         try {
-            scriptableBoss = suppliedActor == null ? new ScriptableBoss(ownerEntity) : suppliedActor;
+            scriptableBoss = new ScriptableBoss(ownerEntity);
             instance = new ScriptInstance(luaPowerConfigFields.getLuaPowerDefinition(), scriptableBoss);
             // Bootstrap the Lua VM + tick registration now (on_spawn arrives later as a separate
             // EliteMobSpawnEvent), so a tick-only boss script still starts its on_game_tick loop.

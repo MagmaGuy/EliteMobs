@@ -130,13 +130,6 @@ public class ScriptableBoss extends ScriptableEntity {
         return entityTables.createBossTable();
     }
 
-    /** Reuses canonical entity operations when a specialized owner exposes a known participant. */
-    protected final LuaTable participantTable(ScriptInstance instance, LivingEntity participant) {
-        ensureHelpers(instance);
-        return participant instanceof Player player ? entityTables.createPlayerTable(player)
-                : entityTables.createLivingEntityTable(participant);
-    }
-
     @Override
     public String getContextKey() {
         return "boss";

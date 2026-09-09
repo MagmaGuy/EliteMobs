@@ -35,12 +35,10 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
     private final ClassTrialDefinition trial;
     private final double quotedFee;
     private CustomBossEntity instructor;
-    private ClassTrialCombat combat;
     private BukkitTask combatTask;
     private BukkitTask cleanupTask;
     private boolean ending;
     private boolean closing;
-    private boolean halfway;
     private int elapsedTicks;
     private boolean feeCharged;
     private boolean classUnlocked;
@@ -135,6 +133,7 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
                 throw new IllegalStateException("Trial arena requires an interior north spawn point");
             instructor.spawn(spawn, true);
             if (!instructor.exists()) throw new IllegalStateException("Instructor spawn was rejected");
+            requireActivePowers();
             if (!EconomyHandler.tryWithdraw(challenger.getUniqueId(), quotedFee)) {
                 tell(challenger, "&cThe entry fee could not be paid. The trial was cancelled.");
                 destroyMatch();
@@ -143,8 +142,6 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
             feeCharged = true;
             super.startMatch();
             if (instructor.getLivingEntity() instanceof Mob mob) mob.setTarget(challenger);
-            say(trial.opening());
-            combat = new ClassTrialCombat(trial, instructor, challenger, container);
             combatTask = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, this::tickCombat, 5, 5);
         } catch (RuntimeException failure) {
             Logger.warn("Class trial " + trial.form().id() + " failed: " + failure.getMessage());
@@ -163,12 +160,8 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
             endMatch();
             return;
         }
-        if (!halfway && instructor.getHealth() <= instructor.getMaxHealth() * .5) {
-            halfway = true;
-            say(trial.halfway());
-        }
         try {
-            combat.tick();
+            requireActivePowers();
         } catch (RuntimeException failure) {
             Logger.warn("Class trial combat failed for " + trial.form().id() + ": " + failure.getMessage());
             refund();
@@ -176,7 +169,7 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
             return;
         }
         if ((elapsedTicks += 5) >= 6000 && state == InstancedRegionState.ONGOING) {
-            say("Five minutes. Rest, then return when you are ready.");
+            tell(challenger, "&eThe trial time limit was reached.");
             defeat();
         }
     }
@@ -186,8 +179,6 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
         if (!owns(event.getEliteMobEntity())) return;
         if (state != InstancedRegionState.ONGOING || !event.getPlayer().equals(challenger)) {
             event.setCancelled(true);
-        } else if (event.getEliteMobEntity() == instructor && combat != null) {
-            event.setDamage(event.getDamage() * combat.incomingMultiplier());
         }
     }
 
@@ -196,7 +187,6 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
         if (!owns(event.getEliteMobEntity())) return;
         if (state != InstancedRegionState.ONGOING || !event.getPlayer().equals(challenger))
             event.setCancelled(true);
-        else if (combat != null) event.setDamage(event.getDamage() * combat.outgoingMultiplier());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -205,7 +195,6 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
                 || !challenger.isOnline() || !players.contains(challenger)) return;
         if (ExperimentalCombatModule.get().completeChallenge(challenger, trial.form().id())) {
             classUnlocked = true;
-            say(trial.victory());
             victory();
         } else {
             tell(challenger, "&cYour class data became unavailable. Contact an administrator about this victory.");
@@ -214,16 +203,11 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
         }
     }
 
-    @Override protected void defeat() {
-        if (!closing) say(trial.defeat());
-        super.defeat();
-    }
 
     @Override protected void endMatch() {
         if (closing || ending) return;
         ending = true;
         if (combatTask != null) combatTask.cancel();
-        if (combat != null) combat.close();
         super.endMatch();
         // Let the canonical death/leave callback finish before evacuating its participants.
         cleanupTask = Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, this::destroyMatch);
@@ -239,7 +223,6 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
         HandlerList.unregisterAll(this);
         try {
             if (feeCharged && state == InstancedRegionState.ONGOING) refund();
-            if (combat != null) combat.close();
             if (instructor != null) instructor.remove(RemovalReason.ARENA_RESET);
             super.destroyMatch();
         } finally {
@@ -256,8 +239,20 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
     }
 
     private boolean owns(com.magmaguy.elitemobs.mobconstructor.EliteEntity entity) {
-        return entity != null && (entity == instructor || (combat != null
-                && entity instanceof CustomBossEntity custom && combat.owns(custom)));
+        var visited = new java.util.HashSet<com.magmaguy.elitemobs.mobconstructor.EliteEntity>();
+        while (entity != null && visited.add(entity)) {
+            if (entity == instructor) return true;
+            entity = entity.getSummoningEntity();
+        }
+        return false;
+    }
+
+    private void requireActivePowers() {
+        var powers = instructor.getElitePowers().stream()
+                .filter(com.magmaguy.elitemobs.powers.lua.LuaElitePower.class::isInstance)
+                .map(com.magmaguy.elitemobs.powers.lua.LuaElitePower.class::cast).toList();
+        if (powers.isEmpty() || powers.stream().anyMatch(power -> !power.isRuntimeActive()))
+            throw new IllegalStateException("An instructor's required Lua power is unavailable");
     }
 
     private void refund() {
@@ -268,6 +263,6 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
         else Logger.warn("Trial refund failed for " + challenger.getUniqueId() + ": " + quotedFee);
     }
 
-    private void say(String text) { tell(challenger, "&6" + trial.form().displayName() + " Instructor: &f" + text); }
     private static void tell(Player player, String text) { if (player.isOnline()) player.sendMessage(ChatColorConverter.convert(text)); }
 }
+

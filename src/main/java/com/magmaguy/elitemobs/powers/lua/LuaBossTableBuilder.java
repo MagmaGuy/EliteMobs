@@ -320,6 +320,9 @@ final class LuaBossTableBuilder {
                     }
                 }
             }
+            // Tracked power projectiles share the boss's existing reinforcement lifetime.
+            // In particular, an arena reset must not leave its arrows alive after the owner.
+            if (projectile instanceof Projectile && shouldTrack) eliteEntity.addReinforcement(projectile);
             applyGenericSpawnOptions(projectile, options);
             if (options.get("on_land").isfunction()) {
                 monitorEntityLanding(projectile,
