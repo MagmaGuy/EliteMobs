@@ -79,6 +79,11 @@ public class CustomBossMegaConsumer {
      * @return Whether the spawn succeeded or not.
      */
     public LivingEntity spawn() {
+        return spawn(null);
+    }
+
+    /** Uses the ordinary boss setup for native bodies supplied by the Mind host. */
+    public LivingEntity spawn(java.util.function.Function<java.util.function.Consumer<LivingEntity>, LivingEntity> bodyFactory) {
         if (spawnLocation == null) {
             Logger.warn("Custom Boss Entity " + customBossesConfigFields.getFilename() + " tried to spawn without a valid spawn location getting assigned! Report this to the developer!");
             return null;
@@ -94,9 +99,9 @@ public class CustomBossMegaConsumer {
         }
 
         disguiseQueued = queueDisguise(parseName(customBossEntity, level));
-        LivingEntity livingEntity = (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
+        LivingEntity livingEntity = bodyFactory == null ? (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
                 customBossesConfigFields.getEntityType().getEntityClass(),
-                entity -> applyBossFeatures((LivingEntity) entity));
+                entity -> applyBossFeatures((LivingEntity) entity)) : bodyFactory.apply(this::applyBossFeatures);
         setCustomModel(livingEntity);
         customBossEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
         return livingEntity;

@@ -77,6 +77,7 @@ public final class TransportModule implements Listener, AutoCloseable {
         try {
             if (Bukkit.getServicesManager().load(EliteMindService.class) == null)
                 throw new IllegalStateException("Native flying Minds are unavailable on this server version.");
+            requireTransportEntity(route);
             if (recovery.read(player.getUniqueId()) != null) { recover(player); return false; }
             World world = resolveWorld(player, route);
             CurvedRoute curve = route.curve();
@@ -174,21 +175,20 @@ public final class TransportModule implements Listener, AutoCloseable {
                         j.status = j.flight.tick(context);
                     }
                 }).build();
-        var profile = EliteMindBodyProfile.forCarrier(Objects.requireNonNull(NamespacedKey.fromString(j.route.carrier())), EliteMindBodyLocomotion.FLYING);
+        var entityConfig = requireTransportEntity(j.route);
+        var profile = EliteMindBodyProfile.forCarrier(entityConfig.getEntityType().getKey(), EliteMindBodyLocomotion.FLYING);
         j.actor = EliteMindServiceModule.spawnInternal(new InternalMindActorSpawnRequest(plugin,
                 j.player.getUniqueId(), j.curve.at(0).toLocation(j.world), 1, profile, program, actor -> {
-                    actor.setPersistent(false); actor.setEliteLoot(false); actor.setVanillaLoot(false); actor.setRandomLoot(false);
                     LivingEntity body = actor.getLivingEntity();
                     body.setPersistent(false); body.setRemoveWhenFarAway(false); body.setCanPickupItems(false);
-                    body.setInvulnerable(true); body.setSilent(true); body.setCustomNameVisible(false);
+                    // Journey safety is temporary. Appearance, equipment and powers belong to the boss YAML.
+                    body.setInvulnerable(true);
                     body.setPortalCooldown(Integer.MAX_VALUE);
-                    if (body.getEquipment() != null) body.getEquipment().clear();
-                })).orElseThrow(() -> new IllegalStateException("Native flying Minds are unavailable on this server version"));
+                }, entityConfig)).orElseThrow(() -> new IllegalStateException("Native flying Minds are unavailable on this server version"));
         LivingEntity body = j.actor.getLivingEntity();
-        j.model = TransportModel.attach(body, j.route);
         var bounds = body.getBoundingBox();
         if (bounds.getWidthX() > 1.3 || bounds.getWidthZ() > 1.3 || bounds.getHeight() > 1.4)
-            throw new IllegalArgumentException("Transport carrier exceeds the supported clearance envelope; use the pig carrier with a custom model");
+            throw new IllegalArgumentException("Transport entity exceeds the supported clearance envelope (1.3 blocks wide, 1.4 blocks tall)");
         if (!body.addPassenger(j.player) || j.player.getVehicle() != body)
             throw new IllegalStateException("Could not seat the player on the mount");
         j.player.setFallDistance(0);
@@ -200,7 +200,6 @@ public final class TransportModule implements Listener, AutoCloseable {
         try {
             if (j.actor != null) {
                 j.player.leaveVehicle();
-                if (j.model != null) try { j.model.close(); } catch (Exception error) { plugin.getLogger().warning("Transport model cleanup: " + error); }
                 EliteMindServiceModule.clearInternal(j.actor);
             }
             if (j.journaled && !j.playerOffline && j.player.isOnline() && !j.player.isDead()) {
@@ -322,10 +321,24 @@ public final class TransportModule implements Listener, AutoCloseable {
     }
     static void message(Player player, String text) { player.sendMessage(ChatColorConverter.convert("&6[Travel] &f" + text)); }
 
+    private static com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields requireTransportEntity(TransportRoute route) {
+        var config = com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig.getCustomBoss(route.transportEntity());
+        if (config == null || !config.isEnabled())
+            throw new IllegalArgumentException("Transport entity is missing or disabled: " + route.transportEntity());
+        if (!config.isAi() || config.isFrozen())
+            throw new IllegalArgumentException("Transport entity needs ai: true and frozen: false for native flight: " + config.getFilename());
+        if (config.getCustomModel() != null && !config.getCustomModel().isBlank() && !config.isCustomModelExists())
+            throw new IllegalArgumentException("Transport entity model is unavailable: " + config.getCustomModel());
+        if (config.getDisguise() != null && !config.getDisguise().isBlank()
+                && !Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
+            throw new IllegalArgumentException("Transport entity requires LibsDisguises: " + config.getFilename());
+        return config;
+    }
+
     private static final class Journey {
         final Player player; final TransportRoute route; final World world; final CurvedRoute curve;
         final MatchInstance match; final Location departure; final Location destination;
-        TransportChunks.Lease terrain; EliteEntity actor; AutoCloseable model; RouteFlight flight;
+        TransportChunks.Lease terrain; EliteEntity actor; RouteFlight flight;
         RouteFlight.Status status = RouteFlight.Status.FLYING;
         boolean ready, journaled, playerOffline; int age, charge;
         Journey(Player player, TransportRoute route, World world, CurvedRoute curve, MatchInstance match) {

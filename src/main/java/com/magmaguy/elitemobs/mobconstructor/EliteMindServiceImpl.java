@@ -150,6 +150,7 @@ final class EliteMindServiceImpl implements EliteMindService, Listener {
                 request.systemOwner(),
                 new EliteMindProgram(key, request.program().revision()),
                 request.program());
+        if (request.customBoss() != null) return spawnConfigured(request, entry);
         return spawnResolved(
                 request.systemOwner(),
                 entry,
@@ -215,6 +216,43 @@ final class EliteMindServiceImpl implements EliteMindService, Listener {
         } finally {
             if (!committed) {
                 rollbackSpawn(eliteEntity, body, handle, binding);
+            }
+        }
+    }
+
+    private EliteEntity spawnConfigured(InternalMindActorSpawnRequest request, EliteMindProgramEntry entry) {
+        var config = request.customBoss();
+        if (!config.isEnabled()) throw new IllegalArgumentException("Custom boss is disabled: " + config.getFilename());
+        if (!config.getEntityType().getKey().equals(request.bodyProfile().carrierType()))
+            throw new IllegalArgumentException("Native body must match custom boss entityType");
+        bodyCapabilities.validate(request.bodyProfile());
+        var actor = new com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity(config);
+        actor.setLevel(config.getLevel() > 0 ? config.getLevel() : request.level());
+        actor.setPersistent(false);
+        actor.addCustomData(new NamespacedKey(request.systemOwner(), "native_mind_player_owner"), request.playerOwnerId());
+        MobBody[] body = new MobBody[1];
+        MindHandle[] handle = new MindHandle[1];
+        EliteMindBinding[] binding = new EliteMindBinding[1];
+        boolean committed = false;
+        try {
+            actor.spawnWithBody(request.location(), configure -> {
+                body[0] = mindHost.spawnBody(request.location(), toNativeProfile(request.bodyProfile()));
+                CrashFix.persistentTracker(body[0].entity());
+                handle[0] = mindHost.open(actor.getEliteUUID(), entry.instantiate());
+                binding[0] = new EliteMindBinding(entry, handle[0], body[0]);
+                ((EliteEntity) actor).setEliteMindBinding(binding[0]);
+                configure.accept(body[0].entity());
+                return body[0].entity();
+            });
+            if (!actor.exists() || EntityTracker.getEliteMobEntities().get(actor.getEliteUUID()) != actor)
+                throw new IllegalStateException("Custom boss spawn was rejected: " + config.getFilename());
+            request.initializer().accept(actor);
+            committed = true;
+            return actor;
+        } finally {
+            if (!committed) {
+                try { actor.remove(RemovalReason.ENTITY_REPLACEMENT); }
+                finally { rollbackSpawn(actor, body[0], handle[0], binding[0]); }
             }
         }
     }

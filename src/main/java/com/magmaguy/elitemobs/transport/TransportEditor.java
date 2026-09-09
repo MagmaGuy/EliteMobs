@@ -24,7 +24,7 @@ public final class TransportEditor implements AutoCloseable {
             if (action.equals("create") || action.equals("edit")) {
                 if (drafts.containsKey(player.getUniqueId())) throw new IllegalArgumentException("Save or cancel your current draft first.");
                 TransportRoute route = module.files.get(value);
-                if (action.equals("create") && route != null) throw new IllegalArgumentException("Route already exists. Use edit.");
+                if (action.equals("create") && module.files.hasDefinition(value)) throw new IllegalArgumentException("Route file already exists. Use edit, or correct its configuration if disabled or invalid.");
                 if (action.equals("edit") && route == null) throw new IllegalArgumentException("Unknown route.");
                 if (value == null || !value.matches("[a-z0-9_-]{1,64}")) throw new IllegalArgumentException("Use a lowercase route id with letters, digits, underscores or hyphens.");
                 World world = route == null ? player.getWorld() : TransportModule.resolveWorld(player, route);
@@ -136,8 +136,7 @@ public final class TransportEditor implements AutoCloseable {
         TransportRoute route(float yaw) {
             return new TransportRoute(id, original == null ? id : original.name(),
                     original == null ? authoredWorld : original.world(),
-                    original == null ? "minecraft:pig" : original.carrier(),
-                    original == null ? "" : original.model(), original == null ? "fly" : original.animation(),
+                    original == null ? "transport_cannon_seat.yml" : original.transportEntity(),
                     original == null ? 12 : original.speed(), original == null ? 8 : original.acceleration(),
                     original == null ? 60 : original.countdown(), yaw, points);
         }

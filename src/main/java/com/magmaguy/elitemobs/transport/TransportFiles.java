@@ -12,29 +12,24 @@ final class TransportFiles {
     final Path routes;
     final Path journeys;
     private final Map<String, TransportRoute> loaded = new TreeMap<>();
-    private final Logger logger;
+    private com.magmaguy.elitemobs.config.transport.TransportRoutesConfig configuration;
     TransportFiles(Path data, Logger logger) throws IOException {
         routes = data.resolve("transport_routes"); journeys = data.resolve("transport_journeys");
-        this.logger = logger;
         Files.createDirectories(routes); Files.createDirectories(journeys);
         reload();
     }
     void reload() throws IOException {
         Map<String, TransportRoute> next = new TreeMap<>();
-        try (var paths = Files.walk(routes)) {
-            for (Path file : paths.filter(p -> p.toString().endsWith(".yml")).toList()) {
-                String id = file.getFileName().toString().replaceFirst("\\.yml$", "");
-                try {
-                    YamlConfiguration yaml = new YamlConfiguration(); yaml.load(file.toFile());
-                    TransportRoute route = TransportRoute.read(id, yaml);
-                    if (next.putIfAbsent(id, route) != null) throw new IOException("Duplicate transport route: " + id);
-                } catch (IOException duplicate) { throw duplicate; }
-                catch (Exception invalid) { logger.warning("Transport route " + file + ": " + invalid.getMessage()); }
-            }
+        configuration = new com.magmaguy.elitemobs.config.transport.TransportRoutesConfig();
+        for (var fields : configuration.getCustomConfigFieldsHashMap().values()) {
+            if (!fields.isEnabled()) continue;
+            TransportRoute route = ((com.magmaguy.elitemobs.config.transport.TransportRoutesConfigFields) fields).getRoute();
+            if (route != null) next.put(route.id(), route);
         }
         loaded.clear(); loaded.putAll(next);
     }
     TransportRoute get(String id) { return loaded.get(id); }
+    boolean hasDefinition(String id) { return configuration.getCustomConfigFieldsHashMap().containsKey(id + ".yml"); }
     List<String> ids() { return List.copyOf(loaded.keySet()); }
     void save(TransportRoute route) throws IOException {
         Path target = routes.resolve(route.id() + ".yml");
@@ -43,7 +38,15 @@ final class TransportFiles {
             target = paths.filter(p -> p.getFileName().toString().equals(route.id() + ".yml"))
                     .findFirst().orElse(target);
         }
-        atomic(target, route.write()); loaded.put(route.id(), route);
+        YamlConfiguration yaml = new YamlConfiguration();
+        yaml.options().parseComments(true);
+        try { if (Files.exists(target)) yaml.load(target.toFile()); }
+        catch (org.bukkit.configuration.InvalidConfigurationException invalid) { throw new IOException("Invalid route YAML: " + target, invalid); }
+        route.write(yaml, !Files.exists(target));
+        if (yaml.getComments("transportEntity").isEmpty())
+            yaml.setComments("transportEntity", List.of("Enabled file in custombosses/. Configure its appearance and powers in that file."));
+        atomic(target, yaml);
+        reload();
     }
     static void atomic(Path path, YamlConfiguration yaml) throws IOException {
         Path temp = Files.createTempFile(path.getParent(), ".transport-", ".tmp");

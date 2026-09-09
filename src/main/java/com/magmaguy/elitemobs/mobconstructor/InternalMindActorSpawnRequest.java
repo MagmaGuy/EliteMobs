@@ -21,7 +21,14 @@ public record InternalMindActorSpawnRequest(
         int level,
         EliteMindBodyProfile bodyProfile,
         MindProgram program,
-        Consumer<EliteEntity> initializer) {
+        Consumer<EliteEntity> initializer,
+        com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields customBoss) {
+
+    public InternalMindActorSpawnRequest(Plugin owner, UUID player, Location location, int level,
+                                         EliteMindBodyProfile profile, MindProgram program,
+                                         Consumer<EliteEntity> initializer) {
+        this(owner, player, location, level, profile, program, initializer, null);
+    }
 
     public InternalMindActorSpawnRequest {
         Objects.requireNonNull(systemOwner, "systemOwner");

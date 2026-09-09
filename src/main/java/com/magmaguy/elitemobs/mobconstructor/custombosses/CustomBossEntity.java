@@ -267,6 +267,20 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     protected void spawn(SpawnLifecycle.Context spawnContext) {
+        spawn(spawnContext, null);
+    }
+
+    /** Native Minds provide the body; configuration and spawn lifecycle remain owned here. */
+    public void spawnWithBody(Location location,
+                              java.util.function.Function<java.util.function.Consumer<LivingEntity>, LivingEntity> bodyFactory) {
+        if (exists()) throw new IllegalStateException("Custom boss is already spawned");
+        this.spawnLocation = location.clone();
+        this.persistentLocation = location.clone();
+        spawn(SpawnLifecycle.fromSilentFlag(true), java.util.Objects.requireNonNull(bodyFactory));
+    }
+
+    private void spawn(SpawnLifecycle.Context spawnContext,
+                       java.util.function.Function<java.util.function.Consumer<LivingEntity>, LivingEntity> bodyFactory) {
         if (livingEntity != null && livingEntity.isValid())
             return;
 
@@ -291,7 +305,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         if (PatrolService.canMaterialize(this, effectiveSpawnLocation) || isMount) {
             if (!effectiveSpawnLocation.equals(spawnLocation))
                 setRespawnOverrideLocation(effectiveSpawnLocation);
-            super.livingEntity = new CustomBossMegaConsumer(this).spawn();
+            super.livingEntity = new CustomBossMegaConsumer(this).spawn(bodyFactory);
             setNormalizedHealth();
             if (super.livingEntity == null)
                 Logger.warn("Something just prevented EliteMobs from spawning a Custom Boss! More info up next.");
