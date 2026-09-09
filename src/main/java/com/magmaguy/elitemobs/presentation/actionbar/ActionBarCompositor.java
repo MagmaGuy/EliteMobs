@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.presentation.actionbar;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
+import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -84,10 +85,11 @@ public final class ActionBarCompositor implements Listener {
     private enum Encoding {
         LEGACY,
         RAW,
-        HUD_PROBE
+        COMBAT_HUD
     }
 
     private static final long KEEPALIVE_INTERVAL_TICKS = 40;
+    private static final CombatHud COMBAT_HUD = new CombatHud();
     private static final Map<UUID, PlayerState> playerStates = new HashMap<>();
     private static final ConcurrentLinkedQueue<Mutation> pendingMutations = new ConcurrentLinkedQueue<>();
 
@@ -162,14 +164,6 @@ public final class ActionBarCompositor implements Listener {
         dispatch(new ClearMutation(player.getUniqueId(), source));
     }
 
-    /** Opt-in admin calibration, cleared on logout. Ordinary sources resume when the probe is removed. */
-    public static void setHudProbe(Player player, CombatHudProbe probe) {
-        requirePrimaryThread("setHudProbe");
-        PlayerState state = playerStates.computeIfAbsent(player.getUniqueId(), ignored -> new PlayerState());
-        state.hudProbe = probe;
-        render(player.getUniqueId());
-    }
-
     /** Stops rendering and releases every retained player message. Safe to call more than once. */
     public static void shutdown() {
         if (task != null) {
@@ -221,7 +215,7 @@ public final class ActionBarCompositor implements Listener {
             PlayerState state = playerStates.get(playerId);
             removeExpired(state);
             render(player, state);
-            if (state.hudProbe == null && state.entries.isEmpty() && !state.hasRenderedMessage)
+            if (state.entries.isEmpty() && !state.hasRenderedMessage)
                 iterator.remove();
         }
     }
@@ -230,7 +224,9 @@ public final class ActionBarCompositor implements Listener {
         PlayerState state = playerStates.computeIfAbsent(mutation.playerId(), ignored -> new PlayerState());
         if (mutation instanceof ShowMutation show) {
             long duration = show.durationTicks;
-            if (state.hudProbe != null && show.readingTime && !show.source.isPersistent())
+            Player player = Bukkit.getPlayer(show.playerId());
+            if (player != null && ExperimentalCombatRuntime.isActive(player)
+                    && show.readingTime && !show.source.isPersistent())
                 duration = Math.min(600L, Math.max(120L, duration * 2));
             long expiresAtTick = duration == Source.PERSISTENT
                     ? Long.MAX_VALUE
@@ -252,28 +248,28 @@ public final class ActionBarCompositor implements Listener {
         if (state == null) return;
         removeExpired(state);
         render(player, state);
-        if (state.hudProbe == null && state.entries.isEmpty() && !state.hasRenderedMessage)
+        if (state.entries.isEmpty() && !state.hasRenderedMessage)
             playerStates.remove(playerId);
     }
 
     private static void render(Player player, PlayerState state) {
-        if (state.hudProbe != null) {
-            String text = state.hudProbe.text(player, ExperimentalCombatModule.isAbilityGestureOpen(player.getUniqueId()));
+        if (ExperimentalCombatRuntime.isActive(player)) {
+            String text = COMBAT_HUD.text(player, ExperimentalCombatModule.isAbilityGestureOpen(player.getUniqueId()));
             Entry feedback = selectWinner(state, true);
             String feedbackText = feedback == null ? null : feedback.message;
             Encoding feedbackEncoding = feedback == null ? null : feedback.source.encoding;
-            if (!state.hasRenderedMessage || state.lastEncoding != Encoding.HUD_PROBE
+            if (!state.hasRenderedMessage || state.lastEncoding != Encoding.COMBAT_HUD
                     || !Objects.equals(feedbackText, state.lastFeedback)
                     || feedbackEncoding != state.lastFeedbackEncoding
                     || !text.equals(state.lastMessage)
                     || currentTick - state.lastSentAtTick >= KEEPALIVE_INTERVAL_TICKS) {
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, state.hudProbe.component(
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, COMBAT_HUD.component(
                         text, feedbackText, feedbackEncoding == Encoding.LEGACY));
                 state.hasRenderedMessage = true;
                 state.lastMessage = text;
                 state.lastFeedback = feedbackText;
                 state.lastFeedbackEncoding = feedbackEncoding;
-                state.lastEncoding = Encoding.HUD_PROBE;
+                state.lastEncoding = Encoding.COMBAT_HUD;
                 state.lastSentAtTick = currentTick;
             }
             return;
@@ -362,7 +358,6 @@ public final class ActionBarCompositor implements Listener {
     }
 
     private static final class PlayerState {
-        private CombatHudProbe hudProbe;
         private final EnumMap<Source, Entry> entries = new EnumMap<>(Source.class);
         private boolean hasRenderedMessage;
         private String lastMessage;

@@ -11,23 +11,13 @@ import org.bukkit.entity.Player;
 
 import java.awt.Color;
 
-/** Session-only HUD concept. Assets live in design/combat-hud-probe/mods. */
-public final class CombatHudProbe {
-    public static final int MAX_X_OFFSET = 64;
-    public static final int MAX_Y_OFFSET = 16;
-    private final String font;
-    private final int x;
-
-    public CombatHudProbe(int x, int y) {
-        if (Math.abs((long) x) > MAX_X_OFFSET || Math.abs((long) y) > MAX_Y_OFFSET)
-            throw new IllegalArgumentException("HUD offsets must be x=-64..64 and y=-16..16 GUI pixels.");
-        this.x = x;
-        font = "elitemobs:combat_hud_concept_" + (y + MAX_Y_OFFSET);
-    }
+/** Resource-pack HUD rendered automatically by the managed-world combat lifecycle. */
+public final class CombatHud {
+    private static final String FONT = "elitemobs:combat_hud_concept_16";
 
     public String text(Player player, boolean active) {
         int animationFrame = (int) Math.floorMod(MonotonicTickClock.currentTick() / 4L, 4L);
-        StringBuilder line = new StringBuilder(spacing(x));
+        StringBuilder line = new StringBuilder();
         line.append(active ? '\uE001' : '\uE000').append(spacing(-191));
         double health = player.getHealth();
         var maximumAttribute = player.getAttribute(Attribute.MAX_HEALTH);
@@ -49,12 +39,12 @@ public final class CombatHudProbe {
         });
         if (active) abilityIcons(line, player);
         // All overlays return to the panel origin. Keep the total advance at 190 GUI pixels.
-        return line.append(spacing(190 - x)).toString();
+        return line.append(spacing(190)).toString();
     }
 
     public TextComponent component(String text) {
         TextComponent component = new TextComponent(text);
-        component.setFont(font);
+        component.setFont(FONT);
         component.setColor(net.md_5.bungee.api.ChatColor.WHITE);
         component.setShadowColor(new Color(0, true));
         return component;
@@ -67,7 +57,7 @@ public final class CombatHudProbe {
         int width = CombatHudFeedback.widthInHalfPixels(message);
         // The HUD advances 190px. The text overlay must have zero net advance or Minecraft
         // recenters the entire action bar when feedback changes length.
-        int start = x * 2 + (380 - width) / 2;
+        int start = (380 - width) / 2;
         component.addExtra(halfPixelSpacing(start - 380));
         for (var part : message) component.addExtra(part);
         component.addExtra(halfPixelSpacing(380 - start - width));

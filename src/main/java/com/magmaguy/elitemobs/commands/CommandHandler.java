@@ -94,8 +94,6 @@ public class CommandHandler {
         emCommand.registerCommand(new ProtectionBypassCommand());
         emCommand.registerCommand(new FirstTimeSetupCommand());
         emCommand.registerCommand(new DebugCommand());
-        emCommand.registerCommand(new CombatHudProbeCommand(true));
-        emCommand.registerCommand(new CombatHudProbeCommand(false));
         emCommand.registerCommand(new DebugInfoCommand());
         for (String action : java.util.List.of("create", "edit", "add", "remove", "move", "undo", "save", "cancel", "ride", "start", "stop", "status", "list", "reload"))
             emCommand.registerCommand(new TransportCommand(action));
