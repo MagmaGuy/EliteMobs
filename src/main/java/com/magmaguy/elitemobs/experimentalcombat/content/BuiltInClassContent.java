@@ -27,7 +27,7 @@ public final class BuiltInClassContent {
     private static final int RESOLVE_MANA_RATE_PERCENT = 66;
     private static final int FURY_MANA_RATE_PERCENT = 55;
     private static final int FOCUS_MANA_RATE_PERCENT = 85;
-    private static final int GRACE_MANA_RATE_PERCENT = 66;
+    private static final int GRACE_MANA_RATE_PERCENT = 200;
     private static final DamageFreeRecoveryBonus RANGER_FOCUSED_RECOVERY =
             new DamageFreeRecoveryBonus(100L, 110D / FOCUS_MANA_RATE_PERCENT);
     private static final NearbyRecoveryBonus PALADIN_NEARBY_ELITE_RECOVERY =

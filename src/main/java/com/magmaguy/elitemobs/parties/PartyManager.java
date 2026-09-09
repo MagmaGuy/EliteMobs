@@ -1,6 +1,9 @@
 package com.magmaguy.elitemobs.parties;
 
 import com.magmaguy.elitemobs.config.PartyConfig;
+import com.magmaguy.elitemobs.api.PlayerJoinDungeonEvent;
+import com.magmaguy.elitemobs.api.InstancedDungeonRemoveEvent;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.items.customloottable.SharedLootTable;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -11,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -34,6 +38,7 @@ public final class PartyManager implements Listener {
     private static final Map<UUID, Party> parties = new HashMap<>();
     private static final Map<UUID, UUID> partyByPlayer = new HashMap<>();
     private static final Map<UUID, PendingInvite> pendingInvites = new HashMap<>();
+    private static final Map<UUID, UUID> dungeonParties = new HashMap<>();
 
     public static void initialize() {
         shutdown();
@@ -51,6 +56,7 @@ public final class PartyManager implements Listener {
         parties.clear();
         partyByPlayer.clear();
         pendingInvites.clear();
+        dungeonParties.clear();
         onlineMembers.forEach(PartySidebar::clearPlayer);
         PartySidebar.shutdown();
     }
@@ -242,6 +248,49 @@ public final class PartyManager implements Listener {
 
     public static void leave(Player player) {
         leave(player.getUniqueId(), true);
+    }
+
+    /** Post-admission only: cancelled or rejected entry attempts never change party membership. */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDungeonJoin(PlayerJoinDungeonEvent event) {
+        if (!PartyConfig.isEnabled()) return;
+        DungeonInstance dungeon = event.getDungeonInstance();
+        // Visitors in spectator mode are not members of the dungeon's combat party.
+        List<Player> roster = dungeon.getParticipants().stream()
+                .filter(member -> !dungeon.isSpectator(member) && member.isOnline())
+                .sorted(Comparator.comparing(Player::getName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
+        if (roster.isEmpty()) return;
+        Set<UUID> rosterIds = new HashSet<>();
+        roster.forEach(member -> rosterIds.add(member.getUniqueId()));
+        Party party = parties.get(dungeonParties.get(dungeon.getRuntimeId()));
+        if (party != null && !rosterIds.containsAll(party.getMembers())) party = null;
+        if (party == null) {
+            // Retain a preformed party if all its members were admitted to this dungeon.
+            party = getParty(roster.get(0).getUniqueId());
+            if (party == null || !rosterIds.containsAll(party.getMembers())) {
+                Player leader = roster.get(0);
+                leave(leader.getUniqueId(), false);
+                party = new Party(leader.getUniqueId());
+                parties.put(party.getId(), party);
+                partyByPlayer.put(leader.getUniqueId(), party.getId());
+            }
+            dungeonParties.put(dungeon.getRuntimeId(), party.getId());
+        }
+        for (Player member : roster) {
+            if (getParty(member.getUniqueId()) == party) continue;
+            leave(member.getUniqueId(), false);
+            party.addAdmittedDungeonMember(member.getUniqueId());
+            partyByPlayer.put(member.getUniqueId(), party.getId());
+            send(member, PartyConfig.getJoinedPartyMessage());
+        }
+        refresh(party);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDungeonRemoved(InstancedDungeonRemoveEvent event) {
+        // The party itself remains session-scoped so the group can choose another dungeon.
+        dungeonParties.remove(event.getDungeonInstance().getRuntimeId());
     }
 
     public static List<Player> getNearbyMembers(Player partyMember, Location location) {

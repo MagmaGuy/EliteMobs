@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.skills;
 
 import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.easyminecraftgoals.internal.FakeText;
+import com.magmaguy.easyminecraftgoals.internal.FollowingText;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.combatsystem.combattag.PlayerCombatState;
 import com.magmaguy.elitemobs.config.SkillsConfig;
@@ -18,7 +19,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
-import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -35,8 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Manages combat level text displays above players using packet-based FakeText.
  * <p>
  * The display shows the player's combat level calculated from their skills.
- * Uses FakeText from EasyMinecraftGoals for packet-based display that mounts
- * on players - the client handles positioning automatically.
+ * Follows players without a passenger attachment, preserving vanilla name tags.
  */
 public class CombatLevelDisplay implements Listener {
 
@@ -52,13 +51,13 @@ public class CombatLevelDisplay implements Listener {
 
     private static final class PlayerDisplay {
         private final FakeText display;
+        private final FollowingText tracking;
         private String text;
-        private boolean healthVisible;
 
-        private PlayerDisplay(FakeText display, String text, boolean healthVisible) {
+        private PlayerDisplay(FakeText display, FollowingText tracking, String text) {
             this.display = display;
+            this.tracking = tracking;
             this.text = text;
-            this.healthVisible = healthVisible;
         }
     }
 
@@ -92,7 +91,7 @@ public class CombatLevelDisplay implements Listener {
         // Remove existing display if present
         removeDisplay(player);
 
-        // Create the FakeText display at the player's location (will be mounted)
+        // The bottom of this label sits above the native name; extra lines grow upward.
         boolean showHealth = shouldShowHealth(player);
         String text = renderText(player, showHealth);
         FakeText fakeText = NMSManager.getAdapter().fakeTextBuilder()
@@ -100,15 +99,13 @@ public class CombatLevelDisplay implements Listener {
                 .billboard(Display.Billboard.CENTER)
                 .shadow(true)
                 .seeThrough(false)
-                .translation(0, getDisplayHeight(player), 0)
                 .viewerFilter(viewer -> canSeeNameTag(player, viewer))
                 .build(player.getLocation());
 
-        playerDisplays.put(player.getUniqueId(), new PlayerDisplay(fakeText, text, showHealth));
-
-        // Attach to the player - this mounts and registers with the global tracker
-        // which handles visibility, world changes, respawns, etc. automatically
-        fakeText.attachTo(player);
+        FollowingText tracking = new FollowingText(fakeText, player,
+                () -> player.getLocation().add(0, player.getHeight() + getDisplayHeight(player), 0),
+                viewer -> canSeeNameTag(player, viewer));
+        playerDisplays.put(player.getUniqueId(), new PlayerDisplay(fakeText, tracking, text));
     }
 
     /**
@@ -116,7 +113,9 @@ public class CombatLevelDisplay implements Listener {
      * are not represented by Player or Scoreboard state and therefore cannot be detected here.
      */
     private static boolean canSeeNameTag(Player player, Player viewer) {
-        if (!viewer.canSee(player)) return false;
+        if (viewer.equals(player) || !viewer.canSee(player) || player.isInvisible()) return false;
+        if (player.isSneaking() && viewer.getLocation().distanceSquared(player.getLocation()) >= 32D * 32D)
+            return false;
 
         Scoreboard scoreboard = viewer.getScoreboard();
         Team playerTeam = scoreboard.getEntryTeam(player.getName());
@@ -144,7 +143,7 @@ public class CombatLevelDisplay implements Listener {
     public static void removeDisplay(Player player) {
         PlayerDisplay display = playerDisplays.remove(player.getUniqueId());
         if (display != null) {
-            display.display.detach(); // Unregisters from tracker and hides from all viewers
+            display.tracking.close();
         }
     }
 
@@ -160,14 +159,13 @@ public class CombatLevelDisplay implements Listener {
         }
 
         PlayerDisplay display = playerDisplays.get(player.getUniqueId());
-        if (display != null) {
+        if (display != null && display.tracking.isValid()) {
             boolean showHealth = shouldShowHealth(player);
             String text = renderText(player, showHealth);
             if (!text.equals(display.text)) {
                 display.display.setText(ChatColorConverter.convert(text));
                 display.text = text;
             }
-            display.healthVisible = showHealth;
         } else {
             // Recreate if missing
             createDisplay(player);
@@ -197,7 +195,7 @@ public class CombatLevelDisplay implements Listener {
         }
         combatState = null;
         for (PlayerDisplay display : playerDisplays.values()) {
-            display.display.detach();
+            display.tracking.close();
         }
         playerDisplays.clear();
     }
@@ -208,26 +206,11 @@ public class CombatLevelDisplay implements Listener {
      */
     public static void initialize() {
         shutdown();
-        // Delay initialization to ensure players are fully loaded
+        // Reconcile missing or invalid labels after joins, respawns and world changes.
         refreshTask = new BukkitRunnable() {
-            private boolean initialized;
-
             @Override
             public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (!initialized) {
-                        createDisplay(player);
-                        continue;
-                    }
-                    PlayerDisplay display = playerDisplays.get(player.getUniqueId());
-                    if (display == null) {
-                        // Bed, world-change and respawn handlers own recreation after
-                        // passenger synchronization; the refresh must not race them.
-                        continue;
-                    }
-                    if (display.healthVisible || shouldShowHealth(player)) updateDisplay(player);
-                }
-                initialized = true;
+                for (Player player : Bukkit.getOnlinePlayers()) updateDisplay(player);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20L, 5L);
     }
@@ -241,74 +224,24 @@ public class CombatLevelDisplay implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerBedEnter(PlayerBedEnterEvent event) {
-        // When a player sleeps, the server re-syncs passenger data which doesn't include
-        // our packet-only entity, causing it to detach and float. Remove it preemptively.
         if (event.useBed() != Event.Result.ALLOW
                 && event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) return;
         removeDisplay(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerBedLeave(PlayerBedLeaveEvent event) {
-        Player player = event.getPlayer();
-        if (!shouldRender(player)) return;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!player.isOnline()) return;
-                createDisplay(player);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 5L);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
-        // Same passenger-resync issue as bed entry: the dimension-change handshake
-        // makes the server re-broadcast the player's passenger list without our
-        // packet-only entity, leaving the display detached in the destination
-        // world. Tear it down preemptively and rebuild after the handshake
-        // settles. The MagmaCore tracker tries to remount on its own one tick
-        // later, but that races with the server's own sync, which can land last
-        // and wipe the mount.
-        Player player = event.getPlayer();
-        if (!shouldRender(player)) {
-            removeDisplay(player);
-            return;
-        }
-        removeDisplay(player);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!player.isOnline()) return;
-                createDisplay(player);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20L);
+        // Old packet entities belong to the previous world. The refresh creates fresh ones.
+        removeDisplay(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        // Same passenger-resync class of issue as bed/world-change. On respawn
-        // the client tears down its entity tracking, but server-side the packet
-        // entity is still flagged visible to the player, so MagmaCore's tracker
-        // doesn't resend a spawn packet — and its follow-up remount references
-        // an entity ID the client no longer knows about. Tear it down here and
-        // rebuild so a fresh spawn + mount goes out.
-        Player player = event.getPlayer();
-        if (!shouldRender(player)) {
-            removeDisplay(player);
-            return;
-        }
-        removeDisplay(player);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!player.isOnline()) return;
-                createDisplay(player);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20L);
+        removeDisplay(event.getPlayer());
     }
 
     private static boolean shouldRender(Player player) {
+        if (!player.isOnline() || player.isDead() || player.isSleeping()) return false;
         if (PlayerIdentityLabelRenderer.hasClassLabel(player.getUniqueId())) return true;
         return SkillsConfig.isSkillSystemEnabled()
                 && SkillsConfig.isShowCombatLevelDisplay()

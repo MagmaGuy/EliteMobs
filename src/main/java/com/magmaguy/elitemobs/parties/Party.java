@@ -47,6 +47,11 @@ public final class Party {
         return members.size() >= MAX_MEMBERS;
     }
 
+    /** An admitted dungeon roster may exceed the ordinary five-player invitation limit. */
+    boolean addAdmittedDungeonMember(UUID playerId) {
+        return members.add(playerId);
+    }
+
     boolean addMember(UUID playerId) {
         return !isFull() && members.add(playerId);
     }
