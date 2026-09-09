@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.presentation.actionbar;
 
 import net.md_5.bungee.api.chat.TextComponent;
 import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
+import com.magmaguy.elitemobs.experimentalcombat.classes.ClassResourceType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -32,6 +33,7 @@ public final class CombatHudProbe {
         overlay(line, 25, healthText, healthText.length() * 6);
         bar(line, 25, '\uE110', health, maximum, 63, false);
         var resource = ExperimentalCombatModule.resourceSnapshot(player.getUniqueId()).orElse(null);
+        if (resource != null) overlay(line, 171, String.valueOf(resourceIcon(resource.type())), 11);
         String resourceText = resource == null ? "0/0" : number(resource.amount()) + "/" + number(resource.maximum());
         rightAlignedText(line, 165, resourceText, resourceText.length() * 6);
         bar(line, 102, '\uE111', resource == null ? 0 : resource.amount(),
@@ -93,5 +95,15 @@ public final class CombatHudProbe {
         if (rounded >= 1_000_000) return Math.round(rounded / 1_000_000D) + "M";
         if (rounded >= 10_000) return Math.round(rounded / 1_000D) + "K";
         return Long.toString(rounded);
+    }
+
+    private static char resourceIcon(ClassResourceType type) {
+        return switch (type) {
+            case RESOLVE -> '\uE500';
+            case FURY -> '\uE501';
+            case FOCUS -> '\uE502';
+            case GRACE -> '\uE503';
+            case MANA -> '\uE504';
+        };
     }
 }

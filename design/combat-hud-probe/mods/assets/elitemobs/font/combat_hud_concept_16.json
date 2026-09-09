@@ -72,6 +72,15 @@
     },
     {
       "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/resource_icons.png",
+      "height": 15,
+      "ascent": -16,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_diamond.png",
       "height": 42,
       "ascent": 1,
