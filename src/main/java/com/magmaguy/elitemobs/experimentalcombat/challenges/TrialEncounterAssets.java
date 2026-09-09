@@ -12,7 +12,7 @@ import java.util.*;
 
 /** Indexes class admission metadata on ordinary, disk-loaded custom bosses. No bundled fallback. */
 public final class TrialEncounterAssets {
-    record Encounter(CustomBossesConfigFields boss, LuaPowerConfigFields power, TrialEquipment.Magic magicWeapon,
+    record Encounter(CustomBossesConfigFields boss, LuaPowerConfigFields power,
                      String opening, String halfway, String victory, String defeat) {}
     private static Map<String, Encounter> loaded = Map.of();
     private TrialEncounterAssets() {}
@@ -34,12 +34,11 @@ public final class TrialEncounterAssets {
                     throw new IllegalArgumentException("Missing Lua power " + config.getString("power"));
                 if (power.getLuaPowerDefinition().getHooks().stream().noneMatch(hook -> hook.getKey().equals("on_game_tick")))
                     throw new IllegalArgumentException("Trial power needs an on_game_tick hook");
-                String magic = config.getString("magicWeapon");
                 var actors = config.getConfigurationSection("actors");
                 if (actors != null) for (String key : actors.getKeys(false))
                     if (CustomBossesConfig.getCustomBoss(actors.getString(key)) == null)
                         throw new IllegalArgumentException("Missing trial actor " + actors.getString(key));
-                pending.put(id, new Encounter(boss, power, magic == null ? null : TrialEquipment.Magic.valueOf(magic),
+                pending.put(id, new Encounter(boss, power,
                         required(config, "voice.opening"), required(config, "voice.halfway"),
                         required(config, "voice.victory"), required(config, "voice.defeat")));
             } catch (RuntimeException failure) {

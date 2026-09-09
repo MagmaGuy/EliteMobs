@@ -42,14 +42,12 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
     private final LuaElitePower power;
     private final double matchedHit;
     private Horse steed;
-    private TrialProjectileWalls walls;
     private TrialEffects effects;
     private LuaTable trial;
     private long ticks;
     private long playerGraceUntil;
     private boolean closed;
     private boolean transferring;
-    private final org.bukkit.NamespacedKey controlKey = new org.bukkit.NamespacedKey(MetadataHandler.PLUGIN, "trial_control_guard");
 
     TrialScriptActor(CustomBossEntity boss, Player player, ArenaContainer bounds, LuaElitePower power) {
         super(boss);
@@ -59,9 +57,7 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         this.power = power;
         movement = new TrialMovement(bounds, player);
         projectiles = new TrialProjectiles(boss, player, bounds,
-                () -> !closed && ticks >= playerGraceUntil,
-                uuid -> actors.values().stream().filter(actor -> actor.exists()
-                        && actor.getLivingEntity().getUniqueId().equals(uuid)).findFirst().orElse(null));
+                () -> !closed && ticks >= playerGraceUntil);
         matchedHit = LevelScaling.calculateBaseDamageToElite(boss.getLevel());
         Bukkit.getPluginManager().registerEvents(this, MetadataHandler.PLUGIN);
     }
@@ -104,17 +100,6 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
             player.setVelocity(impulse.setY(.08));
             return LuaValue.TRUE;
         }));
-        table.set("pose", method(table, args -> { pose(args.checkjstring(1)); return LuaValue.NIL; }));
-        table.set("crossbow", method(table, args -> {
-            var equipment = boss.getLivingEntity().getEquipment();
-            if (equipment == null) return LuaValue.NIL;
-            ItemStack item = equipment.getItemInMainHand();
-            if (item.getItemMeta() instanceof org.bukkit.inventory.meta.CrossbowMeta meta) {
-                meta.setChargedProjectiles(args.checkboolean(1) ? List.of(new ItemStack(Material.ARROW)) : List.of());
-                item.setItemMeta(meta); equipment.setItemInMainHand(item);
-            }
-            return LuaValue.NIL;
-        }));
         table.set("ground", method(table, args -> {
             Location point = location(args.arg1());
             if (!bounds.contains(point)) return LuaValue.NIL;
@@ -123,10 +108,6 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
             if (hit == null) return LuaValue.NIL;
             Location ground = hit.getHitPosition().toLocation(point.getWorld()).add(0,.01,0);
             return movement.standing(boss.getLivingEntity(), ground) ? LuaTableSupport.locationToTable(ground) : LuaValue.NIL;
-        }));
-        table.set("control_guard", method(table, args -> {
-            controlGuard(args.checkboolean(1));
-            return LuaValue.NIL;
         }));
         table.set("arm_survival", method(table, args -> {
             String actor = args.checkjstring(1), key = args.checkjstring(2);
@@ -150,10 +131,6 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         }));
         table.set("slow_player", method(table, args -> { effects().slow(player, args.checkdouble(1), args.checkint(2)); return LuaValue.NIL; }));
         table.set("clear_player_slow", method(table, args -> { if (effects != null) effects.clearMovement(player); return LuaValue.NIL; }));
-        table.set("magic_weapon", method(table, args -> {
-            boss.getLivingEntity().getEquipment().setItemInMainHand(TrialEquipment.magic(TrialEquipment.Magic.valueOf(args.checkjstring(1))));
-            return LuaValue.NIL;
-        }));
         table.set("cleanse", method(table, args -> {
             LivingEntity target = effectTarget(args.checkjstring(1));
             if (target != null) effects().cleanse(target, args.optboolean(2, false), args.optint(3, 0));
@@ -210,21 +187,6 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         table.set("stop", method(table, args -> { if (body().isValid()) body().setVelocity(new Vector()); return LuaValue.NIL; }));
         table.set("mount", method(table, args -> { mount(); return LuaValue.valueOf(steed != null); }));
         table.set("dismount", method(table, args -> { dismount(); return LuaValue.NIL; }));
-        table.set("wall", method(table, args -> {
-            Location center = location(args.arg(2));
-            Location facing = location(args.arg(3));
-            double width = bounded(args.optdouble(4, 5), 1, 8);
-            Vector normal = facing.toVector().subtract(center.toVector()).setY(0);
-            if (normal.lengthSquared() < .001) return LuaValue.FALSE;
-            normal.normalize();
-            Vector side = new Vector(normal.getZ(), 0, -normal.getX()).multiply(width / 2);
-            for (int sign : new int[]{-1, 1}) for (double y : new double[]{0, 3.2})
-                if (!bounds.contains(center.clone().add(side.clone().multiply(sign)).add(0, y, 0))) return LuaValue.FALSE;
-            if (walls == null) walls = new TrialProjectileWalls(player);
-            walls.add(args.checkjstring(1), center, facing, width, args.optint(5, 100), ticks);
-            return LuaValue.TRUE;
-        }));
-        table.set("remove_wall", method(table, args -> { if (walls != null) walls.remove(args.checkjstring(1)); return LuaValue.NIL; }));
         table.set("own_projectile", method(table, args -> {
             Entity entity = reference(args.arg1());
             if (!(entity instanceof Projectile projectile)) throw new IllegalArgumentException("Expected a physical projectile");
@@ -249,23 +211,10 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         }));
         table.set("arrow", method(table, args -> {
             LuaTable options = args.arg(7).opttable(new LuaTable());
-            List<CustomBossEntity> penetrate = new ArrayList<>();
-            LuaValue values = options.get("penetrate");
-            if (values.istable()) for (int i=1; i<=values.length(); i++) {
-                CustomBossEntity prop = actors.get(values.get(i).checkjstring());
-                if (prop != null) penetrate.add(prop);
-            }
             Projectile arrow = projectiles.arrow(location(args.arg1()), location(args.arg(2)), args.checkdouble(3),
                     args.checkdouble(4), args.checkjstring(5), args.checkdouble(6),
-                    options.get("lifetime").optint(48), penetrate, options.get("gravity").optboolean(false));
+                    options.get("lifetime").optint(48), options.get("gravity").optboolean(false));
             return LuaValue.valueOf(arrow != null);
-        }));
-        table.set("curve_arrow", method(table, args -> {
-            LuaTable values = args.checktable(1);
-            List<Location> points = new ArrayList<>();
-            for (int i=1; i<=values.length(); i++) points.add(location(values.get(i)));
-            projectiles.curve(points, args.checkdouble(2), args.checkjstring(3), args.checkdouble(4));
-            return LuaValue.NIL;
         }));
         table.set("spawn_actor", method(table, args -> spawnActor(instance, args)));
         table.set("actor", method(table, args -> {
@@ -391,7 +340,6 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         projectiles.tick(ticks);
         survival.values().removeIf(ward -> ticks >= ward.expires);
         protectedActors.values().removeIf(expiry -> ticks >= expiry);
-        if (walls != null) walls.tick(ticks);
         if (effects != null) effects.tick(ticks);
         // Recheck actual physics, including external pushes, against the same read-only bounds.
         if (!bounds.contains(body().getLocation())) throw new IllegalStateException("Trial actor left its bounds");
@@ -431,11 +379,6 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         steed = null;
     }
 
-    private void pose(String pose) {
-        if (pose.equals("swing")) boss.getLivingEntity().swingMainHand();
-        TrialPoses.apply(boss.getLivingEntity(), pose.equals("draw") || pose.equals("cast"), pose.equals("guard"));
-    }
-
     boolean owns(CustomBossEntity entity) { return entity == boss || actors.containsValue(entity); }
 
     /** Runs after EliteMobs has normalized damage, preserving the original damage event and attacker. */
@@ -468,9 +411,8 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         projectiles.close();
         survival.clear(); spentSurvival.clear(); survivalNotifications.clear(); protectedActors.clear();
         dismount();
-        if (walls != null) walls.close();
         if (effects != null) effects.close();
-        if (boss.exists()) { controlGuard(false); pose("idle"); boss.getLivingEntity().setVelocity(new Vector()); }
+        if (boss.exists()) { boss.getLivingEntity().setVelocity(new Vector()); }
         actors.values().forEach(actor -> { if (actor.exists()) actor.remove(RemovalReason.ARENA_RESET); });
         actors.clear();
     }
@@ -489,15 +431,6 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
     private TrialEffects effects() {
         if (effects == null) { effects = new TrialEffects(); effects.tick(ticks); }
         return effects;
-    }
-
-    private void controlGuard(boolean active) {
-        var attribute = boss.getLivingEntity().getAttribute(org.bukkit.attribute.Attribute.KNOCKBACK_RESISTANCE);
-        if (attribute == null) return;
-        var existing = attribute.getModifiers().stream().filter(modifier -> modifier.getKey().equals(controlKey)).findFirst();
-        if (!active) existing.ifPresent(attribute::removeModifier);
-        else if (existing.isEmpty()) attribute.addModifier(new org.bukkit.attribute.AttributeModifier(controlKey, 1,
-                org.bukkit.attribute.AttributeModifier.Operation.ADD_NUMBER, org.bukkit.inventory.EquipmentSlotGroup.ANY));
     }
 
     private Entity reference(LuaValue value) {

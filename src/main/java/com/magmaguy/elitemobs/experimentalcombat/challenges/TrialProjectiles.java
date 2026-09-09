@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.experimentalcombat.challenges;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.arena.ArenaContainer;
@@ -13,7 +12,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.util.Vector;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BooleanSupplier;
 
 /** Physical trial missiles, shared cast budgets, and impact receipts consumed by authored powers. */
 final class TrialProjectiles implements Listener, AutoCloseable {
@@ -26,9 +25,6 @@ final class TrialProjectiles implements Listener, AutoCloseable {
         final double damage, cap;
         final String group;
         final long expires;
-        final Set<UUID> penetrable = new HashSet<>();
-        List<Location> curve = List.of();
-        long curveStart;
         Missile(Projectile entity, double damage, String group, double cap, long expires) {
             this.entity=entity; this.damage=damage; this.group=group; this.cap=cap; this.expires=expires;
         }
@@ -42,7 +38,6 @@ final class TrialProjectiles implements Listener, AutoCloseable {
     private final Player player;
     private final ArenaContainer bounds;
     private final BooleanSupplier canDamage;
-    private final Function<UUID, CustomBossEntity> actor;
     private final Map<UUID, Missile> missiles = new HashMap<>();
     private final Map<UUID, Long> retired = new HashMap<>();
     private final Map<String, Cast> casts = new HashMap<>();
@@ -50,8 +45,8 @@ final class TrialProjectiles implements Listener, AutoCloseable {
     private boolean closed;
 
     TrialProjectiles(CustomBossEntity boss, Player player, ArenaContainer bounds,
-                     BooleanSupplier canDamage, Function<UUID, CustomBossEntity> actor) {
-        this.boss=boss; this.player=player; this.bounds=bounds; this.canDamage=canDamage; this.actor=actor;
+                     BooleanSupplier canDamage) {
+        this.boss=boss; this.player=player; this.bounds=bounds; this.canDamage=canDamage;
         Bukkit.getPluginManager().registerEvents(this, MetadataHandler.PLUGIN);
     }
 
@@ -68,7 +63,7 @@ final class TrialProjectiles implements Listener, AutoCloseable {
     }
 
     Projectile arrow(Location from, Location target, double speed, double damage, String group,
-                     double cap, int lifetime, List<CustomBossEntity> penetrate, boolean gravity) {
+                     double cap, int lifetime, boolean gravity) {
         if (closed || missiles.size()>=48 || !bounds.contains(from) || !Double.isFinite(speed) || speed<=0 || speed>1.8) return null;
         Vector direction=target.toVector().subtract(from.toVector());
         if (direction.lengthSquared()<.001) return null;
@@ -77,22 +72,7 @@ final class TrialProjectiles implements Listener, AutoCloseable {
         own(arrow,damage,group,cap,lifetime);
         Missile missile=missiles.get(arrow.getUniqueId());
         if (missile==null) return null;
-        for (CustomBossEntity prop : penetrate) if (prop!=null && prop.exists()) missile.penetrable.add(prop.getLivingEntity().getUniqueId());
-        if (missile.penetrable.size()>3) { discard(missile); throw new IllegalArgumentException("At most three penetration targets"); }
-        if (!missile.penetrable.isEmpty()) arrow.setPierceLevel(missile.penetrable.size());
         return arrow;
-    }
-
-    void curve(List<Location> points, double damage, String group, double cap) {
-        if (points.size()<3 || points.size()>40) throw new IllegalArgumentException("Curve must have 3–40 fixed points");
-        for (int i=0; i<points.size(); i++) {
-            if (!bounds.contains(points.get(i))) return;
-            if (i>0 && points.get(i).distanceSquared(points.get(i-1))>1.2*1.2) throw new IllegalArgumentException("Curve segment exceeds physical travel bound");
-        }
-        Projectile projectile=arrow(points.getFirst(),points.get(1),points.getFirst().distance(points.get(1)),damage,group,cap,points.size()+1,List.of(),false);
-        if (projectile==null) return;
-        Missile missile=missiles.get(projectile.getUniqueId());
-        missile.curve=points.stream().map(Location::clone).toList(); missile.curveStart=tick;
     }
 
     double spent(String group) { Cast cast=casts.get(group); return cast==null ? 0 : cast.spent; }
@@ -112,14 +92,6 @@ final class TrialProjectiles implements Listener, AutoCloseable {
             if (!projectile.isValid() || now>=missile.expires || !bounds.contains(projectile.getLocation())) {
                 receipt(missile,projectile.getLocation(),false,0); discard(missile); continue;
             }
-            if (!missile.curve.isEmpty()) {
-                int next=(int)(now-missile.curveStart)+1;
-                if (next>=missile.curve.size()) { receipt(missile,projectile.getLocation(),false,0); discard(missile); continue; }
-                Vector velocity=missile.curve.get(next).toVector().subtract(projectile.getLocation().toVector());
-                if (velocity.lengthSquared()>1.8*1.8) { discard(missile); continue; }
-                // Native arrow movement performs terrain/entity collision on each segment; no teleport or retargeting.
-                projectile.setVelocity(velocity);
-            }
             if (now%2==0 && projectile instanceof Snowball)
                 player.spawnParticle(Particle.DUST,projectile.getLocation(),2,.03,.03,.03,0,new Particle.DustOptions(Color.fromRGB(160,120,255),.8F));
         }
@@ -135,12 +107,6 @@ final class TrialProjectiles implements Listener, AutoCloseable {
     public void hit(ProjectileHitEvent event) {
         Missile missile=missiles.get(event.getEntity().getUniqueId()); if (missile==null) return;
         event.setCancelled(true);
-        if (event.getHitEntity()!=null && missile.penetrable.remove(event.getHitEntity().getUniqueId())) {
-            CustomBossEntity prop=actor.apply(event.getHitEntity().getUniqueId());
-            if (prop!=null && prop.exists()) prop.remove(RemovalReason.EFFECT_TIMEOUT);
-            player.spawnParticle(Particle.CLOUD,event.getHitEntity().getLocation().add(0,1,0),5,.2,.3,.2,0);
-            return;
-        }
         Location point=impactLocation(event);
         boolean playerHit=event.getHitEntity()==player;
         double damage=0;

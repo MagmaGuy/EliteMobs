@@ -135,7 +135,6 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
                 throw new IllegalStateException("Trial arena requires an interior north spawn point");
             instructor.spawn(spawn, true);
             if (!instructor.exists()) throw new IllegalStateException("Instructor spawn was rejected");
-            instructor.getLivingEntity().setAI(false);
             if (!EconomyHandler.tryWithdraw(challenger.getUniqueId(), quotedFee)) {
                 tell(challenger, "&cThe entry fee could not be paid. The trial was cancelled.");
                 destroyMatch();
@@ -143,7 +142,6 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
             }
             feeCharged = true;
             super.startMatch();
-            instructor.getLivingEntity().setAI(true);
             if (instructor.getLivingEntity() instanceof Mob mob) mob.setTarget(challenger);
             say(trial.opening());
             combat = new ClassTrialCombat(trial, instructor, challenger, container);

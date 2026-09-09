@@ -12,9 +12,9 @@ import java.util.Optional;
  */
 public enum ClassBand {
     ROOT(0, 1, 30, 10),
-    LEVEL_31(1, 31, 60, 31),
-    LEVEL_61(2, 61, 90, 61),
-    LEVEL_91(3, 91, Integer.MAX_VALUE, 91),
+    LEVEL_31(1, 31, 60, 30),
+    LEVEL_61(2, 61, 90, 60),
+    LEVEL_91(3, 91, Integer.MAX_VALUE, 90),
     STARTER(-1, 1, 10, 1);
 
     private final int depth;
