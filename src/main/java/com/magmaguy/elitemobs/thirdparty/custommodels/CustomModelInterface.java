@@ -27,11 +27,9 @@ public interface CustomModelInterface {
     /**
      * Whether this model is capable of rendering a nametag at all.
      * <p>
-     * A model that defines no nametag anchor can never show a name: the underlying
-     * living entity is hidden by the model plugin, so its vanilla nametag is not
-     * rendered either, and the model has nowhere to draw one. A boss configured with
-     * {@code alwaysShowName: true} on such a model is therefore silently nameless.
-     * This exists so that misconfiguration can be reported instead of being invisible.
+     * FMM also supplies a nameplate above the hitbox when no authored anchor exists.
+     * Other providers may still require a nametag bone. This capability check keeps
+     * missing-name warnings limited to providers which cannot render a fallback.
      *
      * @return false only when it is known that no nametag can ever render; true when
      * a nametag anchor exists or when the model plugin cannot report the capability.
