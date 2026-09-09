@@ -10,7 +10,8 @@ import java.util.Arrays;
 
 /** Uses the same vanilla glyph providers and advances as the feedback resource-pack font. */
 final class CombatHudFeedback {
-    private static final short[] METRICS = loadMetrics();
+    private static final short[] METRICS = loadMetrics("/combat-hud-feedback-metrics.bin");
+    private static final short[] CLASS_NAME_METRICS = loadMetrics("/combat-hud-class-name-metrics.bin");
 
     private CombatHudFeedback() { }
 
@@ -26,21 +27,55 @@ final class CombatHudFeedback {
     }
 
     static int widthInHalfPixels(BaseComponent[] components) {
+        return widthInHalfPixels(components, METRICS);
+    }
+
+    static int classNameWidthInHalfPixels(BaseComponent[] components) {
+        return widthInHalfPixels(components, CLASS_NAME_METRICS);
+    }
+
+    /** Use ordinary characters, not class-specific glyphs. Bound unusually long translations. */
+    static BaseComponent[] className(String name) {
+        String plain = org.bukkit.ChatColor.stripColor(org.bukkit.ChatColor.translateAlternateColorCodes('&', name))
+                .replace('\n', ' ').replace('\r', ' ');
+        int[] points = plain.codePoints().toArray();
+        int width = 0;
+        for (int point : points) width += CLASS_NAME_METRICS[point] >> 2;
+        if (width > 268) {
+            int suffixWidth = 3 * (CLASS_NAME_METRICS['.'] >> 2);
+            StringBuilder fitted = new StringBuilder();
+            int used = 0;
+            for (int point : points) {
+                int advance = CLASS_NAME_METRICS[point] >> 2;
+                if (used + advance + suffixWidth > 268) break;
+                fitted.appendCodePoint(point);
+                used += advance;
+            }
+            plain = fitted.append("...").toString();
+        }
+        TextComponent label = new TextComponent(plain);
+        label.setFont("elitemobs:combat_hud_class_name");
+        label.setColor(net.md_5.bungee.api.ChatColor.of("#fff0be"));
+        label.setShadowColor(new Color(0, true));
+        return new BaseComponent[]{label};
+    }
+
+    private static int widthInHalfPixels(BaseComponent[] components, short[] metrics) {
         int width = 0;
         for (BaseComponent component : components) {
             int[] points = component.toPlainText().codePoints().toArray();
             for (int point : points) {
-                int metric = METRICS[point];
+                int metric = metrics[point];
                 width += (metric >> 2) + (component.isBold() ? metric & 3 : 0);
             }
         }
         return width;
     }
 
-    private static short[] loadMetrics() {
+    private static short[] loadMetrics(String path) {
         short[] metrics = new short[Character.MAX_CODE_POINT + 1];
         Arrays.fill(metrics, (short) ((12 << 2) | 2)); // Vanilla missing-glyph advance.
-        try (var resource = CombatHudFeedback.class.getResourceAsStream("/combat-hud-feedback-metrics.bin")) {
+        try (var resource = CombatHudFeedback.class.getResourceAsStream(path)) {
             if (resource == null) throw new IllegalStateException("Missing HUD feedback font metrics");
             try (DataInputStream input = new DataInputStream(resource)) {
                 if (input.readInt() != 1) throw new IOException("Unsupported HUD font metrics version");

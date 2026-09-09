@@ -9,17 +9,11 @@ import java.util.Properties;
 /** Immutable mapping generated alongside the HUD font providers and ability artwork. */
 final class CombatHudAbilityIcons {
     private static final Map<String, Character> GLYPHS = load("/combat-hud-ability-icons.properties");
-    private static final Map<String, Character> BADGES = load("/combat-hud-class-badges.properties");
 
     private CombatHudAbilityIcons() { }
 
     static String glyph(String abilityId) {
         Character glyph = GLYPHS.get(abilityId);
-        return glyph == null ? "" : glyph.toString();
-    }
-
-    static String classBadge(String formId) {
-        Character glyph = BADGES.get(formId);
         return glyph == null ? "" : glyph.toString();
     }
 

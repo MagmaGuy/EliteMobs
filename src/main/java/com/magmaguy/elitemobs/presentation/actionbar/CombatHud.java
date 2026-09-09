@@ -15,7 +15,9 @@ import java.awt.Color;
 public final class CombatHud {
     private static final String FONT = "elitemobs:combat_hud_concept_16";
 
-    public String text(Player player, boolean active) {
+    public record Frame(String text, String className) { }
+
+    public Frame frame(Player player, boolean active) {
         int animationFrame = (int) Math.floorMod(MonotonicTickClock.currentTick() / 4L, 4L);
         StringBuilder line = new StringBuilder();
         line.append(active ? '\uE001' : '\uE000').append(spacing(-191));
@@ -33,13 +35,11 @@ public final class CombatHud {
                 resource == null ? 0 : resource.maximum(), 63, true, animationFrame);
         bar(line, 5, '\uE980', player.getExp(), 1, 180, false, animationFrame);
         classDiamond(line, player, animationFrame, active);
-        ExperimentalCombatModule.activeClassLineageSnapshot(player.getUniqueId()).ifPresent(lineage -> {
-            String badge = CombatHudAbilityIcons.classBadge(lineage.activeForm().id());
-            if (!badge.isEmpty()) overlay(line, 4, badge, 75);
-        });
+        String className = ExperimentalCombatModule.activeClassLineageSnapshot(player.getUniqueId())
+                .map(lineage -> lineage.activeForm().displayName()).orElse("");
         if (active) abilityIcons(line, player);
         // All overlays return to the panel origin. Keep the total advance at 190 GUI pixels.
-        return line.append(spacing(190)).toString();
+        return new Frame(line.append(spacing(190)).toString(), className);
     }
 
     public TextComponent component(String text) {
@@ -50,18 +50,35 @@ public final class CombatHud {
         return component;
     }
 
-    public TextComponent component(String text, String feedback, boolean legacy) {
-        TextComponent component = component(text);
+    public TextComponent component(Frame frame, String feedback, boolean legacy) {
+        TextComponent component = component(frame.text());
+        if (!frame.className().isBlank()) {
+            var label = CombatHudFeedback.className(frame.className());
+            int width = CombatHudFeedback.classNameWidthInHalfPixels(label);
+            int badgeWidth = Math.max(74, (width + 1) / 2 + 8);
+            int left = 78 - badgeWidth;
+            // Keep the right edge clear of the diamond; longer translations expand left.
+            String border = "\uE600\uE101" + "\uE601\uE101".repeat(badgeWidth - 6) + "\uE602\uE101";
+            component.addExtra(halfPixelSpacing(left * 2 - 380));
+            component.addExtra(border);
+            component.addExtra(halfPixelSpacing(380 - (left + badgeWidth) * 2));
+            appendText(component, label, left * 2 + (badgeWidth * 2 - width) / 2, width);
+        }
         if (feedback == null || feedback.isBlank()) return component;
         var message = CombatHudFeedback.components(feedback, legacy);
         int width = CombatHudFeedback.widthInHalfPixels(message);
         // The HUD advances 190px. The text overlay must have zero net advance or Minecraft
         // recenters the entire action bar when feedback changes length.
         int start = (380 - width) / 2;
+        appendText(component, message, start, width);
+        return component;
+    }
+
+    private static void appendText(TextComponent component, net.md_5.bungee.api.chat.BaseComponent[] message,
+                                   int start, int width) {
         component.addExtra(halfPixelSpacing(start - 380));
         for (var part : message) component.addExtra(part);
         component.addExtra(halfPixelSpacing(380 - start - width));
-        return component;
     }
 
     private static String halfPixelSpacing(int halfPixels) {

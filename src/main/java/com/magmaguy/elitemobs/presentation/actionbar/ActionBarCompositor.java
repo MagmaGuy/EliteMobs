@@ -254,19 +254,20 @@ public final class ActionBarCompositor implements Listener {
 
     private static void render(Player player, PlayerState state) {
         if (ExperimentalCombatRuntime.isActive(player)) {
-            String text = COMBAT_HUD.text(player, ExperimentalCombatModule.isAbilityGestureOpen(player.getUniqueId()));
+            var frame = COMBAT_HUD.frame(player, ExperimentalCombatModule.isAbilityGestureOpen(player.getUniqueId()));
             Entry feedback = selectWinner(state, true);
             String feedbackText = feedback == null ? null : feedback.message;
             Encoding feedbackEncoding = feedback == null ? null : feedback.source.encoding;
             if (!state.hasRenderedMessage || state.lastEncoding != Encoding.COMBAT_HUD
                     || !Objects.equals(feedbackText, state.lastFeedback)
                     || feedbackEncoding != state.lastFeedbackEncoding
-                    || !text.equals(state.lastMessage)
+                    || !frame.equals(state.lastHudFrame)
                     || currentTick - state.lastSentAtTick >= KEEPALIVE_INTERVAL_TICKS) {
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, COMBAT_HUD.component(
-                        text, feedbackText, feedbackEncoding == Encoding.LEGACY));
+                        frame, feedbackText, feedbackEncoding == Encoding.LEGACY));
                 state.hasRenderedMessage = true;
-                state.lastMessage = text;
+                state.lastMessage = frame.text();
+                state.lastHudFrame = frame;
                 state.lastFeedback = feedbackText;
                 state.lastFeedbackEncoding = feedbackEncoding;
                 state.lastEncoding = Encoding.COMBAT_HUD;
@@ -358,6 +359,7 @@ public final class ActionBarCompositor implements Listener {
     }
 
     private static final class PlayerState {
+        private CombatHud.Frame lastHudFrame;
         private final EnumMap<Source, Entry> entries = new EnumMap<>(Source.class);
         private boolean hasRenderedMessage;
         private String lastMessage;
