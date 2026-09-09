@@ -40,7 +40,7 @@
       "height": 3,
       "ascent": -28,
       "chars": [
-        ""
+        ""
       ]
     },
     {
@@ -49,7 +49,7 @@
       "height": 3,
       "ascent": -28,
       "chars": [
-        ""
+        ""
       ]
     },
     {
@@ -58,7 +58,7 @@
       "height": 2,
       "ascent": -37,
       "chars": [
-        ""
+        ""
       ]
     },
     {
@@ -89,6 +89,42 @@
         "",
         "",
         "\u0000\u0000\u0000"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/class_diamond_1.png",
+      "height": 42,
+      "ascent": 1,
+      "chars": [
+        "",
+        "",
+        "",
+        "\u0000\u0000\u0000"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/class_diamond_2.png",
+      "height": 42,
+      "ascent": 1,
+      "chars": [
+        "",
+        "",
+        "",
+        "\u0000\u0000\u0000"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/class_diamond_3.png",
+      "height": 42,
+      "ascent": 1,
+      "chars": [
+        "",
+        "",
+        "",
+        "\u0000\u0000\u0000"
       ]
     }
   ]

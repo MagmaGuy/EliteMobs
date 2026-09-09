@@ -15,6 +15,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class WorldInstantiator {
 
@@ -94,12 +95,11 @@ public class WorldInstantiator {
         // Picks up world folders at both legacy and Paper-26.1+ modern locations.
         worldNames.addAll(WorldFolderResolver.listAllWorldNames());
         int highestNumber = 0;
-
+        String instancePrefix = blueprintWorldName.toLowerCase(Locale.ROOT) + "_";
         for (String worldName : worldNames) {
-            if (worldName.contains(blueprintWorldName)) {
+            if (worldName.toLowerCase(Locale.ROOT).startsWith(instancePrefix)) {
                 try {
-                    String[] strings = worldName.replace(blueprintWorldName, "").split("_");
-                    int worldNumber = Integer.parseInt(strings[strings.length - 1]);
+                    int worldNumber = Integer.parseInt(worldName.substring(instancePrefix.length()));
                     if (worldNumber > highestNumber) highestNumber = worldNumber;
                 } catch (Exception exception) {
                 }

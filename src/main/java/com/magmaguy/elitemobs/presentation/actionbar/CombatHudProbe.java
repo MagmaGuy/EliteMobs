@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.presentation.actionbar;
 
 import net.md_5.bungee.api.chat.TextComponent;
 import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
+import com.magmaguy.elitemobs.experimentalcombat.MonotonicTickClock;
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassResourceType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import org.bukkit.attribute.Attribute;
@@ -24,6 +25,7 @@ public final class CombatHudProbe {
     }
 
     public String text(Player player, boolean active) {
+        int animationFrame = (int) Math.floorMod(MonotonicTickClock.currentTick() / 4L, 4L);
         StringBuilder line = new StringBuilder(spacing(x));
         line.append(active ? '\uE001' : '\uE000').append(spacing(-191));
         double health = player.getHealth();
@@ -31,15 +33,15 @@ public final class CombatHudProbe {
         double maximum = maximumAttribute == null ? health : maximumAttribute.getValue();
         String healthText = number(health) + "/" + number(maximum);
         overlay(line, 25, healthText, healthText.length() * 6);
-        bar(line, 25, '\uE110', health, maximum, 63, false);
+        bar(line, 25, '\uE600', health, maximum, 63, false, animationFrame);
         var resource = ExperimentalCombatModule.resourceSnapshot(player.getUniqueId()).orElse(null);
         if (resource != null) overlay(line, 171, String.valueOf(resourceIcon(resource.type())), 11);
         String resourceText = resource == null ? "0/0" : number(resource.amount()) + "/" + number(resource.maximum());
         rightAlignedText(line, 165, resourceText, resourceText.length() * 6);
-        bar(line, 102, '\uE111', resource == null ? 0 : resource.amount(),
-                resource == null ? 0 : resource.maximum(), 63, true);
-        bar(line, 5, '\uE112', player.getExp(), 1, 180, false);
-        classDiamond(line, player);
+        bar(line, 102, '\uE620', resource == null ? 0 : resource.amount(),
+                resource == null ? 0 : resource.maximum(), 63, true, animationFrame);
+        bar(line, 5, '\uE640', player.getExp(), 1, 180, false, animationFrame);
+        classDiamond(line, player, animationFrame);
         // All overlays return to the panel origin. Keep the total advance at 190 GUI pixels.
         return line.append(spacing(190 - x)).toString();
     }
@@ -66,13 +68,18 @@ public final class CombatHudProbe {
     }
 
     private static void bar(StringBuilder line, int offset, char glyph, double amount, double maximum, int width,
-                            boolean rightAligned) {
+                            boolean rightAligned, int animationFrame) {
         int pixels = maximum <= 0 ? 0 : (int) Math.round(width * Math.max(0, Math.min(1, amount / maximum)));
-        overlay(line, offset + (rightAligned ? width - pixels : 0),
-                (String.valueOf(glyph) + '\uE101').repeat(pixels), pixels);
+        int start = rightAligned ? width - pixels : 0;
+        StringBuilder fill = new StringBuilder(pixels * 2);
+        // Anchor the traveling brightness pattern to the trough, so changing
+        // the amount clips the liquid without making its pattern jump sideways.
+        for (int column = start; column < start + pixels; column++)
+            fill.append((char) (glyph + Math.floorMod(column - animationFrame * 4, 16))).append('\uE101');
+        overlay(line, offset + start, fill.toString(), pixels);
     }
 
-    private static void classDiamond(StringBuilder line, Player player) {
+    private static void classDiamond(StringBuilder line, Player player, int animationFrame) {
         var progress = ExperimentalCombatModule.classProgressSnapshot(player.getUniqueId()).orElse(null);
         if (progress == null || !progress.unlocked()) return;
         int level = progress.effectiveLevel();
@@ -82,7 +89,7 @@ public final class CombatHudProbe {
         double fraction = progress.xp() >= progress.xpAtCap() ? 1
                 : (double) (progress.xp() - currentThreshold) / SkillXPCalculator.xpToNextLevel(level);
         int rows = (int) Math.round(28 * Math.max(0, Math.min(1, fraction)));
-        overlay(line, 79, String.valueOf((char) (0xE400 + rows)), 33);
+        overlay(line, 79, String.valueOf((char) (0xE400 + animationFrame * 32 + rows)), 33);
         String digits = Integer.toString(level);
         StringBuilder glyphs = new StringBuilder();
         for (char digit : digits.toCharArray()) glyphs.append((char) (0xE300 + digit - '0'));
