@@ -8,7 +8,8 @@ import java.util.Properties;
 
 /** Immutable mapping generated alongside the HUD font providers and ability artwork. */
 final class CombatHudAbilityIcons {
-    private static final Map<String, Character> GLYPHS = load();
+    private static final Map<String, Character> GLYPHS = load("/combat-hud-ability-icons.properties");
+    private static final Map<String, Character> BADGES = load("/combat-hud-class-badges.properties");
 
     private CombatHudAbilityIcons() { }
 
@@ -17,9 +18,14 @@ final class CombatHudAbilityIcons {
         return glyph == null ? "" : glyph.toString();
     }
 
-    private static Map<String, Character> load() {
+    static String classBadge(String formId) {
+        Character glyph = BADGES.get(formId);
+        return glyph == null ? "" : glyph.toString();
+    }
+
+    private static Map<String, Character> load(String resource) {
         Properties properties = new Properties();
-        try (InputStream input = CombatHudAbilityIcons.class.getResourceAsStream("/combat-hud-ability-icons.properties")) {
+        try (InputStream input = CombatHudAbilityIcons.class.getResourceAsStream(resource)) {
             if (input == null) throw new IllegalStateException("Missing HUD ability icon mapping");
             properties.load(input);
         } catch (IOException exception) {

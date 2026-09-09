@@ -126,7 +126,7 @@ public final class ActionBarCompositor implements Listener {
         long duration = source.isPersistent()
                 ? source.defaultDurationTicks()
                 : Math.max(source.defaultDurationTicks(), readingDurationTicks(message));
-        publish(player, source, message, duration);
+        publish(player, source, message, duration, true);
     }
 
     /**
@@ -152,7 +152,7 @@ public final class ActionBarCompositor implements Listener {
     public static void show(Player player, Source source, String message, long durationTicks) {
         if (durationTicks <= 0)
             throw new IllegalArgumentException("Action-bar duration must be positive");
-        publish(player, source, message, durationTicks);
+        publish(player, source, message, durationTicks, false);
     }
 
     /** Removes one source without disturbing messages owned by other sources. */
@@ -186,11 +186,11 @@ public final class ActionBarCompositor implements Listener {
         nextSequence = 0;
     }
 
-    private static void publish(Player player, Source source, String message, long durationTicks) {
+    private static void publish(Player player, Source source, String message, long durationTicks, boolean readingTime) {
         Objects.requireNonNull(player, "player");
         Objects.requireNonNull(source, "source");
         Objects.requireNonNull(message, "message");
-        dispatch(new ShowMutation(player.getUniqueId(), source, message, durationTicks));
+        dispatch(new ShowMutation(player.getUniqueId(), source, message, durationTicks, readingTime));
     }
 
     private static void dispatch(Mutation mutation) {
@@ -229,9 +229,12 @@ public final class ActionBarCompositor implements Listener {
     private static void apply(Mutation mutation) {
         PlayerState state = playerStates.computeIfAbsent(mutation.playerId(), ignored -> new PlayerState());
         if (mutation instanceof ShowMutation show) {
-            long expiresAtTick = show.durationTicks == Source.PERSISTENT
+            long duration = show.durationTicks;
+            if (state.hudProbe != null && show.readingTime && !show.source.isPersistent())
+                duration = Math.min(600L, Math.max(120L, duration * 2));
+            long expiresAtTick = duration == Source.PERSISTENT
                     ? Long.MAX_VALUE
-                    : saturatingAdd(currentTick, show.durationTicks);
+                    : saturatingAdd(currentTick, duration);
             state.entries.put(show.source,
                     new Entry(show.source, show.message, expiresAtTick, ++nextSequence));
         } else if (mutation instanceof ClearMutation clear) {
@@ -256,18 +259,26 @@ public final class ActionBarCompositor implements Listener {
     private static void render(Player player, PlayerState state) {
         if (state.hudProbe != null) {
             String text = state.hudProbe.text(player, ExperimentalCombatModule.isAbilityGestureOpen(player.getUniqueId()));
+            Entry feedback = selectWinner(state, true);
+            String feedbackText = feedback == null ? null : feedback.message;
+            Encoding feedbackEncoding = feedback == null ? null : feedback.source.encoding;
             if (!state.hasRenderedMessage || state.lastEncoding != Encoding.HUD_PROBE
+                    || !Objects.equals(feedbackText, state.lastFeedback)
+                    || feedbackEncoding != state.lastFeedbackEncoding
                     || !text.equals(state.lastMessage)
                     || currentTick - state.lastSentAtTick >= KEEPALIVE_INTERVAL_TICKS) {
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, state.hudProbe.component(text));
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, state.hudProbe.component(
+                        text, feedbackText, feedbackEncoding == Encoding.LEGACY));
                 state.hasRenderedMessage = true;
                 state.lastMessage = text;
+                state.lastFeedback = feedbackText;
+                state.lastFeedbackEncoding = feedbackEncoding;
                 state.lastEncoding = Encoding.HUD_PROBE;
                 state.lastSentAtTick = currentTick;
             }
             return;
         }
-        Entry winner = selectWinner(state);
+        Entry winner = selectWinner(state, false);
         if (winner == null) {
             if (state.hasRenderedMessage) {
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
@@ -302,9 +313,12 @@ public final class ActionBarCompositor implements Listener {
         state.lastSentAtTick = currentTick;
     }
 
-    private static Entry selectWinner(PlayerState state) {
+    private static Entry selectWinner(PlayerState state, boolean feedbackOnly) {
         Entry winner = null;
         for (Entry candidate : state.entries.values()) {
+            // Persistent vitals and the open-gesture controls are already represented by the HUD.
+            if (feedbackOnly && (candidate.source.isPersistent() || candidate.source == Source.ABILITY_INPUT))
+                continue;
             if (winner == null
                     || candidate.source.priority > winner.source.priority
                     || (candidate.source.priority == winner.source.priority
@@ -337,7 +351,7 @@ public final class ActionBarCompositor implements Listener {
         UUID playerId();
     }
 
-    private record ShowMutation(UUID playerId, Source source, String message, long durationTicks)
+    private record ShowMutation(UUID playerId, Source source, String message, long durationTicks, boolean readingTime)
             implements Mutation {
     }
 
@@ -352,6 +366,8 @@ public final class ActionBarCompositor implements Listener {
         private final EnumMap<Source, Entry> entries = new EnumMap<>(Source.class);
         private boolean hasRenderedMessage;
         private String lastMessage;
+        private String lastFeedback;
+        private Encoding lastFeedbackEncoding;
         private Encoding lastEncoding;
         private long lastSentAtTick;
     }

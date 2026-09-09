@@ -42,6 +42,10 @@ public final class CombatHudProbe {
                 resource == null ? 0 : resource.maximum(), 63, true, animationFrame);
         bar(line, 5, '\uE980', player.getExp(), 1, 180, false, animationFrame);
         classDiamond(line, player, animationFrame, active);
+        ExperimentalCombatModule.activeClassLineageSnapshot(player.getUniqueId()).ifPresent(lineage -> {
+            String badge = CombatHudAbilityIcons.classBadge(lineage.activeForm().id());
+            if (!badge.isEmpty()) overlay(line, 4, badge, 75);
+        });
         if (active) abilityIcons(line, player);
         // All overlays return to the panel origin. Keep the total advance at 190 GUI pixels.
         return line.append(spacing(190 - x)).toString();
@@ -53,6 +57,25 @@ public final class CombatHudProbe {
         component.setColor(net.md_5.bungee.api.ChatColor.WHITE);
         component.setShadowColor(new Color(0, true));
         return component;
+    }
+
+    public TextComponent component(String text, String feedback, boolean legacy) {
+        TextComponent component = component(text);
+        if (feedback == null || feedback.isBlank()) return component;
+        var message = CombatHudFeedback.components(feedback, legacy);
+        int width = CombatHudFeedback.widthInHalfPixels(message);
+        // The HUD advances 190px. The text overlay must have zero net advance or Minecraft
+        // recenters the entire action bar when feedback changes length.
+        int start = x * 2 + (380 - width) / 2;
+        component.addExtra(halfPixelSpacing(start - 380));
+        for (var part : message) component.addExtra(part);
+        component.addExtra(halfPixelSpacing(380 - start - width));
+        return component;
+    }
+
+    private static String halfPixelSpacing(int halfPixels) {
+        return spacing(halfPixels / 2) + (halfPixels % 2 == 0 ? ""
+                : halfPixels < 0 ? "\uE102" : "\uE103");
     }
 
     private static void abilityIcons(StringBuilder line, Player player) {
