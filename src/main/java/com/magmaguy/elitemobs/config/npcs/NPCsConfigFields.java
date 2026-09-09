@@ -31,7 +31,7 @@ public class NPCsConfigFields extends CustomConfigFields {
     @Getter
     private double nameplateScale = 1;
     @Getter
-    private double nameplateLineGap = 0.2;
+    private double nameplateLineGap = 0.1;
     @Setter
     private Villager.Profession profession = null;
     @Getter
@@ -163,10 +163,10 @@ public class NPCsConfigFields extends CustomConfigFields {
         this.name = translatable(filename, "name", processString("name", name, "", true));
         this.role = translatable(filename, "role", processString("role", role, "", true));
         nameplateScale = processDouble("nameplateScale", nameplateScale, 1D, true);
-        nameplateLineGap = processDouble("nameplateLineGap", nameplateLineGap, 0.2D, true);
+        nameplateLineGap = processDouble("nameplateLineGap", nameplateLineGap, 0.1D, true);
         if (!Double.isFinite(nameplateScale) || nameplateScale <= 0 || nameplateScale > Float.MAX_VALUE)
             nameplateScale = 1;
-        if (!Double.isFinite(nameplateLineGap) || nameplateLineGap < 0) nameplateLineGap = 0.2;
+        if (!Double.isFinite(nameplateLineGap) || nameplateLineGap < 0) nameplateLineGap = 0.1;
         try {
             if (Bukkit.getServer() == null) {
                 processString("profession", professionConfigName(), "nitwit", false);

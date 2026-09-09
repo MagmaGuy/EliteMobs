@@ -258,6 +258,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         boolean disguiseQueued = queueDisguise(displayName);
         villager = effectiveSpawnLocation.getWorld().spawn(effectiveSpawnLocation, Villager.class, villagerInstance -> {
             villagerInstance.setAI(false);
+            // Patrols enable AI for navigation; NPC bodies must still never push or be pushed by players.
+            villagerInstance.setCollidable(false);
             villagerInstance.setPersistent(false);
             villagerInstance.setRemoveWhenFarAway(false);
             villagerInstance.setCustomName(displayName);
