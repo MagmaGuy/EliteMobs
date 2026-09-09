@@ -29,16 +29,16 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/text.png",
       "height": 7,
-      "ascent": -16,
+      "ascent": -18,
       "chars": [
         "0123456789/ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       ]
     },
     {
       "type": "bitmap",
-      "file": "elitemobs:gui/combat_hud_probe/text.png",
-      "height": 6,
-      "ascent": -10,
+      "file": "elitemobs:gui/combat_hud_probe/labels.png",
+      "height": 7,
+      "ascent": -11,
       "chars": [
         ""
       ]
@@ -47,7 +47,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/health.png",
       "height": 3,
-      "ascent": -26,
+      "ascent": -28,
       "chars": [
         ""
       ]
@@ -56,7 +56,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/resource.png",
       "height": 3,
-      "ascent": -26,
+      "ascent": -28,
       "chars": [
         ""
       ]

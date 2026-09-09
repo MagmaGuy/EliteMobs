@@ -28,16 +28,16 @@ public final class CombatHudProbe {
         double health = player.getHealth();
         var maximumAttribute = player.getAttribute(Attribute.MAX_HEALTH);
         double maximum = maximumAttribute == null ? health : maximumAttribute.getValue();
-        overlay(line, 25, label("HEALTH"), 6 * 5);
+        overlay(line, 25, label("HEALTH"), 6 * 4);
         String healthText = number(health) + "/" + number(maximum);
         overlay(line, 25, healthText, healthText.length() * 6);
         bar(line, 25, '\uE110', health, maximum, 63);
         var resource = ExperimentalCombatModule.resourceSnapshot(player.getUniqueId()).orElse(null);
         String resourceName = resource == null ? "ENERGY" : resource.type().name();
-        overlay(line, 117, label(resourceName), resourceName.length() * 5);
+        overlay(line, 118, label(resourceName), resourceName.length() * 4);
         String resourceText = resource == null ? "0/0" : number(resource.amount()) + "/" + number(resource.maximum());
-        overlay(line, 117, resourceText, resourceText.length() * 6);
-        bar(line, 117, '\uE111', resource == null ? 0 : resource.amount(),
+        overlay(line, 118, resourceText, resourceText.length() * 6);
+        bar(line, 118, '\uE111', resource == null ? 0 : resource.amount(),
                 resource == null ? 0 : resource.maximum(), 63);
         bar(line, 5, '\uE112', player.getExp(), 1, 180);
         // All overlays return to the panel origin. Keep the total advance at 190 GUI pixels.
