@@ -22,13 +22,14 @@ import java.util.stream.Collectors;
 
 /**
  * Encourages playing the active class's weapons: class weapons hit elites 10% harder and
- * off-class weapons 10% softer, with a rate-limited action-bar reminder. Vanilla-mob combat is
+ * off-class weapons 20% softer, with a rate-limited action-bar reminder. Vanilla-mob combat is
  * deliberately untouched because EliteMobs separates elite combat from vanilla balance.
  */
 public final class ClassWeaponAffinity implements Listener {
 
     private static final double CLASS_WEAPON_MULTIPLIER = 1.10D;
-    private static final double OFF_CLASS_WEAPON_MULTIPLIER = .90D;
+    private static final int OFF_CLASS_WEAPON_PENALTY_PERCENT = 20;
+    private static final double OFF_CLASS_WEAPON_MULTIPLIER = 1D - OFF_CLASS_WEAPON_PENALTY_PERCENT / 100D;
     private static final long WARNING_INTERVAL_MILLIS = 5L * 60L * 1_000L;
 
     private final Map<UUID, Long> lastWarnings = new HashMap<>();
@@ -67,10 +68,11 @@ public final class ClassWeaponAffinity implements Listener {
                 player,
                 ActionBarCompositor.Source.AFFINITY_WARNING,
                 ChatColorConverter.convert(
-                        header + " &8» &c-10% damage&7. " + bonus));
+                        header + " &8» &c-" + OFF_CLASS_WEAPON_PENALTY_PERCENT + "% damage&7. " + bonus));
         if (chatWarnedThisSession.add(player.getUniqueId()))
             player.sendMessage(ChatColorConverter.convert(
-                    header + " &8» &7This weapon does not match your class: &c-10% damage&7."
+                    header + " &8» &7This weapon does not match your class: &c-"
+                            + OFF_CLASS_WEAPON_PENALTY_PERCENT + "% damage&7."
                             + " " + bonus));
     }
 
