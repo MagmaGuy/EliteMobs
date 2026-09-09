@@ -447,10 +447,11 @@ public class DungeonsConfig extends ConfigurationFile {
                 file, fileConfiguration, "dynamicDungeonDifficultySelectionSelectedLevel", "&7Selected Level: &e$level", true);
         dungeonLockoutTitle = ConfigurationEngine.setString(
                 List.of("Title shown on screen during dungeon boss lockout.",
-                        "Leave empty for subtitle only."),
+                        "Leave empty to show only the HUD notification and chat message."),
                 file, fileConfiguration, "dungeonLockoutTitle", "", true);
         dungeonLockoutSubtitle = ConfigurationEngine.setString(
-                List.of("Sets the subtitle shown when a player kills a boss they are locked out from"),
+                List.of("Sets the HUD notification when a player kills a boss they are locked out from.",
+                        "The legacy key name is retained; this text is not shown as an on-screen subtitle."),
                 file, fileConfiguration, "dungeonLockoutSubtitle", "&cLockout!", true);
         dungeonLockoutChatMessage = ConfigurationEngine.setString(
                 List.of("Sets the chat message shown when a player kills a boss they are locked out from",

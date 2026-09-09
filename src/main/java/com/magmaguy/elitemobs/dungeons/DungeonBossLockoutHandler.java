@@ -100,12 +100,12 @@ public class DungeonBossLockoutHandler implements Listener {
      * Notifies a player that they are locked out from boss loot.
      */
     private static void notifyLockout(Player player, InstancedBossEntity boss, DungeonBossLockout lockout, String bossIdentifier) {
-        // Show subtitle
-        String subtitle = DungeonsConfig.getDungeonLockoutSubtitle();
-        ActionBarCompositor.show(player, ActionBarCompositor.Source.LOCKOUT, subtitle);
+        // Retain the existing configuration key for the HUD notification.
+        ActionBarCompositor.show(player, ActionBarCompositor.Source.LOCKOUT,
+                DungeonsConfig.getDungeonLockoutSubtitle());
 
-        // Send title with empty title and just subtitle
-        player.sendTitle(DungeonsConfig.getDungeonLockoutTitle(), subtitle, 10, 70, 20);
+        String title = DungeonsConfig.getDungeonLockoutTitle();
+        if (!title.isBlank()) player.sendTitle(title, "", 10, 70, 20);
 
         // Send chat message
         String bossName = boss.getName();
