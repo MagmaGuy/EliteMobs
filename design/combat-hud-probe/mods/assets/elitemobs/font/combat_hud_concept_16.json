@@ -711,6 +711,258 @@
     },
     {
       "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/sniper.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/sniper.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/bowmaster.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/bowmaster.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/deadeye.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/deadeye.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/raincaller.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/raincaller.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/arbalist.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/arbalist.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/artillerist.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/artillerist.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/dragonslayer.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/dragonslayer.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/skirmisher.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/skirmisher.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/windrunner.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/windrunner.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/pathfinder.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/pathfinder.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/tempest_archer.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/tempest_archer.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/saboteur.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/saboteur.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/trapper.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/trapper.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/demolitionist.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/demolitionist.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/abilities/cleric.mobility.png",
       "height": 13,
       "ascent": -47,
