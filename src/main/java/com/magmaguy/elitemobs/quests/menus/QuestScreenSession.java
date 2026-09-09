@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.quests.menus;
 
+import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.magmacore.dialog.DialogManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,6 +38,7 @@ public final class QuestScreenSession implements Listener {
         if (QuestInventoryMenu.isQuestInventory(player.getOpenInventory().getTopInventory())
                 || books.remove(player.getUniqueId())) player.closeInventory();
         DialogManager.clearOwnedDialog(player, DIALOG_OWNER);
+        QuestDialogueBossBarManager.close(player, false);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

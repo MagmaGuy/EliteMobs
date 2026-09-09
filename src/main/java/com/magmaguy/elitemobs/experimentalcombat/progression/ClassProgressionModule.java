@@ -620,14 +620,14 @@ public final class ClassProgressionModule {
                     }
                 }
                 state.progressXp.put(form.id(), xp);
-                boolean granted = form.band().effectiveStart() <= effectiveLevel;
+                boolean granted = form.requiredFoundationSkillLevel() <= effectiveLevel;
                 if (granted) state.challenges.add(form.id()); else state.challenges.remove(form.id());
                 persistedRows.add(new StoredClassProgress(playerId, form.id(), xp, catalogVersion, granted));
             }
             String selectedFormId = state.profile.selectedFormId();
             boolean selectionInvalid = selectedFormId != null
                     && catalog.find(selectedFormId)
-                    .map(selected -> selected.band().effectiveStart() > effectiveLevel)
+                    .map(selected -> selected.requiredFoundationSkillLevel() > effectiveLevel)
                     .orElse(true);
             if (selectionInvalid) {
                 state.profile = new StoredClassProfile(

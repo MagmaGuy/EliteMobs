@@ -117,7 +117,13 @@ public record ClassFormDefinition(
 
     /** The effective level this form can store, including its branching-band ceiling. */
     public int effectiveProgressionCap(ToIntFunction<SkillType> levelProvider) {
-        return Math.min(effectiveSkillCap(levelProvider), band.effectiveEnd());
+        int skillCap = effectiveSkillCap(levelProvider);
+        int cap = Math.min(skillCap, band.effectiveEnd());
+        // Admission at 30/60/90 grants the first local level immediately. The
+        // existing XP bands still start at 31/61/91; no saved XP is rewritten.
+        return skillCap >= requiredFoundationSkillLevel()
+                ? Math.max(band.effectiveStart(), cap)
+                : cap;
     }
 
     /** Returns zero while locked, otherwise the number of local levels this form may earn. */
