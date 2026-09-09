@@ -63,6 +63,7 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
     private final ExperimentalCombatShutdownPolicy shutdownPolicy = new ExperimentalCombatShutdownPolicy();
     private BukkitTask reconciliationTask;
     private BukkitTask hungerEnforcementTask;
+    private com.magmaguy.easyminecraftgoals.ammunition.RangedAmmunition rangerAmmunition;
 
     public ExperimentalCombatRuntime(PlayerCombatState combatState) {
         if (instance != null)
@@ -97,6 +98,10 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
     public void start() {
         if (reconciliationTask != null)
             throw new IllegalStateException("Experimental Combat runtime is already running.");
+        rangerAmmunition = com.magmaguy.easyminecraftgoals.NMSManager.getAdapter()
+                .grantOrdinaryAmmunition(MetadataHandler.PLUGIN, player -> isActive(player)
+                        && ExperimentalCombatModule.activeClassLineageSnapshot(player.getUniqueId())
+                        .map(lineage -> lineage.root().id().equals("ranger")).orElse(false));
         combatState.addListener(this);
         reconciliationTask = Bukkit.getScheduler().runTaskTimer(
                 MetadataHandler.PLUGIN,
@@ -111,6 +116,10 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
     }
 
     public void shutdown() {
+        if (rangerAmmunition != null) {
+            rangerAmmunition.close();
+            rangerAmmunition = null;
+        }
         boolean preserveHealth = shutdownPolicy.consumeHealthCleanup()
                 == ExperimentalCombatShutdownPolicy.HealthCleanup.PRESERVE_FOR_SOFT_RELOAD;
         combatState.removeListener(this);
