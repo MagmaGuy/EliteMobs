@@ -26,6 +26,7 @@ public record ActiveAbilityBalanceReport(List<Row> rows) {
         List<String> lines = new ArrayList<>();
         lines.add("ACTIVE ABILITY BALANCE GRAPH");
         lines.add("Score is a normalized matched-level effect budget. D/G/P means 1, 3 and 8 targets.");
+        lines.add("Cadence uses in-combat passive recovery; excludes combat gains, nearby/damage-free bonuses and passives.");
         for (AbilitySlot slot : AbilitySlot.values()) {
             List<Row> slotRows = rows.stream()
                     .filter(row -> row.slot() == slot)

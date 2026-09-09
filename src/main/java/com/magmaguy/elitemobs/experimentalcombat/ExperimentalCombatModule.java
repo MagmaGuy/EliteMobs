@@ -486,7 +486,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
                 practicing ? 0D : commitEffects.resourceGrant() - abilityCost,
                 0, 1, Set.of(), abilitySpec.executionTraits().mechanics()));
         recordAbilityContribution(player, result.abilityId(), result.contribution());
-        sendCastFeedback(player, ClassAbilityActivationFeedback.message(
+        sendFeedback(player, ClassAbilityActivationFeedback.message(
                 lineage, slot, abilitySpec, active.activeEffectiveLevel()));
         skillTutorial.successfulCast(player, progression, slot);
         return result;
@@ -965,14 +965,6 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     }
 
     private static void sendFeedback(Player player, String message) {
-        ActionBarCompositor.show(
-                player,
-                ActionBarCompositor.Source.SKILL_FEEDBACK,
-                ChatColorConverter.convert(message));
-    }
-
-    private static void sendCastFeedback(Player player, String message) {
-        // No explicit duration: the compositor scales the lifetime to slow-reader speed.
         ActionBarCompositor.show(
                 player,
                 ActionBarCompositor.Source.SKILL_FEEDBACK,

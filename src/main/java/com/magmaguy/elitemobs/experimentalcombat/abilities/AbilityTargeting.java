@@ -115,31 +115,6 @@ final class AbilityTargeting {
                 .map(AimedCandidate::player);
     }
 
-    TargetSelection selectAlongGroundRoute(
-            Player caster,
-            FixedAbilitySpec spec,
-            SafeMovement.GroundRoute route) {
-        List<Location> points = route.points();
-        if (points.size() < 2) return new TargetSelection(List.of(), List.of(), caster.getLocation());
-        World world = points.get(0).getWorld();
-        if (world == null) return new TargetSelection(List.of(), List.of(), caster.getLocation());
-
-        double width = Math.max(1D, spec.tuning().radius());
-        BoundingBox bounds = routeBounds(points, width);
-        List<RouteCandidate> candidates = new ArrayList<>();
-        for (Entity entity : world.getNearbyEntities(bounds)) {
-            if (!(entity instanceof LivingEntity living)
-                    || !semantics.canTargetEnemy(caster, living, spec)) continue;
-            RouteCandidate candidate = routeCandidate(caster, points, living, width);
-            if (candidate != null) candidates.add(candidate);
-        }
-        candidates.sort(Comparator.comparingDouble(RouteCandidate::progress));
-        return new TargetSelection(
-                candidates.stream().map(RouteCandidate::entity).toList(),
-                List.of(),
-                route.destination());
-    }
-
     boolean unobstructedFrom(Location observerFeet, double observerHeight, LivingEntity target) {
         if (observerFeet.getWorld() == null || !observerFeet.getWorld().equals(target.getWorld())) return false;
         Location source = observerFeet.clone().add(0, Math.max(.5D, observerHeight * .5D), 0);
@@ -247,63 +222,6 @@ final class AbilityTargeting {
         return new ForwardCandidate(entity, forward);
     }
 
-    private static BoundingBox routeBounds(List<Location> points, double expansion) {
-        Location first = points.get(0);
-        double minX = first.getX();
-        double minY = first.getY();
-        double minZ = first.getZ();
-        double maxX = minX;
-        double maxY = minY;
-        double maxZ = minZ;
-        for (Location point : points) {
-            minX = Math.min(minX, point.getX());
-            minY = Math.min(minY, point.getY());
-            minZ = Math.min(minZ, point.getZ());
-            maxX = Math.max(maxX, point.getX());
-            maxY = Math.max(maxY, point.getY());
-            maxZ = Math.max(maxZ, point.getZ());
-        }
-        return new BoundingBox(
-                minX - expansion,
-                minY - expansion,
-                minZ - expansion,
-                maxX + expansion,
-                maxY + expansion,
-                maxZ + expansion);
-    }
-
-    private static RouteCandidate routeCandidate(
-            Player caster,
-            List<Location> points,
-            LivingEntity entity,
-            double width) {
-        Vector target = entity.getLocation().add(0, entity.getHeight() * .5D, 0).toVector();
-        double bestDistanceSquared = Double.POSITIVE_INFINITY;
-        double bestProgress = 0D;
-        Location closest = null;
-        double eyeOffset = Math.max(.5D, caster.getHeight() * .5D);
-        for (int index = 0; index < points.size() - 1; index++) {
-            Vector start = points.get(index).toVector().add(new Vector(0, eyeOffset, 0));
-            Vector end = points.get(index + 1).toVector().add(new Vector(0, eyeOffset, 0));
-            Vector segment = end.clone().subtract(start);
-            double lengthSquared = segment.lengthSquared();
-            double fraction = lengthSquared < 1.0E-12D
-                    ? 0D
-                    : Math.max(0D, Math.min(1D,
-                    target.clone().subtract(start).dot(segment) / lengthSquared));
-            Vector point = start.clone().add(segment.multiply(fraction));
-            double distanceSquared = point.distanceSquared(target);
-            if (distanceSquared >= bestDistanceSquared) continue;
-            bestDistanceSquared = distanceSquared;
-            bestProgress = index + fraction;
-            closest = point.toLocation(points.get(index).getWorld());
-        }
-        if (closest == null || bestDistanceSquared > width * width) return null;
-        Location targetLocation = entity.getLocation().add(0, entity.getHeight() * .5D, 0);
-        if (!unobstructed(closest, targetLocation)) return null;
-        return new RouteCandidate(entity, bestProgress);
-    }
-
     private static boolean unobstructed(Location source, Location destination) {
         World world = source.getWorld();
         if (world == null || destination.getWorld() == null || !world.equals(destination.getWorld())) return false;
@@ -343,6 +261,4 @@ final class AbilityTargeting {
     private record ForwardCandidate(LivingEntity entity, double forwardDistance) {
     }
 
-    private record RouteCandidate(LivingEntity entity, double progress) {
-    }
 }

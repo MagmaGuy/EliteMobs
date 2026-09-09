@@ -37,10 +37,6 @@ public final class ClassAbilityEligibility {
         policy = DENY_ALL;
     }
 
-    static boolean matches(boolean eligibleCombatContent, boolean outsideControlOptIn) {
-        return eligibleCombatContent || outsideControlOptIn;
-    }
-
     private record Policy(
             Predicate<Player> eligibleCombatContent,
             Predicate<Player> outsideControlOptIn) {

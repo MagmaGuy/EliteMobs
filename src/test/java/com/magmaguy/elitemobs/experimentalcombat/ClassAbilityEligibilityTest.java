@@ -43,13 +43,6 @@ class ClassAbilityEligibilityTest {
     }
 
     @Test
-    void classAbilityUnionDoesNotImplyDungeonCombatRules() {
-        assertTrue(ClassAbilityEligibility.matches(false, true));
-        assertTrue(ClassAbilityEligibility.matches(true, false));
-        assertFalse(ClassAbilityEligibility.matches(false, false));
-    }
-
-    @Test
     void eligibleCombatContentDoesNotConsultSessionOptIn() {
         AtomicBoolean outsideOptInConsulted = new AtomicBoolean();
         ClassAbilityEligibility.install(

@@ -9,13 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Collision-shape-aware primitives with explicit movement-family policies.
@@ -25,9 +20,6 @@ import java.util.TreeSet;
  */
 final class SafeMovement {
     private static final double ROUTE_STEP = .125D;
-    private static final double ENDPOINT_SAMPLE_STEP = .5D;
-    private static final double MAX_GROUNDED_STEP_UP = 1.05D;
-    private static final double MAX_GROUNDED_DROP = 1.25D;
     private static final double BODY_EPSILON = 1.0E-4D;
     private static final double CONTACT_EPSILON = 1.0E-7D;
     private static final double SUPPORT_DEPTH = .075D;
@@ -49,38 +41,6 @@ final class SafeMovement {
             Material.COBWEB);
 
     private SafeMovement() {
-    }
-
-    /**
-     * Plans a grounded charge which follows collision-shape support instead of sweeping a flat
-     * airborne line. Each step must have safe footing and may climb at most one block or descend a
-     * small ledge. Unsupported gaps stop the route.
-     */
-    static Optional<GroundRoute> groundedForwardRoute(Player player, double maximumDistance) {
-        if (!validDistance(maximumDistance)) return Optional.empty();
-        Vector direction = horizontalFacing(player);
-        if (direction == null) return Optional.empty();
-
-        Location start = player.getLocation();
-        if (!safeStanding(player, start)) return Optional.empty();
-        Location current = start.clone();
-        List<Location> points = new ArrayList<>();
-        points.add(start.clone());
-
-        int steps = Math.max(1, (int) Math.ceil(maximumDistance / ROUTE_STEP));
-        for (int step = 1; step <= steps; step++) {
-            double distance = Math.min(step * ROUTE_STEP, maximumDistance);
-            double x = start.getX() + direction.getX() * distance;
-            double z = start.getZ() + direction.getZ() * distance;
-            Location next = groundedStep(player, current, x, z).orElse(null);
-            if (next == null) break;
-            current = next;
-            points.add(current.clone());
-        }
-
-        double horizontalDistance = horizontalDistance(start, current);
-        if (horizontalDistance < .5D) return Optional.empty();
-        return Optional.of(new GroundRoute(points, horizontalDistance));
     }
 
     /**
@@ -107,38 +67,6 @@ final class SafeMovement {
     }
 
     /**
-     * Finds safe footing near a desired ally/anchor and requires a direct, continuously clear
-     * player-volume route to it. This does not return a partial stop before a wall.
-     */
-    static Optional<Location> directFlightDestination(
-            Player player,
-            Location desired,
-            double maximumDistance,
-            double endpointSearchRadius,
-            double arrivalTolerance) {
-        if (!validDistance(maximumDistance)
-                || !Double.isFinite(endpointSearchRadius)
-                || endpointSearchRadius < 0D
-                || !Double.isFinite(arrivalTolerance)
-                || arrivalTolerance < 0D)
-            return Optional.empty();
-        Location start = player.getLocation();
-        if (desired.getWorld() == null || !desired.getWorld().equals(start.getWorld())) return Optional.empty();
-        if (start.distance(desired) > maximumDistance + arrivalTolerance) return Optional.empty();
-
-        return safeStandingCandidatesNear(player, desired, endpointSearchRadius).stream()
-                .filter(candidate -> candidate.distance(desired) <= arrivalTolerance + CONTACT_EPSILON)
-                .filter(candidate -> start.distance(candidate) <= maximumDistance + CONTACT_EPSILON)
-                .filter(candidate -> bodyPathClear(player, start, candidate))
-                .findFirst();
-    }
-
-    static boolean safeStanding(Player player, Location location) {
-        BoundingBox body = bodyAt(player, location);
-        return safeStanding(player, location, body);
-    }
-
-    /**
      * Uses at least the normal standing-player volume even if the caster is currently crouching,
      * swimming or gliding. Blink uses this conservative shape so a pose change after teleport
      * cannot place the player's head inside collision geometry.
@@ -151,11 +79,6 @@ final class SafeMovement {
                 body,
                 Math.max(SUPPORT_HALF_WIDTH, body.getWidthX() * .5D),
                 Math.max(SUPPORT_HALF_WIDTH, body.getWidthZ() * .5D));
-    }
-
-    private static boolean safeStanding(Player player, Location location, BoundingBox body) {
-        return safeStanding(
-                player, location, body, SUPPORT_HALF_WIDTH, SUPPORT_HALF_WIDTH);
     }
 
     private static boolean safeStanding(
@@ -180,30 +103,12 @@ final class SafeMovement {
                 && !containsUnsafeFooting(world, union(body, supportProbe));
     }
 
-    static boolean bodyClear(Player player, Location location) {
-        World world = location.getWorld();
-        if (world == null || !world.equals(player.getWorld())) return false;
-        BoundingBox body = bodyAt(player, location);
-        return volumeAvailable(player, world, body) && !intersectsCollision(world, body);
-    }
-
-    static boolean standingBodyClear(Player player, Location location) {
-        World world = location.getWorld();
-        if (world == null || !world.equals(player.getWorld())) return false;
-        BoundingBox body = standingBodyAt(player, location);
-        return volumeAvailable(player, world, body) && !intersectsCollision(world, body);
-    }
-
     /**
      * Checks the continuously swept player volume, not merely the center line or destination.
      * This deliberately rejects diagonal corner clipping and routes through thin collision shapes.
      */
     static boolean bodyPathClear(Player player, Location from, Location to) {
         return bodyPathClear(player, from, to, bodyAt(player, from), bodyAt(player, to));
-    }
-
-    static boolean standingBodyPathClear(Player player, Location from, Location to) {
-        return bodyPathClear(player, from, to, standingBodyAt(player, from), standingBodyAt(player, to));
     }
 
     private static boolean bodyPathClear(
@@ -235,91 +140,6 @@ final class SafeMovement {
             }
         }
         return true;
-    }
-
-    private static Optional<Location> groundedStep(
-            Player player,
-            Location current,
-            double x,
-            double z) {
-        World world = current.getWorld();
-        if (world == null) return Optional.empty();
-        return supportSurfaceHeights(world, x, z, current.getY()).stream()
-                .filter(y -> y - current.getY() <= MAX_GROUNDED_STEP_UP + CONTACT_EPSILON)
-                .filter(y -> current.getY() - y <= MAX_GROUNDED_DROP + CONTACT_EPSILON)
-                .map(y -> new Location(world, x, y, z, current.getYaw(), current.getPitch()))
-                .filter(candidate -> safeStanding(player, candidate))
-                .filter(candidate -> groundedTransitionClear(player, current, candidate))
-                .min(Comparator.comparingDouble(candidate -> Math.abs(candidate.getY() - current.getY())));
-    }
-
-    private static boolean groundedTransitionClear(Player player, Location from, Location to) {
-        if (to.getY() > from.getY() + CONTACT_EPSILON) {
-            Location raised = from.clone();
-            raised.setY(to.getY());
-            return bodyPathClear(player, from, raised) && bodyPathClear(player, raised, to);
-        }
-        if (to.getY() < from.getY() - CONTACT_EPSILON) {
-            Location overEdge = to.clone();
-            overEdge.setY(from.getY());
-            return bodyPathClear(player, from, overEdge) && bodyPathClear(player, overEdge, to);
-        }
-        return bodyPathClear(player, from, to);
-    }
-
-    private static List<Location> safeStandingCandidatesNear(
-            Player player,
-            Location anchor,
-            double searchRadius) {
-        World world = anchor.getWorld();
-        if (world == null || !world.equals(player.getWorld())
-                || !Double.isFinite(searchRadius) || searchRadius < 0D)
-            return List.of();
-
-        List<Location> candidates = new ArrayList<>();
-        int samples = Math.max(0, (int) Math.ceil(searchRadius / ENDPOINT_SAMPLE_STEP));
-        for (int xSample = -samples; xSample <= samples; xSample++) {
-            for (int zSample = -samples; zSample <= samples; zSample++) {
-                double xOffset = xSample * ENDPOINT_SAMPLE_STEP;
-                double zOffset = zSample * ENDPOINT_SAMPLE_STEP;
-                if (square(xOffset) + square(zOffset) > square(searchRadius) + CONTACT_EPSILON) continue;
-                double x = anchor.getX() + xOffset;
-                double z = anchor.getZ() + zOffset;
-                for (double standingY : supportSurfaceHeights(world, x, z, anchor.getY())) {
-                    if (Math.abs(standingY - anchor.getY()) > 2.5D) continue;
-                    Location candidate = new Location(
-                            world, x, standingY, z, anchor.getYaw(), anchor.getPitch());
-                    if (safeStanding(player, candidate)) candidates.add(candidate);
-                }
-            }
-        }
-        candidates.sort(Comparator.comparingDouble(anchor::distanceSquared));
-        return List.copyOf(candidates);
-    }
-
-    private static List<Double> supportSurfaceHeights(World world, double x, double z, double anchorY) {
-        TreeSet<Double> heights = new TreeSet<>();
-        int minimumY = Math.max(world.getMinHeight(), (int) Math.floor(anchorY) - 3);
-        int maximumY = Math.min(world.getMaxHeight() - 1, (int) Math.ceil(anchorY) + 2);
-        int centerBlockX = (int) Math.floor(x);
-        int centerBlockZ = (int) Math.floor(z);
-        for (int blockX = centerBlockX - 1; blockX <= centerBlockX + 1; blockX++) {
-            for (int blockZ = centerBlockZ - 1; blockZ <= centerBlockZ + 1; blockZ++) {
-                if (!world.isChunkLoaded(blockX >> 4, blockZ >> 4)) continue;
-                for (int blockY = minimumY; blockY <= maximumY; blockY++) {
-                    Block block = world.getBlockAt(blockX, blockY, blockZ);
-                    for (BoundingBox local : block.getCollisionShape().getBoundingBoxes()) {
-                        BoundingBox absolute = absolute(local, blockX, blockY, blockZ);
-                        if (x + SUPPORT_HALF_WIDTH > absolute.getMinX() + CONTACT_EPSILON
-                                && x - SUPPORT_HALF_WIDTH < absolute.getMaxX() - CONTACT_EPSILON
-                                && z + SUPPORT_HALF_WIDTH > absolute.getMinZ() + CONTACT_EPSILON
-                                && z - SUPPORT_HALF_WIDTH < absolute.getMaxZ() - CONTACT_EPSILON)
-                            heights.add(absolute.getMaxY());
-                    }
-                }
-            }
-        }
-        return List.copyOf(heights);
     }
 
     private static BoundingBox bodyAt(Player player, Location location) {
@@ -457,32 +277,12 @@ final class SafeMovement {
         return Double.isFinite(distance) && distance > 0D;
     }
 
-    private static double horizontalDistance(Location first, Location second) {
-        return Math.sqrt(square(first.getX() - second.getX()) + square(first.getZ() - second.getZ()));
-    }
-
     private static int minimumBlock(double coordinate) {
         return (int) Math.floor(coordinate);
     }
 
     private static int maximumBlock(double coordinate) {
         return (int) Math.floor(coordinate - BODY_EPSILON);
-    }
-
-    private static double square(double value) {
-        return value * value;
-    }
-
-    record GroundRoute(List<Location> points, double horizontalDistance) {
-        GroundRoute {
-            points = points.stream().map(Location::clone).toList();
-            if (points.size() < 2 || horizontalDistance < 0D)
-                throw new IllegalArgumentException("A grounded route requires movement");
-        }
-
-        Location destination() {
-            return points.get(points.size() - 1).clone();
-        }
     }
 
     private record AxisTimes(double entry, double exit) {

@@ -96,7 +96,7 @@ public final class ActiveAbilityBalanceAnalyzer {
         double netResourceCost = Math.max(0D, spec.resourceCost()
                 - AbilityCommitEffects.resolve(spec, evaluationLevel).resourceGrant());
         double efficiency = normalized / Math.max(1D, netResourceCost) * 100D;
-        ActiveAbilityBalanceReport.Cadence cadence = cadence(spec, evaluationLevel);
+        ActiveAbilityBalanceReport.Cadence cadence = cadence(spec, evaluationLevel, resourceType);
         List<ActiveAbilityBalanceReport.TargetScenario> scenarios = targetScenarios(
                 spec, normalized, cadence.sustainableCastsPerMinute(), netResourceCost);
         Optional<ActiveAbilityBalanceReport.SummonMetrics> summon = summonMetrics(
@@ -211,10 +211,12 @@ public final class ActiveAbilityBalanceAnalyzer {
 
     private static ActiveAbilityBalanceReport.Cadence cadence(
             FixedAbilitySpec spec,
-            int evaluationLevel) {
+            int evaluationLevel,
+            ClassResourceType resourceType) {
         double netResourceCost = Math.max(0D, spec.resourceCost()
                 - AbilityCommitEffects.resolve(spec, evaluationLevel).resourceGrant());
-        double resourceRefillSeconds = netResourceCost * .6D;
+        double recoveryPerSecond = BuiltInClassContent.resourceDefinitions().get(resourceType).inCombatTickDelta();
+        double resourceRefillSeconds = netResourceCost / recoveryPerSecond;
         double sustainable = resourceRefillSeconds <= 0D
                 ? MAXIMUM_CASTS_PER_MINUTE
                 : Math.min(MAXIMUM_CASTS_PER_MINUTE, 60D / resourceRefillSeconds);
