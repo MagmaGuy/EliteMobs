@@ -207,10 +207,13 @@ public class TestReport {
         lines.add(String.format("&7%d abilities modeled across level bands; &e%d efficiency outliers.",
                 activeAbilityBalance.rows().size(), activeOutliers.size()));
         activeOutliers.stream().limit(6).forEach(row -> lines.add(String.format(
-                row.outlier() == ActiveAbilityBalanceReport.Outlier.HIGH
-                        ? "  &cHIGH &f%s &7%.2f/100 resource"
-                        : "  &9LOW &f%s &7%.2f/100 resource",
-                row.abilityId(), row.resourceEfficiency())));
+                "  %s &f%s &7%.2f/100 resource",
+                switch (row.outlier()) {
+                    case HIGH -> "&cHIGH";
+                    case LOW -> "&9LOW";
+                    case MIXED -> "&eMIXED";
+                    case NONE -> "&7NONE";
+                }, row.abilityId(), row.resourceEfficiency())));
 
         lines.add("");
 

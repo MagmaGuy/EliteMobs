@@ -25,53 +25,6 @@ public final class EliteMobsAbilitySemantics implements AbilitySemantics {
     private final RuntimeSignalSink runtimeSignalSink;
     private final ObservationSink observationSink;
 
-    public EliteMobsAbilitySemantics(ThreatSink threatSink, ContributionSink contributionSink) {
-        this(threatSink, contributionSink, ignored -> 1D, (ignored, amount) -> {
-        }, ignored -> List.of(), ignored -> {
-        }, ignored -> AbilityMechanicModifiers.NEUTRAL, (ignored, signal, ticks) -> {
-        }, ignored -> {
-        });
-    }
-
-    public EliteMobsAbilitySemantics(
-            ThreatSink threatSink,
-            ContributionSink contributionSink,
-            HealingMultiplier healingMultiplier) {
-        this(threatSink, contributionSink, healingMultiplier, (ignored, amount) -> {
-        }, ignored -> List.of(), ignored -> {
-        }, ignored -> AbilityMechanicModifiers.NEUTRAL, (ignored, signal, ticks) -> {
-        }, ignored -> {
-        });
-    }
-
-    public EliteMobsAbilitySemantics(
-            ThreatSink threatSink,
-            ContributionSink contributionSink,
-            HealingMultiplier healingMultiplier,
-            ResourceSink resourceSink,
-            ActiveLineageProvider activeLineageProvider,
-            SourceCleanup sourceCleanup) {
-        this(threatSink, contributionSink, healingMultiplier, resourceSink,
-                activeLineageProvider, sourceCleanup, ignored -> AbilityMechanicModifiers.NEUTRAL,
-                (ignored, signal, ticks) -> {
-                }, ignored -> {
-                });
-    }
-
-    public EliteMobsAbilitySemantics(
-            ThreatSink threatSink,
-            ContributionSink contributionSink,
-            HealingMultiplier healingMultiplier,
-            ResourceSink resourceSink,
-            ActiveLineageProvider activeLineageProvider,
-            SourceCleanup sourceCleanup,
-            MechanicModifierProvider mechanicModifierProvider,
-            RuntimeSignalSink runtimeSignalSink) {
-        this(threatSink, contributionSink, healingMultiplier, resourceSink,
-                activeLineageProvider, sourceCleanup, mechanicModifierProvider,
-                runtimeSignalSink, ignored -> { });
-    }
-
     public EliteMobsAbilitySemantics(
             ThreatSink threatSink,
             ContributionSink contributionSink,
@@ -92,12 +45,6 @@ public final class EliteMobsAbilitySemantics implements AbilitySemantics {
                 mechanicModifierProvider, "mechanicModifierProvider");
         this.runtimeSignalSink = Objects.requireNonNull(runtimeSignalSink, "runtimeSignalSink");
         this.observationSink = Objects.requireNonNull(observationSink, "observationSink");
-    }
-
-    public static EliteMobsAbilitySemantics withoutPersistenceCallbacks() {
-        return new EliteMobsAbilitySemantics(request -> {
-        }, (caster, abilityId, contribution) -> {
-        });
     }
 
     @Override

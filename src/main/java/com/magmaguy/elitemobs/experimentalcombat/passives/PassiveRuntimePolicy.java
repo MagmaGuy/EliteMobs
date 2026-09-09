@@ -23,10 +23,6 @@ final class PassiveRuntimePolicy {
         return 1D - mechanics.controlResistanceFraction();
     }
 
-    static boolean isSpellDamage(boolean classAbilityDamage, SkillType progressionSkill) {
-        return classAbilityDamage || isMagicWeaponSkill(progressionSkill);
-    }
-
     static boolean isMagicWeaponSkill(SkillType progressionSkill) {
         return progressionSkill == SkillType.WANDS || progressionSkill == SkillType.STAVES;
     }

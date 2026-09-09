@@ -32,12 +32,9 @@ final class TransportFiles {
     boolean hasDefinition(String id) { return configuration.getCustomConfigFieldsHashMap().containsKey(id + ".yml"); }
     List<String> ids() { return List.copyOf(loaded.keySet()); }
     void save(TransportRoute route) throws IOException {
-        Path target = routes.resolve(route.id() + ".yml");
-        // Updating a nested DLC definition must not create a duplicate root definition.
-        try (var paths = Files.walk(routes)) {
-            target = paths.filter(p -> p.getFileName().toString().equals(route.id() + ".yml"))
-                    .findFirst().orElse(target);
-        }
+        var fields = configuration.getCustomConfigFieldsHashMap().get(route.id() + ".yml");
+        // The configuration loader owns duplicate selection and nested DLC file identity.
+        Path target = fields == null ? routes.resolve(route.id() + ".yml") : fields.getFile().toPath();
         YamlConfiguration yaml = new YamlConfiguration();
         yaml.options().parseComments(true);
         try { if (Files.exists(target)) yaml.load(target.toFile()); }

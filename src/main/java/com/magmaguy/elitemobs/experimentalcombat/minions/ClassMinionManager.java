@@ -101,27 +101,6 @@ public final class ClassMinionManager implements Listener, AutoCloseable {
     private int sequence;
     private boolean closed;
 
-    public ClassMinionManager(Plugin plugin, OwnerProfileResolver ownerProfiles) {
-        this(plugin, ownerProfiles, MinionDamageEvaluator.NEUTRAL,
-                MinionImpactEffectApplier.NONE, MinionRuntimeObserver.NONE);
-    }
-
-    public ClassMinionManager(
-            Plugin plugin,
-            OwnerProfileResolver ownerProfiles,
-            MinionDamageEvaluator damageEvaluator) {
-        this(plugin, ownerProfiles, damageEvaluator,
-                MinionImpactEffectApplier.NONE, MinionRuntimeObserver.NONE);
-    }
-
-    public ClassMinionManager(
-            Plugin plugin,
-            OwnerProfileResolver ownerProfiles,
-            MinionDamageEvaluator damageEvaluator,
-            MinionImpactEffectApplier impactEffects) {
-        this(plugin, ownerProfiles, damageEvaluator, impactEffects, MinionRuntimeObserver.NONE);
-    }
-
     public ClassMinionManager(
             Plugin plugin,
             OwnerProfileResolver ownerProfiles,
