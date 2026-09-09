@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassFormDefinition;
 import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
-import org.bukkit.Bukkit;
 
 /** Resolves the ordinary boss selected for a class and validates admission prerequisites. */
 public record ClassTrialDefinition(ClassFormDefinition form, CustomBossesConfigFields boss) {
@@ -22,9 +21,6 @@ public record ClassTrialDefinition(ClassFormDefinition form, CustomBossesConfigF
                     + form.requiredFoundationSkillLevel() + " in " + boss.getFilename());
         if (boss.getPowers() == null || boss.getPowers().isEmpty())
             throw new IllegalArgumentException("Instructor requires ordinary powers: " + boss.getFilename());
-        if (boss.getDisguise() != null && !boss.getDisguise().isBlank()
-                && !Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
-            throw new IllegalArgumentException("Configured instructor disguise requires LibsDisguises: " + boss.getFilename());
         if (boss.getCustomModel() != null && !boss.getCustomModel().isBlank()
                 && (!CustomModel.customModelsEnabled() || !CustomModel.modelExists(boss.getCustomModel())))
             throw new IllegalArgumentException("Missing instructor custom model: " + boss.getCustomModel());
