@@ -869,7 +869,8 @@ public class DungeonInstance extends MatchInstance {
                         Logger.warn("Could not find a safe destination for " + player.getName() + " while deleting " + worldToDelete.getName() + ".");
                         continue;
                     }
-                    DungeonPlayerEvacuation.clearSpectatorTargetIfNeeded(player);
+                    if (player.getGameMode() == org.bukkit.GameMode.SPECTATOR)
+                        player.setSpectatorTarget(null);
                     MatchInstance.MatchInstanceEvents.teleportBypass = true;
                     player.teleport(destination);
                 } catch (Exception exception) {

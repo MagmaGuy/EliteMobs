@@ -29,17 +29,6 @@ final class SpawnLifecycle {
         return silent ? Context.SILENT : Context.ANNOUNCED;
     }
 
-    static <T> void restorePersistedSpawn(Context context,
-                                          T persistentLocation,
-                                          Consumer<T> respawnLocationSetter,
-                                          Consumer<Context> spawnAction) {
-        Objects.requireNonNull(context, "context");
-        Objects.requireNonNull(respawnLocationSetter, "respawnLocationSetter");
-        Objects.requireNonNull(spawnAction, "spawnAction");
-        respawnLocationSetter.accept(persistentLocation);
-        spawnAction.accept(context);
-    }
-
     static void apply(Context context,
                       Consumer<Boolean> tracking,
                       Runnable announcement,

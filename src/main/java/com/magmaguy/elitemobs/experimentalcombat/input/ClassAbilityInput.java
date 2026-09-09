@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.experimentalcombat.input;
 
 import com.magmaguy.elitemobs.experimentalcombat.abilities.AbilityResult;
 import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
-import com.magmaguy.elitemobs.experimentalcombat.progression.InputProfile;
 import org.bukkit.entity.Player;
 
 /**
@@ -12,8 +11,6 @@ import org.bukkit.entity.Player;
  * resources and ability execution remain behind this interface.</p>
  */
 public interface ClassAbilityInput {
-
-    boolean mechanicsActive(Player player);
 
     boolean hasActiveClass(Player player);
 
@@ -25,8 +22,6 @@ public interface ClassAbilityInput {
     boolean outsideControlsAllowed();
 
     void onControlModeChanged(Player player);
-
-    InputProfile activeInputProfile(Player player);
 
     String abilityName(Player player, AbilitySlot slot);
 

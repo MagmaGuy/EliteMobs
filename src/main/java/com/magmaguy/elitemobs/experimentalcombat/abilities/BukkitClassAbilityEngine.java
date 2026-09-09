@@ -1528,8 +1528,8 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 && !caster.isDead()
                 && ClassAbilityEligibility.isEligible(caster);
         if (caster == null) return false;
-        return new DelayedCastLease(caster.getUniqueId(), lifecycleToken).permits(
-                caster.getUniqueId(), states.lifecycleToken(caster), runtimeEligible);
+        long currentGeneration = states.lifecycleToken(caster);
+        return runtimeEligible && lifecycleToken == currentGeneration;
     }
 
     private void presentConstruct(Player player, FixedAbilitySpec spec, Location origin) {

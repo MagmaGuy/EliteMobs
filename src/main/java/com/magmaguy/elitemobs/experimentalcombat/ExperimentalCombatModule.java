@@ -304,7 +304,6 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         reconcileAfterClassSelection(player);
     }
 
-    @Override
     public boolean mechanicsActive(Player player) {
         return inputRouter.controlsEnabled(player);
     }
@@ -350,7 +349,6 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         reconcilePlayer(player);
     }
 
-    @Override
     public InputProfile activeInputProfile(Player player) {
         return progression.snapshot(player.getUniqueId())
                 .map(ProfileSnapshot::activeInputProfile)

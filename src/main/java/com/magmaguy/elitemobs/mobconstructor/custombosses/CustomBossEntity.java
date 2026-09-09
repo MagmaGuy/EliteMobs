@@ -692,11 +692,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     protected final void restorePersistedSpawn(SpawnLifecycle.Context spawnContext) {
-        SpawnLifecycle.restorePersistedSpawn(
-                spawnContext,
-                persistentLocation,
-                this::setRespawnOverrideLocation,
-                this::spawn);
+        Objects.requireNonNull(spawnContext, "context");
+        setRespawnOverrideLocation(persistentLocation);
+        spawn(spawnContext);
     }
 
     @Override

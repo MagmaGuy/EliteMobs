@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.experimentalcombat.input;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.AbilityContribution;
 import com.magmaguy.elitemobs.experimentalcombat.abilities.AbilityResult;
 import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
-import com.magmaguy.elitemobs.experimentalcombat.progression.InputProfile;
 import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -270,13 +269,7 @@ class ClassAbilityInputRouterTest {
     private static final class RecordingAbilityInput implements ClassAbilityInput {
 
         private final List<AbilitySlot> usedSlots = new ArrayList<>();
-        private InputProfile activeProfile = InputProfile.JAVA_HOTBAR_LAYER;
         private boolean alwaysAvailable = true;
-
-        @Override
-        public boolean mechanicsActive(Player player) {
-            return true;
-        }
 
         @Override
         public boolean hasActiveClass(Player player) {
@@ -300,11 +293,6 @@ class ClassAbilityInputRouterTest {
 
         @Override
         public void onControlModeChanged(Player player) {
-        }
-
-        @Override
-        public InputProfile activeInputProfile(Player player) {
-            return activeProfile;
         }
 
         @Override
