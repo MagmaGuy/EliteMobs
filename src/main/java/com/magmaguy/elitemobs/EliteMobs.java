@@ -426,7 +426,6 @@ public class EliteMobs extends JavaPlugin {
         EventsRegistrer.registerEvents();
         PatrolService.initialize();
         PatrolEditor.initialize();
-        com.magmaguy.elitemobs.experimentalcombat.challenges.TrialEncounterAssets.initialize();
 
         //Launch the local data cache
         initializationContext.step("Player Database");
@@ -753,6 +752,7 @@ public class EliteMobs extends JavaPlugin {
         BuyOrSellMenu.BuyOrSellMenuEvents.shutdown();
         Quest.shutdown();
         QuestInventoryMenu.shutdown();
+        com.magmaguy.elitemobs.quests.menus.QuestScreenSession.shutdown();
         StatsPage.StatsPageEvents.shutdown();
         GearPage.GearPageEvents.shutdown();
         CommandsPage.CommandsPageEvents.shutdown();
@@ -788,7 +788,6 @@ public class EliteMobs extends JavaPlugin {
         DungeonInstance.shutdown();
         ArenaInstance.shutdown();
         LuaPowerManager.shutdown();
-        com.magmaguy.elitemobs.experimentalcombat.challenges.TrialEncounterAssets.shutdown();
         NPCScriptManager.shutdown();
         // Final pass memory leak fixes
         ElitePower.shutdown();

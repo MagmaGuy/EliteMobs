@@ -329,9 +329,6 @@ public final class TransportModule implements Listener, AutoCloseable {
             throw new IllegalArgumentException("Transport entity needs ai: true and frozen: false for native flight: " + config.getFilename());
         if (config.getCustomModel() != null && !config.getCustomModel().isBlank() && !config.isCustomModelExists())
             throw new IllegalArgumentException("Transport entity model is unavailable: " + config.getCustomModel());
-        if (config.getDisguise() != null && !config.getDisguise().isBlank()
-                && !Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
-            throw new IllegalArgumentException("Transport entity requires LibsDisguises: " + config.getFilename());
         return config;
     }
 
