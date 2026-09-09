@@ -65,7 +65,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_level.png",
       "height": 16,
-      "ascent": -12,
+      "ascent": -14,
       "chars": [
         ""
       ]
