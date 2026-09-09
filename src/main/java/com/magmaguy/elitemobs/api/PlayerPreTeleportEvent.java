@@ -28,6 +28,7 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
     @Getter
     private final Player player;
     private final boolean deferredStart;
+    private final PlayerTeleportEvent.Purpose purpose;
     private boolean isCancelled = false;
 
     /**
@@ -38,14 +39,20 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
      * @param destination Teleport destination
      */
     public PlayerPreTeleportEvent(Player player, Location destination) {
-        this(player, destination, false);
+        this(player, destination, false, PlayerTeleportEvent.Purpose.NORMAL);
     }
 
-    private PlayerPreTeleportEvent(Player player, Location destination, boolean deferredStart) {
+    public PlayerPreTeleportEvent(Player player, Location destination, PlayerTeleportEvent.Purpose purpose) {
+        this(player, destination, false, purpose);
+    }
+
+    private PlayerPreTeleportEvent(Player player, Location destination, boolean deferredStart,
+                                   PlayerTeleportEvent.Purpose purpose) {
         this.player = player;
         this.destination = destination.clone();
         this.originalLocation = player.getLocation().clone();
         this.deferredStart = deferredStart;
+        this.purpose = java.util.Objects.requireNonNull(purpose, "purpose");
     }
 
     public static void teleportPlayer(Player player, Location destination) {
@@ -75,7 +82,8 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
         List<PlayerPreTeleportEvent> events = new ArrayList<>();
         for (Player player : uniquePlayers.values()) {
             if (!player.isOnline() || !player.isValid()) return false;
-            PlayerPreTeleportEvent event = new PlayerPreTeleportEvent(player, destination, true);
+            PlayerPreTeleportEvent event = new PlayerPreTeleportEvent(player, destination, true,
+                    PlayerTeleportEvent.Purpose.NORMAL);
             new EventCaller(event);
             if (event.isCancelled()) return false;
             events.add(event);
@@ -100,7 +108,8 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
                     return;
                 }
 
-                if (player.getLocation().getX() != originalLocation.getX() ||
+                if (!player.getWorld().equals(originalLocation.getWorld()) ||
+                        player.getLocation().getX() != originalLocation.getX() ||
                         player.getLocation().getY() != originalLocation.getY() ||
                         player.getLocation().getZ() != originalLocation.getZ())
                     isCancelled = true;
@@ -116,7 +125,7 @@ public class PlayerPreTeleportEvent extends Event implements Cancellable {
 
 
                 if (timerLeft == 0) {
-                    PlayerTeleportEvent.teleportPlayer(player, destination);
+                    PlayerTeleportEvent.teleportPlayer(player, destination, purpose);
                     cancel();
                     return;
                 }

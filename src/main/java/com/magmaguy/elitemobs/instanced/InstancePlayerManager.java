@@ -233,8 +233,8 @@ public class InstancePlayerManager {
         if (matchInstance.players.isEmpty() && matchInstance.getDeathLocationByPlayer(player) != null)
             matchInstance.getDeathLocationByPlayer(player).clear(false);
 
-        //Teleport the player out
-        if (player.isOnline()) {
+        // A successful explicit exit already moved the player to their chosen destination.
+        if (player.isOnline() && matchInstance.isInRegion(player.getLocation())) {
             MatchInstance.MatchInstanceEvents.teleportBypass = true;
             player.teleport(matchInstance.participantExitLocation(player));
         }
@@ -337,8 +337,10 @@ public class InstancePlayerManager {
         if (wasParticipant && !matchInstance.participants.contains(player))
             fireLeaveEvents(matchInstance, player);
         player.setGameMode(GameMode.SURVIVAL);
-        MatchInstance.MatchInstanceEvents.teleportBypass = true;
-        player.teleport(matchInstance.participantExitLocation(player));
+        if (matchInstance.isInRegion(player.getLocation())) {
+            MatchInstance.MatchInstanceEvents.teleportBypass = true;
+            player.teleport(matchInstance.participantExitLocation(player));
+        }
         PlayerData.setMatchInstance(player, null);
         matchInstance.playerLives.remove(player);
         if (matchInstance.getDeathLocationByPlayer(player) != null)

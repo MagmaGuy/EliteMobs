@@ -18,6 +18,8 @@ import java.util.UUID;
 
 public class PlayerTeleportEvent extends Event implements Cancellable {
 
+    public enum Purpose { NORMAL, LEAVE_INSTANCE }
+
     private static final HandlerList handlers = new HandlerList();
     @Getter
     private final Location destination;
@@ -25,6 +27,7 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
     @Getter
     private final Player player;
     private final boolean deferredExecution;
+    private final Purpose purpose;
     private boolean isCancelled = false;
 
     /**
@@ -35,18 +38,27 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
      * @param destination Teleport destination
      */
     public PlayerTeleportEvent(Player player, Location destination) {
-        this(player, destination, false);
+        this(player, destination, false, Purpose.NORMAL);
     }
 
-    private PlayerTeleportEvent(Player player, Location destination, boolean deferredExecution) {
+    public PlayerTeleportEvent(Player player, Location destination, Purpose purpose) {
+        this(player, destination, false, purpose);
+    }
+
+    private PlayerTeleportEvent(Player player, Location destination, boolean deferredExecution, Purpose purpose) {
         this.player = player;
         this.destination = destination;
         this.originalLocation = player.getLocation().clone();
         this.deferredExecution = deferredExecution;
+        this.purpose = java.util.Objects.requireNonNull(purpose, "purpose");
     }
 
     public static void teleportPlayer(Player player, Location destination) {
         new EventCaller(new PlayerTeleportEvent(player, destination));
+    }
+
+    public static void teleportPlayer(Player player, Location destination, Purpose purpose) {
+        new EventCaller(new PlayerTeleportEvent(player, destination, purpose));
     }
 
     /**
@@ -66,7 +78,7 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
         List<PlayerTeleportEvent> events = new ArrayList<>();
         for (Player player : uniquePlayers.values()) {
             if (!player.isOnline() || !player.isValid()) return false;
-            PlayerTeleportEvent event = new PlayerTeleportEvent(player, destination, true);
+            PlayerTeleportEvent event = new PlayerTeleportEvent(player, destination, true, Purpose.NORMAL);
             new EventCaller(event);
             if (event.isCancelled()) return false;
             events.add(event);
@@ -104,7 +116,10 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
             PlayerData.setBackTeleportLocation(player, originalLocation);
         WormholeManager.getInstance(false).addPlayerToCooldown(player, destination);
         if (!player.getPassengers().isEmpty()) player.getPassengers().forEach(player::removePassenger);
-        player.teleport(destination);
+        if (purpose == Purpose.LEAVE_INSTANCE)
+            com.magmaguy.elitemobs.instanced.InstancePlayerMovement.teleportLeavingInstance(
+                    player, destination, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.PLUGIN);
+        else player.teleport(destination);
     }
 
     public static class PlayerTeleportEventExecutor implements Listener {
