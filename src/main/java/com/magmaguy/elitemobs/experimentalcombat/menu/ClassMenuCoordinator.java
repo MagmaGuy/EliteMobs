@@ -126,7 +126,8 @@ final class ClassMenuCoordinator {
                 send(player, ClassPresentationTheme.gradient(ClassPresentationTheme.GOLD,
                         "How to play:") + " &fF,F&7: Mobility | &fF+LMB&7: Signature | &fF+RMB&7: Utility.");
                 send(player, ClassPresentationTheme.gradient(ClassPresentationTheme.RED,
-                        "Weapons:") + " &7class weapons deal &a+10%&7, all others &c-10%&7.");
+                        "Weapons:") + " " + com.magmaguy.elitemobs.experimentalcombat.ClassWeaponAffinity.description(
+                        ExperimentalCombatModule.get().catalog().require(formId)));
             }
             case UNCHANGED -> send(player, "&7That is already your active class.");
             case NOT_READY -> send(player, "&eYour class profile is still loading.");

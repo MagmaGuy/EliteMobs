@@ -10,6 +10,7 @@ import com.magmaguy.elitemobs.api.ScriptZoneEnterEvent;
 import com.magmaguy.elitemobs.api.ScriptZoneLeaveEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.PreventMountExploit;
+import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.InstanceEffectPolicy;
 import com.magmaguy.elitemobs.events.BossCustomAttackDamage;
@@ -89,6 +90,34 @@ final class LuaPowerEntityTables {
 
     LuaTable createEventTable(Event event) {
         LuaTable eventTable = new LuaTable();
+        if (event instanceof EliteMobDamagedByPlayerEvent playerDamage) {
+            eventTable.set("entity", createEntityTable(playerDamage.getEliteMobEntity().getLivingEntity()));
+            eventTable.set("is_damage_transfer", LuaValue.valueOf(CombatDamageContext.isDamageTransferActive()));
+            eventTable.set("transfer_damage", method(eventTable, args -> {
+                Entity target = support.resolveEntityReference(args.arg1());
+                double amount = args.checkdouble(2);
+                if (!Double.isFinite(amount) || amount < 0) throw new IllegalArgumentException("Invalid transferred damage");
+                if (CombatDamageContext.isDamageTransferActive() || playerDamage.isCancelled() || amount == 0)
+                    return LuaValue.FALSE;
+                if (!(target instanceof LivingEntity living) || !isAlive(living)
+                        || !InstanceEffectPolicy.canAffect(eliteEntity, living)
+                        || target.equals(playerDamage.getEliteMobEntity().getLivingEntity())) return LuaValue.FALSE;
+                EliteEntity recipient = EntityTracker.getEliteMobEntity(living);
+                if (recipient == null) throw new IllegalArgumentException("Damage transfers require an elite recipient");
+                int previousTicks = living.getNoDamageTicks();
+                double previousDamage = living.getLastDamage();
+                try {
+                    living.setNoDamageTicks(0);
+                    CombatDamageContext.runPlayerToEliteTransfer(() -> living.damage(amount, playerDamage.getPlayer()));
+                } finally {
+                    if (isAlive(living)) {
+                        living.setNoDamageTicks(previousTicks);
+                        living.setLastDamage(previousDamage);
+                    }
+                }
+                return LuaValue.TRUE;
+            }));
+        }
         if (event instanceof EliteDamageEvent eliteDamageEvent) {
             eventTable.set("damage_amount", LuaValue.valueOf(eliteDamageEvent.getDamage()));
             eventTable.set("get_damage_amount", new VarArgFunction() {

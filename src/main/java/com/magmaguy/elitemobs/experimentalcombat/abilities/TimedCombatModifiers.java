@@ -156,6 +156,7 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerDamagesElite(EliteMobDamagedByPlayerEvent event) {
+        if (com.magmaguy.elitemobs.combatsystem.CombatDamageContext.isDamageTransferActive()) return;
         if (closed || event.getDamage() <= 0D) return;
         Player attacker = event.getPlayer();
         if (attacker == null || !ClassAbilityEligibility.isEligible(attacker)) return;

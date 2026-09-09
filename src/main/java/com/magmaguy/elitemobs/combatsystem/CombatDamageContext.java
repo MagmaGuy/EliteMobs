@@ -23,6 +23,7 @@ public final class CombatDamageContext {
     private static final ThreadLocal<Deque<PendingOverride>> ELITE_TO_PLAYER =
             ThreadLocal.withInitial(ArrayDeque::new);
     private static final ThreadLocal<Integer> ACTIVE_PLAYER_TO_ELITE_BYPASS = new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> ACTIVE_DAMAGE_TRANSFER = new ThreadLocal<>();
     private static final ThreadLocal<Deque<ClassAbilityDamageDomain>> ACTIVE_CLASS_ABILITY_DAMAGE =
             ThreadLocal.withInitial(ArrayDeque::new);
     private static final ThreadLocal<Deque<PlayerDamageSource>> ACTIVE_PLAYER_TO_ELITE_SOURCES =
@@ -105,6 +106,21 @@ public final class CombatDamageContext {
     public static boolean isPlayerToEliteBypassActive() {
         Integer depth = ACTIVE_PLAYER_TO_ELITE_BYPASS.get();
         return depth != null && depth > 0;
+    }
+
+    public static boolean isDamageTransferActive() {
+        return Boolean.TRUE.equals(ACTIVE_DAMAGE_TRANSFER.get());
+    }
+
+    /** A transferred hit keeps attribution and scaling, but cannot recursively transfer again. */
+    public static void runPlayerToEliteTransfer(Runnable damageCall) {
+        if (isDamageTransferActive()) throw new IllegalStateException("Recursive damage transfer");
+        ACTIVE_DAMAGE_TRANSFER.set(true);
+        try {
+            runPlayerToEliteBypass(currentPlayerToEliteSource().orElse(null), damageCall);
+        } finally {
+            ACTIVE_DAMAGE_TRANSFER.remove();
+        }
     }
 
     public static boolean isClassAbilityDamageActive() {

@@ -54,6 +54,7 @@ public class LightningEnchantment extends CustomEnchantment {
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
         public void onEntityDamagedByPlayer(EliteMobDamagedByPlayerEvent event) {
+            if (CombatDamageContext.isDamageTransferActive()) return;
             if (event.getPlayer().hasMetadata("NPC") ||
                     !ElitePlayerInventory.playerInventories.containsKey(event.getPlayer().getUniqueId())) return;
             UUID playerUUID = event.getPlayer().getUniqueId();

@@ -70,6 +70,20 @@ public class LuaElitePower extends ElitePower {
         } else recordEventHook(hook, false);
     }
 
+    /** Shares the original, mutable damage event with the summoner's ordinary Lua powers. */
+    public void checkReinforcementDamage(EliteMobDamagedByPlayerEvent event) {
+        EliteEntity owner = getOwnerEntity();
+        if (owner == null || event.isCancelled() || powerPauseState.isPaused()
+                || owner.getPowerSuppression().isSuppressed()) return;
+        ScriptHook hook = ScriptableBoss.ON_REINFORCEMENT_DAMAGED_BY_PLAYER;
+        if (!luaPowerConfigFields.getLuaPowerDefinition().supportsHook(hook)) return;
+        initializeInstance(false);
+        if (instance != null) {
+            instance.handleEvent(hook, event, event.getEliteMobEntity().getLivingEntity(), event.getPlayer());
+            recordEventHook(hook, !instance.isClosed());
+        } else recordEventHook(hook, false);
+    }
+
     public void check(Event event, EliteEntity eliteEntity, LivingEntity directTarget) {
         if (powerPauseState.isPaused() || eliteEntity.getPowerSuppression().isSuppressed()) return;
         ScriptHook hook = mapHook(event);

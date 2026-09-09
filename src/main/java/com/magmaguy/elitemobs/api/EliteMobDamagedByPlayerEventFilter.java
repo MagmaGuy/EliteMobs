@@ -763,7 +763,8 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
         double damageAfterConfigMultipliers = damage;
 
         // Critical hit
-        boolean guaranteedClassCritical = CombatDamageContext.currentClassAbilityDamageDomain()
+        boolean guaranteedClassCritical = !CombatDamageContext.isDamageTransferActive()
+                && CombatDamageContext.currentClassAbilityDamageDomain()
                 .map(domain -> domain.strikeQuality()
                         == CombatDamageContext.ClassAbilityStrikeQuality.GUARANTEED_CRITICAL)
                 .orElse(false);

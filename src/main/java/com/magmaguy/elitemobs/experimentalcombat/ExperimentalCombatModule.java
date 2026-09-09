@@ -820,6 +820,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerDamagesElite(EliteMobDamagedByPlayerEvent event) {
+        if (com.magmaguy.elitemobs.combatsystem.CombatDamageContext.isDamageTransferActive()) return;
         if (!mechanicsActive(event.getPlayer()) || event.getDamage() <= 0D) return;
         resources.onDamageDealt(event.getPlayer(), event.getDamage());
     }

@@ -41,6 +41,7 @@ public class ScriptableBoss extends ScriptableEntity {
     // ── Boss-specific hooks ─────────────────────────────────────────────
     public static final ScriptHook ON_DAMAGED = new ScriptHook("on_boss_damaged");
     public static final ScriptHook ON_DAMAGED_BY_PLAYER = new ScriptHook("on_boss_damaged_by_player");
+    public static final ScriptHook ON_REINFORCEMENT_DAMAGED_BY_PLAYER = new ScriptHook("on_reinforcement_damaged_by_player");
     public static final ScriptHook ON_DAMAGED_BY_ELITE = new ScriptHook("on_boss_damaged_by_elite");
     public static final ScriptHook ON_PLAYER_DAMAGED = new ScriptHook("on_player_damaged_by_boss");
     public static final ScriptHook ON_ENTER_COMBAT = new ScriptHook("on_enter_combat");
@@ -54,7 +55,7 @@ public class ScriptableBoss extends ScriptableEntity {
     private static final Set<ScriptHook> SUPPORTED_HOOKS = Set.of(
             ScriptHook.ON_SPAWN, ScriptHook.ON_TICK,
             ScriptHook.ON_ZONE_ENTER, ScriptHook.ON_ZONE_LEAVE,
-            ON_DAMAGED, ON_DAMAGED_BY_PLAYER, ON_DAMAGED_BY_ELITE,
+            ON_DAMAGED, ON_DAMAGED_BY_PLAYER, ON_REINFORCEMENT_DAMAGED_BY_PLAYER, ON_DAMAGED_BY_ELITE,
             ON_PLAYER_DAMAGED, ON_ENTER_COMBAT, ON_EXIT_COMBAT,
             ON_HEAL, ON_TARGET, ON_DEATH, ON_PHASE_SWITCH, ON_MIND_ACTION
     );

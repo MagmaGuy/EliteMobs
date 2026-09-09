@@ -46,6 +46,13 @@ public class ScriptListener implements Listener {
     public void onEliteMobDamagedByPlayerEvent(EliteMobDamagedByPlayerEvent event) {
         if (event.isCancelled()) return;
         runEvent(event, event.getEliteMobEntity(), event.getPlayer());
+        // Direct summoners receive a distinct hook, never the boss's own damage hook.
+        EliteEntity summoner = event.getEliteMobEntity().getSummoningEntity();
+        if (summoner != null && summoner.exists() && !event.isCancelled())
+            for (ElitePower power : summoner.getElitePowersInExecutionOrder()) {
+                if (event.isCancelled()) break;
+                if (power instanceof LuaElitePower luaPower) luaPower.checkReinforcementDamage(event);
+            }
     }
 
     @EventHandler

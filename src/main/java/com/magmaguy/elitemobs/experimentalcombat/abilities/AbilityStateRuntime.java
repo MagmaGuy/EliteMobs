@@ -639,6 +639,7 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerDamagesElite(EliteMobDamagedByPlayerEvent event) {
+        if (com.magmaguy.elitemobs.combatsystem.CombatDamageContext.isDamageTransferActive()) return;
         if (closed || event.getDamage() <= 0D) return;
         Player player = event.getPlayer();
         long now = System.nanoTime();

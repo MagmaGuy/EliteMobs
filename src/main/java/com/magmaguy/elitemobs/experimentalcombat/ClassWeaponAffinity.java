@@ -27,7 +27,8 @@ import java.util.stream.Collectors;
  */
 public final class ClassWeaponAffinity implements Listener {
 
-    private static final double CLASS_WEAPON_MULTIPLIER = 1.10D;
+    private static final int CLASS_WEAPON_BONUS_PERCENT = 10;
+    private static final double CLASS_WEAPON_MULTIPLIER = 1D + CLASS_WEAPON_BONUS_PERCENT / 100D;
     private static final int OFF_CLASS_WEAPON_PENALTY_PERCENT = 20;
     private static final double OFF_CLASS_WEAPON_MULTIPLIER = 1D - OFF_CLASS_WEAPON_PENALTY_PERCENT / 100D;
     private static final long WARNING_INTERVAL_MILLIS = 5L * 60L * 1_000L;
@@ -37,6 +38,7 @@ public final class ClassWeaponAffinity implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEliteDamagedByPlayer(EliteMobDamagedByPlayerEvent event) {
+        if (com.magmaguy.elitemobs.combatsystem.CombatDamageContext.isDamageTransferActive()) return;
         Player player = event.getPlayer();
         if (!ExperimentalCombatModule.isInitialized()) return;
         ExperimentalCombatModule module = ExperimentalCombatModule.get();
@@ -61,9 +63,7 @@ public final class ClassWeaponAffinity implements Listener {
         if (form == null) return;
         lastWarnings.put(player.getUniqueId(), now);
         String header = ClassPresentationTheme.gradient(ClassPresentationTheme.RED, "Off-class weapon");
-        String bonus = "&f" + form.weaponAffinities().stream()
-                .map(SkillType::getDisplayName).collect(Collectors.joining(" &7and &f"))
-                + " &7deal &a10% more damage &7with &f" + form.displayName() + "&7.";
+        String bonus = bonusDescription(form);
         ActionBarCompositor.show(
                 player,
                 ActionBarCompositor.Source.AFFINITY_WARNING,
@@ -74,6 +74,18 @@ public final class ClassWeaponAffinity implements Listener {
                     header + " &8» &7This weapon does not match your class: &c-"
                             + OFF_CLASS_WEAPON_PENALTY_PERCENT + "% damage&7."
                             + " " + bonus));
+    }
+
+    public static String description(ClassFormDefinition form) {
+        return bonusDescription(form) + " &7Other weapons deal &c"
+                + OFF_CLASS_WEAPON_PENALTY_PERCENT + "% less damage&7.";
+    }
+
+    private static String bonusDescription(ClassFormDefinition form) {
+        return "&f" + form.weaponAffinities().stream()
+                .map(SkillType::getDisplayName).collect(Collectors.joining(" &7and &f"))
+                + " &7deal &a" + CLASS_WEAPON_BONUS_PERCENT + "% more damage &7with &f"
+                + form.displayName() + "&7.";
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

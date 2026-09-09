@@ -67,6 +67,7 @@ public final class ClassPassiveRuntime implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerDamagesElite(EliteMobDamagedByPlayerEvent event) {
+        if (com.magmaguy.elitemobs.combatsystem.CombatDamageContext.isDamageTransferActive()) return;
         Player player = event.getPlayer();
         if (!combatActive.test(player)) return;
         PassiveAggregate passive = passiveProvider.apply(player.getUniqueId());

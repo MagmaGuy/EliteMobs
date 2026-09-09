@@ -157,6 +157,7 @@ public class EliteEntity {
     protected boolean inCombat = false;
     @Getter
     protected boolean inCombatGracePeriod = false;
+    @Getter
     @Setter
     protected EliteEntity summoningEntity;
     protected List<CustomBossEntity> globalReinforcementEntities = new ArrayList<>();
@@ -453,7 +454,11 @@ public class EliteEntity {
         ElitePlayerInventory inventory = ElitePlayerInventory.getPlayer(player);
         double loudStrikesBonus = inventory == null ? 0D : inventory.getLoudStrikesBonusMultiplier(false);
         if (!Double.isFinite(loudStrikesBonus) || loudStrikesBonus < 0D) loudStrikesBonus = 0D;
-        aggro.merge(trackedPlayer, damage * (1D + loudStrikesBonus), Double::sum);
+        double classThreat = com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime.isActive(player)
+                && com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule
+                .activeClassLineageSnapshot(player.getUniqueId())
+                .map(lineage -> lineage.root().id().equals("spellcaster")).orElse(false) ? .8D : 1D;
+        aggro.merge(trackedPlayer, damage * (1D + loudStrikesBonus) * classThreat, Double::sum);
 
         AdvancedAggroManager.updateTarget(this);
     }
