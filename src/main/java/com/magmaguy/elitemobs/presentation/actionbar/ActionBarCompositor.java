@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.presentation.actionbar;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -82,7 +83,8 @@ public final class ActionBarCompositor implements Listener {
 
     private enum Encoding {
         LEGACY,
-        RAW
+        RAW,
+        HUD_PROBE
     }
 
     private static final long KEEPALIVE_INTERVAL_TICKS = 40;
@@ -160,6 +162,14 @@ public final class ActionBarCompositor implements Listener {
         dispatch(new ClearMutation(player.getUniqueId(), source));
     }
 
+    /** Opt-in admin calibration, cleared on logout. Ordinary sources resume when the probe is removed. */
+    public static void setHudProbe(Player player, CombatHudProbe probe) {
+        requirePrimaryThread("setHudProbe");
+        PlayerState state = playerStates.computeIfAbsent(player.getUniqueId(), ignored -> new PlayerState());
+        state.hudProbe = probe;
+        render(player.getUniqueId());
+    }
+
     /** Stops rendering and releases every retained player message. Safe to call more than once. */
     public static void shutdown() {
         if (task != null) {
@@ -211,7 +221,7 @@ public final class ActionBarCompositor implements Listener {
             PlayerState state = playerStates.get(playerId);
             removeExpired(state);
             render(player, state);
-            if (state.entries.isEmpty() && !state.hasRenderedMessage)
+            if (state.hudProbe == null && state.entries.isEmpty() && !state.hasRenderedMessage)
                 iterator.remove();
         }
     }
@@ -239,11 +249,24 @@ public final class ActionBarCompositor implements Listener {
         if (state == null) return;
         removeExpired(state);
         render(player, state);
-        if (state.entries.isEmpty() && !state.hasRenderedMessage)
+        if (state.hudProbe == null && state.entries.isEmpty() && !state.hasRenderedMessage)
             playerStates.remove(playerId);
     }
 
     private static void render(Player player, PlayerState state) {
+        if (state.hudProbe != null) {
+            String text = state.hudProbe.text(ExperimentalCombatModule.isAbilityGestureOpen(player.getUniqueId()));
+            if (!state.hasRenderedMessage || state.lastEncoding != Encoding.HUD_PROBE
+                    || !text.equals(state.lastMessage)
+                    || currentTick - state.lastSentAtTick >= KEEPALIVE_INTERVAL_TICKS) {
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, state.hudProbe.component(text));
+                state.hasRenderedMessage = true;
+                state.lastMessage = text;
+                state.lastEncoding = Encoding.HUD_PROBE;
+                state.lastSentAtTick = currentTick;
+            }
+            return;
+        }
         Entry winner = selectWinner(state);
         if (winner == null) {
             if (state.hasRenderedMessage) {
@@ -325,6 +348,7 @@ public final class ActionBarCompositor implements Listener {
     }
 
     private static final class PlayerState {
+        private CombatHudProbe hudProbe;
         private final EnumMap<Source, Entry> entries = new EnumMap<>(Source.class);
         private boolean hasRenderedMessage;
         private String lastMessage;

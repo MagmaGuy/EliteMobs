@@ -244,6 +244,10 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         return instance;
     }
 
+    public static boolean isAbilityGestureOpen(UUID playerId) {
+        return instance != null && instance.inputRouter != null && instance.inputRouter.isGestureOpen(playerId);
+    }
+
     public static void shutdownIfInitialized() {
         if (instance != null) instance.close();
     }
