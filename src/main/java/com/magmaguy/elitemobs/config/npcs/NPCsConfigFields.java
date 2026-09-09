@@ -9,6 +9,7 @@ import com.magmaguy.magmacore.util.VersionChecker;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.Keyed;
 import org.bukkit.entity.Villager;
 
 import java.util.ArrayList;
@@ -210,7 +211,7 @@ public class NPCsConfigFields extends CustomConfigFields {
 
     private String professionConfigName() {
         if (profession == null) return "nitwit";
-        return profession.toString();
+        return ((Keyed) profession).getKey().getKey();
     }
 
     public void setEnabled(boolean enabled) {
