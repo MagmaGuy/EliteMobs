@@ -36,11 +36,56 @@
     },
     {
       "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/f_badges.png",
+      "height": 7,
+      "ascent": -33,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/health.png",
       "height": 3,
       "ascent": -28,
       "chars": [
-        ""
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/resource_resolve.png",
+      "height": 3,
+      "ascent": -28,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/resource_fury.png",
+      "height": 3,
+      "ascent": -28,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/resource_focus.png",
+      "height": 3,
+      "ascent": -28,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/resource_grace.png",
+      "height": 3,
+      "ascent": -28,
+      "chars": [
+        ""
       ]
     },
     {
@@ -49,7 +94,7 @@
       "height": 3,
       "ascent": -28,
       "chars": [
-        ""
+        ""
       ]
     },
     {
@@ -58,7 +103,7 @@
       "height": 2,
       "ascent": -37,
       "chars": [
-        ""
+        ""
       ]
     },
     {

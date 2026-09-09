@@ -33,15 +33,15 @@ public final class CombatHudProbe {
         double maximum = maximumAttribute == null ? health : maximumAttribute.getValue();
         String healthText = number(health) + "/" + number(maximum);
         overlay(line, 25, healthText, healthText.length() * 6);
-        bar(line, 25, '\uE600', health, maximum, 63, false, animationFrame);
+        bar(line, 25, '\uE800', health, maximum, 63, false, animationFrame);
         var resource = ExperimentalCombatModule.resourceSnapshot(player.getUniqueId()).orElse(null);
         if (resource != null) overlay(line, 171, String.valueOf(resourceIcon(resource.type())), 11);
         String resourceText = resource == null ? "0/0" : number(resource.amount()) + "/" + number(resource.maximum());
         rightAlignedText(line, 165, resourceText, resourceText.length() * 6);
-        bar(line, 102, '\uE620', resource == null ? 0 : resource.amount(),
+        bar(line, 102, resource == null ? '\uE940' : resourceBar(resource.type()), resource == null ? 0 : resource.amount(),
                 resource == null ? 0 : resource.maximum(), 63, true, animationFrame);
-        bar(line, 5, '\uE640', player.getExp(), 1, 180, false, animationFrame);
-        classDiamond(line, player, animationFrame);
+        bar(line, 5, '\uE980', player.getExp(), 1, 180, false, animationFrame);
+        classDiamond(line, player, animationFrame, active);
         // All overlays return to the panel origin. Keep the total advance at 190 GUI pixels.
         return line.append(spacing(190 - x)).toString();
     }
@@ -72,14 +72,16 @@ public final class CombatHudProbe {
         int pixels = maximum <= 0 ? 0 : (int) Math.round(width * Math.max(0, Math.min(1, amount / maximum)));
         int start = rightAligned ? width - pixels : 0;
         StringBuilder fill = new StringBuilder(pixels * 2);
-        // Anchor the traveling brightness pattern to the trough, so changing
-        // the amount clips the liquid without making its pattern jump sideways.
-        for (int column = start; column < start + pixels; column++)
-            fill.append((char) (glyph + Math.floorMod(column - animationFrame * 4, 16))).append('\uE101');
+        // Anchor each hand-drawn liquid frame to the trough. Mirroring the
+        // right-hand resource reverses its motion as well as its fill direction.
+        for (int column = start; column < start + pixels; column++) {
+            int textureColumn = (rightAligned ? width - 1 - column : column) % 16;
+            fill.append((char) (glyph + animationFrame * 16 + textureColumn)).append('\uE101');
+        }
         overlay(line, offset + start, fill.toString(), pixels);
     }
 
-    private static void classDiamond(StringBuilder line, Player player, int animationFrame) {
+    private static void classDiamond(StringBuilder line, Player player, int animationFrame, boolean active) {
         var progress = ExperimentalCombatModule.classProgressSnapshot(player.getUniqueId()).orElse(null);
         if (progress == null || !progress.unlocked()) return;
         int level = progress.effectiveLevel();
@@ -90,6 +92,7 @@ public final class CombatHudProbe {
                 : (double) (progress.xp() - currentThreshold) / SkillXPCalculator.xpToNextLevel(level);
         int rows = (int) Math.round(28 * Math.max(0, Math.min(1, fraction)));
         overlay(line, 79, String.valueOf((char) (0xE400 + animationFrame * 32 + rows)), 33);
+        overlay(line, 91, String.valueOf((char) (0xE520 + (active ? 4 : 0) + animationFrame)), 9);
         String digits = Integer.toString(level);
         StringBuilder glyphs = new StringBuilder();
         for (char digit : digits.toCharArray()) glyphs.append((char) (0xE300 + digit - '0'));
@@ -111,6 +114,16 @@ public final class CombatHudProbe {
             case FOCUS -> '\uE502';
             case GRACE -> '\uE503';
             case MANA -> '\uE504';
+        };
+    }
+
+    private static char resourceBar(ClassResourceType type) {
+        return switch (type) {
+            case RESOLVE -> '\uE840';
+            case FURY -> '\uE880';
+            case FOCUS -> '\uE8C0';
+            case GRACE -> '\uE900';
+            case MANA -> '\uE940';
         };
     }
 }
