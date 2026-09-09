@@ -14,6 +14,7 @@ import org.bukkit.Statistic;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -121,10 +122,10 @@ class ClassAbilityInputRouterTest {
 
     @ParameterizedTest(name = "held slot {0} prompts {1}")
     @CsvSource({
-            "0, '[7/LMB] Blink  [2/RMB] Arcane Bolt  [3/Jump] Mana Ward'",
-            "1, '[1/LMB] Blink  [8/RMB] Arcane Bolt  [3/Jump] Mana Ward'",
-            "2, '[1/LMB] Blink  [2/RMB] Arcane Bolt  [9/Jump] Mana Ward'",
-            "4, '[1/LMB] Blink  [2/RMB] Arcane Bolt  [3/Jump] Mana Ward'"
+            "0, '[7/F] Blink  [2/LMB] Arcane Bolt  [3/RMB] Mana Ward'",
+            "1, '[1/F] Blink  [8/LMB] Arcane Bolt  [3/RMB] Mana Ward'",
+            "2, '[1/F] Blink  [2/LMB] Arcane Bolt  [9/RMB] Mana Ward'",
+            "4, '[1/F] Blink  [2/LMB] Arcane Bolt  [3/RMB] Mana Ward'"
     })
     void fPromptSubstitutesTheMirrorKeyForTheAbilityOnTheHeldSlot(int selectedSlot, String expectedPrompt) {
         // Pressing the digit of the already-held slot sends no packet, so that key is advertised
@@ -189,20 +190,36 @@ class ClassAbilityInputRouterTest {
         assertEquals(Event.Result.DENY, click.useItemInHand());
     }
 
-    @Test
-    void jumpInsideTheOpenChordExecutesUtility() {
+    @ParameterizedTest
+    @CsvSource({"MOBILITY", "SIGNATURE", "UTILITY"})
+    void jumpLeavesTheChordAndDisplayOpenForTheNextAbility(AbilitySlot nextAbility) throws Exception {
         router.onSwapHands(new PlayerSwapHandItemsEvent(player, null, null));
-        router.onChordJump(new PlayerStatisticIncrementEvent(player, Statistic.JUMP, 0, 1));
+        List<String> displayBeforeJump = List.copyOf(actionBars);
+        PlayerStatisticIncrementEvent jump = new PlayerStatisticIncrementEvent(player, Statistic.JUMP, 0, 1);
+        // Deliver to any registered router handler, so a reintroduced jump binding fails this check.
+        for (var method : router.getClass().getMethods()) {
+            if (method.isAnnotationPresent(EventHandler.class) && method.getParameterCount() == 1
+                    && method.getParameterTypes()[0].isInstance(jump)) method.invoke(router, jump);
+        }
+        assertTrue(router.isGestureOpen(player.getUniqueId()));
+        assertFalse(jump.isCancelled());
+        assertEquals(List.of(), input.usedSlots);
+        assertEquals(displayBeforeJump, actionBars);
 
-        assertEquals(List.of(AbilitySlot.UTILITY), input.usedSlots);
+        if (nextAbility == AbilitySlot.MOBILITY)
+            router.onSwapHands(new PlayerSwapHandItemsEvent(player, null, null));
+        else router.onChordInteract(new PlayerInteractEvent(player,
+                nextAbility == AbilitySlot.SIGNATURE ? Action.LEFT_CLICK_AIR : Action.RIGHT_CLICK_AIR,
+                null, null, BlockFace.SELF));
+        assertEquals(List.of(nextAbility), input.usedSlots);
+        assertFalse(router.isGestureOpen(player.getUniqueId()));
     }
 
     @Test
-    void clicksAndJumpOutsideAnOpenChordPassThrough() {
+    void clicksOutsideAnOpenChordPassThrough() {
         PlayerInteractEvent click = new PlayerInteractEvent(
                 player, Action.RIGHT_CLICK_AIR, null, null, BlockFace.SELF);
         router.onChordInteract(click);
-        router.onChordJump(new PlayerStatisticIncrementEvent(player, Statistic.JUMP, 0, 1));
 
         assertEquals(List.of(), input.usedSlots);
         assertEquals(Event.Result.DEFAULT, click.useItemInHand());

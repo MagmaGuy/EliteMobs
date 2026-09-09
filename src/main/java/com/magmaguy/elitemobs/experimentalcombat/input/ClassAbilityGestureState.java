@@ -9,7 +9,8 @@ import java.util.Objects;
  * Hotbar keys 1, 2 and 3 select mobility, signature and utility. Keys 7, 8 and 9 mirror those
  * bindings so a player can still activate the ability assigned to their already-selected slot,
  * which a vanilla client does not report as a slot change. Left click selects signature;
- * right click and jump select utility inside the window. The state contains no
+ * right click selects utility inside the window. Jumping does not change this state.
+ * The state contains no
  * Bukkit objects, which keeps timing and precedence testable without a server.</p>
  */
 public final class ClassAbilityGestureState {
@@ -42,11 +43,6 @@ public final class ClassAbilityGestureState {
 
     /** Resolves a right click while the F chord is open: it selects utility. */
     public Transition rightClick(long currentTick) {
-        return inWindowSelection(currentTick, Outcome.UTILITY);
-    }
-
-    /** Resolves a jump while the F chord is open: it selects utility. */
-    public Transition jump(long currentTick) {
         return inWindowSelection(currentTick, Outcome.UTILITY);
     }
 

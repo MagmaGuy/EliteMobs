@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
 import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,7 +20,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.Plugin;
@@ -37,7 +35,8 @@ import java.util.UUID;
 /**
  * Interprets the F-key ability layer without owning combat behavior.
  * F,F selects mobility, F+left-click signature and F+right-click utility.
- * Hotbar and jump inputs also work inside the open chord. Sneak-double-F toggles
+ * Hotbar inputs also work inside the open chord. Jumping is never a chord input.
+ * Sneak-double-F toggles
  * the layer outside managed content when permitted. Bedrock has no F-key input.
  */
 public final class ClassAbilityInputRouter implements Listener {
@@ -159,15 +158,6 @@ public final class ClassAbilityInputRouter implements Listener {
         applyGestureTransition(player, transition);
     }
 
-    /** Chord-window jump binding: a ground jump inside the open chord selects utility. */
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onChordJump(PlayerStatisticIncrementEvent event) {
-        if (event.getStatistic() != Statistic.JUMP) return;
-        PendingGesture pending = pendingGestures.get(event.getPlayer().getUniqueId());
-        if (pending == null) return;
-        applyGestureTransition(event.getPlayer(), pending.state().jump(MonotonicTickClock.currentTick()));
-    }
-
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChordInteractEntity(PlayerInteractEntityEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
@@ -243,7 +233,7 @@ public final class ClassAbilityInputRouter implements Listener {
                         + ChatColor.GRAY + "  [" + (heldSlot == 1 ? "8" : "2") + "/LMB] "
                         + ChatColor.WHITE
                         + input.abilityName(player, AbilitySlot.SIGNATURE)
-                        + ChatColor.GRAY + "  [" + (heldSlot == 2 ? "9" : "3") + "/RMB/Jump] "
+                        + ChatColor.GRAY + "  [" + (heldSlot == 2 ? "9" : "3") + "/RMB] "
                         + ChatColor.WHITE
                         + input.abilityName(player, AbilitySlot.UTILITY),
                 ClassAbilityGestureState.CHORD_WINDOW_TICKS + 1L);

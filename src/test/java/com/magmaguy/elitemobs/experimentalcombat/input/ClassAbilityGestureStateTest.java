@@ -35,24 +35,20 @@ class ClassAbilityGestureStateTest {
     }
 
     @Test
-    void clicksAndJumpInsideTheOpenChordActivateTheirAbilitiesAndCloseIt() {
+    void clicksInsideTheOpenChordActivateTheirAbilitiesAndCloseIt() {
         ClassAbilityGestureState open = ClassAbilityGestureState.closed()
                 .pressF(300, false)
                 .next();
 
         ClassAbilityGestureState.Transition leftClick = open.leftClick(303);
         ClassAbilityGestureState.Transition rightClick = open.rightClick(303);
-        ClassAbilityGestureState.Transition jump = open.jump(303);
 
         assertEquals(SIGNATURE, leftClick.outcome());
         assertEquals(UTILITY, rightClick.outcome());
-        assertEquals(UTILITY, jump.outcome());
         assertTrue(leftClick.consumesInput());
         assertTrue(rightClick.consumesInput());
-        assertTrue(jump.consumesInput());
         assertFalse(leftClick.next().isOpenAt(303));
         assertFalse(rightClick.next().isOpenAt(303));
-        assertFalse(jump.next().isOpenAt(303));
     }
 
     @Test

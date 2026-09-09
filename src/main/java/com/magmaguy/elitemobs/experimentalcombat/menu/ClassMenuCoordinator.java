@@ -124,8 +124,7 @@ final class ClassMenuCoordinator {
                         "Class active:") + " &f"
                         + ExperimentalCombatModule.get().catalog().require(formId).displayName());
                 send(player, ClassPresentationTheme.gradient(ClassPresentationTheme.GOLD,
-                        "How to play:") + " &7Press &fF&7 for abilities &8(&7then &f1/2/3&7,"
-                        + " &fclick&7 or &fjump&8)&7. Kill elites to level up.");
+                        "How to play:") + " &fF,F&7: Mobility | &fF+LMB&7: Signature | &fF+RMB&7: Utility.");
                 send(player, ClassPresentationTheme.gradient(ClassPresentationTheme.RED,
                         "Weapons:") + " &7class weapons deal &a+10%&7, all others &c-10%&7.");
             }
