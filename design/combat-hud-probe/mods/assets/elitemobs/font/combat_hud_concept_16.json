@@ -73,7 +73,7 @@
     {
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_diamond.png",
-      "height": 32,
+      "height": 42,
       "ascent": 1,
       "chars": [
         "",
