@@ -253,6 +253,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     }
 
     private void spawn() {
+        // Chunk load can precede entity ticking. The patrol must own retries even if no body exists yet.
+        PatrolService.registerPendingNpc(this);
         Location effectiveSpawnLocation = PatrolService.materializationLocation(this).orElse(spawnLocation);
         if (effectiveSpawnLocation == null ||
                 effectiveSpawnLocation.getWorld() == null ||

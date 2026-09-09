@@ -111,6 +111,14 @@ public final class PatrolService implements Listener {
         return controller(owner) != null || hasPatrolConfiguration(owner);
     }
 
+    /** Registers persistent NPCs before their first body can enter the entity-ticking ring. */
+    public static void registerPendingNpc(NPCEntity npc) {
+        if (instance == null || npc.getNPCsConfigFields().isInstanced()
+                || npc.getNPCsConfigFields().getPatrolRoute() == null
+                || npc.getSpawnLocation() == null || npc.getSpawnLocation().getWorld() == null) return;
+        instance.register(new NpcPatrolActor(npc));
+    }
+
     public static boolean pause(Object owner) {
         PatrolController controller = controller(owner);
         if (controller == null) return false;
