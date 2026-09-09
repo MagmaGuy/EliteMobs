@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
+import com.magmaguy.magmacore.nightbreak.NightbreakSetupMenuHelper;
 
 import java.util.List;
 
@@ -179,9 +180,12 @@ public class InitializeConfig extends ConfigurationFile {
         fileConfiguration.addDefault("menuSubtitle", "<g:#CD7F32:#FFD700>Events</g>&7, <g:#2E8B57:#3CB371>Dungeons</g>&7, <g:#4A7A9A:#6A9ABA>Arenas</g> &7& <g:#7B2FBE:#A855F7>More</g>&7!");
         fileConfiguration.setComments("menuSubtitle", List.of("Subtitle shown in the /em initialize menu"));
         menuSubtitle = fileConfiguration.getString("menuSubtitle");
+        // Migrate only the old stock separator; retain administrator customizations.
+        if (("<g:#8B0000:#CC4400:#DAA520>" + "▬".repeat(80) + "</g>").equals(fileConfiguration.getString("separatorLine")))
+            fileConfiguration.set("separatorLine", NightbreakSetupMenuHelper.getSeparator());
         separatorLine = ConfigurationEngine.setString(
                 List.of("Separator line used in chat messages"),
-                file, fileConfiguration, "separatorLine", "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>", true);
+                file, fileConfiguration, "separatorLine", NightbreakSetupMenuHelper.getSeparator(), true);
 
         // Info button
         infoButtonName = ConfigurationEngine.setString(
