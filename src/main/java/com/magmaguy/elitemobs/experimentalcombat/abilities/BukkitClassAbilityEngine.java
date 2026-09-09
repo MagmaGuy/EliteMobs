@@ -1229,7 +1229,7 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             int effectiveLevel,
             BukkitClassAbilityPresentation.Session presentation) {
         Location start = player.getLocation().clone();
-        Optional<Player> aimedAlly = targeting.aimedAlly(player, spec.tuning().range());
+        Optional<Player> aimedAlly = targeting.aimedAlly(player, spec);
         boolean started;
         if (aimedAlly.isPresent()) {
             Player ally = aimedAlly.get();

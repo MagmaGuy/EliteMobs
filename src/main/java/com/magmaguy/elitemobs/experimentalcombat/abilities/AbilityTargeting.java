@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.experimentalcombat.abilities;
 
+import com.magmaguy.magmacore.util.EntityAimAssist;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -42,7 +43,7 @@ final class AbilityTargeting {
                     .orElseGet(() -> new TargetSelection(List.of(), List.of(), origin));
             case NEARBY_ENEMIES -> new TargetSelection(enemiesNear(caster, origin, tuning.radius(), spec), List.of(), origin);
             case FORWARD_ENEMIES -> new TargetSelection(enemiesForward(caster, tuning.range(), tuning.radius(), spec), List.of(), origin);
-            case AIMED_ALLY -> aimedAlly(caster, tuning.range())
+            case AIMED_ALLY -> aimedAlly(caster, spec)
                     .map(ally -> new TargetSelection(List.of(), List.of(ally), ally.getLocation()))
                     .orElseGet(() -> new TargetSelection(List.of(), List.of(caster), caster.getLocation()));
             case NEARBY_ALLIES -> new TargetSelection(List.of(), alliesNear(caster, origin, tuning.radius()), origin);
@@ -88,6 +89,15 @@ final class AbilityTargeting {
                 .stream()
                 .map(PiercingLinePolicy.Intersection::target)
                 .toList();
+    }
+
+    Optional<Player> aimedAlly(Player caster, FixedAbilitySpec spec) {
+        if (spec.executionTraits().mechanics().contains(AbilityMechanic.ASSISTED_ALLY_TARGETING))
+            return EntityAimAssist.select(caster, validAllies(caster), spec.tuning().range(),
+                    EntityAimAssist.DEFAULT_CONE_DEGREES,
+                    ally -> ally.getGameMode() != org.bukkit.GameMode.SPECTATOR && caster.canSee(ally),
+                    ally -> 0, 1).stream().findFirst();
+        return aimedAlly(caster, spec.tuning().range());
     }
 
     Optional<Player> aimedAlly(Player caster, double range) {

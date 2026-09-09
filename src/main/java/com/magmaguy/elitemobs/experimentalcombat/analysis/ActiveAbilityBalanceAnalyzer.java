@@ -305,7 +305,7 @@ public final class ActiveAbilityBalanceAnalyzer {
             case OPENS_DEFENSE_BREAK -> .2D;
             case WARD_BREAK_SIGNAL -> 0D;
             case EXTEND_TAUNT -> .2D;
-            case SINGLE_ENEMY, CASTER_ONLY_SUPPORT -> 0D;
+            case SINGLE_ENEMY, CASTER_ONLY_SUPPORT, ASSISTED_ALLY_TARGETING -> 0D;
         };
     }
 

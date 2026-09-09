@@ -170,6 +170,8 @@ public final class FixedAbilityRegistry {
                 tune(0, 0, .04, 0, 1, 18, 0, 60, 1, 1), AbilityEffect.SHIELD);
         cost(specs, "cleric.mobility", 45D);
         cleric(specs);
+        specs.replaceAll((id, spec) -> spec.target() == AbilityTarget.AIMED_ALLY
+                ? spec.withMechanics(AbilityMechanic.ASSISTED_ALLY_TARGETING) : spec);
         mechanics(specs, "priest.signature", AbilityMechanic.LOWEST_HEALTH_FIRST);
         mechanics(specs, "saint.signature", AbilityMechanic.LOWEST_HEALTH_FIRST);
         mechanics(specs, "exorcist.signature", AbilityMechanic.LOWEST_HEALTH_FIRST);

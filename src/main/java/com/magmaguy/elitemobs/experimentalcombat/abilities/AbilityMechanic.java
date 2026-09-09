@@ -7,6 +7,7 @@ package com.magmaguy.elitemobs.experimentalcombat.abilities;
  * the same contracts without adding form-id branches to the execution engine.</p>
  */
 public enum AbilityMechanic {
+    ASSISTED_ALLY_TARGETING,
     LOWEST_HEALTH_FIRST,
     EXECUTE_DAMAGE,
     PIERCING_CAST,
