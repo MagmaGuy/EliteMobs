@@ -57,16 +57,7 @@ public class LuaElitePower extends ElitePower {
     }
 
     public void check(Event event, EliteEntity eliteEntity, Player player) {
-        if (powerPauseState.isPaused() || eliteEntity.getPowerSuppression().isSuppressed()) return;
-        ScriptHook hook = mapHook(event);
-        if (hook == null || !luaPowerConfigFields.getLuaPowerDefinition().supportsHook(hook)) {
-            return;
-        }
-        initializeInstance(false);
-        if (instance != null) {
-            instance.handleEvent(hook, event, player, player);
-            recordEventHook(hook, !instance.isClosed());
-        } else recordEventHook(hook, false);
+        check(event, eliteEntity, (LivingEntity) player);
     }
 
     /** Shares the original, mutable damage event with the summoner's ordinary Lua powers. */
@@ -86,6 +77,10 @@ public class LuaElitePower extends ElitePower {
     public void check(Event event, EliteEntity eliteEntity, LivingEntity directTarget) {
         if (powerPauseState.isPaused() || eliteEntity.getPowerSuppression().isSuppressed()) return;
         ScriptHook hook = mapHook(event);
+        // The spawn consumer applies powers before the owner has its live body.
+        // Start the tick runtime at the subsequent spawn event even if the script
+        // does not declare an optional on_spawn callback.
+        if (hook == ScriptHook.ON_SPAWN) initializeInstance(false);
         if (hook == null || !luaPowerConfigFields.getLuaPowerDefinition().supportsHook(hook)) {
             return;
         }
