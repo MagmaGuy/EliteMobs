@@ -11,8 +11,8 @@ import java.util.List;
 public final class GuildPatrolConfig extends NPCsConfigFields {
     public GuildPatrolConfig() {
         super("guild_patrol", true,
-                "<g:#6A7A8A:#8A9AAA>Rowan</g>",
-                "<g:#5A6A7A:#7A8A9A><Guild Patrol></g>",
+                "<g:#A3C75B:#5F8A36>Gribble the Lookout</g>",
+                "<g:#7A9A45:#4D6B2C><Guild Patrol></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,286.531,92,284.350,0,0",
                 List.of(), List.of(), List.of(), false, 3,
