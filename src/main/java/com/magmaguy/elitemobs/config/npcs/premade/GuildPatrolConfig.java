@@ -12,11 +12,14 @@ public final class GuildPatrolConfig extends NPCsConfigFields {
     public GuildPatrolConfig() {
         super("guild_patrol", true,
                 "<g:#A3C75B:#5F8A36>Gribble the Lookout</g>",
-                "<g:#7A9A45:#4D6B2C><Guild Patrol></g>",
+                "<g:#7A9A45:#4D6B2C><Goblin Kingdom></g>",
                 Villager.Profession.ARMORER,
                 "em_adventurers_guild,286.531,92,284.350,0,0",
                 List.of(), List.of(), List.of(), false, 3,
-                NPCInteractions.NPCInteractionType.NONE);
+                NPCInteractions.NPCInteractionType.COMMAND);
+        setCommand("em dungeontp goblin_kingdom.yml");
+        setCustomModel("em_goblin_hunter");
+        setPatrolPauseNearPlayersRadius(3D);
         setSyncMovement(true);
     }
 

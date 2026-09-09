@@ -39,6 +39,7 @@ final class PatrolController {
     private Location safeLocation;
     private boolean destinationAssigned;
     private boolean combatHeld;
+    private boolean proximityHeld;
     private boolean lifecycleHeld;
     private boolean aiHeld;
     private boolean yieldedHeld;
@@ -75,6 +76,7 @@ final class PatrolController {
     boolean tick(long tick) {
         if (retired) return true;
         LivingEntity body = liveBody();
+        proximityHeld = actor.isNearPlayer(tick);
         if (body == null) {
             if (driver != null || attachedBodyId != null) detachBody();
             if (!actor.persistsWhileDetached()) {
@@ -299,6 +301,11 @@ final class PatrolController {
         if (combatHeld || actor.isInCombat()) {
             clearDestination();
             state = PatrolRuntimeState.YIELDED;
+            return;
+        }
+        if (proximityHeld) {
+            clearDestination();
+            state = PatrolRuntimeState.HELD;
             return;
         }
         if (!body.hasAI() || body instanceof Mob mob && !mob.isAware()) {
@@ -607,12 +614,13 @@ final class PatrolController {
     }
 
     private boolean clockFrozen() {
-        return combatHeld || lifecycleHeld || aiHeld || yieldedHeld || manuallyPaused
+        return combatHeld || proximityHeld || lifecycleHeld || aiHeld || yieldedHeld || manuallyPaused
                 || terrainHeld || state == PatrolRuntimeState.HELD || state == PatrolRuntimeState.AI_OFF;
     }
 
     private String holdReason() {
         if (combatHeld) return "combat";
+        if (proximityHeld) return "nearby_player";
         if (lifecycleHeld) return "body_replacement";
         if (aiHeld) return "ai_off";
         if (yieldedHeld) return "yielded";

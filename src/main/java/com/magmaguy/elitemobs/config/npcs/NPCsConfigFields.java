@@ -100,6 +100,10 @@ public class NPCsConfigFields extends CustomConfigFields {
     private List<String> transportRoutes = new ArrayList<>();
     @Getter
     private PatrolRoute patrolRoute;
+    /** Zero disables proximity pauses. Independent of chatter and manual patrol holds. */
+    @Getter
+    @Setter
+    private double patrolPauseNearPlayersRadius;
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -205,6 +209,11 @@ public class NPCsConfigFields extends CustomConfigFields {
         this.syncMovement = processBoolean("syncMovement", syncMovement, false, true);
         this.scripts = processStringList("scripts", scripts, new ArrayList<>(), false);
         this.transportRoutes = processStringList("transportRoutes", transportRoutes, new ArrayList<>(), false);
+        patrolPauseNearPlayersRadius = processDouble("patrol.pauseNearPlayersRadius", patrolPauseNearPlayersRadius, 0D, false);
+        if (!Double.isFinite(patrolPauseNearPlayersRadius) || patrolPauseNearPlayersRadius < 0D) {
+            Logger.warn("Invalid patrol.pauseNearPlayersRadius in " + filename + ": expected a finite, non-negative radius. Disabling proximity pauses.");
+            patrolPauseNearPlayersRadius = 0D;
+        }
         try {
             this.patrolRoute = PatrolRoute.parse(fileConfiguration);
         } catch (IllegalArgumentException exception) {
