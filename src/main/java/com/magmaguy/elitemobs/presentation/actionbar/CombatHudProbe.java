@@ -31,15 +31,15 @@ public final class CombatHudProbe {
         overlay(line, 25, label("HEALTH"), 6 * 4);
         String healthText = number(health) + "/" + number(maximum);
         overlay(line, 25, healthText, healthText.length() * 6);
-        bar(line, 25, '\uE110', health, maximum, 63);
+        bar(line, 25, '\uE110', health, maximum, 63, false);
         var resource = ExperimentalCombatModule.resourceSnapshot(player.getUniqueId()).orElse(null);
         String resourceName = resource == null ? "ENERGY" : resource.type().name();
-        overlay(line, 118, label(resourceName), resourceName.length() * 4);
+        rightAlignedText(line, 165, label(resourceName), resourceName.length() * 4);
         String resourceText = resource == null ? "0/0" : number(resource.amount()) + "/" + number(resource.maximum());
-        overlay(line, 118, resourceText, resourceText.length() * 6);
-        bar(line, 118, '\uE111', resource == null ? 0 : resource.amount(),
-                resource == null ? 0 : resource.maximum(), 63);
-        bar(line, 5, '\uE112', player.getExp(), 1, 180);
+        rightAlignedText(line, 165, resourceText, resourceText.length() * 6);
+        bar(line, 102, '\uE111', resource == null ? 0 : resource.amount(),
+                resource == null ? 0 : resource.maximum(), 63, true);
+        bar(line, 5, '\uE112', player.getExp(), 1, 180, false);
         // All overlays return to the panel origin. Keep the total advance at 190 GUI pixels.
         return line.append(spacing(190 - x)).toString();
     }
@@ -60,9 +60,16 @@ public final class CombatHudProbe {
         line.append(spacing(offset)).append(text).append(spacing(-offset - advance));
     }
 
-    private static void bar(StringBuilder line, int offset, char glyph, double amount, double maximum, int width) {
+    private static void rightAlignedText(StringBuilder line, int rightEdge, String text, int advance) {
+        // Each fixed-width glyph has one trailing spacing pixel outside its visible bounds.
+        overlay(line, rightEdge - (advance - 1), text, advance);
+    }
+
+    private static void bar(StringBuilder line, int offset, char glyph, double amount, double maximum, int width,
+                            boolean rightAligned) {
         int pixels = maximum <= 0 ? 0 : (int) Math.round(width * Math.max(0, Math.min(1, amount / maximum)));
-        overlay(line, offset, (String.valueOf(glyph) + '\uE101').repeat(pixels), pixels);
+        overlay(line, offset + (rightAligned ? width - pixels : 0),
+                (String.valueOf(glyph) + '\uE101').repeat(pixels), pixels);
     }
 
     private static String label(String text) {
