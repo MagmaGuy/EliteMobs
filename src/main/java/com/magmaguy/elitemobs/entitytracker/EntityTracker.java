@@ -42,19 +42,25 @@ public class EntityTracker implements Listener {
     private static final HashMap<UUID, NPCEntity> npcEntities = new HashMap<>();
 
     public static void registerEliteMob(EliteEntity eliteEntity) {
+        tryRegisterEliteMob(eliteEntity);
+    }
+
+    /** Publishes only a fully initialized actor accepted by its single spawn event. */
+    public static boolean tryRegisterEliteMob(EliteEntity eliteEntity) {
+        LivingEntity body = eliteEntity.getLivingEntity();
+        if (body == null || body.isDead()) return false;
         EliteMobSpawnEvent eliteMobSpawnEvent = new EliteMobSpawnEvent(eliteEntity);
         new EventCaller(eliteMobSpawnEvent);
-        if (eliteMobSpawnEvent.isCancelled()) return;
-        PersistentTagger.tagElite(eliteEntity.getLivingEntity(), eliteEntity.getEliteUUID());
+        if (eliteMobSpawnEvent.isCancelled() || eliteEntity.getLivingEntity() != body || body.isDead()) return false;
+        PersistentTagger.tagElite(body, eliteEntity.getEliteUUID());
         eliteMobEntities.put(eliteEntity.getEliteUUID(), eliteEntity);
+        return true;
     }
 
     public static void registerEliteMob(EliteEntity eliteEntity, LivingEntity livingEntity) {
-        EliteMobSpawnEvent eliteMobSpawnEvent = new EliteMobSpawnEvent(eliteEntity);
-        new EventCaller(eliteMobSpawnEvent);
-        if (eliteMobSpawnEvent.isCancelled()) return;
-        PersistentTagger.tagElite(livingEntity, eliteEntity.getEliteUUID());
-        eliteMobEntities.put(eliteEntity.getEliteUUID(), eliteEntity);
+        if (eliteEntity.getLivingEntity() != livingEntity)
+            throw new IllegalArgumentException("Elite actor must be initialized before registration");
+        registerEliteMob(eliteEntity);
     }
 
     public static boolean isEliteMob(Entity entity) {

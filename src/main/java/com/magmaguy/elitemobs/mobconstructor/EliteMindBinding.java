@@ -19,6 +19,8 @@ final class EliteMindBinding implements AutoCloseable {
     private EliteMindProgramEntry pendingEntry;
     private long pendingGeneration = -1L;
     private boolean closed;
+    private boolean paused;
+    private boolean aiPaused;
 
     EliteMindBinding(
             EliteMindProgramEntry entry,
@@ -77,8 +79,19 @@ final class EliteMindBinding implements AutoCloseable {
 
     void setPaused(boolean paused) {
         requireOpen();
-        handle.setPaused(paused);
+        handle.setPaused(paused || aiPaused);
+        this.paused = paused;
     }
+
+    void setAiPaused(boolean paused) {
+        requireOpen();
+        handle.setPaused(this.paused || paused);
+        aiPaused = paused;
+    }
+
+    boolean isPaused() { return paused || aiPaused; }
+
+    boolean isExplicitlyPaused() { return paused; }
 
     EliteMindSnapshot snapshot(EliteEntity eliteEntity) {
         requireOpen();

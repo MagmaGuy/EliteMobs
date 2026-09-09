@@ -28,20 +28,7 @@ import java.util.Optional;
 public class SpawnCommand {
 
     public static void spawnEliteEntityTypeCommand(Player player, EntityType entityType, Integer level, Optional<String> powers) {
-        LivingEntity livingEntity = (LivingEntity) player.getLocation().getWorld().spawnEntity(getLocation(player), entityType);
-        EliteEntity eliteEntity = new EliteEntity();
-        eliteEntity.setLevel(level);
-        eliteEntity.setNaturalEntity(true);
-        //The living entity has to exist before powers are applied, the power stance rings spawn item entities in its world
-        eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
-
-        if (powers.isPresent()) {
-            String[] powersArray = powers.get().split(" ");
-            HashSet<PowersConfigFields> mobPowers = getPowers(powersArray, player);
-            eliteEntity.applyPowers(mobPowers);
-        } else {
-            eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));
-        }
+        spawnEliteEntityTypeCommand(player, getLocation(player), entityType, level, powers);
     }
 
     public static void spawnEliteEntityTypeCommand(CommandSender commandSender,
@@ -67,21 +54,33 @@ public class SpawnCommand {
                                                    EntityType entityType,
                                                    Integer level,
                                                    Optional<String> powers) {
-        if (!EliteMobProperties.getValidMobTypes().contains(entityType)) {
+        if (EliteMobProperties.getPluginData(entityType) == null) {
             commandSender.sendMessage(CommandMessagesConfig.getInvalidEntityTypeMessage().replace("$type", entityType.toString()));
             return;
         }
-        LivingEntity livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
         HashSet<PowersConfigFields> mobPowers = new HashSet<>();
         if (powers.isPresent()) {
             String[] powersArray = powers.get().split(" ");
             mobPowers = getPowers(powersArray, commandSender);
         }
+        if (EliteMobProperties.getPluginData(entityType).getBehavior() != null) {
+            try {
+                com.magmaguy.elitemobs.mobconstructor.EliteMindServiceModule.spawnBehaviorElite(
+                        location, entityType, level, CreatureSpawnEvent.SpawnReason.CUSTOM,
+                        powers.isPresent() ? mobPowers : null);
+            } catch (RuntimeException failure) {
+                com.magmaguy.magmacore.util.Logger.sendMessage(commandSender,
+                        "Could not spawn " + entityType + ": " + failure.getMessage());
+            }
+            return;
+        }
+        LivingEntity livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
         EliteEntity eliteEntity = new EliteEntity();
         eliteEntity.setLevel(level);
         eliteEntity.setNaturalEntity(true);
         eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
-        if (!mobPowers.isEmpty()) eliteEntity.applyPowers(mobPowers);
+        if (eliteEntity.getLivingEntity() == null) return;
+        if (powers.isPresent()) eliteEntity.applyPowers(mobPowers);
         else eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));
     }
 

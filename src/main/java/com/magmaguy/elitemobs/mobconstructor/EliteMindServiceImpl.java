@@ -13,6 +13,10 @@ import com.magmaguy.elitemobs.api.mind.EliteMindService;
 import com.magmaguy.elitemobs.api.mind.EliteMindSnapshot;
 import com.magmaguy.elitemobs.api.mind.EliteMindSpawnRequest;
 import com.magmaguy.elitemobs.api.mind.EliteMindTransferPolicy;
+import com.magmaguy.elitemobs.api.mind.EliteMindPowerLoadout;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.elitemobs.api.mind.EliteNaturalSpawnContext;
 import com.magmaguy.elitemobs.api.mind.EliteNaturalSpawnProvider;
 import com.magmaguy.elitemobs.api.mind.EliteNaturalSpawnReplacement;
@@ -29,9 +33,11 @@ import com.magmaguy.magmacore.ai.MobBody;
 import com.magmaguy.magmacore.ai.StateTransfer;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -43,6 +49,8 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -63,6 +71,66 @@ final class EliteMindServiceImpl implements EliteMindService, Listener {
         this.mindHost = Objects.requireNonNull(mindHost, "mindHost");
         this.luaPowerService = Objects.requireNonNull(luaPowerService, "luaPowerService");
         this.bodyCapabilities = toPublicCapabilities(mindHost.bodyCapabilities());
+        try {
+            catalog.loadBehaviors(MetadataHandler.PLUGIN);
+        } catch (RuntimeException failure) {
+            catalog.clear();
+            throw failure;
+        }
+    }
+
+    LivingEntity spawnBehaviorBody(
+            CustomBossEntity actor, Location location, String filename, Consumer<LivingEntity> configure) {
+        requireAvailable();
+        requireServerThread();
+        var fields = actor.getCustomBossesConfigFields();
+        var properties = EliteMobProperties.getPluginData(fields.getEntityType());
+        EliteMindCatalog.Entry entry = catalog.requireBehavior(filename);
+        MindBodyProfile profile = new MindBodyProfile(MindBodyLocomotion.valueOf(properties.getLocomotion().name()),
+                fields.getScale(), true, fields.getEntityType().getKey().toString());
+        MindHandle handle = mindHost.open(actor.getEliteUUID(), entry.instantiate());
+        boolean configured = false;
+        try {
+            MobBody body = mindHost.spawnBody(location, profile, preparedBody -> {
+                CrashFix.persistentTracker(preparedBody.entity());
+                ((EliteEntity) actor).setEliteMindBinding(new EliteMindBinding(entry, handle, preparedBody));
+                configure.accept(preparedBody.entity());
+            });
+            configured = true;
+            return body.entity();
+        } finally {
+            if (!configured) {
+                clearProgramQuietly(actor, "failed configured behavior spawn");
+                handle.close();
+            }
+        }
+    }
+
+    EliteEntity spawnBehaviorElite(Location location, EntityType type, int level,
+                                  CreatureSpawnEvent.SpawnReason reason,
+                                  Set<PowersConfigFields> explicitPowers) {
+        var properties = EliteMobProperties.getPluginData(type);
+        var entry = catalog.requireBehavior(properties.getBehavior());
+        var loadout = explicitPowers == null
+                ? EliteMindPowerLoadout.randomizedPowers()
+                : EliteMindPowerLoadout.exact(List.of());
+        return spawnResolved(MetadataHandler.PLUGIN, entry, location, level, false,
+                EliteMindBodyProfile.forCarrier(type.getKey(), properties.getLocomotion()), loadout, reason,
+                actor -> {
+                    if (reason == CreatureSpawnEvent.SpawnReason.CUSTOM) {
+                        actor.setNaturalEntity(true);
+                        actor.setMaxHealth();
+                    }
+                    if (explicitPowers != null) actor.applyPowers(new HashSet<>(explicitPowers));
+                });
+    }
+
+    void validateBehavior(String filename) {
+        catalog.requireBehavior(filename);
+    }
+
+    static void detachBehavior(EliteEntity actor) {
+        clearProgramQuietly(actor, "failed boss materialization");
     }
 
     @Override
@@ -236,12 +304,13 @@ final class EliteMindServiceImpl implements EliteMindService, Listener {
         boolean committed = false;
         try {
             actor.spawnWithBody(request.location(), configure -> {
-                body[0] = mindHost.spawnBody(request.location(), toNativeProfile(request.bodyProfile()));
-                CrashFix.persistentTracker(body[0].entity());
                 handle[0] = mindHost.open(actor.getEliteUUID(), entry.instantiate());
-                binding[0] = new EliteMindBinding(entry, handle[0], body[0]);
-                ((EliteEntity) actor).setEliteMindBinding(binding[0]);
-                configure.accept(body[0].entity());
+                body[0] = mindHost.spawnBody(request.location(), toNativeProfile(request.bodyProfile()), preparedBody -> {
+                    CrashFix.persistentTracker(preparedBody.entity());
+                    binding[0] = new EliteMindBinding(entry, handle[0], preparedBody);
+                    ((EliteEntity) actor).setEliteMindBinding(binding[0]);
+                    configure.accept(preparedBody.entity());
+                });
                 return body[0].entity();
             });
             if (!actor.exists() || EntityTracker.getEliteMobEntities().get(actor.getEliteUUID()) != actor)
@@ -343,14 +412,15 @@ final class EliteMindServiceImpl implements EliteMindService, Listener {
             throw new IllegalStateException("Elite actor is not backed by a MagmaCore native mind body");
         }
         EliteMindSnapshot before = binding.snapshot(eliteEntity);
-        if (before.paused() == paused) return before;
+        boolean previouslyPaused = binding.isExplicitlyPaused();
+        if (previouslyPaused == paused) return before;
 
         binding.setPaused(paused);
         try {
             luaPowerService.setMindActorPowersPaused(eliteEntity, paused);
         } catch (RuntimeException failure) {
             try {
-                binding.setPaused(before.paused());
+                binding.setPaused(previouslyPaused);
             } catch (RuntimeException rollbackFailure) {
                 failure.addSuppressed(rollbackFailure);
             }

@@ -33,6 +33,9 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private EntityType entityType = EntityType.ZOMBIE;
+    @Getter
+    @Setter
+    private String behavior;
     @Setter
     private String name = "Default Name";
     @Setter
@@ -353,12 +356,16 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.entityType = processEnum("entityType", entityType, EntityType.ZOMBIE, EntityType.class, true);
-        if (entityType == null) entityType = EntityType.ZOMBIE;
+        boolean configuredEntityType = configHas("entityType");
+        this.entityType = processEnum("entityType", entityType,
+                configuredEntityType ? null : EntityType.ZOMBIE, EntityType.class, true);
+        if (entityType == null && !configuredEntityType) entityType = EntityType.ZOMBIE;
         if (EliteMobProperties.getPluginData(entityType) == null) {
-            Logger.warn("Failed to get plugin data for entity type " + entityType.toString() + " in file " + filename + " ! Defaulting to zombie.");
-            entityType = EntityType.ZOMBIE;
+            Logger.warn("Disabling custom boss " + filename + ": entityType " + entityType + " is not a spawnable creature.");
+            isEnabled = false;
+            return;
         }
+        this.behavior = processString("behavior", behavior, null, false);
         this.instanced = processBoolean("instanced", instanced, false, false);
         this.name = translatable(filename, "name", processString("name", name, "Default Name", true));
         //Levels are strings because "dynamic" is a valid value

@@ -4,6 +4,9 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.mind.EliteMindService;
 import com.magmaguy.elitemobs.api.power.ElitePowerActionPosition;
 import com.magmaguy.elitemobs.api.power.ElitePowerActionResult;
+import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.easyminecraftgoals.NMSAdapter;
 import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.magmacore.ai.MindFailure;
@@ -14,7 +17,9 @@ import com.magmaguy.magmacore.ai.MindActionResult;
 import com.magmaguy.magmacore.ai.MindPosition;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.HandlerList;
@@ -24,6 +29,9 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /** Internal lifecycle owner for EliteMobs' native Mind interface. */
 public final class EliteMindServiceModule {
@@ -32,6 +40,37 @@ public final class EliteMindServiceModule {
     private static BukkitTask mindTickTask;
 
     private EliteMindServiceModule() {
+    }
+
+    /** Ordinary YAML chooses a behavior; it does not introduce a second boss spawn path. */
+    public static Function<Consumer<LivingEntity>, LivingEntity> behaviorBodyFactory(
+            CustomBossEntity actor, Location location) {
+        var fields = actor.getCustomBossesConfigFields();
+        if (!fields.isAi() || fields.isNeutral()) return null;
+        String filename = fields.getBehavior();
+        if (filename == null) {
+            var properties = EliteMobProperties.getPluginData(fields.getEntityType());
+            filename = properties == null ? null : properties.getBehavior();
+        }
+        if (filename == null || filename.isBlank() || filename.equalsIgnoreCase("native")) return null;
+        EliteMindServiceImpl current = requireImplementation();
+        String reference = filename.trim();
+        current.validateBehavior(reference);
+        return configure -> current.spawnBehaviorBody(actor, location, reference, configure);
+    }
+
+    public static EliteEntity spawnBehaviorElite(Location location, EntityType type, int level,
+            CreatureSpawnEvent.SpawnReason reason, Set<PowersConfigFields> powers) {
+        return requireImplementation().spawnBehaviorElite(location, type, level, reason, powers);
+    }
+
+    public static void detachBehavior(EliteEntity actor) {
+        EliteMindServiceImpl.detachBehavior(actor);
+    }
+
+    private static EliteMindServiceImpl requireImplementation() {
+        if (implementation == null) throw new IllegalStateException("EliteMobs behavior service is unavailable");
+        return implementation;
     }
 
     public static void initialize() {

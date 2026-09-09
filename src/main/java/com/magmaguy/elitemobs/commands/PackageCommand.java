@@ -44,6 +44,7 @@ public class PackageCommand {
         packContents("wormholes");
         packContents("world_blueprints");
         packContents("powers");
+        packContents("behaviors");
 
         commandSender.sendMessage(CommandMessagesConfig.getPackageDoneMessage());
         commandSender.sendMessage(CommandMessagesConfig.getPackageDontForgetMessage());

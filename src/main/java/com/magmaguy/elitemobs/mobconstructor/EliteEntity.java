@@ -191,6 +191,7 @@ public class EliteEntity {
     //Native Mind actors are normalized before they become observable through EliteMobSpawnEvent.
     //The service attaches the native Mind between preparation and this one-shot commit.
     private transient boolean preparedMindSpawn;
+    private transient double nativeBaseMaxHealth = Double.NaN;
     private transient boolean preparedMindSpawnAttempted;
     private transient List<Runnable> preparedMindSpawnCleanup;
 
@@ -217,6 +218,7 @@ public class EliteEntity {
         // Ordinary actors retain the historical event boundary in setLivingEntity. Native Mind
         // actors use the explicit prepare/commit transaction below.
         setLivingEntity(livingEntity, spawnReason);
+        if (this.livingEntity == null) return;
         if (spawnReason == CreatureSpawnEvent.SpawnReason.NATURAL) {
             isNaturalEntity = true;
         }
@@ -310,6 +312,38 @@ public class EliteEntity {
 
     void setEliteMindBinding(EliteMindBinding eliteMindBinding) {
         this.eliteMindBinding = eliteMindBinding;
+        if (eliteMindBinding != null) eliteMindBinding.setAiPaused(!(mindAIEnabled && mindAware));
+    }
+
+    private boolean mindAIEnabled = true;
+    private boolean mindAware = true;
+
+    /** Logical AI state; controlled bodies retain native NoAI even while their behavior is running. */
+    public boolean isAIEnabled() {
+        return eliteMindBinding == null ? livingEntity != null && livingEntity.hasAI() : mindAIEnabled;
+    }
+
+    /** Pauses movement/brain behavior without pausing the Lua power that may restore it. */
+    public void setAIEnabled(boolean enabled) {
+        mindAIEnabled = enabled;
+        if (eliteMindBinding != null) eliteMindBinding.setAiPaused(!(mindAIEnabled && mindAware));
+        else if (livingEntity != null) livingEntity.setAI(enabled);
+    }
+
+    public boolean isAware() {
+        return eliteMindBinding == null ? livingEntity instanceof Mob mob && mob.isAware() : mindAware;
+    }
+
+    /** Awareness and AI are independent switches; either can hold a controlled brain paused. */
+    public void setAware(boolean aware) {
+        mindAware = aware;
+        if (eliteMindBinding != null) eliteMindBinding.setAiPaused(!(mindAIEnabled && mindAware));
+        else if (livingEntity instanceof Mob mob) mob.setAware(aware);
+    }
+
+    /** Effective behavior state for power/anti-exploit gates, preserving the native hasAI contract. */
+    public boolean isAIActive() {
+        return isAIEnabled() && (eliteMindBinding == null || mindAware && !eliteMindBinding.isPaused());
     }
 
     EliteLuaPowerBinding getEliteLuaPowerBinding() {
@@ -613,12 +647,49 @@ public class EliteEntity {
 
     public void setLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
         if (livingEntity == null) return;
-        normalizeLivingEntity(livingEntity, spawnReason);
-        commitNormalizedSpawn();
+        boolean accepted = false;
+        try {
+            normalizeLivingEntity(livingEntity, spawnReason);
+            accepted = commitNormalizedSpawn();
+        } finally {
+            if (!accepted) discardSpawnBody(livingEntity);
+        }
+    }
+
+    /** Rolls back materialization without ending a persistent logical boss or losing its powers. */
+    protected void discardSpawnBody(LivingEntity body) {
+        EntityTracker.getEliteMobEntities().remove(eliteUUID, this);
+        try {
+            cleanupPreparedMindSpawnEffects();
+            closePowerStances();
+            closeAllPowerRuntimes();
+            closeEliteLuaPowerBinding();
+        } finally {
+            try {
+                EliteMindServiceModule.detachBehavior(this);
+            } finally {
+                try {
+                    if (body != null) {
+                        try {
+                            if (org.bukkit.Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
+                                com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity.undisguise(body);
+                        } finally {
+                            body.remove();
+                        }
+                    }
+                } finally {
+                    livingEntity = null;
+                    unsyncedLivingEntity = null;
+                    clearDamagers();
+                }
+            }
+        }
     }
 
     private void normalizeLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
         if (livingEntity == null) return;
+        if (this.livingEntity != livingEntity || !Double.isFinite(nativeBaseMaxHealth))
+            nativeBaseMaxHealth = AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health");
         this.removalEventCalled = false;
         this.pendingRemovalEventReason = null;
         this.removalCallDepth = 0;
@@ -638,18 +709,20 @@ public class EliteEntity {
             livingEntity.getEquipment().setBootsDropChance(0);
         }
 
-        if (livingEntity.getType().equals(EntityType.RABBIT)) {
+        boolean nativeBehavior = !(com.magmaguy.easyminecraftgoals.NMSManager.isEnabled()
+                && com.magmaguy.easyminecraftgoals.NMSManager.getAdapter().isMindBody(livingEntity));
+        if (nativeBehavior && livingEntity.getType().equals(EntityType.RABBIT)) {
             ((Rabbit) livingEntity).setRabbitType(Rabbit.Type.THE_KILLER_BUNNY);
         }
 
-        if (entityType.equals(EntityType.WOLF)) {
+        if (nativeBehavior && entityType.equals(EntityType.WOLF)) {
             Wolf wolf = (Wolf) livingEntity;
             wolf.setAngry(true);
             wolf.setBreed(false);
             KeepNeutralsAngry.showMeYouWarFace(this);
         }
 
-        if (entityType.equals(EntityType.POLAR_BEAR)) {
+        if (nativeBehavior && entityType.equals(EntityType.POLAR_BEAR)) {
             KeepNeutralsAngry.showMeYouWarFace(this);
         }
 
@@ -657,18 +730,18 @@ public class EliteEntity {
             if (((EnderDragon) livingEntity).getBossBar() != null)
                 ((EnderDragon) livingEntity).getBossBar().setTitle(getName());
 
-        if (entityType.equals(EntityType.LLAMA)) {
+        if (nativeBehavior && entityType.equals(EntityType.LLAMA)) {
             KeepNeutralsAngry.showMeYouWarFace(this);
         }
 
-        if (entityType.equals(EntityType.IRON_GOLEM) && this instanceof CustomBossEntity)
+        if (nativeBehavior && entityType.equals(EntityType.IRON_GOLEM) && this instanceof CustomBossEntity)
             KeepNeutralsAngry.showMeYouWarFace(this);
 
-        if (entityType.equals(EntityType.GOAT)) {
+        if (nativeBehavior && entityType.equals(EntityType.GOAT)) {
             ((Goat) livingEntity).setScreaming(true);
         }
 
-        if (livingEntity instanceof Bee) {
+        if (nativeBehavior && livingEntity instanceof Bee) {
             KeepNeutralsAngry.showMeYouWarFace(this);
             ((Bee) livingEntity).setCannotEnterHiveTicks(Integer.MAX_VALUE);
         }
@@ -695,11 +768,11 @@ public class EliteEntity {
         if (livingEntity == null) {
             throw new IllegalStateException("Cannot commit an EliteEntity without a living entity");
         }
+        if (this instanceof CustomBossEntity boss && boss.isNormalizedCombat()) setNormalizedMaxHealth();
         // Preserve the historical event-time marker contract. EntityTracker writes the same tag
         // again after listeners accept the spawn and only then publishes the actor in its map.
         PersistentTagger.tagElite(livingEntity, eliteUUID);
-        EntityTracker.registerEliteMob(this);
-        if (EntityTracker.getEliteMobEntities().get(eliteUUID) != this) return false;
+        if (!EntityTracker.tryRegisterEliteMob(this)) return false;
         if (preparedMindSpawn
                 && (eliteMindBinding == null || livingEntity == null || !livingEntity.isValid())) {
             EntityTracker.getEliteMobEntities().remove(eliteUUID, this);
@@ -717,10 +790,7 @@ public class EliteEntity {
 
     public void setMaxHealth() {
         EliteMobProperties properties = EliteMobProperties.getPluginData(entityType);
-        double nativeBaseHealth = livingEntity == null
-                ? Double.NaN
-                : AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health");
-        this.defaultMaxHealth = NativeMindActorDefaults.baseHealth(properties, nativeBaseHealth);
+        this.defaultMaxHealth = NativeMindActorDefaults.baseHealth(properties, nativeBaseMaxHealth);
         // Use exponential HP scaling: +5 levels = 2x HP, -5 levels = 0.5x HP
         // This replaces the old damage modifier system for a better player experience
         double calculatedHealth = LevelScaling.calculateMobHealth(level, this.defaultMaxHealth);

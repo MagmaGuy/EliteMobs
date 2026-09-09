@@ -306,20 +306,12 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             if (!effectiveSpawnLocation.equals(spawnLocation))
                 setRespawnOverrideLocation(effectiveSpawnLocation);
             super.livingEntity = new CustomBossMegaConsumer(this).spawn(bodyFactory);
-            setNormalizedHealth();
             if (super.livingEntity == null)
                 Logger.warn("Something just prevented EliteMobs from spawning a Custom Boss! More info up next.");
         }
-        if (!exists()) {
+        if (livingEntity == null || !livingEntity.isValid()) {
+            discardFailedMaterialization(livingEntity);
             existsFailureCount++;
-            //this may seem odd but not setting it to null can cause double spawn attempts as the plugin catches itself
-            //correctly as not have a valid living entity but the checks are set up in such a way that if a living entity
-            //object is referenced then trying to spawn it again is a double spawn of the same entity
-            if (super.livingEntity != null) {
-                //Under very specific chunk loading conditions mobs can double spawn. It's never incorrect to remove the living entity silently when it spawns
-                super.livingEntity.remove();
-                super.livingEntity = null;
-            }
             if (existsFailureCount > 10) {
                 if (existsFailureCount == 11) {
                     Logger.warn("EliteMobs tried and failed to spawn " + customBossesConfigFields.getFilename() + " " + existsFailureCount + "times, probably due to regional protections or third party plugin incompatibilities.");
@@ -588,8 +580,16 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     public void resetLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
-        super.setLivingEntity(livingEntity, spawnReason);
         new CustomBossMegaConsumer(this).applyBossFeatures(livingEntity);
+        super.setLivingEntity(livingEntity, spawnReason);
+    }
+
+    void discardFailedMaterialization(LivingEntity body) {
+        try {
+            discardSpawnBody(body);
+        } finally {
+            customModel = null;
+        }
     }
 
     @Override

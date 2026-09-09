@@ -104,6 +104,10 @@ public class NaturalMobSpawnEventHandler implements Listener {
         Deal with entities spawned within the plugin
          */
         if (EntityTracker.isEliteMob(event.getEntity())) return;
+        if (EntityTracker.isNPCEntity(event.getEntity()) || EntityTracker.isVisualEffect(event.getEntity())) return;
+        if (event.getEntity() instanceof org.bukkit.entity.Tameable tameable && tameable.isTamed()) return;
+        // Explicit plugin-created entities belong to their creator, regardless of species or name.
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) return;
 
         if (event.getEntity().getCustomName() != null && DefaultConfig.isPreventEliteMobConversionOfNamedMobs())
             return;
@@ -175,7 +179,19 @@ public class NaturalMobSpawnEventHandler implements Listener {
 
         if (!genericTypeEnabled || !genericSelected) return;
 
-        EliteEntity eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
+        EliteEntity eliteEntity;
+        if (EliteMobProperties.getPluginData(event.getEntityType()).getBehavior() != null) {
+            try {
+                eliteEntity = EliteMindServiceModule.spawnBehaviorElite(event.getLocation(), event.getEntityType(),
+                        eliteMobLevel, event.getSpawnReason(), null);
+                event.setCancelled(true);
+                livingEntity = eliteEntity.getLivingEntity();
+            } catch (RuntimeException failure) {
+                Logger.warn("Could not apply elite behavior to " + event.getEntityType() + ": " + failure.getMessage());
+                return;
+            }
+        } else eliteEntity = new EliteEntity(livingEntity, eliteMobLevel, event.getSpawnReason());
+        if (eliteEntity.getLivingEntity() == null) return;
 
         if (DefaultConfig.isUseRandomizedScalingForElites())
             AttributeManager.setAttribute(livingEntity, "generic_scale", ThreadLocalRandom.current().nextDouble(0.8, 1.2));

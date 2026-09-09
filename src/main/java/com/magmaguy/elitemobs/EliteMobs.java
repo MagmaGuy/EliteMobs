@@ -262,8 +262,6 @@ public class EliteMobs extends JavaPlugin {
                     }
                     MetadataHandler.pluginState = PluginState.INITIALIZED;
                     EventsRegistrer.registerPostInitializationEvents();
-                    EliteLuaPowerServiceModule.initialize();
-                    EliteMindServiceModule.initialize();
                     com.magmaguy.elitemobs.transport.TransportModule.initialize();
                     Bukkit.getPluginManager().callEvent(new EliteMobsInitializedEvent());
                     Logger.info("EliteMobs fully initialized!");
@@ -276,6 +274,8 @@ public class EliteMobs extends JavaPlugin {
                 throwable -> {
                     MetadataHandler.pluginState = PluginState.UNINITIALIZED;
                     MetadataHandler.pendingReloadSender = null;
+                    EliteMindServiceModule.shutdown();
+                    EliteLuaPowerServiceModule.shutdown();
                     com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule.shutdownIfInitialized();
                     com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime.shutdownIfInitialized();
                     com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatStateRecovery.clearAllOnlinePlayers();
@@ -424,6 +424,8 @@ public class EliteMobs extends JavaPlugin {
         //Hook up all listeners, some depend on config
         initializationContext.step("Event Listeners");
         EventsRegistrer.registerEvents();
+        EliteLuaPowerServiceModule.initialize();
+        EliteMindServiceModule.initialize();
         PatrolService.initialize();
         PatrolEditor.initialize();
 

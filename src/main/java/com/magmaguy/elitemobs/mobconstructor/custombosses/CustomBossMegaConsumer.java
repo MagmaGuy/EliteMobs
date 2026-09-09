@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+import com.magmaguy.elitemobs.tagger.PersistentTagger;
 import com.magmaguy.elitemobs.mobconstructor.MobLevelPlaceholderFormatter;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
@@ -88,6 +89,15 @@ public class CustomBossMegaConsumer {
             Logger.warn("Custom Boss Entity " + customBossesConfigFields.getFilename() + " tried to spawn without a valid spawn location getting assigned! Report this to the developer!");
             return null;
         }
+        if (bodyFactory == null) {
+            try {
+                bodyFactory = com.magmaguy.elitemobs.mobconstructor.EliteMindServiceModule
+                        .behaviorBodyFactory(customBossEntity, spawnLocation);
+            } catch (IllegalArgumentException | IllegalStateException failure) {
+                Logger.warn("Cannot spawn " + customBossesConfigFields.getFilename() + ": " + failure.getMessage());
+                return null;
+            }
+        }
         if (EliteMobs.worldGuardIsEnabled) {
             if (!WorldGuardFlagChecker.doEliteMobsSpawnFlag(spawnLocation)) {
                 Logger.warn("Attempted to spawn " + customBossesConfigFields.getFilename() + " in location " +
@@ -98,13 +108,23 @@ public class CustomBossMegaConsumer {
                 WorldGuardSpawnEventBypasser.forceSpawn();
         }
 
-        disguiseQueued = queueDisguise(parseName(customBossEntity, level));
-        LivingEntity livingEntity = bodyFactory == null ? (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
-                customBossesConfigFields.getEntityType().getEntityClass(),
-                entity -> applyBossFeatures((LivingEntity) entity)) : bodyFactory.apply(this::applyBossFeatures);
-        setCustomModel(livingEntity);
-        customBossEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
-        return livingEntity;
+        LivingEntity livingEntity = null;
+        boolean accepted = false;
+        try {
+            disguiseQueued = queueDisguise(parseName(customBossEntity, level));
+            livingEntity = bodyFactory == null ? (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
+                    customBossesConfigFields.getEntityType().getEntityClass(),
+                    entity -> applyBossFeatures((LivingEntity) entity)) : bodyFactory.apply(this::applyBossFeatures);
+            if (livingEntity == null || !livingEntity.isValid()) return null;
+            setCustomModel(livingEntity);
+            customBossEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+            accepted = customBossEntity.getLivingEntity() == livingEntity && livingEntity.isValid()
+                    && EntityTracker.getEliteMobEntities().get(customBossEntity.getEliteUUID()) == customBossEntity;
+            return accepted ? livingEntity : null;
+        } finally {
+            if (!accepted) customBossEntity.discardFailedMaterialization(
+                    livingEntity == null ? customBossEntity.getUnsyncedLivingEntity() : livingEntity);
+        }
     }
 
     private void setBaby(LivingEntity livingEntity) {
@@ -234,6 +254,8 @@ public class CustomBossMegaConsumer {
     }
 
     public void applyBossFeatures(LivingEntity livingEntity) {
+        customBossEntity.setUnsyncedLivingEntity(livingEntity);
+        PersistentTagger.tagElite(livingEntity, customBossEntity.getEliteUUID());
         for (ElitePower elitePower : powers)
             elitePower.applyPowers(livingEntity);
         setEquipment(livingEntity);
@@ -258,8 +280,6 @@ public class CustomBossMegaConsumer {
         if (livingEntity instanceof Slime) {
             ((Slime) livingEntity).setSize(customBossEntity.getCustomBossesConfigFields().getSlimeSize());
         }
-        customBossEntity.setUnsyncedLivingEntity(livingEntity);
-        EntityTracker.registerEliteMob(customBossEntity, livingEntity);
     }
 
     private void setFollowRange(LivingEntity livingEntity) {

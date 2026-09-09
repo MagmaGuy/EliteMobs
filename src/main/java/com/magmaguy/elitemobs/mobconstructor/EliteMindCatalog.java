@@ -5,9 +5,13 @@ import com.magmaguy.elitemobs.api.mind.EliteMindProgram;
 import com.magmaguy.magmacore.scripting.LuaMindDefinition;
 import com.magmaguy.magmacore.scripting.LuaMindModuleDescriptor;
 import com.magmaguy.magmacore.scripting.LuaMindModuleRegistry;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -19,9 +23,89 @@ import java.util.Objects;
 /** Validated program catalog. Executable Lua state never lives in this map. */
 final class EliteMindCatalog {
     private final Map<NamespacedKey, Entry> entries = new LinkedHashMap<>();
+    private final Map<String, NamespacedKey> behaviorFiles = new LinkedHashMap<>();
     private final LuaMindModuleRegistry moduleRegistry = new LuaMindModuleRegistry();
     private final Map<Plugin, LuaMindModuleRegistry.OwnerScope> moduleOwners =
             new IdentityHashMap<>();
+
+    /** File-backed programs use the same validated catalog as API-registered Minds. */
+    void loadBehaviors(Plugin owner) {
+        Path directory = owner.getDataFolder().toPath().resolve("behaviors");
+        for (String resource : List.of("basic_melee.lua", "modules/target.lua", "modules/pursuit.lua",
+                "modules/melee.lua", "modules/wander.lua")) {
+            if (!Files.exists(directory.resolve(resource))) owner.saveResource("behaviors/" + resource, false);
+        }
+        Map<Path, String> modules = new LinkedHashMap<>();
+        Map<Path, String> programs = new LinkedHashMap<>();
+        try (var paths = Files.walk(directory)) {
+            Path root = directory.toRealPath();
+            for (Path path : paths.filter(Files::isRegularFile).sorted().toList()) {
+                if (!path.getFileName().toString().endsWith(".lua")) continue;
+                try {
+                    if (!path.toRealPath().startsWith(root)) {
+                        Logger.warn("Behavior file escapes its directory: " + path);
+                        continue;
+                    }
+                    (isModule(directory.relativize(path)) ? modules : programs).put(path, Files.readString(path));
+                } catch (IOException failure) {
+                    Logger.warn("Could not read behavior " + path + ": " + failure.getMessage());
+                }
+            }
+        } catch (IOException failure) {
+            throw new IllegalStateException("Could not load behavior directory " + directory, failure);
+        }
+        // The existing registry requires dependencies to be registered first. Resolve pending
+        // files until no registration advances, then report each remaining dependency/error.
+        Map<Path, String> failures = new LinkedHashMap<>();
+        Map<String, Path> moduleFiles = new LinkedHashMap<>();
+        boolean advanced;
+        do {
+            advanced = false;
+            var iterator = modules.entrySet().iterator();
+            while (iterator.hasNext()) {
+                var file = iterator.next();
+                try {
+                    LuaMindModuleDescriptor module = ownerScope(owner).registerModule(file.getKey().toString(), file.getValue());
+                    Path previous = moduleFiles.put(module.identifier(), file.getKey());
+                    if (previous != null)
+                        Logger.warn("Behavior module " + module.identifier() + " is declared by both " + previous
+                                + " and " + file.getKey() + "; the registered revision is " + module.revision());
+                    iterator.remove();
+                    failures.remove(file.getKey());
+                    advanced = true;
+                } catch (RuntimeException failure) {
+                    failures.put(file.getKey(), failure.getMessage());
+                }
+            }
+        } while (advanced && !modules.isEmpty());
+        failures.forEach((file, error) -> Logger.warn("Could not load behavior module " + file + ": " + error));
+        for (var file : programs.entrySet()) {
+            String reference = directory.relativize(file.getKey()).toString().replace('\\', '/');
+            try {
+                LuaMindDefinition definition = ownerScope(owner).validateProgram(reference, file.getValue());
+                NamespacedKey key = Objects.requireNonNull(NamespacedKey.fromString(definition.programIdentifier()));
+                requireOwnerNamespace(owner, key);
+                if (entries.containsKey(key)) throw new IllegalArgumentException("Duplicate behavior id " + key);
+                entries.put(key, new Entry(owner, key, definition.programRevision(), file.getValue(), definition));
+                behaviorFiles.put(reference, key);
+            } catch (RuntimeException failure) {
+                Logger.warn("Could not load behavior " + reference + ": " + failure.getMessage());
+            }
+        }
+    }
+
+    private static boolean isModule(Path reference) {
+        Path parent = reference.getParent();
+        if (parent == null) return false;
+        for (Path part : parent) if (part.toString().equals("modules")) return true;
+        return false;
+    }
+
+    Entry requireBehavior(String filename) {
+        NamespacedKey key = behaviorFiles.get(filename);
+        if (key == null) throw new IllegalArgumentException("Unknown or invalid behavior file: " + filename);
+        return require(key);
+    }
 
     EliteMindModule registerModule(
             Plugin owner,
@@ -90,10 +174,12 @@ final class EliteMindCatalog {
         }
         LuaMindModuleRegistry.OwnerScope moduleOwner = moduleOwners.remove(owner);
         if (moduleOwner != null) moduleOwner.close();
+        behaviorFiles.values().removeIf(key -> !entries.containsKey(key));
     }
 
     void clear() {
         entries.clear();
+        behaviorFiles.clear();
         for (LuaMindModuleRegistry.OwnerScope owner : new ArrayList<>(moduleOwners.values())) {
             owner.close();
         }
