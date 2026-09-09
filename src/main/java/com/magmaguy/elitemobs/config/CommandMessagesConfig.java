@@ -1067,7 +1067,7 @@ public class CommandMessagesConfig extends ConfigurationFile {
         lootVoteMessage = ConfigurationEngine.setString(
                 List.of("Sets the loot vote message prefix, before the clickable /em loot command.",
                         "$count - the number of items to vote on, used in the suffix."),
-                file, fileConfiguration, "lootVoteMessage", "&8[EliteMobs] &6Loot vote! Click ", true);
+                file, fileConfiguration, "lootVoteMessage", "&8[EliteMobs] &6Shared loot awaiting a roll. Click ", true);
         lootVoteMessageSuffix = ConfigurationEngine.setString(
                 List.of("Sets the loot vote message suffix, after the clickable /em loot command.",
                         "$count - the number of items to vote on"),
@@ -1260,7 +1260,7 @@ public class CommandMessagesConfig extends ConfigurationFile {
                 List.of("Sets the message shown when a player wins a shared loot item.",
                         "$player is the placeholder for the winning player's display name.",
                         "$item is the placeholder for the item's display name."),
-                file, fileConfiguration, "lootWinnerMessage", "$player &areceived $item !", true);
+                file, fileConfiguration, "lootWinnerMessage", "$player &awon $item!", true);
 
         // QuestCommand messages
         questInvalidIdMessage = ConfigurationEngine.setString(
