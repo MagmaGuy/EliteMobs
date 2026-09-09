@@ -55,6 +55,12 @@ public class CustomModelFMM implements CustomModelInterface {
         return true;
     }
 
+    public boolean setLookTarget(Location target) {
+        if (dynamicEntity == null) return false;
+        dynamicEntity.setLookTarget(target);
+        return true;
+    }
+
     public CustomModelFMM(LivingEntity livingEntity, String modelName, String nametagName,
                           ModeledEntityLeftClickCallback leftClickCallback,
                           ModeledEntityRightClickCallback rightClickCallback) {

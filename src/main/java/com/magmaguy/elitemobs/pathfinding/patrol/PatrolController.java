@@ -80,6 +80,7 @@ final class PatrolController {
         if (body == null) {
             if (driver != null || attachedBodyId != null) detachBody();
             if (!actor.persistsWhileDetached()) {
+                actor.tickFacing(false);
                 retired = true;
                 state = PatrolRuntimeState.DISABLED;
                 return true;
@@ -90,16 +91,19 @@ final class PatrolController {
             tickLoaded(body, tick);
         }
 
+        actor.tickFacing(state == PatrolRuntimeState.PAUSED || state == PatrolRuntimeState.HELD);
         if (tick % 20L == 0L) checkpoint();
         return retired;
     }
 
     void shutdown() {
+        actor.tickFacing(false);
         closeDriver();
         checkpoint();
     }
 
     void retire(boolean discardPersistentState) {
+        actor.tickFacing(false);
         retired = true;
         closeDriver();
         if (discardPersistentState) stateStore.remove(actor.canonicalIdentity());
@@ -124,6 +128,7 @@ final class PatrolController {
     }
 
     void worldUnloaded() {
+        actor.tickFacing(false);
         checkpoint();
         closeDriver();
         attachedBodyId = null;

@@ -104,6 +104,9 @@ public class NPCsConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private double patrolPauseNearPlayersRadius;
+    @Getter
+    @Setter
+    private boolean patrolFaceNearbyPlayers;
 
     public NPCsConfigFields(String fileName,
                             boolean isEnabled,
@@ -210,6 +213,7 @@ public class NPCsConfigFields extends CustomConfigFields {
         this.scripts = processStringList("scripts", scripts, new ArrayList<>(), false);
         this.transportRoutes = processStringList("transportRoutes", transportRoutes, new ArrayList<>(), false);
         patrolPauseNearPlayersRadius = processDouble("patrol.pauseNearPlayersRadius", patrolPauseNearPlayersRadius, 0D, false);
+        patrolFaceNearbyPlayers = processBoolean("patrol.faceNearbyPlayers", patrolFaceNearbyPlayers, false, false);
         if (!Double.isFinite(patrolPauseNearPlayersRadius) || patrolPauseNearPlayersRadius < 0D) {
             Logger.warn("Invalid patrol.pauseNearPlayersRadius in " + filename + ": expected a finite, non-negative radius. Disabling proximity pauses.");
             patrolPauseNearPlayersRadius = 0D;

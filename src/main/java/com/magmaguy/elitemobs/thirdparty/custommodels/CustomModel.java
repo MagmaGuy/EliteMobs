@@ -217,6 +217,12 @@ public class CustomModel implements CustomModelInterface {
         }
     }
 
+    /** Lets the model own body/head facing; null releases the previous target. */
+    public boolean setLookTarget(Location target) {
+        return modelPlugin == ModelPlugin.FREE_MINECRAFT_MODELS && customModelFMM != null
+                && customModelFMM.setLookTarget(target);
+    }
+
     public enum ModelPlugin {
         NONE, FREE_MINECRAFT_MODELS, MODEL_ENGINE
     }

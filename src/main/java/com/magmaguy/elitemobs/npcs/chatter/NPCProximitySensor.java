@@ -60,6 +60,8 @@ public class NPCProximitySensor implements Listener {
                     if (activationRadius <= 0) continue;
                     double activationRadiusSquared = activationRadius * activationRadius;
                     Location npcLocation = villager.getLocation();
+                    boolean patrolOwnsFacing = npcEntity.getNPCsConfigFields().isPatrolFaceNearbyPlayers()
+                            && PatrolService.hasConfiguredPatrol(npcEntity);
                     for (Entity entity : villager.getNearbyEntities(activationRadius, activationRadius, activationRadius)) {
                         if (!(entity instanceof Player player)) continue;
                         if (!player.isValid()) continue;
@@ -69,7 +71,7 @@ public class NPCProximitySensor implements Listener {
                                 playerLocation.distanceSquared(npcLocation) > activationRadiusSquared)
                             continue;
                         Vector direction = playerLocation.toVector().subtract(npcLocation.toVector());
-                        if (direction.lengthSquared() > 0) {
+                        if (!patrolOwnsFacing && direction.lengthSquared() > 0) {
                             villager.teleport(npcLocation.clone().setDirection(direction));
                         }
                         detections.put(new NPCProximityKey(npcEntity.getUuid(), player.getUniqueId()), new ProximityDetection(npcEntity, player));

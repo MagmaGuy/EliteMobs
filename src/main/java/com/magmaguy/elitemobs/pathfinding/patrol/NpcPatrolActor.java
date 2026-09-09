@@ -2,9 +2,11 @@ package com.magmaguy.elitemobs.pathfinding.patrol;
 
 import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
 import com.magmaguy.magmacore.util.AttributeManager;
-import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -16,7 +18,8 @@ final class NpcPatrolActor implements PatrolActor {
     private final PatrolOrigin origin;
     private final String canonicalIdentity;
     private long nextProximityCheck;
-    private boolean nearPlayer;
+    private UUID nearestPlayerId;
+    private CustomModel facingModel;
 
     NpcPatrolActor(NPCEntity npc) {
         this.npc = npc;
@@ -39,23 +42,65 @@ final class NpcPatrolActor implements PatrolActor {
         LivingEntity body = body();
         double radius = npc.getNPCsConfigFields().getPatrolPauseNearPlayersRadius();
         if (radius <= 0D || body == null || !body.isValid() || body.isDead()) {
-            nearPlayer = false;
+            nearestPlayerId = null;
             nextProximityCheck = 0L;
             return false;
         }
-        if (tick < nextProximityCheck) return nearPlayer;
+        if (tick < nextProximityCheck) return nearestPlayerId != null;
         nextProximityCheck = tick + 20L;
-        nearPlayer = false;
+        nearestPlayerId = null;
         Location location = body.getLocation();
+        double nearestDistance = radius * radius;
         for (var entity : body.getNearbyEntities(radius, radius, radius)) {
             if (entity instanceof Player player && player.isValid() && !player.isDead()
-                    && player.getGameMode() != GameMode.SPECTATOR
-                    && player.getLocation().distanceSquared(location) <= radius * radius) {
-                nearPlayer = true;
-                break;
+                    && player.getGameMode() != GameMode.SPECTATOR) {
+                double distance = player.getLocation().distanceSquared(location);
+                // Stable tie-breaker avoids alternating between players standing at the same distance.
+                if (distance < nearestDistance || distance == nearestDistance
+                        && (nearestPlayerId == null || player.getUniqueId().compareTo(nearestPlayerId) < 0)) {
+                    nearestDistance = distance;
+                    nearestPlayerId = player.getUniqueId();
+                }
             }
         }
-        return nearPlayer;
+        return nearestPlayerId != null;
+    }
+
+    @Override
+    public void tickFacing(boolean paused) {
+        CustomModel model = npc.getCustomModel();
+        if (facingModel != null && facingModel != model) {
+            facingModel.setLookTarget(null);
+            facingModel = null;
+        }
+        Location target = null;
+        LivingEntity body = body();
+        if (paused && npc.getNPCsConfigFields().isPatrolFaceNearbyPlayers() && nearestPlayerId != null
+                && !PatrolEditor.isEditing(npc) && body != null && body.isValid() && !body.isDead()) {
+            Player player = Bukkit.getPlayer(nearestPlayerId);
+            double radius = npc.getNPCsConfigFields().getPatrolPauseNearPlayersRadius();
+            if (player != null && player.isValid() && !player.isDead()
+                    && player.getGameMode() != GameMode.SPECTATOR && player.getWorld() == body.getWorld()
+                    && player.getLocation().distanceSquared(body.getLocation()) <= radius * radius)
+                target = player.getEyeLocation();
+        }
+        if (target != null && model != null && model.setLookTarget(target)) {
+            facingModel = model;
+            return;
+        }
+        if (facingModel != null) {
+            facingModel.setLookTarget(null);
+            facingModel = null;
+        }
+        if (target != null) {
+            // Unmodeled NPCs retain a Bukkit-only fallback. FMM handles its own gaze above.
+            Location eyes = body.getEyeLocation();
+            var direction = target.toVector().subtract(eyes.toVector());
+            if (direction.lengthSquared() > 1.0E-8D) {
+                eyes.setDirection(direction);
+                body.setRotation(eyes.getYaw(), eyes.getPitch());
+            }
+        }
     }
 
     @Override
