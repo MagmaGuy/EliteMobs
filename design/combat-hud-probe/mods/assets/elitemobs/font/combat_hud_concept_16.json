@@ -10,8 +10,8 @@
     {
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/gray.png",
-      "height": 60,
-      "ascent": -5,
+      "height": 54,
+      "ascent": -11,
       "chars": [
         ""
       ]
@@ -19,8 +19,8 @@
     {
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/red.png",
-      "height": 60,
-      "ascent": -5,
+      "height": 54,
+      "ascent": -11,
       "chars": [
         ""
       ]
@@ -32,15 +32,6 @@
       "ascent": -18,
       "chars": [
         "0123456789/ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "elitemobs:gui/combat_hud_probe/labels.png",
-      "height": 7,
-      "ascent": -11,
-      "chars": [
-        ""
       ]
     },
     {
@@ -74,7 +65,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_level.png",
       "height": 16,
-      "ascent": -6,
+      "ascent": -12,
       "chars": [
         ""
       ]
@@ -83,7 +74,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_diamond.png",
       "height": 32,
-      "ascent": 7,
+      "ascent": 1,
       "chars": [
         "",
         "",

@@ -12,7 +12,6 @@ import java.awt.Color;
 public final class CombatHudProbe {
     public static final int MAX_X_OFFSET = 64;
     public static final int MAX_Y_OFFSET = 16;
-    private static final String ALPHABET = "0123456789/ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private final String font;
     private final int x;
 
@@ -29,13 +28,10 @@ public final class CombatHudProbe {
         double health = player.getHealth();
         var maximumAttribute = player.getAttribute(Attribute.MAX_HEALTH);
         double maximum = maximumAttribute == null ? health : maximumAttribute.getValue();
-        overlay(line, 25, label("HEALTH"), 6 * 4);
         String healthText = number(health) + "/" + number(maximum);
         overlay(line, 25, healthText, healthText.length() * 6);
         bar(line, 25, '\uE110', health, maximum, 63, false);
         var resource = ExperimentalCombatModule.resourceSnapshot(player.getUniqueId()).orElse(null);
-        String resourceName = resource == null ? "ENERGY" : resource.type().name();
-        rightAlignedText(line, 165, label(resourceName), resourceName.length() * 4);
         String resourceText = resource == null ? "0/0" : number(resource.amount()) + "/" + number(resource.maximum());
         rightAlignedText(line, 165, resourceText, resourceText.length() * 6);
         bar(line, 102, '\uE111', resource == null ? 0 : resource.amount(),
@@ -72,12 +68,6 @@ public final class CombatHudProbe {
         int pixels = maximum <= 0 ? 0 : (int) Math.round(width * Math.max(0, Math.min(1, amount / maximum)));
         overlay(line, offset + (rightAligned ? width - pixels : 0),
                 (String.valueOf(glyph) + '\uE101').repeat(pixels), pixels);
-    }
-
-    private static String label(String text) {
-        StringBuilder result = new StringBuilder();
-        for (char character : text.toCharArray()) result.append((char) (0xE200 + ALPHABET.indexOf(character)));
-        return result.toString();
     }
 
     private static void classDiamond(StringBuilder line, Player player) {
