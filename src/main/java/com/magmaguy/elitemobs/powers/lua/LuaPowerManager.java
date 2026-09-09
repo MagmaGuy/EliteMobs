@@ -22,13 +22,15 @@ public final class LuaPowerManager {
     public static Map<String, PowersConfigFields> discoverLuaPowers(Collection<PowersConfigFields> loadedYamlPowers) {
         LinkedHashMap<String, PowersConfigFields> discoveredPowers = new LinkedHashMap<>();
         LinkedHashSet<File> powerDirectories = new LinkedHashSet<>();
+        Map<java.nio.file.Path, PowersConfigFields> metadata = new HashMap<>();
         for (PowersConfigFields loadedYamlPower : loadedYamlPowers) {
             if (loadedYamlPower.getFile() != null && loadedYamlPower.getFile().getParentFile() != null) {
                 powerDirectories.add(loadedYamlPower.getFile().getParentFile());
+                metadata.put(loadedYamlPower.getFile().toPath().toAbsolutePath().normalize(), loadedYamlPower);
             }
         }
         for (File powerDirectory : powerDirectories) {
-            discoverDirectory(powerDirectory, discoveredPowers);
+            discoverDirectory(powerDirectory, discoveredPowers, metadata);
         }
         return discoveredPowers;
     }
@@ -37,7 +39,8 @@ public final class LuaPowerManager {
         definitions.clear();
     }
 
-    private static void discoverDirectory(File directory, Map<String, PowersConfigFields> discoveredPowers) {
+    private static void discoverDirectory(File directory, Map<String, PowersConfigFields> discoveredPowers,
+                                          Map<java.nio.file.Path, PowersConfigFields> metadata) {
         File[] files = directory.listFiles();
         if (files == null) {
             return;
@@ -45,14 +48,23 @@ public final class LuaPowerManager {
         Arrays.sort(files, Comparator.comparing(File::getName));
         for (File file : files) {
             if (file.isDirectory()) {
-                discoverDirectory(file, discoveredPowers);
+                discoverDirectory(file, discoveredPowers, metadata);
                 continue;
             }
             if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".lua")) {
                 continue;
             }
             try {
-                discoveredPowers.put(file.getName(), loadLuaPower(file.getName(), file, null, PowerType.MISCELLANEOUS));
+                String stem = file.getName().substring(0, file.getName().length() - 4);
+                PowersConfigFields settings = metadata.get(file.toPath().resolveSibling(stem + ".yml").toAbsolutePath().normalize());
+                if (settings != null && !settings.isEnabled()) continue;
+                var power = loadLuaPower(file.getName(), file, settings == null ? null : settings.getEffect(),
+                        settings == null || settings.getPowerType() == null ? PowerType.MISCELLANEOUS : settings.getPowerType());
+                if (settings != null) {
+                    power.setPowerCooldown(settings.getPowerCooldown());
+                    power.setGlobalCooldown(settings.getGlobalCooldown());
+                }
+                discoveredPowers.put(file.getName(), power);
             } catch (IOException exception) {
                 Logger.warn("Failed to read Lua power file " + file.getName() + ".");
             } catch (Exception exception) {
@@ -66,8 +78,33 @@ public final class LuaPowerManager {
                                                     File file,
                                                     String effect,
                                                     PowerType powerType) throws IOException {
-        String source = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+        String source = readSource(file.toPath().toRealPath(), file.toPath().toRealPath().getParent(), new HashSet<>(), 0);
         return registerLuaPower(registryKey, file, source, effect, powerType).configFields;
+    }
+
+    private static final java.util.regex.Pattern INCLUDE = java.util.regex.Pattern.compile("^\\s*--\\s*@include\\s+(\\S+)\\s*$");
+
+    /** Shared fragments stay editable alongside their power, without enabling Lua filesystem access. */
+    private static String readSource(java.nio.file.Path file, java.nio.file.Path root,
+                                     Set<java.nio.file.Path> active, int depth) throws IOException {
+        file = file.toRealPath();
+        if (!file.startsWith(root) || depth > 16 || !active.add(file))
+            throw new IOException("Invalid or circular Lua include: " + file);
+        try {
+            if (Files.size(file) > 4 * 1024 * 1024) throw new IOException("Lua source is too large: " + file);
+            StringBuilder source = new StringBuilder();
+            for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
+                var include = INCLUDE.matcher(line);
+                if (include.matches())
+                    source.append(readSource(file.getParent().resolve(include.group(1)), root, active, depth + 1));
+                else source.append(line);
+                source.append('\n');
+                if (source.length() > 4 * 1024 * 1024) throw new IOException("Expanded Lua source is too large: " + file);
+            }
+            return source.toString();
+        } finally {
+            active.remove(file);
+        }
     }
 
     /**

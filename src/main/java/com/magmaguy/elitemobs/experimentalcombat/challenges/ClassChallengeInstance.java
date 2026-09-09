@@ -130,7 +130,6 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
         }
         try {
             instructor = new CustomBossEntity(trial.boss());
-            instructor.setNormalizedCombat();
             Location spawn = container.spawnPoint("north");
             if (spawn == null || !container.contains(spawn))
                 throw new IllegalStateException("Trial arena requires an interior north spawn point");

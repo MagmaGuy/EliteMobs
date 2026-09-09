@@ -14,7 +14,10 @@ final class ClassTrialCombat implements AutoCloseable {
 
     ClassTrialCombat(ClassTrialDefinition definition, CustomBossEntity boss, Player player, ArenaContainer arena) {
         this.boss = boss;
-        power = TrialEncounterAssets.require(definition.form().id()).registration().newPower();
+        var encounter = TrialEncounterAssets.require(definition.form().id());
+        power = new LuaElitePower(encounter.power());
+        if (encounter.magicWeapon() != null)
+            boss.getLivingEntity().getEquipment().setItemInMainHand(TrialEquipment.magic(encounter.magicWeapon()));
         power.setOwnerEntity(boss);
         actor = new TrialScriptActor(boss, player, arena, power);
         boss.getLivingEntity().setAI(false);

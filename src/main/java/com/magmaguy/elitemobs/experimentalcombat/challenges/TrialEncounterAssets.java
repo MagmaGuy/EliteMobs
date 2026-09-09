@@ -1,111 +1,70 @@
 package com.magmaguy.elitemobs.experimentalcombat.challenges;
 
-import com.magmaguy.elitemobs.config.powers.PowersConfigFields.PowerType;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.config.powers.LuaPowerConfigFields;
+import com.magmaguy.elitemobs.config.powers.PowersConfig;
 import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
-import com.magmaguy.elitemobs.powers.lua.LuaPowerManager;
 import com.magmaguy.magmacore.util.Logger;
-import org.bukkit.Material;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.configuration.ConfigurationSection;
 
-import java.io.File;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-/** Bundled authored content, validated as one catalog through the existing Lua power loader. */
+/** Indexes class admission metadata on ordinary, disk-loaded custom bosses. No bundled fallback. */
 public final class TrialEncounterAssets {
-    record Encounter(String id, String title, String skin, double healthMultiplier,
-                     Map<EquipmentSlot, Material> equipment, TrialEquipment.Magic magicWeapon, org.bukkit.Color armorColor, String opening, String halfway,
-                     String victory, String defeat, LuaPowerManager.Registration registration) {
-        Encounter { equipment = Map.copyOf(equipment); }
-    }
+    record Encounter(CustomBossesConfigFields boss, LuaPowerConfigFields power, TrialEquipment.Magic magicWeapon,
+                     String opening, String halfway, String victory, String defeat) {}
     private static Map<String, Encounter> loaded = Map.of();
     private TrialEncounterAssets() {}
 
     public static synchronized void initialize() {
-        if (!loaded.isEmpty()) return;
-        try { loadAll(); }
-        catch (RuntimeException failure) { Logger.warn(failure.getMessage()); }
+        Map<String, Encounter> pending = new LinkedHashMap<>();
+        Set<String> claimed = new HashSet<>();
+        for (var boss : CustomBossesConfig.getCustomBosses().values()) {
+            ConfigurationSection config = boss.getFileConfiguration().getConfigurationSection("classTrial");
+            if (config == null) continue;
+            try {
+                String id = required(config, "class");
+                BuiltInClassContent.catalog().require(id);
+                if (!claimed.add(id)) {
+                    pending.remove(id);
+                    throw new IllegalArgumentException("Multiple enabled bosses claim class " + id);
+                }
+                if (!(PowersConfig.getPower(required(config, "power")) instanceof LuaPowerConfigFields power))
+                    throw new IllegalArgumentException("Missing Lua power " + config.getString("power"));
+                if (power.getLuaPowerDefinition().getHooks().stream().noneMatch(hook -> hook.getKey().equals("on_game_tick")))
+                    throw new IllegalArgumentException("Trial power needs an on_game_tick hook");
+                String magic = config.getString("magicWeapon");
+                var actors = config.getConfigurationSection("actors");
+                if (actors != null) for (String key : actors.getKeys(false))
+                    if (CustomBossesConfig.getCustomBoss(actors.getString(key)) == null)
+                        throw new IllegalArgumentException("Missing trial actor " + actors.getString(key));
+                pending.put(id, new Encounter(boss, power, magic == null ? null : TrialEquipment.Magic.valueOf(magic),
+                        required(config, "voice.opening"), required(config, "voice.halfway"),
+                        required(config, "voice.victory"), required(config, "voice.defeat")));
+            } catch (RuntimeException failure) {
+                Logger.warn("Invalid class trial in " + boss.getFile() + ": " + failure.getMessage());
+            }
+        }
+        loaded = Map.copyOf(pending);
+        Logger.info("Loaded " + loaded.size() + " class trials from custom boss YAML files.");
+        List<String> missing = BuiltInClassContent.catalog().forms().stream().map(form -> form.id())
+                .filter(id -> !loaded.containsKey(id)).sorted().toList();
+        if (!missing.isEmpty()) Logger.warn("Missing class-trial content for " + String.join(", ", missing)
+                + ". Install or check the Adventurer's Guild custombosses and powers. These trials are unavailable; no entry fee will be charged.");
     }
 
-    public static synchronized void shutdown() {
-        loaded.values().forEach(encounter -> encounter.registration().close());
-        loaded = Map.of();
-    }
+    public static synchronized void shutdown() { loaded = Map.of(); }
 
     static synchronized Encounter require(String id) {
-        if (loaded.isEmpty()) loadAll();
         Encounter encounter = loaded.get(id);
-        if (encounter == null) throw new IllegalArgumentException("No authored trial for " + id);
+        if (encounter == null) throw new IllegalArgumentException("No enabled custom boss YAML trial for " + id);
         return encounter;
     }
 
-    private static void loadAll() {
-        Map<String, Encounter> pending = new LinkedHashMap<>();
-        List<LuaPowerManager.Registration> registrations = new ArrayList<>();
-        try {
-            String support = text("shared.lua");
-            for (var form : BuiltInClassContent.catalog().forms()) {
-                String id = form.id();
-                String root = BuiltInClassContent.catalog().rootOf(id).id();
-                String metadataPath = "encounters/" + id + ".yml";
-                YamlConfiguration metadata;
-                try (var reader = new InputStreamReader(stream(metadataPath), StandardCharsets.UTF_8)) {
-                    metadata = YamlConfiguration.loadConfiguration(reader);
-                }
-                if (!id.equals(metadata.getString("id"))) throw new IllegalArgumentException("Wrong form ID in " + metadataPath);
-                String skin = required(metadata, "skin");
-                com.magmaguy.elitemobs.config.npcs.ClassTrainerConfig.disguise(skin);
-                Map<EquipmentSlot, Material> equipment = new EnumMap<>(EquipmentSlot.class);
-                var slots = Objects.requireNonNull(metadata.getConfigurationSection("equipment"), metadataPath + " equipment");
-                for (String slot : slots.getKeys(false)) {
-                    Material material = Material.getMaterial(slots.getString(slot, ""));
-                    if (material == null || !material.isItem()) throw new IllegalArgumentException("Invalid equipment " + metadataPath + ": " + slot);
-                    equipment.put(EquipmentSlot.valueOf(slot), material);
-                }
-                if (!equipment.containsKey(EquipmentSlot.HAND)) throw new IllegalArgumentException("Missing weapon in " + metadataPath);
-                String magicName = metadata.getString("magicWeapon");
-                TrialEquipment.Magic magic = magicName == null ? null : TrialEquipment.Magic.valueOf(magicName);
-                org.bukkit.Color armorColor = org.bukkit.Color.fromRGB(Integer.parseInt(required(metadata, "armorColor"), 16));
-                double health = metadata.getDouble("healthMultiplier", 10 + form.band().depth());
-                if (!Double.isFinite(health) || health < 1 || health > 15) throw new IllegalArgumentException("Invalid health in " + metadataPath);
-                String source = support + "\n" + text("mobility/" + root + ".lua")
-                        + "\n" + optionalText("powers/" + root + ".lua") + "\n" + text("encounters/" + id + ".lua");
-                var registration = LuaPowerManager.registerLuaPower("class_trial_" + id + ".lua",
-                        new File("bundled/class_trials/encounters/" + id + ".lua"), source, null, PowerType.UNIQUE);
-                registrations.add(registration);
-                if (!registration.hookKeys().contains("on_game_tick")) throw new IllegalArgumentException("No authored timeline in " + id);
-                pending.put(id, new Encounter(id, required(metadata, "title"), skin, health, equipment, magic, armorColor,
-                        required(metadata, "voice.opening"), required(metadata, "voice.halfway"),
-                        required(metadata, "voice.victory"), required(metadata, "voice.defeat"), registration));
-            }
-            loaded = Map.copyOf(pending);
-            Logger.info("Validated " + loaded.size() + " authored class-trial encounters.");
-        } catch (Exception failure) {
-            registrations.forEach(LuaPowerManager.Registration::close);
-            throw new IllegalStateException("Authored trial content unavailable: " + failure.getMessage(), failure);
-        }
-    }
-
-    private static String required(YamlConfiguration config, String path) {
+    private static String required(ConfigurationSection config, String path) {
         String value = config.getString(path);
-        if (value == null || value.isBlank()) throw new IllegalArgumentException("Missing trial field " + path);
+        if (value == null || value.isBlank()) throw new IllegalArgumentException("Missing classTrial." + path);
         return value;
-    }
-
-    private static java.io.InputStream stream(String path) {
-        return Objects.requireNonNull(TrialEncounterAssets.class.getResourceAsStream("/class_trials/" + path),
-                "Missing authored asset class_trials/" + path);
-    }
-
-    private static String text(String path) throws java.io.IOException {
-        try (var input = stream(path)) { return new String(input.readAllBytes(), StandardCharsets.UTF_8); }
-    }
-
-    private static String optionalText(String path) throws java.io.IOException {
-        try (var input = TrialEncounterAssets.class.getResourceAsStream("/class_trials/" + path)) {
-            return input == null ? "" : new String(input.readAllBytes(), StandardCharsets.UTF_8);
-        }
     }
 }

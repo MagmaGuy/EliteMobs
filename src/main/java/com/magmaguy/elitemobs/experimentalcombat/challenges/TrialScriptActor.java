@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.combatsystem.LevelScaling;
-import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.instanced.arena.ArenaContainer;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.lua.LuaElitePower;
@@ -363,35 +363,18 @@ final class TrialScriptActor extends ScriptableBoss implements Listener {
         Location spawn = location(args.arg(2));
         if (!movement.standing(boss.getLivingEntity(), spawn)) return LuaValue.NIL;
         double healthHits = bounded(args.optdouble(3, 3), .5, 8);
-        boolean prop = args.optjstring(5, "HUSK").equals("ARMOR_STAND");
-        // The visible stand uses an ordinary living damage carrier, so its authored hit budget
-        // does not depend on vanilla armor stands' special break-on-attack behavior.
-        EntityType type = prop ? EntityType.HUSK : EntityType.valueOf(args.optjstring(5, "HUSK"));
-        if (!Set.of(EntityType.HUSK, EntityType.SKELETON, EntityType.WOLF, EntityType.IRON_GOLEM, EntityType.WITHER_SKELETON,
-                EntityType.BLAZE, EntityType.VEX).contains(type))
-            throw new IllegalArgumentException("Unsupported trial actor type " + type);
-        var fields = new CustomBossesConfigFields("trial_actor_" + id + ".yml", type, true,
-                args.optjstring(4, "&fSparring partner"), Integer.toString(boss.getLevel()));
-        fields.setHealthMultiplier(healthHits / LevelScaling.TARGET_HITS_TO_KILL_MOB);
-        fields.setNormalizedCombat(true);
-        fields.setDamageMultiplier(1);
-        fields.setAi(false);
-        fields.setDropsEliteMobsLoot(false);
-        fields.setDropsVanillaLoot(false);
-        fields.setDropsRandomLoot(false);
-        fields.setDropsSkillXP(false);
-        fields.setClassLoot(false);
-        fields.setPowers(List.of());
-        fields.setUniqueLootList(List.of());
-        if (TrialPoses.available()) {
-            if (prop) fields.setDisguise("ARMOR_STAND");
-            else if (type == EntityType.HUSK) fields.setDisguise(boss.getCustomBossesConfigFields().getDisguise());
-        }
+        String template = boss.getCustomBossesConfigFields().getFileConfiguration()
+                .getString("classTrial.actors." + args.optjstring(5, "HUSK"));
+        var fields = CustomBossesConfig.getCustomBoss(template);
+        if (fields == null) throw new IllegalArgumentException("Missing configured trial actor: " + template);
+        boolean prop = fields.getFileConfiguration().getBoolean("trialActor.prop");
         CustomBossEntity actor = new CustomBossEntity(fields);
+        // Hit budgets and names are authored by the Lua mechanic, applied to this spawn only.
+        actor.setHealthMultiplier(fields.getHealthMultiplier() * healthHits / LevelScaling.TARGET_HITS_TO_KILL_MOB);
         actor.setSummoningEntity(boss);
-        actor.setNormalizedCombat();
-        actor.spawn(spawn, true);
+        actor.spawn(spawn, boss.getLevel(), true);
         if (!actor.exists()) return LuaValue.NIL;
+        actor.setName(ChatColorConverter.convert(args.optjstring(4, fields.getName())), true);
         if (!movement.standing(actor.getLivingEntity(), spawn)) { actor.remove(RemovalReason.EFFECT_TIMEOUT); return LuaValue.NIL; }
         actors.put(id, actor);
         actor.getLivingEntity().setAI(false);
