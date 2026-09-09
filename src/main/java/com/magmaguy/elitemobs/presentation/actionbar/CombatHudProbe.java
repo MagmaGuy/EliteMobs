@@ -42,6 +42,7 @@ public final class CombatHudProbe {
                 resource == null ? 0 : resource.maximum(), 63, true, animationFrame);
         bar(line, 5, '\uE980', player.getExp(), 1, 180, false, animationFrame);
         classDiamond(line, player, animationFrame, active);
+        if (active) abilityIcons(line, player);
         // All overlays return to the panel origin. Keep the total advance at 190 GUI pixels.
         return line.append(spacing(190 - x)).toString();
     }
@@ -52,6 +53,16 @@ public final class CombatHudProbe {
         component.setColor(net.md_5.bungee.api.ChatColor.WHITE);
         component.setShadowColor(new Color(0, true));
         return component;
+    }
+
+    private static void abilityIcons(StringBuilder line, Player player) {
+        ExperimentalCombatModule.activeClassLineageSnapshot(player.getUniqueId()).ifPresent(lineage -> {
+            var abilities = java.util.List.of(lineage.signature(), lineage.utility(), lineage.mobility());
+            for (int index = 0; index < abilities.size(); index++) {
+                String glyph = CombatHudAbilityIcons.glyph(abilities.get(index).id());
+                if (!glyph.isEmpty()) overlay(line, 7 + index * 61, glyph, 14);
+            }
+        });
     }
 
     private static String spacing(int pixels) {

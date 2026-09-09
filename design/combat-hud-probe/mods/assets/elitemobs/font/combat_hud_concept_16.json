@@ -126,6 +126,141 @@
     },
     {
       "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/paladin.mobility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/paladin.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/paladin.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/berserker.mobility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/berserker.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/berserker.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/ranger.mobility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/ranger.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/ranger.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/cleric.mobility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/cleric.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/cleric.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/spellcaster.mobility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/spellcaster.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/spellcaster.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_diamond.png",
       "height": 42,
       "ascent": 1,

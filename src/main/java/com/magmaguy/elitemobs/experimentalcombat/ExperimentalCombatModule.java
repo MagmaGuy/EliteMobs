@@ -268,6 +268,13 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         return catalog;
     }
 
+    /** The same effective lineage used for activation, including an instance's locked class. */
+    public static Optional<ClassLineage> activeClassLineageSnapshot(UUID playerId) {
+        return instance == null ? Optional.empty() : instance.progression.snapshot(playerId)
+                .flatMap(ProfileSnapshot::optionalActiveLineage)
+                .map(active -> instance.catalog.lineageOf(active.activeFormId()));
+    }
+
     public Optional<ProfileSnapshot> profile(UUID playerId) {
         return progression.snapshot(playerId);
     }
