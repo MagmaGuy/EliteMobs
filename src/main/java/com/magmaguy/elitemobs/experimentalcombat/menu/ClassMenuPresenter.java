@@ -21,9 +21,13 @@ final class ClassMenuPresenter {
         String activeClass = activeForm == null
                 ? "&7None"
                 : ClassMenuStyle.themed(activeForm, activeForm.displayName());
-        List<String> body = List.of(
-                ClassMenuStyle.section(ClassMenuStyle.GOLD, "Active class:")
-                        + " " + activeClass);
+        List<String> body = new ArrayList<>();
+        body.add(ClassMenuStyle.section(ClassMenuStyle.GOLD, "Active class:") + " " + activeClass);
+        for (ClassMenuView.FormView root : view.roots()) {
+            if (root.band() == com.magmaguy.elitemobs.experimentalcombat.classes.ClassBand.STARTER)
+                body.add("&7Start as " + root.displayName() + ". Reach level " + root.band().effectiveEnd()
+                        + " to challenge the other class instructors.");
+        }
 
         List<ClassMenuPresentation.ActionView> actions = new ArrayList<>();
         for (ClassMenuView.FormView root : view.roots()) {
@@ -86,7 +90,7 @@ final class ClassMenuPresenter {
         }
 
         List<ClassMenuPresentation.ActionView> actions = new ArrayList<>();
-        if (form.parentId() != null) {
+        if (form.parentId() != null && (showAllClasses || !form.band().isRoot())) {
             ClassMenuView.FormView parent = view.requireForm(form.parentId());
             actions.add(new ClassMenuPresentation.ActionView(
                     ClassMenuPresentation.ActionKind.PARENT,
@@ -97,7 +101,9 @@ final class ClassMenuPresenter {
         }
         for (ClassMenuView.FormLink childLink : form.children()) {
             ClassMenuView.FormView child = view.requireForm(childLink.id());
-            actions.add(formAction(child, ClassMenuPresentation.ActionKind.FORM, showAllClasses));
+            // Crossing into another kit shows its public preview, not this trainer's trial enrollment.
+            actions.add(formAction(child, ClassMenuPresentation.ActionKind.FORM,
+                    showAllClasses || child.band().isRoot()));
         }
         if (form.unlocked() && !form.selected() && !view.runLocked()) {
             actions.add(new ClassMenuPresentation.ActionView(

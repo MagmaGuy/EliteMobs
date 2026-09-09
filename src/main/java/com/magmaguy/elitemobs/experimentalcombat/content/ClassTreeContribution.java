@@ -14,8 +14,9 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * One self-contained class tree contribution: player-facing forms, executable abilities,
- * passive mechanics and its resource economy. Future roots register one contribution.
+ * One combat kit contribution: player-facing forms, executable abilities,
+ * passive mechanics and its resource economy. The root may have an external starter
+ * prerequisite, which the assembled catalog validates across contributions.
  */
 public record ClassTreeContribution(
         String rootId,

@@ -25,7 +25,7 @@ final class BuiltInClassDefinitions {
                 new RootClassKit(ClassResourceType.STAMINA,
                         ability("adventurer", AbilitySlot.MOBILITY, "Dodge", "Dash a short distance along your aim.")),
                 ability("adventurer", AbilitySlot.SIGNATURE, "Quick Strike", "Strike one foe within melee reach."),
-                ability("adventurer", AbilitySlot.UTILITY, "Second Wind", "Recover a little health."),
+                ability("adventurer", AbilitySlot.UTILITY, "Second Wind", "Recover a little of your own health."),
                 new PassiveDefinition("adventurer.passive", "Take 5% less damage. Practice with any weapon."),
                 java.util.Arrays.stream(SkillType.values()).filter(skill -> skill != SkillType.ARMOR).toList()));
     }
@@ -391,7 +391,7 @@ final class BuiltInClassDefinitions {
                 new RootClassKit(resourceType, ability(id, AbilitySlot.MOBILITY, mobilityName, mobilityDescription)),
                 ability(id, AbilitySlot.SIGNATURE, signatureName, signatureDescription),
                 ability(id, AbilitySlot.UTILITY, utilityName, utilityDescription),
-                new PassiveDefinition(id + ".passive", passiveDescription));
+                new PassiveDefinition(id + ".passive", passiveDescription)).afterStarter("adventurer");
     }
 
     private static ClassFormDefinition form(

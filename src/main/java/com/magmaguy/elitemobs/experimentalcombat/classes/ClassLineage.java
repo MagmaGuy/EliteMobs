@@ -19,9 +19,11 @@ public record ClassLineage(List<ClassFormDefinition> forms) {
 
         for (int index = 0; index < forms.size(); index++) {
             ClassFormDefinition form = forms.get(index);
-            if (form.band().depth() != index)
+            if (form.band().depth() != forms.getFirst().band().depth() + index)
                 throw new IllegalArgumentException("Lineage skips class band at " + form.id());
             if (index == 0) continue;
+            if (form.rootKit() != null)
+                throw new IllegalArgumentException("Combat lineage crosses into another root kit at " + form.id());
             ClassFormDefinition parent = forms.get(index - 1);
             if (!form.parentId().equals(parent.id()))
                 throw new IllegalArgumentException(form.id() + " is not a child of " + parent.id());

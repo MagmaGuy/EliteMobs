@@ -9,7 +9,8 @@ import java.util.function.ToIntFunction;
 import java.util.regex.Pattern;
 
 /**
- * Immutable definition for either a root class or one specialization form.
+ * Immutable class form. parentId defines progression prerequisites; a non-null
+ * rootKit starts a new combat kit rather than inheriting the parent's mechanics.
  */
 public record ClassFormDefinition(
         String id,
@@ -39,7 +40,9 @@ public record ClassFormDefinition(
             throw new IllegalArgumentException("Weapon affinities require distinct weapon skills");
 
         if (band.isRoot()) {
-            if (parentId != null) throw new IllegalArgumentException("Root form " + id + " must not have a parent");
+            if (band == ClassBand.STARTER && parentId != null)
+                throw new IllegalArgumentException("Starter form " + id + " must not have a parent");
+            if (parentId != null) parentId = requireId(parentId);
             rootKit = Objects.requireNonNull(rootKit, "rootKit");
         } else {
             parentId = requireId(parentId);
@@ -77,6 +80,14 @@ public record ClassFormDefinition(
     public ClassFormDefinition withWeaponAffinities(SkillType... weapons) {
         return new ClassFormDefinition(id, displayName, band, parentId, foundationSkills, rootKit,
                 signature, utility, passive, List.of(weapons));
+    }
+
+    /** A resource-owning root can branch from a starter without inheriting its combat kit. */
+    public ClassFormDefinition afterStarter(String starterId) {
+        if (band != ClassBand.ROOT)
+            throw new IllegalArgumentException("Only root classes can branch from a starter");
+        return new ClassFormDefinition(id, displayName, band, requireId(starterId), foundationSkills,
+                rootKit, signature, utility, passive, weaponAffinities);
     }
 
     private static List<SkillType> foundationWeapons(FoundationSkillPair skills) {

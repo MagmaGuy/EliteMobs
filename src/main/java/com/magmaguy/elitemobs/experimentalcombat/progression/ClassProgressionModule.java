@@ -492,8 +492,8 @@ public final class ClassProgressionModule {
                         ClassProgressionSetResult.Status.NOT_READY,
                         formId, effectiveLevel, null, 0, List.of(), null);
             Map<SkillType, Integer> levels = captureFoundationLevels(playerId);
-            ClassLineage lineage = catalog.lineageOf(formId);
-            for (ClassFormDefinition lineageForm : lineage.forms()) {
+            List<ClassFormDefinition> progressionPath = catalog.progressionPathOf(formId);
+            for (ClassFormDefinition lineageForm : progressionPath) {
                 int neededLevel = lineageForm.id().equals(formId)
                         ? effectiveLevel
                         : lineageForm.band().effectiveEnd();
@@ -510,7 +510,7 @@ public final class ClassProgressionModule {
             }
 
             List<StoredClassProgress> persistedRows = new ArrayList<>();
-            for (ClassFormDefinition lineageForm : lineage.forms()) {
+            for (ClassFormDefinition lineageForm : progressionPath) {
                 int visibleLevel = lineageForm.id().equals(formId)
                         ? effectiveLevel
                         : lineageForm.band().effectiveEnd();
@@ -560,7 +560,8 @@ public final class ClassProgressionModule {
             Set<String> forgotten = new HashSet<>();
             List<StoredClassProgress> rows = new ArrayList<>();
             for (ClassFormDefinition form : catalog.forms()) {
-                if (!catalog.lineageOf(form.id()).formIds().contains(formId)) continue;
+                if (catalog.progressionPathOf(form.id()).stream().noneMatch(ancestor -> ancestor.id().equals(formId)))
+                    continue;
                 forgotten.add(form.id());
                 state.progressXp.put(form.id(), 0L);
                 state.challenges.remove(form.id());
@@ -883,7 +884,7 @@ public final class ClassProgressionModule {
                         form.id(), skillType, currentLevel, requiredFoundationLevel));
         }
 
-        if (!form.band().isRoot()) {
+        if (form.parentId() != null) {
             ClassFormDefinition parent = catalog.require(form.parentId());
             blockers.addAll(unlockBlockers(parent, progressXp, challenges, levels, memo));
             long parentXpAtCap = xpAtLocalCap(parent, parent.localProgressionCap(levels::get));

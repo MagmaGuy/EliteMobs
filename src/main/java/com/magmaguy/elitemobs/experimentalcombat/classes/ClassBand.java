@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * A form's position in the fixed 30-level branching cadence.
+ * A form's position in progression: an introductory ten-level starter followed
+ * by the established 30-level cadence within each main class kit.
  *
  * <p>The final band intentionally has no hard upper bound. Level 100 is a soft cap,
  * matching foundation skills, rather than a terminal progression limit.</p>
@@ -14,7 +15,7 @@ public enum ClassBand {
     LEVEL_31(1, 31, 60, 31),
     LEVEL_61(2, 61, 90, 61),
     LEVEL_91(3, 91, Integer.MAX_VALUE, 91),
-    STARTER(0, 1, 30, 1);
+    STARTER(-1, 1, 10, 1);
 
     private final int depth;
     private final int effectiveStart;
@@ -49,7 +50,7 @@ public enum ClassBand {
     }
 
     public boolean isTerminal() {
-        return this == LEVEL_91 || this == STARTER;
+        return this == LEVEL_91;
     }
 
     public boolean containsEffectiveLevel(int effectiveLevel) {

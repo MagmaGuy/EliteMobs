@@ -72,10 +72,8 @@ public final class ClassCatalog {
         forms.keySet().forEach(id -> mutableChildren.put(id, new ArrayList<>()));
         List<ClassFormDefinition> roots = new ArrayList<>();
         for (ClassFormDefinition form : forms.values()) {
-            if (form.band().isRoot()) {
-                roots.add(form);
-                continue;
-            }
+            if (form.band().isRoot()) roots.add(form);
+            if (form.parentId() == null) continue;
 
             ClassFormDefinition parent = forms.get(form.parentId());
             if (parent == null)
@@ -109,6 +107,7 @@ public final class ClassCatalog {
         return retiredFormIds;
     }
 
+    /** Roots of combat kits, including the starter. Progression can connect these kits. */
     public List<ClassFormDefinition> roots() {
         return roots;
     }
@@ -130,6 +129,16 @@ public final class ClassCatalog {
     }
 
     public ClassLineage lineageOf(String formId) {
+        List<ClassFormDefinition> path = progressionPathOf(formId);
+        // A new root replaces the starter kit rather than inheriting its resource or passives.
+        for (int index = path.size() - 1; index >= 0; index--)
+            if (path.get(index).rootKit() != null)
+                return new ClassLineage(path.subList(index, path.size()));
+        throw new IllegalStateException("Class has no combat kit: " + formId);
+    }
+
+    /** Full prerequisite path, including the starter before a resource-owning root class. */
+    public List<ClassFormDefinition> progressionPathOf(String formId) {
         ClassFormDefinition current = require(formId);
         List<ClassFormDefinition> reversed = new ArrayList<>();
         Set<String> visited = new HashSet<>();
@@ -138,7 +147,7 @@ public final class ClassCatalog {
             reversed.add(current);
             current = current.parentId() == null ? null : require(current.parentId());
         }
-        return new ClassLineage(reversed.reversed());
+        return List.copyOf(reversed.reversed());
     }
 
     public ClassFormDefinition rootOf(String formId) {
@@ -176,6 +185,11 @@ public final class ClassCatalog {
 
         for (ClassFormDefinition form : forms.values()) {
             int childCount = children.get(form.id()).size();
+            if (form.band() == ClassBand.STARTER) {
+                if (childCount == 0)
+                    throw new IllegalArgumentException("Starter " + form.id() + " must lead to a root class");
+                continue;
+            }
             int expectedChildren = form.band().isTerminal() ? 0 : 2;
             if (childCount != expectedChildren)
                 throw new IllegalArgumentException(form.id() + " requires exactly " + expectedChildren
@@ -183,7 +197,8 @@ public final class ClassCatalog {
         }
 
         Set<String> reachable = new HashSet<>();
-        for (ClassFormDefinition root : roots) collectReachable(root, children, reachable);
+        for (ClassFormDefinition root : roots)
+            if (root.parentId() == null) collectReachable(root, children, reachable);
         if (reachable.size() != forms.size())
             throw new IllegalArgumentException("Every class form must be reachable from exactly one root");
     }

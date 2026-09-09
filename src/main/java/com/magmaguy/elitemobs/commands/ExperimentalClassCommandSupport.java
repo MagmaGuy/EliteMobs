@@ -76,7 +76,7 @@ final class ExperimentalClassCommandSupport {
         FormProgressSnapshot progress = profile.forms().get(form.id());
         ClassLineage lineage = catalog.lineageOf(form.id());
         send(player, "&6&l" + form.displayName() + " &8(&7" + form.id() + "&8)");
-        send(player, "&7Branch: &f" + String.join(" &8> &f", lineage.forms().stream()
+        send(player, "&7Branch: &f" + String.join(" &8> &f", catalog.progressionPathOf(form.id()).stream()
                 .map(ClassFormDefinition::displayName).toList()));
         if (progress.unlocked())
             send(player, "&7Level: &f" + progress.effectiveLevel() + " &8(local " + progress.localLevel()
