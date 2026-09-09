@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-/** Immutable mapping generated alongside the HUD font providers and 64px artwork. */
+/** Immutable mapping generated alongside the HUD font providers and ability artwork. */
 final class CombatHudAbilityIcons {
     private static final Map<String, Character> GLYPHS = load();
 
