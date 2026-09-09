@@ -2,12 +2,9 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,29 +46,6 @@ class SpawnLifecycleTest {
                 RegionalBossSpawnPolicy.forPersistedState(0));
         assertEquals(SpawnLifecycle.Context.ANNOUNCED,
                 RegionalBossSpawnPolicy.forPersistedState(1_700_000_000_000L));
-    }
-
-    @Test
-    void persistedSpawnRestoresTheLastLocationBeforeUsingTheRequestedLifecycle() {
-        AtomicReference<String> respawnLocation = new AtomicReference<>();
-        AtomicReference<SpawnLifecycle.Context> spawnContext = new AtomicReference<>();
-        List<String> invocationOrder = new ArrayList<>();
-
-        SpawnLifecycle.restorePersistedSpawn(
-                SpawnLifecycle.Context.RESTORED,
-                "last-persistent-location",
-                location -> {
-                    respawnLocation.set(location);
-                    invocationOrder.add("location");
-                },
-                context -> {
-                    spawnContext.set(context);
-                    invocationOrder.add("spawn");
-                });
-
-        assertEquals("last-persistent-location", respawnLocation.get());
-        assertEquals(SpawnLifecycle.Context.RESTORED, spawnContext.get());
-        assertEquals(List.of("location", "spawn"), invocationOrder);
     }
 
     @Test

@@ -26,40 +26,6 @@ final class ExperimentalClassCommandSupport {
         return false;
     }
 
-    static void showOverview(Player player) {
-        if (!requireModule(player)) return;
-        ProfileSnapshot profile = ExperimentalCombatModule.get().profile(player.getUniqueId()).orElse(null);
-        if (profile == null) {
-            send(player, "&eYour class profile is still loading. Try again in a moment.");
-            return;
-        }
-        send(player, "&6&lExperimental Combat Classes");
-        send(player, "&7Classes are experimental. Please test them and send honest feedback to the developer.");
-        if (profile.activeLineage() == null) {
-            send(player, "&7Active: &fNone");
-        } else {
-            ClassFormDefinition active = catalog()
-                    .require(profile.activeLineage().activeFormId());
-            send(player, "&7Active: &b" + active.displayName() + " &f"
-                    + profile.activeLineage().activeEffectiveLevel()
-                    + (profile.lockedRunSelection() == null ? "" : " &c(run locked)"));
-        }
-        send(player, "&7Controls: &fF,F &7Mobility | &fF+LMB &7Signature | &fF+RMB &7Utility");
-        send(player, "&7Root classes:");
-        for (ClassFormDefinition root : catalog().roots()) {
-            FormProgressSnapshot progress = profile.forms().get(root.id());
-            String state = progress.unlocked()
-                    ? "&aunlocked, level " + progress.effectiveLevel() + "/" + progress.effectiveCap()
-                    : "&clocked";
-            send(player, "  &f" + root.displayName() + " &8(&7" + root.id() + "&8) - " + state);
-        }
-        send(player, "&e/em class info <class> &7details &8| &e/em class select <class> &7select");
-        if (player.hasPermission("elitemobs.experimentalcombat.admin")) {
-            send(player, "&dTester admin: &f/em class test set <player> <class> <effectiveLevel>");
-            send(player, "&dForget a branch: &f/em class test forget <player> <class>");
-        }
-    }
-
     static void showForm(Player player, String formId) {
         if (!requireModule(player)) return;
         ClassCatalog catalog = catalog();
