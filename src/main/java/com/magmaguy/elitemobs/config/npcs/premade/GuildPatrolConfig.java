@@ -24,7 +24,7 @@ public final class GuildPatrolConfig extends NPCsConfigFields {
     public void processConfigFields() {
         processBoolean("patrol.enabled", true, false, true);
         processString("patrol.mode", PatrolMode.LOOP.name(), null, true);
-        processDouble("patrol.speed", 1D, 1D, true);
+        processDouble("patrol.speed", 0.5D, 0.5D, true);
         processStringList("patrol.nodes", List.of(
                 "0,0,0",
                 "0.126,0,12.284",
