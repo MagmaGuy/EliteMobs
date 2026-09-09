@@ -255,7 +255,7 @@ public final class ActionBarCompositor implements Listener {
 
     private static void render(Player player, PlayerState state) {
         if (state.hudProbe != null) {
-            String text = state.hudProbe.text(ExperimentalCombatModule.isAbilityGestureOpen(player.getUniqueId()));
+            String text = state.hudProbe.text(player, ExperimentalCombatModule.isAbilityGestureOpen(player.getUniqueId()));
             if (!state.hasRenderedMessage || state.lastEncoding != Encoding.HUD_PROBE
                     || !text.equals(state.lastMessage)
                     || currentTick - state.lastSentAtTick >= KEEPALIVE_INTERVAL_TICKS) {

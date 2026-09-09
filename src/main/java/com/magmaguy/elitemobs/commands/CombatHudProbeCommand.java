@@ -42,7 +42,7 @@ public final class CombatHudProbeCommand extends AdvancedCommand {
             ActionBarCompositor.setHudProbe(player, probe);
             data.getCommandSender().sendMessage(show
                     ? "HUD probe enabled: 190x60 GUI pixels. Positive x moves right; positive y moves down. "
-                      + "Gray is idle; red follows the F ability window. Requires an active class and enabled skill controls. "
+                      + "Wood/brass HUD with live vitals; skill cards follow the F ability window. Requires enabled skill controls. "
                       + "The probe ends on logout or /em hudprobe off " + player.getName()
                     : "HUD probe disabled for " + player.getName() + ".");
         } catch (IllegalArgumentException exception) {

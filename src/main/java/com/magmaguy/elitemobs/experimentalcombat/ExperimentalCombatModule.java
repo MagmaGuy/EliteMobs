@@ -248,6 +248,11 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         return instance != null && instance.inputRouter != null && instance.inputRouter.isGestureOpen(playerId);
     }
 
+    /** Read-only presentation snapshot; callers never receive the mutable resource controller. */
+    public static Optional<ClassResourceController.Snapshot> resourceSnapshot(UUID playerId) {
+        return instance == null ? Optional.empty() : instance.resources.snapshot(playerId);
+    }
+
     public static void shutdownIfInitialized() {
         if (instance != null) instance.close();
     }
