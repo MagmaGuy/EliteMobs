@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.dungeons.WorldPackage;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.magmacore.util.Logger;
-import com.magmaguy.magmacore.util.TemporaryWorldManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -42,9 +41,8 @@ public class DungeonUtils {
     }
 
     public static World loadWorld(String worldName, World.Environment environment, ContentPackagesConfigFields contentPackagesConfigFields) {
-        World world = TemporaryWorldManager.loadVoidTemporaryWorld(worldName, environment);
+        World world = EliteMobsWorld.loadWorld(worldName, environment, contentPackagesConfigFields);
         if (world != null) {
-            EliteMobsWorld.create(world.getUID(), contentPackagesConfigFields);
             //Persistent objects that were parsed while this world was unloaded are filed under its name and are only
             //drained by WorldLoadEvent. TemporaryWorldManager returns an already-loaded world without firing that
             //event, which leaves the handlers stranded, so drain explicitly. The drain is idempotent: handlers that

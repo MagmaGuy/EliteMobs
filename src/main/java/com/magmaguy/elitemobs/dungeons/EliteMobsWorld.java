@@ -5,27 +5,25 @@ import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.magmacore.instance.InstanceProtector;
 import com.magmaguy.magmacore.instance.WorldProtectionRules;
+import com.magmaguy.magmacore.util.TemporaryWorldManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
- * Façade over MagmaCore's {@link InstanceProtector} that keeps EliteMobs'
- * existing per-world config (ContentPackagesConfigFields) accessible while
- * delegating actual event handling to the shared MagmaCore listener.
- *
- * Behaviorally identical to the pre-move implementation; the difference is
- * that the protection event handlers now live in
- * {@code com.magmaguy.magmacore.instance.InstanceProtector} and the same
- * suite can be applied to non-EliteMobs worlds via that API.
+ * Tracks dungeon-world ownership independently of protection settings and
+ * delegates enabled protection rules to MagmaCore's {@link InstanceProtector}.
  */
 public class EliteMobsWorld {
 
     private static final HashMap<UUID, EliteMobsWorld> eliteMobsWorlds = new HashMap<>();
+    private static final Set<String> loadingWorlds = new HashSet<>();
 
     @Getter
     private final ContentPackagesConfigFields contentPackagesConfigFields;
@@ -36,9 +34,9 @@ public class EliteMobsWorld {
         this.contentPackagesConfigFields = contentPackagesConfigFields;
         this.allowExplosions = contentPackagesConfigFields.isAllowExplosions();
 
-        if (!contentPackagesConfigFields.isProtect()) return;
-
         eliteMobsWorlds.put(worldUUID, this);
+
+        if (!contentPackagesConfigFields.isProtect()) return;
 
         World world = Bukkit.getWorld(worldUUID);
         if (world == null) return;
@@ -68,7 +66,23 @@ public class EliteMobsWorld {
     }
 
     public static boolean isEliteMobsWorld(UUID worldUUID) {
-        return eliteMobsWorlds.containsKey(worldUUID);
+        if (eliteMobsWorlds.containsKey(worldUUID)) return true;
+        World world = Bukkit.getWorld(worldUUID);
+        return world != null && loadingWorlds.contains(world.getName());
+    }
+
+    /** Registers ownership before Bukkit's synchronous world-load listeners query it. */
+    public static World loadWorld(String worldName, World.Environment environment,
+                                  ContentPackagesConfigFields fields) {
+        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Dungeon worlds must load on the server thread");
+        boolean added = loadingWorlds.add(worldName);
+        try {
+            World world = TemporaryWorldManager.loadVoidTemporaryWorld(worldName, environment);
+            if (world != null) create(world.getUID(), fields);
+            return world;
+        } finally {
+            if (added) loadingWorlds.remove(worldName);
+        }
     }
 
     public static void create(UUID worldUUID, ContentPackagesConfigFields contentPackagesConfigFields) {
