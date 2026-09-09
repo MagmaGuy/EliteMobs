@@ -4,6 +4,8 @@ import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.SoundsConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestsConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
@@ -306,11 +308,18 @@ public class TreasureChest implements PersistentObject {
             }
             weighedValues.put(filename, weight);
         }
-        CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(WeightedProbability.pickWeighedProbability(weighedValues));
-        if (customBossEntity == null) {
+        String filename = WeightedProbability.pickWeighedProbability(weighedValues);
+        CustomBossesConfigFields fields = CustomBossesConfig.getCustomBoss(filename);
+        if (fields == null) {
             Logger.warn("Failed to spawn mimic for treasure chest " + customTreasureChestConfigFields.getFilename() + ": custom boss config was not found.");
             return;
         }
+
+        DungeonInstance dungeonInstance = getDungeonInstance(player);
+        CustomBossEntity customBossEntity = dungeonInstance == null
+                ? CustomBossEntity.createCustomBossEntity(filename)
+                : dungeonInstance.createEncounterBoss(fields, location);
+        if (customBossEntity == null) return;
 
         Integer dynamicDungeonLevel = getDynamicDungeonLevel(player);
         if (customBossEntity.getCustomBossesConfigFields().getLevel() == -1) {
@@ -361,21 +370,20 @@ public class TreasureChest implements PersistentObject {
     }
 
     private Integer getDynamicDungeonLevel(Player player) {
-        if (player != null) {
-            MatchInstance matchInstance = PlayerData.getMatchInstance(player);
-            if (matchInstance instanceof DynamicDungeonInstance dynamicDungeonInstance)
-                return dynamicDungeonInstance.getSelectedLevel();
-        }
-        // Fallback for edge cases where player data isn't available yet.
-        return getDynamicDungeonLevelByWorld();
+        DungeonInstance dungeonInstance = getDungeonInstance(player);
+        return dungeonInstance instanceof DynamicDungeonInstance dynamic ? dynamic.getSelectedLevel() : null;
     }
 
-    private Integer getDynamicDungeonLevelByWorld() {
+    private DungeonInstance getDungeonInstance(Player player) {
         if (location == null || location.getWorld() == null) return null;
+        if (player != null) {
+            MatchInstance matchInstance = PlayerData.getMatchInstance(player);
+            if (matchInstance instanceof DungeonInstance dungeonInstance
+                    && location.getWorld().equals(dungeonInstance.getWorld())) return dungeonInstance;
+        }
+        // Fallback for edge cases where player data isn't available yet.
         for (DungeonInstance dungeonInstance : DungeonInstance.getDungeonInstances()) {
-            if (!(dungeonInstance instanceof DynamicDungeonInstance dynamicDungeonInstance)) continue;
-            if (dungeonInstance.getWorld() == null) continue;
-            if (dungeonInstance.getWorld().equals(location.getWorld())) return dynamicDungeonInstance.getSelectedLevel();
+            if (location.getWorld().equals(dungeonInstance.getWorld())) return dungeonInstance;
         }
         return null;
     }

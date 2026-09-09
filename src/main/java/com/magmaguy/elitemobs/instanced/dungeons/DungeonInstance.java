@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.api.WorldUninstanceEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.PartyConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
@@ -79,6 +80,15 @@ public class DungeonInstance extends MatchInstance {
     private BukkitTask initializeEntitiesTask = null;
     private BukkitTask destroyMatchTask = null;
     private BukkitTask removeInstanceTask = null;
+
+    /** Creates a one-life encounter mob owned and cleaned up by this dungeon. */
+    public InstancedBossEntity createEncounterBoss(CustomBossesConfigFields fields, Location location) {
+        if (instanceRemovalScheduled || instancedBossEntitiesRemoved || world == null
+                || location == null || !world.equals(location.getWorld())) return null;
+        InstancedBossEntity boss = new InstancedBossEntity(fields, location.clone(), this);
+        instancedBossEntities.add(boss);
+        return boss;
+    }
 
     public DungeonInstance(ContentPackagesConfigFields contentPackagesConfigFields,
                            Location lobbyLocation,
