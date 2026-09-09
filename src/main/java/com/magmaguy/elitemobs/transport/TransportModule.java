@@ -143,8 +143,10 @@ public final class TransportModule implements Listener, AutoCloseable {
                     finish(j, j.status == RouteFlight.Status.ARRIVED,
                             j.status == RouteFlight.Status.ARRIVED ? "Arrived at " + j.route.name() + "." : "The route became obstructed.");
                 }
-            } catch (Exception failure) {
-                plugin.getLogger().warning("Transport " + j.route.id() + ": " + failure);
+            } catch (Exception | LinkageError failure) {
+                // An incompatible native adapter must terminate this journey, not retry boarding
+                // every tick while leaving the recovery journal and terrain lease alive.
+                plugin.getLogger().log(java.util.logging.Level.WARNING, "Transport " + j.route.id() + " failed", failure);
                 finish(j, false, "Travel could not continue safely.");
             }
         }
