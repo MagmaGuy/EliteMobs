@@ -69,6 +69,27 @@
       "chars": [
         ""
       ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/class_level.png",
+      "height": 16,
+      "ascent": -6,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/class_diamond.png",
+      "height": 32,
+      "ascent": 7,
+      "chars": [
+        "",
+        "",
+        "",
+        "\u0000\u0000\u0000"
+      ]
     }
   ]
 }

@@ -50,6 +50,7 @@ import com.magmaguy.elitemobs.experimentalcombat.progression.ClassProgressionFor
 import com.magmaguy.elitemobs.experimentalcombat.progression.InputProfile;
 import com.magmaguy.elitemobs.experimentalcombat.progression.FoundationLevelSnapshot;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ProfileSnapshot;
+import com.magmaguy.elitemobs.experimentalcombat.progression.FormProgressSnapshot;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ProgressionReadiness;
 import com.magmaguy.elitemobs.experimentalcombat.progression.ProgressionCapReason;
 import com.magmaguy.elitemobs.experimentalcombat.progression.RunLockResult;
@@ -251,6 +252,12 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     /** Read-only presentation snapshot; callers never receive the mutable resource controller. */
     public static Optional<ClassResourceController.Snapshot> resourceSnapshot(UUID playerId) {
         return instance == null ? Optional.empty() : instance.resources.snapshot(playerId);
+    }
+
+    /** Active form, including the selection locked for an instance run. */
+    public static Optional<FormProgressSnapshot> classProgressSnapshot(UUID playerId) {
+        return instance == null ? Optional.empty() : instance.profile(playerId)
+                .flatMap(profile -> profile.activeFormId().map(profile.forms()::get));
     }
 
     public static void shutdownIfInitialized() {

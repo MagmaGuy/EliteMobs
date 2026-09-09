@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.presentation.actionbar;
 
 import net.md_5.bungee.api.chat.TextComponent;
 import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
+import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
@@ -40,6 +41,7 @@ public final class CombatHudProbe {
         bar(line, 102, '\uE111', resource == null ? 0 : resource.amount(),
                 resource == null ? 0 : resource.maximum(), 63, true);
         bar(line, 5, '\uE112', player.getExp(), 1, 180, false);
+        classDiamond(line, player);
         // All overlays return to the panel origin. Keep the total advance at 190 GUI pixels.
         return line.append(spacing(190 - x)).toString();
     }
@@ -76,6 +78,24 @@ public final class CombatHudProbe {
         StringBuilder result = new StringBuilder();
         for (char character : text.toCharArray()) result.append((char) (0xE200 + ALPHABET.indexOf(character)));
         return result.toString();
+    }
+
+    private static void classDiamond(StringBuilder line, Player player) {
+        var progress = ExperimentalCombatModule.classProgressSnapshot(player.getUniqueId()).orElse(null);
+        if (progress == null || !progress.unlocked()) return;
+        int level = progress.effectiveLevel();
+        int bandStart = level - progress.localLevel() + 1;
+        long currentThreshold = SkillXPCalculator.totalXPForLevel(level)
+                - SkillXPCalculator.totalXPForLevel(bandStart);
+        double fraction = progress.xp() >= progress.xpAtCap() ? 1
+                : (double) (progress.xp() - currentThreshold) / SkillXPCalculator.xpToNextLevel(level);
+        int rows = (int) Math.round(28 * Math.max(0, Math.min(1, fraction)));
+        overlay(line, 79, String.valueOf((char) (0xE400 + rows)), 33);
+        String digits = Integer.toString(level);
+        StringBuilder glyphs = new StringBuilder();
+        for (char digit : digits.toCharArray()) glyphs.append((char) (0xE300 + digit - '0'));
+        int advance = digits.length() * 6;
+        overlay(line, 95 - advance / 2, glyphs.toString(), advance);
     }
 
     private static String number(double value) {
