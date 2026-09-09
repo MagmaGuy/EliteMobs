@@ -990,6 +990,258 @@
     },
     {
       "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/priest.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/priest.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/hierophant.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/hierophant.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/saint.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/saint.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/exorcist.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/exorcist.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/oracle.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/oracle.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/fateweaver.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/fateweaver.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/seraph.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/seraph.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/shaman.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/shaman.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/lifewarden.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/lifewarden.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/grovekeeper.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/grovekeeper.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/shepherd.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/shepherd.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/spiritcaller.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/spiritcaller.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/mistweaver.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/mistweaver.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/soulwarden.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/soulwarden.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/abilities/spellcaster.mobility.png",
       "height": 13,
       "ascent": -47,
