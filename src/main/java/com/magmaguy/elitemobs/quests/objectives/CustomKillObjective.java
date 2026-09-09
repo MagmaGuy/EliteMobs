@@ -11,8 +11,23 @@ public class CustomKillObjective extends KillObjective {
     private final String customBossFilename;
 
     public CustomKillObjective(String customBossFilename, int targetKillAmount, int questLevel) {
-        super(targetKillAmount, CustomBossesConfig.getCustomBosses().get(customBossFilename).getCleanName(questLevel * 10));
+        super(targetKillAmount, objectiveName(customBossFilename));
         this.customBossFilename = customBossFilename;
+    }
+
+    @Override
+    public String getObjectiveName() {
+        // The objective quantity is rendered separately from the boss's configured name.
+        return objectiveName(customBossFilename);
+    }
+
+    private static String objectiveName(String filename) {
+        var boss = CustomBossesConfig.getCustomBoss(filename);
+        if (boss == null) return filename;
+        String name = boss.getName();
+        for (String token : java.util.List.of("$normalLevel", "$minibossLevel", "$bossLevel",
+                "$reinforcementLevel", "$eventBossLevel", "$level")) name = name.replace(token, "");
+        return com.magmaguy.magmacore.util.ChatColorConverter.convert(name).strip();
     }
 
     @Override

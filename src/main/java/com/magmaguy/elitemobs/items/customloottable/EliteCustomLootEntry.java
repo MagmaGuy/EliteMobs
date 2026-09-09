@@ -19,7 +19,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -211,18 +210,18 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
             return;
         }
         String name = null;
+        int delivered = 0;
         for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = customItem.generateItemStack(itemTier, player, null);
             if (itemStack == null) continue;
-            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(itemStack);
-            leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
+            delivered += deliver(player, itemStack);
             if (name == null && itemStack.getItemMeta() != null) {
                 if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
                 else name = itemStack.getType().toString().replace("_", " ");
             }
         }
-        if (name != null)
-            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", getAmount() + "x " + name));
+        if (name != null && delivered > 0)
+            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", delivered + "x " + name));
     }
 
     public void directDropExactLevel(int itemTier, Player player) {
@@ -232,18 +231,18 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
             return;
         }
         String name = null;
+        int delivered = 0;
         for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = customItem.generateItemStackExact(itemTier, player, null);
             if (itemStack == null) continue;
-            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(itemStack);
-            leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
+            delivered += deliver(player, itemStack);
             if (name == null && itemStack.getItemMeta() != null) {
                 if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
                 else name = itemStack.getType().toString().replace("_", " ");
             }
         }
-        if (name != null)
-            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", getAmount() + "x " + name));
+        if (name != null && delivered > 0)
+            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", delivered + "x " + name));
     }
 
     //This is the drop for boss loot
@@ -256,18 +255,34 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
             return;
         }
         String name = null;
+        int delivered = 0;
         for (int i = 0; i < getAmount(); i++) {
             ItemStack itemStack = customItem.generateItemStack(itemTier, player, eliteEntity);
-            if (itemStack == null) return;
-            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(itemStack);
-            leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
+            if (itemStack == null) continue;
+            delivered += deliver(player, itemStack);
             if (name == null && itemStack.getItemMeta() != null) {
                 if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
                 else name = itemStack.getType().toString().replace("_", " ");
             }
         }
-        if (name != null)
-            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", getAmount() + "x " + name));
+        if (name != null && delivered > 0)
+            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", delivered + "x " + name));
+    }
+
+    private static int deliver(Player player, ItemStack item) {
+        int amount = item.getAmount();
+        var overflow = player.getInventory().addItem(item);
+        int dropped = 0;
+        for (ItemStack leftover : overflow.values()) {
+            dropped += leftover.getAmount();
+            var entity = player.getWorld().dropItem(player.getLocation(), leftover);
+            entity.setOwner(player.getUniqueId());
+        }
+        return amount - dropped;
+    }
+
+    public boolean isEquipment() {
+        return com.magmaguy.elitemobs.items.LootItemPolicy.isEquipment(generateCustomItem());
     }
 
     private boolean isGroupLoot(int itemTier, Player player, EliteEntity eliteEntity) {
@@ -276,12 +291,13 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
             if (matchInstance instanceof DungeonInstance dungeonInstance) {
                 // Beyond this point the item is for an instanced dungeon. A mismatched difficulty suppresses it.
                 if (!dungeonInstance.matchesDifficulty(difficultyIDs, configFilename)) return true;
+                if (!isEquipment()) return false;
                 addGroupLoot(CustomItem.limitItemLevel(player, itemTier), eliteEntity);
                 return true;
             }
         }
 
-        if (!PartyManager.shouldUsePartyLoot(player, eliteEntity)) return false;
+        if (!isEquipment() || !PartyManager.shouldUsePartyLoot(player, eliteEntity)) return false;
         return addPartyLoot(CustomItem.limitItemLevel(player, itemTier), player, eliteEntity);
     }
 

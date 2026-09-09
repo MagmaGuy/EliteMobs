@@ -284,11 +284,23 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
                 reconcilePlayer(player, false);
                 continue;
             }
+            capDamageOverTime(player);
             if (player.getFoodLevel() != ExperimentalCombatRules.SERVER_FOOD_LEVEL
                     || player.getSaturation() != 0F
                     || player.getExhaustion() != 0F)
                 maintainHunger(player);
         }
+    }
+
+    /** Fixed alpha policy, including effects already present when entering a managed world. */
+    private static void capDamageOverTime(Player player) {
+        if (player.getFireTicks() > 60) player.setFireTicks(60);
+        var poison = player.getPotionEffect(org.bukkit.potion.PotionEffectType.POISON);
+        if (poison == null || !poison.isInfinite() && poison.getDuration() <= 60) return;
+        // Bukkit does not replace an equal-amplifier effect with a shorter duration.
+        player.removePotionEffect(poison.getType());
+        player.addPotionEffect(new org.bukkit.potion.PotionEffect(poison.getType(), 60,
+                poison.getAmplifier(), poison.isAmbient(), poison.hasParticles(), poison.hasIcon()));
     }
 
     private static void renderHud(Player player) {

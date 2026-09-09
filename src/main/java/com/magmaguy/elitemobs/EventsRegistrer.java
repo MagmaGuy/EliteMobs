@@ -337,6 +337,7 @@ public class EventsRegistrer {
         register(new CustomQuest.CustomQuestEvents());
         register(new QuestDialogueBossBarManager.QuestDialogueBossBarEvents());
         register(new QuestInventoryMenu.QuestInventoryMenuEvents());
+        register(new com.magmaguy.elitemobs.quests.menus.QuestScreenSession());
         register(new ArenaCompleteEvent.ArenaCompleteEventHandler());
 
         //Songs

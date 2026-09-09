@@ -49,6 +49,10 @@ public class QuestInventoryMenu {
         generateInventoryQuestEntries(quests, player, npcEntity, false);
     }
 
+    public static boolean isQuestInventory(Inventory inventory) {
+        return questDirectories.containsKey(inventory) || questInventories.containsKey(inventory);
+    }
+
     public static void generateInventoryQuestEntries(List<? extends Quest> quests, Player player, NPCEntity npcEntity,
                                                      boolean returnToPlayerStatus) {
         if (quests.size() == 1)

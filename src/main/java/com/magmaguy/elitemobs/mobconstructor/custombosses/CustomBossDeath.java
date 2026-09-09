@@ -34,6 +34,12 @@ public class CustomBossDeath implements Listener {
             if (lockedOutPlayers.contains(player)) continue;
             dropLoot(player, customBossEntity);
         }
+        for (Player player : com.magmaguy.elitemobs.parties.PartyManager.expandSharedCreditParticipants(
+                customBossEntity.getDamagers().keySet(), customBossEntity)) {
+            if (lockedOutPlayers.contains(player) || customBossEntity.getDamagers().containsKey(player)) continue;
+            customBossEntity.customBossesConfigFields.getCustomLootTable().bossDrop(player,
+                    customBossEntity.getLevel(), customBossEntity.getLocation(), customBossEntity, true);
+        }
     }
 
     public static void dropLoot(Player player, CustomBossEntity customBossEntity) {

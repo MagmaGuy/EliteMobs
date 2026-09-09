@@ -194,7 +194,7 @@ public final class FixedAbilityRegistry {
         cost(specs, "saint.signature", 65D);
         cost(specs, "fateweaver.signature", 85D);
         cost(specs, "cleric.signature", 30D);
-        cost(specs, "cleric.utility", 30D);
+        cost(specs, "cleric.utility", 50D);
         cost(specs, "priest.signature", 60D);
         cost(specs, "saint.utility", 75D);
         cost(specs, "grovekeeper.utility", 80D);

@@ -233,7 +233,8 @@ public class ItemConstructor {
         /*
         Register item source for lore redraw
          */
-        ItemTagger.registerItemSource(eliteEntity, itemMeta);
+        if (com.magmaguy.elitemobs.items.LootItemPolicy.keepsMobProvenance(itemStack))
+            ItemTagger.registerItemSource(eliteEntity, itemMeta);
 
         //Tag the item
         ItemTagger.registerEnchantments(itemMeta, enchantments);

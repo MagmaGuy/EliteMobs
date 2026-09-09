@@ -77,7 +77,7 @@ public final class BuiltInClassContent {
                             BASELINE_MAX_RESOURCE,
                             manaRelativeRecovery(MANA_IN_COMBAT_PER_SECOND, FOCUS_MANA_RATE_PERCENT),
                             manaRelativeRecovery(MANA_OUT_OF_COMBAT_PER_SECOND, FOCUS_MANA_RATE_PERCENT),
-                            0D, 0D, -20D,
+                            0D, 0D, 0D,
                             0L, 0D, 0D, 0D, 0D, NearbyRecoveryBonus.NONE, RANGER_FOCUSED_RECOVERY)),
             new ClassTreeContribution(
                     "cleric",

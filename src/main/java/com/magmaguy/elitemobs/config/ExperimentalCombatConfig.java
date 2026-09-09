@@ -30,7 +30,9 @@ public final class ExperimentalCombatConfig extends ConfigurationFile {
                 List.of(
                         "Enables the fixed Experimental Combat baseline in EliteMobs dungeons and worlds.",
                         "This feature is under active development. Please test the unchanged defaults and send feedback to the developer.",
-                        "No balance settings are exposed until a stable baseline has been established."),
+                        "Localization and customization settings are deliberately deferred during alpha.",
+                        "They will be added after the system has been tested, feedback has been gathered, and Experimental Combat is out of alpha.",
+                        "Please keep the fixed defaults while we establish a solid baseline; no balance settings are exposed yet."),
                 fileConfiguration,
                 "enabled",
                 true);

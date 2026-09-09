@@ -64,6 +64,7 @@ public class QuestMenu {
 
     public static void generateBookQuestEntries(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
         BookMaker.generateBook(player, generateBookQuestEntriesComponents(quests, player, npcEntity));
+        QuestScreenSession.openedBook(player);
     }
 
     public static TextComponent[] generateBookQuestEntriesComponents(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {

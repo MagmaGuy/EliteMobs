@@ -411,6 +411,7 @@ public class CustomItem {
             default:
         }
 
+        if (player != null) loot.setOwner(player.getUniqueId());
         SoulbindEnchantment.addPhysicalDisplay(loot, player);
         loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
         loot.setCustomNameVisible(true);
@@ -423,6 +424,7 @@ public class CustomItem {
         ItemStack itemStack = generateItemStackExact(level, player, eliteEntity);
         if (itemStack == null) return null;
         Item loot = location.getWorld().dropItem(location, itemStack);
+        if (player != null) loot.setOwner(player.getUniqueId());
         SoulbindEnchantment.addPhysicalDisplay(loot, player);
         loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
         loot.setCustomNameVisible(true);

@@ -46,7 +46,8 @@ public class DialogMaker {
     public static void sendQuestMessage(List<? extends Quest> quests, Player player, NPCEntity npcEntity) {
         if (quests.isEmpty()) return;
         if (quests.size() == 1) {
-            DialogManager.sendDialog(player, buildQuestDialogBuilder(quests, 0, player, npcEntity, false));
+            DialogManager.sendDialog(player, buildQuestDialogBuilder(quests, 0, player, npcEntity, false),
+                    com.magmaguy.elitemobs.quests.menus.QuestScreenSession.DIALOG_OWNER);
             return;
         }
         showQuestListDialog(quests, player, npcEntity);
@@ -70,7 +71,7 @@ public class DialogMaker {
         listBuilder.columns(1);
         listBuilder.buttonWidth(questDialogWidth);
 
-        DialogManager.sendDialog(player, listBuilder);
+        DialogManager.sendDialog(player, listBuilder, com.magmaguy.elitemobs.quests.menus.QuestScreenSession.DIALOG_OWNER);
     }
 
     private static DialogManager.MultiActionDialogBuilder buildQuestDialogBuilder(

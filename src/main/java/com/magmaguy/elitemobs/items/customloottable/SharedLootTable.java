@@ -255,10 +255,14 @@ public class SharedLootTable {
             return;
         }
         Player winner = players.get(ThreadLocalRandom.current().nextInt(players.size()));
-        SoulbindEnchantment.addEnchantment(item, winner);
+        if (com.magmaguy.elitemobs.items.LootItemPolicy.shouldSoulbind(item))
+            SoulbindEnchantment.addEnchantment(item, winner);
         new EliteItemLore(item, false);
         Map<Integer, ItemStack> pendingItems = winner.getInventory().addItem(item);
-        pendingItems.values().forEach(leftover -> winner.getWorld().dropItemNaturally(winner.getLocation(), leftover));
+        pendingItems.values().forEach(leftover -> {
+            var dropped = winner.getWorld().dropItemNaturally(winner.getLocation(), leftover);
+            dropped.setOwner(winner.getUniqueId());
+        });
         String itemName = item.hasItemMeta() && item.getItemMeta().hasDisplayName()
                 ? item.getItemMeta().getDisplayName()
                 : item.getType().toString().replace('_', ' ');

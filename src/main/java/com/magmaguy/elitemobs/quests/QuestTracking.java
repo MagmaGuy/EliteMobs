@@ -63,6 +63,17 @@ public class QuestTracking {
     private BossBar compassBar;
     private boolean questIsDone = false;
     private boolean stopped = false;
+    private boolean wasWaiting;
+    private boolean refreshQueued;
+
+    private void queueLocationRefresh() {
+        if (stopped || refreshQueued) return;
+        refreshQueued = true;
+        Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+            refreshQueued = false;
+            if (!stopped && player.isOnline()) updateLocations(quest);
+        });
+    }
 
     public QuestTracking(Player player, Quest quest) {
         this.player = player;
@@ -261,11 +272,20 @@ public class QuestTracking {
 
     private void addLocationString(List<Location> locations, String rawLocation) {
         if (rawLocation == null || rawLocation.isBlank()) return;
+        if (PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeon
+                && dungeon.getContentPackagesConfigFields().getWorldName().equals(ConfigurationLocation.worldName(rawLocation))) {
+            addLocation(locations, ConfigurationLocation.serializeWithInstance(dungeon.getWorld(), rawLocation));
+            return;
+        }
         addLocation(locations, ConfigurationLocation.serialize(rawLocation, true));
     }
 
     private void addLocation(List<Location> locations, Location location) {
         if (location == null || location.getWorld() == null) return;
+        // A loaded copy belonging to another party must not suppress the authored
+        // destination fallback for the player's own instance.
+        if (PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeon
+                && !location.getWorld().equals(dungeon.getWorld())) return;
         for (Location existingLocation : locations)
             if (isSameBlockLocation(existingLocation, location))
                 return;
@@ -325,6 +345,17 @@ public class QuestTracking {
     }
 
     private void updateCompassContents() {
+        var match = PlayerData.getMatchInstance(player);
+        boolean waiting = match != null && match.isWaitingPlayer(player);
+        if (waiting != wasWaiting) {
+            wasWaiting = waiting;
+            updateLocations(quest);
+        }
+        if (waiting) {
+            compassBar.setTitle("Waiting for the dungeon to start");
+            BossBarOrderManager.show(player, compassBar);
+            return;
+        }
         //for reference, character 32 is straight ahead
         String compassText = "---------------------------------------------------------------";
         List<LocationAndSymbol> locationAndSymbols = projectLocations();
@@ -421,6 +452,12 @@ public class QuestTracking {
     }
 
     public static class QuestTrackingEvents implements Listener {
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onTargetSpawn(com.magmaguy.elitemobs.api.EliteMobSpawnEvent event) {
+            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
+            for (QuestTracking tracking : playerTrackingQuests.values())
+                if (tracking.player.getWorld().equals(event.getEntity().getWorld())) tracking.queueLocationRefresh();
+        }
         @EventHandler
         public void onWorldChanged(PlayerChangedWorldEvent event) {
             Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
