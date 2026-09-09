@@ -46,6 +46,15 @@ public class CustomModelFMM implements CustomModelInterface {
         dynamicEntity.setDisplayName(nametagName);
     }
 
+    public boolean setNameLines(List<String> lines, float scale, double gap) {
+        if (dynamicEntity == null) return false;
+        dynamicEntity.setDisplayNameLines(lines);
+        dynamicEntity.setDisplayNameScale(scale);
+        dynamicEntity.setDisplayNameLineGap(gap);
+        dynamicEntity.setDisplayNameVisible(true);
+        return true;
+    }
+
     public CustomModelFMM(LivingEntity livingEntity, String modelName, String nametagName,
                           ModeledEntityLeftClickCallback leftClickCallback,
                           ModeledEntityRightClickCallback rightClickCallback) {
@@ -103,6 +112,7 @@ public class CustomModelFMM implements CustomModelInterface {
     public void setName(String nametagName, boolean visible) {
         if (dynamicEntity == null) return;
         dynamicEntity.setDisplayName(nametagName);
+        dynamicEntity.setDisplayNameVisible(visible);
     }
 
     @Override
@@ -132,9 +142,8 @@ public class CustomModelFMM implements CustomModelInterface {
 
     @Override
     public boolean hasNametagBone() {
-        if (dynamicEntity == null) return true;
-        List<Bone> nametagBones = dynamicEntity.getNametagBones();
-        return nametagBones != null && !nametagBones.isEmpty();
+        // FMM provides a hitbox-top fallback when no authored name anchor exists.
+        return dynamicEntity != null;
     }
 
     @Override

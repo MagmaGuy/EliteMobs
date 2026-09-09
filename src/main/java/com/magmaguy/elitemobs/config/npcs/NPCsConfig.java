@@ -27,6 +27,7 @@ public class NPCsConfig extends CustomConfig {
             if (npCsConfigFields.isEnabled())
                 NPCEntity.initializeNPCs(npCsConfigFields);
         }
+        NPCEntity.startNameplates();
     }
 
     public static HashMap<String, NPCsConfigFields> getNpcEntities() {
