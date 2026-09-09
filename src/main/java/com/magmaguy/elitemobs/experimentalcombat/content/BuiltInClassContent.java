@@ -43,6 +43,13 @@ public final class BuiltInClassContent {
 
     private static final List<ClassTreeContribution> TREES = List.of(
             new ClassTreeContribution(
+                    "adventurer", BuiltInClassDefinitions.adventurerTree(),
+                    FixedAbilityRegistry.adventurerDefinitions(),
+                    Map.of("adventurer", new PassiveProfile(0, 0, -.05, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
+                    resource(ClassResourceType.STAMINA, BASELINE_MAX_RESOURCE,
+                            MANA_IN_COMBAT_PER_SECOND, MANA_OUT_OF_COMBAT_PER_SECOND,
+                            0D, 0D, 0D, 0L, 0D, 0D, 0D, 0D, NearbyRecoveryBonus.NONE, DamageFreeRecoveryBonus.NONE)),
+            new ClassTreeContribution(
                     "paladin",
                     BuiltInClassDefinitions.paladinTree(),
                     FixedAbilityRegistry.paladinDefinitions(),

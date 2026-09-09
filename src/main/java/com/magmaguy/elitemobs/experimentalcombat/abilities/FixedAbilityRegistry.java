@@ -45,6 +45,20 @@ public final class FixedAbilityRegistry {
         return spec;
     }
 
+    public static Map<String, FixedAbilitySpec> adventurerDefinitions() {
+        Map<String, FixedAbilitySpec> specs = new LinkedHashMap<>();
+        add(specs, "adventurer.mobility", AbilitySlot.MOBILITY, AbilityFamily.SAFE_DASH, AbilityTarget.SELF,
+                tune(0, 0, 0, 0, 1, 4, 0, 0, 1, 1));
+        instant(specs, "adventurer.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_ENEMY,
+                tune(1.1, 0, 0, 0, 1, 3, 0, 1, 1, 1), AbilityEffect.DAMAGE);
+        instant(specs, "adventurer.utility", AbilitySlot.UTILITY, AbilityTarget.SELF,
+                support(.12, 0, 0, 0, 1), AbilityEffect.HEAL);
+        cost(specs, "adventurer.mobility", 20D);
+        cost(specs, "adventurer.signature", 20D);
+        cost(specs, "adventurer.utility", 30D);
+        return Collections.unmodifiableMap(specs);
+    }
+
     public static Map<String, FixedAbilitySpec> paladinDefinitions() {
         Map<String, FixedAbilitySpec> specs = new LinkedHashMap<>();
         add(specs, "paladin.mobility", AbilitySlot.MOBILITY, AbilityFamily.MOUNTED_CHARGE, AbilityTarget.FORWARD_ENEMIES,
@@ -177,8 +191,8 @@ public final class FixedAbilityRegistry {
         mechanics(specs, "soulwarden.utility", AbilityMechanic.DAMAGE_SHARE);
         cost(specs, "saint.signature", 65D);
         cost(specs, "fateweaver.signature", 85D);
-        cost(specs, "cleric.signature", 50D);
-        cost(specs, "cleric.utility", 50D);
+        cost(specs, "cleric.signature", 30D);
+        cost(specs, "cleric.utility", 30D);
         cost(specs, "priest.signature", 60D);
         cost(specs, "saint.utility", 75D);
         cost(specs, "grovekeeper.utility", 80D);

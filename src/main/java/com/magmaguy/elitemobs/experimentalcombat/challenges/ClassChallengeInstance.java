@@ -59,6 +59,7 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
     }
 
     public static double fee(ClassFormDefinition form) {
+        if (form.band() == com.magmaguy.elitemobs.experimentalcombat.classes.ClassBand.STARTER) return 1D;
         return 100D * Math.max(0, ItemLootShower.getCurrencyAmount(form.requiredFoundationSkillLevel()));
     }
 

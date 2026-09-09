@@ -9,7 +9,9 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
-import com.magmaguy.magmacore.util.AttributeManager;
+import com.magmaguy.elitemobs.experimentalcombat.CombatHealthFormatter;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
@@ -26,7 +28,6 @@ import java.util.UUID;
 /** Owns the combined party and quest sidebar while a player belongs to a party. */
 public final class PartySidebar {
     private static final int MAX_LINES = 15;
-    private static final int HEALTH_SEGMENTS = 5;
     private static final long REFRESH_PERIOD_TICKS = 20L;
     private static final Map<UUID, TemporaryQuestView> temporaryQuestViews = new HashMap<>();
     private static final Map<UUID, SidebarSnapshot> lastRenderedSidebars = new HashMap<>();
@@ -148,7 +149,8 @@ public final class PartySidebar {
                 && dungeonInstance != null
                 && dungeonInstance.isSpectator(member)
                 && dungeonInstance.getRemainingLives(member) != null;
-        String health = downed ? PartyConfig.getSidebarDownedDisplay() : renderHealth(member);
+        String health = renderHealth(member, downed);
+        if (downed) health += PartyConfig.getSidebarDownedDisplay();
         String lives = renderLives(member, dungeonInstance);
         boolean hasHealthPlaceholder = template.contains("$health");
         boolean hasLivesPlaceholder = template.contains("$lives");
@@ -163,30 +165,25 @@ public final class PartySidebar {
         return color(rendered);
     }
 
-    private static String renderHealth(Player member) {
-        double healthFraction = 0D;
-        if (member != null && member.isOnline() && member.isValid()) {
-            double maximumHealth = Math.max(1D,
-                    AttributeManager.getAttributeValue(member, "generic_max_health"));
-            healthFraction = Math.max(0D, Math.min(1D, member.getHealth() / maximumHealth));
-        }
+    private static String renderHealth(Player member, boolean downed) {
+        if (member == null || !member.isOnline()) return " &8-/-";
+        AttributeInstance attribute = member.getAttribute(Attribute.MAX_HEALTH);
+        double maximum = Math.max(1D, attribute == null ? member.getHealth() : attribute.getValue());
+        double current = downed || member.isDead() ? 0D : Math.max(0D, Math.min(maximum, member.getHealth()));
+        double fraction = current / maximum;
+        // Green at full health, red at half health, almost black when downed.
+        int from = fraction >= .5D ? 0xFF0000 : 0x080000;
+        int to = fraction >= .5D ? 0x55FF55 : 0xFF0000;
+        double blend = fraction >= .5D ? (fraction - .5D) * 2D : fraction * 2D;
+        int red = interpolateChannel(from >> 16, to >> 16, blend);
+        int green = interpolateChannel(from >> 8, to >> 8, blend);
+        int blue = interpolateChannel(from, to, blend);
+        String tint = net.md_5.bungee.api.ChatColor.of(new java.awt.Color(red, green, blue)).toString();
+        return " " + tint + CombatHealthFormatter.format(current) + "&7/&f" + CombatHealthFormatter.format(maximum);
+    }
 
-        int filledSegments = healthFraction <= 0D
-                ? 0
-                : Math.max(1, (int) Math.ceil(healthFraction * HEALTH_SEGMENTS));
-        String filledColor = healthFraction > 2D / 3D
-                ? PartyConfig.getSidebarHealthHealthyColor()
-                : healthFraction > 1D / 3D
-                ? PartyConfig.getSidebarHealthWoundedColor()
-                : PartyConfig.getSidebarHealthCriticalColor();
-        String glyph = PartyConfig.getSidebarHealthGlyph();
-        StringBuilder healthBar = new StringBuilder(" ");
-        if (filledSegments > 0)
-            healthBar.append(filledColor).append(glyph.repeat(filledSegments));
-        if (filledSegments < HEALTH_SEGMENTS)
-            healthBar.append(PartyConfig.getSidebarHealthMissingColor())
-                    .append(glyph.repeat(HEALTH_SEGMENTS - filledSegments));
-        return healthBar.toString();
+    private static int interpolateChannel(int from, int to, double blend) {
+        return (int) Math.round((from & 255) + ((to & 255) - (from & 255)) * blend);
     }
 
     private static String renderLives(Player member, DungeonInstance dungeonInstance) {

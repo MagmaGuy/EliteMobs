@@ -68,7 +68,7 @@ public record ClassFormDefinition(
             AbilityDefinition signature,
             AbilityDefinition utility,
             PassiveDefinition passive) {
-        if (band == ClassBand.ROOT) throw new IllegalArgumentException("A specialization cannot use the root band");
+        if (band.isRoot()) throw new IllegalArgumentException("A specialization cannot use the root band");
         return new ClassFormDefinition(id, displayName, band, parentId, foundationSkills, null,
                 signature, utility, passive, foundationWeapons(foundationSkills));
     }

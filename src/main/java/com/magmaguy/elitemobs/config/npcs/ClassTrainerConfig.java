@@ -10,19 +10,24 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 
-/** Shared presentation and entry point for the five root-class instructors. */
+/** Shared presentation and entry point for root-class instructors. */
 public abstract class ClassTrainerConfig extends NPCsConfigFields {
     private static final JsonObject SKINS = readSkins();
 
     protected ClassTrainerConfig(String root, String name, String className, String location,
                                  String greeting, String farewell) {
+        this(root, name, className, location, greeting, farewell, root);
+    }
+
+    protected ClassTrainerConfig(String root, String name, String className, String location,
+                                 String greeting, String farewell, String skin) {
         super("class_trainer_" + root, true, "&6" + name, "&e<" + className + " Instructor>",
                 Villager.Profession.NITWIT, "em_adventurers_guild," + location,
                 List.of(greeting), List.of("Inspect your training\\nand specializations."),
                 List.of(farewell), true, 3, NPCInteractions.NPCInteractionType.CLASS_TRAINER);
         setClassRoot(root);
         setDisguise("custom:ag_class_" + root);
-        setCustomDisguiseData(disguise(root));
+        setCustomDisguiseData(disguise(skin));
     }
 
     public static String disguise(String root) {

@@ -35,7 +35,7 @@ public final class ClassPresentationTheme {
 
     public static String colors(ClassResourceType resourceType) {
         return switch (Objects.requireNonNull(resourceType, "resourceType")) {
-            case RESOLVE -> GOLD;
+            case STAMINA, RESOLVE -> GOLD;
             case FURY -> ORANGE;
             case FOCUS -> GREEN;
             case GRACE -> BLUE;

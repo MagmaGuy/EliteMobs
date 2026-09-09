@@ -13,7 +13,8 @@ public enum ClassBand {
     ROOT(0, 1, 30, 10),
     LEVEL_31(1, 31, 60, 31),
     LEVEL_61(2, 61, 90, 61),
-    LEVEL_91(3, 91, Integer.MAX_VALUE, 91);
+    LEVEL_91(3, 91, Integer.MAX_VALUE, 91),
+    STARTER(0, 1, 30, 1);
 
     private final int depth;
     private final int effectiveStart;
@@ -44,11 +45,11 @@ public enum ClassBand {
     }
 
     public boolean isRoot() {
-        return this == ROOT;
+        return this == ROOT || this == STARTER;
     }
 
     public boolean isTerminal() {
-        return this == LEVEL_91;
+        return this == LEVEL_91 || this == STARTER;
     }
 
     public boolean containsEffectiveLevel(int effectiveLevel) {
@@ -70,6 +71,7 @@ public enum ClassBand {
     }
 
     public Optional<ClassBand> next() {
+        if (isTerminal()) return Optional.empty();
         return Arrays.stream(values()).filter(candidate -> candidate.depth == depth + 1).findFirst();
     }
 

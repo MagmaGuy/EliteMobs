@@ -4,6 +4,7 @@ package com.magmaguy.elitemobs.experimentalcombat.classes;
  * Root-class resource shown in the Experimental Combat action-bar HUD.
  */
 public enum ClassResourceType {
+    STAMINA("Stamina", "Stamina recovers at the same steady rate as mana."),
     RESOLVE("Resolve", "Resolve recovers faster near elites and grows in frontline combat."),
     FURY("Fury", "Recovers at 55% of mana's rate. Damaging hits restore 10 Fury; taking damage also grants Fury."),
     FOCUS("Focus", "Focus recovers at 85% of mana recovery, rising to 110% after over 5 seconds without taking damage."),

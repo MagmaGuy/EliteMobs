@@ -25,7 +25,8 @@ import java.util.List;
 public class SimpleScoreboard {
     private static final String SIDEBAR_OBJECTIVE = "em_quest_sb";
     private static final int MAX_SIDEBAR_LINES = 15;
-    private static final int LEGACY_SCOREBOARD_ENTRY_LIMIT = 40;
+    // Supported Minecraft versions accept long entries; RGB formatting alone uses 14 characters.
+    private static final int SCOREBOARD_ENTRY_LIMIT = 32767;
     private static final Map<UUID, Scoreboard> previousScoreboards = new ConcurrentHashMap<>();
     private static final Set<Scoreboard> managedScoreboards = Collections.newSetFromMap(new WeakHashMap<>());
     private static final Map<Scoreboard, Set<String>> managedSidebarEntries = new WeakHashMap<>();
@@ -163,8 +164,8 @@ public class SimpleScoreboard {
 
     private static String trimScoreboardEntry(String entry) {
         if (entry == null) return "";
-        if (entry.length() <= LEGACY_SCOREBOARD_ENTRY_LIMIT) return entry;
-        return entry.substring(0, LEGACY_SCOREBOARD_ENTRY_LIMIT - 1);
+        if (entry.length() <= SCOREBOARD_ENTRY_LIMIT) return entry;
+        return entry.substring(0, SCOREBOARD_ENTRY_LIMIT - 1);
     }
 
     private static void copyTeams(Scoreboard sourceScoreboard, Scoreboard targetScoreboard) {

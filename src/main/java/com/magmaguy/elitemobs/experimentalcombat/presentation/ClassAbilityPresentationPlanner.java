@@ -56,7 +56,7 @@ public final class ClassAbilityPresentationPlanner {
         AbilityPresentationTheme branch = BRANCH_THEMES.get(lineage.activeForm().id());
         if (branch != null) return branch;
         return switch (lineage.resourceType()) {
-            case RESOLVE -> AbilityPresentationTheme.VALOR;
+            case STAMINA, RESOLVE -> AbilityPresentationTheme.VALOR;
             case FURY -> AbilityPresentationTheme.FURY;
             case FOCUS -> AbilityPresentationTheme.HUNT;
             case GRACE -> AbilityPresentationTheme.RADIANT;

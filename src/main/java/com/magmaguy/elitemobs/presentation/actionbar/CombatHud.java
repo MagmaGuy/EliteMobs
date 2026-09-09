@@ -168,6 +168,7 @@ public final class CombatHud {
             case FOCUS -> '\uE502';
             case GRACE -> '\uE503';
             case MANA -> '\uE504';
+            case STAMINA -> '\uE505';
         };
     }
 
@@ -178,6 +179,7 @@ public final class CombatHud {
             case FOCUS -> '\uE8C0';
             case GRACE -> '\uE900';
             case MANA -> '\uE940';
+            case STAMINA -> '\uE9C0';
         };
     }
 }

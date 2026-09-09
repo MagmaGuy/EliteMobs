@@ -19,6 +19,17 @@ final class BuiltInClassDefinitions {
     private BuiltInClassDefinitions() {
     }
 
+    static List<ClassFormDefinition> adventurerTree() {
+        return List.of(new ClassFormDefinition("adventurer", "Adventurer", ClassBand.STARTER, null,
+                new FoundationSkillPair(SkillType.ARMOR, SkillType.SWORDS),
+                new RootClassKit(ClassResourceType.STAMINA,
+                        ability("adventurer", AbilitySlot.MOBILITY, "Dodge", "Dash a short distance along your aim.")),
+                ability("adventurer", AbilitySlot.SIGNATURE, "Quick Strike", "Strike one foe within melee reach."),
+                ability("adventurer", AbilitySlot.UTILITY, "Second Wind", "Recover a little health."),
+                new PassiveDefinition("adventurer.passive", "Take 5% less damage. Practice with any weapon."),
+                java.util.Arrays.stream(SkillType.values()).filter(skill -> skill != SkillType.ARMOR).toList()));
+    }
+
     static List<ClassFormDefinition> paladinTree() {
         return List.of(
                 root("paladin", "Paladin", SkillType.ARMOR, SkillType.SWORDS, ClassResourceType.RESOLVE,

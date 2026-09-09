@@ -110,6 +110,15 @@
     },
     {
       "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/resource_stamina.png",
+      "height": 3,
+      "ascent": -28,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_level.png",
       "height": 16,
       "ascent": -14,
@@ -123,7 +132,7 @@
       "height": 15,
       "ascent": -16,
       "chars": [
-        ""
+        ""
       ]
     },
     {
@@ -132,7 +141,7 @@
       "height": 7,
       "ascent": -55,
       "chars": [
-        ""
+        ""
       ]
     },
     {
@@ -1600,6 +1609,33 @@
       "ascent": -47,
       "chars": [
         ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/adventurer.signature.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/adventurer.utility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/adventurer.mobility.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
       ]
     },
     {
