@@ -12,7 +12,8 @@ return ai.module {
             tick = function(c)
                 if c.tick < (c.memory:get('next_attack') or 0) then return end
                 local target = c.perception:current_target()
-                if not target or not target.is_valid or target.is_dead then return end
+                if not target or not target.is_valid or target.is_dead
+                        or (target.game_mode ~= 'survival' and target.game_mode ~= 'adventure') then return end
                 local at, own = target.current_location, c.entity.current_location
                 if not at or not own or at.world ~= own.world then return end
                 local dx, dy, dz = at.x - own.x, at.y - own.y, at.z - own.z

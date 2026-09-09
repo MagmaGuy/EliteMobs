@@ -9,7 +9,11 @@ return ai.module {
             can_continue = function(c) return c.perception:current_target() ~= nil end,
             tick = function(c)
                 local target = c.perception:current_target()
-                if not target or not target.is_valid or target.is_dead then return end
+                if not target or not target.is_valid or target.is_dead
+                        or (target.game_mode ~= 'survival' and target.game_mode ~= 'adventure') then
+                    c.actuator:stop_moving()
+                    return
+                end
                 local at, own = target.current_location, c.entity.current_location
                 if not at or not own or at.world ~= own.world then
                     c.actuator:stop_moving()

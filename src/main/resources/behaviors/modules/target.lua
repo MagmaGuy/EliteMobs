@@ -34,8 +34,11 @@ return ai.module {
             can_start = function(c) return true end,
             can_continue = function(c) return true end,
             tick = function(c)
-                if eligible(c.perception:current_target(), c.entity.current_location) then return end
                 local candidate = c.memory:get('candidate')
+                -- Consume this sensor result once. A later teleport or game-mode change
+                -- must not reuse a stale UUID before the next sensor pass.
+                c.memory:forget('candidate')
+                if eligible(c.perception:current_target(), c.entity.current_location) then return end
                 if candidate then c.actuator:set_target(candidate)
                 else c.actuator:clear_target() end
             end
