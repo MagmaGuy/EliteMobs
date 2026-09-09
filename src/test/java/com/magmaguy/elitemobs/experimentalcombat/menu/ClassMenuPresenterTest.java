@@ -190,7 +190,8 @@ class ClassMenuPresenterTest {
                     0D,
                     false,
                     false,
-                    lineage.forms().stream().map(ClassFormDefinition::displayName).toList(),
+                    lineage.root().displayName(),
+                    catalog.progressionPathOf(definition.id()).stream().map(ClassFormDefinition::displayName).toList(),
                     definition.parentId(),
                     catalog.childrenOf(definition.id()).stream()
                             .map(child -> new ClassMenuView.FormLink(
@@ -223,7 +224,6 @@ class ClassMenuPresenterTest {
                 "Open until the run starts.",
                 InputProfile.JAVA_HOTBAR_LAYER,
                 InputProfile.JAVA_HOTBAR_LAYER,
-                8,
                 catalog.roots().stream().map(root -> forms.get(root.id())).toList(),
                 forms);
     }
@@ -240,6 +240,7 @@ class ClassMenuPresenterTest {
                     form.challengeFee(),
                     form.id().equals(formId),
                     form.id().equals(formId),
+                    form.trainerName(),
                     form.lineage(),
                     form.parentId(),
                     form.children(),

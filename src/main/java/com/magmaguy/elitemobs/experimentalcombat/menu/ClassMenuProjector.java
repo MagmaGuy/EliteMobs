@@ -115,6 +115,7 @@ final class ClassMenuProjector {
                 com.magmaguy.elitemobs.experimentalcombat.challenges.ClassChallengeInstance.fee(form),
                 form.id().equals(selectedFormId),
                 form.id().equals(activeFormId),
+                lineage.root().displayName(),
                 catalog.progressionPathOf(form.id()).stream().map(ClassFormDefinition::displayName).toList(),
                 form.parentId(),
                 catalog.childrenOf(form.id()).stream()

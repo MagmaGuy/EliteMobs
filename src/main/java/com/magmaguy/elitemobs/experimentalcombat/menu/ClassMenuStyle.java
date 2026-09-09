@@ -55,9 +55,8 @@ final class ClassMenuStyle {
     }
 
     static String trialInstructions(ClassMenuView.FormView form) {
-        String root = form.lineage().getFirst();
         String fee = com.magmaguy.elitemobs.economy.EconomyHandler.formatCurrency(form.challengeFee());
-        return "&eVisit the " + root + " trainer in the Adventurer's Guild.\n"
+        return "&eVisit the " + form.trainerName() + " trainer in the Adventurer's Guild.\n"
                 + "&7Meet the training requirements, then select Challenge Instructor.\n"
                 + "&7Each solo attempt costs " + fee + " coins when combat begins.\n"
                 + "&7Defeat the instructor to unlock and activate " + form.displayName() + ".";

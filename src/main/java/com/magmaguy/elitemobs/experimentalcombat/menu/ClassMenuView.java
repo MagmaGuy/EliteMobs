@@ -44,6 +44,7 @@ record ClassMenuView(
             double challengeFee,
             boolean selected,
             boolean active,
+            String trainerName,
             List<String> lineage,
             String parentId,
             List<FormLink> children,
@@ -65,6 +66,7 @@ record ClassMenuView(
             Objects.requireNonNull(id, "id");
             Objects.requireNonNull(displayName, "displayName");
             Objects.requireNonNull(band, "band");
+            Objects.requireNonNull(trainerName, "trainerName");
             lineage = List.copyOf(lineage);
             children = List.copyOf(children);
             Objects.requireNonNull(xpSummary, "xpSummary");
