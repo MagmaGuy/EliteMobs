@@ -4,6 +4,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
 import com.magmaguy.elitemobs.experimentalcombat.MonotonicTickClock;
 import com.magmaguy.elitemobs.experimentalcombat.classes.ClassResourceType;
+import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -80,10 +81,22 @@ public final class CombatHudProbe {
 
     private static void abilityIcons(StringBuilder line, Player player) {
         ExperimentalCombatModule.activeClassLineageSnapshot(player.getUniqueId()).ifPresent(lineage -> {
-            var abilities = java.util.List.of(lineage.signature(), lineage.utility(), lineage.mobility());
-            for (int index = 0; index < abilities.size(); index++) {
-                String glyph = CombatHudAbilityIcons.glyph(abilities.get(index).id());
-                if (!glyph.isEmpty()) overlay(line, 7 + index * 61, glyph, 14);
+            var slots = java.util.List.of(AbilitySlot.SIGNATURE, AbilitySlot.UTILITY, AbilitySlot.MOBILITY);
+            for (int index = 0; index < slots.size(); index++) {
+                var state = ExperimentalCombatModule.abilityResourceSnapshot(player, slots.get(index)).orElse(null);
+                if (state == null) continue;
+                int left = 4 + index * 61;
+                // Replace only this card's surface, before drawing its icon and live cost.
+                if (!state.affordable()) overlay(line, left, String.valueOf((char) (0xE680 + index)), 61);
+                String glyph = CombatHudAbilityIcons.glyph(state.abilityId());
+                if (!glyph.isEmpty()) overlay(line, left + 3, glyph, 14);
+                String digits = Long.toString((long) Math.ceil(state.cost()));
+                int start = left + 38 - (digits.length() * 4 + 7) / 2;
+                overlay(line, start, String.valueOf((char) (0xE540 + resourceIcon(lineage.resourceType()) - 0xE500)), 6);
+                StringBuilder cost = new StringBuilder();
+                for (char digit : digits.toCharArray())
+                    cost.append((char) ((state.affordable() ? 0xE700 : 0xE710) + digit - '0'));
+                overlay(line, start + 8, cost.toString(), digits.length() * 4);
             }
         });
     }

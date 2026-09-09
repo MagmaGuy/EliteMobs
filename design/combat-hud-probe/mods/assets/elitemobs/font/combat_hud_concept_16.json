@@ -128,9 +128,63 @@
     },
     {
       "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/resource_icons.png",
+      "height": 7,
+      "ascent": -55,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/cost_ready.png",
+      "height": 5,
+      "ascent": -57,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/cost_unaffordable.png",
+      "height": 5,
+      "ascent": -57,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/skill_unaffordable_0.png",
+      "height": 21,
+      "ascent": -43,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/skill_unaffordable_1.png",
+      "height": 21,
+      "ascent": -43,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/skill_unaffordable_2.png",
+      "height": 21,
+      "ascent": -43,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/paladin.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -139,7 +193,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/guardian.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -148,7 +202,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/aegis.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -157,7 +211,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/bulwark.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -166,7 +220,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/shieldbearer.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -175,7 +229,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/justicar.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -184,7 +238,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/templar.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -193,7 +247,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/inquisitor.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -202,7 +256,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/warlord.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -211,7 +265,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/marshal.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -220,7 +274,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/bannerlord.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -229,7 +283,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/strategist.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -238,7 +292,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/conqueror.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -247,7 +301,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/tyrant.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -256,7 +310,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/champion.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -265,7 +319,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/berserker.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -274,7 +328,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/bloodrager.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -283,7 +337,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/reaver.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -292,7 +346,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/bloodstorm.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -301,7 +355,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/deathless.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -310,7 +364,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/slayer.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -319,7 +373,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/headsman.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -328,7 +382,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/harvester.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -337,7 +391,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/juggernaut.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -346,7 +400,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/crusher.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -355,7 +409,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/siegebreaker.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -364,7 +418,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/titanbane.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -373,7 +427,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/dreadnought.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -382,7 +436,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/warmonger.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -391,7 +445,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/colossus.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -400,7 +454,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/ranger.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -409,7 +463,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/sniper.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -418,7 +472,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/bowmaster.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -427,7 +481,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/deadeye.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -436,7 +490,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/raincaller.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -445,7 +499,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/arbalist.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -454,7 +508,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/artillerist.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -463,7 +517,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/dragonslayer.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -472,7 +526,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/skirmisher.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -481,7 +535,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/windrunner.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -490,7 +544,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/pathfinder.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -499,7 +553,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/tempest_archer.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -508,7 +562,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/saboteur.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -517,7 +571,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/trapper.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -526,7 +580,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/demolitionist.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -535,7 +589,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/cleric.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -544,7 +598,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/priest.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -553,7 +607,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/hierophant.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -562,7 +616,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/saint.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -571,7 +625,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/exorcist.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -580,7 +634,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/oracle.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -589,7 +643,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/fateweaver.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -598,7 +652,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/seraph.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -607,7 +661,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/shaman.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -616,7 +670,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/lifewarden.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -625,7 +679,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/grovekeeper.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -634,7 +688,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/shepherd.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -643,7 +697,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/spiritcaller.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -652,7 +706,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/mistweaver.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -661,7 +715,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/soulwarden.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -670,7 +724,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/spellcaster.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -679,7 +733,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/mage.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -688,7 +742,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/elementalist.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -697,7 +751,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/pyromancer.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -706,7 +760,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/cryomancer.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -715,7 +769,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/battlemage.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -724,7 +778,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/spellblade.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -733,7 +787,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/arcane_knight.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -742,7 +796,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/occultist.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -751,7 +805,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/necromancer.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -760,7 +814,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/lich.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -769,7 +823,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/plaguebringer.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -778,7 +832,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/summoner.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -787,7 +841,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/demonologist.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]
@@ -796,7 +850,7 @@
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_badges/spiritbinder.png",
       "height": 9,
-      "ascent": -9,
+      "ascent": -7,
       "chars": [
         ""
       ]

@@ -254,6 +254,17 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         return instance == null ? Optional.empty() : instance.resources.snapshot(playerId);
     }
 
+    /** Read-only presentation of the same cost and affordability check used when casting. */
+    public static Optional<AbilityResourceSnapshot> abilityResourceSnapshot(Player player, AbilitySlot slot) {
+        return activeClassLineageSnapshot(player.getUniqueId()).map(lineage -> {
+            FixedAbilitySpec spec = instance.abilityRegistry.require(abilityId(lineage, slot));
+            double cost = instance.abilityCost(player, spec);
+            return new AbilityResourceSnapshot(spec.id(), cost, instance.resources.canAfford(player, cost));
+        });
+    }
+
+    public record AbilityResourceSnapshot(String abilityId, double cost, boolean affordable) { }
+
     /** Active form, including the selection locked for an instance run. */
     public static Optional<FormProgressSnapshot> classProgressSnapshot(UUID playerId) {
         return instance == null ? Optional.empty() : instance.profile(playerId)
