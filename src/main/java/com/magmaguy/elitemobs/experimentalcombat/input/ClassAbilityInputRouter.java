@@ -173,7 +173,14 @@ public final class ClassAbilityInputRouter implements Listener {
         if (event.getHand() != EquipmentSlot.HAND) return;
         Player player = event.getPlayer();
         PendingGesture pending = pendingGestures.get(player.getUniqueId());
-        if (pending == null) return;
+        if (pending == null) {
+            // A model can translate a consumed block/air click into an entity permission
+            // check on the next tick. It must not also open an NPC menu behind the skill.
+            RecentDispatch recent = recentDispatches.get(player.getUniqueId());
+            if (recent != null && MonotonicTickClock.currentTick() - recent.serverTick() <= 1L)
+                event.setCancelled(true);
+            return;
+        }
         ClassAbilityGestureState.Transition transition =
                 pending.state().rightClick(MonotonicTickClock.currentTick());
         if (transition.consumesInput()) event.setCancelled(true);
