@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.magmacore.nightbreak.NightbreakChatStyle;
+
 import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
 
@@ -519,6 +521,7 @@ public class CommandMessagesConfig extends ConfigurationFile {
 
     @Override
     public void initializeValues() {
+        NightbreakChatStyle.migrateSeparators(fileConfiguration, "statsSeparator", "lootVoteSeparator");
         // Currency commands
         payNiceTryMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when a player tries to pay a negative amount"),
@@ -1020,7 +1023,7 @@ public class CommandMessagesConfig extends ConfigurationFile {
                 file, fileConfiguration, "trackedNpcCountMessage", "Tracked NPC count: ", true);
         statsSeparator = ConfigurationEngine.setString(
                 List.of("Sets the separator line for the stats command."),
-                file, fileConfiguration, "statsSeparator", "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>", true);
+                file, fileConfiguration, "statsSeparator", NightbreakChatStyle.separator(), true);
         statsVersionHeader = ConfigurationEngine.setString(
                 List.of("Sets the version header for the stats command.",
                         "$version is the placeholder for the plugin version."),
@@ -1060,7 +1063,7 @@ public class CommandMessagesConfig extends ConfigurationFile {
         // SharedLootTable messages
         lootVoteSeparator = ConfigurationEngine.setString(
                 List.of("Sets the separator line for loot votes"),
-                file, fileConfiguration, "lootVoteSeparator", "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>", true);
+                file, fileConfiguration, "lootVoteSeparator", NightbreakChatStyle.separator(), true);
         lootVoteMessage = ConfigurationEngine.setString(
                 List.of("Sets the loot vote message prefix, before the clickable /em loot command.",
                         "$count - the number of items to vote on, used in the suffix."),

@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.versionnotifier;
 
+import com.magmaguy.magmacore.nightbreak.NightbreakChatStyle;
+
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
@@ -491,7 +493,7 @@ public class VersionChecker {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.hasPermission("elitemobs.versionnotification")) continue;
 
-                Logger.sendSimpleMessage(player, "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
+                Logger.sendSimpleMessage(player, NightbreakChatStyle.separator());
                 NightbreakPluginUpdater.PluginUpdateCheck pluginUpdateCheck = currentPluginUpdateCheck();
                 if (hasPluginUpdateNotice(pluginUpdateCheck)) {
                     sendPluginUpdateNotice(player, pluginUpdateCheck);
@@ -524,7 +526,7 @@ public class VersionChecker {
                             )
                     );
                 }
-                Logger.sendSimpleMessage(player, "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
+                Logger.sendSimpleMessage(player, NightbreakChatStyle.separator());
             }
         });
     }
@@ -752,13 +754,13 @@ public class VersionChecker {
                     NightbreakPluginUpdater.PluginUpdateCheck pluginUpdateCheck = currentPluginUpdateCheck();
                     boolean pluginUpdateAvailable = hasPluginUpdateNotice(pluginUpdateCheck);
                     if (pluginUpdateAvailable && outdatedSnapshot.isEmpty()) {
-                        Logger.sendSimpleMessage(event.getPlayer(), "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
+                        Logger.sendSimpleMessage(event.getPlayer(), NightbreakChatStyle.separator());
                         sendPluginUpdateNotice(event.getPlayer(), pluginUpdateCheck);
-                        Logger.sendSimpleMessage(event.getPlayer(), "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
+                        Logger.sendSimpleMessage(event.getPlayer(), NightbreakChatStyle.separator());
                     }
 
                     if (!outdatedSnapshot.isEmpty()) {
-                        Logger.sendSimpleMessage(event.getPlayer(), "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
+                        Logger.sendSimpleMessage(event.getPlayer(), NightbreakChatStyle.separator());
                         if (pluginUpdateAvailable) {
                             sendPluginUpdateNotice(event.getPlayer(), pluginUpdateCheck);
                             Logger.sendSimpleMessage(event.getPlayer(), "&8&m-----------------------------------------------------");
@@ -803,7 +805,7 @@ public class VersionChecker {
                                     )
                             );
                         }
-                        Logger.sendSimpleMessage(event.getPlayer(), "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>");
+                        Logger.sendSimpleMessage(event.getPlayer(), NightbreakChatStyle.separator());
                     }
                     if (SHA1Updated) {
                         event.getPlayer().sendMessage(CommandMessagesConfig.getResourcePackUpdatedMessage());

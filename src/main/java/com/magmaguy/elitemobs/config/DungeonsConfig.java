@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.magmacore.nightbreak.NightbreakChatStyle;
+
 import com.magmaguy.magmacore.config.ConfigurationFile;
 import lombok.Getter;
 
@@ -346,6 +348,7 @@ public class DungeonsConfig extends ConfigurationFile {
 
     @Override
     public void initializeValues() {
+        NightbreakChatStyle.migrateSeparators(fileConfiguration, "contentDownloadSeparator", "skillMigrationSeparator");
 
         dungeonJoinAsPlayerText = ConfigurationEngine.setString(
                 List.of("Sets the text for joining a dungeon as a player! Placeholders:", "$dungeonName - the name of the dungeon"),
@@ -656,7 +659,7 @@ public class DungeonsConfig extends ConfigurationFile {
                 file, fileConfiguration, "contentDownloadLegacyMessage", "&4Download this at &9$link &4!", true);
         contentDownloadSeparator = ConfigurationEngine.setString(
                 List.of("Sets the separator line used in download messages."),
-                file, fileConfiguration, "contentDownloadSeparator", "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>", true);
+                file, fileConfiguration, "contentDownloadSeparator", NightbreakChatStyle.separator(), true);
         contentNightbreakPromptLine1 = ConfigurationEngine.setString(
                 List.of("Sets the first line of the account token prompt."),
                 file, fileConfiguration, "contentNightbreakPromptLine1", "&eThis content can be downloaded automatically after connecting this server.", true);
@@ -743,7 +746,7 @@ public class DungeonsConfig extends ConfigurationFile {
         // SkillSystemMigration messages
         skillMigrationSeparator = ConfigurationEngine.setString(
                 List.of("Sets the separator line used in the skill migration notification."),
-                file, fileConfiguration, "skillMigrationSeparator", "<g:#8B0000:#CC4400:#DAA520>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬</g>", true);
+                file, fileConfiguration, "skillMigrationSeparator", NightbreakChatStyle.separator(), true);
         skillMigrationTitle = ConfigurationEngine.setString(
                 List.of("Sets the title of the skill migration notification."),
                 file, fileConfiguration, "skillMigrationTitle", "<g:#7B2FBE:#A855F7>&lSKILL SYSTEM ACTIVATED</g>", true);
