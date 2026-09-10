@@ -10,10 +10,25 @@ import java.util.Arrays;
 
 /** Uses the same vanilla glyph providers and advances as the feedback resource-pack font. */
 final class CombatHudFeedback {
+    private static final boolean CUSTOM_SHADOW_SUPPORTED = supportsCustomShadow();
     private static final short[] METRICS = loadMetrics("/combat-hud-feedback-metrics.bin");
     private static final short[] CLASS_NAME_METRICS = loadMetrics("/combat-hud-class-name-metrics.bin");
 
     private CombatHudFeedback() { }
+
+    private static boolean supportsCustomShadow() {
+        try {
+            BaseComponent.class.getMethod("setShadowColor", Color.class);
+            return true;
+        } catch (NoSuchMethodException ignored) {
+            return false;
+        }
+    }
+
+    static void shadow(BaseComponent component, Color color) {
+        // Older supported servers do not expose custom shadows in their Bungee API.
+        if (CUSTOM_SHADOW_SUPPORTED) component.setShadowColor(color);
+    }
 
     static BaseComponent[] components(String message, boolean legacy) {
         String singleLine = message.replace('\n', ' ').replace('\r', ' ');
@@ -21,7 +36,7 @@ final class CombatHudFeedback {
                 : new BaseComponent[]{new TextComponent(singleLine)};
         for (BaseComponent component : components) {
             component.setFont("elitemobs:combat_hud_feedback");
-            component.setShadowColor(new Color(0, 0, 0, 190));
+            shadow(component, new Color(0, 0, 0, 190));
         }
         return components;
     }
@@ -56,7 +71,7 @@ final class CombatHudFeedback {
         TextComponent label = new TextComponent(plain);
         label.setFont("elitemobs:combat_hud_class_name");
         label.setColor(net.md_5.bungee.api.ChatColor.of("#fff0be"));
-        label.setShadowColor(new Color(0, true));
+        shadow(label, new Color(0, true));
         return new BaseComponent[]{label};
     }
 

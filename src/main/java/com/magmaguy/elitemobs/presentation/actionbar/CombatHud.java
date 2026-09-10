@@ -46,7 +46,7 @@ public final class CombatHud {
         TextComponent component = new TextComponent(text);
         component.setFont(FONT);
         component.setColor(net.md_5.bungee.api.ChatColor.WHITE);
-        component.setShadowColor(new Color(0, true));
+        CombatHudFeedback.shadow(component, new Color(0, true));
         return component;
     }
 
