@@ -166,15 +166,6 @@ public abstract class MatchInstance {
                 && player.getWorld().equals(lobbyLocation == null ? world : lobbyLocation.getWorld());
     }
 
-    /** Transport may move an admitted participant within this match, never across its boundary. */
-    public final boolean authorizesTransport(Player player, Location destination) {
-        return !isDefunct() && !destroyingMatch && player != null && destination != null
-                && players.contains(player) && PlayerData.getMatchInstance(player) == this
-                && (state == InstancedRegionState.ONGOING || isWaitingPlayer(player))
-                && world != null && world.equals(player.getWorld()) && world.equals(destination.getWorld())
-                && isInRegion(player.getLocation()) && isInRegion(destination);
-    }
-
     /** Acquired after all cancellable admission preflights, before player registration. */
     protected boolean reserveAdmission() { return true; }
 

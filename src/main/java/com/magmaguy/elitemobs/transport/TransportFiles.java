@@ -7,15 +7,14 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.logging.Logger;
 
-/** Route definitions and crash-recovery journals have separate directories and lifecycles. */
+/** Loads and saves authored route definitions. */
 final class TransportFiles {
     final Path routes;
-    final Path journeys;
     private final Map<String, TransportRoute> loaded = new TreeMap<>();
     private com.magmaguy.elitemobs.config.transport.TransportRoutesConfig configuration;
     TransportFiles(Path data, Logger logger) throws IOException {
-        routes = data.resolve("transport_routes"); journeys = data.resolve("transport_journeys");
-        Files.createDirectories(routes); Files.createDirectories(journeys);
+        routes = data.resolve("transport_routes");
+        Files.createDirectories(routes);
         reload();
     }
     void reload() throws IOException {
