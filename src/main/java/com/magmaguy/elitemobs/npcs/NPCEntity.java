@@ -111,11 +111,18 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
      * @param location
      */
     public NPCEntity(Location location) {
-        this.npCsConfigFields = NPCsConfig.getNpcEntities().get("travelling_merchant.yml");
-        if (!npCsConfigFields.isEnabled()) return;
+        this(location, "travelling_merchant.yml");
+    }
+
+    /** Transient summons retain the ordinary NPC spawn, timeout and removal owner. */
+    public NPCEntity(Location location, String filename) {
+        this.npCsConfigFields = NPCsConfig.getNpcEntities().get(filename);
+        if (npCsConfigFields == null || !npCsConfigFields.isEnabled() || location.getWorld() == null
+                || !location.getWorld().isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4)) return;
         Location potentialLocation = location.clone();
         potentialLocation.add(potentialLocation.getDirection().normalize()).setY(location.getY());
-        if (NonSolidBlockTypes.isPassthrough(potentialLocation.getBlock().getType()))
+        if (location.getWorld().isChunkLoaded(potentialLocation.getBlockX() >> 4, potentialLocation.getBlockZ() >> 4)
+                && NonSolidBlockTypes.isPassthrough(potentialLocation.getBlock().getType()))
             this.spawnLocation = potentialLocation;
         else this.spawnLocation = location.clone();
         this.spawnLocation.setDirection(this.spawnLocation.getDirection().multiply(-1));

@@ -1,0 +1,15 @@
+isEnabled: true
+name: Summon Merchant
+maxLevel: 1
+validSlots: [MAINHAND, OFFHAND, HEAD, CHEST, LEGS, FEET]
+stacking: source_item
+script: summon_merchant.lua
+parameters:
+  value: 10
+  procedural: false
+  npc: travelling_merchant.yml
+  message: Jeeves!
+  players_say_message: true
+  cooldown_ticks: 1200
+  lifetime_ticks: 1
+  stop_on_unequip: true

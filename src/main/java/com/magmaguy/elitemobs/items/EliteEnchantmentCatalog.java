@@ -21,11 +21,11 @@ public final class EliteEnchantmentCatalog {
     private static final Set<ScriptHook> HOOKS = Set.of(THREAT_BONUS, CRITICAL_CHANCE);
     private static final Set<ScriptHook> ALL_HOOKS = java.util.stream.Stream.concat(HOOKS.stream(),
             EnchantmentInputs.HOOKS.stream()).collect(java.util.stream.Collectors.toUnmodifiableSet());
-    private static final Set<String> SHARED = Set.of("loud_strikes", "critical_strikes", "drilling", "ice_breaker");
+    private static final Set<String> SHARED = Set.of("loud_strikes", "critical_strikes", "drilling", "ice_breaker", "summon_wolf", "summon_merchant", "flamethrower", "lightning");
     // Removed as each remaining effect is moved to this provider. Soulbind is an ownership setting.
-    private static final Set<String> REMAINING_CONFIGS = Set.of("hunter", "lightning", "flamethrower",
+    private static final Set<String> REMAINING_CONFIGS = Set.of("hunter",
             "earthquake", "plasma_boots", "grappling_hook", "meteor_shower",
-            "summon_merchant", "summon_wolf", "soulbind", "multicast", "blast_radius", "ignition");
+            "soulbind", "multicast", "blast_radius", "ignition");
     private static volatile EnchantmentCatalog catalog;
     private static volatile Set<String> sharedNames = SHARED;
     private static EnchantmentDefinitions.HostedCatalog hosted;
@@ -79,14 +79,17 @@ public final class EliteEnchantmentCatalog {
 
     public static void publish() {
         if (hosted == null)
-            hosted = EnchantmentDefinitions.publishActions(MetadataHandler.PLUGIN, catalog, Set.of(), HOOKS,
+            hosted = EnchantmentDefinitions.publishActions(MetadataHandler.PLUGIN, catalog, Set.of(EnchantmentActions.SOURCE_FACTS), HOOKS,
                     EnchantmentInputs.HOOKS, (operation, request) -> {
+                        if (operation == EnchantmentProviders.Operation.EVALUATE
+                                && EnchantmentActions.SOURCE_FACTS.equals(request.get("kind")))
+                            return captureCombatFacts(request);
                         if (operation != EnchantmentProviders.Operation.EVALUATE
                                 || !"attributed_damage".equals(request.get("kind"))) return Map.of("supported", false);
                         var input = EnchantmentActions.DamageInput.read(request);
                         return Map.of("applied", input != null && EnchantmentInputs.applyExplicitDamage(MetadataHandler.PLUGIN,
                                 input.actor(), input.target(), () -> com.magmaguy.elitemobs.combatsystem.EnchantmentDamage.apply(
-                                        input.attackId(), input.actor().getUniqueId(), input.equipment(),
+                                        input.attackId(), input.providerFacts(),
                                         () -> input.target().damage(input.amount(), input.actor()))));
                     });
         else hosted.reload(catalog);
@@ -101,6 +104,29 @@ public final class EliteEnchantmentCatalog {
     }
 
     public static long revision() { return revision; }
+
+    private static Map<String, Object> captureCombatFacts(Map<String, Object> request) {
+        if (!request.keySet().equals(Set.of("kind", "actor", "equipment"))
+                || !(request.get("actor") instanceof UUID actorId)
+                || !(request.get("equipment") instanceof Map<?, ?> equipment))
+            throw new IllegalArgumentException("Invalid EM source facts request");
+        var player = org.bukkit.Bukkit.getPlayer(actorId);
+        if (player == null || !player.isOnline()) throw new IllegalArgumentException("Missing source player");
+        double threat = 0;
+        int weaponLevel = 0;
+        for (var entry : equipment.entrySet()) {
+            var slot = EnchantmentDefinition.Slot.valueOf((String) entry.getKey());
+            if (!(entry.getValue() instanceof ItemStack item)) throw new IllegalArgumentException("Invalid source item");
+            if (com.magmaguy.elitemobs.api.utils.EliteItemManager.isOnLastDamage(item)
+                    || !com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment.isValidSoulbindUser(item.getItemMeta(), player)
+                    || !com.magmaguy.elitemobs.items.GearRestrictionHandler.canEquip(player, item)) continue;
+            if (slot == EnchantmentDefinition.Slot.MAINHAND)
+                weaponLevel = com.magmaguy.elitemobs.playerdata.PlayerItem.readWeaponTier(player, item);
+            threat += contribution(item, THREAT_BONUS, actorId, slot);
+        }
+        if (!Double.isFinite(threat)) throw new IllegalArgumentException("Invalid captured threat bonus");
+        return Map.of("weapon_level", weaponLevel, "loud_strikes", threat);
+    }
 
     public static EnchantmentDefinition definition(String id) {
         var current = catalog;

@@ -1,0 +1,12 @@
+isEnabled: true
+name: Flamethrower
+maxLevel: 1
+validSlots: [MAINHAND]
+stacking: source_item
+script: flamethrower.lua
+parameters:
+  value: 20
+  procedural: false
+  cooldown_ticks: 3600
+  lifetime_ticks: 102
+  stop_on_unequip: false

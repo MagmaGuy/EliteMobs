@@ -514,9 +514,9 @@ public class EnchantmentGenerator {
     }
 
     private static HashMap<String, Integer> validateSecondaryCustomEnchantments(String string) {
-        if (string.equals("critical_strikes"))
+        if (com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.ownsFilename(string + ".yml"))
             return new HashMap<>(com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.procedural(
-                    com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.CRITICAL_STRIKES));
+                    "elitemobs:" + string));
 
         EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase(Locale.ROOT) + ".yml");
 

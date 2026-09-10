@@ -190,11 +190,6 @@ public class ElitePlayerInventory {
         return Math.min(cap, critChance);
     }
 
-    public double getLightningChance(boolean update) {
-        double lightningChance = mainhand.getLightningChance(player.getInventory().getItemInMainHand(), update);
-        return lightningChance;
-    }
-
     public double getHunterChance(boolean update) {
         double hunterChance = helmet.getHunterChance(player.getInventory().getHelmet(), update) +
                 chestplate.getHunterChance(player.getInventory().getChestplate(), update) +

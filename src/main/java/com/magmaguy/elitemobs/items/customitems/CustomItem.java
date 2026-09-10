@@ -505,7 +505,7 @@ public class CustomItem {
                         throw new IllegalArgumentException("Duplicate custom enchantment identity " + name);
                     continue;
                 }
-                if (java.util.Set.of("multicast", "blast_radius", "ignition", "repair", "unbind", "lucky_source", "enchanted_source", "loud_strikes", "critical_strikes", "drilling", "ice_breaker")
+                if (java.util.Set.of("multicast", "blast_radius", "ignition", "repair", "unbind", "lucky_source", "enchanted_source", "loud_strikes", "critical_strikes", "drilling", "ice_breaker", "summon_wolf", "summon_merchant", "flamethrower", "lightning")
                         .contains(name.toLowerCase(Locale.ROOT))) {
                     customItemsConfigFields.setEnabled(false);
                     Logger.warn("Custom item " + customItemsConfigFields.getFilename()

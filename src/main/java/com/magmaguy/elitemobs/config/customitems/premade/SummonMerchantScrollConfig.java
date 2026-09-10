@@ -13,7 +13,7 @@ public class SummonMerchantScrollConfig extends CustomItemsConfigFields {
                 Material.PAPER,
                 "&6Summon Merchant Scroll",
                 new ArrayList<>(List.of("&aNeed to sell an item?", "&aRight-click to activate", "&aor yell &9Jeeves!")));
-        setEnchantments(List.of("SUMMON_MERCHANT,1"));
+        setEnchantments(List.of("elitemobs:summon_merchant,1"));
         setDropWeight("5");
     }
 }

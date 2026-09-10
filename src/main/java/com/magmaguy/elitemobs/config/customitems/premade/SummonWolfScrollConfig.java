@@ -14,7 +14,7 @@ public class SummonWolfScrollConfig extends CustomItemsConfigFields {
                 Material.PAPER,
                 "&6Summon Wolf Scroll",
                 new ArrayList<>(List.of("&aSummons a good boy", "&ato help you bite Elites!", "&aMake sure you pet it!")));
-        setEnchantments(List.of("SUMMON_WOLF,1"));
+        setEnchantments(List.of("elitemobs:summon_wolf,1"));
         setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

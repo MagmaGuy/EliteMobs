@@ -30,13 +30,9 @@ public abstract class CustomEnchantment {
     }
 
     public static void initializeCustomEnchantments() {
-        new FlamethrowerEnchantment();
         new PlasmaBootsEnchantment();
         new HunterEnchantment();
         new MeteorShowerEnchantment();
-        new SummonMerchantEnchantment();
-        new SummonWolfEnchantment();
-        new LightningEnchantment();
         new GrapplingHookEnchantment();
         new EarthquakeEnchantment();
     }

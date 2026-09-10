@@ -41,6 +41,16 @@ public final class LuaEntityEnricher {
     }
 
     private static void addEliteFields(LuaTable table, Entity entity) {
+        if (entity instanceof org.bukkit.entity.Player player) {
+            LuaTableSupport.lazyField(table, "elite_player", () -> {
+                var inventory = com.magmaguy.elitemobs.playerdata.ElitePlayerInventory.playerInventories.get(player.getUniqueId());
+                if (inventory == null) return LuaValue.NIL;
+                LuaTable values = new LuaTable();
+                // Combat tier is calculated from skill XP and does not refresh enchantment queries.
+                values.set("tier", inventory.getFullPlayerTier(false));
+                return values;
+            });
+        }
         table.set("can_receive_hostile_effect", LuaTableSupport.tableMethod(table, args -> {
             Entity actor = Bukkit.getEntity(java.util.UUID.fromString(args.checkjstring(1)));
             return LuaValue.valueOf(actor instanceof org.bukkit.entity.Player player

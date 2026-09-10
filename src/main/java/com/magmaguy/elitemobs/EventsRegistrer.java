@@ -192,7 +192,6 @@ public class EventsRegistrer {
             register(new SoulbindEnchantment.SoulbindEnchantmentEvents());
         register(new CustomSummonPower.CustomSummonPowerEvent());
         register(new CombatEnterScanPower.MajorCombatEnterScanningPowerEvents());
-        register(new LightningEnchantment.LightningEnchantmentEvents());
         registerPower(new BonusCoins.BonusCoinsEvents(), "bonus_coins.yml");
 
         //special powers
@@ -316,9 +315,6 @@ public class EventsRegistrer {
         register(new BossBarOrderManager.BossBarOrderManagerEvents());
 
         //Initialize items from custom events
-        register(new FlamethrowerEnchantment.FlamethrowerEnchantmentEvents());
-        register(new SummonMerchantEnchantment.SummonMerchantEvents());
-        register(new SummonWolfEnchantment.SummonWolfEnchantmentEvent());
         register(new MeteorShowerEnchantment.MeteorShowerEvents());
         register(new GrapplingHookEnchantment.GrapplingHookEnchantmentEvents());
         register(new EarthquakeEnchantment.EarthquakeEnchantmentEvents());

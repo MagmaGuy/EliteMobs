@@ -566,6 +566,7 @@ public class EliteMobs extends JavaPlugin {
             }
         }
         com.magmaguy.elitemobs.scripting.LuaEntityEnricher.register();
+        com.magmaguy.elitemobs.scripting.LuaWorldEnricher.register();
 
         //Initialize custom & regional bosses
         initializationContext.step("Custom Bosses");
@@ -728,10 +729,6 @@ public class EliteMobs extends JavaPlugin {
         CustomBossEntity.shutdown();
         com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay.shutdown();
         // Memory leak fixes - clear static collections
-        SummonWolfEnchantment.SummonWolfEnchantmentEvent.shutdown();
-        SummonMerchantEnchantment.SummonMerchantEvents.shutdown();
-        FlamethrowerEnchantment.shutdown();
-        LightningEnchantment.LightningEnchantmentEvents.shutdown();
         ItemLootShower.shutdown();
         com.magmaguy.elitemobs.utils.MessageThrottler.shutdown();
         TrackingFireballSupport.shutdown();
