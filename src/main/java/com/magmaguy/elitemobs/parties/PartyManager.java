@@ -283,7 +283,8 @@ public final class PartyManager implements Listener {
                 .filter(member -> !dungeon.isSpectator(member) && member.isOnline())
                 .sorted(Comparator.comparing(Player::getName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
-        if (roster.isEmpty()) return;
+        // Solo admission leaves party membership alone; group the dungeon when a second player joins.
+        if (roster.size() < 2) return;
         Set<UUID> rosterIds = new HashSet<>();
         roster.forEach(member -> rosterIds.add(member.getUniqueId()));
         Party party = parties.get(dungeonParties.get(dungeon.getRuntimeId()));
