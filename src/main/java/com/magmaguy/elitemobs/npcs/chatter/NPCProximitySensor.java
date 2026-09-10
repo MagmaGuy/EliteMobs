@@ -44,9 +44,13 @@ import java.util.function.Predicate;
 
 public class NPCProximitySensor implements Listener {
 
+    private static final int BOUNCE_PERIOD_TICKS = 40;
+    private static final double BOUNCE_HEIGHT = 0.16;
     private static final NPCProximityState proximityState = new NPCProximityState();
     private static BukkitTask proximityScanTask = null;
     private static BukkitTask questIndicatorTask;
+    private static int indicatorAnimationTick;
+    private static double indicatorBounceOffset;
     private static final Map<NPCProximityKey, QuestIndicator> questIndicators = new HashMap<>();
 
     public NPCProximitySensor() {
@@ -111,7 +115,7 @@ public class NPCProximitySensor implements Listener {
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20L * 5L);
         questIndicatorTask = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN,
-                NPCProximitySensor::refreshQuestIndicators, 1L, 10L);
+                NPCProximitySensor::refreshQuestIndicators, 1L, 1L);
     }
 
     public static void shutdown() {
@@ -122,6 +126,8 @@ public class NPCProximitySensor implements Listener {
         proximityState.clear();
         if (questIndicatorTask != null) questIndicatorTask.cancel();
         questIndicatorTask = null;
+        indicatorAnimationTick = 0;
+        indicatorBounceOffset = 0;
         removeIndicators(key -> true);
     }
 
@@ -146,10 +152,15 @@ public class NPCProximitySensor implements Listener {
         if (type != NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER
                 && type != NPCInteractions.NPCInteractionType.QUEST_GIVER) return;
         NPCProximityKey key = new NPCProximityKey(npcEntity.getUuid(), player.getUniqueId());
-        questIndicators.computeIfAbsent(key, ignored -> new QuestIndicator()).update(npcEntity, player);
+        questIndicators.computeIfAbsent(key, ignored -> new QuestIndicator()).update(npcEntity, player, true);
     }
 
     private static void refreshQuestIndicators() {
+        indicatorAnimationTick = (indicatorAnimationTick + 1) % BOUNCE_PERIOD_TICKS;
+        // Bounce upward from the compact anchor so the low point never overlaps the nameplate.
+        indicatorBounceOffset = BOUNCE_HEIGHT * 0.5 * (1 + Math.sin(
+                2 * Math.PI * indicatorAnimationTick / BOUNCE_PERIOD_TICKS - Math.PI / 2));
+        boolean refreshQuestState = indicatorAnimationTick % 10 == 0;
         var iterator = questIndicators.entrySet().iterator();
         while (iterator.hasNext()) {
             var entry = iterator.next();
@@ -165,7 +176,7 @@ public class NPCProximitySensor implements Listener {
                 entry.getValue().remove();
                 iterator.remove();
             } else {
-                entry.getValue().update(npc, player);
+                entry.getValue().update(npc, player, refreshQuestState);
             }
         }
     }
@@ -217,13 +228,15 @@ public class NPCProximitySensor implements Listener {
     private static final class QuestIndicator {
         private FakeText display;
 
-        private void update(NPCEntity npc, Player player) {
-            String text = findQuestState(npc, player);
+        private void update(NPCEntity npc, Player player, boolean refreshQuestState) {
+            // Animate every tick, retaining the existing half-second quest-state refresh cadence.
+            String text = refreshQuestState ? findQuestState(npc, player)
+                    : display == null ? null : display.getText();
             if (text == null) {
                 remove();
                 return;
             }
-            Location location = npc.getQuestIndicatorLocation();
+            Location location = npc.getQuestIndicatorLocation().add(0, indicatorBounceOffset, 0);
             if (display == null) {
                 display = VisualDisplay.createStyledFakeText(location, text, Color.fromARGB(0), true, 3.0f);
                 if (display != null) display.displayTo(player);
