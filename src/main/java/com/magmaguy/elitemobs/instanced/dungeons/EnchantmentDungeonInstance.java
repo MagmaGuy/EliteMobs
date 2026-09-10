@@ -1,6 +1,10 @@
 package com.magmaguy.elitemobs.instanced.dungeons;
 
 import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.items.upgradesystem.EnchantmentAcquisition;
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
@@ -12,10 +16,8 @@ import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -23,12 +25,8 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
     @Getter
     @Setter
     Player player;
-    @Getter
-    @Setter
-    private ItemStack upgradedItem;
-    @Getter
-    @Setter
-    private ItemStack currentItem;
+    private EnchantmentAcquisition acquisition;
+    private BukkitTask acquisitionMonitor;
     private boolean challengeResolved = false;
 
     public EnchantmentDungeonInstance(ContentPackagesConfigFields contentPackagesConfigFields,
@@ -46,7 +44,7 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         this.player = player;
     }
 
-    public static boolean setupRandomEnchantedChallengeDungeon(Player player, ItemStack upgradedItem, ItemStack itemFromInventory) {
+    public static boolean setupRandomEnchantedChallengeDungeon(Player player, EnchantmentAcquisition acquisition) {
         List<ContentPackagesConfigFields> contentPackagesConfigFieldsList = new ArrayList<>();
         WorldDungeonPackage.getEmPackages().values().stream().forEach(emPackage -> {if (emPackage.isInstalled() && emPackage.getContentPackagesConfigFields().isEnchantmentChallenge()) contentPackagesConfigFieldsList.add(emPackage.getContentPackagesConfigFields());});
         if (contentPackagesConfigFieldsList.isEmpty()) {
@@ -58,30 +56,46 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
 
         if (!launchEvent(contentPackagesConfigFields, instancedWordName, player)) return false;
 
-        // Clone single-item snapshots before passing to lambda to avoid later stack mutation.
-        ItemStack upgradedItemClone = cloneSingleItem(upgradedItem);
-        ItemStack currentItemClone = cloneSingleItem(itemFromInventory);
-
+        boolean[] accepted = {false};
         WorldOperationQueue.queueOperation(
                 player,
                 () -> cloneWorldFiles(contentPackagesConfigFields, instancedWordName) != null,
                 () -> {
-                    DungeonInstance dungeonInstance = initializeInstancedWorld(contentPackagesConfigFields, instancedWordName, player, (String) contentPackagesConfigFields.getDifficulties().get(0).get("name"));
-                    if (dungeonInstance instanceof EnchantmentDungeonInstance enchantmentDungeonInstance) {
-                        enchantmentDungeonInstance.setUpgradedItem(upgradedItemClone);
-                        enchantmentDungeonInstance.setCurrentItem(currentItemClone);
-                    }
+                    if (!player.isOnline() || MetadataHandler.shutdownRequested || !acquisition.isOwned()) return;
+                    acquisition.validateProviders();
+                    DungeonInstance instance = initializeInstancedWorld(contentPackagesConfigFields, instancedWordName,
+                            player, (String) contentPackagesConfigFields.getDifficulties().get(0).get("name"));
+                    if (instance instanceof EnchantmentDungeonInstance challenge && !challenge.isDefunct()) {
+                        challenge.accept(acquisition);
+                        accepted[0] = true;
+                    } else if (instance != null) instance.removeInstance();
                 },
-                contentPackagesConfigFields.getName()
-        );
-
+                contentPackagesConfigFields.getName(),
+                () -> { if (!accepted[0]) acquisition.abort("challenge startup failed or was cancelled"); });
         return true;
     }
 
-    private static ItemStack cloneSingleItem(ItemStack itemStack) {
-        ItemStack clone = itemStack.clone();
-        clone.setAmount(1);
-        return clone;
+    private void accept(EnchantmentAcquisition acquisition) {
+        this.acquisition = acquisition;
+        acquisitionMonitor = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, () -> {
+            try { acquisition.validateProviders(); }
+            catch (RuntimeException invalid) { removeInstance(); }
+        }, 20L, 20L);
+    }
+
+    @Override
+    protected void cancelScheduledTasks() {
+        if (acquisitionMonitor != null) { acquisitionMonitor.cancel(); acquisitionMonitor = null; }
+        super.cancelScheduledTasks();
+    }
+
+    @Override
+    public void removeInstance() {
+        if (acquisition != null && !challengeResolved) {
+            challengeResolved = true;
+            acquisition.abort("challenge infrastructure or provider lifetime ended before resolution");
+        }
+        super.removeInstance();
     }
 
     /**
@@ -114,33 +128,33 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
     @Override
     protected void victory() {
         if (!markChallengeResolved()) return;
+        acquisition.success();
         super.victory();
         player.sendMessage(DungeonsConfig.getEnchantChallengeCompleteMessage());
         player.sendMessage(DungeonsConfig.getEnchantChallengeSuccessMessage());
-        ItemEnchantmentMenu.broadcastEnchantmentMessage(upgradedItem, player, SpecialItemSystemsConfig.getSuccessAnnouncement());
-        HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(upgradedItem);
-        if (!leftOvers.isEmpty())
-            leftOvers.values().forEach(leftover -> player.getWorld().dropItem(player.getLocation(), leftover));
+        ItemEnchantmentMenu.broadcastEnchantmentMessage(acquisition.upgraded(), player, SpecialItemSystemsConfig.getSuccessAnnouncement());
     }
 
     @Override
     protected void defeat() {
         if (!markChallengeResolved()) return;
+        boolean destroyed = ThreadLocalRandom.current().nextDouble() < SpecialItemSystemsConfig.getCriticalFailureChanceDuringChallengeChance();
+        if (destroyed) acquisition.criticalFailure(); else acquisition.failure();
         super.defeat();
-        if (ThreadLocalRandom.current().nextDouble() < SpecialItemSystemsConfig.getCriticalFailureChanceDuringChallengeChance()) {
-            player.sendMessage(DungeonsConfig.getEnchantCriticalFailureMessage().replace("$item", currentItem.getItemMeta().getDisplayName()));
-            ItemEnchantmentMenu.broadcastEnchantmentMessage(upgradedItem, player, SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
+        if (destroyed) { // Preserve the existing intentional challenge-defeat loss probability.
+            player.sendMessage(DungeonsConfig.getEnchantCriticalFailureMessage().replace("$item", acquisition.original().getItemMeta().getDisplayName()));
+            ItemEnchantmentMenu.broadcastEnchantmentMessage(acquisition.upgraded(), player, SpecialItemSystemsConfig.getCriticalFailureAnnouncement());
         } else {
-            player.sendMessage(DungeonsConfig.getEnchantChallengeFailedMessage().replace("$item", currentItem.getItemMeta().getDisplayName()));
-            HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(currentItem);
-            if (!leftOvers.isEmpty())
-                leftOvers.values().forEach(leftover -> player.getWorld().dropItem(player.getLocation(), leftover));
+            player.sendMessage(DungeonsConfig.getEnchantChallengeFailedMessage().replace("$item", acquisition.original().getItemMeta().getDisplayName()));
         }
     }
 
     private boolean markChallengeResolved() {
-        if (challengeResolved) return false;
+        if (challengeResolved || acquisition == null) return false;
+        try { acquisition.validateProviders(); }
+        catch (RuntimeException invalid) { removeInstance(); return false; }
         challengeResolved = true;
+        if (acquisitionMonitor != null) { acquisitionMonitor.cancel(); acquisitionMonitor = null; }
         return true;
     }
 

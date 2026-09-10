@@ -1,89 +1,79 @@
 package com.magmaguy.elitemobs.items.upgradesystem;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.items.customenchantments.EnchantedSourceEnchantment;
-import com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment;
 import com.magmaguy.elitemobs.items.itemconstructor.EnchantmentGenerator;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
+import com.magmaguy.magmacore.enchantments.EnchantmentItems;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import java.util.*;
 
-import java.util.HashMap;
-import java.util.Map;
+/** EM's additive book progression, prepared before charging and pinned to both input stacks. */
+public final class UpgradeSystem {
+    private UpgradeSystem() { }
 
-public class UpgradeSystem {
-    private UpgradeSystem() {
-    }
-
-    public static ItemStack upgrade(ItemStack originalItemToUpgrade, ItemStack enchantedBook) {
-        if (!isCompatibleBook(originalItemToUpgrade, enchantedBook))
-            throw new IllegalArgumentException("The book contains enchantments incompatible with this item");
-        ItemStack itemToUpgrade = originalItemToUpgrade.clone();
-        ItemMeta itemMeta = itemToUpgrade.getItemMeta();
-        Map<NamespacedKey, Integer> currentEnchantments = ItemTagger.getItemEnchantments(itemToUpgrade);
-        Map<NamespacedKey, Integer> bookEnchantments = ItemTagger.getItemEnchantments(enchantedBook);
-        Map<NamespacedKey, Integer> newMap = new HashMap<>(currentEnchantments);
-        //Remove the enchantment that makes this a book, it's non-transferable
-        bookEnchantments.remove(new NamespacedKey(MetadataHandler.PLUGIN, EnchantedSourceEnchantment.key));
-
-        //merge enchants
-        for (Map.Entry<NamespacedKey, Integer> entrySet : bookEnchantments.entrySet()) {
-            if (!currentEnchantments.containsKey(entrySet.getKey()))
-                newMap.put(entrySet.getKey(), entrySet.getValue());
-            else
-                newMap.put(entrySet.getKey(), currentEnchantments.get(entrySet.getKey()) + entrySet.getValue());
+    public static Preview preview(ItemStack source, ItemStack book) {
+        if (source == null || source.getAmount() < 1 || !ItemTagger.isEliteItem(source))
+            throw new IllegalArgumentException("An eligible elite target is required");
+        Map<String,Integer> additions = EliteEnchantmentItems.readBook(book);
+        var custom = EliteEnchantmentItems.custom(source);
+        var natives = new HashMap<>(EliteEnchantmentItems.nativeLevels(source));
+        for (var entry : additions.entrySet()) {
+            if (entry.getKey().startsWith("minecraft:")) {
+                var enchantment = Enchantment.getByKey(NamespacedKey.fromString(entry.getKey()));
+                if (enchantment == null) throw new IllegalArgumentException("Unknown native enchantment");
+                if (WeaponIdentityResolver.isMagicWeapon(source)
+                        && !EnchantmentGenerator.supportedMagicEnchantments().contains(enchantment))
+                    throw new IllegalArgumentException("Native enchantment is incompatible with this magic weapon");
+                natives.merge(enchantment, entry.getValue(), Math::addExact);
+            } else custom.merge(entry.getKey(), entry.getValue(), Math::addExact);
         }
-
-        //get vanilla enchants
-        Map<NamespacedKey, Integer> vanillaEnchantmentsNamespaced = new HashMap<>();
-        HashMap<Enchantment, Integer> vanillaEnchantments = new HashMap<>();
-        for (Map.Entry<NamespacedKey, Integer> entrySet : newMap.entrySet()) {
-            Enchantment enchantment = Enchantment.getByKey(entrySet.getKey());
-            if (enchantment != null) {
-                vanillaEnchantments.put(enchantment, entrySet.getValue());
-                vanillaEnchantmentsNamespaced.put(entrySet.getKey(), entrySet.getValue());
-            }
+        for (var entry : natives.entrySet()) {
+            var config = EnchantmentsConfig.getEnchantment(entry.getKey());
+            if (config == null || !config.isEnabled() || entry.getValue() > config.getMaxEnchantmentLevel())
+                throw new IllegalArgumentException("Native upgrade exceeds EM's configured limit");
         }
-
-        EnchantmentGenerator.generateEnchantments(itemMeta, vanillaEnchantments);
-        ItemTagger.registerEnchantments(itemMeta, vanillaEnchantments);
-
-        //get custom enchantments
-        HashMap<String, Integer> customEnchantments = new HashMap<>();
-        for (Map.Entry<NamespacedKey, Integer> entrySet : newMap.entrySet())
-            if (!vanillaEnchantmentsNamespaced.containsKey(entrySet.getKey()))
-                customEnchantments.put(entrySet.getKey().getKey(), entrySet.getValue());
-
-        ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
-
-        itemToUpgrade.setItemMeta(itemMeta);
-        new EliteItemLore(itemToUpgrade, false);
-        return itemToUpgrade;
+        ItemStack nativeDraft = source.clone();
+        nativeDraft.setAmount(1);
+        var meta = nativeDraft.getItemMeta();
+        EnchantmentGenerator.generateEnchantments(meta, natives);
+        ItemTagger.registerEnchantments(meta, natives);
+        nativeDraft.setItemMeta(meta);
+        var shared = EliteEnchantmentItems.ITEMS.previewCustom(nativeDraft, custom);
+        ItemStack rendered = shared.previewItem();
+        new EliteItemLore(rendered, false);
+        return new Preview(source.clone(), book.clone(), nativeDraft, shared, rendered);
     }
 
-    public static boolean isValidUpgrade(ItemStack originalItemToUpgrade, ItemStack enchantedBook) {
-        if (!isCompatibleBook(originalItemToUpgrade, enchantedBook)) return false;
-        ItemStack finalItemStack = upgrade(originalItemToUpgrade, enchantedBook);
-        Map<EnchantmentsConfigFields, Integer> currentEnchantments = ItemTagger.getItemEnchantmentConfigFields(finalItemStack);
-        for (Map.Entry<EnchantmentsConfigFields, Integer> entry : currentEnchantments.entrySet())
-            if (entry.getKey() == null || entry.getValue() > entry.getKey().getMaxEnchantmentLevel()
-                    || (MagicWeaponEnchantment.KEYS.contains(entry.getKey().getFilename().replace(".yml", ""))
-                    && entry.getValue() > 3)) return false;
-        return true;
+    public static ItemStack upgrade(ItemStack source, ItemStack book) { return preview(source, book).apply(source, book); }
+
+    public static boolean isValidUpgrade(ItemStack source, ItemStack book) {
+        try { preview(source, book); return true; }
+        catch (RuntimeException invalid) { return false; }
     }
 
-    public static boolean isCompatibleBook(ItemStack item, ItemStack book) {
-        if (item == null || book == null) return false;
-        Map<NamespacedKey, Integer> additions = ItemTagger.getItemEnchantments(book);
-        additions.remove(new NamespacedKey(MetadataHandler.PLUGIN, EnchantedSourceEnchantment.key));
-        if (additions.isEmpty()) return false;
-        for (NamespacedKey key : additions.keySet())
-            if (!MagicWeaponEnchantment.compatible(item, key)) return false;
-        return true;
+    public static boolean isCompatibleBook(ItemStack source, ItemStack book) {
+        return isValidUpgrade(source, book);
     }
 
+    public static final class Preview {
+        private final ItemStack source, book, nativeDraft, result;
+        private final EnchantmentItems.Preview shared;
+        private Preview(ItemStack source, ItemStack book, ItemStack nativeDraft, EnchantmentItems.Preview shared, ItemStack result) {
+            this.source = source;
+            this.book = book;
+            this.nativeDraft = nativeDraft;
+            this.shared = shared;
+            this.result = result;
+        }
+        public ItemStack apply(ItemStack currentSource, ItemStack currentBook) {
+            if (!source.equals(currentSource) || !book.equals(currentBook))
+                throw new ConcurrentModificationException("Enchantment inputs changed after preview");
+            shared.apply(nativeDraft); // Recheck the captured provider revisions without reconstructing output.
+            return result.clone();
+        }
+    }
 }

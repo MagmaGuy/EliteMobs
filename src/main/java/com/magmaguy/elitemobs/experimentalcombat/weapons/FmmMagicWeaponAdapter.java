@@ -25,7 +25,7 @@ import java.util.Objects;
 /** FMM-linked implementation loaded only after the optional plugin is present. */
 final class FmmMagicWeaponAdapter
         implements ExperimentalMagicWeaponIntegration.Connection, MagicAttackResolver {
-    private static final int REQUIRED_CAPABILITY_VERSION = 4;
+    private static final int REQUIRED_CAPABILITY_VERSION = 6;
 
     private final Plugin owner;
     private volatile boolean registered;
@@ -95,21 +95,8 @@ final class FmmMagicWeaponAdapter
     @Override
     public boolean canAttack(org.bukkit.entity.Player player, ItemStack weapon,
                              com.magmaguy.freeminecraftmodels.api.magic.MagicAttackKind attackKind) {
-        com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment.removeLegacyPunch(weapon);
         com.magmaguy.elitemobs.items.ItemDurability.prepareMagicWeapon(weapon);
         return !EliteItemManager.isOnLastDamage(weapon);
-    }
-
-    @Override
-    public com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponModifiers modifiers(ItemStack weapon, MagicWeaponKind kind) {
-        int multicast = com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment.level(weapon, "multicast");
-        int radius = com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment.level(weapon, "blast_radius");
-        int ignition = com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment.level(weapon, "ignition");
-        return new com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponModifiers(
-                multicast == 0 ? 1 : multicast == 3 ? 3 : 2,
-                com.magmaguy.elitemobs.config.enchantments.premade.MulticastConfig.damageMultiplier(multicast),
-                com.magmaguy.elitemobs.config.enchantments.premade.BlastRadiusConfig.radiusMultiplier(radius),
-                com.magmaguy.elitemobs.config.enchantments.premade.IgnitionConfig.fireTicks(ignition));
     }
 
     @Override

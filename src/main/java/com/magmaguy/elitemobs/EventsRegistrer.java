@@ -324,7 +324,6 @@ public class EventsRegistrer {
         register(new IceBreakerEnchantment.IceBreakerEnchantmentEvent());
         register(new GrapplingHookEnchantment.GrapplingHookEnchantmentEvents());
         register(new EarthquakeEnchantment.EarthquakeEnchantmentEvents());
-        //register(new UnbindEnchantment.UnbindEvents());
 
         //register quests
         register(new KillObjective.KillObjectiveEvents());

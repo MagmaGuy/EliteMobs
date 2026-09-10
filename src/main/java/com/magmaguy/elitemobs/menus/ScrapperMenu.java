@@ -6,7 +6,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
-import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
+import com.magmaguy.elitemobs.items.ItemConsumables;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.utils.CustomModelAdder;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
@@ -153,7 +153,7 @@ public class ScrapperMenu extends EliteMenu {
                         if (itemStack == null)
                             continue;
 
-                        ItemStack scrapItem = RepairEnchantment.generateScrap(itemStack, player, null);
+                        ItemStack scrapItem = ItemConsumables.generateScrap(itemStack, player, null);
                         if (scrapItem == null) {
                             // Don't consume the item if scrap generation failed
                             generationFailed = true;

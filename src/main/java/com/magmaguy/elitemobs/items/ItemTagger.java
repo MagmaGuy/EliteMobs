@@ -48,7 +48,6 @@ public class ItemTagger {
     public static NamespacedKey onHitPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "onHitPotionEffect");
     public static NamespacedKey continuousPotionEffectKey = new NamespacedKey(MetadataHandler.PLUGIN, "continuousPotionEffect");
     public static NamespacedKey itemSource = new NamespacedKey(MetadataHandler.PLUGIN, "itemSource");
-    public static NamespacedKey enchantmentCount = new NamespacedKey(MetadataHandler.PLUGIN, "enchantmentCount");
 
     public static void registerEliteItem(ItemMeta itemMeta) {
         itemMeta.getPersistentDataContainer().set(eliteMobsItemNamespacedKey, PersistentDataType.BYTE, (byte) 1);
@@ -181,7 +180,8 @@ public class ItemTagger {
         if (level == null) {
             Enchantment enchantment = Enchantment.getByKey(enchantmentKey);
             if (enchantment != null)
-                return itemMeta.getEnchantLevel(enchantment);
+                return itemMeta instanceof org.bukkit.inventory.meta.EnchantmentStorageMeta book
+                        ? book.getStoredEnchantLevel(enchantment) : itemMeta.getEnchantLevel(enchantment);
             else
                 return 0;
         } else
@@ -413,17 +413,6 @@ public class ItemTagger {
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.getPersistentDataContainer().set(ELITE_LEVEL, PersistentDataType.INTEGER, level);
         itemStack.setItemMeta(itemMeta);
-    }
-
-    public static void registerEnchantmentCount(@Nullable ItemMeta itemMeta, int count) {
-        if (itemMeta == null) return;
-        itemMeta.getPersistentDataContainer().set(enchantmentCount, PersistentDataType.INTEGER, count);
-    }
-
-    public static int getEnchantmentCount(@Nullable ItemStack itemStack) {
-        if (itemStack == null || itemStack.getItemMeta() == null) return 0;
-        Integer value = itemStack.getItemMeta().getPersistentDataContainer().get(enchantmentCount, PersistentDataType.INTEGER);
-        return value == null ? 0 : value;
     }
 
     public static HashMap<NamespacedKey, Integer> getItemEnchantments(@Nullable ItemStack itemStack) {

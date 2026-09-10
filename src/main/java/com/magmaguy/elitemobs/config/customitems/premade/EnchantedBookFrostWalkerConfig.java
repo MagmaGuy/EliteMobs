@@ -11,10 +11,10 @@ public class EnchantedBookFrostWalkerConfig extends CustomItemsConfigFields {
     public EnchantedBookFrostWalkerConfig() {
         super("enchanted_book_frost_walker",
                 true,
-                Material.BOOK,
+                Material.ENCHANTED_BOOK,
                 "&5Elite Frost Walker Enchanted Book",
                 new ArrayList<>(List.of("&2Used to enchant items at the enchanter!")));
-        setEnchantments(new ArrayList<>(List.of("FROST_WALKER,1", "ENCHANTED_SOURCE,1")));
+        setEnchantments(new ArrayList<>(List.of("FROST_WALKER,1")));
         setItemType(CustomItem.ItemType.UNIQUE);
         setScalability(CustomItem.Scalability.FIXED);
         setSoulbound(false);

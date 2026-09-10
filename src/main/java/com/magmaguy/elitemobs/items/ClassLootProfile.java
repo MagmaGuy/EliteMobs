@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
-import com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment;
+import com.magmaguy.elitemobs.items.itemconstructor.MagicEnchantmentGeneration;
 import com.magmaguy.elitemobs.skills.SkillType;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -46,11 +46,12 @@ public record ClassLootProfile(String primary, List<Rule> enchantments, List<Rul
         if (ThreadLocalRandom.current().nextDouble() >= rule.chance) return;
         // maxLevelV2 is the normal procedural/value reference, not the authored-content ceiling.
         int level = Math.min(rule.level, config.getMaxEnchantmentLevel());
-        if (MagicWeaponEnchantment.KEYS.contains(rule.key)) level = Math.min(level, 3);
+        if (MagicEnchantmentGeneration.KEYS.contains(rule.key)) level = Math.min(level, 3);
         if (level <= 0) return;
         Enchantment nativeEnchantment = nativeEnchantment(rule.key);
         if (nativeEnchantment != null) nativeLevels.merge(nativeEnchantment, level, Math::max);
-        else customLevels.merge(rule.key, level, Math::max);
+        else customLevels.merge(MagicEnchantmentGeneration.KEYS.contains(rule.key)
+                ? "freeminecraftmodels:" + rule.key : rule.key, level, Math::max);
     }
 
     public static Enchantment nativeEnchantment(String key) {
@@ -77,7 +78,7 @@ public record ClassLootProfile(String primary, List<Rule> enchantments, List<Rul
     public static boolean supports(SkillType skill, String key) {
         if (Set.of("unbreaking", "mending", "vanishing_curse").contains(key)) return true;
         if (skill == SkillType.STAVES || skill == SkillType.WANDS)
-            return key.equals("power") || MagicWeaponEnchantment.supports(skill, key);
+            return key.equals("power") || MagicEnchantmentGeneration.supports(skill, key);
         if (key.equals("critical_strikes")) return true;
         return switch (skill) {
             case BOWS -> Set.of("power", "flame", "punch", "infinity").contains(key);

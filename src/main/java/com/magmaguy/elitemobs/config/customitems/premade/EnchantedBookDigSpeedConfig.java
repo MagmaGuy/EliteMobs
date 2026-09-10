@@ -11,10 +11,10 @@ public class EnchantedBookDigSpeedConfig extends CustomItemsConfigFields {
     public EnchantedBookDigSpeedConfig() {
         super("enchanted_book_dig_speed",
                 true,
-                Material.BOOK,
+                Material.ENCHANTED_BOOK,
                 "&5Elite Efficiency Enchanted Book",
                 new ArrayList<>(List.of("&2Used to enchant items at the enchanter!")));
-        setEnchantments(new ArrayList<>(List.of("EFFICIENCY,1", "ENCHANTED_SOURCE,1")));
+        setEnchantments(new ArrayList<>(List.of("EFFICIENCY,1")));
         setItemType(CustomItem.ItemType.UNIQUE);
         setScalability(CustomItem.Scalability.FIXED);
     }

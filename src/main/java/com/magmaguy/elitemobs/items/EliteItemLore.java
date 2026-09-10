@@ -53,7 +53,6 @@ public class EliteItemLore {
     private Player soulboundPlayer = null;
     private List<String> customLore = new ArrayList<>();
     private int prestigeLevel = 0;
-    private int enchantmentCount = 0;
     private List<String> thirdPartyLore = null;
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth) {
@@ -98,7 +97,6 @@ public class EliteItemLore {
 
         constructItemWorth();
 
-        ItemTagger.registerEnchantmentCount(itemMeta, enchantmentCount);
         this.itemStack.setItemMeta(this.itemMeta);
         ItemStack rendered = ENCHANTMENT_PRESENTATION.refreshPresentation(this.itemStack, hostLore -> {
             if (isNewItem && !hostLore.isEmpty()) thirdPartyLore = hostLore;
@@ -121,7 +119,6 @@ public class EliteItemLore {
                 vanillaEnchantmentsLore.add(ChatColorConverter.convert(
                         "&7" + EnchantmentsConfig.getEnchantment(enchantment).getName() + " "
                                 + itemMeta.getEnchants().get(enchantment)));
-            enchantmentCount += itemMeta.getEnchantLevel(enchantment);
         }
     }
 
@@ -142,7 +139,6 @@ public class EliteItemLore {
         if (enchantmentLevel > enchantment.getMaxLevel()) {
             int eliteLevel = enchantmentLevel - enchantment.getMaxLevel();
             eliteVanillaEnchantments.put(enchantment, eliteLevel);
-            enchantmentCount += eliteLevel;
         }
     }
 
@@ -163,7 +159,6 @@ public class EliteItemLore {
             int enchantmentLevel = ItemTagger.getEnchantment(itemMeta, customEnchantment.getKey());
             if (enchantmentLevel > 0) {
                 customEnchantments.put(customEnchantment, enchantmentLevel);
-                enchantmentCount += enchantmentLevel;
             }
         }
     }
@@ -173,10 +168,7 @@ public class EliteItemLore {
             customEnchantmentLore.add(ChatColorConverter.convert
                     ("&6" + customEnchantment.getEnchantmentsConfigFields().getName() + " "
                             + customEnchantments.get(customEnchantment)));
-            if (customEnchantment instanceof com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment)
-                customEnchantmentLore.add(ChatColorConverter.convert("&7" +
-                        com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment.effectDescription(
-                                customEnchantment.getKey(), customEnchantments.get(customEnchantment))));
+
         }
     }
 

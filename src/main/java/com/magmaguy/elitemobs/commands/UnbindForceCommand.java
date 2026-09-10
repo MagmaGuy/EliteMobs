@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
-import com.magmaguy.elitemobs.items.customenchantments.UnbindEnchantment;
+import com.magmaguy.elitemobs.items.ItemConsumables;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
@@ -31,7 +31,7 @@ public class UnbindForceCommand extends AdvancedCommand {
         if (itemStack != null && itemStack.hasItemMeta()
                 && SoulbindEnchantment.itemHasSoulbindEnchantment(itemStack.getItemMeta())) {
             commandData.getPlayerSender().getInventory()
-                    .setItemInMainHand(UnbindEnchantment.unbindItem(itemStack));
+                    .setItemInMainHand(ItemConsumables.unbind(itemStack));
             Logger.sendMessage(commandData.getCommandSender(),
                     CommandMessagesConfig.getUnbindForceSuccessMessage());
         } else {
