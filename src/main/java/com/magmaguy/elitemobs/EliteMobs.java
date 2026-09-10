@@ -204,6 +204,8 @@ public class EliteMobs extends JavaPlugin {
 
     }
 
+    private com.magmaguy.magmacore.enchantments.EnchantmentAnvil.Registration enchantmentAnvil;
+
     @Override
     public void onEnable() {
         // ═══════════════════════════════════════════════════════
@@ -221,6 +223,15 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("By MagmaGuy - v. " + MetadataHandler.PLUGIN.getDescription().getVersion());
 
         MagmaCore.onEnable(this);
+        enchantmentAnvil = com.magmaguy.magmacore.enchantments.EnchantmentAnvil.register(this, item -> null, item -> {
+            if (com.magmaguy.elitemobs.items.ItemTagger.isEliteItem(item))
+                return "Use the EliteMobs enchanter for elite items.";
+            if (item.getType() == org.bukkit.Material.ENCHANTED_BOOK)
+                for (var entry : com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems.nativeLevels(item).entrySet())
+                    if (entry.getValue() > entry.getKey().getMaxLevel())
+                        return "Use the EliteMobs enchanter for extended native enchantment books.";
+            return null;
+        });
         com.magmaguy.magmacore.menus.NightbreakSetupIcons.setAdditionalResourcePackAvailableSupplier(DefaultConfig::useResourcePackModels);
         MagmaCore.exportSharedAssets(this);
         MagmaCore.enableWorldProtections(this);
@@ -627,6 +638,7 @@ public class EliteMobs extends JavaPlugin {
     @Override
     public void onDisable() {
         MetadataHandler.shutdownRequested = true;
+        if (enchantmentAnvil != null) { enchantmentAnvil.close(); enchantmentAnvil = null; }
         CustomItem.shutdownCacheRegeneration();
         ClassSelectionMenu.shutdown();
         GuildTrainingMenu.shutdown();
