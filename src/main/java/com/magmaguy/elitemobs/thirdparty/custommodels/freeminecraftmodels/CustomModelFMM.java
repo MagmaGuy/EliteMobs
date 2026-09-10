@@ -66,6 +66,10 @@ public class CustomModelFMM implements CustomModelInterface {
                           ModeledEntityRightClickCallback rightClickCallback) {
         dynamicEntity = DynamicEntity.create(modelName, livingEntity);
         if (dynamicEntity == null) return;
+        // NPC models use click interactions, never hostile contact. Patrols need AI enabled,
+        // so FMM's AI guard cannot distinguish these villagers from combat models.
+        dynamicEntity.setDamagesOnContact(false);
+        dynamicEntity.setHitboxContactCallback(null);
         dynamicEntity.setDisplayName(nametagName);
         if (leftClickCallback != null) dynamicEntity.setLeftClickCallback(leftClickCallback);
         if (rightClickCallback != null) dynamicEntity.setRightClickCallback(rightClickCallback);
