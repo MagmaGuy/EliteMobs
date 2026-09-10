@@ -537,7 +537,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         double stackHeight = (nameplateLineCount * 0.225
                 + Math.max(0, nameplateLineCount - 1) * npCsConfigFields.getNameplateLineGap())
                 * npCsConfigFields.getNameplateScale();
-        return getNameplateLocation().add(0, stackHeight + 0.12, 0);
+        return getNameplateLocation().add(0, stackHeight - 0.08, 0);
     }
 
     private void removeNameplate() {

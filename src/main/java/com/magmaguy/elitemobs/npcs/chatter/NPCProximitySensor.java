@@ -157,7 +157,7 @@ public class NPCProximitySensor implements Listener {
 
     private static void refreshQuestIndicators() {
         indicatorAnimationTick = (indicatorAnimationTick + 1) % BOUNCE_PERIOD_TICKS;
-        // Bounce upward from the compact anchor so the low point never overlaps the nameplate.
+        // Bounce upward from the configured marker anchor.
         indicatorBounceOffset = BOUNCE_HEIGHT * 0.5 * (1 + Math.sin(
                 2 * Math.PI * indicatorAnimationTick / BOUNCE_PERIOD_TICKS - Math.PI / 2));
         boolean refreshQuestState = indicatorAnimationTick % 10 == 0;
