@@ -661,6 +661,8 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onEliteMobAttacked(EntityDamageByEntityEvent event) {
         boolean bypass = CombatDamageContext.consumePlayerToElite().bypass();
+        if (bypass || CombatDamageContext.isPlayerToEliteBypassActive())
+            com.magmaguy.magmacore.enchantments.EnchantmentInputs.markExplicitDamage(MetadataHandler.PLUGIN, event);
 
         if (event.getEntity().getType().equals(EntityType.ENDER_DRAGON) && ((EnderDragon) event.getEntity()).getPhase().equals(EnderDragon.Phase.DYING))
             return;
