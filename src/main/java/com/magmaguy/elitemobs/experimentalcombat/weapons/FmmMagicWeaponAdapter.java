@@ -72,8 +72,7 @@ final class FmmMagicWeaponAdapter
             if (elite != null && !elite.isValid()) elite = null;
         } catch (RuntimeException failure) {
             warnCalculationFailure(failure);
-            applyWithEliteMobsBypass(request, progressionSkill,
-                    request.balance().standaloneDamage(), application);
+            application.apply(0);
             return;
         }
         if (elite == null) {
@@ -87,7 +86,8 @@ final class FmmMagicWeaponAdapter
             damage = scaledDamage(request, elite, progressionSkill);
         } catch (RuntimeException failure) {
             warnCalculationFailure(failure);
-            damage = request.balance().standaloneDamage();
+            application.apply(0);
+            return;
         }
         applyWithEliteMobsBypass(request, progressionSkill, damage, application);
     }
@@ -156,8 +156,7 @@ final class FmmMagicWeaponAdapter
     private void warnCalculationFailure(RuntimeException failure) {
         if (calculationWarningSent) return;
         calculationWarningSent = true;
-        Logger.warn("EliteMobs could not scale an FMM magic impact. Conservative FMM "
-                + "damage was used: " + failure.getMessage());
+        Logger.warn("EliteMobs could not scale an FMM magic impact. The impact was rejected: " + failure.getMessage());
     }
 
     static SkillType progressionSkill(MagicWeaponKind weaponKind) {
