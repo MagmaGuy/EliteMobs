@@ -25,16 +25,14 @@ import org.bukkit.util.Vector;
 import java.util.UUID;
 
 
-public class SoulbindEnchantment extends CustomEnchantment {
+public final class SoulbindEnchantment {
 
     public static final NamespacedKey PRESTIGE_KEY = new NamespacedKey(MetadataHandler.PLUGIN, "prestige");
     public static String key = "soulbind";
     public static final NamespacedKey SOULBIND_KEY = new NamespacedKey(MetadataHandler.PLUGIN, key);
     public static boolean isEnabled;
 
-    public SoulbindEnchantment() {
-        super(key, true);
-    }
+    private SoulbindEnchantment() { }
 
     /**
      * Live config read. The old pattern refreshed the static only inside

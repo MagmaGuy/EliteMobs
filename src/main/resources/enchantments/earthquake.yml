@@ -1,0 +1,15 @@
+isEnabled: true
+name: Earthquake
+maxLevel: 5
+validSlots: [HEAD, CHEST, LEGS, FEET]
+stacking: sum_equipped_levels
+conflicts: [elitemobs:plasma_boots]
+script: earthquake.lua
+parameters:
+  value: 50
+  procedural: false
+  cooldown_ticks: 2400
+  lifetime_ticks: 2402
+  stop_on_unequip: false
+  activation_message: '&8[EliteMobs] &aEarthquake triggered! &c2 min cooldown!'
+  available_message: '&8[EliteMobs] &2Earthquake cooldown over!'

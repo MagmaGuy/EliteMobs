@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
-import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -505,7 +504,7 @@ public class CustomItem {
                         throw new IllegalArgumentException("Duplicate custom enchantment identity " + name);
                     continue;
                 }
-                if (java.util.Set.of("multicast", "blast_radius", "ignition", "repair", "unbind", "lucky_source", "enchanted_source", "loud_strikes", "critical_strikes", "drilling", "ice_breaker", "summon_wolf", "summon_merchant", "flamethrower", "lightning")
+                if (java.util.Set.of("multicast", "blast_radius", "ignition", "repair", "unbind", "lucky_source", "enchanted_source", "loud_strikes", "critical_strikes", "drilling", "ice_breaker", "summon_wolf", "summon_merchant", "flamethrower", "lightning", "hunter", "earthquake", "plasma_boots", "grappling_hook", "meteor_shower")
                         .contains(name.toLowerCase(Locale.ROOT))) {
                     customItemsConfigFields.setEnabled(false);
                     Logger.warn("Custom item " + customItemsConfigFields.getFilename()
@@ -522,11 +521,6 @@ public class CustomItem {
                     Logger.warn("Reminder - The correct format for these is [enchantmentName],[level]");
                     Logger.warn("The name should follow the API names and the level should be above 0.");
                     Logger.warn("Defaulting " + name + " to level 1.");
-                }
-
-                if (CustomEnchantment.isCustomEnchantment(name)) {
-                    customEnchantments.put(name.toLowerCase(Locale.ROOT), level);
-                    continue;
                 }
 
                 Enchantment enchantment;

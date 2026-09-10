@@ -25,7 +25,9 @@ public class EnchantmentsConfig extends CustomConfig {
     }
 
     @Override protected boolean ownsFilename(String filename) {
-        return !com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.ownsFilename(filename);
+        String stem = filename.toLowerCase(Locale.ROOT).replaceFirst("\\.ya?ml$", "");
+        return com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.HOST_SETTINGS.contains(stem)
+                || Enchantment.getByKey(org.bukkit.NamespacedKey.minecraft(stem)) != null;
     }
 
     public static EnchantmentsConfigFields getEnchantment(String string) {

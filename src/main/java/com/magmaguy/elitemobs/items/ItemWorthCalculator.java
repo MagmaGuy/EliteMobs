@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
-import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.magmacore.util.Round;
@@ -51,11 +50,7 @@ public class ItemWorthCalculator {
             } else
                 value += EnchantmentsConfig.getEnchantment(enchantment).getValue() * itemStack.getEnchantments().get(enchantment);
         }
-        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantmentMap().values()) {
-            int enchantmentLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), customEnchantment.key);
-            if (enchantmentLevel > 0)
-                value += customEnchantment.getEnchantmentsConfigFields().getValue() * ItemTagger.getEnchantment(itemStack.getItemMeta(), customEnchantment.key);
-        }
+
         for (var entry : com.magmaguy.magmacore.enchantments.EnchantmentItems.inspectCustom(itemStack.getItemMeta()).entrySet()) {
             var definition = EliteEnchantmentCatalog.definition(entry.getKey());
             Object weight = definition == null ? null : definition.parameters().get("value");

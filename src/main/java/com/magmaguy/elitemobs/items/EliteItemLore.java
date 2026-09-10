@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.premade.SoulbindConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
-import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
@@ -38,8 +37,6 @@ public class EliteItemLore {
     private final List<String> vanillaEnchantmentsLore = new ArrayList<>();
     private final HashMap<Enchantment, Integer> eliteVanillaEnchantments = new HashMap<>();
     private final ArrayList<String> eliteVanillaEnchantmentsLore = new ArrayList<>();
-    private final HashMap<CustomEnchantment, Integer> customEnchantments = new HashMap<>();
-    private final ArrayList<String> customEnchantmentLore = new ArrayList<>();
     private final List<String> potionListLore = new ArrayList<>();
     @Getter
     private ItemStack itemStack;
@@ -83,9 +80,6 @@ public class EliteItemLore {
 
         parseAllEliteEnchantments();
         constructEliteEnchantments();
-
-        parseCustomEnchantments();
-        constructCustomEnchantments();
 
         constructSoulbindEntry();
         constructSoulboundOwner();
@@ -149,27 +143,6 @@ public class EliteItemLore {
                             + EnchantmentsConfig.getEnchantment(enchantment).getName()
                             + " " + eliteVanillaEnchantments.get(enchantment)));
 
-    }
-
-    /**
-     * Note: This excludes the soulbind enchantment as it doesn't store an integer value
-     */
-    private void parseCustomEnchantments() {
-        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantmentMap().values()) {
-            int enchantmentLevel = ItemTagger.getEnchantment(itemMeta, customEnchantment.getKey());
-            if (enchantmentLevel > 0) {
-                customEnchantments.put(customEnchantment, enchantmentLevel);
-            }
-        }
-    }
-
-    private void constructCustomEnchantments() {
-        for (CustomEnchantment customEnchantment : customEnchantments.keySet()) {
-            customEnchantmentLore.add(ChatColorConverter.convert
-                    ("&6" + customEnchantment.getEnchantmentsConfigFields().getName() + " "
-                            + customEnchantments.get(customEnchantment)));
-
-        }
     }
 
     private void constructSoulbindEntry() {
@@ -256,7 +229,6 @@ public class EliteItemLore {
             string = stringReplacer(string, "$prestigeLevel", prestigeLevel);
             string = stringReplacer(string, "$itemLevel", EliteItemManager.getRoundedItemLevel(itemStack));
 
-
             if (string.contains("$enchantments")) {
                 for (String entry : vanillaEnchantmentsLore)
                     lore.add(ItemSettingsConfig.getVanillaEnchantmentColor() + entry);
@@ -270,8 +242,7 @@ public class EliteItemLore {
                 for (String entry : potionListLore)
                     lore.add(ItemSettingsConfig.getPotionEffectColor() + entry);
             } else if (string.contains("$customEnchantments")) {
-                for (String entry : customEnchantmentLore)
-                    lore.add(ItemSettingsConfig.getCustomEnchantmentColor() + ChatColor.stripColor(entry));
+                // Shared Minecraft-style lines are composed by ENCHANTMENT_PRESENTATION.
             } else if (string.contains("$loreResaleValue")) {
                 lore.add(itemWorth);
             } else if (string.contains("$customLore")) {
@@ -290,8 +261,7 @@ public class EliteItemLore {
                 if (!customLore.isEmpty())
                     lore.add(string.replace("$ifLore", ""));
             } else if (string.contains("$ifCustomEnchantments")) {
-                if (!customEnchantments.isEmpty())
-                    lore.add(string.replace("$ifCustomEnchantments", ""));
+                // Shared presentation owns the custom enchantment section.
             } else if (!string.isEmpty())
                 lore.add(ChatColorConverter.convert(string));
         }

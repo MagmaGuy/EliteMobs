@@ -18,14 +18,13 @@ public final class EliteEnchantmentCatalog {
     public static final String CRITICAL_STRIKES = "elitemobs:critical_strikes";
     public static final ScriptHook THREAT_BONUS = new ScriptHook("on_threat_bonus");
     public static final ScriptHook CRITICAL_CHANCE = new ScriptHook("on_critical_chance");
-    private static final Set<ScriptHook> HOOKS = Set.of(THREAT_BONUS, CRITICAL_CHANCE);
+    public static final ScriptHook HUNTER_BONUS = new ScriptHook("on_natural_spawn_bonus");
+    private static final Set<ScriptHook> HOOKS = Set.of(THREAT_BONUS, CRITICAL_CHANCE, HUNTER_BONUS);
     private static final Set<ScriptHook> ALL_HOOKS = java.util.stream.Stream.concat(HOOKS.stream(),
             EnchantmentInputs.HOOKS.stream()).collect(java.util.stream.Collectors.toUnmodifiableSet());
-    private static final Set<String> SHARED = Set.of("loud_strikes", "critical_strikes", "drilling", "ice_breaker", "summon_wolf", "summon_merchant", "flamethrower", "lightning");
-    // Removed as each remaining effect is moved to this provider. Soulbind is an ownership setting.
-    private static final Set<String> REMAINING_CONFIGS = Set.of("hunter",
-            "earthquake", "plasma_boots", "grappling_hook", "meteor_shower",
-            "soulbind", "multicast", "blast_radius", "ignition");
+    private static final Set<String> SHARED = Set.of("loud_strikes", "critical_strikes", "drilling", "ice_breaker", "summon_wolf", "summon_merchant", "flamethrower", "lightning", "hunter", "earthquake", "plasma_boots", "grappling_hook", "meteor_shower");
+    /** EM acquisition probabilities and Soulbind ownership retain their existing configuration owner. */
+    public static final Set<String> HOST_SETTINGS = Set.of("soulbind", "multicast", "blast_radius", "ignition");
     private static volatile EnchantmentCatalog catalog;
     private static volatile Set<String> sharedNames = SHARED;
     private static EnchantmentDefinitions.HostedCatalog hosted;
@@ -53,7 +52,7 @@ public final class EliteEnchantmentCatalog {
             Set<String> selectedNames = new HashSet<>(SHARED);
             var candidate = EnchantmentCatalog.load("elitemobs", directory, ALL_HOOKS, path -> {
                 String stem = path.getFileName().toString().toLowerCase(Locale.ROOT).replaceFirst("\\.ya?ml$", "");
-                if (REMAINING_CONFIGS.contains(stem)
+                if (HOST_SETTINGS.contains(stem)
                         || org.bukkit.enchantments.Enchantment.getByKey(org.bukkit.NamespacedKey.minecraft(stem)) != null)
                     return false;
                 try {
@@ -105,6 +104,16 @@ public final class EliteEnchantmentCatalog {
 
     public static long revision() { return revision; }
 
+    /** Natural spawning retains its existing player selection and world policy. */
+    public static double huntingGearBonus(List<org.bukkit.entity.Player> players) {
+        double bonus = 0;
+        for (var player : players) {
+            var inventory = com.magmaguy.elitemobs.playerdata.ElitePlayerInventory.playerInventories.get(player.getUniqueId());
+            if (inventory != null) bonus += inventory.getHunterChance(true);
+        }
+        return bonus;
+    }
+
     private static Map<String, Object> captureCombatFacts(Map<String, Object> request) {
         if (!request.keySet().equals(Set.of("kind", "actor", "equipment"))
                 || !(request.get("actor") instanceof UUID actorId)
@@ -114,18 +123,30 @@ public final class EliteEnchantmentCatalog {
         if (player == null || !player.isOnline()) throw new IllegalArgumentException("Missing source player");
         double threat = 0;
         int weaponLevel = 0;
+        Map<String, Boolean> usableSlots = new LinkedHashMap<>();
+        Map<String, Integer> equippedLevels = new TreeMap<>();
         for (var entry : equipment.entrySet()) {
             var slot = EnchantmentDefinition.Slot.valueOf((String) entry.getKey());
             if (!(entry.getValue() instanceof ItemStack item)) throw new IllegalArgumentException("Invalid source item");
             if (com.magmaguy.elitemobs.api.utils.EliteItemManager.isOnLastDamage(item)
                     || !com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment.isValidSoulbindUser(item.getItemMeta(), player)
                     || !com.magmaguy.elitemobs.items.GearRestrictionHandler.canEquip(player, item)) continue;
+            usableSlots.put(slot.name(), true);
+            var profile = EnchantmentItems.classify(item);
+            for (var enchantment : EnchantmentItems.inspectCustom(item.getItemMeta()).entrySet()) {
+                var definition = definition(enchantment.getKey());
+                if (definition == null || enchantment.getValue() < 1
+                        || !definition.validSlots().isEmpty() && !definition.validSlots().contains(slot)
+                        || !definition.itemTypes().isEmpty() && !definition.itemTypes().contains(profile.type())) continue;
+                equippedLevels.merge(enchantment.getKey(), enchantment.getValue(), Math::addExact);
+            }
             if (slot == EnchantmentDefinition.Slot.MAINHAND)
                 weaponLevel = com.magmaguy.elitemobs.playerdata.PlayerItem.readWeaponTier(player, item);
             threat += contribution(item, THREAT_BONUS, actorId, slot);
         }
         if (!Double.isFinite(threat)) throw new IllegalArgumentException("Invalid captured threat bonus");
-        return Map.of("weapon_level", weaponLevel, "loud_strikes", threat);
+        return Map.of("weapon_level", weaponLevel, "loud_strikes", threat,
+                "usable_slots", usableSlots, "equipped_levels", equippedLevels);
     }
 
     public static EnchantmentDefinition definition(String id) {
@@ -148,7 +169,7 @@ public final class EliteEnchantmentCatalog {
         var profile = EnchantmentItems.classify(item);
         for (var entry : new TreeMap<>(levels).entrySet()) {
             var definition = definition(entry.getKey());
-            if (definition == null || entry.getValue() > definition.maxLevel()
+            if (definition == null || entry.getValue() < 1
                     || !definition.validSlots().isEmpty() && !definition.validSlots().contains(slot)
                     || !definition.itemTypes().isEmpty() && !definition.itemTypes().contains(profile.type())
                     || !definition.attackKinds().isEmpty() && Collections.disjoint(definition.attackKinds(), profile.attackKinds())) continue;
@@ -175,7 +196,7 @@ public final class EliteEnchantmentCatalog {
         var definition = definition(id);
         if (definition == null || !Boolean.TRUE.equals(definition.parameters().get("procedural"))) return Map.of();
         Object raw = definition.parameters().get("procedural_max_level");
-        if (!(raw instanceof Integer maximum) || maximum < 1 || maximum > definition.maxLevel())
+        if (!(raw instanceof Integer maximum) || maximum < 1)
             throw new IllegalArgumentException("Invalid procedural limit for " + id);
         return Map.of(id, java.util.concurrent.ThreadLocalRandom.current().nextInt(maximum) + 1);
     }

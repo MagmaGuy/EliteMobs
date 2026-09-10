@@ -22,7 +22,7 @@ end
 local function right_click(context)
   local eye = context.player:get_eye_location()
   local direction = context.player:get_look_direction()
-  local hit = context.world:raycast(eye.x, eye.y, eye.z, direction.x, direction.y, direction.z, 6, "ALWAYS", true)
+  local hit = context.world:raycast(eye.x, eye.y, eye.z, direction.x, direction.y, direction.z, 6, "ALWAYS", true, true)
   if hit and freeze(context, hit.hit_block) then context.event:cancel() end
 end
 

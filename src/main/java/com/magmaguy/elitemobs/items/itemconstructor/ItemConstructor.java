@@ -234,18 +234,10 @@ public class ItemConstructor {
 
         //Tag the item
         ItemTagger.registerEnchantments(itemMeta, enchantments);
-        HashMap<String, Integer> remainingLegacy = new HashMap<>();
-        HashMap<String, Integer> shared = new HashMap<>();
-        customEnchantments.forEach((id, value) -> {
-            if (id.contains(":")) shared.put(id, value);
-            else remainingLegacy.put(id, value);
-        });
-        // Non-replaced EM effects retain their existing writer until their disposition row closes.
-        ItemTagger.registerCustomEnchantments(itemMeta, remainingLegacy);
         itemStack.setItemMeta(itemMeta);
-        if (!shared.isEmpty()) {
+        if (!customEnchantments.isEmpty()) {
             var items = com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems.ITEMS;
-            itemStack = items.previewCustom(itemStack, shared).apply(itemStack);
+            itemStack = items.previewAuthoredCustom(itemStack, customEnchantments).apply(itemStack);
         }
 
         /*

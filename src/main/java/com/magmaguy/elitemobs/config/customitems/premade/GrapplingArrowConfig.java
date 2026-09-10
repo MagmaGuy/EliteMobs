@@ -13,7 +13,7 @@ public class GrapplingArrowConfig extends CustomItemsConfigFields {
                 Material.SPECTRAL_ARROW,
                 "&6Grappling Arrow",
                 List.of("&eFire at a TARGET BLOCK to grapple!"));
-        setEnchantments(List.of("GRAPPLING_HOOK,1"));
+        setEnchantments(List.of("elitemobs:grappling_hook,1"));
         setScalability(CustomItem.Scalability.FIXED);
         setDropWeight("1");
     }

@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
-import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -80,7 +79,6 @@ public class ItemTagger {
                 .get(CUSTOM_ITEM_ID, PersistentDataType.STRING);
     }
 
-
     /**
      * Used to register custom lore as a string to the item. This is necessary for the lore updater as it redraws the custom
      * lore portion of the item based on these contents.
@@ -142,28 +140,6 @@ public class ItemTagger {
      */
     public static void registerEnchantment(ItemMeta itemMeta, NamespacedKey enchantmentKey, int enchantmentLevel) {
         itemMeta.getPersistentDataContainer().set(enchantmentKey, PersistentDataType.INTEGER, enchantmentLevel);
-    }
-
-    public static void registerCustomEnchantments(ItemMeta itemMeta, HashMap<String, Integer> customEnchantments) {
-        for (String subString : customEnchantments.keySet())
-            registerCustomEnchantment(itemMeta, subString, customEnchantments.get(subString));
-    }
-
-    /**
-     * For custom enchantments
-     *
-     * @param itemMeta
-     * @param enchantmentKey
-     * @param enchantmentLevel
-     */
-    public static void registerCustomEnchantment(ItemMeta itemMeta, String enchantmentKey, int enchantmentLevel) {
-        if (EliteEnchantmentCatalog.ownsFilename(enchantmentKey))
-            throw new IllegalArgumentException("Retired custom writer: use the shared namespaced enchantment record");
-        itemMeta.getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, enchantmentKey), PersistentDataType.INTEGER, enchantmentLevel);
-    }
-
-    public static void registerCustomEnchantment(ItemMeta itemMeta, String enchantmentKey, String uuid) {
-        itemMeta.getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, enchantmentKey), PersistentDataType.STRING, uuid);
     }
 
     public static int getEnchantment(ItemMeta itemMeta, String enchantmentKey) {
@@ -449,11 +425,7 @@ public class ItemTagger {
             if (enchantmentLevel > 0)
                 itemEnchantmentFilenames.put(enchantment.getKey(), enchantmentLevel);
         }
-        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantmentMap().values()) {
-            int enchantmentLevel = getEnchantment(itemMeta, customEnchantment.getKey());
-            if (enchantmentLevel > 0)
-                itemEnchantmentFilenames.put(new NamespacedKey(MetadataHandler.PLUGIN, customEnchantment.getKey()), enchantmentLevel);
-        }
+
         com.magmaguy.magmacore.enchantments.EnchantmentItems.inspectCustom(itemMeta).forEach((id, level) ->
                 itemEnchantmentFilenames.put(Objects.requireNonNull(NamespacedKey.fromString(id)), level));
         return itemEnchantmentFilenames;
@@ -474,11 +446,7 @@ public class ItemTagger {
                 itemEnchantmentFilenames.put(enchantmentsConfigFields, enchantmentLevel);
             }
         }
-        for (CustomEnchantment customEnchantment : CustomEnchantment.getCustomEnchantmentMap().values()) {
-            int enchantmentLevel = getEnchantment(itemMeta, customEnchantment.getKey());
-            if (enchantmentLevel > 0)
-                itemEnchantmentFilenames.put(customEnchantment.getEnchantmentsConfigFields(), enchantmentLevel);
-        }
+
         return itemEnchantmentFilenames;
     }
 }

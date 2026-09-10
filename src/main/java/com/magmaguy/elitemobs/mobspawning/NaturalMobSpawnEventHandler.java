@@ -7,7 +7,7 @@ import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.MobTierCalculator;
-import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
+import com.magmaguy.elitemobs.items.EliteEnchantmentCatalog;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.EliteMindServiceModule;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
@@ -173,7 +173,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
         boolean genericSelected = false;
         if (genericTypeEnabled) {
             double validChance = MobCombatSettingsConfig.getAggressiveMobConversionPercentage()
-                    + HunterEnchantment.getHuntingGearBonus(nearbyPlayers);
+                    + EliteEnchantmentCatalog.huntingGearBonus(nearbyPlayers);
             genericSelected = ThreadLocalRandom.current().nextDouble() < validChance;
         }
 

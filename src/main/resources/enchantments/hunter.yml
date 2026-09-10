@@ -1,0 +1,11 @@
+isEnabled: true
+name: Hunter
+maxLevel: 3
+validSlots: [HEAD, CHEST, LEGS, FEET, MAINHAND, OFFHAND]
+stacking: sum_equipped_levels
+script: hunter.lua
+parameters:
+  value: 10
+  procedural: true
+  procedural_max_level: 3
+  spawn_bonus: 0.05

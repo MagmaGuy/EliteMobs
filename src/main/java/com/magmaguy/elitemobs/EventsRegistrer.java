@@ -187,7 +187,6 @@ public class EventsRegistrer {
         registerPower(new TrackingFireballSupport.Events(), "tracking_fireball.yml");
 
         //boss powers
-        register(new PlasmaBootsEnchantment.PlasmaBootsEnchantmentEvents());
         if (EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled())
             register(new SoulbindEnchantment.SoulbindEnchantmentEvents());
         register(new CustomSummonPower.CustomSummonPowerEvent());
@@ -315,9 +314,6 @@ public class EventsRegistrer {
         register(new BossBarOrderManager.BossBarOrderManagerEvents());
 
         //Initialize items from custom events
-        register(new MeteorShowerEnchantment.MeteorShowerEvents());
-        register(new GrapplingHookEnchantment.GrapplingHookEnchantmentEvents());
-        register(new EarthquakeEnchantment.EarthquakeEnchantmentEvents());
 
         //register quests
         register(new KillObjective.KillObjectiveEvents());

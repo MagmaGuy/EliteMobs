@@ -1,0 +1,13 @@
+isEnabled: true
+name: Plasma Boots
+maxLevel: 3
+validSlots: [FEET]
+stacking: source_item
+conflicts: [elitemobs:earthquake]
+script: plasma_boots.lua
+parameters:
+  value: 20
+  procedural: false
+  cooldown_ticks: 2400
+  lifetime_ticks: 262
+  stop_on_unequip: false

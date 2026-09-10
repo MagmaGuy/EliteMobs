@@ -1,0 +1,11 @@
+isEnabled: true
+name: Grappling Hook
+maxLevel: 1
+validSlots: [MAINHAND, OFFHAND]
+stacking: source_item
+script: grappling_hook.lua
+parameters:
+  value: 10
+  procedural: false
+  lifetime_ticks: 463
+  stop_on_unequip: false

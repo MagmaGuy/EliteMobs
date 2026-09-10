@@ -11,7 +11,8 @@ local function activate(context)
   local durability = context.item:get_durability()
   if not stats or stats.weapon_level <= 0 or not durability or durability.current < 4 then return end
   local eye, look = context.player:get_eye_location(), context.player:get_look_direction()
-  local ray = context.world:raycast(eye.x, eye.y, eye.z, look.x, look.y, look.z, 30, "NEVER", true)
+  local ray = context.world:raycast(eye.x, eye.y, eye.z, look.x, look.y, look.z, 30, "NEVER", true, true)
+  if not ray then return end
   local target = ray.hit_block or {x=eye.x+look.x*30, y=eye.y+look.y*30, z=eye.z+look.z*30}
   target = {x=math.floor(target.x)+0.5, y=math.floor(target.y)+1, z=math.floor(target.z)+0.5}
   if not direction(context.player.current_location, target) then return end

@@ -8,7 +8,7 @@ import java.util.List;
 
 public final class AdventurerStaffConfig extends AdventurerRewardItemConfig {
     public AdventurerStaffConfig() {
-        super("Staff", Material.getMaterial("WOODEN_SPEAR"), List.of("POWER,3", "UNBREAKING,2", "BLAST_RADIUS,2", "IGNITION,2"));
+        super("Staff", Material.getMaterial("WOODEN_SPEAR"), List.of("POWER,3", "UNBREAKING,2", "freeminecraftmodels:blast_radius,2", "freeminecraftmodels:ignition,2"));
         setWeaponType(SkillType.STAVES);
         setFmmItemModel("fmm_default_arcane_staff");
     }

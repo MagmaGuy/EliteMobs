@@ -176,7 +176,6 @@ public class EliteMobs extends JavaPlugin {
         new PowersConfig();
         MobPropertiesConfig.initializeConfigs();
         new EliteMobPowersConfig();
-        CustomEnchantment.initializeCustomEnchantments();
 
         new MobCombatSettingsConfig();
         CommandsConfig.initializeConfigs();
@@ -700,7 +699,6 @@ public class EliteMobs extends JavaPlugin {
         PeaceBannerItem.unregisterRecipe();
         validWorldList.clear();
         CustomBossesConfigFields.getRegionalElites().clear();
-        CustomEnchantment.getCustomEnchantmentMap().clear();
         CustomItem.getCustomItems().clear();
         CustomItem.getCustomItemStackList().clear();
         CustomItem.getCustomItemStackShopList().clear();
@@ -770,8 +768,6 @@ public class EliteMobs extends JavaPlugin {
         com.magmaguy.elitemobs.economy.GamblingEconomyHandler.shutdown();
         DynamicDungeonBrowser.shutdown();
         InstancedDungeonBrowser.shutdown();
-        PlasmaBootsEnchantment.PlasmaBootsEnchantmentEvents.shutdown();
-        EarthquakeEnchantment.EarthquakeEnchantmentEvents.shutdown();
         BuyOrSellMenu.BuyOrSellMenuEvents.shutdown();
         Quest.shutdown();
         QuestInventoryMenu.shutdown();

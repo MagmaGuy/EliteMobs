@@ -11,7 +11,8 @@ public class WorldGuardExplosionBlockDamageFlag implements Listener {
     public void WorldGuardExplosionBlockDamageFlag(EntityExplodeEvent event) {
         if (WorldGuardFlagChecker.checkFlag(event.getLocation(), WorldGuardCompatibility.getELITEMOBS_EXPLOSION_BLOCK_DAMAGE()))
             return;
-        if (!EntityTracker.isProjectileEntity(event.getEntity()) && !EntityTracker.isEliteMob(event.getEntity()))
+        if (!EntityTracker.isProjectileEntity(event.getEntity()) && !EntityTracker.isEliteMob(event.getEntity())
+                && !com.magmaguy.magmacore.scripting.ScriptNativeProjectiles.isProtectionAware(event.getEntity()))
             return;
         event.blockList().clear();
     }

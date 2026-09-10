@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.EliteEnchantments;
-import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -441,28 +440,28 @@ public class EnchantmentGenerator {
             case GOLDEN_HELMET:
             case IRON_HELMET:
             case LEATHER_HELMET:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(HunterEnchantment.key));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("hunter"));
                 break;
             case CHAINMAIL_CHESTPLATE:
             case DIAMOND_CHESTPLATE:
             case GOLDEN_CHESTPLATE:
             case IRON_CHESTPLATE:
             case LEATHER_CHESTPLATE:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(HunterEnchantment.key));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("hunter"));
                 break;
             case CHAINMAIL_LEGGINGS:
             case DIAMOND_LEGGINGS:
             case GOLDEN_LEGGINGS:
             case IRON_LEGGINGS:
             case LEATHER_LEGGINGS:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(HunterEnchantment.key));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("hunter"));
                 break;
             case CHAINMAIL_BOOTS:
             case DIAMOND_BOOTS:
             case GOLDEN_BOOTS:
             case IRON_BOOTS:
             case LEATHER_BOOTS:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(HunterEnchantment.key));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("hunter"));
                 break;
             case FISHING_ROD:
                 break;
@@ -513,27 +512,6 @@ public class EnchantmentGenerator {
 
     }
 
-    private static HashMap<String, Integer> validateSecondaryCustomEnchantments(String string) {
-        if (com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.ownsFilename(string + ".yml"))
-            return new HashMap<>(com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.procedural(
-                    "elitemobs:" + string));
-
-        EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase(Locale.ROOT) + ".yml");
-
-        if (enchantmentsConfigFields == null ||
-                !enchantmentsConfigFields.isEnabled() ||
-                !enchantmentsConfigFields.isEnabledForProcedurallyGeneratedItems())
-            return new HashMap<>();
-
-        HashMap<String, Integer> enchantmentMap = new HashMap<>();
-
-        if (enchantmentsConfigFields != null && enchantmentsConfigFields.isEnabled())
-            enchantmentMap.put(string, ThreadLocalRandom.current().nextInt(enchantmentsConfigFields.getMaxLevel()) + 1);
-
-        return enchantmentMap;
-
-    }
-
     private static int totalSecondaryEnchantmentCount(HashMap<Enchantment, Integer> validEnchantments) {
 
         int totalCount = 0;
@@ -556,4 +534,7 @@ public class EnchantmentGenerator {
 
     }
 
+    private static HashMap<String, Integer> validateSecondaryCustomEnchantments(String name) {
+        return new HashMap<>(com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.procedural("elitemobs:" + name));
+    }
 }

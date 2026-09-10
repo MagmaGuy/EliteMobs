@@ -14,7 +14,7 @@ public class EnchantedBookHunterConfig extends CustomItemsConfigFields {
                 Material.ENCHANTED_BOOK,
                 "&5Elite Hunter Enchanted Book",
                 new ArrayList<>(List.of("&2Used to enchant items at the enchanter!")));
-        setEnchantments(new ArrayList<>(List.of("HUNTER,1")));
+        setEnchantments(new ArrayList<>(List.of("elitemobs:hunter,1")));
         setItemType(CustomItem.ItemType.UNIQUE);
         setScalability(CustomItem.Scalability.FIXED);
         setSoulbound(false);

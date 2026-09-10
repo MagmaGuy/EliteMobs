@@ -194,22 +194,10 @@ public class ElitePlayerInventory {
         double hunterChance = helmet.getHunterChance(player.getInventory().getHelmet(), update) +
                 chestplate.getHunterChance(player.getInventory().getChestplate(), update) +
                 leggings.getHunterChance(player.getInventory().getLeggings(), update) +
-                boots.getHunterChance(player.getInventory().getBoots(), update);
+                boots.getHunterChance(player.getInventory().getBoots(), update) +
+                mainhand.getHunterChance(player.getInventory().getItemInMainHand(), update) +
+                offhand.getHunterChance(player.getInventory().getItemInOffHand(), update);
         return hunterChance;
-    }
-
-    public double getPlasmaBootsLevel(boolean update) {
-        double plasmaBootsLevel = boots.getPlasmaBootsLevel(player.getInventory().getBoots(), update);
-        return plasmaBootsLevel;
-    }
-
-    public double getEarthquakeLevel(boolean update) {
-        //todo: should earthquake really apply for things other than the boots?
-        double earthquakeLevel = helmet.getEarthquakeLevel(player.getInventory().getHelmet(), update) +
-                chestplate.getEarthquakeLevel(player.getInventory().getChestplate(), update) +
-                leggings.getEarthquakeLevel(player.getInventory().getLeggings(), update) +
-                boots.getEarthquakeLevel(player.getInventory().getBoots(), update);
-        return earthquakeLevel;
     }
 
     /**

@@ -14,7 +14,7 @@ public class EnchantedBookPlasmaBootsConfig extends CustomItemsConfigFields {
                 Material.ENCHANTED_BOOK,
                 "&5Elite Plasma Boots Enchanted Book",
                 new ArrayList<>(List.of("&2Used to enchant items at the enchanter!")));
-        setEnchantments(new ArrayList<>(List.of("PLASMA_BOOTS,1")));
+        setEnchantments(new ArrayList<>(List.of("elitemobs:plasma_boots,1")));
         setItemType(CustomItem.ItemType.UNIQUE);
         setScalability(CustomItem.Scalability.FIXED);
         setSoulbound(false);

@@ -1,0 +1,11 @@
+isEnabled: true
+name: Meteor Shower
+maxLevel: 1
+validSlots: [MAINHAND]
+stacking: source_item
+script: meteor_shower.lua
+parameters:
+  value: 130
+  procedural: false
+  lifetime_ticks: 402
+  stop_on_unequip: false

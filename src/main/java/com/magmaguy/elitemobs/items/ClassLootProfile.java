@@ -46,7 +46,7 @@ public record ClassLootProfile(String primary, List<Rule> enchantments, List<Rul
             var definition = EliteEnchantmentCatalog.definition(id);
             if (definition == null || !Boolean.TRUE.equals(definition.parameters().get("procedural"))
                     || ThreadLocalRandom.current().nextDouble() >= rule.chance) return;
-            int level = Math.min(rule.level, definition.maxLevel());
+            int level = rule.level;
             if (level > 0) customLevels.merge(id, level, Math::max);
             return;
         }
@@ -54,8 +54,7 @@ public record ClassLootProfile(String primary, List<Rule> enchantments, List<Rul
         if (config == null || !config.isEnabled() || !config.isEnabledForProcedurallyGeneratedItems()) return;
         if (ThreadLocalRandom.current().nextDouble() >= rule.chance) return;
         // maxLevelV2 is the normal procedural/value reference, not the authored-content ceiling.
-        int level = Math.min(rule.level, config.getMaxEnchantmentLevel());
-        if (MagicEnchantmentGeneration.KEYS.contains(rule.key)) level = Math.min(level, 3);
+        int level = rule.level;
         if (level <= 0) return;
         Enchantment nativeEnchantment = nativeEnchantment(rule.key);
         if (nativeEnchantment != null) nativeLevels.merge(nativeEnchantment, level, Math::max);

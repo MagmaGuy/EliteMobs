@@ -31,10 +31,8 @@ public class PlayerItem {
     public int damageArthropodsLevel = 0;
     public int damageUndeadLevel = 0;
     public int thornsLevel = 0;
-    private double plasmaBootsLevel = 0;
     private double critChance = 0;
     private double hunterChance = 0;
-    private double earthquakeLevel = 0;
     private double eliteDamageReduction = 0;
     private double protectionProjectile = 0;
     private double eliteDamage = 0;
@@ -149,9 +147,8 @@ public class PlayerItem {
         this.damageUndeadLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.SMITE.getKey());
         this.critChance = com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.contribution(itemStack,
                 com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.CRITICAL_CHANCE, player.getUniqueId(), sharedSlot());
-        this.plasmaBootsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, PlasmaBootsEnchantment.key));
-        this.hunterChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, HunterEnchantment.key)) * EnchantmentsConfig.getEnchantment("hunter.yml").getFileConfiguration().getDouble("hunterSpawnBonus");
-        this.earthquakeLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, EarthquakeEnchantment.key));
+        this.hunterChance = com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.contribution(itemStack,
+                com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.HUNTER_BONUS, player.getUniqueId(), sharedSlot());
         this.thornsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.THORNS.getKey());
         this.loudStrikesBonus = readLoudStrikesBonus(itemStack, sharedSlot(), player.getUniqueId());
         eliteEnchantmentDamage = EliteItemManager.getEliteDamageFromEnchantments(itemStack);
@@ -182,10 +179,8 @@ public class PlayerItem {
         damageArthropodsLevel = 0;
         damageUndeadLevel = 0;
         thornsLevel = 0;
-        plasmaBootsLevel = 0;
         critChance = 0;
         hunterChance = 0;
-        earthquakeLevel = 0;
         eliteDamageReduction = 0;
         protectionProjectile = 0;
         eliteDamage = 0;
@@ -254,16 +249,6 @@ public class PlayerItem {
     public double getHunterChance(ItemStack itemStack, boolean update) {
         if (update) fullUpdate(itemStack);
         return this.hunterChance;
-    }
-
-    public double getPlasmaBootsLevel(ItemStack itemStack, boolean update) {
-        if (update) fullUpdate(itemStack);
-        return this.plasmaBootsLevel;
-    }
-
-    public double getEarthquakeLevel(ItemStack itemStack, boolean update) {
-        if (update) fullUpdate(itemStack);
-        return this.earthquakeLevel;
     }
 
     public double getLoudStrikesBonus(ItemStack itemStack, boolean update) {
