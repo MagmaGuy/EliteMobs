@@ -97,6 +97,8 @@ public class CustomLootTable implements Serializable {
 
     public void bossDrop(Player player, int level, Location dropLocation, EliteEntity eliteEntity, boolean materialsOnly) {
         for (CustomLootEntry customLootEntry : entries) {
+            // These entries belong to the one-per-contributor class roll, not independent death rolls.
+            if (customLootEntry instanceof EliteCustomLootEntry custom && custom.isClassLoot()) continue;
             if (materialsOnly && (!(customLootEntry instanceof EliteCustomLootEntry custom) || custom.isEquipment()))
                 continue;
             if (customLootEntry.willDrop(player)) {

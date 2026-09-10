@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.config.custombosses;
 
-import com.magmaguy.elitemobs.items.ClassLootFamily;
 
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
@@ -240,10 +239,6 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     private String classLootRank = "AUTO";
     @Getter
-    private final Map<ClassLootFamily, ClassLootItem> classLootItems = new EnumMap<>(ClassLootFamily.class);
-    @Getter
-    private List<String> classLootPresentationIssues = List.of();
-    @Getter
     private double scale = 1D;
     @Getter
     @Setter
@@ -476,7 +471,6 @@ public class CustomBossesConfigFields extends CustomConfigFields {
             Logger.warn("Invalid classLootRank in " + filename + "; using AUTO.");
             classLootRank = "AUTO";
         }
-        processClassLootItems();
 
         this.scale = processDouble("scale", scale, 1, false);
         this.silent = processBoolean("silent", silent, false, false);
@@ -567,50 +561,6 @@ public class CustomBossesConfigFields extends CustomConfigFields {
                 "&e&l    3rd Damager: $damager3name &ewith $damager3damage damage!",
                 "&aSlayers: $players",
                 "&e&l---------------------------------------------"));
-    }
-
-    private void processClassLootItems() {
-        migrateClassLootPresentation();
-        classLootItems.clear();
-        List<String> issues = new ArrayList<>();
-        var presentation = fileConfiguration.getConfigurationSection("classLootItems");
-        if (presentation != null) for (String key : presentation.getKeys(false)) {
-            try { ClassLootFamily.valueOf(key); }
-            catch (IllegalArgumentException invalid) { issues.add("classLootItems." + key + " (unknown family)"); }
-        }
-        for (ClassLootFamily family : ClassLootFamily.values()) {
-            String path = "classLootItems." + family.name();
-            Object rawName = fileConfiguration.get(path + ".name");
-            Object rawLore = fileConfiguration.get(path + ".lore");
-            boolean validName = rawName instanceof String text && !text.isBlank();
-            boolean validLore = rawLore instanceof List<?> lines && lines.stream().allMatch(String.class::isInstance);
-            if (!validName) issues.add(path + ".name (missing, blank or invalid)");
-            if (!validLore) issues.add(path + ".lore (missing or invalid; use [] for intentionally empty lore)");
-            String itemName = validName ? (String) rawName : ClassLootItem.DEFAULT.name();
-            List<String> itemLore = validLore ? fileConfiguration.getStringList(path + ".lore") : List.of();
-            classLootItems.put(family, new ClassLootItem(
-                    translatable(filename, path + ".name", itemName),
-                    translatable(filename, path + ".lore", itemLore)));
-        }
-        classLootPresentationIssues = List.copyOf(issues);
-        if (classLoot && isEnabled() && !issues.isEmpty())
-            Logger.warn("[ClassLoot presentation] " + filename + ": " + String.join("; ", issues)
-                    + ". Missing/invalid fields use generic names or empty lore. Loot remains enabled.");
-    }
-
-    /** One-way upgrade of the early flat format; explicit per-item values always win. */
-    private void migrateClassLootPresentation() {
-        boolean hasLegacyLore = fileConfiguration.isList("classLootLore");
-        for (SkillType skill : SkillType.getWeaponSkills()) {
-            String path = "classLootItems." + skill.name();
-            String legacyName = "classLootNames." + skill.name();
-            if (!fileConfiguration.contains(path + ".name") && fileConfiguration.isString(legacyName))
-                fileConfiguration.set(path + ".name", fileConfiguration.getString(legacyName));
-            if (!fileConfiguration.contains(path + ".lore") && hasLegacyLore)
-                fileConfiguration.set(path + ".lore", fileConfiguration.getStringList("classLootLore"));
-        }
-        fileConfiguration.set("classLootNames", null);
-        fileConfiguration.set("classLootLore", null);
     }
 
     public void saveFile() {

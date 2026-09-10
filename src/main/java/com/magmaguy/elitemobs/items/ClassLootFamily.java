@@ -37,6 +37,28 @@ public enum ClassLootFamily {
     }
 
     public SkillType skill() { return skill; }
+
+    /** Weapons use their existing identity; armor needs an explicit reward role. */
+    public static ClassLootFamily resolve(Material material, SkillType weaponType, String explicitFamily) {
+        ClassLootFamily inferred = null;
+        if (weaponType == SkillType.STAVES) inferred = STAVES;
+        else if (weaponType == SkillType.WANDS) inferred = WANDS;
+        else if (material != null) {
+            SkillType skill = SkillType.fromMaterialIncludingArmor(material);
+            for (ClassLootFamily family : values())
+                if (family.isWeapon() && family.skill() == skill) { inferred = family; break; }
+            if (material == Material.SHIELD) inferred = SHIELDS;
+        }
+        if (explicitFamily == null || explicitFamily.isBlank()) {
+            if (inferred != null) return inferred;
+            throw new IllegalArgumentException("classLootFamily is required for armor; use DPS_<slot> or TANK_<slot>");
+        }
+        ClassLootFamily explicit = valueOf(explicitFamily.toUpperCase(java.util.Locale.ROOT));
+        if (inferred != null && inferred == explicit) return explicit;
+        if (inferred == null && material != null && explicit.category() == Category.ARMOR
+                && material.name().endsWith("_" + explicit.slot())) return explicit;
+        throw new IllegalArgumentException("classLootFamily " + explicit + " does not match material/weaponType");
+    }
     public enum Category { WEAPONS, ARMOR, SHIELDS }
     public Category category() { return isWeapon() ? Category.WEAPONS : this == SHIELDS ? Category.SHIELDS : Category.ARMOR; }
     public String label() { return label; }

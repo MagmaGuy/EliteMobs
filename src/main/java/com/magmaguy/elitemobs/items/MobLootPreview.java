@@ -21,7 +21,7 @@ public final class MobLootPreview {
     public static void run(Player player, CustomBossesConfigFields fields, int level, Difficulty difficulty,
                            Rank rank, ClassLootFamily selectedFamily, boolean giveAll) {
         var form = ClassLootSelection.activeClass(player);
-        var available = ClassLootCoverage.availableFamilies(difficulty, rank);
+        var available = ClassLootCoverage.availableFamilies(fields, difficulty, rank, player);
         var probabilities = ClassLootSelection.probabilities(available, form);
         List<ItemStack> samples = new ArrayList<>();
         List<String> failures = new ArrayList<>();
@@ -31,7 +31,6 @@ public final class MobLootPreview {
                 + "; family percentages below are conditional on a successful roll.");
         if (!ClassLootSettingsConfig.enabled() || !fields.isClassLoot() || fields.isReinforcement())
             tell(player, "&eAutomatic drops are disabled for this configuration. Review samples deliberately bypass that switch.");
-        for (String issue : fields.getClassLootPresentationIssues()) tell(player, "&ePresentation: " + issue);
         List<ClassLootFamily> families = selectedFamily == null ? Arrays.asList(ClassLootFamily.values()) : List.of(selectedFamily);
         for (ClassLootFamily family : families) {
             if (!available.contains(family)) {
@@ -62,6 +61,7 @@ public final class MobLootPreview {
                         + (entry.getPermission().isEmpty() ? "" : " | permission " + entry.getPermission())
                         + (entry.getWave() < 0 ? "" : " | wave " + entry.getWave()));
                 if (!giveAll || !(entry instanceof EliteCustomLootEntry || entry instanceof VanillaCustomLootEntry)) continue;
+                if (entry instanceof EliteCustomLootEntry classEntry && classEntry.isClassLoot()) continue;
                 // One sample per entry, including disabled/permission-gated entries, without running reward actions.
                 try {
                     ItemStack sample = entry instanceof EliteCustomLootEntry elite

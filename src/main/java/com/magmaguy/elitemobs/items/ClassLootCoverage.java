@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.config.custombosses.ClassLootItem;
+import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry;
+import com.magmaguy.elitemobs.items.itemconstructor.ClassLootItemConstructor;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.ClassLootSettingsConfig;
 import com.magmaguy.elitemobs.config.ClassLootSettingsConfig.Difficulty;
@@ -10,18 +12,10 @@ import com.magmaguy.elitemobs.items.customloottable.SharedLootTable;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
-import com.magmaguy.elitemobs.items.itemconstructor.ProceduralItemType;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.skills.SkillType;
-import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
-import com.magmaguy.magmacore.util.ChatColorConverter;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -39,7 +33,6 @@ public final class ClassLootCoverage {
         boolean dungeonPool = boss instanceof InstancedBossEntity;
         Difficulty difficulty = difficulty(boss);
         Rank rank = rank(boss);
-        var available = availableFamilies(difficulty, rank);
         double chance = ClassLootSettingsConfig.dropChance(rank);
         List<Player> contributors = boss.getDamagers().keySet().stream().filter(player ->
                 !player.hasMetadata("NPC") && PlayerData.isInMemory(player.getUniqueId())
@@ -57,17 +50,20 @@ public final class ClassLootCoverage {
                 audience = contributors.stream().filter(nearby::contains).toList();
             }
             Player preferenceOwner = audience.isEmpty() ? player : audience.get(ThreadLocalRandom.current().nextInt(audience.size()));
-            ClassLootFamily family = ClassLootSelection.select(available, preferenceOwner);
-            if (family == null) continue;
-            ItemStack item = generate(boss.getCustomBossesConfigFields(), boss.getLevel(), level, difficulty, rank,
-                    family, boss, dungeonPool || partyPool ? null : player);
-            if (item == null) continue;
-            if (dungeonPool) {
-                SharedLootTable table = SharedLootTable.getSharedLootTables().get(boss);
-                if (table == null) table = new SharedLootTable(boss);
-                table.addLoot(item);
-            } else if (!partyPool || !SharedLootTable.addPartyLoot(boss, player, item))
-                LootTables.deliverGeneratedItem(player, boss.getLocation(), item);
+            var eligible = candidates(boss.getCustomBossesConfigFields(), difficulty, rank, preferenceOwner, boss);
+            var selected = ClassLootSelection.selectEntry(eligible, preferenceOwner);
+            if (selected == null || !selected.willDrop(preferenceOwner)) continue;
+            for (int copy = 0; copy < selected.getAmount(); copy++) {
+                ItemStack item = ClassLootItemConstructor.construct(CustomItem.getCustomItem(selected.getFilename()),
+                        level, difficulty, rank, boss, dungeonPool || partyPool ? null : player);
+                if (item == null) continue;
+                if (dungeonPool) {
+                    SharedLootTable table = SharedLootTable.getSharedLootTables().get(boss);
+                    if (table == null) table = new SharedLootTable(boss);
+                    table.addLoot(item);
+                } else if (!partyPool || !SharedLootTable.addPartyLoot(boss, player, item))
+                    LootTables.deliverGeneratedItem(player, boss.getLocation(), item);
+            }
         }
     }
 
@@ -100,54 +96,48 @@ public final class ClassLootCoverage {
     public static ItemStack generate(CustomBossEntity boss, int level, Player owner) {
         Difficulty difficulty = difficulty(boss);
         Rank rank = rank(boss);
-        ClassLootFamily family = ClassLootSelection.select(availableFamilies(difficulty, rank), owner);
+        ClassLootFamily family = ClassLootSelection.select(candidates(boss.getCustomBossesConfigFields(), difficulty, rank, owner, boss).stream()
+                .map(entry -> CustomItem.getCustomItem(entry.getFilename()).getCustomItemsConfigFields().getClassLootFamily()).distinct().toList(), owner);
         if (family == null) return null;
         return generate(boss.getCustomBossesConfigFields(), boss.getLevel(), level, difficulty, rank, family, boss, owner);
-    }
-
-    public static List<ClassLootFamily> availableFamilies(Difficulty difficulty, Rank rank) {
-        List<ClassLootFamily> supported = new ArrayList<>();
-        for (ClassLootFamily family : ClassLootFamily.values())
-            if (family.material() != null && (family.magicType() == null || family.magicType().isAvailable())
-                    && ClassLootSettingsConfig.profile(difficulty, rank, family) != null)
-                supported.add(family);
-        return List.copyOf(supported);
     }
 
     /** Uses the production item constructor without spawning an entity or awarding death rewards. */
     public static ItemStack preview(CustomBossesConfigFields fields, int level, Difficulty difficulty,
                                     Rank rank, ClassLootFamily family, Player owner) {
-        if (!availableFamilies(difficulty, rank).contains(family)) return null;
+        if (!availableFamilies(fields, difficulty, rank, owner).contains(family)) return null;
         return generate(fields, level, level, difficulty, rank, family, null, owner);
     }
 
     private static ItemStack generate(CustomBossesConfigFields fields, int mobLevel, int level, Difficulty difficulty,
                                       Rank rank, ClassLootFamily family, CustomBossEntity boss, Player owner) {
-        String bossName = fields.getName().replace("$bossLevel", "").replace("$minibossLevel", "")
-                .replace("$normalLevel", "").replace("$eventBossLevel", "").replace("$reinforcementLevel", "")
-                .replace("$level", Integer.toString(mobLevel));
-        bossName = ChatColor.stripColor(ChatColorConverter.convert(bossName)).strip();
-        ClassLootItem presentation = fields.getClassLootItems().getOrDefault(family, ClassLootItem.DEFAULT);
-        String name = presentation.name().replace("$boss", bossName).replace("$weapon", family.label()).replace("$item", family.label())
-                .replace("$difficulty", difficulty.name());
-        String finalBossName = bossName;
-        List<String> lore = presentation.lore().stream().map(line ->
-                line.replace("$boss", finalBossName).replace("$weapon", family.label()).replace("$item", family.label())
-                        .replace("$difficulty", difficulty.name())).toList();
-        Material material = family.material();
-        SkillType explicit = family.skill() == SkillType.STAVES || family.skill() == SkillType.WANDS ? family.skill() : null;
-        var profile = ClassLootSettingsConfig.profile(difficulty, rank, family);
-        var roll = profile.roll(
-                ClassLootSettingsConfig.budgetFraction(), ClassLootSettingsConfig.minimumPrimaryLevel());
-        ProceduralItemType magicType = family.magicType();
-        String model = magicType == null ? null : magicType.fmmItemId();
-        ItemStack item = ItemConstructor.constructItem(level, name, material, roll.nativeEnchantments(), roll.customEnchantments(),
-                profile.potionEffects(), lore, boss, owner, false, null, null, true,
-                "class_coverage_" + family.name().toLowerCase(java.util.Locale.ROOT), null, explicit, model);
-        if (magicType != null && !magicType.applyMagicData(item)) return null;
-        if (family.isWeapon() && WeaponIdentityResolver.progressionSkill(item) != family.skill())
-            throw new IllegalStateException("Class loot lost its " + family.skill() + " identity");
-        return item;
+        var choices = candidates(fields, difficulty, rank, owner, boss).stream()
+                .filter(entry -> CustomItem.getCustomItem(entry.getFilename()).getCustomItemsConfigFields().getClassLootFamily() == family).toList();
+        if (choices.isEmpty()) return null;
+        var item = CustomItem.getCustomItem(choices.get(ThreadLocalRandom.current().nextInt(choices.size())).getFilename());
+        return ClassLootItemConstructor.construct(item, level, difficulty, rank, boss, owner, fields.getName());
+    }
+
+    public static List<EliteCustomLootEntry> candidates(CustomBossesConfigFields fields, Difficulty difficulty,
+                                                       Rank rank, Player player, CustomBossEntity boss) {
+        if (fields.getCustomLootTable() == null) return List.of();
+        var resolver = new com.magmaguy.elitemobs.instanced.dungeons.DifficultyResolver(fields.getFilename(), List.of());
+        java.util.function.Predicate<List<String>> filter = ids -> resolver.matches(ids, Integer.toString(difficulty.ordinal()), fields.getFilename());
+        if (boss instanceof InstancedBossEntity instanced && instanced.getDungeonInstance() != null)
+            filter = ids -> instanced.getDungeonInstance().matchesDifficulty(ids, fields.getFilename());
+        var difficultyFilter = filter;
+        return fields.getCustomLootTable().getEntries().stream()
+                .filter(EliteCustomLootEntry.class::isInstance).map(EliteCustomLootEntry.class::cast)
+                .filter(entry -> entry.eligibleForClassLoot(player, difficultyFilter))
+                .filter(entry -> ClassLootItemConstructor.available(CustomItem.getCustomItem(entry.getFilename()), difficulty, rank))
+                .toList();
+    }
+
+    public static List<ClassLootFamily> availableFamilies(CustomBossesConfigFields fields, Difficulty difficulty,
+                                                         Rank rank, Player player) {
+        return candidates(fields, difficulty, rank, player, null).stream()
+                .map(entry -> CustomItem.getCustomItem(entry.getFilename()).getCustomItemsConfigFields().getClassLootFamily())
+                .distinct().toList();
     }
 
 }

@@ -78,7 +78,7 @@ public class CustomItem {
     public CustomItem(CustomItemsConfigFields customItemsConfigFields) {
         this.customItemsConfigFields = customItemsConfigFields;
         this.itemLevel = customItemsConfigFields.getLevel();
-        if (itemLevel == 0)
+        if (itemLevel == 0 && customItemsConfigFields.getItemType() != ItemType.CLASS_LOOT)
             itemLevel = (int) EliteItemManager.getItemLevel(new ItemStack(customItemsConfigFields.getMaterial()));
         this.permission = customItemsConfigFields.getPermission();
         if (!customItemsConfigFields.isEnabled()) return;
@@ -86,6 +86,14 @@ public class CustomItem {
         parseEnchantments();
         parsePotionEffects();
         parseItemType();
+        if (itemType == ItemType.CLASS_LOOT) {
+            if (customItemsConfigFields.getClassLootFamily() == null) return;
+            scalability = Scalability.SCALABLE;
+            itemLevel = Math.max(1, customItemsConfigFields.getLevel());
+            addCustomItem(customItemsConfigFields.getFilename(), this);
+            addCustomItem(this);
+            return;
+        }
         parseItemLevel();
         //give getloot menu items to work with
         addCustomItem(customItemsConfigFields.getFilename(), this);
@@ -114,7 +122,9 @@ public class CustomItem {
 
     // Adds custom items to the list used by the getloot GUI
     private static void addCustomItem(CustomItem customItem) {
-        customItemStackList.add(customItem.generateDefaultsItemStack(null, false, null));
+        ItemStack sample = customItem.generateDefaultsItemStack(null, false, null);
+        if (sample == null) return;
+        customItemStackList.add(sample);
         if (isShopExcluded(customItem.getItemType())) return;
         customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null));
     }
@@ -344,8 +354,10 @@ public class CustomItem {
         //way it did before.
         ItemStack defaultsItemStack = customItem.generateDefaultsItemStack(null, false, null);
 
+        if (defaultsItemStack == null) return;
         // Regenerate loot menu items
         itemStackList.add(defaultsItemStack);
+        if (customItem.getItemType() == ItemType.CLASS_LOOT) return;
         if (!isShopExcluded(customItem.getItemType()))
             itemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null));
 
@@ -583,6 +595,7 @@ public class CustomItem {
 
     public ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth, EliteEntity eliteEntity, boolean bypass) {
         if (!bypass && player != null && !permission.isEmpty() && !player.hasPermission(permission)) return null;
+        if (itemType == ItemType.CLASS_LOOT) return generateClassLootItem(itemLevel, player, eliteEntity);
         ItemStack itemStack =
                 ItemConstructor.constructItem(
                         itemLevel,
@@ -613,6 +626,7 @@ public class CustomItem {
     }
 
     public ItemStack generateItemStack(int itemTier, Player player, EliteEntity eliteEntity) {
+        if (itemType == ItemType.CLASS_LOOT) return generateClassLootItem(itemTier, player, eliteEntity);
         ItemStack itemStack = null;
         //This can happen when doing drop tables, the loot is not yet assigned to anyone
         if (player != null)
@@ -631,6 +645,7 @@ public class CustomItem {
     }
 
     public ItemStack generateItemStackExact(int itemTier, Player player, EliteEntity eliteEntity) {
+        if (itemType == ItemType.CLASS_LOOT) return generateClassLootItem(itemTier, player, eliteEntity);
         ItemStack itemStack = null;
         switch (this.scalability) {
             case FIXED:
@@ -643,6 +658,16 @@ public class CustomItem {
                 itemStack = ScalableItemConstructor.constructScalableItem(itemTier, this, player, eliteEntity);
         }
         return itemStack;
+    }
+
+    private ItemStack generateClassLootItem(int level, Player player, EliteEntity entity) {
+        var boss = entity instanceof com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity custom ? custom : null;
+        var difficulty = boss == null ? com.magmaguy.elitemobs.config.ClassLootSettingsConfig.defaultDifficulty()
+                : com.magmaguy.elitemobs.items.ClassLootCoverage.difficulty(boss);
+        var rank = boss == null ? com.magmaguy.elitemobs.config.ClassLootSettingsConfig.Rank.TRASH
+                : com.magmaguy.elitemobs.items.ClassLootCoverage.rank(boss);
+        return com.magmaguy.elitemobs.items.itemconstructor.ClassLootItemConstructor.construct(this,
+                level, difficulty, rank, entity, player);
     }
 
     public enum ItemType {
@@ -663,7 +688,9 @@ public class CustomItem {
          * can never simply buy it. Useful for items that should feel earned but
          * don't need to be locked to a specific boss.
          */
-        DROPPABLE
+        DROPPABLE,
+        /** Explicit custom-item candidates for a boss's single class-based equipment roll. */
+        CLASS_LOOT
     }
 
     /**
@@ -672,7 +699,7 @@ public class CustomItem {
      * separately in {@link #parseScalability()}.
      */
     private static boolean isShopExcluded(ItemType type) {
-        return type == ItemType.UNIQUE || type == ItemType.DROPPABLE;
+        return type == ItemType.UNIQUE || type == ItemType.DROPPABLE || type == ItemType.CLASS_LOOT;
     }
 
     public enum Scalability {
