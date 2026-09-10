@@ -45,6 +45,8 @@ public class DrillingEnchantment extends CustomEnchantment {
 
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onDig(BlockBreakEvent event) {
+            // Authored child mining is cancellable, but must not activate another drill.
+            if (event.getClass() != BlockBreakEvent.class) return;
             if (event.isCancelled()) return;
             if (!event.getPlayer().getInventory().getItemInMainHand().hasItemMeta() ||
                     event.getPlayer().getInventory().getItemInMainHand().getItemMeta() == null) return;
