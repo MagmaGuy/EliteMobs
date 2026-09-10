@@ -115,8 +115,7 @@ public final class TransportEditor implements AutoCloseable {
         for (double distance = 0; distance <= curve.length(); distance += step) {
             Vector point = curve.at(distance);
             if (point.distanceSquared(viewer) > 96 * 96) continue;
-            boolean loaded = player.getWorld().isChunkLoaded((int) Math.floor(point.getX()) >> 4, (int) Math.floor(point.getZ()) >> 4);
-            Color color = !loaded ? Color.YELLOW : TransportClearance.point(player.getWorld(), point, TransportClearance.player(player)) != null ? Color.RED : ghost ? Color.AQUA : Color.LIME;
+            Color color = ghost ? Color.AQUA : Color.LIME;
             player.spawnParticle(Particle.DUST, point.toLocation(player.getWorld()), 1, new Particle.DustOptions(color, ghost ? .5F : 1F));
         }
     }

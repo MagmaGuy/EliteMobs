@@ -15,10 +15,10 @@ public record TransportRoute(String id, String name, String world, String transp
             throw new IllegalArgumentException("Route needs a name and authored world");
         if (transportEntity == null || transportEntity.isBlank() || !transportEntity.endsWith(".yml"))
             throw new IllegalArgumentException("transportEntity must name an enabled customboss .yml file");
-        if (!Double.isFinite(speed) || speed < 1 || speed > 32
-                || !Double.isFinite(acceleration) || acceleration < 1 || acceleration > 32)
-            throw new IllegalArgumentException("Speed and acceleration must be 1 to 32");
-        if (countdown < 0 || countdown > 200 || !Float.isFinite(arrivalYaw))
+        if (!Double.isFinite(speed) || speed <= 0
+                || !Double.isFinite(acceleration) || acceleration <= 0)
+            throw new IllegalArgumentException("Speed and acceleration must be finite and positive");
+        if (countdown < 0 || !Float.isFinite(arrivalYaw))
             throw new IllegalArgumentException("Invalid countdown or arrival yaw");
         points = points.stream().map(Vector::clone).toList();
         new CurvedRoute(points);
