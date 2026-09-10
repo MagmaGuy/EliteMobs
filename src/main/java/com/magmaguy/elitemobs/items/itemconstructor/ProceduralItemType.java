@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.items.ItemDurability;
 import com.magmaguy.elitemobs.skills.SkillType;
-import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -43,8 +42,8 @@ public record ProceduralItemType(Material material, SkillType magicSkill) {
         if (magicSkill == SkillType.WANDS && !ProceduralItemGenerationSettingsConfig.isWandsEnabled()) return false;
         if (!Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")) return false;
         try {
-            return MagicWeaponAPI.capabilityVersion() >= 4 && MagicWeaponAPI.isOperational()
-                    && MagicWeaponAPI.isBuiltInWeapon(fmmItemId());
+            return MagicWeaponAPI.capabilityVersion() >= 6 && MagicWeaponAPI.isOperational()
+                    && MagicWeaponAPI.isWeapon(fmmItemId());
         } catch (LinkageError incompatibleFmm) {
             return false;
         }
@@ -55,11 +54,10 @@ public record ProceduralItemType(Material material, SkillType magicSkill) {
         if (magicSkill == null) return true;
         if (!isAvailable()) return false;
         try {
-            if (!MagicWeaponAPI.applyBuiltInWeaponData(item, fmmItemId())) return false;
+            if (!MagicWeaponAPI.applyWeaponData(item, fmmItemId())) return false;
         } catch (LinkageError incompatibleFmm) {
             return false;
         }
-        WeaponIdentityResolver.stamp(item, magicSkill);
         ItemDurability.prepareMagicWeapon(item);
         return true;
     }

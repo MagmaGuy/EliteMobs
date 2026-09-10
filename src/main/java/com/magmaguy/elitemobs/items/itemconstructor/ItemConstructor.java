@@ -112,15 +112,22 @@ public class ItemConstructor {
         ItemTagger.registerCustomItemId(itemMeta, filename);
         itemStack.setItemMeta(itemMeta);
 
-        if (weaponType != null) WeaponIdentityResolver.stamp(itemStack, weaponType);
-
-        // Built-in magic IDs let FMM stamp the item it owns. Other IDs remain presentation-only.
+        // FMM assigns its sole authored identity. Other model IDs remain presentation-only.
         if (fmmItemModel != null && !fmmItemModel.isEmpty())
             applyFmmItemData(itemStack, fmmItemModel, filename);
+        if (weaponType != null && WeaponIdentityResolver.progressionSkill(itemStack) != weaponType) {
+            com.magmaguy.magmacore.util.Logger.warn("Custom item " + filename + " requires an available FMM authored weapon matching " + weaponType + ".");
+            return null;
+        }
 
         // Apply FMM scripted item data if configured and FMM is installed
         if (scriptedItem != null && !scriptedItem.isEmpty()
                 && org.bukkit.Bukkit.getPluginManager().getPlugin("FreeMinecraftModels") != null) {
+            if (WeaponIdentityResolver.isMagicWeapon(itemStack)) {
+                com.magmaguy.magmacore.util.Logger.warn("Custom item " + filename
+                        + " cannot combine an authored FMM weapon with the old scriptedItem path.");
+                return null;
+            }
             try {
                 boolean applied = com.magmaguy.freeminecraftmodels.api.ScriptedItemAPI
                         .applyScriptedItemData(itemStack, scriptedItem);
@@ -140,26 +147,15 @@ public class ItemConstructor {
 
     private static void applyFmmItemData(ItemStack itemStack, String fmmItemModel, String filename) {
         if (!org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")) return;
-        boolean magicWeapon = com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI.DEFAULT_STAFF_ID
-                .equalsIgnoreCase(fmmItemModel)
-                || com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI.DEFAULT_WAND_ID
-                .equalsIgnoreCase(fmmItemModel);
+        boolean magicWeapon = false;
         boolean applied = false;
         try {
-            magicWeapon = magicWeapon || com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI
-                    .isBuiltInWeapon(fmmItemModel);
+            magicWeapon = com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI.isWeapon(fmmItemModel);
             applied = magicWeapon
-                    ? com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI
-                    .applyBuiltInWeaponData(itemStack, fmmItemModel)
-                    : com.magmaguy.freeminecraftmodels.api.ModelItemAPI
-                    .applyDisplayModel(itemStack, fmmItemModel);
+                    ? com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI.applyWeaponData(itemStack, fmmItemModel)
+                    : com.magmaguy.freeminecraftmodels.api.ModelItemAPI.applyDisplayModel(itemStack, fmmItemModel);
         } catch (LinkageError incompatibleFmm) {
-            try {
-                applied = com.magmaguy.freeminecraftmodels.api.ModelItemAPI
-                        .applyDisplayModel(itemStack, fmmItemModel);
-            } catch (LinkageError ignored) {
-                // The Experimental Combat integration emits the single actionable compatibility warning.
-            }
+            // The integration emits the actionable compatibility warning. Never stamp an old identity.
         }
         if (!applied && !magicWeapon) {
             com.magmaguy.magmacore.util.Logger.warn("FMM presentation model '"

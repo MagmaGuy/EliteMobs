@@ -74,7 +74,11 @@ final class CombatTestEquipment {
     }
 
     private static ItemStack explicitlyIdentified(ItemStack itemStack, SkillType skillType) {
-        WeaponIdentityResolver.stamp(itemStack, skillType);
+        String id = skillType == SkillType.WANDS
+                ? com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI.DEFAULT_WAND_ID
+                : com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI.DEFAULT_STAFF_ID;
+        if (!com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI.applyWeaponData(itemStack, id))
+            throw new IllegalStateException("FMM authored weapon is unavailable: " + id);
         return itemStack;
     }
 
