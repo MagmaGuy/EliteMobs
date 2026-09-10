@@ -45,6 +45,7 @@ public class NPCInteractions implements Listener {
         cooldowns.add(playerUUID);
         Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> cooldowns.remove(playerUUID), 1);
 
+        com.magmaguy.elitemobs.quests.objectives.ClassUnlockObjective.refresh(player);
         if (DialogObjective.progressAtNPC(player, npcEntity)) return;
         npcEntity.runScripts(ScriptableNPC.ON_INTERACT, null, player);
 

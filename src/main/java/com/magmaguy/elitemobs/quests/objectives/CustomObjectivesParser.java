@@ -33,9 +33,13 @@ public class CustomObjectivesParser {
         String location = null;
         List<String> dialog = null;
         String name = null;
+        String classId = null;
         Integer amount = 1;
         for (Map.Entry<String, Object> entry : rawMap.entrySet()) {
             switch (entry.getKey()) {
+                case "class":
+                    classId = MapListInterpreter.parseString(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename());
+                    break;
                 case "objectiveType":
                     objectiveType = MapListInterpreter.parseEnum(entry.getKey(), entry.getValue(), ObjectiveType.class, customQuest.getConfigurationFilename());
                     break;
@@ -66,6 +70,18 @@ public class CustomObjectivesParser {
             } catch (Exception ex){
                 Logger.warn("Failed to get name for custom item " + filename + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not display the item name.");
             }
+        }
+
+        if (objectiveType == ObjectiveType.CLASS_UNLOCK) {
+            var form = classId == null || classId.isBlank() ? null
+                    : com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent.catalog().find(classId).orElse(null);
+            if (form == null || filename == null || filename.isBlank()) {
+                Logger.warn("Invalid CLASS_UNLOCK objective in " + customQuest.getConfigurationFilename()
+                        + ": a valid class and trainer filename are required. The objective cannot be completed.");
+                // Keep a blocked objective: skipping it would allow the quest to complete without an unlock.
+                return new ClassUnlockObjective(null, name == null ? "Unknown class" : name, filename);
+            }
+            return new ClassUnlockObjective(form.id(), name == null ? form.displayName() : name, filename);
         }
 
         if (filename == null) {
@@ -102,6 +118,7 @@ public class CustomObjectivesParser {
         KILL_CUSTOM,
         FETCH_ITEM,
         DIALOG,
-        ARENA
+        ARENA,
+        CLASS_UNLOCK
     }
 }

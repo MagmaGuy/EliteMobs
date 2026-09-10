@@ -295,7 +295,9 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     }
 
     public boolean completeChallenge(Player player, String formId) {
-        return progression.completeChallenge(player.getUniqueId(), formId);
+        if (!progression.completeChallenge(player.getUniqueId(), formId)) return false;
+        com.magmaguy.elitemobs.quests.objectives.ClassUnlockObjective.refresh(player);
+        return true;
     }
 
     /** Refreshes the awarded selection after the trial has removed its participant. */
@@ -543,6 +545,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
                         return;
                     }
                     progressionFailureWarnings.remove(player.getUniqueId());
+                    com.magmaguy.elitemobs.quests.objectives.ClassUnlockObjective.refresh(player);
                     CombatLevelDisplay.updateDisplay(player);
                     reconcileRunLock(player);
                     reconcilePlayer(player);

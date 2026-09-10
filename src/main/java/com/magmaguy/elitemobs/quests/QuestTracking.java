@@ -144,6 +144,8 @@ public class QuestTracking {
                         destinations.addAll(getKillLocations((CustomKillObjective) objective));
                     else if (objective instanceof DialogObjective)
                         destinations.addAll(getDialogLocations((DialogObjective) objective));
+                    else if (objective instanceof ClassUnlockObjective unlock && unlock.getNpcFilename() != null)
+                        destinations.add(new ObjectiveDestinations(unlock, getNPCLocations(unlock.getNpcFilename())));
                     else if (objective instanceof CustomFetchObjective)
                         destinations.addAll(getFetchLocations((CustomFetchObjective) objective));
             objectiveDestinations = destinations;

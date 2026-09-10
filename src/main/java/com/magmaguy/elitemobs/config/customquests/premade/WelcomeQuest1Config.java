@@ -15,7 +15,7 @@ public class WelcomeQuest1Config extends CustomQuestsConfigFields {
                 )),
                 1,
                 "&2Welcome to the AG!",
-                Collections.singletonList("&aMeet the Adventurer's Guild NPCs!")
+                List.of("&aMeet the Adventurer's Guild NPCs!", "&aDefeat the level-1 training dummy.")
         );
         //Huff my shorts java, you and your 10 Map.of limit
         super.customObjectives.put("Objective1", Map.of("objectiveType", "DIALOG", "filename", "back_teleporter.yml", "npcName", "Hermes", "location", "by the gate", "dialog", List.of("&8[&aHermes&8]&f I take you back to where you were before! Just talk to me again!")));
@@ -29,6 +29,15 @@ public class WelcomeQuest1Config extends CustomQuestsConfigFields {
         super.customObjectives.put("Objective9", Map.of("objectiveType", "DIALOG", "filename", "scrapper_config.yml", "npcName", "Kelly", "location", "under the main building", "dialog", List.of("&8[&aKelly&8]&f Got extra Elite items? Don't know what to do with them? Give them to me, and I'll turn them into scrap!", "You can use scrap to repair Elite items!")));
         super.customObjectives.put("Objective10", Map.of("objectiveType", "DIALOG", "filename", "special_blacksmith.yml", "npcName", "Grog", "location", "in the main building", "dialog", List.of("&8[&aGrog&8]&f Want to buy special items? I've got just the thing!")));
         super.customObjectives.put("Objective11", Map.of("objectiveType", "DIALOG", "filename", "unbinder.yml", "npcName", "Ulfric", "location", "under the main building", "dialog", List.of("&8[&aUlfric&8]&f If you bring me a very special and rare item, I can unbind your Elite items.", "You don't yet look prepared to take this challenge on, but you can make killing the Binder of Worlds your ultimate goal, if you dare.")));
+        super.customObjectives.put("Objective12", Map.of("objectiveType", "DIALOG", "filename", "fletcher.yml", "npcName", "Robin", "location", "on the lower floor of the main building", "dialog", List.of("&8[&aRobin&8]&f Need arrows for your bow or crossbow? I sell ammunition, including tipped and spectral arrows.")));
+        super.customObjectives.put("Objective13", Map.of("objectiveType", "DIALOG", "filename", "scroll_applier_config.yml", "npcName", "Scotty", "location", "under the main building", "dialog", List.of("&8[&aScotty&8]&f Bring me an Elite Scroll and a vanilla item you want to convert into Elite equipment.")));
+        super.customObjectives.put("Objective14", Map.of("objectiveType", "DIALOG", "filename", "wood_league_arena_master.yml", "npcName", "Gladius", "location", "at the Wood League entrance", "dialog", List.of("&8[&aGladius&8]&f The Wood League arena is a place to test yourself against waves of enemies. Talk to me again when you are ready for a match.")));
+        super.customObjectives.put("Objective15", Map.of("objectiveType", "DIALOG", "filename", "story_dungeons_quest_giver.yml", "npcName", "Manager Wallitz", "location", "on the lower floor of the guild", "dialog", List.of("&8[&aManager Wallitz&8]&f I offer the Story Mode dungeon quest chain. Start with the first chapter and work your way through the story.", "Talk to me again when you are ready to see your next story quest.")));
+        super.customObjectives.put("Objective16", Map.of("objectiveType", "KILL_CUSTOM", "filename", "training_dummy_lv1.yml", "amount", 1));
+        setQuestAcceptDialog(List.of("&8[&aCasus&8]&f Meet the guild's members and learn where to find their services.",
+                "Practice on the level-1 training dummy by the training grounds, then return to me."));
+        setQuestCompleteDialog(List.of("&8[&aCasus&8]&f You know your way around now, and you have had your first practice fight.",
+                "Talk to me again. Your next task is to visit Rowan and unlock the Adventurer class."));
         setQuestLockoutPermission();
     }
 }

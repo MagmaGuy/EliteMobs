@@ -65,6 +65,7 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
     private static String fetchQuestDefaultSummaryLine;
     private static String dialogQuestDefaultSummaryLine;
     private static String arenaQuestDefaultSummaryLine;
+    private static String classUnlockQuestDefaultSummaryLine;
     private static String rewardsDefaultSummaryLine;
     @Getter
     private static boolean useQuestTracking;
@@ -82,6 +83,8 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
             newString = dialogQuestDefaultSummaryLine.replace("$location", safeString(((DialogObjective) objective).getTargetLocation()));
         else if (objective instanceof CustomFetchObjective)
             newString = fetchQuestDefaultSummaryLine;
+        else if (objective instanceof ClassUnlockObjective)
+            newString = classUnlockQuestDefaultSummaryLine;
         else if (objective instanceof ArenaObjective) {
             String arenaFilename = ((ArenaObjective) objective).getArenaFilename();
             CustomArenasConfigFields arenaFields = CustomArenasConfig.getCustomArena(arenaFilename);
@@ -185,6 +188,7 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
         fetchQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "fetchQuestDefaultSummaryLine", "&c➤Get $name:$color&$current&0/$color$target", true);
         dialogQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "dialogQuestDefaultSummaryLine", "&c➤Go talk to $name $location", true);
         arenaQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "arenaQuestDefaultSummaryLine", "&c➤Complete $arenaName", true);
+        classUnlockQuestDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "classUnlockQuestDefaultSummaryLine", "&c➤Unlock $name", true);
 
         rewardsLine = ConfigurationEngine.setString(file, fileConfiguration, "rewardsLine", "&2&lRewards:", true);
         rewardsDefaultSummaryLine = ConfigurationEngine.setString(file, fileConfiguration, "rewardsDefaultSummaryLine", "&2➤$amountx $rewardName &8($chance%)", true);
