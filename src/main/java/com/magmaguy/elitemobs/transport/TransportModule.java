@@ -79,7 +79,7 @@ public final class TransportModule implements Listener, AutoCloseable {
                 finish(journey, false, null);
                 throw failure;
             }
-            message(player, "Departing for " + route.name() + " in " + route.countdown() / 20D + " seconds.");
+            message(player, "Stand still. Departing for " + route.name() + " in " + route.countdown() / 20D + " seconds.");
             return true;
         } catch (Exception | LinkageError failure) { message(player, failure.getMessage()); return false; }
     }
@@ -165,6 +165,15 @@ public final class TransportModule implements Listener, AutoCloseable {
             }
             if (reason != null && j.player.isOnline()) message(j.player, reason);
         } catch (Exception error) { plugin.getLogger().warning("Transport cleanup: " + error); }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void moveDuringCountdown(PlayerMoveEvent event) {
+        Journey journey = journeys.get(event.getPlayer().getUniqueId());
+        if (journey == null || journey.boarded || event.getTo() == null) return;
+        Location from = event.getFrom(), to = event.getTo();
+        if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ())
+            finish(journey, false, "Departure cancelled because you moved.");
     }
 
     @EventHandler public void quit(PlayerQuitEvent event) {
