@@ -30,6 +30,7 @@ public final class AdventurerTrainingQuestConfig extends CustomQuestsConfigField
                 "Find Rowan with the Adventurer Instructor title beside Charles. His trial costs one coin.",
                 "Once you have unlocked Adventurer, come back for your equipment."));
         setQuestCompleteDialog(List.of("&8[&aCasus&8]&f Welcome to the Adventurers! Here is your armor and a weapon of every type.",
-                "Try them all. Adventurers are proficient with every weapon!"));
+                "Try them all. Adventurers are proficient with every weapon!",
+                "Talk to me again for two new journeys: the Story Mode dungeons and the Primis expedition."));
     }
 }
