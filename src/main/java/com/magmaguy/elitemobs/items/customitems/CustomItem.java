@@ -94,7 +94,7 @@ public class CustomItem {
             addCustomItem(this);
             return;
         }
-        parseItemLevel();
+        if (!parseItemLevel()) return;
         //give getloot menu items to work with
         addCustomItem(customItemsConfigFields.getFilename(), this);
         addCustomItem(this);
@@ -610,8 +610,11 @@ public class CustomItem {
         }
     }
 
-    private void parseItemLevel() {
-        this.itemLevel = (int) Math.round(EliteItemManager.getItemLevel(generateDefaultsItemStack(null, false, null)));
+    private boolean parseItemLevel() {
+        ItemStack itemStack = generateDefaultsItemStack(null, false, null);
+        if (itemStack == null) return false;
+        this.itemLevel = (int) Math.round(EliteItemManager.getItemLevel(itemStack));
+        return true;
     }
 
     public ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth, EliteEntity eliteEntity) {
@@ -643,10 +646,6 @@ public class CustomItem {
                         customItemsConfigFields.getWeaponType(),
                         customItemsConfigFields.getFmmItemModel()
                 );
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        //Adds the filename to the persistent data container, useful for several things but mostly used for tracking quest keys
-//        Objects.requireNonNull(itemMeta).getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, customItemsConfigFields.getFilename()), PersistentDataType.STRING, customItemsConfigFields.getFilename());
-        itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
 
