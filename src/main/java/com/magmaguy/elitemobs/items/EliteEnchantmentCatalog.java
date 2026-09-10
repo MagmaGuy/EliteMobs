@@ -89,7 +89,7 @@ public final class EliteEnchantmentCatalog {
                         return Map.of("applied", input != null && EnchantmentInputs.applyExplicitDamage(MetadataHandler.PLUGIN,
                                 input.actor(), input.target(), () -> com.magmaguy.elitemobs.combatsystem.EnchantmentDamage.apply(
                                         input.attackId(), input.providerFacts(),
-                                        () -> input.target().damage(input.amount(), input.actor()))));
+                                        input::applyDamage)));
                     });
         else hosted.reload(catalog);
         revision++;
