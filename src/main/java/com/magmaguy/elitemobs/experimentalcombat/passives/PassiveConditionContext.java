@@ -22,7 +22,8 @@ public record PassiveConditionContext(
         boolean blastClassAbilityDamage,
         boolean magicWeaponDamage,
         boolean recentEliteKill,
-        boolean wardBroken) {
+        boolean wardBroken,
+        boolean drawingRangedWeapon) {
 
     public PassiveConditionContext {
         playerHealthFraction = fraction(playerHealthFraction);
@@ -50,7 +51,7 @@ public record PassiveConditionContext(
                 targetHealthFraction, targetBoss, targetControlled, targetIsolated,
                 targetGrouped, targetDistance, criticalHit, rangedAttack, classAbilityDamage,
                 classAbilityDamage, false, false, false,
-                false, false, false);
+                false, false, false, false);
     }
 
     /** Compatibility constructor for callers predating typed class-ability domains. */
@@ -76,7 +77,7 @@ public record PassiveConditionContext(
                 targetHealthFraction, targetBoss, targetControlled, targetIsolated,
                 targetGrouped, targetDistance, criticalHit, rangedAttack, classAbilityDamage,
                 classAbilityDamage, false, false, false,
-                magicWeaponDamage, recentEliteKill, wardBroken);
+                magicWeaponDamage, recentEliteKill, wardBroken, false);
     }
 
     public static PassiveConditionContext playerOnly(
@@ -94,12 +95,24 @@ public record PassiveConditionContext(
             boolean grouped,
             boolean recentEliteKill,
             boolean wardBroken) {
+        return playerOnly(playerHealthFraction, moving, recentlyHit, grouped,
+                recentEliteKill, wardBroken, false);
+    }
+
+    public static PassiveConditionContext playerOnly(
+            double playerHealthFraction,
+            boolean moving,
+            boolean recentlyHit,
+            boolean grouped,
+            boolean recentEliteKill,
+            boolean wardBroken,
+            boolean drawingRangedWeapon) {
         return new PassiveConditionContext(
                 playerHealthFraction, moving, recentlyHit, grouped,
                 false, 1D, false, false, false, false,
                 Double.POSITIVE_INFINITY, false, false, false,
                 false, false, false, false,
-                false, recentEliteKill, wardBroken);
+                false, recentEliteKill, wardBroken, drawingRangedWeapon);
     }
 
     private static double fraction(double value) {

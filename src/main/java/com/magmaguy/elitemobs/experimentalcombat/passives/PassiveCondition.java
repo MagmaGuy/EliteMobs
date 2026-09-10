@@ -8,6 +8,7 @@ public enum PassiveCondition {
     HEALTH_BELOW_25,
     MOVING,
     STANDING,
+    DRAWING_RANGED_WEAPON,
     RECENTLY_HIT,
     NOT_RECENTLY_HIT,
     GROUPED,
@@ -40,6 +41,7 @@ public enum PassiveCondition {
             case HEALTH_BELOW_25 -> context.playerHealthFraction() < .25D;
             case MOVING -> context.moving();
             case STANDING -> !context.moving();
+            case DRAWING_RANGED_WEAPON -> context.drawingRangedWeapon();
             case RECENTLY_HIT -> context.recentlyHit();
             case NOT_RECENTLY_HIT -> !context.recentlyHit();
             case GROUPED -> context.grouped();

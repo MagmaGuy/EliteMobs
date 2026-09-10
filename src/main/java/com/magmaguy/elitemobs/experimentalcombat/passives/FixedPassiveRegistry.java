@@ -331,7 +331,7 @@ public final class FixedPassiveRegistry {
                 trait(PassiveCondition.TARGET_BOSS, .18, 0, 0, 0, 0, 0),
                 trait(PassiveCondition.TARGET_ORDINARY, -.10, 0, 0, 0, 0, 0));
         add(definitions, "skirmisher",
-                trait(PassiveCondition.MOVING, .08, 0, 0, 0, 0, 0),
+                trait(PassiveCondition.DRAWING_RANGED_WEAPON, 0, 0, .40, 0, 0, 0),
                 trait(PassiveCondition.RECENTLY_HIT, 0, .04, -.08, 0, 0, 0));
         add(definitions, "windrunner",
                 trait(PassiveCondition.MOVING, .12, 0, 0, 0, 0, 0),

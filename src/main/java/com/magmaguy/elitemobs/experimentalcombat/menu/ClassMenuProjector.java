@@ -261,6 +261,7 @@ final class ClassMenuProjector {
             case HEALTH_BELOW_25 -> "under 25% HP";
             case MOVING -> "while moving";
             case STANDING -> "while still";
+            case DRAWING_RANGED_WEAPON -> "while drawing a bow or crossbow";
             case RECENTLY_HIT -> "after being hit";
             case NOT_RECENTLY_HIT -> "while unhit";
             case GROUPED -> "near allies";

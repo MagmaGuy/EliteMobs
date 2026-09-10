@@ -298,12 +298,12 @@ class ClassPassiveBehaviorTest {
     }
 
     @Test
-    void skirmisherGainsDamageWhileMovingButLosesSpeedAfterAHit() {
+    void skirmisherMovementDoesNotBoostDamageAndHitsStillReduceSpeed() {
         activate("skirmisher");
         assertEquals(10.152D, outgoingDamage(), 0.000001);
         assertEquals(.102525D, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), 0.000001);
         player.setVelocity(new Vector(.2, 0, 0));
-        assertEquals(10.72D, outgoingDamage(), 0.000001);
+        assertEquals(10.152D, outgoingDamage(), 0.000001);
         assertEquals(10.121D, incomingDamage(), 0.000001);
         assertEquals(.096845D, player.getAttribute(Attribute.MOVEMENT_SPEED).getValue(), 0.000001);
         assertEquals(10.405D, incomingDamage(), 0.000001);

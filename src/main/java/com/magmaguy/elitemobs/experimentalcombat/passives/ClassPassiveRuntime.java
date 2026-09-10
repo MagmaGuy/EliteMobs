@@ -26,9 +26,11 @@ import org.bukkit.event.entity.EntityKnockbackByEntityEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.inventory.EquipmentSlotGroup;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +58,7 @@ public final class ClassPassiveRuntime implements Listener {
     private final Function<UUID, PassiveAggregate> passiveProvider;
     private final Predicate<Player> combatActive;
     private final Map<UUID, Double> appliedMovementAdjustments = new HashMap<>();
+    private final Map<UUID, Boolean> observedDrawStates = new HashMap<>();
     private final Set<UUID> mechanicsActivePlayers = new HashSet<>();
     private final Set<UUID> applyingControlResistance = new HashSet<>();
     private final PassiveStateTracker state = new PassiveStateTracker();
@@ -217,8 +220,12 @@ public final class ClassPassiveRuntime implements Listener {
             mechanicsActivePlayers.remove(playerId);
             state.clear(playerId);
         }
+        PassiveAggregate passive = mechanicsActive ? passiveProvider.apply(playerId) : null;
+        if (passive != null && passive.requires(PassiveCondition.DRAWING_RANGED_WEAPON))
+            observedDrawStates.put(playerId, drawingRangedWeapon(player));
+        else observedDrawStates.remove(playerId);
         double adjustment = mechanicsActive
-                ? evaluatedMovement(player, passiveProvider.apply(player.getUniqueId()))
+                ? evaluatedMovement(player, passive)
                 : 0D;
         Double previous = appliedMovementAdjustments.get(player.getUniqueId());
         if (previous != null && Math.abs(previous - adjustment) < 1.0E-9D) return;
@@ -227,9 +234,20 @@ public final class ClassPassiveRuntime implements Listener {
         else appliedMovementAdjustments.put(player.getUniqueId(), adjustment);
     }
 
+    /** Checks active item use each tick; full passive evaluation runs only on a transition. */
+    public void tickItemUse(Collection<? extends Player> players) {
+        for (Player player : players) {
+            Boolean previous = observedDrawStates.get(player.getUniqueId());
+            if (previous == null) continue;
+            boolean active = combatActive.test(player) && !player.isDead();
+            if (!active || previous != drawingRangedWeapon(player)) reconcile(player, active);
+        }
+    }
+
     public void discard(Player player) {
         UUID playerId = player.getUniqueId();
         appliedMovementAdjustments.remove(playerId);
+        observedDrawStates.remove(playerId);
         mechanicsActivePlayers.remove(playerId);
         applyingControlResistance.remove(playerId);
         state.clear(playerId);
@@ -242,6 +260,7 @@ public final class ClassPassiveRuntime implements Listener {
             if (player != null) applyMovementAdjustment(player, 0D);
         }
         appliedMovementAdjustments.clear();
+        observedDrawStates.clear();
         mechanicsActivePlayers.clear();
         applyingControlResistance.clear();
         state.clearAll();
@@ -283,7 +302,8 @@ public final class ClassPassiveRuntime implements Listener {
                 state.recentlyHit(playerId),
                 grouped(player),
                 state.recentEliteKill(playerId),
-                state.wardBroken(playerId));
+                state.wardBroken(playerId),
+                drawingRangedWeapon(player));
     }
 
     private PassiveConditionContext context(
@@ -323,7 +343,18 @@ public final class ClassPassiveRuntime implements Listener {
                 damageFacts.blastClassAbilityDamage(),
                 PassiveRuntimePolicy.isMagicWeaponSkill(sourceSkill),
                 state.recentEliteKill(player.getUniqueId()),
-                state.wardBroken(player.getUniqueId()));
+                state.wardBroken(player.getUniqueId()),
+                drawingRangedWeapon(player));
+    }
+
+    private static boolean drawingRangedWeapon(Player player) {
+        if (player.isDead()) return false;
+        ItemStack item = player.getItemInUse();
+        if (item == null) return false;
+        return switch (item.getType()) {
+            case BOW, CROSSBOW -> true;
+            default -> false;
+        };
     }
 
     private double partyMovementAdjustment(Player player) {

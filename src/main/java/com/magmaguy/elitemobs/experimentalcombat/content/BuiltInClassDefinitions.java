@@ -207,7 +207,7 @@ final class BuiltInClassDefinitions {
                 form("skirmisher", "Skirmisher", ClassBand.LEVEL_31, "ranger", SkillType.BOWS, SkillType.CROSSBOWS,
                         "Fan Volley", "Fire a wide spread while moving.",
                         "Running Hunt", "Reveal and weaken foes, then gain speed.",
-                        "Movement boosts damage, but hits slow you more."),
+                        "Move faster while drawing bows or crossbows, but hits slow you more."),
                 form("windrunner", "Windrunner", ClassBand.LEVEL_61, "skirmisher", SkillType.BOWS, SkillType.SPEARS,
                         "Strafe Volley", "Fire while moving and gain speed.",
                         "Tailwind", "Gain speed and restore Focus.",

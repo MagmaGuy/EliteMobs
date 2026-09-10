@@ -130,6 +130,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     private final FixedAbilityRegistry abilityRegistry = BuiltInClassContent.abilityRegistry();
     private final FixedPassiveRegistry passiveRegistry;
     private final ClassPassiveRuntime passiveRuntime;
+    private int reconciliationTicks;
     private final Predicate<Player> passiveActive;
     private final ClassAbilityEngine abilityEngine;
     private final ClassAbilityInputRouter inputRouter;
@@ -228,7 +229,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         Bukkit.getPluginManager().registerEvents(passiveRuntime, MetadataHandler.PLUGIN);
         Bukkit.getPluginManager().registerEvents(inputRouter, MetadataHandler.PLUGIN);
         Bukkit.getPluginManager().registerEvents(weaponAffinity, MetadataHandler.PLUGIN);
-        updateTask = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, this::tick, 1L, 20L);
+        updateTask = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, this::tick, 1L, 1L);
     }
 
     /** Stable observation seam for the external every-class behavior probe. */
@@ -554,6 +555,12 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
 
     private void tick() {
         Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
+        passiveRuntime.tickItemUse(onlinePlayers);
+        if (reconciliationTicks > 0) {
+            reconciliationTicks--;
+            return;
+        }
+        reconciliationTicks = 19;
         resources.tick(onlinePlayers, combatState::isInCombat);
         for (Player player : onlinePlayers) {
             if (!progression.isReady(player.getUniqueId())) {
