@@ -115,6 +115,12 @@ public class CustomQuest extends Quest {
     }
 
     public boolean hasPermissionForQuest(Player player) {
+        return hasPermissionForQuest(player, getCustomQuestsConfigFields());
+    }
+
+    /** Checks availability without creating a pending quest or notifying the player. */
+    public static boolean hasPermissionForQuest(Player player, CustomQuestsConfigFields customQuestsConfigFields) {
+        if (customQuestsConfigFields == null || !customQuestsConfigFields.isEnabled()) return false;
         if (PlayerQuestCooldowns.bypassesQuestRestrictions(player)) return true;
         if (customQuestsConfigFields.getQuestAcceptPermissions() != null && !
                 customQuestsConfigFields.getQuestAcceptPermissions().isEmpty())
@@ -128,7 +134,8 @@ public class CustomQuest extends Quest {
         // Check new lockout system (preferred) - if lockoutMinutes is configured, use the new system
         if (customQuestsConfigFields.getQuestLockoutMinutes() > 0) {
             // Only check the new lockout system, ignore old permission-based lockouts
-            return !QuestLockoutHandler.isLockedOut(player, configurationFilename, customQuestsConfigFields.getQuestName());
+            QuestLockout lockout = PlayerData.getQuestLockout(player.getUniqueId());
+            return lockout == null || !lockout.isLockedOut(customQuestsConfigFields.getFilename());
         }
 
         // If neither lockout system is configured, the quest is available.

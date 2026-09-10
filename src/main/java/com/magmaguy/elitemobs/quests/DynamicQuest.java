@@ -105,6 +105,22 @@ public class DynamicQuest extends Quest {
         return dynamicQuests;
     }
 
+    /** The same offer selection as getQuests, without generating pending quests for a marker. */
+    public static boolean hasAvailableQuests(Player player) {
+        List<Quest> activeQuests = PlayerData.getQuests(player.getUniqueId());
+        if (activeQuests == null) return false;
+        for (Quest quest : activeQuests)
+            if (quest instanceof DynamicQuest && !quest.isAccepted() && !quest.getQuestObjectives().isTurnedIn())
+                return true;
+        int level = DynamicQuestLevel.clamp(CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
+        List<QuestObjectives> templates = threeRandomDynamicObjectives.get(DynamicQuestLevel.toTemplateBucket(level));
+        if (templates == null) return false;
+        for (QuestObjectives template : templates)
+            if (activeQuests.stream().noneMatch(quest -> quest instanceof DynamicQuest
+                    && quest.getQuestObjectives().getUuid().equals(template.getUuid()))) return true;
+        return false;
+    }
+
     /**
      * Adapts all active DynamicQuests for a player to a new mob level.
      * Called when a player enters a dynamic dungeon with a specific level selection.

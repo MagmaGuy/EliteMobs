@@ -2,8 +2,10 @@ package com.magmaguy.elitemobs.npcs.chatter;
 
 import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.NPCEntityRemoveEvent;
 import com.magmaguy.elitemobs.api.NPCProximityEnterEvent;
 import com.magmaguy.elitemobs.api.NPCProximityLeaveEvent;
+import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
@@ -18,6 +20,7 @@ import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.VisualDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -25,20 +28,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public class NPCProximitySensor implements Listener {
 
     private static final NPCProximityState proximityState = new NPCProximityState();
     private static BukkitTask proximityScanTask = null;
+    private static BukkitTask questIndicatorTask;
+    private static final Map<NPCProximityKey, QuestIndicator> questIndicators = new HashMap<>();
 
     public NPCProximitySensor() {
         proximityScanTask = new BukkitRunnable() {
@@ -48,6 +57,7 @@ public class NPCProximitySensor implements Listener {
                 Collection<NPCEntity> npcEntities = EntityTracker.getNpcEntities().values();
                 if (npcEntities.isEmpty() || Bukkit.getOnlinePlayers().isEmpty()) {
                     proximityState.clear();
+                    removeIndicators(key -> true);
                     return;
                 }
 
@@ -81,6 +91,7 @@ public class NPCProximitySensor implements Listener {
                 NPCProximityState.ProximityChanges changes = proximityState.update(detections.keySet());
                 for (Map.Entry<NPCProximityKey, ProximityDetection> entry : detections.entrySet()) {
                     ProximityDetection detection = entry.getValue();
+                    updateQuestIndicator(detection.npcEntity(), detection.player());
                     if (changes.entered().contains(entry.getKey())) {
                         handleEnter(detection.npcEntity(), detection.player());
                     } else if (!detection.npcEntity().getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT)) {
@@ -88,6 +99,8 @@ public class NPCProximitySensor implements Listener {
                     }
                 }
                 for (NPCProximityKey leftKey : changes.left()) {
+                    QuestIndicator indicator = questIndicators.remove(leftKey);
+                    if (indicator != null) indicator.remove();
                     NPCEntity npcEntity = EntityTracker.getNpcEntities().get(leftKey.npcUuid());
                     Player player = Bukkit.getPlayer(leftKey.playerUuid());
                     if (npcEntity != null && player != null) {
@@ -97,7 +110,8 @@ public class NPCProximitySensor implements Listener {
             }
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20L * 5L);
-
+        questIndicatorTask = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN,
+                NPCProximitySensor::refreshQuestIndicators, 1L, 10L);
     }
 
     public static void shutdown() {
@@ -106,6 +120,9 @@ public class NPCProximitySensor implements Listener {
             proximityScanTask = null;
         }
         proximityState.clear();
+        if (questIndicatorTask != null) questIndicatorTask.cancel();
+        questIndicatorTask = null;
+        removeIndicators(key -> true);
     }
 
     private void handleEnter(NPCEntity npcEntity, Player player) {
@@ -113,7 +130,6 @@ public class NPCProximitySensor implements Listener {
         new EventCaller(event);
         npcEntity.runScripts(ScriptableNPC.ON_PROXIMITY_ENTER, event, player);
         npcEntity.sayGreeting(player);
-        startQuestIndicator(npcEntity, player);
     }
 
     private void handleLeave(NPCEntity npcEntity, Player player) {
@@ -125,112 +141,123 @@ public class NPCProximitySensor implements Listener {
     private record ProximityDetection(NPCEntity npcEntity, Player player) {
     }
 
-    private void startQuestIndicator(NPCEntity npcEntity, Player player) {
-        if (!npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.QUEST_GIVER) &&
-                !npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER))
-            return;
-        findQuestState(npcEntity, player);
-
+    private static void updateQuestIndicator(NPCEntity npcEntity, Player player) {
+        var type = npcEntity.getNPCsConfigFields().getInteractionType();
+        if (type != NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER
+                && type != NPCInteractions.NPCInteractionType.QUEST_GIVER) return;
+        NPCProximityKey key = new NPCProximityKey(npcEntity.getUuid(), player.getUniqueId());
+        questIndicators.computeIfAbsent(key, ignored -> new QuestIndicator()).update(npcEntity, player);
     }
 
-    private void findQuestState(NPCEntity npcEntity, Player player) {
-        //Case for NPCs needed for quests but who are not themselves quest givers
-        if (npcEntity.getNPCsConfigFields().getQuestFilenames() == null) return;
-        if (npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER)) {
-            if (!PlayerData.getQuests(player.getUniqueId()).isEmpty()) {
-                for (String questString : npcEntity.getNPCsConfigFields().getQuestFilenames())
-                    for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
-                        if (quest instanceof CustomQuest &&
-                                questString.equals(((CustomQuest) quest).getCustomQuestsConfigFields().getFilename()))
-                            if (!quest.isAccepted()) {
-                                if (!((CustomQuest) quest).hasPermissionForQuest(player))
-                                    return;
-                                //Quest yet to be accepted
-                                unacceptedQuestIndicator(npcEntity, player);
-                                return;
-                            } else if (!quest.getQuestObjectives().isOver()) {
-                                //Quest has been accepted but not completed
-                                acceptedQuestIndicator(npcEntity, player);
-                                return;
-                            } else {
-                                //Quest has been completed
-                                completedQuestIndicator(npcEntity, player);
-                                return;
-                            }
+    private static void refreshQuestIndicators() {
+        var iterator = questIndicators.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var entry = iterator.next();
+            NPCEntity npc = EntityTracker.getNpcEntities().get(entry.getKey().npcUuid());
+            Player player = Bukkit.getPlayer(entry.getKey().playerUuid());
+            if (npc == null || player == null || !player.isValid()
+                    || npc.getVillager() == null || !npc.getVillager().isValid()
+                    || PatrolService.isActivelyMoving(npc) || PatrolEditor.isEditing(npc)
+                    || !npc.getVillager().getWorld().equals(player.getWorld())
+                    || npc.getNPCsConfigFields().getActivationRadius() <= 0
+                    || npc.getVillager().getLocation().distanceSquared(player.getLocation())
+                    > Math.pow(npc.getNPCsConfigFields().getActivationRadius(), 2)) {
+                entry.getValue().remove();
+                iterator.remove();
+            } else {
+                entry.getValue().update(npc, player);
             }
-        } else if (npcEntity.getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.QUEST_GIVER)) {
-            for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
-                if (quest instanceof DynamicQuest)
-                    //Dynamic quest
-                    if (!quest.isAccepted()) {
-                        //Quest yet to be accepted
-                        unacceptedQuestIndicator(npcEntity, player);
-                        return;
-                    } else if (!quest.getQuestObjectives().isOver()) {
-                        //Quest has been accepted but not completed
-                        acceptedQuestIndicator(npcEntity, player);
-                        return;
-                    } else {
-                        //Quest has been completed
-                        completedQuestIndicator(npcEntity, player);
-                        return;
-                    }
         }
-        unacceptedQuestIndicator(npcEntity, player);
     }
 
-    private void unacceptedQuestIndicator(NPCEntity npcEntity, Player player) {
-        generateIndicator(npcEntity, player, ChatColor.YELLOW + "" + ChatColor.BOLD + "!",
-                ChatColor.GOLD + "" + ChatColor.BOLD + "!");
+    private static String findQuestState(NPCEntity npcEntity, Player player) {
+        if (!PlayerData.isInMemory(player)) return null;
+        List<Quest> quests = PlayerData.getQuests(player.getUniqueId());
+        if (quests == null) return null;
+        var type = npcEntity.getNPCsConfigFields().getInteractionType();
+        boolean dynamic = type == NPCInteractions.NPCInteractionType.QUEST_GIVER;
+        if (!dynamic && type != NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER) return null;
+        if (dynamic && !player.hasPermission("elitemobs.quest.npc")) return null;
+
+        Set<String> activeCustomQuests = new HashSet<>();
+        for (Quest quest : quests) {
+            if (quest.getQuestObjectives().isTurnedIn()) continue;
+            if (quest instanceof CustomQuest customQuest && quest.isAccepted())
+                activeCustomQuests.add(customQuest.getConfigurationFilename());
+            boolean canTurnInHere = dynamic ? quest instanceof DynamicQuest
+                    : quest instanceof CustomQuest
+                    && npcEntity.getNPCsConfigFields().getFilename().equals(quest.getQuestTaker());
+            // Inspect every turn-in before considering offers, including NPCs with no offer list.
+            if (canTurnInHere && quest.isAccepted() && quest.getQuestObjectives().isOver())
+                return ChatColor.YELLOW + "" + ChatColor.BOLD + "?";
+        }
+
+        if (dynamic)
+            return DynamicQuest.hasAvailableQuests(player) ? ChatColor.YELLOW + "" + ChatColor.BOLD + "!" : null;
+        if (npcEntity.getNPCsConfigFields().getQuestFilenames() != null)
+            for (String filename : npcEntity.getNPCsConfigFields().getQuestFilenames()) {
+                if (activeCustomQuests.contains(filename)) continue;
+                if (CustomQuest.hasPermissionForQuest(player, CustomQuestsConfig.getCustomQuests().get(filename)))
+                    return ChatColor.YELLOW + "" + ChatColor.BOLD + "!";
+            }
+        return null;
     }
 
-    private void acceptedQuestIndicator(NPCEntity npcEntity, Player player) {
-        generateIndicator(npcEntity, player, ChatColor.GRAY + "" + ChatColor.BOLD + "?",
-                ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "?");
+    private static void removeIndicators(Predicate<NPCProximityKey> matches) {
+        var iterator = questIndicators.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var entry = iterator.next();
+            if (!matches.test(entry.getKey())) continue;
+            entry.getValue().remove();
+            iterator.remove();
+        }
     }
 
-    private void completedQuestIndicator(NPCEntity npcEntity, Player player) {
-        generateIndicator(npcEntity, player, ChatColor.YELLOW + "" + ChatColor.BOLD + "?",
-                ChatColor.GOLD + "" + ChatColor.BOLD + "?");
-    }
+    /** One packet display per NPC/player pair; state changes update that display in place. */
+    private static final class QuestIndicator {
+        private FakeText display;
 
-    private void generateIndicator(NPCEntity npcEntity, Player player, String messageUp, String messageDown) {
-        Location newLocation = npcEntity.getVillager().getEyeLocation().clone()
-                .add(player.getLocation().clone().subtract(npcEntity.getVillager().getLocation()).toVector().normalize().multiply(0.5))
-                .add(new Vector(0, -0.1, 0));
-        FakeText fakeText = VisualDisplay.generateFakeText(newLocation, messageUp, player);
-        if (fakeText == null) return;
-
-        AtomicInteger counter = new AtomicInteger();
-        AtomicBoolean up = new AtomicBoolean(true);
-        final Location[] currentLocation = {newLocation.clone()};
-
-        Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, task -> {
-            if (!player.isValid() ||
-                    npcEntity.getVillager() == null ||
-                    !npcEntity.getVillager().isValid() ||
-                    PatrolService.isActivelyMoving(npcEntity) || PatrolEditor.isEditing(npcEntity) ||
-                    !npcEntity.getVillager().getWorld().equals(player.getWorld()) ||
-                    npcEntity.getVillager().getLocation().distance(player.getLocation()) > npcEntity.getNPCsConfigFields().getActivationRadius()) {
-                task.cancel();
-                fakeText.remove();
+        private void update(NPCEntity npc, Player player) {
+            String text = findQuestState(npc, player);
+            if (text == null) {
+                remove();
                 return;
             }
-
-            counter.getAndIncrement();
-
-            if (counter.get() % 20 == 0) {
-                up.getAndSet(!up.get());
-                if (up.get())
-                    fakeText.setText(messageUp);
-                else
-                    fakeText.setText(messageDown);
+            // Leave room for the NPC's name and role rows, including enlarged nameplates.
+            double height = Math.max(2.3, npc.getVillager().getHeight() + 0.5)
+                    + (0.5 + npc.getNPCsConfigFields().getNameplateLineGap())
+                    * npc.getNPCsConfigFields().getNameplateScale() + 0.5;
+            Location location = npc.getVillager().getLocation().add(0, height, 0);
+            if (display == null) {
+                display = VisualDisplay.createStyledFakeText(location, text, Color.fromARGB(0), true, 3.0f);
+                if (display != null) display.displayTo(player);
+            } else {
+                if (!text.equals(display.getText())) display.setText(text);
+                Location previous = display.getLocation();
+                if (!location.getWorld().equals(previous.getWorld()) || location.distanceSquared(previous) > 1.0E-8)
+                    display.teleport(location);
             }
+        }
 
-            currentLocation[0].add(new Vector(0, up.get() ? 0.01 : -0.01, 0));
-            fakeText.teleport(currentLocation[0]);
+        private void remove() {
+            if (display != null) display.remove();
+            display = null;
+        }
+    }
 
-        }, 0L, 1L);
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        removeIndicators(key -> key.playerUuid().equals(event.getPlayer().getUniqueId()));
+    }
+
+    @EventHandler
+    public void onWorldChanged(PlayerChangedWorldEvent event) {
+        removeIndicators(key -> key.playerUuid().equals(event.getPlayer().getUniqueId()));
+    }
+
+    @EventHandler
+    public void onNPCRemoved(NPCEntityRemoveEvent event) {
+        removeIndicators(key -> key.npcUuid().equals(event.getNPCEntity().getUuid()));
     }
 
     @EventHandler
