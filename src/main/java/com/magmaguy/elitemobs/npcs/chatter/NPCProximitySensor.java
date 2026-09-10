@@ -223,11 +223,7 @@ public class NPCProximitySensor implements Listener {
                 remove();
                 return;
             }
-            // Leave room for the NPC's name and role rows, including enlarged nameplates.
-            double height = Math.max(2.3, npc.getVillager().getHeight() + 0.5)
-                    + (0.5 + npc.getNPCsConfigFields().getNameplateLineGap())
-                    * npc.getNPCsConfigFields().getNameplateScale() + 0.5;
-            Location location = npc.getVillager().getLocation().add(0, height, 0);
+            Location location = npc.getQuestIndicatorLocation();
             if (display == null) {
                 display = VisualDisplay.createStyledFakeText(location, text, Color.fromARGB(0), true, 3.0f);
                 if (display != null) display.displayTo(player);

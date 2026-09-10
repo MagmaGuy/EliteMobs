@@ -61,6 +61,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private Location spawnLocation;
     private boolean isTalking = false;
     private StackedText nameplate;
+    private int nameplateLineCount;
     private static BukkitTask nameplateTask;
     private boolean isDisguised = false;
     private String locationString;
@@ -495,6 +496,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         String name = ChatColorConverter.convert(npCsConfigFields.getName());
         if (!role.isBlank()) lines.add(role);
         if (!name.isBlank()) lines.add(name);
+        nameplateLineCount = lines.stream().mapToInt(line -> line.split("\\R", -1).length).sum();
         float scale = (float) npCsConfigFields.getNameplateScale();
         double gap = npCsConfigFields.getNameplateLineGap();
         if (customModel != null && customModel.setNpcNameLines(lines, scale, gap)) {
@@ -518,8 +520,24 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
 
     private void updateNameplateLocation() {
         if (nameplate == null || villager == null || !villager.isValid()) return;
-        double height = customModel != null ? 2.3 : villager.getHeight() + 0.5;
-        nameplate.move(villager.getLocation().add(0, height, 0));
+        nameplate.move(getNameplateLocation());
+    }
+
+    private Location getNameplateLocation() {
+        if (customModel != null) return villager.getLocation().add(0, 2.3, 0);
+        double height = isDisguised
+                ? DisguiseEntity.getDisguiseHeight(villager, npCsConfigFields.getScale())
+                : villager.getHeight();
+        return villager.getLocation().add(0, height + 0.08, 0);
+    }
+
+    /** Anchor the marker to the same nameplate geometry rather than another body-height estimate. */
+    public Location getQuestIndicatorLocation() {
+        // StackedText rows occupy 0.225 blocks at native scale; the bottom row is the anchor.
+        double stackHeight = (nameplateLineCount * 0.225
+                + Math.max(0, nameplateLineCount - 1) * npCsConfigFields.getNameplateLineGap())
+                * npCsConfigFields.getNameplateScale();
+        return getNameplateLocation().add(0, stackHeight + 0.12, 0);
     }
 
     private void removeNameplate() {

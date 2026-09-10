@@ -153,7 +153,15 @@ public class DisguiseEntity {
         Disguise disguise = DisguiseAPI.getDisguise(entity);
         if (disguise == null) return;
         if (disguise instanceof PlayerDisguise) {
-            ((PlayerDisguise) disguise).setNameVisible(true);
+            ((PlayerDisguise) disguise).setNameVisible(disguiseNameVisibility);
         }
+    }
+
+    /** Height of the visible disguise at the NPC's configured entity scale. */
+    public static double getDisguiseHeight(Entity entity, double scale) {
+        Disguise disguise = DisguiseAPI.getDisguise(entity);
+        if (disguise == null) return entity.getHeight();
+        double height = disguise.getHeight();
+        return Double.isFinite(height) && height > 0 ? height * scale : entity.getHeight();
     }
 }
