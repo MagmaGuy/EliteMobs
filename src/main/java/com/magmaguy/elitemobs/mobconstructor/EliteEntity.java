@@ -1413,6 +1413,10 @@ public class EliteEntity {
             closeAllPowerRuntimes();
             closeEliteLuaPowerBinding();
             closePowerSuppression();
+            // Persistent bosses can dispose of a body without a terminal remove event.
+            // Close its session here so later materialization can reopen the logical actor.
+            // Serialized chunk suspension bypasses remove() and retains its existing session.
+            EliteMindServiceModule.detachBehavior(this);
             //This prevents the entity tracker from running this code twice when removing due to specific reasons
             //Custom bosses have their own tracking removal rules
             if (livingEntity != null && (!(this instanceof CustomBossEntity)))

@@ -130,7 +130,7 @@ final class EliteMindServiceImpl implements EliteMindService, Listener {
     }
 
     static void detachBehavior(EliteEntity actor) {
-        clearProgramQuietly(actor, "failed boss materialization");
+        clearProgramQuietly(actor, "behavior body disposal");
     }
 
     @Override
