@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.combatsystem.displays;
 import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
-import com.magmaguy.elitemobs.config.enchantments.premade.CriticalStrikesConfig;
+import com.magmaguy.elitemobs.items.EliteEnchantmentCatalog;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.utils.VisualDisplay;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -93,7 +93,7 @@ final class CombatPopupManager {
             text.append("&c");
         }
 
-        if (critical) text.append(CriticalStrikesConfig.getCriticalHitColor()).append("&l");
+        if (critical) text.append(EliteEnchantmentCatalog.text(EliteEnchantmentCatalog.CRITICAL_STRIKES, "criticalHitColor", "&5")).append("&l");
         text.append(CombatPopupText.damageAmount(
                 eliteEntity.isScaledCombat(), eliteEntity.getMaxHealth(), damage,
                 classAbilityBonusDamage));
@@ -116,7 +116,7 @@ final class CombatPopupManager {
             Location criticalLocation = entity.getLocation().clone();
             criticalLocation.add(criticalOffset.getX(), eyeHeight + criticalOffset.getY() + 0.3,
                     criticalOffset.getZ());
-            create(criticalLocation, CriticalStrikesConfig.getCriticalHitPopup(), PopupType.CRITICAL, 0.9f);
+            create(criticalLocation, EliteEnchantmentCatalog.text(EliteEnchantmentCatalog.CRITICAL_STRIKES, "criticalHitPopup", "&5Critical Hit!"), PopupType.CRITICAL, 0.9f);
         }
     }
 

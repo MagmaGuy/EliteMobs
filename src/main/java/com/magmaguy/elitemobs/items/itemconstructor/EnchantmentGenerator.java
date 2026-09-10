@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.items.EliteEnchantments;
-import com.magmaguy.elitemobs.items.customenchantments.CriticalStrikesEnchantment;
 import com.magmaguy.elitemobs.items.customenchantments.HunterEnchantment;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -397,11 +396,11 @@ public class EnchantmentGenerator {
             case STONE_SWORD:
             case WOODEN_SWORD:
             case TRIDENT:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CriticalStrikesEnchantment.key));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("critical_strikes"));
                 break;
             case BOW:
             case CROSSBOW:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CriticalStrikesEnchantment.key));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("critical_strikes"));
                 break;
             case DIAMOND_PICKAXE:
             case GOLDEN_PICKAXE:
@@ -435,7 +434,7 @@ public class EnchantmentGenerator {
             case WOODEN_SPEAR:
             case COPPER_SPEAR:
             case NETHERITE_SPEAR:
-                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments(CriticalStrikesEnchantment.key));
+                validSecondaryEnchantments.putAll(validateSecondaryCustomEnchantments("critical_strikes"));
                 break;
             case CHAINMAIL_HELMET:
             case DIAMOND_HELMET:
@@ -515,6 +514,9 @@ public class EnchantmentGenerator {
     }
 
     private static HashMap<String, Integer> validateSecondaryCustomEnchantments(String string) {
+        if (string.equals("critical_strikes"))
+            return new HashMap<>(com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.procedural(
+                    com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.CRITICAL_STRIKES));
 
         EnchantmentsConfigFields enchantmentsConfigFields = EnchantmentsConfig.getEnchantment(string.toLowerCase(Locale.ROOT) + ".yml");
 

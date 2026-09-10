@@ -24,6 +24,10 @@ public class EnchantmentsConfig extends CustomConfig {
             enchantments.put(key, (EnchantmentsConfigFields) super.getCustomConfigFieldsHashMap().get(key));
     }
 
+    @Override protected boolean ownsFilename(String filename) {
+        return !com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.ownsFilename(filename);
+    }
+
     public static EnchantmentsConfigFields getEnchantment(String string) {
         String newString = LegacyValueConverter.parseEnchantment(string.replace(".yml", "")) + ".yml";
         newString = newString.toLowerCase(Locale.ROOT);

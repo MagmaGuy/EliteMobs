@@ -41,6 +41,15 @@ public record ClassLootProfile(String primary, List<Rule> enchantments, List<Rul
     }
 
     private static void add(Rule rule, HashMap<Enchantment, Integer> nativeLevels, HashMap<String, Integer> customLevels) {
+        if (EliteEnchantmentCatalog.ownsFilename(rule.key)) {
+            String id = "elitemobs:" + rule.key;
+            var definition = EliteEnchantmentCatalog.definition(id);
+            if (definition == null || !Boolean.TRUE.equals(definition.parameters().get("procedural"))
+                    || ThreadLocalRandom.current().nextDouble() >= rule.chance) return;
+            int level = Math.min(rule.level, definition.maxLevel());
+            if (level > 0) customLevels.merge(id, level, Math::max);
+            return;
+        }
         var config = EnchantmentsConfig.getEnchantment(rule.key);
         if (config == null || !config.isEnabled() || !config.isEnabledForProcedurallyGeneratedItems()) return;
         if (ThreadLocalRandom.current().nextDouble() >= rule.chance) return;

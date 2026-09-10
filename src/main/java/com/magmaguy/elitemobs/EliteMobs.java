@@ -163,6 +163,7 @@ public class EliteMobs extends JavaPlugin {
         new EconomySettingsConfig();
         new EventsConfig();
         new SkillsConfig();
+        com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.prepare();
         new EnchantmentsConfig();
         new AntiExploitConfig();
         new CombatTagConfig();
@@ -283,6 +284,7 @@ public class EliteMobs extends JavaPlugin {
                     }
                 },
                 throwable -> {
+                    com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.close();
                     MetadataHandler.pluginState = PluginState.UNINITIALIZED;
                     MetadataHandler.pendingReloadSender = null;
                     EliteMindServiceModule.shutdown();
@@ -297,6 +299,18 @@ public class EliteMobs extends JavaPlugin {
     private void asyncInitialization(PluginInitializationContext initializationContext) {
         initializationContext.step("Configs");
         initializeConfigs();
+        // Publish on the server thread before authored item construction resolves providers.
+        try {
+            Bukkit.getScheduler().callSyncMethod(this, () -> {
+                com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.publish();
+                return null;
+            }).get();
+        } catch (InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted publishing enchantments", interrupted);
+        } catch (java.util.concurrent.ExecutionException failure) {
+            throw new IllegalStateException("Cannot publish enchantments", failure.getCause());
+        }
         initializationContext.step("Database");
         new DatabaseConfig();
         initializationContext.step("Skill Bonuses Config");
@@ -637,6 +651,7 @@ public class EliteMobs extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.close();
         MetadataHandler.shutdownRequested = true;
         if (enchantmentAnvil != null) { enchantmentAnvil.close(); enchantmentAnvil = null; }
         CustomItem.shutdownCacheRegeneration();

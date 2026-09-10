@@ -56,6 +56,12 @@ public class ItemWorthCalculator {
             if (enchantmentLevel > 0)
                 value += customEnchantment.getEnchantmentsConfigFields().getValue() * ItemTagger.getEnchantment(itemStack.getItemMeta(), customEnchantment.key);
         }
+        for (var entry : com.magmaguy.magmacore.enchantments.EnchantmentItems.inspectCustom(itemStack.getItemMeta()).entrySet()) {
+            var definition = EliteEnchantmentCatalog.definition(entry.getKey());
+            Object weight = definition == null ? null : definition.parameters().get("value");
+            if (weight instanceof Number number && Double.isFinite(number.doubleValue()) && number.doubleValue() >= 0)
+                value += number.doubleValue() * entry.getValue();
+        }
         return value;
     }
 

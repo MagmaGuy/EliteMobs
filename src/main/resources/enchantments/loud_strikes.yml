@@ -1,0 +1,9 @@
+isEnabled: true
+name: Loud Strikes
+maxLevel: 10
+validSlots: [MAINHAND, OFFHAND, HEAD, CHEST, LEGS, FEET]
+stacking: sum_equipped_levels
+script: loud_strikes.lua
+parameters:
+  value: 6
+  procedural: false

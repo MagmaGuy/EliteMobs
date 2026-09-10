@@ -33,7 +33,6 @@ public abstract class CustomEnchantment {
         new FlamethrowerEnchantment();
         new PlasmaBootsEnchantment();
         new HunterEnchantment();
-        new CriticalStrikesEnchantment();
         new DrillingEnchantment();
         new IceBreakerEnchantment();
         new MeteorShowerEnchantment();
@@ -42,7 +41,6 @@ public abstract class CustomEnchantment {
         new LightningEnchantment();
         new GrapplingHookEnchantment();
         new EarthquakeEnchantment();
-        new LoudStrikesEnchantment();
     }
 
     public static boolean isCustomEnchantment(String enchantmentFilename) {

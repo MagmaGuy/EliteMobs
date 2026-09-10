@@ -148,13 +148,14 @@ public class PlayerItem {
         this.blastProtection = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.BLAST_PROTECTION.getKey());
         this.damageArthropodsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.BANE_OF_ARTHROPODS.getKey());
         this.damageUndeadLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.SMITE.getKey());
-        this.critChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, CriticalStrikesEnchantment.key)) / 10D;
+        this.critChance = com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.contribution(itemStack,
+                com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.CRITICAL_CHANCE, player.getUniqueId(), sharedSlot());
         this.lightningChance = Math.pow(ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, LightningEnchantment.key)), 2) / 1000D;
         this.plasmaBootsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, PlasmaBootsEnchantment.key));
         this.hunterChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, HunterEnchantment.key)) * EnchantmentsConfig.getEnchantment("hunter.yml").getFileConfiguration().getDouble("hunterSpawnBonus");
         this.earthquakeLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, EarthquakeEnchantment.key));
         this.thornsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.THORNS.getKey());
-        this.loudStrikesBonus = readLoudStrikesBonus(itemStack);
+        this.loudStrikesBonus = readLoudStrikesBonus(itemStack, sharedSlot(), player.getUniqueId());
         eliteEnchantmentDamage = EliteItemManager.getEliteDamageFromEnchantments(itemStack);
 
         this.itemStack = itemStack.clone();
@@ -268,9 +269,21 @@ public class PlayerItem {
     }
 
     /** The same per-item contribution is used for active gear and captured attack equipment. */
-    public static double readLoudStrikesBonus(ItemStack item) {
+    public static double readLoudStrikesBonus(ItemStack item,
+            com.magmaguy.magmacore.enchantments.EnchantmentDefinition.Slot slot, java.util.UUID actor) {
         if (item == null || item.getType().isAir() || !item.hasItemMeta() || EliteItemManager.isOnLastDamage(item)) return 0;
-        return ItemTagger.getEnchantment(item.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, LoudStrikesEnchantment.key)) / 3d;
+        return com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.contribution(item,
+                com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.THREAT_BONUS, actor, slot);
+    }
+
+    private com.magmaguy.magmacore.enchantments.EnchantmentDefinition.Slot sharedSlot() {
+        return com.magmaguy.magmacore.enchantments.EnchantmentDefinition.Slot.valueOf(switch (equipmentSlot) {
+            case HELMET -> "HEAD";
+            case CHESTPLATE -> "CHEST";
+            case LEGGINGS -> "LEGS";
+            case BOOTS -> "FEET";
+            default -> equipmentSlot.name();
+        });
     }
 
     public enum EquipmentSlot {
@@ -284,7 +297,7 @@ public class PlayerItem {
 
     private record ItemRuntimeContext(GearRestrictionHandler.RestrictionContext restrictionContext,
                                       boolean soulbindEnabled,
-                                      int dungeonLevelSync) {
+                                      int dungeonLevelSync, long enchantmentRevision) {
 
         private static ItemRuntimeContext capture(Player player, ItemStack itemStack) {
             int dungeonLevelSync = PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeonInstance
@@ -293,7 +306,7 @@ public class PlayerItem {
             return new ItemRuntimeContext(
                     GearRestrictionHandler.getRestrictionContext(player, itemStack),
                     EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled(),
-                    dungeonLevelSync);
+                    dungeonLevelSync, com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.revision());
         }
     }
 

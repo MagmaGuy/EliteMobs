@@ -1,0 +1,12 @@
+isEnabled: true
+name: Critical Strikes
+maxLevel: 3
+validSlots: [MAINHAND, OFFHAND, HEAD, CHEST, LEGS, FEET]
+stacking: sum_equipped_levels
+script: critical_strikes.lua
+parameters:
+  value: 13
+  procedural: true
+  procedural_max_level: 2
+  criticalHitPopup: '&5Critical Hit!'
+  criticalHitColor: '&5'

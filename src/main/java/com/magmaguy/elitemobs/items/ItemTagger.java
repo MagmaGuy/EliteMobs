@@ -157,6 +157,8 @@ public class ItemTagger {
      * @param enchantmentLevel
      */
     public static void registerCustomEnchantment(ItemMeta itemMeta, String enchantmentKey, int enchantmentLevel) {
+        if (EliteEnchantmentCatalog.ownsFilename(enchantmentKey))
+            throw new IllegalArgumentException("Retired custom writer: use the shared namespaced enchantment record");
         itemMeta.getPersistentDataContainer().set(new NamespacedKey(MetadataHandler.PLUGIN, enchantmentKey), PersistentDataType.INTEGER, enchantmentLevel);
     }
 
@@ -178,6 +180,8 @@ public class ItemTagger {
     public static int getEnchantment(ItemMeta itemMeta, NamespacedKey enchantmentKey) {
         if (itemMeta == null)
             return 0;
+        if (enchantmentKey.getNamespace().equals("elitemobs") && EliteEnchantmentCatalog.ownsFilename(enchantmentKey.getKey()))
+            return com.magmaguy.magmacore.enchantments.EnchantmentItems.inspectCustom(itemMeta).getOrDefault(enchantmentKey.toString(), 0);
         Integer level = itemMeta.getPersistentDataContainer().get(enchantmentKey, PersistentDataType.INTEGER);
         if (level == null) {
             Enchantment enchantment = Enchantment.getByKey(enchantmentKey);
@@ -450,6 +454,8 @@ public class ItemTagger {
             if (enchantmentLevel > 0)
                 itemEnchantmentFilenames.put(new NamespacedKey(MetadataHandler.PLUGIN, customEnchantment.getKey()), enchantmentLevel);
         }
+        com.magmaguy.magmacore.enchantments.EnchantmentItems.inspectCustom(itemMeta).forEach((id, level) ->
+                itemEnchantmentFilenames.put(Objects.requireNonNull(NamespacedKey.fromString(id)), level));
         return itemEnchantmentFilenames;
     }
 
