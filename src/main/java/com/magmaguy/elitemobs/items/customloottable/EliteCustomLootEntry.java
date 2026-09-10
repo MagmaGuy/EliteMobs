@@ -281,6 +281,21 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         return amount - dropped;
     }
 
+    public boolean isClassLoot() {
+        CustomItem item = generateCustomItem();
+        return item != null && item.getItemType() == CustomItem.ItemType.CLASS_LOOT;
+    }
+
+    /** Non-random eligibility; chance remains a probability applied after class selection. */
+    public boolean eligibleForClassLoot(Player player, java.util.function.Predicate<List<String>> difficultyFilter) {
+        CustomItem item = generateCustomItem();
+        return isClassLoot() && item.getCustomItemsConfigFields().isEnabled()
+                && getAmount() > 0 && Double.isFinite(getChance()) && getChance() > 0
+                && (getPermission().isEmpty() || player != null && player.hasPermission(getPermission()))
+                && (item.getPermission().isEmpty() || player != null && player.hasPermission(item.getPermission()))
+                && (difficultyIDs == null || difficultyFilter.test(difficultyIDs));
+    }
+
     public boolean isEquipment() {
         return com.magmaguy.elitemobs.items.LootItemPolicy.isEquipment(generateCustomItem());
     }

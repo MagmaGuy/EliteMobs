@@ -62,4 +62,19 @@ public final class ClassLootSelection {
         }
         return last;
     }
+
+    /** Select a family first, then an authored item, so extra variants cannot inflate a family's share. */
+    public static com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry selectEntry(
+            List<com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry> eligible, Player player) {
+        var byFamily = new EnumMap<ClassLootFamily, List<com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry>>(ClassLootFamily.class);
+        for (var entry : eligible) {
+            var item = com.magmaguy.elitemobs.items.customitems.CustomItem.getCustomItem(entry.getFilename());
+            if (item == null || item.getCustomItemsConfigFields().getClassLootFamily() == null) continue;
+            byFamily.computeIfAbsent(item.getCustomItemsConfigFields().getClassLootFamily(), ignored -> new java.util.ArrayList<>()).add(entry);
+        }
+        var family = select(List.copyOf(byFamily.keySet()), player);
+        if (family == null) return null;
+        var choices = byFamily.get(family);
+        return choices.get(ThreadLocalRandom.current().nextInt(choices.size()));
+    }
 }

@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-/** The editable, corpus-derived baseline; item-specific names and lore remain in each boss. */
+/** The editable, corpus-derived baseline; item-specific names and lore belong to custom items. */
 public class ClassLootSettingsConfig extends ConfigurationFile {
     public enum Difficulty { NORMAL, HARD, MYTHIC }
     public enum Rank { TRASH, MINIBOSS, BOSS }

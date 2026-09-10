@@ -39,6 +39,8 @@ public class CustomItemsConfigFields extends CustomConfigFields {
     @Setter
     private CustomItem.ItemType itemType = CustomItem.ItemType.CUSTOM;
     @Getter
+    private com.magmaguy.elitemobs.items.ClassLootFamily classLootFamily;
+    @Getter
     @Setter
     private String customModelID = null;
     @Getter
@@ -90,6 +92,9 @@ public class CustomItemsConfigFields extends CustomConfigFields {
      */
     @Override
     public void processConfigFields() {
+        Object authoredMaterial = fileConfiguration.get("material");
+        Object authoredName = fileConfiguration.get("name");
+        Object authoredLore = fileConfiguration.get("lore");
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         // Materials for future versions (e.g. spears) may not exist yet — skip silently
         if (configHas("material")) {
@@ -125,6 +130,22 @@ public class CustomItemsConfigFields extends CustomConfigFields {
         this.level = processInt("level", level, 0, false);
         this.soulbound = processBoolean("soulbound", soulbound, true, false);
         this.showSource = processBoolean("showSource", showSource, showSource, false);
+        classLootFamily = null;
+        if (itemType == CustomItem.ItemType.CLASS_LOOT) {
+            try {
+                if (!(authoredMaterial instanceof String) || !(authoredName instanceof String text) || text.isBlank()
+                        || !(authoredLore instanceof List<?> lines)
+                        || !lines.stream().allMatch(String.class::isInstance))
+                    throw new IllegalArgumentException("material, name and lore must be valid item fields (lore: [] is allowed)");
+                if (Material.getMaterial(fileConfiguration.getString("material").toUpperCase(java.util.Locale.ROOT)) == null)
+                    throw new IllegalArgumentException("material is unavailable on this server");
+                classLootFamily = com.magmaguy.elitemobs.items.ClassLootFamily.resolve(material, weaponType,
+                        fileConfiguration.getString("classLootFamily"));
+            } catch (IllegalArgumentException invalid) {
+                this.isEnabled = false;
+                Logger.warn("Invalid CLASS_LOOT item " + filename + ": " + invalid.getMessage() + "; item disabled.");
+            }
+        }
         updatePostProcessor();
     }
 
