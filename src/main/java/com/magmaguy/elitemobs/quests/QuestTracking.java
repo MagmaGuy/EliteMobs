@@ -42,14 +42,20 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class QuestTracking {
+
+    private static final double VERTICAL_ENTER_RADIUS = 4;
+    private static final double VERTICAL_EXIT_RADIUS = 6;
+    private static final double VERTICAL_ENTER_HEIGHT = 5;
+    private static final double VERTICAL_EXIT_HEIGHT = 3;
 
     @Getter
     private static final HashMap<UUID, QuestTracking> playerTrackingQuests = new HashMap<>();
@@ -65,6 +71,10 @@ public class QuestTracking {
     private boolean stopped = false;
     private boolean wasWaiting;
     private boolean refreshQueued;
+    private Set<VerticalDestination> previousVerticalDestinations = new HashSet<>();
+    private Set<VerticalDestination> verticalDestinations = new HashSet<>();
+    private boolean targetsAbove;
+    private boolean targetsBelow;
 
     private void queueLocationRefresh() {
         if (stopped || refreshQueued) return;
@@ -306,6 +316,8 @@ public class QuestTracking {
     public void stop() {
         if (stopped) return;
         stopped = true;
+        previousVerticalDestinations.clear();
+        verticalDestinations.clear();
         playerTrackingQuests.remove(player.getUniqueId());
         resetPlayerScoreboard();
         if (locationRefresher != null) locationRefresher.cancel();
@@ -347,6 +359,13 @@ public class QuestTracking {
     }
 
     private void updateCompassContents() {
+        // Reuse both sets, retaining hysteresis only for destinations seen in consecutive frames.
+        Set<VerticalDestination> reusable = previousVerticalDestinations;
+        previousVerticalDestinations = verticalDestinations;
+        verticalDestinations = reusable;
+        verticalDestinations.clear();
+        targetsAbove = false;
+        targetsBelow = false;
         var match = PlayerData.getMatchInstance(player);
         boolean waiting = match != null && match.isWaitingPlayer(player);
         if (waiting != wasWaiting) {
@@ -354,6 +373,7 @@ public class QuestTracking {
             updateLocations(quest);
         }
         if (waiting) {
+            previousVerticalDestinations.clear();
             compassBar.setTitle("Waiting for the dungeon to start");
             BossBarOrderManager.show(player, compassBar);
             return;
@@ -361,7 +381,7 @@ public class QuestTracking {
         //for reference, character 32 is straight ahead
         String compassText = "---------------------------------------------------------------";
         List<LocationAndSymbol> locationAndSymbols = projectLocations();
-        if (!locationAndSymbols.isEmpty())
+        if (!locationAndSymbols.isEmpty() || targetsAbove || targetsBelow)
             for (LocationAndSymbol pair : locationAndSymbols)
                 compassText = compassText.substring(0, pair.getKey()) + pair.getValue() + compassText.substring(pair.getKey() + 1);
         else {
@@ -395,6 +415,11 @@ public class QuestTracking {
             }
         }
 
+        // Draw last so another objective at the same bearing cannot hide the height cue.
+        if (targetsAbove || targetsBelow) {
+            String arrow = targetsAbove ? (targetsBelow ? "↕" : "↑") : "↓";
+            compassText = compassText.substring(0, 31) + arrow + compassText.substring(32);
+        }
         compassBar.setTitle(compassText);
         BossBarOrderManager.show(player, compassBar);
     }
@@ -418,8 +443,25 @@ public class QuestTracking {
     private LocationAndSymbol processLocations(Location location, Objective objective) {
         if (location == null || location.getWorld() == null) return null;
         if (player.getWorld().equals(location.getWorld())) {
-            Vector toTarget = toTargetVector(player, location);
-            double angle = getAngle(toTarget, player);
+            Location playerLocation = player.getLocation();
+            double deltaX = location.getX() - playerLocation.getX();
+            double deltaY = location.getY() - playerLocation.getY();
+            double deltaZ = location.getZ() - playerLocation.getZ();
+            double horizontalDistanceSquared = deltaX * deltaX + deltaZ * deltaZ;
+            VerticalDestination destination = new VerticalDestination(location.getWorld().getUID(),
+                    location.getX(), location.getY(), location.getZ(), deltaY > 0);
+            boolean wasVertical = previousVerticalDestinations.contains(destination);
+            double radius = wasVertical ? VERTICAL_EXIT_RADIUS : VERTICAL_ENTER_RADIUS;
+            // Compare feet to feet so camera pitch, sneaking and eye height do not affect the cue.
+            boolean heightRequiresArrow = wasVertical ? Math.abs(deltaY) > VERTICAL_EXIT_HEIGHT
+                    : Math.abs(deltaY) >= VERTICAL_ENTER_HEIGHT;
+            if (horizontalDistanceSquared <= radius * radius && heightRequiresArrow) {
+                verticalDestinations.add(destination);
+                if (deltaY > 0) targetsAbove = true;
+                else targetsBelow = true;
+                return null;
+            }
+            double angle = getAngle(deltaX, deltaZ, playerLocation.getYaw());
             if (Math.abs(angle) > Math.PI / 2D) return null;
             //Convert to degrees, each character has a resolution of 3 degrees
             return new LocationAndSymbol((int) (angle * 57D / 3D), getSymbol(objective));
@@ -427,16 +469,16 @@ public class QuestTracking {
         return null;
     }
 
-    private Vector toTargetVector(Player player, Location location) {
-        return location.clone().add(new Vector(0, 1.85, 0)).subtract(player.getEyeLocation()).toVector().normalize();
+    private double getAngle(double deltaX, double deltaZ, float yaw) {
+        if (deltaX == 0 && deltaZ == 0) return 0;
+        double facingX = -Math.sin(Math.toRadians(yaw));
+        double facingZ = Math.cos(Math.toRadians(yaw));
+        // atan2 also works when looking straight up/down, without normalizing a zero vector.
+        return Math.atan2(facingX * deltaZ - facingZ * deltaX, facingX * deltaX + facingZ * deltaZ);
     }
 
-    private double getAngle(Vector toTarget, Player player) {
-        double angle = player.getEyeLocation().getDirection().setY(0).angle(toTarget.clone().setY(0));
-        if (toTarget.getX() * player.getEyeLocation().getDirection().getZ() - toTarget.getZ() * player.getEyeLocation().getDirection().getX() > 0)
-            angle *= -1;
-        return angle;
-    }
+    // Ignore target yaw/pitch when locations refresh; direction changes must cross the entry threshold again.
+    private record VerticalDestination(UUID worldId, double x, double y, double z, boolean above) {}
 
     private String getSymbol(Objective objective) {
         //case for portals
