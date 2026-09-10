@@ -306,9 +306,7 @@ public class EliteMobs extends JavaPlugin {
         waitForModelRegistryRebuild(MagmaCore.initializeImporter(this));
         initializationContext.step("Custom Items");
         new CustomItemsConfig();
-        CustomItem.initializeCustomItems();
-        if (ExperimentalCombatConfig.isEnabled())
-            com.magmaguy.elitemobs.experimentalcombat.weapons.ExperimentalMagicWeaponItems.register();
+        CustomItem.initializeCustomItems(initializationContext::isShutdownRequested);
         initializationContext.step("Loot Tables");
         LootTables.initialize();
         initializationContext.step("Content Packages Config");

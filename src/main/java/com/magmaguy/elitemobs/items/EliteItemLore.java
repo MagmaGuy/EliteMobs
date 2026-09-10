@@ -11,6 +11,9 @@ import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffect;
 import com.magmaguy.elitemobs.items.potioneffects.ElitePotionEffectContainer;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.magmacore.enchantments.EnchantmentDefinitions;
+import com.magmaguy.magmacore.enchantments.EnchantmentItemProfile;
+import com.magmaguy.magmacore.enchantments.EnchantmentItems;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Round;
 import lombok.Getter;
@@ -28,6 +31,9 @@ import java.util.List;
 import java.util.Locale;
 
 public class EliteItemLore {
+
+    private static final EnchantmentItems ENCHANTMENT_PRESENTATION =
+            new EnchantmentItems(EnchantmentDefinitions::resolve, EnchantmentItemProfile::vanilla);
 
     private final List<String> vanillaEnchantmentsLore = new ArrayList<>();
     private final HashMap<Enchantment, Integer> eliteVanillaEnchantments = new HashMap<>();
@@ -51,29 +57,24 @@ public class EliteItemLore {
     private List<String> thirdPartyLore = null;
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth) {
-        initialize(itemStack, showItemWorth);
+        this(itemStack, showItemWorth, false);
     }
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth, boolean isNewItem) {
-        if (isNewItem
-                && itemStack.hasItemMeta()
-                && itemStack.getItemMeta().hasLore()
-                && itemStack.getItemMeta().getLore() != null
-                && !itemStack.getItemMeta().getLore().isEmpty()) {
-            thirdPartyLore = itemStack.getItemMeta().getLore();
-        }
-        initialize(itemStack, showItemWorth);
+        initialize(itemStack, showItemWorth, isNewItem);
     }
 
-    private void initialize(ItemStack itemStack, boolean showItemWorth){
+    private void initialize(ItemStack itemStack, boolean showItemWorth, boolean isNewItem) {
 
         if (!EliteItemManager.isEliteMobsItem(itemStack)) {
 //            Logger.warn("Attempted to rewrite the lore of a non-elitemobs item! This is not supposed to happen.");
             return;
         }
 
-        this.itemStack = itemStack;
-        this.itemMeta = itemStack.getItemMeta();
+        // Value calculation also writes metadata. Keep every construction step on a clone
+        // until the shared renderer accepts the original prefix and the complete new lore.
+        this.itemStack = itemStack.clone();
+        this.itemMeta = this.itemStack.getItemMeta();
         this.lore = new ArrayList<>();
         this.showItemWorth = showItemWorth;
 
@@ -97,11 +98,17 @@ public class EliteItemLore {
 
         constructItemWorth();
 
-        writeNewLore();
-
-        this.itemMeta.setLore(lore);
         ItemTagger.registerEnchantmentCount(itemMeta, enchantmentCount);
         this.itemStack.setItemMeta(this.itemMeta);
+        ItemStack rendered = ENCHANTMENT_PRESENTATION.refreshPresentation(this.itemStack, hostLore -> {
+            if (isNewItem && !hostLore.isEmpty()) thirdPartyLore = hostLore;
+            writeNewLore();
+            return lore;
+        });
+        if (!itemStack.setItemMeta(rendered.getItemMeta()))
+            throw new IllegalArgumentException("Elite item rejected its rebuilt metadata");
+        this.itemStack = itemStack;
+        this.itemMeta = itemStack.getItemMeta();
     }
 
     private void constructVanillaEnchantments() {
