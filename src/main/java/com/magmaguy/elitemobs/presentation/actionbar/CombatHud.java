@@ -95,7 +95,7 @@ public final class CombatHud {
                 int left = 4 + index * 61;
                 // Replace only this card's surface, before drawing its icon and live cost.
                 if (!state.affordable()) overlay(line, left, String.valueOf((char) (0xE680 + index)), 61);
-                String glyph = CombatHudAbilityIcons.glyph(state.abilityId());
+                String glyph = CombatHudAbilityIcons.glyph(slots.get(index));
                 if (!glyph.isEmpty()) overlay(line, left + 3, glyph, 14);
                 String digits = Long.toString((long) Math.ceil(state.cost()));
                 int start = left + 38 - (digits.length() * 4 + 7) / 2;

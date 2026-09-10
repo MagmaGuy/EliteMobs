@@ -1,19 +1,21 @@
 package com.magmaguy.elitemobs.presentation.actionbar;
 
+import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-/** Immutable mapping generated alongside the HUD font providers and ability artwork. */
+/** Shared slot icons, generated alongside the HUD font providers and ability artwork. */
 final class CombatHudAbilityIcons {
     private static final Map<String, Character> GLYPHS = load("/combat-hud-ability-icons.properties");
 
     private CombatHudAbilityIcons() { }
 
-    static String glyph(String abilityId) {
-        Character glyph = GLYPHS.get(abilityId);
+    static String glyph(AbilitySlot slot) {
+        Character glyph = GLYPHS.get(slot.name());
         return glyph == null ? "" : glyph.toString();
     }
 
