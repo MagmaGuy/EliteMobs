@@ -46,6 +46,7 @@ public class NPCProximitySensor implements Listener {
 
     private static final int BOUNCE_PERIOD_TICKS = 40;
     private static final double BOUNCE_HEIGHT = 0.16;
+    private static final double QUEST_MARKER_RADIUS = 30;
     private static final NPCProximityState proximityState = new NPCProximityState();
     private static BukkitTask proximityScanTask = null;
     private static BukkitTask questIndicatorTask;
@@ -71,19 +72,27 @@ public class NPCProximitySensor implements Listener {
                     if (villager == null || !villager.isValid()) continue;
                     if (PatrolService.isActivelyMoving(npcEntity) || PatrolEditor.isEditing(npcEntity)) continue;
                     double activationRadius = npcEntity.getNPCsConfigFields().getActivationRadius();
-                    if (activationRadius <= 0) continue;
+                    var interaction = npcEntity.getNPCsConfigFields().getInteractionType();
+                    boolean questGiver = interaction == NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER
+                            || interaction == NPCInteractions.NPCInteractionType.QUEST_GIVER;
+                    double scanRadius = Math.max(activationRadius, questGiver ? QUEST_MARKER_RADIUS : 0);
+                    if (scanRadius <= 0) continue;
                     double activationRadiusSquared = activationRadius * activationRadius;
                     Location npcLocation = villager.getLocation();
                     boolean patrolOwnsFacing = npcEntity.getNPCsConfigFields().isPatrolFaceNearbyPlayers()
                             && PatrolService.hasConfiguredPatrol(npcEntity);
-                    for (Entity entity : villager.getNearbyEntities(activationRadius, activationRadius, activationRadius)) {
+                    for (Entity entity : villager.getNearbyEntities(scanRadius, scanRadius, scanRadius)) {
                         if (!(entity instanceof Player player)) continue;
                         if (!player.isValid()) continue;
                         Location playerLocation = player.getLocation();
                         if (playerLocation.getWorld() == null || npcLocation.getWorld() == null ||
-                                !playerLocation.getWorld().getUID().equals(npcLocation.getWorld().getUID()) ||
-                                playerLocation.distanceSquared(npcLocation) > activationRadiusSquared)
+                                !playerLocation.getWorld().getUID().equals(npcLocation.getWorld().getUID()))
                             continue;
+                        double distanceSquared = playerLocation.distanceSquared(npcLocation);
+                        if (questGiver && distanceSquared <= QUEST_MARKER_RADIUS * QUEST_MARKER_RADIUS)
+                            updateQuestIndicator(npcEntity, player);
+                        // Distant markers do not trigger greetings, proximity scripts or NPC facing.
+                        if (activationRadius <= 0 || distanceSquared > activationRadiusSquared) continue;
                         Vector direction = playerLocation.toVector().subtract(npcLocation.toVector());
                         if (!patrolOwnsFacing && direction.lengthSquared() > 0) {
                             villager.teleport(npcLocation.clone().setDirection(direction));
@@ -95,7 +104,6 @@ public class NPCProximitySensor implements Listener {
                 NPCProximityState.ProximityChanges changes = proximityState.update(detections.keySet());
                 for (Map.Entry<NPCProximityKey, ProximityDetection> entry : detections.entrySet()) {
                     ProximityDetection detection = entry.getValue();
-                    updateQuestIndicator(detection.npcEntity(), detection.player());
                     if (changes.entered().contains(entry.getKey())) {
                         handleEnter(detection.npcEntity(), detection.player());
                     } else if (!detection.npcEntity().getNPCsConfigFields().getInteractionType().equals(NPCInteractions.NPCInteractionType.CHAT)) {
@@ -103,8 +111,6 @@ public class NPCProximitySensor implements Listener {
                     }
                 }
                 for (NPCProximityKey leftKey : changes.left()) {
-                    QuestIndicator indicator = questIndicators.remove(leftKey);
-                    if (indicator != null) indicator.remove();
                     NPCEntity npcEntity = EntityTracker.getNpcEntities().get(leftKey.npcUuid());
                     Player player = Bukkit.getPlayer(leftKey.playerUuid());
                     if (npcEntity != null && player != null) {
@@ -170,9 +176,8 @@ public class NPCProximitySensor implements Listener {
                     || npc.getVillager() == null || !npc.getVillager().isValid()
                     || PatrolService.isActivelyMoving(npc) || PatrolEditor.isEditing(npc)
                     || !npc.getVillager().getWorld().equals(player.getWorld())
-                    || npc.getNPCsConfigFields().getActivationRadius() <= 0
                     || npc.getVillager().getLocation().distanceSquared(player.getLocation())
-                    > Math.pow(npc.getNPCsConfigFields().getActivationRadius(), 2)) {
+                    > QUEST_MARKER_RADIUS * QUEST_MARKER_RADIUS) {
                 entry.getValue().remove();
                 iterator.remove();
             } else {
