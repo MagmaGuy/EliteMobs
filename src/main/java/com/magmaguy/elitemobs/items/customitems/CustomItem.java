@@ -83,7 +83,7 @@ public class CustomItem {
         this.permission = customItemsConfigFields.getPermission();
         if (!customItemsConfigFields.isEnabled()) return;
         if (customItemsConfigFields.getMaterial() == null) return;
-        parseEnchantments();
+        if (!parseEnchantments()) return;
         parsePotionEffects();
         parseItemType();
         parseItemLevel();
@@ -479,10 +479,28 @@ public class CustomItem {
         return loot;
     }
 
-    private void parseEnchantments() {
+    private boolean parseEnchantments() {
         for (String string : this.customItemsConfigFields.getEnchantments())
             try {
                 String name = string.split(",")[0];
+                if (name.contains(":") && !name.startsWith("minecraft:")) {
+                    com.magmaguy.magmacore.enchantments.EnchantmentDefinition.requireId(name);
+                    String[] parts = string.split(",", -1);
+                    if (parts.length != 2) throw new IllegalArgumentException("Expected namespaced_id,level");
+                    int sharedLevel = Integer.parseInt(parts[1]);
+                    if (sharedLevel < 1) throw new IllegalArgumentException("Custom levels must be positive");
+                    if (customEnchantments.putIfAbsent(name, sharedLevel) != null)
+                        throw new IllegalArgumentException("Duplicate custom enchantment identity " + name);
+                    continue;
+                }
+                if (java.util.Set.of("multicast", "blast_radius", "ignition", "repair", "unbind", "lucky_source", "enchanted_source")
+                        .contains(name.toLowerCase(Locale.ROOT))) {
+                    customItemsConfigFields.setEnabled(false);
+                    Logger.warn("Custom item " + customItemsConfigFields.getFilename()
+                            + " disabled: retired custom enchantment format " + name
+                            + ". Author the current namespaced enchantment or consumable role; old formats are not converted.");
+                    return false;
+                }
                 int level = 1;
                 try {
                     level = Integer.parseInt(string.split(",")[1]);
@@ -514,11 +532,18 @@ public class CustomItem {
                 enchantments.put(enchantment, level);
 
             } catch (Exception ex) {
+                if (string.contains(":") && !string.startsWith("minecraft:")) {
+                    customItemsConfigFields.setEnabled(false);
+                    Logger.warn("Custom item " + customItemsConfigFields.getFilename()
+                            + " disabled: invalid shared enchantment " + string + ": " + ex.getMessage());
+                    return false;
+                }
                 Logger.warn("Invalid enchantment entry for item " + customItemsConfigFields.getFilename());
                 Logger.warn("[" + string + "] is not a valid entry and will be ignored.");
                 Logger.warn("Reminder - The correct format for these is [enchantmentName],[level]");
                 Logger.warn("The name should follow the API names and the level should be above 0.");
             }
+        return true;
     }
 
     private void parsePotionEffects() {

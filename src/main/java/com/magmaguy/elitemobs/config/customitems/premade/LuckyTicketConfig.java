@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.customitems.premade;
 
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.items.ItemConsumables;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class LuckyTicketConfig extends CustomItemsConfigFields {
                 new ArrayList<>(List.of(
                         "&2Doubles the chance of successfully",
                         "&2enchanting an item!")));
-        setEnchantments(List.of("LUCKY_SOURCE,1"));
+        setConsumable(new ItemConsumables.Definition(ItemConsumables.Type.LUCKY_TICKET, 0));
         setItemType(CustomItem.ItemType.UNIQUE);
         setScalability(CustomItem.Scalability.FIXED);
         setSoulbound(false);

@@ -8,9 +8,9 @@ import java.util.List;
 
 public final class EnchantedBookMulticastConfig extends CustomItemsConfigFields {
     public EnchantedBookMulticastConfig() {
-        super("enchanted_book_multicast", true, Material.BOOK, "&5Elite Multicast Enchanted Book",
+        super("enchanted_book_multicast", true, Material.ENCHANTED_BOOK, "&5Elite Multicast Enchanted Book",
                 new ArrayList<>(List.of("&2Used at the enchanter.", "&7Wands only. Adds extra magic bolts.")));
-        setEnchantments(new ArrayList<>(List.of("MULTICAST,1", "ENCHANTED_SOURCE,1")));
+        setEnchantments(new ArrayList<>(List.of("freeminecraftmodels:multicast,1")));
         setItemType(CustomItem.ItemType.UNIQUE);
         setScalability(CustomItem.Scalability.FIXED);
         setSoulbound(false);

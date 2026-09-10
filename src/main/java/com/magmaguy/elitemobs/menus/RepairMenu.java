@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.RepairMenuConfig;
-import com.magmaguy.elitemobs.items.customenchantments.RepairEnchantment;
+import com.magmaguy.elitemobs.items.ItemConsumables;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,7 +40,7 @@ public class RepairMenu extends EliteMenu {
             return;
         }
 
-        int scrapLevel = RepairEnchantment.getRepairLevel(repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot));
+        int scrapLevel = ItemConsumables.repairTier(repairInventory.getItem(RepairMenuConfig.eliteScrapInputSlot));
         ItemStack outputItem = repairInventory.getItem(RepairMenuConfig.eliteItemInputSlot).clone();
         int baselineRepair = 100;
         int newDamage = baselineRepair * scrapLevel;
@@ -142,8 +142,8 @@ public class RepairMenu extends EliteMenu {
 
             if (isBottomMenu(event)) {
                 //Item is scrap
-                if (RepairEnchantment.isRepairItem(currentItem) && repairInventory.getItem(scrapItemInputSlot) == null) {
-                    int scrapLevel = RepairEnchantment.getRepairLevel(currentItem);
+                if (ItemConsumables.is(currentItem, ItemConsumables.Type.REPAIR_SCRAP) && repairInventory.getItem(scrapItemInputSlot) == null) {
+                    int scrapLevel = ItemConsumables.repairTier(currentItem);
                     if (scrapLevel >= 0) {
                         moveOneItemUp(scrapItemInputSlot, event);
                         calculateOutput(repairInventory);

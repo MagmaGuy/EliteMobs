@@ -173,10 +173,7 @@ public class EliteItemLore {
             customEnchantmentLore.add(ChatColorConverter.convert
                     ("&6" + customEnchantment.getEnchantmentsConfigFields().getName() + " "
                             + customEnchantments.get(customEnchantment)));
-            if (customEnchantment instanceof com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment)
-                customEnchantmentLore.add(ChatColorConverter.convert("&7" +
-                        com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment.effectDescription(
-                                customEnchantment.getKey(), customEnchantments.get(customEnchantment))));
+
         }
     }
 

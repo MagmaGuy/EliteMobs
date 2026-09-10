@@ -22,7 +22,7 @@ public class EnchantmentGenerator {
             HashMap<String, Integer> authored) {
         HashMap<String, Integer> result = new HashMap<>(authored);
         if (fields.isProceduralEnchantments())
-            com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment.generate(level, fields.getWeaponType())
+            com.magmaguy.elitemobs.items.itemconstructor.MagicEnchantmentGeneration.generate(level, fields.getWeaponType())
                     .forEach((key, value) -> result.merge(key, value, Math::max));
         return result;
     }
@@ -61,16 +61,22 @@ public class EnchantmentGenerator {
             if (enchantmentMap.get(entry.getKey()) > entry.getKey().getMaxLevel()) {
                 if (EliteEnchantments.isPotentialEliteEnchantment(entry.getKey())) {
                     if (enchantmentMap.get(entry.getKey()) > entry.getKey().getMaxLevel()) {
-                        itemMeta.addEnchant(entry.getKey(), entry.getKey().getMaxLevel(), true);
+                        writeNative(itemMeta, entry.getKey(), entry.getKey().getMaxLevel());
                     } else
-                        itemMeta.addEnchant(entry.getKey(), enchantmentMap.get(entry.getKey()), true);
+                        writeNative(itemMeta, entry.getKey(), enchantmentMap.get(entry.getKey()));
                 } else
-                    itemMeta.addEnchant(entry.getKey(), entry.getValue(), true);
+                    writeNative(itemMeta, entry.getKey(), entry.getValue());
             } else {
-                itemMeta.addEnchant(entry.getKey(), entry.getValue(), true);
+                writeNative(itemMeta, entry.getKey(), entry.getValue());
             }
         }
         return itemMeta;
+    }
+
+    private static void writeNative(ItemMeta meta, Enchantment enchantment, int level) {
+        if (meta instanceof org.bukkit.inventory.meta.EnchantmentStorageMeta book)
+            book.addStoredEnchant(enchantment, level, true);
+        else meta.addEnchant(enchantment, level, true);
     }
 
     /*

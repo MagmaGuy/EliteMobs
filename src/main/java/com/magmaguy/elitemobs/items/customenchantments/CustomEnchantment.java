@@ -30,7 +30,6 @@ public abstract class CustomEnchantment {
     }
 
     public static void initializeCustomEnchantments() {
-        for (String key : MagicWeaponEnchantment.KEYS) new MagicWeaponEnchantment(key);
         new FlamethrowerEnchantment();
         new PlasmaBootsEnchantment();
         new HunterEnchantment();
@@ -40,14 +39,10 @@ public abstract class CustomEnchantment {
         new MeteorShowerEnchantment();
         new SummonMerchantEnchantment();
         new SummonWolfEnchantment();
-        new UnbindEnchantment();
         new LightningEnchantment();
         new GrapplingHookEnchantment();
         new EarthquakeEnchantment();
         new LoudStrikesEnchantment();
-        new RepairEnchantment();
-        new LuckySourceEnchantment();
-        new EnchantedSourceEnchantment();
     }
 
     public static boolean isCustomEnchantment(String enchantmentFilename) {

@@ -5,7 +5,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.menus.premade.UnbinderMenuConfig;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
-import com.magmaguy.elitemobs.items.customenchantments.UnbindEnchantment;
+import com.magmaguy.elitemobs.items.ItemConsumables;
 import com.magmaguy.elitemobs.versionnotifier.VersionChecker;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Bukkit;
@@ -44,7 +44,7 @@ public class UnbindMenu extends EliteMenu {
             return;
         }
         ItemStack outputItem = UnbinderInventory.getItem(UnbinderMenuConfig.getEliteItemInputSlot()).clone();
-        UnbinderInventory.setItem(outputSlot, UnbindEnchantment.unbindItem(outputItem));
+        UnbinderInventory.setItem(outputSlot, ItemConsumables.unbind(outputItem));
     }
 
     /**
@@ -138,7 +138,7 @@ public class UnbindMenu extends EliteMenu {
 
             if (isBottomMenu(event)) {
                 //Item is unbind scroll
-                if (ItemTagger.hasEnchantment(currentItem.getItemMeta(), UnbindEnchantment.key) && SoulbindEnchantment.isValidSoulbindUser(currentItem.getItemMeta(), player)) {
+                if (ItemConsumables.is(currentItem, ItemConsumables.Type.UNBIND) && SoulbindEnchantment.isValidSoulbindUser(currentItem.getItemMeta(), player)) {
                     if (unbinderInventory.getItem(unbindScrollItemInputSlot) == null) {
                         moveOneItemUp(unbindScrollItemInputSlot, event);
                         calculateOutput(unbinderInventory);

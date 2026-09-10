@@ -181,7 +181,8 @@ public class ItemTagger {
         if (level == null) {
             Enchantment enchantment = Enchantment.getByKey(enchantmentKey);
             if (enchantment != null)
-                return itemMeta.getEnchantLevel(enchantment);
+                return itemMeta instanceof org.bukkit.inventory.meta.EnchantmentStorageMeta book
+                        ? book.getStoredEnchantLevel(enchantment) : itemMeta.getEnchantLevel(enchantment);
             else
                 return 0;
         } else

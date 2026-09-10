@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.config.customitems;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.LegacyValueConverter;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.items.ItemConsumables;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -68,6 +69,9 @@ public class CustomItemsConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private boolean showSource = true;
+    @Getter
+    @Setter
+    private ItemConsumables.Definition consumable;
 
     public CustomItemsConfigFields(String fileName,
                                    boolean isEnabled,
@@ -125,13 +129,46 @@ public class CustomItemsConfigFields extends CustomConfigFields {
         this.level = processInt("level", level, 0, false);
         this.soulbound = processBoolean("soulbound", soulbound, true, false);
         this.showSource = processBoolean("showSource", showSource, showSource, false);
+        processConsumable();
         updatePostProcessor();
+    }
+
+    private void processConsumable() {
+        try {
+            if (configHas("consumable") && !fileConfiguration.isConfigurationSection("consumable"))
+                throw new IllegalArgumentException("consumable must contain type and optional repair tier");
+            var section = fileConfiguration.getConfigurationSection("consumable");
+            if (section != null && !java.util.Set.of("type", "tier").containsAll(section.getKeys(false)))
+                throw new IllegalArgumentException("Unknown consumable field");
+            String type = processString("consumable.type", consumable == null ? null
+                    : consumable.type().name().toLowerCase(java.util.Locale.ROOT), null, false);
+            if (type == null) {
+                if (section != null) throw new IllegalArgumentException("consumable.type is required");
+                consumable = null;
+                return;
+            }
+            if (material == null || material.isAir() || !material.isItem())
+                throw new IllegalArgumentException("Consumables require a valid item material");
+            var parsed = ItemConsumables.Type.valueOf(type.toUpperCase(java.util.Locale.ROOT));
+            if (configHas("consumable.tier") && !(fileConfiguration.get("consumable.tier") instanceof Integer))
+                throw new IllegalArgumentException("consumable.tier must be an integer");
+            if (parsed != ItemConsumables.Type.REPAIR_SCRAP && configHas("consumable.tier"))
+                throw new IllegalArgumentException("Only repair_scrap accepts consumable.tier");
+            int tier = parsed == ItemConsumables.Type.REPAIR_SCRAP
+                    ? processInt("consumable.tier", consumable == null ? 0 : consumable.tier(), 0, false) : 0;
+            consumable = new ItemConsumables.Definition(parsed, tier);
+        } catch (IllegalArgumentException invalid) {
+            consumable = null;
+            isEnabled = false;
+            Logger.warn("Item " + filename + " disabled: " + invalid.getMessage());
+        }
     }
 
     private void updatePostProcessor() {
         List<String> newEnchantments = new ArrayList<>();
         for (String enchantment : enchantments) {
             if (!enchantment.contains(",")) {
+                if (enchantment.contains(":") && !enchantment.startsWith("minecraft:")) isEnabled = false;
                 Logger.warn("Invalid format for enchantment in file " + filename + " for enchantment " + enchantment + " : missing ',' for valid level after the enchantment name");
                 continue;
             }

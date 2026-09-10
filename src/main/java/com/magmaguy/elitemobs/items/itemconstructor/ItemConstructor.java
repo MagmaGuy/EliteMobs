@@ -196,7 +196,7 @@ public class ItemConstructor {
                 itemTier, type.material(), type.magicSkill(), itemMeta);
         HashMap<String, Integer> customEnchantmentMap = type.magicSkill() == null
                 ? EnchantmentGenerator.generateCustomEnchantments(itemTier, type.material())
-                : com.magmaguy.elitemobs.items.customenchantments.MagicWeaponEnchantment.generate(itemTier, type.magicSkill());
+                : com.magmaguy.elitemobs.items.itemconstructor.MagicEnchantmentGeneration.generate(itemTier, type.magicSkill());
         itemMeta.setDisplayName(NameGenerator.generateName(type));
         itemStack.setItemMeta(itemMeta);
 
@@ -234,9 +234,19 @@ public class ItemConstructor {
 
         //Tag the item
         ItemTagger.registerEnchantments(itemMeta, enchantments);
-        ItemTagger.registerCustomEnchantments(itemMeta, customEnchantments);
-
+        HashMap<String, Integer> remainingLegacy = new HashMap<>();
+        HashMap<String, Integer> shared = new HashMap<>();
+        customEnchantments.forEach((id, value) -> {
+            if (id.contains(":")) shared.put(id, value);
+            else remainingLegacy.put(id, value);
+        });
+        // Non-replaced EM effects retain their existing writer until their disposition row closes.
+        ItemTagger.registerCustomEnchantments(itemMeta, remainingLegacy);
         itemStack.setItemMeta(itemMeta);
+        if (!shared.isEmpty()) {
+            var items = com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems.ITEMS;
+            itemStack = items.previewCustom(itemStack, shared).apply(itemStack);
+        }
 
         /*
         Add soulbind if applicable

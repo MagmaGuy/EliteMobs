@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
-import com.magmaguy.elitemobs.items.customenchantments.UnbindEnchantment;
+import com.magmaguy.elitemobs.items.ItemConsumables;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
@@ -40,7 +40,7 @@ public class UnbindForceAllCommand extends AdvancedCommand {
             if (itemStack == null || !itemStack.hasItemMeta()) continue;
             if (!SoulbindEnchantment.itemHasSoulbindEnchantment(itemStack.getItemMeta())) continue;
             // unbindItem works on a clone, so the cleaned stack must be written back.
-            inventory.setItem(slot, UnbindEnchantment.unbindItem(itemStack));
+            inventory.setItem(slot, ItemConsumables.unbind(itemStack));
             unbound++;
         }
         Logger.sendMessage(commandData.getCommandSender(),
