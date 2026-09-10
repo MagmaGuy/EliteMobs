@@ -6,7 +6,7 @@ import com.magmaguy.easyminecraftgoals.internal.FollowingText;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.combatsystem.combattag.PlayerCombatState;
 import com.magmaguy.elitemobs.config.SkillsConfig;
-import com.magmaguy.elitemobs.experimentalcombat.CombatHealthFormatter;
+import com.magmaguy.elitemobs.advancedcombat.CombatHealthFormatter;
 import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;

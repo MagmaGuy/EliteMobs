@@ -74,7 +74,7 @@ public class CustomObjectivesParser {
 
         if (objectiveType == ObjectiveType.CLASS_UNLOCK) {
             var form = classId == null || classId.isBlank() ? null
-                    : com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent.catalog().find(classId).orElse(null);
+                    : com.magmaguy.elitemobs.advancedcombat.content.BuiltInClassContent.catalog().find(classId).orElse(null);
             if (form == null || filename == null || filename.isBlank()) {
                 Logger.warn("Invalid CLASS_UNLOCK objective in " + customQuest.getConfigurationFilename()
                         + ": a valid class and trainer filename are required. The objective cannot be completed.");

@@ -184,8 +184,8 @@ public class CustomItem {
                         && !cancelled.getAsBoolean());
             }, cancelled);
         }
-        if (com.magmaguy.elitemobs.config.ExperimentalCombatConfig.isEnabled())
-            constructOnServerThread(com.magmaguy.elitemobs.experimentalcombat.weapons.ExperimentalMagicWeaponItems::register, cancelled);
+        if (com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig.isEnabled())
+            constructOnServerThread(com.magmaguy.elitemobs.advancedcombat.weapons.AdvancedMagicWeaponItems::register, cancelled);
     }
 
     /** The worker waits between bounded server-thread batches; the server thread never waits. */

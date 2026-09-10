@@ -1,0 +1,61 @@
+package com.magmaguy.elitemobs.advancedcombat.abilities;
+
+/**
+ * Reusable stateful mechanics layered on top of an ability's target, family and immediate effects.
+ *
+ * <p>These are deliberately gameplay concepts rather than class names. New class trees can compose
+ * the same contracts without adding form-id branches to the execution engine.</p>
+ */
+public enum AbilityMechanic {
+    ASSISTED_ALLY_TARGETING,
+    LOWEST_HEALTH_FIRST,
+    EXECUTE_DAMAGE,
+    PIERCING_CAST,
+    CHAINING_CAST,
+    DELAYED_PAYLOAD,
+    FOLLOW_CASTER_FIELD,
+    WIND_UP,
+    PLANTED_GUARD,
+    DAMAGE_REDIRECT,
+    MULTI_ALLY_REDIRECT,
+    RETALIATION_RELEASE,
+    DEATH_GUARD,
+    DAMAGE_SHARE,
+    HEAL_ECHO,
+    SUSTAINED_TETHER,
+    LIFESTEAL_WINDOW,
+    CONTROL_IMMUNITY,
+    RESOURCE_BURST,
+    DETONATING_MARK,
+    PARTY_BUFF,
+    GROUP_SCALING,
+    MISSING_HEALTH_SCALING,
+    EXPANDING_PULSES,
+    PROJECTILE_BOMBARDMENT,
+    RECENT_ATTACKERS,
+    RETALIATION_HEAL,
+    DEBUFF_IMMUNITY,
+    REQUIRES_ACTIVE_FIELD,
+    TAUNTED_TARGETS_ONLY,
+    EXTEND_TAUNT,
+    WOUNDED_TARGETS_ONLY,
+    CASTER_ONLY_FIELD,
+    HEALTH_SCALED_MARK,
+    OPENS_DEFENSE_BREAK,
+    REQUIRES_DEFENSE_BREAK,
+    LARGE_OR_BOSS_ONLY,
+    BOSS_ONLY,
+    REQUIRES_WIND_UP,
+    MINIMUM_RANGE,
+    GUARANTEED_CRITICAL,
+    REQUIRES_MOVEMENT,
+    EXTEND_CONTROL_DURATION,
+    CLUSTER_PROJECTILE,
+    LOW_HEALTH_ALLY_ONLY,
+    SINGLE_ENEMY,
+    CASTER_ONLY_SUPPORT,
+    BARRIER_BREAK_HEAL,
+    THREAT_TRIGGERED_PROTECTION,
+    WARD_BREAK_SIGNAL,
+    REQUIRES_CORPSE
+}

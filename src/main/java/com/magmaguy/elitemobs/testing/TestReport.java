@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.testing;
 
-import com.magmaguy.elitemobs.experimentalcombat.analysis.ActiveAbilityBalanceAnalyzer;
-import com.magmaguy.elitemobs.experimentalcombat.analysis.ActiveAbilityBalanceReport;
+import com.magmaguy.elitemobs.advancedcombat.analysis.ActiveAbilityBalanceAnalyzer;
+import com.magmaguy.elitemobs.advancedcombat.analysis.ActiveAbilityBalanceReport;
 import com.magmaguy.elitemobs.skills.SkillType;
 import lombok.Getter;
 import lombok.Setter;

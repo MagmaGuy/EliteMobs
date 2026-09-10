@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.quests.objectives;
 
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
 import com.magmaguy.elitemobs.api.QuestCompleteEvent;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import lombok.Getter;
@@ -31,8 +31,8 @@ public final class ClassUnlockObjective extends Objective {
     }
 
     private boolean isUnlocked(Player player) {
-        if (classId == null || classId.isBlank() || !ExperimentalCombatModule.isInitialized()) return false;
-        return ExperimentalCombatModule.get().profile(player.getUniqueId())
+        if (classId == null || classId.isBlank() || !AdvancedCombatModule.isInitialized()) return false;
+        return AdvancedCombatModule.get().profile(player.getUniqueId())
                 .map(profile -> profile.forms().get(classId))
                 .map(form -> form.unlocked()).orElse(false);
     }

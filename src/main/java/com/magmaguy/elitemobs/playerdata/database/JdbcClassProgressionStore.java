@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.config.DatabaseConfig;
-import com.magmaguy.elitemobs.experimentalcombat.progression.ClassProgressionStore;
-import com.magmaguy.elitemobs.experimentalcombat.progression.StoredClassProfile;
-import com.magmaguy.elitemobs.experimentalcombat.progression.StoredClassProgress;
+import com.magmaguy.elitemobs.advancedcombat.progression.ClassProgressionStore;
+import com.magmaguy.elitemobs.advancedcombat.progression.StoredClassProfile;
+import com.magmaguy.elitemobs.advancedcombat.progression.StoredClassProgress;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

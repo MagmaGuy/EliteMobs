@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.commands.admin;
 
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
-import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
-import com.magmaguy.elitemobs.experimentalcombat.weapons.ExperimentalMagicWeaponItems;
+import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
+import com.magmaguy.elitemobs.advancedcombat.weapons.AdvancedMagicWeaponItems;
 import com.magmaguy.elitemobs.items.EliteItemLore;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.itemconstructor.EliteItemSkins;
@@ -70,8 +70,8 @@ public class GetTierCommand {
             } catch (NoSuchFieldError ignored) {
                 // SPEAR doesn't exist pre-1.21.11
             }
-            if (ExperimentalCombatConfig.isEnabled()) {
-                magicWeapons = ExperimentalMagicWeaponItems.generateDebugLoadout(tierLevel, player);
+            if (AdvancedCombatSystemConfig.isEnabled()) {
+                magicWeapons = AdvancedMagicWeaponItems.generateDebugLoadout(tierLevel, player);
                 magicWeapons.forEach(GetTierCommand::addDurability);
             }
         }

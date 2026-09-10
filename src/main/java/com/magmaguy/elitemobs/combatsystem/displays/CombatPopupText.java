@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.combatsystem.displays;
 
-import com.magmaguy.elitemobs.experimentalcombat.presentation.ClassPresentationTheme;
+import com.magmaguy.elitemobs.advancedcombat.presentation.ClassPresentationTheme;
 
 /** Pure text composition for damage popup amounts. */
 final class CombatPopupText {

@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.playerdata.statusscreen;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
+import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
@@ -70,7 +70,7 @@ public class PlayerStatusScreenDialog {
             listBuilder.addDialog(DialogManager.DialogReference.inline(buildSkillsDialog(player)));
         }
 
-        if (ExperimentalCombatConfig.isEnabled()) {
+        if (AdvancedCombatSystemConfig.isEnabled()) {
             listBuilder.addDialog(DialogManager.DialogReference.inline(buildClassesDialog()));
         }
 

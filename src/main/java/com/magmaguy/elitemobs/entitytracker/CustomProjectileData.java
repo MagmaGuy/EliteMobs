@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.entitytracker;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.experimentalcombat.abilities.ClassAbilityProjectileCarrier;
+import com.magmaguy.elitemobs.advancedcombat.abilities.ClassAbilityProjectileCarrier;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

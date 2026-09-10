@@ -13,7 +13,7 @@ public final class HealthDisplayCoordinator {
 
     public enum Owner {
         ARMOR_SKILL,
-        EXPERIMENTAL_COMBAT
+        ADVANCED_COMBAT
     }
 
     private static final double DISPLAY_HEALTH = 20D;
@@ -69,10 +69,10 @@ public final class HealthDisplayCoordinator {
 
     /**
      * Recovers the ten-heart display after an unclean stop when no in-memory owner survived.
-     * This is intentionally narrow and is only called when the matching persisted experimental
+     * This is intentionally narrow and is only called when the matching persisted advanced
      * max-health modifier proves that EliteMobs owned the abandoned display.
      */
-    public static void clearStaleExperimentalDisplay(Player player) {
+    public static void clearStaleAdvancedDisplay(Player player) {
         if (player == null || states.containsKey(player.getUniqueId())) return;
         if (player.isHealthScaled() && Math.abs(player.getHealthScale() - DISPLAY_HEALTH) < 1.0E-6)
             player.setHealthScaled(false);

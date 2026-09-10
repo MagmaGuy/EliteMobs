@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
-import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
-import com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu;
+import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
+import com.magmaguy.elitemobs.advancedcombat.menu.ClassSelectionMenu;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
@@ -38,7 +38,7 @@ public final class GuildTrainingMenu {
     }
 
     public static void open(Player player) {
-        if (!ExperimentalCombatConfig.isEnabled()) {
+        if (!AdvancedCombatSystemConfig.isEnabled()) {
             SkillBonusMenu.openWeaponSelectMenu(player);
             return;
         }

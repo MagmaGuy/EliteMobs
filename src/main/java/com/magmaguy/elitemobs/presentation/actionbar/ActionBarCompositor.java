@@ -1,8 +1,8 @@
 package com.magmaguy.elitemobs.presentation.actionbar;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatRuntime;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -225,7 +225,7 @@ public final class ActionBarCompositor implements Listener {
         if (mutation instanceof ShowMutation show) {
             long duration = show.durationTicks;
             Player player = Bukkit.getPlayer(show.playerId());
-            if (player != null && ExperimentalCombatRuntime.isActive(player)
+            if (player != null && AdvancedCombatRuntime.isActive(player)
                     && show.readingTime && !show.source.isPersistent())
                 duration = Math.min(600L, Math.max(120L, duration * 2));
             long expiresAtTick = duration == Source.PERSISTENT
@@ -253,8 +253,8 @@ public final class ActionBarCompositor implements Listener {
     }
 
     private static void render(Player player, PlayerState state) {
-        if (ExperimentalCombatRuntime.isActive(player)) {
-            var frame = COMBAT_HUD.frame(player, ExperimentalCombatModule.isAbilityGestureOpen(player.getUniqueId()));
+        if (AdvancedCombatRuntime.isActive(player)) {
+            var frame = COMBAT_HUD.frame(player, AdvancedCombatModule.isAbilityGestureOpen(player.getUniqueId()));
             Entry feedback = selectWinner(state, true);
             String feedbackText = feedback == null ? null : feedback.message;
             Encoding feedbackEncoding = feedback == null ? null : feedback.source.encoding;

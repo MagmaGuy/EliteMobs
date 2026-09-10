@@ -9,7 +9,7 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
-import com.magmaguy.elitemobs.experimentalcombat.CombatHealthFormatter;
+import com.magmaguy.elitemobs.advancedcombat.CombatHealthFormatter;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import com.magmaguy.magmacore.util.ChatColorConverter;

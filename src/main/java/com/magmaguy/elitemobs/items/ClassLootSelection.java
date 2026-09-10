@@ -1,9 +1,9 @@
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.ClassLootSettingsConfig;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
-import com.magmaguy.elitemobs.experimentalcombat.classes.ClassFormDefinition;
-import com.magmaguy.elitemobs.experimentalcombat.progression.ProfileSnapshot;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule;
+import com.magmaguy.elitemobs.advancedcombat.classes.ClassFormDefinition;
+import com.magmaguy.elitemobs.advancedcombat.progression.ProfileSnapshot;
 import org.bukkit.entity.Player;
 
 import java.util.EnumMap;
@@ -16,8 +16,8 @@ public final class ClassLootSelection {
     private ClassLootSelection() {}
 
     public static ClassFormDefinition activeClass(Player player) {
-        if (player == null || !ExperimentalCombatModule.isInitialized()) return null;
-        var module = ExperimentalCombatModule.get();
+        if (player == null || !AdvancedCombatModule.isInitialized()) return null;
+        var module = AdvancedCombatModule.get();
         return module.profile(player.getUniqueId()).flatMap(ProfileSnapshot::optionalActiveLineage)
                 .map(active -> module.catalog().require(active.activeFormId())).orElse(null);
     }

@@ -7,8 +7,8 @@ import com.magmaguy.elitemobs.combatsystem.ScaledCombatRewardResolver;
 import com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
-import com.magmaguy.elitemobs.experimentalcombat.progression.AwardResult;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule;
+import com.magmaguy.elitemobs.advancedcombat.progression.AwardResult;
 import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -81,8 +81,8 @@ public class SkillXPHandler implements Listener {
 
         // Class participation includes meaningful healing, mitigation and threat in addition to
         // damage. Foundation skills keep their established damage-proportional distribution.
-        Set<Player> meaningfulParticipants = ExperimentalCombatModule.isInitialized()
-                ? ExperimentalCombatModule.get().meaningfulParticipants(eliteEntity)
+        Set<Player> meaningfulParticipants = AdvancedCombatModule.isInitialized()
+                ? AdvancedCombatModule.get().meaningfulParticipants(eliteEntity)
                 : new LinkedHashSet<>(eliteEntity.getDamagers().keySet());
 
         // Class progression belongs to the encounter, not to a participant's combat level or
@@ -118,9 +118,9 @@ public class SkillXPHandler implements Listener {
                 }
             }
 
-            AwardResult classAward = ExperimentalCombatModule.isInitialized()
+            AwardResult classAward = AdvancedCombatModule.isInitialized()
                     && classXpInRange(player, rewardLevel, eliteEntity.isScaledCombat())
-                    ? ExperimentalCombatModule.get().awardClassXp(player, rawClassReward)
+                    ? AdvancedCombatModule.get().awardClassXp(player, rawClassReward)
                     : null;
             long classXpEarned = classAward == null ? 0L : classAward.appliedXp();
 
@@ -204,7 +204,7 @@ public class SkillXPHandler implements Listener {
 
     private static boolean classXpInRange(Player player, int rewardLevel, boolean scaledCombat) {
         if (!FarmingProtection.isLevelRewardProtectionEnabled() || scaledCombat) return true;
-        return ExperimentalCombatModule.get().profile(player.getUniqueId())
+        return AdvancedCombatModule.get().profile(player.getUniqueId())
                 .flatMap(snapshot -> snapshot.optionalActiveLineage())
                 .map(active -> FarmingProtection.isSkillXPInRange(
                         active.activeEffectiveLevel(), rewardLevel, false))

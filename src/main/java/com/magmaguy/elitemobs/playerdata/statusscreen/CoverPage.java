@@ -1,11 +1,11 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
 import com.magmaguy.elitemobs.commands.guild.AdventurersGuildCommand;
-import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
+import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.config.PartyConfig;
-import com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu;
+import com.magmaguy.elitemobs.advancedcombat.menu.ClassSelectionMenu;
 import com.magmaguy.elitemobs.parties.PartyInventoryMenu;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -119,7 +119,7 @@ public class CoverPage {
             inventory.setItem(PlayerStatusMenuConfig.getIndexSkillsSlot(), PlayerStatusMenuConfig.getIndexSkillsItem());
 
         int classesSlot = -1;
-        if (ExperimentalCombatConfig.isEnabled()) {
+        if (AdvancedCombatSystemConfig.isEnabled()) {
             classesSlot = firstFreeClassesSlot(inventory);
             inventory.setItem(classesSlot, classesItem());
         }
@@ -216,7 +216,7 @@ public class CoverPage {
             }
 
             Integer classesSlot = classesSlots.get(event.getInventory());
-            if (classesSlot != null && event.getSlot() == classesSlot && ExperimentalCombatConfig.isEnabled()) {
+            if (classesSlot != null && event.getSlot() == classesSlot && AdvancedCombatSystemConfig.isEnabled()) {
                 player.closeInventory();
                 ClassSelectionMenu.open(player);
                 return;

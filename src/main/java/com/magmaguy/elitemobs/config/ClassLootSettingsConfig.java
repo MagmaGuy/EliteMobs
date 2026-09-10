@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.config;
 import com.magmaguy.elitemobs.items.ClassLootProfile;
 import com.magmaguy.elitemobs.items.ClassLootFamily;
 import com.magmaguy.elitemobs.items.ClassLootPreferences;
-import com.magmaguy.elitemobs.experimentalcombat.content.BuiltInClassContent;
+import com.magmaguy.elitemobs.advancedcombat.content.BuiltInClassContent;
 import com.magmaguy.magmacore.config.ConfigurationFile;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.configuration.ConfigurationSection;

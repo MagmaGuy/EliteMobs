@@ -2,10 +2,10 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.EliteMobs;
-import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
+import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.MetaPackage;
-import com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu;
+import com.magmaguy.elitemobs.advancedcombat.menu.ClassSelectionMenu;
 import com.magmaguy.elitemobs.menus.GuildTrainingMenu;
 import com.magmaguy.magmacore.command.CommandManager;
 import com.magmaguy.magmacore.nightbreak.NightbreakDownloadContentCommand;
@@ -154,7 +154,7 @@ public class CommandHandler {
         emCommand.registerCommand(new StartCommand());
         emCommand.registerCommand(new ArenaCommand());
         emCommand.registerCommand(new DismissCommand());
-        emCommand.registerCommand(new ExperimentalCombatDismissSuggestionCommand());
+        emCommand.registerCommand(new AdvancedCombatDismissSuggestionCommand());
         emCommand.registerCommand(new AltCommand());
         emCommand.registerCommand(new SpawnTeleportCommand());
         emCommand.registerCommand(new DungeonTeleportCommand());
@@ -172,12 +172,12 @@ public class CommandHandler {
         emCommand.registerCommand(new PartyDeclineCommand());
         emCommand.registerCommand(new PartyHideInteractionHintCommand());
 
-        if (ExperimentalCombatConfig.isEnabled()) {
-            emCommand.registerCommand(new ExperimentalClassCommand());
-            emCommand.registerCommand(new ExperimentalClassInfoCommand());
-            emCommand.registerCommand(new ExperimentalClassSelectCommand());
-            emCommand.registerCommand(new ExperimentalClassTestSetCommand());
-            emCommand.registerCommand(new ExperimentalClassTestForgetCommand());
+        if (AdvancedCombatSystemConfig.isEnabled()) {
+            emCommand.registerCommand(new AdvancedClassCommand());
+            emCommand.registerCommand(new AdvancedClassInfoCommand());
+            emCommand.registerCommand(new AdvancedClassSelectCommand());
+            emCommand.registerCommand(new AdvancedClassTestSetCommand());
+            emCommand.registerCommand(new AdvancedClassTestForgetCommand());
             ClassSelectionMenu.commands().forEach(emCommand::registerCommand);
             GuildTrainingMenu.commands().forEach(emCommand::registerCommand);
         }

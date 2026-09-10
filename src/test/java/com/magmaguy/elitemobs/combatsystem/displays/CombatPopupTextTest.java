@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.combatsystem.displays;
 
-import com.magmaguy.elitemobs.experimentalcombat.presentation.ClassPresentationTheme;
+import com.magmaguy.elitemobs.advancedcombat.presentation.ClassPresentationTheme;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

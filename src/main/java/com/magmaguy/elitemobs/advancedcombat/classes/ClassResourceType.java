@@ -1,0 +1,29 @@
+package com.magmaguy.elitemobs.advancedcombat.classes;
+
+/**
+ * Root-class resource shown in the [Alpha] Advanced Combat System action-bar HUD.
+ */
+public enum ClassResourceType {
+    STAMINA("Stamina", "Stamina recovers at the same steady rate as mana."),
+    RESOLVE("Resolve", "Resolve recovers faster near elites and grows in frontline combat."),
+    FURY("Fury", "Recovers at 55% of mana's rate. Damaging hits restore 10 Fury; taking damage also grants Fury."),
+    FOCUS("Focus", "Focus recovers at 85% of mana recovery, rising to 110% after over 5 seconds without taking damage."),
+    GRACE("Grace", "Grace recovers faster near other players and grows from effective healing."),
+    MANA("Mana", "Mana recovers steadily in and out of combat.");
+
+    private final String displayName;
+    private final String description;
+
+    ClassResourceType(String displayName, String description) {
+        this.displayName = displayName;
+        this.description = description;
+    }
+
+    public String displayName() {
+        return displayName;
+    }
+
+    public String description() {
+        return description;
+    }
+}

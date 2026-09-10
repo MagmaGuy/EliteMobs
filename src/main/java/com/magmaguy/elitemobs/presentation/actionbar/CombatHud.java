@@ -1,10 +1,10 @@
 package com.magmaguy.elitemobs.presentation.actionbar;
 
 import net.md_5.bungee.api.chat.TextComponent;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
-import com.magmaguy.elitemobs.experimentalcombat.MonotonicTickClock;
-import com.magmaguy.elitemobs.experimentalcombat.classes.ClassResourceType;
-import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule;
+import com.magmaguy.elitemobs.advancedcombat.MonotonicTickClock;
+import com.magmaguy.elitemobs.advancedcombat.classes.ClassResourceType;
+import com.magmaguy.elitemobs.advancedcombat.classes.AbilitySlot;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -27,7 +27,7 @@ public final class CombatHud {
         String healthText = number(health) + "/" + number(maximum);
         overlay(line, 25, healthText, healthText.length() * 6);
         bar(line, 25, '\uE800', health, maximum, 63, false, animationFrame);
-        var resource = ExperimentalCombatModule.resourceSnapshot(player.getUniqueId()).orElse(null);
+        var resource = AdvancedCombatModule.resourceSnapshot(player.getUniqueId()).orElse(null);
         if (resource != null) overlay(line, 171, String.valueOf(resourceIcon(resource.type())), 11);
         String resourceText = resource == null ? "0/0" : number(resource.amount()) + "/" + number(resource.maximum());
         rightAlignedText(line, 165, resourceText, resourceText.length() * 6);
@@ -35,7 +35,7 @@ public final class CombatHud {
                 resource == null ? 0 : resource.maximum(), 63, true, animationFrame);
         bar(line, 5, '\uE980', player.getExp(), 1, 180, false, animationFrame);
         classDiamond(line, player, animationFrame, active);
-        String className = ExperimentalCombatModule.activeClassLineageSnapshot(player.getUniqueId())
+        String className = AdvancedCombatModule.activeClassLineageSnapshot(player.getUniqueId())
                 .map(lineage -> lineage.activeForm().displayName()).orElse("");
         if (active) abilityIcons(line, player);
         // All overlays return to the panel origin. Keep the total advance at 190 GUI pixels.
@@ -87,10 +87,10 @@ public final class CombatHud {
     }
 
     private static void abilityIcons(StringBuilder line, Player player) {
-        ExperimentalCombatModule.activeClassLineageSnapshot(player.getUniqueId()).ifPresent(lineage -> {
+        AdvancedCombatModule.activeClassLineageSnapshot(player.getUniqueId()).ifPresent(lineage -> {
             var slots = java.util.List.of(AbilitySlot.SIGNATURE, AbilitySlot.UTILITY, AbilitySlot.MOBILITY);
             for (int index = 0; index < slots.size(); index++) {
-                var state = ExperimentalCombatModule.abilityResourceSnapshot(player, slots.get(index)).orElse(null);
+                var state = AdvancedCombatModule.abilityResourceSnapshot(player, slots.get(index)).orElse(null);
                 if (state == null) continue;
                 int left = 4 + index * 61;
                 // Replace only this card's surface, before drawing its icon and live cost.
@@ -136,7 +136,7 @@ public final class CombatHud {
     }
 
     private static void classDiamond(StringBuilder line, Player player, int animationFrame, boolean active) {
-        var progress = ExperimentalCombatModule.classProgressSnapshot(player.getUniqueId()).orElse(null);
+        var progress = AdvancedCombatModule.classProgressSnapshot(player.getUniqueId()).orElse(null);
         if (progress == null || !progress.unlocked()) return;
         int level = progress.effectiveLevel();
         int bandStart = level - progress.localLevel() + 1;

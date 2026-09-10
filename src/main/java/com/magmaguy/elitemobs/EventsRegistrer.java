@@ -10,11 +10,11 @@ import com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime;
 import com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay;
 import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
 import com.magmaguy.elitemobs.config.*;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatSuggestion;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatStateRecovery;
-import com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatRuntime;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatSuggestion;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatStateRecovery;
+import com.magmaguy.elitemobs.advancedcombat.menu.ClassSelectionMenu;
 import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfig;
@@ -102,7 +102,7 @@ public class EventsRegistrer {
         plugin = MetadataHandler.PLUGIN;
 
         register(new FirstTimeSetup());
-        register(new ExperimentalCombatSuggestion());
+        register(new AdvancedCombatSuggestion());
 
         register(new Navigation());
 
@@ -118,7 +118,7 @@ public class EventsRegistrer {
         register(new SkillSystemMigration.MigrationEvents());
         register(new CombatLevelDisplay());
         register(new SkillBonusEventHandler());
-        register(new ExperimentalCombatStateRecovery());
+        register(new AdvancedCombatStateRecovery());
         register(new SkillBonusMenu.SkillBonusMenuEvents());
         register(new PlayerQuestCooldownsLogout());
 
@@ -243,7 +243,7 @@ public class EventsRegistrer {
         //player status menu
         register(new StatusInventorySafety());
         register(new CoverPage.CoverPageEvents());
-        if (ExperimentalCombatConfig.isEnabled()) {
+        if (AdvancedCombatSystemConfig.isEnabled()) {
             register(ClassSelectionMenu.listener());
             register(GuildTrainingMenu.listener());
         }
@@ -401,20 +401,20 @@ public class EventsRegistrer {
     public static void registerPostInitializationEvents() {
         ActionBarCompositor.initialize();
         for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers())
-            ExperimentalCombatStateRecovery.reconcile(player);
-        if (!DungeonsConfig.isEnableDungeonFoodRegeneration() && !ExperimentalCombatConfig.isEnabled()) return;
+            AdvancedCombatStateRecovery.reconcile(player);
+        if (!DungeonsConfig.isEnableDungeonFoodRegeneration() && !AdvancedCombatSystemConfig.isEnabled()) return;
 
         DungeonCombatRuntime dungeonCombatRuntime = new DungeonCombatRuntime();
         CombatLevelDisplay.setCombatState(dungeonCombatRuntime);
         register(dungeonCombatRuntime);
         dungeonCombatRuntime.start();
 
-        if (ExperimentalCombatConfig.isEnabled()) {
-            ExperimentalCombatRuntime experimentalCombatRuntime =
-                    new ExperimentalCombatRuntime(dungeonCombatRuntime);
-            register(experimentalCombatRuntime);
-            experimentalCombatRuntime.start();
-            ExperimentalCombatModule.initialize(dungeonCombatRuntime);
+        if (AdvancedCombatSystemConfig.isEnabled()) {
+            AdvancedCombatRuntime advancedCombatRuntime =
+                    new AdvancedCombatRuntime(dungeonCombatRuntime);
+            register(advancedCombatRuntime);
+            advancedCombatRuntime.start();
+            AdvancedCombatModule.initialize(dungeonCombatRuntime);
         }
     }
 

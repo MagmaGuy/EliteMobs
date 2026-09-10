@@ -49,7 +49,7 @@ public class GenerateDatabase {
         statement.executeUpdate(sql);
         statement.close();
 
-        createExperimentalCombatTables();
+        createAdvancedCombatTables();
 
         // Check and add missing columns if any
         addEntryIfEmpty("DisplayName", ColumnValues.TEXT);
@@ -90,7 +90,7 @@ public class GenerateDatabase {
         addEntryIfEmpty("GamblingDebtCents", ColumnValues.BIGINT);
     }
 
-    private static void createExperimentalCombatTables() throws Exception {
+    private static void createAdvancedCombatTables() throws Exception {
         synchronized (PlayerDataRepository.jdbcMonitor()) {
             try (Statement statement = PlayerDataRepository.connection().createStatement()) {
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS "

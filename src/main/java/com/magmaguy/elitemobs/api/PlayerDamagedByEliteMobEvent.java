@@ -8,8 +8,8 @@ import com.magmaguy.elitemobs.combatsystem.PotionCombatModifierCalculator;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRules;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatRules;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatRuntime;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
@@ -466,8 +466,8 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             // [Alpha] Advanced Combat System expands the health reservoir, not incoming damage. Remove only
             // its flat health increase so ordinary skill and plugin bonuses still contribute to
             // the same one-shot ceiling they provided before the player entered the mode.
-            double oneShotProtectionMaxHealth = ExperimentalCombatRuntime.isActive(player)
-                    ? ExperimentalCombatRules.ordinaryMaximumHealth(actualMaxHealth)
+            double oneShotProtectionMaxHealth = AdvancedCombatRuntime.isActive(player)
+                    ? AdvancedCombatRules.ordinaryMaximumHealth(actualMaxHealth)
                     : actualMaxHealth;
             double finalDamage = Math.min(preCapDamage, oneShotProtectionMaxHealth - 1);
 

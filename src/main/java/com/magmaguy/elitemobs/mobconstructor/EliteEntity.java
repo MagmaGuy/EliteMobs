@@ -503,8 +503,8 @@ public class EliteEntity {
         double loudStrikesBonus = capturedLoudStrikes != null ? capturedLoudStrikes
                 : inventory == null ? 0D : inventory.getLoudStrikesBonusMultiplier(false);
         if (!Double.isFinite(loudStrikesBonus) || loudStrikesBonus < 0D) loudStrikesBonus = 0D;
-        double classThreat = com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime.isActive(player)
-                && com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule
+        double classThreat = com.magmaguy.elitemobs.advancedcombat.AdvancedCombatRuntime.isActive(player)
+                && com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule
                 .activeClassLineageSnapshot(player.getUniqueId())
                 .map(lineage -> lineage.root().id().equals("spellcaster")).orElse(false) ? .8D : 1D;
         aggro.merge(trackedPlayer, damage * (1D + loudStrikesBonus) * classThreat, Double::sum);

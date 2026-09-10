@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.experimentalcombat.classes.ClassFormDefinition;
+import com.magmaguy.elitemobs.advancedcombat.classes.ClassFormDefinition;
 import java.util.Set;
 
 /** Equipment preferences supplement the class catalog's existing weapon affinities. */

@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 
 /**
  * Owns the live, playtested EliteMobs combat curve: exponential elite health plus the offensive
- * and defensive skill adjustments used by the damage pipelines. Experimental level-difference
+ * and defensive skill adjustments used by the damage pipelines. Advanced level-difference
  * damage modifiers intentionally do not live here.
  */
 public class LevelScaling {

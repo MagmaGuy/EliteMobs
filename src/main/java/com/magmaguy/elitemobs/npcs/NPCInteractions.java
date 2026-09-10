@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.npcs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
-import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
+import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.menus.gambling.BettingMenu;
@@ -58,7 +58,7 @@ public class NPCInteractions implements Listener {
             case CLASS_TRAINER:
                 if (player.hasPermission("elitemobs.command") && npcEntity.getNPCsConfigFields().getClassRoot() != null)
                     Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () ->
-                            com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu.openTrainer(
+                            com.magmaguy.elitemobs.advancedcombat.menu.ClassSelectionMenu.openTrainer(
                                     player, npcEntity.getNPCsConfigFields().getClassRoot()));
                 break;
             case GUILD_GREETER:
@@ -66,7 +66,7 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            if (ExperimentalCombatConfig.isEnabled())
+                            if (AdvancedCombatSystemConfig.isEnabled())
                                 GuildTrainingMenu.open(player);
                             else
                                 SkillBonusMenu.openWeaponSelectMenu(player);

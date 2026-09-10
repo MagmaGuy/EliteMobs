@@ -55,7 +55,7 @@ public final class LuaEntityEnricher {
             Entity actor = Bukkit.getEntity(java.util.UUID.fromString(args.checkjstring(1)));
             return LuaValue.valueOf(actor instanceof org.bukkit.entity.Player player
                     && LuaEntityTable.isHostileEffectTarget(player, entity)
-                    && com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatEnemyAuthorization
+                    && com.magmaguy.elitemobs.advancedcombat.AdvancedCombatEnemyAuthorization
                     .canTargetWithMagicWeapon(player, (org.bukkit.entity.LivingEntity) entity));
         }));
         boolean isElite = EntityTracker.isEliteMob(entity);

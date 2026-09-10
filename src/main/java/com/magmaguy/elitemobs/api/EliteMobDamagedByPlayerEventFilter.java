@@ -10,7 +10,7 @@ import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.entitytracker.CustomProjectileData;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.experimentalcombat.abilities.ClassAbilityProjectileCarrier;
+import com.magmaguy.elitemobs.advancedcombat.abilities.ClassAbilityProjectileCarrier;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;

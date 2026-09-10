@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.presentation.actionbar;
 
-import com.magmaguy.elitemobs.experimentalcombat.classes.AbilitySlot;
+import com.magmaguy.elitemobs.advancedcombat.classes.AbilitySlot;
 
 import java.io.IOException;
 import java.io.InputStream;

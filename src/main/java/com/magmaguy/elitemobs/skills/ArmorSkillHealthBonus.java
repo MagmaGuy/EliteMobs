@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.skills;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime;
-import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
+import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import org.bukkit.NamespacedKey;
@@ -187,7 +187,7 @@ public class ArmorSkillHealthBonus {
 
     private static boolean isHealthBonusWorld(Player player) {
         return !SkillsConfig.isWorldExcludedFromSkills(player)
-                && (!ExperimentalCombatConfig.isEnabled()
+                && (!AdvancedCombatSystemConfig.isEnabled()
                 || DungeonCombatRuntime.isInManagedCombatWorld(player));
     }
 

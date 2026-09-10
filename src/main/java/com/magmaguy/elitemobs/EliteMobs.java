@@ -40,7 +40,7 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.ActionEvent;
 import com.magmaguy.elitemobs.events.TimedEvent;
 import com.magmaguy.elitemobs.explosionregen.Explosion;
-import com.magmaguy.elitemobs.experimentalcombat.menu.ClassSelectionMenu;
+import com.magmaguy.elitemobs.advancedcombat.menu.ClassSelectionMenu;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
@@ -189,7 +189,7 @@ public class EliteMobs extends JavaPlugin {
         new ArenasConfig();
         //ModelsConfig.initializeConfig();
         new DungeonsConfig();
-        new ExperimentalCombatConfig();
+        new AdvancedCombatSystemConfig();
         new CommandMessagesConfig();
         new ChangelogsConfig();
         new InitializeConfig();
@@ -289,9 +289,9 @@ public class EliteMobs extends JavaPlugin {
                     MetadataHandler.pendingReloadSender = null;
                     EliteMindServiceModule.shutdown();
                     EliteLuaPowerServiceModule.shutdown();
-                    com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule.shutdownIfInitialized();
-                    com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime.shutdownIfInitialized();
-                    com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatStateRecovery.clearAllOnlinePlayers();
+                    com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule.shutdownIfInitialized();
+                    com.magmaguy.elitemobs.advancedcombat.AdvancedCombatRuntime.shutdownIfInitialized();
+                    com.magmaguy.elitemobs.advancedcombat.AdvancedCombatStateRecovery.clearAllOnlinePlayers();
                     throwable.printStackTrace();
                 });
     }
@@ -664,7 +664,7 @@ public class EliteMobs extends JavaPlugin {
         PatrolService.shutdown();
         // Physical class servants and portal surfaces must be removed while their native Mind
         // runtime is still available.
-        com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule.shutdownIfInitialized();
+        com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule.shutdownIfInitialized();
         EliteMindServiceModule.shutdown();
         EliteLuaPowerServiceModule.shutdown();
         AutoclickerThrottle.shutdown();
@@ -786,7 +786,7 @@ public class EliteMobs extends JavaPlugin {
         SkillBonusInitializer.shutdown();
         SkillXPBar.shutdown();
         CombatLevelDisplay.shutdown();
-        com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime.shutdownIfInitialized();
+        com.magmaguy.elitemobs.advancedcombat.AdvancedCombatRuntime.shutdownIfInitialized();
         HealthDisplayCoordinator.shutdown();
         com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor.shutdown();
         com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime.shutdownIfInitialized();

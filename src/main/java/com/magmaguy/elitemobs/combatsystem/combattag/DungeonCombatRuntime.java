@@ -2,8 +2,8 @@ package com.magmaguy.elitemobs.combatsystem.combattag;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
-import com.magmaguy.elitemobs.config.ExperimentalCombatConfig;
-import com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRules;
+import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatRules;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,8 +33,8 @@ public final class DungeonCombatRuntime implements Listener, PlayerCombatState {
     private BukkitTask updateTask;
 
     public DungeonCombatRuntime() {
-        this(ExperimentalCombatConfig.isEnabled()
-                        ? ExperimentalCombatRules.COMBAT_TIMEOUT_TICKS
+        this(AdvancedCombatSystemConfig.isEnabled()
+                        ? AdvancedCombatRules.COMBAT_TIMEOUT_TICKS
                         : DungeonsConfig.getDungeonFoodRegenerationCombatTimeoutSeconds() * 20L,
                 DungeonsConfig.getDungeonFoodRegenerationIntervalSeconds() * 20L);
     }
@@ -106,7 +106,7 @@ public final class DungeonCombatRuntime implements Listener, PlayerCombatState {
             for (PlayerCombatState.Listener listener : listeners) listener.onCombatEnded(playerId);
 
         if (!DungeonsConfig.isEnableDungeonFoodRegeneration()) return;
-        if (ExperimentalCombatConfig.isEnabled()) return;
+        if (AdvancedCombatSystemConfig.isEnabled()) return;
         if (currentTick < nextFoodRegenerationTick) return;
         nextFoodRegenerationTick = currentTick + foodRegenerationIntervalTicks;
 

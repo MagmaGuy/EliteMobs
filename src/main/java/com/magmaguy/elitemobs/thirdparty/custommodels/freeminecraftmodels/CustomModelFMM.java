@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.admin.RemoveCommand;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEventFilter;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
-import com.magmaguy.elitemobs.experimentalcombat.abilities.ClassAbilityProjectileCarrier;
+import com.magmaguy.elitemobs.advancedcombat.abilities.ClassAbilityProjectileCarrier;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModelInterface;
