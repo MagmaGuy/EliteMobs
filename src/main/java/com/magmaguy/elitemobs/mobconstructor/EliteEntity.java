@@ -386,9 +386,17 @@ public class EliteEntity {
         if (livingEntity != null
                 && removedBody != null
                 && !livingEntity.getUniqueId().equals(removedBody.getUniqueId())) return false;
+        LivingEntity previousBody = removedBody != null ? removedBody : livingEntity;
+        if (previousBody != null && this instanceof CustomBossEntity customBoss)
+            customBoss.updatePersistentLocation(previousBody.getLocation());
         livingEntity = null;
         unsyncedLivingEntity = null;
         return true;
+    }
+
+    /** A serialized body will reattach to this session rather than being spawned again. */
+    protected final boolean hasSuspendedMindBody() {
+        return livingEntity == null && eliteMindBinding != null;
     }
 
     /** Terminal removal for a native Mind actor, including one whose body is chunk-unloaded. */

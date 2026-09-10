@@ -58,7 +58,7 @@ final class BossPatrolActor implements PatrolActor {
     }
 
     @Override public void updatePersistentLocation(Location safeLocation) {
-        boss.updatePatrolPersistentLocation(safeLocation);
+        boss.updatePersistentLocation(safeLocation);
     }
     @Override public void materialize() {
         if (boss instanceof RegionalBossEntity regionalBoss && regionalBoss.isRespawning()) return;

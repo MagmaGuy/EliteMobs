@@ -281,6 +281,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     private void spawn(SpawnLifecycle.Context spawnContext,
                        java.util.function.Function<java.util.function.Consumer<LivingEntity>, LivingEntity> bodyFactory) {
+        if (hasSuspendedMindBody()) return;
         if (livingEntity != null && livingEntity.isValid())
             return;
 
@@ -563,7 +564,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     /** Updates persistence without changing the authored route origin. */
-    public void updatePatrolPersistentLocation(Location location) {
+    public void updatePersistentLocation(Location location) {
         if (location == null) return;
         persistentLocation = location.clone();
         if (persistentObjectHandler != null)
