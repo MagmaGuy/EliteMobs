@@ -496,7 +496,10 @@ final class EliteMindServiceImpl implements EliteMindService, Listener {
     boolean suspendForChunkUnload(EliteEntity eliteEntity, LivingEntity removedBody) {
         EliteMindBinding binding = eliteEntity.getEliteMindBinding();
         if (closed || binding == null) return false;
-        if (removedBody != null && removedBody.isDead()) return false;
+        // Ordinary elites are not saved by Minecraft. Their established removal and
+        // PersistentObjectHandler paths own disposal and configured rematerialization.
+        // Retain a native session only when its body can actually be serialized.
+        if (removedBody == null || removedBody.isDead() || !removedBody.isPersistent()) return false;
         boolean suspended = eliteEntity.suspendMindBodyForChunkUnload(removedBody);
         if (suspended) {
             binding.suspendBody();
