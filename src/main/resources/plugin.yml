@@ -318,3 +318,395 @@ permissions:
   elitemobs.scroll.give:
     description: Gives a target player an elite scroll scaled to their combat level
     default: op
+
+  elitemobs.perks.xp.10percentboost.all:
+    description: Applies the 1.1 XP multiplier to all weapon and armor skills
+    default: false
+    children:
+      elitemobs.perks.xp.10percentboost.armor: true
+      elitemobs.perks.xp.10percentboost.swords: true
+      elitemobs.perks.xp.10percentboost.axes: true
+      elitemobs.perks.xp.10percentboost.bows: true
+      elitemobs.perks.xp.10percentboost.crossbows: true
+      elitemobs.perks.xp.10percentboost.tridents: true
+      elitemobs.perks.xp.10percentboost.hoes: true
+      elitemobs.perks.xp.10percentboost.maces: true
+      elitemobs.perks.xp.10percentboost.spears: true
+      elitemobs.perks.xp.10percentboost.staves: true
+      elitemobs.perks.xp.10percentboost.wands: true
+  elitemobs.perks.xp.10percentboost.armor:
+    description: Applies the 1.1 XP multiplier to armor
+    default: false
+  elitemobs.perks.xp.10percentboost.swords:
+    description: Applies the 1.1 XP multiplier to swords
+    default: false
+  elitemobs.perks.xp.10percentboost.axes:
+    description: Applies the 1.1 XP multiplier to axes
+    default: false
+  elitemobs.perks.xp.10percentboost.bows:
+    description: Applies the 1.1 XP multiplier to bows
+    default: false
+  elitemobs.perks.xp.10percentboost.crossbows:
+    description: Applies the 1.1 XP multiplier to crossbows
+    default: false
+  elitemobs.perks.xp.10percentboost.tridents:
+    description: Applies the 1.1 XP multiplier to tridents
+    default: false
+  elitemobs.perks.xp.10percentboost.hoes:
+    description: Applies the 1.1 XP multiplier to hoes
+    default: false
+  elitemobs.perks.xp.10percentboost.maces:
+    description: Applies the 1.1 XP multiplier to maces
+    default: false
+  elitemobs.perks.xp.10percentboost.spears:
+    description: Applies the 1.1 XP multiplier to spears
+    default: false
+  elitemobs.perks.xp.10percentboost.staves:
+    description: Applies the 1.1 XP multiplier to staves
+    default: false
+  elitemobs.perks.xp.10percentboost.wands:
+    description: Applies the 1.1 XP multiplier to wands
+    default: false
+
+  elitemobs.perks.xp.25percentboost.all:
+    description: Applies the 1.25 XP multiplier to all weapon and armor skills
+    default: false
+    children:
+      elitemobs.perks.xp.25percentboost.armor: true
+      elitemobs.perks.xp.25percentboost.swords: true
+      elitemobs.perks.xp.25percentboost.axes: true
+      elitemobs.perks.xp.25percentboost.bows: true
+      elitemobs.perks.xp.25percentboost.crossbows: true
+      elitemobs.perks.xp.25percentboost.tridents: true
+      elitemobs.perks.xp.25percentboost.hoes: true
+      elitemobs.perks.xp.25percentboost.maces: true
+      elitemobs.perks.xp.25percentboost.spears: true
+      elitemobs.perks.xp.25percentboost.staves: true
+      elitemobs.perks.xp.25percentboost.wands: true
+  elitemobs.perks.xp.25percentboost.armor:
+    description: Applies the 1.25 XP multiplier to armor
+    default: false
+  elitemobs.perks.xp.25percentboost.swords:
+    description: Applies the 1.25 XP multiplier to swords
+    default: false
+  elitemobs.perks.xp.25percentboost.axes:
+    description: Applies the 1.25 XP multiplier to axes
+    default: false
+  elitemobs.perks.xp.25percentboost.bows:
+    description: Applies the 1.25 XP multiplier to bows
+    default: false
+  elitemobs.perks.xp.25percentboost.crossbows:
+    description: Applies the 1.25 XP multiplier to crossbows
+    default: false
+  elitemobs.perks.xp.25percentboost.tridents:
+    description: Applies the 1.25 XP multiplier to tridents
+    default: false
+  elitemobs.perks.xp.25percentboost.hoes:
+    description: Applies the 1.25 XP multiplier to hoes
+    default: false
+  elitemobs.perks.xp.25percentboost.maces:
+    description: Applies the 1.25 XP multiplier to maces
+    default: false
+  elitemobs.perks.xp.25percentboost.spears:
+    description: Applies the 1.25 XP multiplier to spears
+    default: false
+  elitemobs.perks.xp.25percentboost.staves:
+    description: Applies the 1.25 XP multiplier to staves
+    default: false
+  elitemobs.perks.xp.25percentboost.wands:
+    description: Applies the 1.25 XP multiplier to wands
+    default: false
+
+  elitemobs.perks.xp.50percentboost.all:
+    description: Applies the 1.5 XP multiplier to all weapon and armor skills
+    default: false
+    children:
+      elitemobs.perks.xp.50percentboost.armor: true
+      elitemobs.perks.xp.50percentboost.swords: true
+      elitemobs.perks.xp.50percentboost.axes: true
+      elitemobs.perks.xp.50percentboost.bows: true
+      elitemobs.perks.xp.50percentboost.crossbows: true
+      elitemobs.perks.xp.50percentboost.tridents: true
+      elitemobs.perks.xp.50percentboost.hoes: true
+      elitemobs.perks.xp.50percentboost.maces: true
+      elitemobs.perks.xp.50percentboost.spears: true
+      elitemobs.perks.xp.50percentboost.staves: true
+      elitemobs.perks.xp.50percentboost.wands: true
+  elitemobs.perks.xp.50percentboost.armor:
+    description: Applies the 1.5 XP multiplier to armor
+    default: false
+  elitemobs.perks.xp.50percentboost.swords:
+    description: Applies the 1.5 XP multiplier to swords
+    default: false
+  elitemobs.perks.xp.50percentboost.axes:
+    description: Applies the 1.5 XP multiplier to axes
+    default: false
+  elitemobs.perks.xp.50percentboost.bows:
+    description: Applies the 1.5 XP multiplier to bows
+    default: false
+  elitemobs.perks.xp.50percentboost.crossbows:
+    description: Applies the 1.5 XP multiplier to crossbows
+    default: false
+  elitemobs.perks.xp.50percentboost.tridents:
+    description: Applies the 1.5 XP multiplier to tridents
+    default: false
+  elitemobs.perks.xp.50percentboost.hoes:
+    description: Applies the 1.5 XP multiplier to hoes
+    default: false
+  elitemobs.perks.xp.50percentboost.maces:
+    description: Applies the 1.5 XP multiplier to maces
+    default: false
+  elitemobs.perks.xp.50percentboost.spears:
+    description: Applies the 1.5 XP multiplier to spears
+    default: false
+  elitemobs.perks.xp.50percentboost.staves:
+    description: Applies the 1.5 XP multiplier to staves
+    default: false
+  elitemobs.perks.xp.50percentboost.wands:
+    description: Applies the 1.5 XP multiplier to wands
+    default: false
+
+  elitemobs.perks.xp.double.all:
+    description: Applies the 2 XP multiplier to all weapon and armor skills
+    default: false
+    children:
+      elitemobs.perks.xp.double.armor: true
+      elitemobs.perks.xp.double.swords: true
+      elitemobs.perks.xp.double.axes: true
+      elitemobs.perks.xp.double.bows: true
+      elitemobs.perks.xp.double.crossbows: true
+      elitemobs.perks.xp.double.tridents: true
+      elitemobs.perks.xp.double.hoes: true
+      elitemobs.perks.xp.double.maces: true
+      elitemobs.perks.xp.double.spears: true
+      elitemobs.perks.xp.double.staves: true
+      elitemobs.perks.xp.double.wands: true
+  elitemobs.perks.xp.double.armor:
+    description: Applies the 2 XP multiplier to armor
+    default: false
+  elitemobs.perks.xp.double.swords:
+    description: Applies the 2 XP multiplier to swords
+    default: false
+  elitemobs.perks.xp.double.axes:
+    description: Applies the 2 XP multiplier to axes
+    default: false
+  elitemobs.perks.xp.double.bows:
+    description: Applies the 2 XP multiplier to bows
+    default: false
+  elitemobs.perks.xp.double.crossbows:
+    description: Applies the 2 XP multiplier to crossbows
+    default: false
+  elitemobs.perks.xp.double.tridents:
+    description: Applies the 2 XP multiplier to tridents
+    default: false
+  elitemobs.perks.xp.double.hoes:
+    description: Applies the 2 XP multiplier to hoes
+    default: false
+  elitemobs.perks.xp.double.maces:
+    description: Applies the 2 XP multiplier to maces
+    default: false
+  elitemobs.perks.xp.double.spears:
+    description: Applies the 2 XP multiplier to spears
+    default: false
+  elitemobs.perks.xp.double.staves:
+    description: Applies the 2 XP multiplier to staves
+    default: false
+  elitemobs.perks.xp.double.wands:
+    description: Applies the 2 XP multiplier to wands
+    default: false
+
+  elitemobs.perks.xp.150percentboost.all:
+    description: Applies the 2.5 XP multiplier to all weapon and armor skills
+    default: false
+    children:
+      elitemobs.perks.xp.150percentboost.armor: true
+      elitemobs.perks.xp.150percentboost.swords: true
+      elitemobs.perks.xp.150percentboost.axes: true
+      elitemobs.perks.xp.150percentboost.bows: true
+      elitemobs.perks.xp.150percentboost.crossbows: true
+      elitemobs.perks.xp.150percentboost.tridents: true
+      elitemobs.perks.xp.150percentboost.hoes: true
+      elitemobs.perks.xp.150percentboost.maces: true
+      elitemobs.perks.xp.150percentboost.spears: true
+      elitemobs.perks.xp.150percentboost.staves: true
+      elitemobs.perks.xp.150percentboost.wands: true
+  elitemobs.perks.xp.150percentboost.armor:
+    description: Applies the 2.5 XP multiplier to armor
+    default: false
+  elitemobs.perks.xp.150percentboost.swords:
+    description: Applies the 2.5 XP multiplier to swords
+    default: false
+  elitemobs.perks.xp.150percentboost.axes:
+    description: Applies the 2.5 XP multiplier to axes
+    default: false
+  elitemobs.perks.xp.150percentboost.bows:
+    description: Applies the 2.5 XP multiplier to bows
+    default: false
+  elitemobs.perks.xp.150percentboost.crossbows:
+    description: Applies the 2.5 XP multiplier to crossbows
+    default: false
+  elitemobs.perks.xp.150percentboost.tridents:
+    description: Applies the 2.5 XP multiplier to tridents
+    default: false
+  elitemobs.perks.xp.150percentboost.hoes:
+    description: Applies the 2.5 XP multiplier to hoes
+    default: false
+  elitemobs.perks.xp.150percentboost.maces:
+    description: Applies the 2.5 XP multiplier to maces
+    default: false
+  elitemobs.perks.xp.150percentboost.spears:
+    description: Applies the 2.5 XP multiplier to spears
+    default: false
+  elitemobs.perks.xp.150percentboost.staves:
+    description: Applies the 2.5 XP multiplier to staves
+    default: false
+  elitemobs.perks.xp.150percentboost.wands:
+    description: Applies the 2.5 XP multiplier to wands
+    default: false
+
+  elitemobs.perks.xp.triple.all:
+    description: Applies the 3 XP multiplier to all weapon and armor skills
+    default: false
+    children:
+      elitemobs.perks.xp.triple.armor: true
+      elitemobs.perks.xp.triple.swords: true
+      elitemobs.perks.xp.triple.axes: true
+      elitemobs.perks.xp.triple.bows: true
+      elitemobs.perks.xp.triple.crossbows: true
+      elitemobs.perks.xp.triple.tridents: true
+      elitemobs.perks.xp.triple.hoes: true
+      elitemobs.perks.xp.triple.maces: true
+      elitemobs.perks.xp.triple.spears: true
+      elitemobs.perks.xp.triple.staves: true
+      elitemobs.perks.xp.triple.wands: true
+  elitemobs.perks.xp.triple.armor:
+    description: Applies the 3 XP multiplier to armor
+    default: false
+  elitemobs.perks.xp.triple.swords:
+    description: Applies the 3 XP multiplier to swords
+    default: false
+  elitemobs.perks.xp.triple.axes:
+    description: Applies the 3 XP multiplier to axes
+    default: false
+  elitemobs.perks.xp.triple.bows:
+    description: Applies the 3 XP multiplier to bows
+    default: false
+  elitemobs.perks.xp.triple.crossbows:
+    description: Applies the 3 XP multiplier to crossbows
+    default: false
+  elitemobs.perks.xp.triple.tridents:
+    description: Applies the 3 XP multiplier to tridents
+    default: false
+  elitemobs.perks.xp.triple.hoes:
+    description: Applies the 3 XP multiplier to hoes
+    default: false
+  elitemobs.perks.xp.triple.maces:
+    description: Applies the 3 XP multiplier to maces
+    default: false
+  elitemobs.perks.xp.triple.spears:
+    description: Applies the 3 XP multiplier to spears
+    default: false
+  elitemobs.perks.xp.triple.staves:
+    description: Applies the 3 XP multiplier to staves
+    default: false
+  elitemobs.perks.xp.triple.wands:
+    description: Applies the 3 XP multiplier to wands
+    default: false
+
+  elitemobs.perks.xp.quadruple.all:
+    description: Applies the 4 XP multiplier to all weapon and armor skills
+    default: false
+    children:
+      elitemobs.perks.xp.quadruple.armor: true
+      elitemobs.perks.xp.quadruple.swords: true
+      elitemobs.perks.xp.quadruple.axes: true
+      elitemobs.perks.xp.quadruple.bows: true
+      elitemobs.perks.xp.quadruple.crossbows: true
+      elitemobs.perks.xp.quadruple.tridents: true
+      elitemobs.perks.xp.quadruple.hoes: true
+      elitemobs.perks.xp.quadruple.maces: true
+      elitemobs.perks.xp.quadruple.spears: true
+      elitemobs.perks.xp.quadruple.staves: true
+      elitemobs.perks.xp.quadruple.wands: true
+  elitemobs.perks.xp.quadruple.armor:
+    description: Applies the 4 XP multiplier to armor
+    default: false
+  elitemobs.perks.xp.quadruple.swords:
+    description: Applies the 4 XP multiplier to swords
+    default: false
+  elitemobs.perks.xp.quadruple.axes:
+    description: Applies the 4 XP multiplier to axes
+    default: false
+  elitemobs.perks.xp.quadruple.bows:
+    description: Applies the 4 XP multiplier to bows
+    default: false
+  elitemobs.perks.xp.quadruple.crossbows:
+    description: Applies the 4 XP multiplier to crossbows
+    default: false
+  elitemobs.perks.xp.quadruple.tridents:
+    description: Applies the 4 XP multiplier to tridents
+    default: false
+  elitemobs.perks.xp.quadruple.hoes:
+    description: Applies the 4 XP multiplier to hoes
+    default: false
+  elitemobs.perks.xp.quadruple.maces:
+    description: Applies the 4 XP multiplier to maces
+    default: false
+  elitemobs.perks.xp.quadruple.spears:
+    description: Applies the 4 XP multiplier to spears
+    default: false
+  elitemobs.perks.xp.quadruple.staves:
+    description: Applies the 4 XP multiplier to staves
+    default: false
+  elitemobs.perks.xp.quadruple.wands:
+    description: Applies the 4 XP multiplier to wands
+    default: false
+
+  elitemobs.perks.xp.customboost.all:
+    description: Applies the the configured custom XP multiplier to all weapon and armor skills
+    default: false
+    children:
+      elitemobs.perks.xp.customboost.armor: true
+      elitemobs.perks.xp.customboost.swords: true
+      elitemobs.perks.xp.customboost.axes: true
+      elitemobs.perks.xp.customboost.bows: true
+      elitemobs.perks.xp.customboost.crossbows: true
+      elitemobs.perks.xp.customboost.tridents: true
+      elitemobs.perks.xp.customboost.hoes: true
+      elitemobs.perks.xp.customboost.maces: true
+      elitemobs.perks.xp.customboost.spears: true
+      elitemobs.perks.xp.customboost.staves: true
+      elitemobs.perks.xp.customboost.wands: true
+  elitemobs.perks.xp.customboost.armor:
+    description: Applies the the configured custom XP multiplier to armor
+    default: false
+  elitemobs.perks.xp.customboost.swords:
+    description: Applies the the configured custom XP multiplier to swords
+    default: false
+  elitemobs.perks.xp.customboost.axes:
+    description: Applies the the configured custom XP multiplier to axes
+    default: false
+  elitemobs.perks.xp.customboost.bows:
+    description: Applies the the configured custom XP multiplier to bows
+    default: false
+  elitemobs.perks.xp.customboost.crossbows:
+    description: Applies the the configured custom XP multiplier to crossbows
+    default: false
+  elitemobs.perks.xp.customboost.tridents:
+    description: Applies the the configured custom XP multiplier to tridents
+    default: false
+  elitemobs.perks.xp.customboost.hoes:
+    description: Applies the the configured custom XP multiplier to hoes
+    default: false
+  elitemobs.perks.xp.customboost.maces:
+    description: Applies the the configured custom XP multiplier to maces
+    default: false
+  elitemobs.perks.xp.customboost.spears:
+    description: Applies the the configured custom XP multiplier to spears
+    default: false
+  elitemobs.perks.xp.customboost.staves:
+    description: Applies the the configured custom XP multiplier to staves
+    default: false
+  elitemobs.perks.xp.customboost.wands:
+    description: Applies the the configured custom XP multiplier to wands
+    default: false

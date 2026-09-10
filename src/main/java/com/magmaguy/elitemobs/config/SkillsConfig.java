@@ -35,6 +35,8 @@ public class SkillsConfig extends ConfigurationFile {
     private static String skillLevelUpTitleFormat;
     @Getter
     private static String combatLevelFormat;
+    @Getter
+    private static double customXpPerkMultiplier = 1D;
     private static SkillsConfig instance;
 
     public SkillsConfig() {
@@ -73,6 +75,16 @@ public class SkillsConfig extends ConfigurationFile {
                 List.of("Enables or disables the skill leveling system.",
                         "When enabled, players will earn XP for different weapon types and armor."),
                 fileConfiguration, "skillSystemEnabled", true);
+
+        customXpPerkMultiplier = ConfigurationEngine.setDouble(
+                List.of("Multiplier for elitemobs.perks.xp.customboost.<skill> and .all.",
+                        "Overrides fixed XP perks. Must be finite and non-negative; 1.25 gives +25%.",
+                        "Applies only to eligible combat weapon/armor skill XP, before the public award event."),
+                fileConfiguration, "customXpPerkMultiplier", 1D);
+        if (!Double.isFinite(customXpPerkMultiplier) || customXpPerkMultiplier < 0D) {
+            com.magmaguy.magmacore.util.Logger.warn("Invalid customXpPerkMultiplier in skills.yml; using 1.0.");
+            customXpPerkMultiplier = 1D;
+        }
 
         armorSkillHealthBonusEnabled = ConfigurationEngine.setBoolean(
                 List.of("Whether Armor skill grants bonus max health (+1 heart per level above 1).",

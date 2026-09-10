@@ -90,9 +90,11 @@ public class SkillXPCalculator {
         int level = 1;
         long accumulatedXP = 0;
 
-        while (accumulatedXP + xpToNextLevel(level) <= totalXP) {
-            accumulatedXP += xpToNextLevel(level);
+        long requiredXP = xpToNextLevel(level);
+        while (requiredXP <= totalXP - accumulatedXP) {
+            accumulatedXP += requiredXP;
             level++;
+            requiredXP = xpToNextLevel(level);
         }
 
         return level;

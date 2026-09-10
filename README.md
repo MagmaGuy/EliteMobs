@@ -34,6 +34,35 @@ economy, player progression and skills, NPCs, and shops.
   InfernalMobs, FreeMinecraftModels. Vault is required for economy features; the others enable the corresponding
   integration when present.
 
+## Skill XP permission perks
+
+Grant `elitemobs.perks.xp.<perk>.all` for all weapon/armor skills, or replace `all`
+with `armor`, `swords`, `axes`, `bows`, `crossbows`, `tridents`, `hoes`, `maces`,
+`spears`, `staves`, or `wands`. These permissions default to false, including for
+operators. The `.all` permissions inherit the individual nodes, so a permission
+manager can explicitly deny a particular skill.
+
+| Perk | XP multiplier |
+|---|---|
+| `10percentboost` | 1.1 |
+| `25percentboost` | 1.25 |
+| `50percentboost` | 1.5 |
+| `double` | 2 |
+| `150percentboost` | 2.5 |
+| `triple` | 3 |
+| `quadruple` | 4 |
+| `customboost` | `customXpPerkMultiplier` in `skills.yml`, default 1 |
+
+As in mcMMO, the custom perk overrides fixed perks; otherwise only the largest
+granted fixed multiplier applies. Permissions are checked at each eligible award,
+so temporary grants and revocations take effect without reloading EliteMobs.
+For example, LuckPerms users can grant a 30-minute boost with
+`/lp user PlayerName permission settemp elitemobs.perks.xp.25percentboost.all true 30m`.
+Boosts apply after the native weapon/armor multiplier and round down to whole XP.
+They preserve anti-farm checks, dungeon lockouts, world exclusions and skill-level
+eligibility. They do not boost class XP, currency, loot, vanilla XP, or administrative
+XP writes. Numeric awards saturate at the remaining `long` capacity.
+
 ## Installation
 
 1. Drop `EliteMobs.jar` into your server's `plugins/` folder.
@@ -189,6 +218,43 @@ This is used to check if an entity is from EliteMobs and to get the specific ins
 ---
 
 ## API Events
+
+### Integration API
+
+`com.magmaguy.elitemobs.api.EliteSkillXpGainEvent` is a synchronous Bukkit event
+for each eligible combat weapon/armor skill award. It exposes `getPlayer()`,
+`getSkillType()`, `getEliteEntity()`, `getReason()` with `COMBAT`, and
+`getOriginalXp()`, the amount after native and permission multipliers.
+Listeners can call `setXp(long)` and `setCancelled(boolean)`. Negative amounts
+throw `IllegalArgumentException`; zero/cancelled awards produce no gain feedback.
+Listeners run in ordinary Bukkit priority order, so each sees previous listeners'
+changes. Modify `getXp()` to stack another multiplier or use `getOriginalXp()`
+to replace earlier changes. Take care to avoid overflow in listener arithmetic.
+EliteMobs caps the final amount against the player's actual total and uses the
+applied delta for bars/popups and native level-up effects. PlayerData and admin XP
+writes do not dispatch this event, avoiding recursive bonus grants.
+
+`com.magmaguy.elitemobs.parties.PartyManager` provides result-returning overloads:
+
+```java
+PartyOperationResult created = PartyManager.create(player, false);
+PartyOperationResult invited = PartyManager.invite(player, targetName, false);
+PartyOperationResult accepted = PartyManager.accept(invitedPlayer, false);
+PartyOperationResult left = PartyManager.leave(player, false);
+```
+
+Call them on the server thread with non-null arguments. `PartyOperationResult`
+distinguishes success, disabled parties, missing permissions, unavailable players,
+existing memberships, self-invites, pending/expired invites, full parties and
+leaving without a party. `isSuccess()` identifies successful operations.
+Passing `false` suppresses that operation's chat/broadcast feedback and invite
+prompt, allowing the integration to present the result. Native sidebars, loot
+cleanup and ready-check invalidation still run, including their lifecycle feedback.
+The existing overloads retain native feedback and delegate to the same operations.
+Create/invite/accept require `elitemobs.party`; leave remains available after
+permission revocation or disabling parties. State remains session-local and the
+existing immutable party views remain the query API. Cross-server coordination
+belongs to the caller; these operations do not replicate parties between servers.
 
 EliteMobs has a few basic APIs to interface with in the `com.magmaguy.elitemobs.api` package. Here's the breakdown:
 

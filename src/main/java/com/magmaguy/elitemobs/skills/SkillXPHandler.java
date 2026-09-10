@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.skills;
 
 import com.magmaguy.elitemobs.antiexploit.FarmingProtection;
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.api.EliteSkillXpGainEvent;
 import com.magmaguy.elitemobs.combatsystem.ScaledCombatRewardResolver;
 import com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
@@ -161,10 +162,10 @@ public class SkillXPHandler implements Listener {
                     player, eliteEntity, earnedXP, damageDealt, rewardLevel, eliteEntity.isScaledCombat());
 
             // Award armor XP (always, at 1/3 rate)
-            long armorXP = awardArmorXP(player, earnedXP, rewardLevel, eliteEntity.isScaledCombat());
+            long armorXP = awardArmorXP(player, eliteEntity, earnedXP, rewardLevel, eliteEntity.isScaledCombat());
 
             // Show XP popup with total XP earned (weapon + armor)
-            long totalXPEarned = weaponXP + armorXP + classXpEarned;
+            long totalXPEarned = saturatedSum(saturatedSum(weaponXP, armorXP), classXpEarned);
             if (totalXPEarned > 0 && deathLocation != null) {
                 BossHealthDisplay.createXPPopup(deathLocation, player, totalXPEarned);
             }
@@ -195,8 +196,8 @@ public class SkillXPHandler implements Listener {
                 playerEarnedXP, playerDamage, contributions);
         long totalAwarded = 0L;
         for (Map.Entry<SkillType, Long> entry : shares.entrySet()) {
-            totalAwarded += awardWeaponXP(
-                    player, entry.getKey(), entry.getValue(), rewardLevel, scaledCombat);
+            totalAwarded = saturatedSum(totalAwarded, awardSkillXP(
+                    player, eliteEntity, entry.getKey(), entry.getValue(), rewardLevel, scaledCombat));
         }
         return totalAwarded;
     }
@@ -210,12 +211,15 @@ public class SkillXPHandler implements Listener {
                 .orElse(true);
     }
 
-    private long awardWeaponXP(
+    private long awardSkillXP(
             Player player,
+            EliteEntity eliteEntity,
             SkillType skillType,
             long baseXP,
             int rewardLevel,
             boolean scaledCombat) {
+
+        if (!PlayerData.isDataLoaded(player.getUniqueId())) return 0;
 
         // Get current XP before adding
         long oldXP = PlayerData.getSkillXP(player.getUniqueId(), skillType);
@@ -227,12 +231,27 @@ public class SkillXPHandler implements Listener {
             return 0;
         }
 
-        // Add XP with the skill's multiplier (weapons have 1.0x)
+        // Keep eligibility in the native award path. Permission perks and listeners cannot
+        // turn an excluded kill or out-of-range skill into a reward.
         long xpToAdd = SkillXPCalculator.applySkillMultiplier(skillType, baseXP);
+        xpToAdd = SkillXpPerks.apply(player, skillType, xpToAdd);
+        EliteSkillXpGainEvent event = new EliteSkillXpGainEvent(player, skillType, eliteEntity, xpToAdd);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled() || event.getXp() == 0 || !PlayerData.isDataLoaded(player.getUniqueId())) return 0;
+
+        // A listener may have made an administrative XP write. Use the actual pre-commit
+        // total, cap the increment to its remaining capacity, and report only the real delta.
+        oldXP = PlayerData.getSkillXP(player.getUniqueId(), skillType);
+        if (oldXP < 0) return 0;
+        previousLevel = SkillXPCalculator.levelFromTotalXP(oldXP);
+        xpToAdd = Math.min(event.getXp(), Long.MAX_VALUE - oldXP);
+        if (xpToAdd == 0) return 0;
         long newXP = PlayerData.addSkillXP(player.getUniqueId(), skillType, xpToAdd);
+        long appliedXP = newXP - oldXP;
+        if (appliedXP <= 0) return 0;
 
         // Show XP bar animation
-        SkillXPBar.showXPGain(player, skillType, oldXP, newXP, xpToAdd);
+        SkillXPBar.showXPGain(player, skillType, oldXP, newXP, appliedXP);
 
         // Check for level up
         int newLevel = SkillXPCalculator.levelFromTotalXP(newXP);
@@ -240,7 +259,7 @@ public class SkillXPHandler implements Listener {
             notifyLevelUp(player, skillType, newLevel);
         }
 
-        return xpToAdd;
+        return appliedXP;
     }
 
     /**
@@ -250,32 +269,13 @@ public class SkillXPHandler implements Listener {
      *
      * @return The amount of XP awarded
      */
-    private long awardArmorXP(Player player, long baseXP, int rewardLevel, boolean scaledCombat) {
+    private long awardArmorXP(Player player, EliteEntity eliteEntity, long baseXP, int rewardLevel, boolean scaledCombat) {
         if (!PlayerData.isDataLoaded(player.getUniqueId())) return 0;
-        // Get current XP before adding
-        long oldXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.ARMOR);
-        int previousLevel = SkillXPCalculator.levelFromTotalXP(oldXP);
+        return awardSkillXP(player, eliteEntity, SkillType.ARMOR, baseXP, rewardLevel, scaledCombat);
+    }
 
-        if (FarmingProtection.isLevelRewardProtectionEnabled() &&
-                !FarmingProtection.isSkillXPInRange(previousLevel, rewardLevel, scaledCombat)) {
-            notifySkillXPTooLow(player, SkillType.ARMOR, rewardLevel, previousLevel);
-            return 0;
-        }
-
-        // Armor XP is at 1/3 rate (always awarded on kills)
-        long armorXP = SkillXPCalculator.applySkillMultiplier(SkillType.ARMOR, baseXP);
-        long newXP = PlayerData.addSkillXP(player.getUniqueId(), SkillType.ARMOR, armorXP);
-
-        // Show XP bar animation
-        SkillXPBar.showXPGain(player, SkillType.ARMOR, oldXP, newXP, armorXP);
-
-        // Check for level up
-        int newLevel = SkillXPCalculator.levelFromTotalXP(newXP);
-        if (newLevel > previousLevel) {
-            notifyLevelUp(player, SkillType.ARMOR, newLevel);
-        }
-
-        return armorXP;
+    private static long saturatedSum(long first, long second) {
+        return first > Long.MAX_VALUE - second ? Long.MAX_VALUE : first + second;
     }
 
     /**
