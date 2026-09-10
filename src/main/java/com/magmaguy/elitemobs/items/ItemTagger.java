@@ -170,27 +170,10 @@ public class ItemTagger {
             return level;
     }
 
-    public static boolean hasEnchantment(ItemMeta itemMeta, NamespacedKey enchantmentKey) {
-        if (!itemMeta.hasLore()) //early performance tweak
-            return false;
-        if (itemMeta.getCustomTagContainer().hasCustomTag(enchantmentKey, ItemTagType.INTEGER))
-            return true;
-        return itemMeta.getPersistentDataContainer().has(enchantmentKey, PersistentDataType.INTEGER);
-    }
-
     public static boolean hasKey(ItemStack itemStack, String key) {
         if (itemStack == null) return false;
         if (!itemStack.hasItemMeta()) return false;
         return Objects.requireNonNull(itemStack.getItemMeta()).getPersistentDataContainer().has(new NamespacedKey(MetadataHandler.PLUGIN, key), PersistentDataType.STRING);
-    }
-
-    public static boolean hasEnchantment(ItemMeta itemMeta, String keyString) {
-        NamespacedKey enchantmentKey = new NamespacedKey(MetadataHandler.PLUGIN, keyString);
-        if (!itemMeta.hasLore()) //early performance tweak
-            return false;
-        if (itemMeta.getCustomTagContainer().hasCustomTag(enchantmentKey, ItemTagType.INTEGER))
-            return true;
-        return itemMeta.getPersistentDataContainer().has(enchantmentKey, PersistentDataType.INTEGER);
     }
 
     public static ArrayList<ElitePotionEffect> getPotionEffects(ItemMeta itemMeta, NamespacedKey namespacedKey) {
