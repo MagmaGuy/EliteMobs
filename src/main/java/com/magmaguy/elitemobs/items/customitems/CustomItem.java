@@ -19,6 +19,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.BooleanSupplier;
 
 public class CustomItem {
 
@@ -150,14 +156,62 @@ public class CustomItem {
     /**
      * Initializes all config items on startup. Needs to run after the config initialization as it relies on those values.
      */
-    public static void initializeCustomItems() {
-        for (CustomItemsConfigFields configFields : CustomItemsConfig.getCustomItems().values())
-            try {
-                new CustomItem(configFields);
-            } catch (Exception ex) {
-                Logger.warn("Failed to generate custom item in file " + configFields.getFilename() + " !");
-                ex.printStackTrace();
+    public static void initializeCustomItems(BooleanSupplier cancelled) {
+        Iterator<CustomItemsConfigFields> configs = List.copyOf(CustomItemsConfig.getCustomItems().values()).iterator();
+        while (configs.hasNext()) {
+            constructOnServerThread(() -> {
+                long started = System.nanoTime();
+                int built = 0;
+                do {
+                    CustomItemsConfigFields config = configs.next();
+                    try {
+                        new CustomItem(config);
+                    } catch (Exception exception) {
+                        Logger.warn("Failed to generate custom item in file " + config.getFilename() + " !");
+                        exception.printStackTrace();
+                    }
+                } while (configs.hasNext() && ++built < 16 && System.nanoTime() - started < 5_000_000L
+                        && !cancelled.getAsBoolean());
+            }, cancelled);
+        }
+        if (com.magmaguy.elitemobs.config.ExperimentalCombatConfig.isEnabled())
+            constructOnServerThread(com.magmaguy.elitemobs.experimentalcombat.weapons.ExperimentalMagicWeaponItems::register, cancelled);
+    }
+
+    /** The worker waits between bounded server-thread batches; the server thread never waits. */
+    private static void constructOnServerThread(Runnable construction, BooleanSupplier cancelled) {
+        Runnable guarded = () -> {
+            if (cancelled.getAsBoolean() || com.magmaguy.elitemobs.MetadataHandler.shutdownRequested)
+                throw new CancellationException("Item construction was cancelled");
+            construction.run();
+        };
+        if (org.bukkit.Bukkit.isPrimaryThread()) {
+            guarded.run();
+            return;
+        }
+        Future<?> pending = org.bukkit.Bukkit.getScheduler().callSyncMethod(
+                com.magmaguy.elitemobs.MetadataHandler.PLUGIN, () -> { guarded.run(); return null; });
+        try {
+            while (true) {
+                if (cancelled.getAsBoolean() || com.magmaguy.elitemobs.MetadataHandler.shutdownRequested)
+                    throw new CancellationException("Item construction was cancelled");
+                try {
+                    pending.get(1, TimeUnit.SECONDS);
+                    return;
+                } catch (TimeoutException waitingForServer) {
+                    // Recheck the owning initialization/rebuild generation while waiting.
+                }
             }
+        } catch (InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+            throw new CancellationException("Item construction worker was interrupted");
+        } catch (ExecutionException failed) {
+            if (failed.getCause() instanceof RuntimeException runtime) throw runtime;
+            if (failed.getCause() instanceof Error error) throw error;
+            throw new IllegalStateException("Item construction failed", failed.getCause());
+        } finally {
+            if (!pending.isDone()) pending.cancel(false);
+        }
     }
 
     /**
@@ -167,17 +221,8 @@ public class CustomItem {
      * Call this after all plugins have finished loading to ensure custom skins are applied.
      */
     public static void regenerateCachedItemStacks() {
-        //Rebuilt off the main thread, then swapped in on it.
-        //
-        //Every item here is constructed from scratch, and constructing one rewrites its whole lore,
-        //which recalculates DPS, attack speed and defence. On a server with a few hundred custom
-        //items that added up to enough main-thread time for Paper's watchdog to start dumping
-        //threads mid-startup. The same construction already runs off the main thread when items are
-        //first loaded, so doing it here too is not new ground.
-        //
-        //The caches are populated by that earlier load, so they stay usable throughout: this only
-        //refreshes them with resource-pack models that were not available yet at that point. Worst
-        //case, an item shows its pre-pack appearance for a moment longer.
+        // Keep the old caches usable while a worker coordinates bounded construction
+        // batches on the server thread. Provider resolution must never run on the worker.
         CacheRegenerationLifecycle.Attempt<CustomItem> attempt = cacheRegenerationLifecycle.beginIf(
                 () -> !com.magmaguy.elitemobs.MetadataHandler.shutdownRequested
                         && com.magmaguy.elitemobs.MetadataHandler.PLUGIN != null
@@ -264,17 +309,20 @@ public class CustomItem {
                                                  ArrayList<ItemStack> itemStackShopList,
                                                  HashMap<Integer, ArrayList<ItemStack>> tieredLootTarget,
                                                  HashMap<ItemStack, Double> weighedFixedItemsTarget) {
-        // Regenerate all cached ItemStacks with proper skins
-        for (CustomItem customItem : attempt.snapshot())
-            if (!cacheRegenerationLifecycle.runIfCurrent(
-                    attempt.generation(),
-                    () -> appendCachedItemStacks(
-                            customItem,
-                            itemStackList,
-                            itemStackShopList,
-                            tieredLootTarget,
-                            weighedFixedItemsTarget)))
-                return false;
+        Iterator<CustomItem> remaining = attempt.snapshot().iterator();
+        BooleanSupplier cancelled = () -> !cacheRegenerationLifecycle.isCurrent(attempt.generation());
+        while (remaining.hasNext()) {
+            constructOnServerThread(() -> {
+                long started = System.nanoTime();
+                int built = 0;
+                do {
+                    CustomItem item = remaining.next();
+                    if (!cacheRegenerationLifecycle.runIfCurrent(attempt.generation(),
+                            () -> appendCachedItemStacks(item, itemStackList, itemStackShopList,
+                                    tieredLootTarget, weighedFixedItemsTarget))) return;
+                } while (remaining.hasNext() && ++built < 16 && System.nanoTime() - started < 5_000_000L);
+            }, cancelled);
+        }
 
         return cacheRegenerationLifecycle.isCurrent(attempt.generation());
     }
