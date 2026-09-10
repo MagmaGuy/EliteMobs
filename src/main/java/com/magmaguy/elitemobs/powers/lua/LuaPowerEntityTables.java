@@ -462,16 +462,19 @@ final class LuaPowerEntityTables {
             return LuaValue.NIL;
         }));
         entity.set("face_direction_or_location", method(entity, args -> {
-            Vector direction = support.toVector(args.arg1());
-            if (direction == null && args.arg1().istable()) {
-                Location destination = support.toLocation(args.arg1());
-                if (destination != null && livingEntity.getLocation().getWorld() != null &&
-                        livingEntity.getLocation().getWorld().getUID().equals(destination.getWorld().getUID())) {
-                    direction = destination.toVector().subtract(livingEntity.getLocation().toVector());
-                }
-            }
+            LuaValue target = args.arg1();
+            Location location = livingEntity.getLocation();
+            Vector direction;
+            // Location tables also contain a direction field. Resolve their destination
+            // first, rather than copying the target's own facing as a direction vector.
+            if (target.istable() && (target.get("world").isstring()
+                    || target.get("current_location").istable())) {
+                Location destination = support.toLocation(target);
+                if (destination == null || location.getWorld() == null
+                        || !location.getWorld().equals(destination.getWorld())) return LuaValue.NIL;
+                direction = destination.toVector().subtract(location.toVector());
+            } else direction = support.toVector(target);
             if (direction != null && direction.lengthSquared() > 0) {
-                Location location = livingEntity.getLocation();
                 location.setDirection(direction);
                 livingEntity.teleport(location);
             }

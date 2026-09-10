@@ -101,8 +101,7 @@ final class LuaNPCTable {
     private static LuaValue locationTable(Location location) {
         if (location == null) return LuaValue.NIL;
         LuaTable table = LuaTableSupport.locationToTable(location);
-        // Preserve the legacy NPC contract: location tables carry a `direction` sub-table.
-        // face_direction_or_location() and scripts reading get_location().direction depend on it.
+        // Scripts can explicitly read get_location().direction when they want a facing vector.
         table.set("direction", LuaTableSupport.vectorToTable(location.getDirection()));
         return table;
     }
@@ -122,15 +121,15 @@ final class LuaNPCTable {
     private static void faceDirectionOrLocation(NPCEntity npcEntity, LuaValue value) {
         if (npcEntity.getVillager() == null || !npcEntity.getVillager().isValid()) return;
         if (PatrolService.isActivelyMoving(npcEntity)) return;
-        Vector direction = toVector(value);
-        if (direction == null) {
-            Location destination = toLocation(value, npcEntity);
-            if (destination != null && destination.getWorld() != null &&
-                    npcEntity.getVillager().getWorld().getUID().equals(destination.getWorld().getUID()))
-                direction = destination.toVector().subtract(npcEntity.getVillager().getLocation().toVector());
-        }
-        if (direction == null || direction.lengthSquared() <= 0) return;
         Location location = npcEntity.getVillager().getLocation();
+        Vector direction;
+        if (value.istable() && (value.get("world").isstring()
+                || value.get("current_location").istable())) {
+            Location destination = toLocation(value, npcEntity);
+            if (destination == null || !location.getWorld().equals(destination.getWorld())) return;
+            direction = destination.toVector().subtract(location.toVector());
+        } else direction = toVector(value);
+        if (direction == null || direction.lengthSquared() <= 0) return;
         location.setDirection(direction);
         npcEntity.getVillager().teleport(location);
     }
