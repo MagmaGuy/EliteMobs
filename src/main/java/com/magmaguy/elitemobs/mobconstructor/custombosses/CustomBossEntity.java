@@ -297,19 +297,21 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             return;
         }
 
+        // Keep the persistent registration so chunk loading can retry this deferred spawn.
+        if (!isMount && !PatrolService.canMaterialize(this, effectiveSpawnLocation))
+            return;
+
         //This is a bit dumb but -1 is reserved for dynamic levels, commands can force a dynamic to spawn with a level so check that
         if (customBossesConfigFields.getLevel() == -1 && level == -1) {
             dynamicLevel = true;
             getDynamicLevel(effectiveSpawnLocation);
         }
 
-        if (PatrolService.canMaterialize(this, effectiveSpawnLocation) || isMount) {
-            if (!effectiveSpawnLocation.equals(spawnLocation))
-                setRespawnOverrideLocation(effectiveSpawnLocation);
-            super.livingEntity = new CustomBossMegaConsumer(this).spawn(bodyFactory);
-            if (super.livingEntity == null)
-                Logger.warn("Something just prevented EliteMobs from spawning a Custom Boss! More info up next.");
-        }
+        if (!effectiveSpawnLocation.equals(spawnLocation))
+            setRespawnOverrideLocation(effectiveSpawnLocation);
+        super.livingEntity = new CustomBossMegaConsumer(this).spawn(bodyFactory);
+        if (super.livingEntity == null)
+            Logger.warn("Something just prevented EliteMobs from spawning a Custom Boss! More info up next.");
         if (livingEntity == null || !livingEntity.isValid()) {
             discardFailedMaterialization(livingEntity);
             existsFailureCount++;
