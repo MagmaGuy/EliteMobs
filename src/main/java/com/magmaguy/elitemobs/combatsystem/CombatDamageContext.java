@@ -273,11 +273,16 @@ public final class CombatDamageContext {
         }
     }
 
-    public record PlayerDamageSource(UUID attackId, SkillType progressionSkill) {
+    public record PlayerDamageSource(UUID attackId, SkillType progressionSkill, Boolean criticalHit, Double loudStrikesBonus) {
+        public PlayerDamageSource(UUID attackId, SkillType progressionSkill) {
+            this(attackId, progressionSkill, null, null);
+        }
         public PlayerDamageSource {
             if (attackId == null) throw new IllegalArgumentException("attackId must not be null");
             if (progressionSkill == null || !progressionSkill.isWeaponSkill())
                 throw new IllegalArgumentException("progressionSkill must be a weapon skill");
+            if (loudStrikesBonus != null && (!Double.isFinite(loudStrikesBonus) || loudStrikesBonus < 0))
+                throw new IllegalArgumentException("Invalid captured threat bonus");
         }
     }
 

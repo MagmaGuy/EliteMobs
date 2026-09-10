@@ -484,6 +484,12 @@ public class EliteEntity {
 
     /** Records reward damage and, when known, the weapon skill that actually produced it. */
     public void addDamager(Player player, double damage, SkillType progressionSkill) {
+        addDamager(player, damage, progressionSkill,
+                com.magmaguy.elitemobs.combatsystem.CombatDamageContext.currentPlayerToEliteSource()
+                        .map(com.magmaguy.elitemobs.combatsystem.CombatDamageContext.PlayerDamageSource::loudStrikesBonus).orElse(null));
+    }
+
+    public void addDamager(Player player, double damage, SkillType progressionSkill, Double capturedLoudStrikes) {
         if (player == null || !Double.isFinite(damage) || damage <= 0) return;
 
         Player trackedPlayer = findTrackedPlayer(player);
@@ -494,7 +500,8 @@ public class EliteEntity {
                     .merge(progressionSkill, damage, Double::sum);
 
         ElitePlayerInventory inventory = ElitePlayerInventory.getPlayer(player);
-        double loudStrikesBonus = inventory == null ? 0D : inventory.getLoudStrikesBonusMultiplier(false);
+        double loudStrikesBonus = capturedLoudStrikes != null ? capturedLoudStrikes
+                : inventory == null ? 0D : inventory.getLoudStrikesBonusMultiplier(false);
         if (!Double.isFinite(loudStrikesBonus) || loudStrikesBonus < 0D) loudStrikesBonus = 0D;
         double classThreat = com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatRuntime.isActive(player)
                 && com.magmaguy.elitemobs.experimentalcombat.ExperimentalCombatModule

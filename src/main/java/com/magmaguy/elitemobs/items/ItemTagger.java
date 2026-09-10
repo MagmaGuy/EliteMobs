@@ -42,6 +42,8 @@ public class ItemTagger {
     private static final NamespacedKey ARROW_SKILL_LEVEL = new NamespacedKey(MetadataHandler.PLUGIN, "arrowSkillLevel");
     private static final NamespacedKey ARROW_DAMAGE_MULTIPLIER = new NamespacedKey(MetadataHandler.PLUGIN, "arrowDamageMultiplier");
     private static final NamespacedKey ARROW_LAUNCH_VELOCITY = new NamespacedKey(MetadataHandler.PLUGIN, "arrowLaunchVelocity");
+    private static final NamespacedKey ARROW_CRITICAL = new NamespacedKey(MetadataHandler.PLUGIN, "arrowCritical");
+    private static final NamespacedKey ARROW_LOUD_STRIKES = new NamespacedKey(MetadataHandler.PLUGIN, "arrowLoudStrikes");
 
     public static String itemValue = "ItemValue";
 
@@ -300,6 +302,25 @@ public class ItemTagger {
         if (projectile == null) return -1;
         Double val = projectile.getPersistentDataContainer().get(ARROW_WEAPON_LEVEL, PersistentDataType.DOUBLE);
         return val != null ? val : -1;
+    }
+
+    public static void setArrowEnchantmentCombat(Projectile projectile, boolean critical, double loudStrikes) {
+        if (!Double.isFinite(loudStrikes) || loudStrikes < 0) throw new IllegalArgumentException("Invalid projectile threat");
+        projectile.getPersistentDataContainer().set(ARROW_CRITICAL, PersistentDataType.BYTE, (byte) (critical ? 1 : 0));
+        projectile.getPersistentDataContainer().set(ARROW_LOUD_STRIKES, PersistentDataType.DOUBLE, loudStrikes);
+    }
+
+    public static boolean hasArrowEnchantmentCombat(Projectile projectile) {
+        return projectile.getPersistentDataContainer().has(ARROW_CRITICAL, PersistentDataType.BYTE);
+    }
+
+    public static boolean getArrowCritical(Projectile projectile) {
+        return Byte.valueOf((byte) 1).equals(projectile.getPersistentDataContainer().get(ARROW_CRITICAL, PersistentDataType.BYTE));
+    }
+
+    public static double getArrowLoudStrikes(Projectile projectile) {
+        Double value = projectile.getPersistentDataContainer().get(ARROW_LOUD_STRIKES, PersistentDataType.DOUBLE);
+        return value != null && Double.isFinite(value) && value >= 0 ? value : 0;
     }
 
     public static void setArrowSkillType(@Nullable Projectile projectile, String skillType) {

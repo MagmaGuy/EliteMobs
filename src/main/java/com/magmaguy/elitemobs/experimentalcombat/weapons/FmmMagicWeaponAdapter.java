@@ -25,7 +25,7 @@ import java.util.Objects;
 /** FMM-linked implementation loaded only after the optional plugin is present. */
 final class FmmMagicWeaponAdapter
         implements ExperimentalMagicWeaponIntegration.Connection, MagicAttackResolver {
-    private static final int REQUIRED_CAPABILITY_VERSION = 6;
+    private static final int REQUIRED_CAPABILITY_VERSION = 7;
 
     private final Plugin owner;
     private volatile boolean registered;
@@ -57,6 +57,18 @@ final class FmmMagicWeaponAdapter
     @Override
     public boolean isOperational() {
         return registered && owner.isEnabled() && MagicWeaponAPI.isOperational();
+    }
+
+    @Override
+    public java.util.Map<String, Double> capture(org.bukkit.entity.Player player, ItemStack weapon,
+            com.magmaguy.freeminecraftmodels.api.magic.MagicAttackKind attackKind) {
+        var inventory = com.magmaguy.elitemobs.playerdata.ElitePlayerInventory.getPlayer(player);
+        int skillLevel = 1;
+        if (!SkillsConfig.isWorldExcludedFromSkills(player) && PlayerData.isDataLoaded(player.getUniqueId()))
+            skillLevel = Math.max(1, PlayerData.getSkillLevel(player.getUniqueId(), progressionSkill(attackKind.weaponKind())));
+        return java.util.Map.of("critical", com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEventFilter.captureCriticalHit(player) ? 1D : 0D,
+                "loud_strikes", inventory == null ? 0D : inventory.getLoudStrikesBonusMultiplier(true),
+                "skill_level", (double) skillLevel);
     }
 
     @Override
@@ -123,12 +135,7 @@ final class FmmMagicWeaponAdapter
             MagicAttackRequest request,
             EliteEntity elite,
             SkillType progressionSkill) {
-        int skillLevel = 1;
-        if (!SkillsConfig.isWorldExcludedFromSkills(request.attacker())
-                && PlayerData.isDataLoaded(request.attacker().getUniqueId())) {
-            skillLevel = Math.max(1, PlayerData.getSkillLevel(
-                    request.attacker().getUniqueId(), progressionSkill));
-        }
+        int skillLevel = (int) fact(request, "skill_level");
 
         ItemStack weapon = request.weapon();
         double itemLevel = EliteItemManager.getItemLevel(weapon);
@@ -149,8 +156,16 @@ final class FmmMagicWeaponAdapter
             double damage,
             MagicDamageApplication application) {
         CombatDamageContext.runPlayerToEliteBypass(
-                new CombatDamageContext.PlayerDamageSource(request.attackId(), progressionSkill),
+                new CombatDamageContext.PlayerDamageSource(request.attackId(), progressionSkill,
+                        fact(request, "critical") == 1D, fact(request, "loud_strikes")),
                 () -> application.apply(damage));
+    }
+
+    private static double fact(MagicAttackRequest request, String key) {
+        Double value = request.resolverFacts().get(key);
+        if (value == null || !Double.isFinite(value) || value < 0)
+            throw new IllegalArgumentException("Missing or invalid launch fact: " + key);
+        return value;
     }
 
     private void warnCalculationFailure(RuntimeException failure) {

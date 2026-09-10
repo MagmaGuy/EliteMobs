@@ -178,9 +178,18 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
         return ((CustomBossEntity) eliteEntity).getDamageModifier(itemStackType);
     }
 
-    private static boolean isCriticalHit(Player player) {
-        double criticalStrike = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).getCritChance(false);
+    /** Existing critical owner: resolve once at launch for delayed attacks, at acceptance for melee. */
+    public static boolean captureCriticalHit(Player player) {
+        ElitePlayerInventory inventory = ElitePlayerInventory.getPlayer(player);
+        double criticalStrike = inventory == null ? 0 : inventory.getCritChance(true);
         return ThreadLocalRandom.current().nextDouble() < criticalStrike;
+    }
+
+    private static boolean isCriticalHit(Player player, EntityDamageByEntityEvent event) {
+        var captured = CombatDamageContext.currentPlayerToEliteSource().orElse(null);
+        if (captured != null && captured.criticalHit() != null) return captured.criticalHit();
+        if (event.getDamager() instanceof Projectile projectile) return ItemTagger.getArrowCritical(projectile);
+        return captureCriticalHit(player);
     }
 
     /**
@@ -612,6 +621,11 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
         EliteItemManager.tagArrow(projectile, weapon);
         double weaponLevel = WeaponOffenseCalculator.getEffectiveWeaponLevel(weapon);
         ItemTagger.setArrowWeaponLevel(projectile, weaponLevel);
+        if (!ItemTagger.hasArrowEnchantmentCombat(projectile)) {
+            ElitePlayerInventory inventory = ElitePlayerInventory.getPlayer(player);
+            ItemTagger.setArrowEnchantmentCombat(projectile, captureCriticalHit(player),
+                    inventory == null ? 0D : inventory.getLoudStrikesBonusMultiplier(true));
+        }
 
         SkillType skillType = WeaponIdentityResolver.progressionSkill(weapon);
         if (skillType != null) {
@@ -769,8 +783,10 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
                         == CombatDamageContext.ClassAbilityStrikeQuality.GUARANTEED_CRITICAL)
                 .orElse(false);
         boolean criticalHit = false;
-        if (validPlayer && (!bypass || guaranteedClassCritical)) {
-            criticalHit = guaranteedClassCritical || isCriticalHit(player);
+        boolean capturedWeaponCritical = !CombatDamageContext.isDamageTransferActive()
+                && CombatDamageContext.currentPlayerToEliteSource().map(source -> source.criticalHit() != null).orElse(false);
+        if (validPlayer && (!bypass || guaranteedClassCritical || capturedWeaponCritical)) {
+            criticalHit = guaranteedClassCritical || isCriticalHit(player, event);
             if (criticalHit) {
                 damage *= 1.5;
                 if (breakdown != null) {
@@ -923,7 +939,9 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
 
         if (validPlayer) {
             //Time to deal custom damage!
-            eliteEntity.addDamager(player, damage, progressionSkillFor(event, player));
+            eliteEntity.addDamager(player, damage, progressionSkillFor(event, player),
+                    event.getDamager() instanceof Projectile projectile ? Double.valueOf(ItemTagger.getArrowLoudStrikes(projectile))
+                            : CombatDamageContext.currentPlayerToEliteSource().map(CombatDamageContext.PlayerDamageSource::loudStrikesBonus).orElse(null));
         }
 
         //Dragons need special handling due to their custom deaths
