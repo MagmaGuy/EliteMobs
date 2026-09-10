@@ -279,7 +279,8 @@ public final class CombatDamageContext {
         }
         public PlayerDamageSource {
             if (attackId == null) throw new IllegalArgumentException("attackId must not be null");
-            if (progressionSkill == null || !progressionSkill.isWeaponSkill())
+            // Authored secondary effects retain player/threat attribution without awarding weapon XP.
+            if (progressionSkill != null && !progressionSkill.isWeaponSkill())
                 throw new IllegalArgumentException("progressionSkill must be a weapon skill");
             if (loudStrikesBonus != null && (!Double.isFinite(loudStrikesBonus) || loudStrikesBonus < 0))
                 throw new IllegalArgumentException("Invalid captured threat bonus");

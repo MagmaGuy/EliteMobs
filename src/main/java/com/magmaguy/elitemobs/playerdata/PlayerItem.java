@@ -154,7 +154,7 @@ public class PlayerItem {
         this.hunterChance = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, HunterEnchantment.key)) * EnchantmentsConfig.getEnchantment("hunter.yml").getFileConfiguration().getDouble("hunterSpawnBonus");
         this.earthquakeLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, EarthquakeEnchantment.key));
         this.thornsLevel = ItemTagger.getEnchantment(itemStack.getItemMeta(), Enchantment.THORNS.getKey());
-        this.loudStrikesBonus = ItemTagger.getEnchantment(itemStack.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, LoudStrikesEnchantment.key)) / 3d;
+        this.loudStrikesBonus = readLoudStrikesBonus(itemStack);
         eliteEnchantmentDamage = EliteItemManager.getEliteDamageFromEnchantments(itemStack);
 
         this.itemStack = itemStack.clone();
@@ -265,6 +265,12 @@ public class PlayerItem {
     public double getLoudStrikesBonus(ItemStack itemStack, boolean update) {
         if (update) fullUpdate(itemStack);
         return this.loudStrikesBonus;
+    }
+
+    /** The same per-item contribution is used for active gear and captured attack equipment. */
+    public static double readLoudStrikesBonus(ItemStack item) {
+        if (item == null || item.getType().isAir() || !item.hasItemMeta() || EliteItemManager.isOnLastDamage(item)) return 0;
+        return ItemTagger.getEnchantment(item.getItemMeta(), new NamespacedKey(MetadataHandler.PLUGIN, LoudStrikesEnchantment.key)) / 3d;
     }
 
     public enum EquipmentSlot {
