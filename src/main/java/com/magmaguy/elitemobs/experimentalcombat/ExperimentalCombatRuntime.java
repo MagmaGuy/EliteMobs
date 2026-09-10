@@ -51,7 +51,7 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
 
     private static final String HEALTH_MODIFIER_KEY = "experimental_combat_health";
     private static final String ENTRY_WARNING =
-            "&6&lExperimental Combat &7is active here. You are testing unfinished combat and class systems; &fplease send feedback to the developer&7. This feature will live, evolve, or die by tester feedback.";
+            "&6&l[Alpha] Advanced Combat System &7is active here. You are testing unfinished combat and class systems; &fplease send feedback to the developer&7. This feature will live, evolve, or die by tester feedback.";
     private static final String COMBAT_STARTED = "&cEntering combat!";
     private static final String COMBAT_ENDED = "&aOut of combat &8- &7slow healing resumed";
 
@@ -67,7 +67,7 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
 
     public ExperimentalCombatRuntime(PlayerCombatState combatState) {
         if (instance != null)
-            throw new IllegalStateException("Experimental Combat runtime is already initialized.");
+            throw new IllegalStateException("[Alpha] Advanced Combat System runtime is already initialized.");
         this.combatState = combatState;
         instance = this;
     }
@@ -97,7 +97,7 @@ public final class ExperimentalCombatRuntime implements Listener, PlayerCombatSt
 
     public void start() {
         if (reconciliationTask != null)
-            throw new IllegalStateException("Experimental Combat runtime is already running.");
+            throw new IllegalStateException("[Alpha] Advanced Combat System runtime is already running.");
         rangerAmmunition = com.magmaguy.easyminecraftgoals.NMSManager.getAdapter()
                 .grantOrdinaryAmmunition(MetadataHandler.PLUGIN, player -> isActive(player)
                         && ExperimentalCombatModule.activeClassLineageSnapshot(player.getUniqueId())

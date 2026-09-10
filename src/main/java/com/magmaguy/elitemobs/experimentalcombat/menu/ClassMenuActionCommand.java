@@ -16,7 +16,7 @@ final class ClassMenuActionCommand extends AdvancedCommand {
         this.coordinator = coordinator;
         addArgument("token", new ListStringCommandArgument("<menu-action>"));
         setUsage("/em _classmenu <menu-action>");
-        setDescription("Handles a short-lived Experimental Combat class-menu action.");
+        setDescription("Handles a short-lived [Alpha] Advanced Combat System class-menu action.");
         setPermission("elitemobs.command");
         setSenderType(SenderType.PLAYER);
     }

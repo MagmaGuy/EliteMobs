@@ -29,7 +29,7 @@ import org.bukkit.persistence.PersistentDataType;
  * Removes retired control items and persistent state left behind by interrupted combat sessions.
  *
  * <p>Normal exits are restored from the live runtime baseline. This listener is intentionally
- * registered even while Experimental Combat is disabled, because a disabled build must still be
+ * registered even while [Alpha] Advanced Combat System is disabled, because a disabled build must still be
  * able to recover a player saved by an earlier enabled build.</p>
  */
 public final class ExperimentalCombatStateRecovery implements Listener {

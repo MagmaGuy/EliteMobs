@@ -10,7 +10,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 
-/** Canonical legality boundary for hostile Experimental Combat target acquisition. */
+/** Canonical legality boundary for hostile [Alpha] Advanced Combat System target acquisition. */
 public final class ExperimentalCombatEnemyAuthorization {
     private ExperimentalCombatEnemyAuthorization() {
     }

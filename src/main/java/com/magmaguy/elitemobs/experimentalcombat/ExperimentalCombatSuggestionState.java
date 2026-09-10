@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-/** Server-local, non-database dismissal state for the Experimental Combat tester notice. */
+/** Server-local, non-database dismissal state for the [Alpha] Advanced Combat System tester notice. */
 final class ExperimentalCombatSuggestionState {
     private static final String DISMISSED_PLAYERS = "dismissedPlayers";
 
@@ -46,7 +46,7 @@ final class ExperimentalCombatSuggestionState {
         try {
             yaml.loadFromString(Files.readString(file, StandardCharsets.UTF_8));
         } catch (org.bukkit.configuration.InvalidConfigurationException exception) {
-            throw new IOException("Invalid Experimental Combat suggestion state", exception);
+            throw new IOException("Invalid [Alpha] Advanced Combat System suggestion state", exception);
         }
         Set<UUID> result = new LinkedHashSet<>();
         for (String raw : yaml.getStringList(DISMISSED_PLAYERS)) {

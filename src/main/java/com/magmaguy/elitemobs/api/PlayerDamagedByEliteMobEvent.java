@@ -463,7 +463,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             // 8. 1-shot protection
             double actualMaxHealth = AttributeManager.getAttributeValue(player, "generic_max_health");
-            // Experimental Combat expands the health reservoir, not incoming damage. Remove only
+            // [Alpha] Advanced Combat System expands the health reservoir, not incoming damage. Remove only
             // its flat health increase so ordinary skill and plugin bonuses still contribute to
             // the same one-shot ceiling they provided before the player entered the mode.
             double oneShotProtectionMaxHealth = ExperimentalCombatRuntime.isActive(player)

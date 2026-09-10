@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Thread-safe cache and domain Module for Experimental Combat progression.
+ * Thread-safe cache and domain Module for [Alpha] Advanced Combat System progression.
  *
  * <p>All store access runs through one serial executor. Reads, awards and selections use only
  * immutable catalog data and the loaded cache, so gameplay callers never perform JDBC work.</p>

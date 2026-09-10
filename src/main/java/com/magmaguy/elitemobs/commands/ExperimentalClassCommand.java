@@ -11,7 +11,7 @@ public final class ExperimentalClassCommand extends AdvancedCommand {
     public ExperimentalClassCommand() {
         super(List.of("class"));
         setUsage("/em class");
-        setDescription("Shows your Experimental Combat class profile.");
+        setDescription("Shows your [Alpha] Advanced Combat System class profile.");
         setPermission("elitemobs.command");
         setSenderType(SenderType.PLAYER);
     }

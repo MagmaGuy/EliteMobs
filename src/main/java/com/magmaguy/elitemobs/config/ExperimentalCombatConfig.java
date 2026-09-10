@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.List;
 
 /**
- * The deliberately narrow feature flag for the Experimental Combat baseline.
+ * The deliberately narrow feature flag for the [Alpha] Advanced Combat System baseline.
  *
  * <p>Balance values and class definitions are intentionally versioned with the plugin while the
  * feature is experimental. This prevents locally modified values from contaminating tester
@@ -28,10 +28,10 @@ public final class ExperimentalCombatConfig extends ConfigurationFile {
     public void initializeValues() {
         enabled = ConfigurationEngine.setBoolean(
                 List.of(
-                        "Enables the fixed Experimental Combat baseline in EliteMobs dungeons and worlds.",
+                        "Enables the fixed [Alpha] Advanced Combat System baseline in EliteMobs dungeons and worlds.",
                         "This feature is under active development. Please test the unchanged defaults and send feedback to the developer.",
                         "Localization and customization settings are deliberately deferred during alpha.",
-                        "They will be added after the system has been tested, feedback has been gathered, and Experimental Combat is out of alpha.",
+                        "They will be added after the system has been tested, feedback has been gathered, and the system is out of alpha.",
                         "Please keep the fixed defaults while we establish a solid baseline; no balance settings are exposed yet."),
                 fileConfiguration,
                 "enabled",

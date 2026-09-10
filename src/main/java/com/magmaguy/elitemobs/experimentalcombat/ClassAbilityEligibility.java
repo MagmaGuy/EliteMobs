@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 /**
  * Eligibility boundary for class active abilities and their temporary effects.
  *
- * <p>This deliberately does not represent Experimental Combat's dungeon health, hunger, food,
+ * <p>This deliberately does not represent [Alpha] Advanced Combat System's dungeon health, hunger, food,
  * passive, progression, recovery, or magic-weapon rules. Eligible EliteMobs combat content is one
  * entry path; a player's session-scoped outside-world class-control opt-in is the other.</p>
  */

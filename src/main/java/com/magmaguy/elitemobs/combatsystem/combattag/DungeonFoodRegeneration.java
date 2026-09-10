@@ -12,7 +12,7 @@ import org.bukkit.potion.PotionEffectType;
  * Pure policy helpers for legacy dungeon food regeneration.
  *
  * <p>{@link DungeonCombatRuntime} owns event parsing, combat time, and scheduling. Keeping the
- * effect policy separate makes it possible for Experimental Combat to replace legacy hunger
+ * effect policy separate makes it possible for [Alpha] Advanced Combat System to replace legacy hunger
  * behavior without creating a second combat tracker.</p>
  */
 public final class DungeonFoodRegeneration {

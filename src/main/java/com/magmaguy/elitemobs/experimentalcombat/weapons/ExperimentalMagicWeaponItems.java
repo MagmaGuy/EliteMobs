@@ -39,7 +39,7 @@ public final class ExperimentalMagicWeaponItems {
         for (String itemId : DEBUG_LOADOUT_IDS) {
             CustomItem customItem = CustomItem.getCustomItem(itemId);
             if (customItem == null) {
-                Logger.warn("Experimental Combat debug item '" + itemId + "' is not registered.");
+                Logger.warn("[Alpha] Advanced Combat System debug item '" + itemId + "' is not registered.");
                 continue;
             }
             ItemStack itemStack = customItem.generateItemStackExact(itemLevel, player, null);
@@ -47,7 +47,7 @@ public final class ExperimentalMagicWeaponItems {
             SkillType expectedSkill = STAFF_ITEM_ID.equals(itemId) ? SkillType.STAVES : SkillType.WANDS;
             boolean validIdentity = WeaponIdentityResolver.progressionSkill(itemStack) == expectedSkill;
             if (!validIdentity) {
-                Logger.warn("Experimental Combat debug item '" + itemId
+                Logger.warn("[Alpha] Advanced Combat System debug item '" + itemId
                         + "' lost its registered magic-weapon identity and was not granted.");
                 continue;
             }

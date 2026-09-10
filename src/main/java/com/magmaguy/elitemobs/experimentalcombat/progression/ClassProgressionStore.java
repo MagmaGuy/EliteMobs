@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Synchronous persistence boundary for Experimental Combat progression.
+ * Synchronous persistence boundary for [Alpha] Advanced Combat System progression.
  *
  * <p>Implementations must be safe to call from asynchronous player-data tasks. This interface
  * does not schedule work; callers choose the appropriate execution context.</p>

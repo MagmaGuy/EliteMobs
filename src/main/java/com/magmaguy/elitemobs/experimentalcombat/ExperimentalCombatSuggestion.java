@@ -30,7 +30,7 @@ public final class ExperimentalCombatSuggestion implements Listener {
         try {
             loaded = new ExperimentalCombatSuggestionState(stateFile);
         } catch (IOException exception) {
-            Logger.warn("Could not read Experimental Combat suggestion dismissals: "
+            Logger.warn("Could not read [Alpha] Advanced Combat System suggestion dismissals: "
                     + exception.getMessage());
         }
         state = loaded;
@@ -56,7 +56,7 @@ public final class ExperimentalCombatSuggestion implements Listener {
             instance.state.dismiss(player.getUniqueId());
             return true;
         } catch (IOException exception) {
-            Logger.warn("Could not save the Experimental Combat suggestion dismissal: "
+            Logger.warn("Could not save the [Alpha] Advanced Combat System suggestion dismissal: "
                     + exception.getMessage());
             return false;
         }
@@ -69,7 +69,7 @@ public final class ExperimentalCombatSuggestion implements Listener {
     }
 
     private static void sendSuggestion(Player player) {
-        Logger.sendSimpleMessage(player, "<g:#9B59FF:#FFB347>Experimental Combat needs testers</g>");
+        Logger.sendSimpleMessage(player, "<g:#9B59FF:#FFB347>[Alpha] Advanced Combat System needs testers</g>");
         Logger.sendSimpleMessage(player,
                 "&7Enable it in &fExperimental Combat.yml &7to test classes and the new dungeon combat model.");
         Logger.sendSimpleMessage(player,

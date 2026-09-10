@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.experimentalcombat.classes.ClassResourceType;
 
 import java.util.Objects;
 
-/** Shared Experimental Combat colors for menus, chat feedback and combat popups. */
+/** Shared [Alpha] Advanced Combat System colors for menus, chat feedback and combat popups. */
 public final class ClassPresentationTheme {
     public static final String ELITE = "#8B0000:#CC4400:#DAA520";
     public static final String GOLD = "#B8860B:#F0C040";

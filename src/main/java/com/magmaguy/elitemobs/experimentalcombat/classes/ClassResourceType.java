@@ -1,7 +1,7 @@
 package com.magmaguy.elitemobs.experimentalcombat.classes;
 
 /**
- * Root-class resource shown in the Experimental Combat action-bar HUD.
+ * Root-class resource shown in the [Alpha] Advanced Combat System action-bar HUD.
  */
 public enum ClassResourceType {
     STAMINA("Stamina", "Stamina recovers at the same steady rate as mana."),

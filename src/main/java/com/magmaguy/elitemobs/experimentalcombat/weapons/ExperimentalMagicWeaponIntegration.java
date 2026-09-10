@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Optional-runtime adapter seam between Experimental Combat and FMM magic weapons.
+ * Optional-runtime adapter seam between [Alpha] Advanced Combat System and FMM magic weapons.
  *
  * <p>This class deliberately has no FMM type in its interface or implemented interfaces. An
  * EliteMobs server without FMM can load it safely, lock Spellcaster, and show one actionable

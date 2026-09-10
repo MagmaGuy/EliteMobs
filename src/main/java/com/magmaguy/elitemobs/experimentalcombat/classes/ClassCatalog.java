@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Validated fixed catalog for the Experimental Combat class forest.
+ * Validated fixed catalog for the [Alpha] Advanced Combat System class forest.
  */
 public final class ClassCatalog {
     private final int persistenceVersion;
@@ -66,7 +66,7 @@ public final class ClassCatalog {
         }
 
         if (forms.isEmpty())
-            throw new IllegalArgumentException("Experimental Combat requires at least one class form");
+            throw new IllegalArgumentException("[Alpha] Advanced Combat System requires at least one class form");
 
         Map<String, List<ClassFormDefinition>> mutableChildren = new LinkedHashMap<>();
         forms.keySet().forEach(id -> mutableChildren.put(id, new ArrayList<>()));
@@ -181,7 +181,7 @@ public final class ClassCatalog {
                                        Map<String, List<ClassFormDefinition>> children,
                                        List<ClassFormDefinition> roots) {
         if (roots.isEmpty())
-            throw new IllegalArgumentException("Experimental Combat requires at least one root class");
+            throw new IllegalArgumentException("[Alpha] Advanced Combat System requires at least one root class");
 
         for (ClassFormDefinition form : forms.values()) {
             int childCount = children.get(form.id()).size();

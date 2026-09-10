@@ -105,7 +105,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Deep module boundary for Experimental Combat classes.
+ * Deep module boundary for [Alpha] Advanced Combat System classes.
  *
  * <p>Bukkit adapters submit player intent here; this object alone coordinates progression,
  * run locks, resources, passives, threat, contribution and presentation. Active abilities have
@@ -204,7 +204,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     }
 
     public static ExperimentalCombatModule initialize(PlayerCombatState combatState) {
-        if (instance != null) throw new IllegalStateException("Experimental Combat module is already initialized");
+        if (instance != null) throw new IllegalStateException("[Alpha] Advanced Combat System module is already initialized");
         ExperimentalCombatModule module = new ExperimentalCombatModule(combatState);
         instance = module;
         ClassAbilityEligibility.install(
@@ -242,7 +242,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     }
 
     public static ExperimentalCombatModule get() {
-        if (instance == null) throw new IllegalStateException("Experimental Combat is not initialized");
+        if (instance == null) throw new IllegalStateException("[Alpha] Advanced Combat System is not initialized");
         return instance;
     }
 
@@ -539,10 +539,10 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
                     if (!player.isOnline() || instance != this) return;
                     if (failure != null) {
                         progressionFailureWarnings.add(player.getUniqueId());
-                        Logger.warn("Could not load Experimental Combat class data for " + player.getName()
+                        Logger.warn("Could not load [Alpha] Advanced Combat System class data for " + player.getName()
                                 + ": " + rootCause(failure).getMessage());
                         player.sendMessage(ChatColorConverter.convert(
-                                "&cYour Experimental Combat class data could not be loaded. Please report this to the developer."));
+                                "&cYour [Alpha] Advanced Combat System class data could not be loaded. Please report this to the developer."));
                         return;
                     }
                     progressionFailureWarnings.remove(player.getUniqueId());
@@ -569,10 +569,10 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
                 if (readiness == ProgressionReadiness.FAILED
                         && progressionFailureWarnings.add(player.getUniqueId())) {
                     Throwable failure = progression.failure(player.getUniqueId()).orElse(null);
-                    Logger.warn("Experimental Combat class progression became unavailable for "
+                    Logger.warn("[Alpha] Advanced Combat System class progression became unavailable for "
                             + player.getName() + (failure == null ? "." : ": " + rootCause(failure).getMessage()));
                     player.sendMessage(ChatColorConverter.convert(
-                            "&cYour Experimental Combat class data became unavailable. Class mechanics were disabled safely; please report this to the developer."));
+                            "&cYour [Alpha] Advanced Combat System class data became unavailable. Class mechanics were disabled safely; please report this to the developer."));
                 }
                 if (readiness == ProgressionReadiness.UNLOADED
                         && PlayerData.isDataLoaded(player.getUniqueId())) load(player);
@@ -666,7 +666,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
     private void reconcileAfterClassSelection(Player player) {
         // A selection is a hard ability-state boundary. Source-scoped fields, links and delayed
         // callbacks from the previous class must not survive merely because the player remains in
-        // the same Experimental Combat world.
+        // the same [Alpha] Advanced Combat System world.
         abilityEngine.deactivate(player);
         reconcilePlayer(player);
         CombatLevelDisplay.updateDisplay(player);
@@ -913,7 +913,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         progression.unload(playerId);
         flush.whenComplete((ignored, failure) -> {
             if (failure != null)
-                Logger.warn("Could not flush Experimental Combat class progression for "
+                Logger.warn("Could not flush [Alpha] Advanced Combat System class progression for "
                         + playerName + ": " + rootCause(failure).getMessage());
         });
     }
@@ -948,7 +948,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
         try {
             progression.closeAsync().join();
         } catch (CompletionException exception) {
-            Logger.warn("Could not flush Experimental Combat class progression during shutdown: "
+            Logger.warn("Could not flush [Alpha] Advanced Combat System class progression during shutdown: "
                     + rootCause(exception).getMessage());
         }
         weaponAffinity.shutdown();
@@ -966,7 +966,7 @@ public final class ExperimentalCombatModule implements Listener, ClassAbilityInp
             if (!player.isOnline() || !ExperimentalCombatConfig.isEnabled()) return;
             if (!outsideControlsAllowed() || !fLayerSupported(player)) return;
             player.sendMessage(ChatColorConverter.convert(
-                    ClassPresentationTheme.gradient(ClassPresentationTheme.ELITE, "Experimental Combat")
+                    ClassPresentationTheme.gradient(ClassPresentationTheme.ELITE, "[Alpha] Advanced Combat System")
                             + " &8» &7New: hold &fsneak&7 and double-tap &fF&7 to toggle class"
                             + " controls anywhere outside EliteMobs content."));
         }, CONTROL_TOGGLE_NOTICE_DELAY_TICKS);

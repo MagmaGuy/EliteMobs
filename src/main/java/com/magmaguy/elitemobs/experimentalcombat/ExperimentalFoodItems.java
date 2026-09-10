@@ -22,7 +22,7 @@ import java.util.Set;
  * full hunger bar.
  *
  * <p>The vanilla client will not start using ordinary food at 20 hunger, so changing only the
- * server-side food level is insufficient. While a player is in Experimental Combat, food in that
+ * server-side food level is insufficient. While a player is in [Alpha] Advanced Combat System, food in that
  * player's inventory receives an {@code always_edible} food component and twice its original
  * consumption duration. Original values are stored on the stack and restored whenever it leaves
  * player custody or the mode ends. Native consumption effects and animations remain intact.</p>

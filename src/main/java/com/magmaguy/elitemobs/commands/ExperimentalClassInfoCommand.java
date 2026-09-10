@@ -17,7 +17,7 @@ public final class ExperimentalClassInfoCommand extends AdvancedCommand {
                         .map(ClassFormDefinition::id).toList(),
                 "<class>"));
         setUsage("/em class info <class>");
-        setDescription("Explains one Experimental Combat class form.");
+        setDescription("Explains one [Alpha] Advanced Combat System class form.");
         setPermission("elitemobs.command");
         setSenderType(SenderType.PLAYER);
     }

@@ -28,7 +28,7 @@ public final class ExperimentalClassTestSetCommand extends AdvancedCommand {
                 "<class>"));
         addArgument("level", new IntegerCommandArgument("<effectiveLevel>"));
         setUsage("/em class test set <player> <class> <effectiveLevel>");
-        setDescription("Sets and selects an exact Experimental Combat branch level for testing.");
+        setDescription("Sets and selects an exact [Alpha] Advanced Combat System branch level for testing.");
         setPermission("elitemobs.experimentalcombat.admin");
     }
 
@@ -36,7 +36,7 @@ public final class ExperimentalClassTestSetCommand extends AdvancedCommand {
     public void execute(CommandData commandData) {
         if (!ExperimentalCombatModule.isInitialized()) {
             Logger.sendMessage(commandData.getCommandSender(),
-                    "&cExperimental Combat is disabled on this server.");
+                    "&c[Alpha] Advanced Combat System is disabled on this server.");
             return;
         }
         String playerName = commandData.getStringArgument("player");

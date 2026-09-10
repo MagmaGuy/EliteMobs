@@ -73,7 +73,7 @@ permissions:
     description: Allows admins to manually launch an event
     default: op
   elitemobs.experimentalcombat.admin:
-    description: Allows admins to prepare exact class branch levels for Experimental Combat testing
+    description: Allows admins to prepare exact class branch levels for [Alpha] Advanced Combat System testing
     default: op
   elitemobs.fireball:
     description: Allows admins to fire an elite fireball for terrain destruction testing purposes

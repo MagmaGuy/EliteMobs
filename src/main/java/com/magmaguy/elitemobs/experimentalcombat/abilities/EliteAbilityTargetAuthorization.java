@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import java.util.EnumSet;
 import java.util.Set;
 
-/** Canonical legality and protection policy for hostile Experimental Combat effects. */
+/** Canonical legality and protection policy for hostile [Alpha] Advanced Combat System effects. */
 final class EliteAbilityTargetAuthorization {
     private static final Set<AbilityEffect> DISPLACEMENT_EFFECTS = EnumSet.of(
             AbilityEffect.KNOCKBACK,

@@ -95,7 +95,7 @@ final class ClassMenuCoordinator {
 
     private Optional<ClassMenuView> project(Player player) {
         if (!ExperimentalCombatModule.isInitialized()) {
-            send(player, "&cExperimental Combat is disabled on this server.");
+            send(player, "&c[Alpha] Advanced Combat System is disabled on this server.");
             return Optional.empty();
         }
         ExperimentalCombatModule module = ExperimentalCombatModule.get();

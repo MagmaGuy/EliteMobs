@@ -76,7 +76,7 @@ final class TimedOutgoingDamageReduction implements AutoCloseable {
         Objects.requireNonNull(liveSource, "liveSource");
         if (closed) return Optional.empty();
         // A class user may weaken an Elite in an ordinary world while another player has not
-        // opted into outside-world class mechanics. The debuff belongs to Experimental Combat;
+        // opted into outside-world class mechanics. The debuff belongs to [Alpha] Advanced Combat System;
         // it must not silently alter damage dealt to that non-participant.
         if (!recipientEligible) return Optional.empty();
         if (!Double.isFinite(originalDamage) || originalDamage <= 0D) return Optional.empty();

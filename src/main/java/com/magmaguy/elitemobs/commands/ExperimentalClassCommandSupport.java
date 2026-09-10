@@ -22,7 +22,7 @@ final class ExperimentalClassCommandSupport {
 
     static boolean requireModule(Player player) {
         if (ExperimentalCombatModule.isInitialized()) return true;
-        send(player, "&cExperimental Combat is disabled on this server.");
+        send(player, "&c[Alpha] Advanced Combat System is disabled on this server.");
         return false;
     }
 

@@ -41,7 +41,7 @@ public final class JdbcClassProgressionStore implements ClassProgressionStore {
                 statement.setString(1, playerId.toString());
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (!resultSet.next())
-                        throw new SQLException("Failed to create Experimental Combat profile for " + playerId);
+                        throw new SQLException("Failed to create [Alpha] Advanced Combat System profile for " + playerId);
                     return readProfile(playerId, resultSet);
                 }
             }

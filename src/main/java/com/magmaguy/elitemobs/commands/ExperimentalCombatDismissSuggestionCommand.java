@@ -8,13 +8,13 @@ import com.magmaguy.magmacore.util.Logger;
 
 import java.util.List;
 
-/** Dismisses the server-local Experimental Combat tester reminder without touching player data. */
+/** Dismisses the server-local [Alpha] Advanced Combat System tester reminder without touching player data. */
 public final class ExperimentalCombatDismissSuggestionCommand extends AdvancedCommand {
     public ExperimentalCombatDismissSuggestionCommand() {
         super(List.of("experimentalcombat"));
         addLiteral("dismiss");
         setUsage("/em experimentalcombat dismiss");
-        setDescription("Dismisses the Experimental Combat tester reminder.");
+        setDescription("Dismisses the [Alpha] Advanced Combat System tester reminder.");
         setPermission("elitemobs.experimentalcombat.admin");
         setSenderType(SenderType.PLAYER);
     }
@@ -23,7 +23,7 @@ public final class ExperimentalCombatDismissSuggestionCommand extends AdvancedCo
     public void execute(CommandData commandData) {
         if (ExperimentalCombatSuggestion.dismiss(commandData.getPlayerSender())) {
             Logger.sendMessage(commandData.getCommandSender(),
-                    "&7Experimental Combat tester reminders dismissed.");
+                    "&7[Alpha] Advanced Combat System tester reminders dismissed.");
         } else {
             Logger.sendMessage(commandData.getCommandSender(),
                     "&cCould not save that reminder dismissal. Check the server log.");

@@ -10,7 +10,7 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import org.bukkit.Material;
 
 /**
- * Canonical level-aware damage curve for Experimental Combat attacks that supply their own
+ * Canonical level-aware damage curve for [Alpha] Advanced Combat System attacks that supply their own
  * server-authoritative damage. Ability tuning and magic-weapon tuning are expressed as multiples
  * of one matched-level EliteMobs basic hit, never as multiples of vanilla attack attributes.
  */

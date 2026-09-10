@@ -41,7 +41,7 @@ import java.util.UUID;
 /**
  * Owns the stateful combat contracts that cannot be represented by one immediate Bukkit effect.
  * Links, guards and windows all use the same source-scoped lifecycle so changing class or leaving
- * Experimental Combat cannot leak a benefit into normal gameplay.
+ * [Alpha] Advanced Combat System cannot leak a benefit into normal gameplay.
  */
 final class AbilityStateRuntime implements Listener, AutoCloseable {
     private static final double REDIRECT_FRACTION = .35D;

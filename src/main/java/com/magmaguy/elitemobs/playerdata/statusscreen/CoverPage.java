@@ -135,7 +135,7 @@ public class CoverPage {
             if (inventory.getItem(slot) == null) return slot;
         for (int slot = 0; slot < inventory.getSize(); slot++)
             if (inventory.getItem(slot) == null) return slot;
-        throw new IllegalStateException("The player status inventory has no free slot for Experimental Combat classes");
+        throw new IllegalStateException("The player status inventory has no free slot for [Alpha] Advanced Combat System classes");
     }
 
     private static ItemStack classesItem() {

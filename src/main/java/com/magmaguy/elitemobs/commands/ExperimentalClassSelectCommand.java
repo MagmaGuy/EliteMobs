@@ -20,7 +20,7 @@ public final class ExperimentalClassSelectCommand extends AdvancedCommand {
                         .map(ClassFormDefinition::id).toList(),
                 "<class>"));
         setUsage("/em class select <class>");
-        setDescription("Selects an unlocked Experimental Combat class form.");
+        setDescription("Selects an unlocked [Alpha] Advanced Combat System class form.");
         setPermission("elitemobs.command");
         setSenderType(SenderType.PLAYER);
     }

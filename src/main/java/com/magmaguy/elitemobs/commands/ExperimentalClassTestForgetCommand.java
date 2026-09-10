@@ -30,7 +30,7 @@ public final class ExperimentalClassTestForgetCommand extends AdvancedCommand {
     @Override
     public void execute(CommandData commandData) {
         if (!ExperimentalCombatModule.isInitialized()) {
-            Logger.sendMessage(commandData.getCommandSender(), "&cExperimental Combat is disabled on this server.");
+            Logger.sendMessage(commandData.getCommandSender(), "&c[Alpha] Advanced Combat System is disabled on this server.");
             return;
         }
         Player player = Bukkit.getPlayer(commandData.getStringArgument("player"));

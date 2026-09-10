@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.experimentalcombat.progression;
 import java.util.Arrays;
 import java.util.Optional;
 
-/** The supported Experimental Combat input layout. */
+/** The supported [Alpha] Advanced Combat System input layout. */
 public enum InputProfile {
     JAVA_HOTBAR_LAYER("java_hotbar_layer");
 
