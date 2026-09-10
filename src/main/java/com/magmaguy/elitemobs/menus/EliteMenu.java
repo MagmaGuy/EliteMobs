@@ -55,7 +55,7 @@ public class EliteMenu implements Listener {
         HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(inventoryToClear.getItem(slotToClear));
         //Item is ultimately lost if the inventory is full and it can't be dropped
         if (!leftovers.isEmpty() && canDrop)
-            player.getWorld().dropItem(player.getLocation(), inventoryToClear.getItem(slotToClear));
+            leftovers.values().forEach(item -> player.getWorld().dropItem(player.getLocation(), item));
         else if (!leftovers.isEmpty())
             itemLoss = true;
         inventoryToClear.setItem(slotToClear, null);

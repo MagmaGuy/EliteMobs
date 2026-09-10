@@ -126,6 +126,15 @@ public class ItemEnchantmentMenu extends EliteMenu {
     public static class ItemEnchantMenuEvents implements Listener {
         private static final Set<Inventory> menus = new HashSet<>();
         private static final Set<Inventory> processing = new HashSet<>();
+        private final java.util.function.DoubleSupplier outcomeRandom;
+
+        public ItemEnchantMenuEvents() {
+            this(() -> ThreadLocalRandom.current().nextDouble());
+        }
+
+        ItemEnchantMenuEvents(java.util.function.DoubleSupplier outcomeRandom) {
+            this.outcomeRandom = Objects.requireNonNull(outcomeRandom);
+        }
 
         public static void shutdown() {
             for (Inventory inventory : new ArrayList<>(menus)) {
@@ -139,7 +148,7 @@ public class ItemEnchantmentMenu extends EliteMenu {
             processing.clear();
         }
 
-        @EventHandler
+        @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
         public void onInventoryInteract(InventoryClickEvent event) {
             if (!EliteMenu.isEliteMenu(event, menus)) return;
             event.setCancelled(true);
@@ -266,7 +275,9 @@ public class ItemEnchantmentMenu extends EliteMenu {
         }
 
         private Chance rollChance(EnchantmentProgression.Quote quote) {
-            double rolled = ThreadLocalRandom.current().nextDouble();
+            double rolled = outcomeRandom.getAsDouble();
+            if (!Double.isFinite(rolled) || rolled < 0D || rolled >= 1D)
+                throw new IllegalStateException("Invalid enchantment outcome sample");
             double threshold = quote.success();
             if (rolled < threshold) return Chance.SUCCESS;
             threshold += quote.criticalFailure();
