@@ -46,14 +46,21 @@ final class TransportChunks implements AutoCloseable {
         } catch (ReflectiveOperationException failure) { return CompletableFuture.failedFuture(failure); }
     }
 
-    Lease acquire(World world, CurvedRoute route) {
+    Lease acquire(World world, CurvedRoute route, TransportClearance.Footprint footprint) {
         if (closed) throw new IllegalStateException("Transport is stopping");
         Set<Key> keys = new HashSet<>();
         for (double d = 0; d < route.length() + .5; d += .5) {
             var p = route.at(Math.min(d, route.length()));
-            for (int x : new int[]{(int) Math.floor(p.getX() - 1), (int) Math.floor(p.getX() + 1)})
-                for (int z : new int[]{(int) Math.floor(p.getZ() - 1), (int) Math.floor(p.getZ() + 1)})
-                    keys.add(new Key(world, x >> 4, z >> 4));
+            int minX = (int) Math.floor(p.getX() - footprint.radius()) >> 4;
+            int maxX = (int) Math.floor(p.getX() + footprint.radius()) >> 4;
+            int minZ = (int) Math.floor(p.getZ() - footprint.radius()) >> 4;
+            int maxZ = (int) Math.floor(p.getZ() + footprint.radius()) >> 4;
+            for (int x = minX; x <= maxX; x++)
+                for (int z = minZ; z <= maxZ; z++) {
+                    keys.add(new Key(world, x, z));
+                    if (keys.size() > 128)
+                        throw new IllegalArgumentException("Route terrain budget exceeded; shorten the route or wait for another flight");
+                }
         }
         if (keys.size() > 128 || entries.size() + keys.stream().filter(k -> !entries.containsKey(k)).count() > 256)
             throw new IllegalArgumentException("Route terrain budget exceeded; shorten the route or wait for another flight");

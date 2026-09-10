@@ -91,16 +91,22 @@ public final class TransportModule implements Listener, AutoCloseable {
             }
             Journey journey = new Journey(player, route, world, curve, match);
             journeys.put(player.getUniqueId(), journey);
-            try { journey.terrain = chunks.acquire(world, curve); }
-            catch (RuntimeException failure) { journeys.remove(player.getUniqueId()); throw failure; }
+            try {
+                prepareMount(journey);
+                journey.footprint = TransportClearance.mounted(journey.actor.getLivingEntity(), player);
+                journey.terrain = chunks.acquire(world, curve, journey.footprint);
+            } catch (Exception | LinkageError failure) {
+                finish(journey, false, null);
+                throw failure;
+            }
             message(player, "Preparing travel to " + route.name() + "...");
             journey.terrain.ready.whenComplete((ignored, failure) -> {
                 if (closed || !plugin.isEnabled()) return;
                 Bukkit.getScheduler().runTask(plugin, () -> {
                     if (journeys.get(player.getUniqueId()) != journey) return;
                     if (failure != null) { finish(journey, false, "Route terrain could not be loaded."); return; }
-                    String obstruction = TransportClearance.route(world, curve);
-                    if (obstruction != null || !TransportClearance.landing(journey.destination)) {
+                    String obstruction = TransportClearance.route(world, curve, journey.footprint);
+                    if (obstruction != null || !TransportClearance.landing(journey.destination, player)) {
                         finish(journey, false, "Route is unsafe: " + (obstruction == null ? "landing needs clear solid ground" : obstruction));
                         return;
                     }
@@ -109,7 +115,7 @@ public final class TransportModule implements Listener, AutoCloseable {
                 });
             });
             return true;
-        } catch (Exception failure) { message(player, failure.getMessage()); return false; }
+        } catch (Exception | LinkageError failure) { message(player, failure.getMessage()); return false; }
     }
 
     static World resolveWorld(Player player, TransportRoute route) {
@@ -132,13 +138,15 @@ public final class TransportModule implements Listener, AutoCloseable {
                 if (++j.age > 20 * 120 + j.curve.length() / j.route.speed() * 40) {
                     finish(j, false, "Travel timed out."); continue;
                 }
-                if (j.actor == null) {
+                if (!j.actor.getLivingEntity().isValid()) {
+                    finish(j, false, "Travel interrupted."); continue;
+                }
+                if (!j.boarded) {
                     if (j.player.getLocation().distanceSquared(j.departure) > .15 * .15) {
                         finish(j, false, "Departure cancelled because you moved."); continue;
                     }
                     if (j.ready && ++j.charge >= j.route.countdown()) board(j);
-                } else if (!j.actor.getLivingEntity().isValid()
-                        || j.player.getVehicle() != j.actor.getLivingEntity()) {
+                } else if (j.player.getVehicle() != j.actor.getLivingEntity()) {
                     finish(j, false, "Travel interrupted.");
                 } else if (j.status != RouteFlight.Status.FLYING) {
                     finish(j, j.status == RouteFlight.Status.ARRIVED,
@@ -153,22 +161,18 @@ public final class TransportModule implements Listener, AutoCloseable {
         }
     }
 
-    private void board(Journey j) throws Exception {
-        if (j.player.isInsideVehicle()) throw new IllegalStateException("Already riding another entity");
-        Location fallback = j.match == null ? j.departure : j.match.getPreviousPlayerLocations().get(j.player);
-        if (fallback == null || fallback.getWorld() == null || fallback.getWorld() == j.world && j.match != null)
-            fallback = Bukkit.getWorlds().getFirst().getSpawnLocation();
-        recovery.write(j.player.getUniqueId(), j.destination, fallback, j.match == null ? null : j.match.getRuntimeId());
-        j.journaled = true;
+    private void prepareMount(Journey j) throws Exception {
         j.flight = new RouteFlight(j.curve, j.route.speed(), j.route.acceleration());
         MindProgram program = MindProgram.builder("elitemobs:transport/" + j.route.id(), 1)
                 .behavior(new MindBehavior() {
                     public String identifier() { return "elitemobs:transport/flight"; }
                     public Set<MindControl> controls() { return Set.of(MindControl.MOVE, MindControl.LOOK); }
-                    public boolean canStart(MindContext context) { return journeys.get(j.player.getUniqueId()) == j; }
+                    public boolean canStart(MindContext context) { return journeys.get(j.player.getUniqueId()) == j && j.boarded; }
                     public void tick(MindContext context) {
                         Vector next = j.curve.at(Math.min(j.curve.length(), j.flight.distance() + 2));
-                        if (TransportClearance.point(j.world, next) != null
+                        var current = TransportClearance.mounted(j.actor.getLivingEntity(), j.player);
+                        if (!j.footprint.contains(current)
+                                || TransportClearance.point(j.world, next, current) != null
                                 || j.match != null && !j.match.authorizesTransport(j.player, next.toLocation(j.world))) {
                             context.actuator().stopMoving(); j.status = RouteFlight.Status.BLOCKED; return;
                         }
@@ -176,21 +180,32 @@ public final class TransportModule implements Listener, AutoCloseable {
                     }
                 }).build();
         var entityConfig = requireTransportEntity(j.route);
-        var profile = EliteMindBodyProfile.forCarrier(entityConfig.getEntityType().getKey(), EliteMindBodyLocomotion.FLYING);
+        var profile = new EliteMindBodyProfile(EliteMindBodyLocomotion.FLYING, entityConfig.getScale(),
+                true, entityConfig.getEntityType().getKey());
         j.actor = EliteMindServiceModule.spawnInternal(new InternalMindActorSpawnRequest(plugin,
                 j.player.getUniqueId(), j.curve.at(0).toLocation(j.world), 1, profile, program, actor -> {
                     LivingEntity body = actor.getLivingEntity();
                     body.setPersistent(false); body.setRemoveWhenFarAway(false); body.setCanPickupItems(false);
                     // Journey safety is temporary. Appearance, equipment and powers belong to the boss YAML.
                     body.setInvulnerable(true);
+                    body.setGravity(false);
                     body.setPortalCooldown(Integer.MAX_VALUE);
                 }, entityConfig)).orElseThrow(() -> new IllegalStateException("Native flying Minds are unavailable on this server version"));
+    }
+
+    private void board(Journey j) throws Exception {
+        if (j.player.isInsideVehicle()) throw new IllegalStateException("Already riding another entity");
         LivingEntity body = j.actor.getLivingEntity();
-        var bounds = body.getBoundingBox();
-        if (bounds.getWidthX() > 1.3 || bounds.getWidthZ() > 1.3 || bounds.getHeight() > 1.4)
-            throw new IllegalArgumentException("Transport entity exceeds the supported clearance envelope (1.3 blocks wide, 1.4 blocks tall)");
+        if (!j.footprint.contains(TransportClearance.mounted(body, j.player)))
+            throw new IllegalArgumentException("Transport dimensions changed during preparation. Please board again.");
+        Location fallback = j.match == null ? j.departure : j.match.getPreviousPlayerLocations().get(j.player);
+        if (fallback == null || fallback.getWorld() == null || fallback.getWorld() == j.world && j.match != null)
+            fallback = Bukkit.getWorlds().getFirst().getSpawnLocation();
+        recovery.write(j.player.getUniqueId(), j.destination, fallback, j.match == null ? null : j.match.getRuntimeId());
+        j.journaled = true;
         if (!body.addPassenger(j.player) || j.player.getVehicle() != body)
             throw new IllegalStateException("Could not seat the player on the mount");
+        j.boarded = true;
         j.player.setFallDistance(0);
         j.world.playSound(body.getLocation(), Sound.ENTITY_HORSE_SADDLE, 1, 1);
     }
@@ -199,13 +214,13 @@ public final class TransportModule implements Listener, AutoCloseable {
         if (!journeys.remove(j.player.getUniqueId(), j)) return;
         try {
             if (j.actor != null) {
-                j.player.leaveVehicle();
+                if (j.player.getVehicle() == j.actor.getLivingEntity()) j.player.leaveVehicle();
                 EliteMindServiceModule.clearInternal(j.actor);
             }
             if (j.journaled && !j.playerOffline && j.player.isOnline() && !j.player.isDead()) {
                 Location target = arrived ? j.destination : j.departure;
                 boolean moved = false;
-                if (TransportClearance.landing(target) && j.player.getWorld() == j.world && PlayerData.getMatchInstance(j.player) == j.match) {
+                if (TransportClearance.landing(target, j.player) && j.player.getWorld() == j.world && PlayerData.getMatchInstance(j.player) == j.match) {
                     if (j.match == null) moved = j.player.teleport(target);
                     else if (j.match.authorizesTransport(j.player, target))
                         moved = InstancePlayerMovement.teleportWithinWorld(j.player, target, PlayerTeleportEvent.TeleportCause.PLUGIN);
@@ -243,7 +258,7 @@ public final class TransportModule implements Listener, AutoCloseable {
                             if (!player.isOnline() || player.isDead() || journeys.containsKey(player.getUniqueId())) return;
                             if (PlayerData.getMatchInstance(player) != match) { recover(player); return; }
                             try {
-                                Location safe = failure == null && chunk != null && TransportClearance.landing(destination)
+                                Location safe = failure == null && chunk != null && TransportClearance.landing(destination, player)
                                         ? destination : Bukkit.getWorlds().getFirst().getSpawnLocation();
                                 MatchInstance current = PlayerData.getMatchInstance(player);
                                 boolean success = current != null && current.authorizesTransport(player, safe)
@@ -310,7 +325,7 @@ public final class TransportModule implements Listener, AutoCloseable {
         for (Journey j : List.copyOf(journeys.values())) if (j.match == event.getInstance()) finish(j, false, null);
     }
     private boolean riding(Player player) {
-        Journey j = journeys.get(player.getUniqueId()); return j != null && j.actor != null;
+        Journey j = journeys.get(player.getUniqueId()); return j != null && j.boarded;
     }
     public void cancel(Player player) {
         Journey j = journeys.get(player.getUniqueId()); if (j != null) finish(j, false, "Travel cancelled.");
@@ -336,8 +351,9 @@ public final class TransportModule implements Listener, AutoCloseable {
         final Player player; final TransportRoute route; final World world; final CurvedRoute curve;
         final MatchInstance match; final Location departure; final Location destination;
         TransportChunks.Lease terrain; EliteEntity actor; RouteFlight flight;
+        TransportClearance.Footprint footprint;
         RouteFlight.Status status = RouteFlight.Status.FLYING;
-        boolean ready, journaled, playerOffline; int age, charge;
+        boolean ready, boarded, journaled, playerOffline; int age, charge;
         Journey(Player player, TransportRoute route, World world, CurvedRoute curve, MatchInstance match) {
             this.player = player; this.route = route; this.world = world; this.curve = curve; this.match = match;
             departure = player.getLocation().clone(); destination = curve.at(curve.length()).toLocation(world);
