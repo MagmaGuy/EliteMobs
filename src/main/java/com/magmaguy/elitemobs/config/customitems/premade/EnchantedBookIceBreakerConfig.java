@@ -14,7 +14,7 @@ public class EnchantedBookIceBreakerConfig extends CustomItemsConfigFields {
                 Material.ENCHANTED_BOOK,
                 "&5Elite Ice Breaker Enchanted Book",
                 new ArrayList<>(List.of("&2Used to enchant items at the enchanter!")));
-        setEnchantments(new ArrayList<>(List.of("ICE_BREAKER,1")));
+        setEnchantments(new ArrayList<>(List.of("elitemobs:ice_breaker,1")));
         setItemType(CustomItem.ItemType.UNIQUE);
         setScalability(CustomItem.Scalability.FIXED);
         setSoulbound(false);

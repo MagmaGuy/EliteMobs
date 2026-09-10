@@ -749,7 +749,6 @@ public class EliteMobs extends JavaPlugin {
         PlayerQuestCooldowns.shutdown();
         GetLootMenu.shutdown();
         TransitiveBlockCommand.shutdown();
-        DrillingEnchantment.shutdown();
         Saturation.shutdown();
         Heal.shutdown();
         Harm.shutdown();

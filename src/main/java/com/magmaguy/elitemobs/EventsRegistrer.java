@@ -320,8 +320,6 @@ public class EventsRegistrer {
         register(new SummonMerchantEnchantment.SummonMerchantEvents());
         register(new SummonWolfEnchantment.SummonWolfEnchantmentEvent());
         register(new MeteorShowerEnchantment.MeteorShowerEvents());
-        register(new DrillingEnchantment.DrillingEnchantmentEvents());
-        register(new IceBreakerEnchantment.IceBreakerEnchantmentEvent());
         register(new GrapplingHookEnchantment.GrapplingHookEnchantmentEvents());
         register(new EarthquakeEnchantment.EarthquakeEnchantmentEvents());
 

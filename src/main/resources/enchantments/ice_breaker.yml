@@ -1,0 +1,11 @@
+isEnabled: true
+name: Ice Breaker
+maxLevel: 2
+validSlots: [MAINHAND]
+stacking: source_item
+script: ice_breaker.lua
+parameters:
+  value: 10
+  procedural: false
+  lifetime_ticks: 1
+  stop_on_unequip: true

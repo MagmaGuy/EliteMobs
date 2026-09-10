@@ -33,8 +33,6 @@ public abstract class CustomEnchantment {
         new FlamethrowerEnchantment();
         new PlasmaBootsEnchantment();
         new HunterEnchantment();
-        new DrillingEnchantment();
-        new IceBreakerEnchantment();
         new MeteorShowerEnchantment();
         new SummonMerchantEnchantment();
         new SummonWolfEnchantment();

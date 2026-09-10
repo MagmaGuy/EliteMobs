@@ -19,10 +19,12 @@ public final class EliteEnchantmentCatalog {
     public static final ScriptHook THREAT_BONUS = new ScriptHook("on_threat_bonus");
     public static final ScriptHook CRITICAL_CHANCE = new ScriptHook("on_critical_chance");
     private static final Set<ScriptHook> HOOKS = Set.of(THREAT_BONUS, CRITICAL_CHANCE);
-    private static final Set<String> SHARED = Set.of("loud_strikes", "critical_strikes");
+    private static final Set<ScriptHook> ALL_HOOKS = java.util.stream.Stream.concat(HOOKS.stream(),
+            EnchantmentInputs.HOOKS.stream()).collect(java.util.stream.Collectors.toUnmodifiableSet());
+    private static final Set<String> SHARED = Set.of("loud_strikes", "critical_strikes", "drilling", "ice_breaker");
     // Removed as each remaining effect is moved to this provider. Soulbind is an ownership setting.
-    private static final Set<String> REMAINING_CONFIGS = Set.of("hunter", "lightning", "flamethrower", "drilling",
-            "ice_breaker", "earthquake", "plasma_boots", "grappling_hook", "meteor_shower",
+    private static final Set<String> REMAINING_CONFIGS = Set.of("hunter", "lightning", "flamethrower",
+            "earthquake", "plasma_boots", "grappling_hook", "meteor_shower",
             "summon_merchant", "summon_wolf", "soulbind", "multicast", "blast_radius", "ignition");
     private static volatile EnchantmentCatalog catalog;
     private static volatile Set<String> sharedNames = SHARED;
@@ -49,7 +51,7 @@ public final class EliteEnchantmentCatalog {
                 }
             }
             Set<String> selectedNames = new HashSet<>(SHARED);
-            var candidate = EnchantmentCatalog.load("elitemobs", directory, HOOKS, path -> {
+            var candidate = EnchantmentCatalog.load("elitemobs", directory, ALL_HOOKS, path -> {
                 String stem = path.getFileName().toString().toLowerCase(Locale.ROOT).replaceFirst("\\.ya?ml$", "");
                 if (REMAINING_CONFIGS.contains(stem)
                         || org.bukkit.enchantments.Enchantment.getByKey(org.bukkit.NamespacedKey.minecraft(stem)) != null)
@@ -77,8 +79,16 @@ public final class EliteEnchantmentCatalog {
 
     public static void publish() {
         if (hosted == null)
-            hosted = EnchantmentDefinitions.publishQueries(MetadataHandler.PLUGIN, catalog, Set.of(), HOOKS,
-                    (operation, request) -> Map.of("supported", false));
+            hosted = EnchantmentDefinitions.publishActions(MetadataHandler.PLUGIN, catalog, Set.of(), HOOKS,
+                    EnchantmentInputs.HOOKS, (operation, request) -> {
+                        if (operation != EnchantmentProviders.Operation.EVALUATE
+                                || !"attributed_damage".equals(request.get("kind"))) return Map.of("supported", false);
+                        var input = EnchantmentActions.DamageInput.read(request);
+                        return Map.of("applied", input != null && EnchantmentInputs.applyExplicitDamage(MetadataHandler.PLUGIN,
+                                input.actor(), input.target(), () -> com.magmaguy.elitemobs.combatsystem.EnchantmentDamage.apply(
+                                        input.attackId(), input.actor().getUniqueId(), input.equipment(),
+                                        () -> input.target().damage(input.amount(), input.actor()))));
+                    });
         else hosted.reload(catalog);
         revision++;
     }
