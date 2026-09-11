@@ -104,6 +104,9 @@ public class EliteItemLore {
     }
 
     private void constructVanillaEnchantments() {
+        // Minecraft renders visible native enchantments itself. Only replace hidden
+        // native lines; otherwise the host lore would print every enchantment twice.
+        if (!itemMeta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) return;
         for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
             if (enchantment.getName().contains("CURSE"))
                 vanillaEnchantmentsLore.add(ChatColorConverter.convert(
@@ -255,7 +258,7 @@ public class EliteItemLore {
                 if (!potionListLore.isEmpty())
                     lore.add(string.replace("$ifPotionEffects", ""));
             } else if (string.contains("$ifEnchantments")) {
-                if (!vanillaEnchantmentsLore.isEmpty())
+                if (!vanillaEnchantmentsLore.isEmpty() || !eliteVanillaEnchantmentsLore.isEmpty())
                     lore.add(string.replace("$ifEnchantments", ""));
             } else if (string.contains("$ifLore")) {
                 if (!customLore.isEmpty())
