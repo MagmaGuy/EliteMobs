@@ -20,6 +20,9 @@ public final class AdvancedCombatSystemConfig extends ConfigurationFile {
     @Getter
     private static boolean allowClassAbilitiesOutsideEliteMobsWorlds;
 
+    @Getter
+    private static boolean enableCombatHud;
+
     public AdvancedCombatSystemConfig() {
         super("AdvancedCombatSystem.yml");
     }
@@ -42,6 +45,14 @@ public final class AdvancedCombatSystemConfig extends ConfigurationFile {
                         "Players opt in per session by double-tapping F while sneaking. EliteMobs combat content is always enabled."),
                 fileConfiguration,
                 "allowClassAbilitiesOutsideEliteMobsWorlds",
+                true);
+        enableCombatHud = ConfigurationEngine.setBoolean(
+                List.of(
+                        "Displays the graphical combat HUD when ResourcePackManager is enabled.",
+                        "Set to false to use the text action bar for health, class resources and ability feedback.",
+                        "The text display is also used automatically when ResourcePackManager is absent or disabled."),
+                fileConfiguration,
+                "enableCombatHud",
                 true);
     }
 }

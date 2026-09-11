@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.presentation.actionbar;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule;
 import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatRuntime;
+import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -253,7 +254,10 @@ public final class ActionBarCompositor implements Listener {
     }
 
     private static void render(Player player, PlayerState state) {
-        if (AdvancedCombatRuntime.isActive(player)) {
+        // CLASS_HUD and ability feedback remain published below as the resource-pack-free fallback.
+        if (AdvancedCombatSystemConfig.isEnableCombatHud()
+                && Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager")
+                && AdvancedCombatRuntime.isActive(player)) {
             var frame = COMBAT_HUD.frame(player, AdvancedCombatModule.isAbilityGestureOpen(player.getUniqueId()));
             Entry feedback = selectWinner(state, true);
             String feedbackText = feedback == null ? null : feedback.message;
