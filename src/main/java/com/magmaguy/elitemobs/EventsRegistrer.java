@@ -244,7 +244,6 @@ public class EventsRegistrer {
         register(new CoverPage.CoverPageEvents());
         if (AdvancedCombatSystemConfig.isEnabled()) {
             register(ClassSelectionMenu.listener());
-            register(GuildTrainingMenu.listener());
         }
         register(new StatsPage.StatsPageEvents());
         register(new SkillsPage.SkillsPageEvents());

@@ -6,7 +6,6 @@ import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.MetaPackage;
 import com.magmaguy.elitemobs.advancedcombat.menu.ClassSelectionMenu;
-import com.magmaguy.elitemobs.menus.GuildTrainingMenu;
 import com.magmaguy.magmacore.command.CommandManager;
 import com.magmaguy.magmacore.nightbreak.NightbreakDownloadContentCommand;
 import com.magmaguy.magmacore.nightbreak.NightbreakDownloadEverythingCommand;
@@ -179,7 +178,6 @@ public class CommandHandler {
             emCommand.registerCommand(new AdvancedClassTestSetCommand());
             emCommand.registerCommand(new AdvancedClassTestForgetCommand());
             ClassSelectionMenu.commands().forEach(emCommand::registerCommand);
-            GuildTrainingMenu.commands().forEach(emCommand::registerCommand);
         }
 
         emCommand.registerCommand(new EliteMobsCommand());

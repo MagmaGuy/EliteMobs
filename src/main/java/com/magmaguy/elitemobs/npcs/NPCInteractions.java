@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.npcs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerPreTeleportEvent;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
-import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.menus.*;
 import com.magmaguy.elitemobs.menus.gambling.BettingMenu;
@@ -66,10 +65,7 @@ public class NPCInteractions implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            if (AdvancedCombatSystemConfig.isEnabled())
-                                GuildTrainingMenu.open(player);
-                            else
-                                SkillBonusMenu.openWeaponSelectMenu(player);
+                            SkillBonusMenu.openWeaponSelectMenu(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }
