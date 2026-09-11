@@ -49,10 +49,10 @@ public final class FixedAbilityRegistry {
         Map<String, FixedAbilitySpec> specs = new LinkedHashMap<>();
         add(specs, "adventurer.mobility", AbilitySlot.MOBILITY, AbilityFamily.SAFE_DASH, AbilityTarget.SELF,
                 tune(0, 0, 0, 0, 1, 4, 0, 0, 1, 1));
-        instant(specs, "adventurer.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_ENEMY,
-                tune(1.1, 0, 0, 0, 1, 3, 0, 1, 1, 1), AbilityEffect.DAMAGE);
+        instant(specs, "adventurer.signature", AbilitySlot.SIGNATURE, AbilityTarget.SELF,
+                support(0, 0, 0, 0, 100), AbilityEffect.HASTE);
         instant(specs, "adventurer.utility", AbilitySlot.UTILITY, AbilityTarget.SELF,
-                support(.12, 0, 0, 0, 1), AbilityEffect.HEAL);
+                support(0, 0, 0, 0, 100), AbilityEffect.RESISTANCE);
         cost(specs, "adventurer.mobility", 20D);
         cost(specs, "adventurer.signature", 20D);
         cost(specs, "adventurer.utility", 30D);

@@ -270,6 +270,8 @@ public final class ActiveAbilityBalanceAnalyzer {
             case SELF_PROTECT -> .7D * durationFactor;
             case ALLY_PROTECT -> .8D * durationFactor;
             case SPEED -> .35D * durationFactor;
+            case HASTE -> .3D * durationFactor;
+            case RESISTANCE -> .7D * durationFactor;
             case STRENGTH -> Math.max(.45D,
                     Math.max(0D, spec.tuning().modifierMultiplier() - 1D) * 3D) * durationFactor;
             case SPELL_STRENGTH -> Math.max(.45D,

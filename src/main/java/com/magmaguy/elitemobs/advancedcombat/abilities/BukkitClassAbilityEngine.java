@@ -1455,7 +1455,7 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             default -> false;
         });
         boolean allyEffect = spec.effects().stream().anyMatch(effect -> switch (effect) {
-            case HEAL, SHIELD, CLEANSE, SELF_PROTECT, ALLY_PROTECT, SPEED, STRENGTH,
+            case HEAL, SHIELD, CLEANSE, SELF_PROTECT, ALLY_PROTECT, SPEED, HASTE, RESISTANCE, STRENGTH,
                     SPELL_STRENGTH, SELF_VULNERABLE -> true;
             default -> false;
         });

@@ -401,6 +401,18 @@ final class AbilityEffects {
                         AbilityEffect.SPEED, 2D, effectDuration);
                 supported = true;
             }
+            for (AbilityEffect effect : List.of(AbilityEffect.HASTE, AbilityEffect.RESISTANCE)) {
+                if (!effects.contains(effect)) continue;
+                PotionEffectType type = effect == AbilityEffect.HASTE
+                        ? PotionEffectType.HASTE : PotionEffectType.RESISTANCE;
+                int duration = Math.max(20, effectDuration);
+                if (ally.addPotionEffect(new PotionEffect(type, duration, 0, false, true, true))) {
+                    observeApplied(caster, ally, spec,
+                            AbilityRuntimeObservation.Kind.MODIFIER_APPLIED,
+                            effect, 1D, duration);
+                    supported = true;
+                }
+            }
             if (effects.contains(AbilityEffect.STRENGTH) && !missingHealthScaling) {
                 double multiplier = tuning.modifierMultiplier() > 1D
                         ? tuning.modifierMultiplier()
@@ -583,6 +595,8 @@ final class AbilityEffects {
                 || effects.contains(AbilityEffect.SHIELD)
                 || effects.contains(AbilityEffect.CLEANSE)
                 || effects.contains(AbilityEffect.SPEED)
+                || effects.contains(AbilityEffect.HASTE)
+                || effects.contains(AbilityEffect.RESISTANCE)
                 || effects.contains(AbilityEffect.STRENGTH)
                 || effects.contains(AbilityEffect.SELF_PROTECT);
     }

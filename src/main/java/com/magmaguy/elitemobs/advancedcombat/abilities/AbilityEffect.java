@@ -17,6 +17,8 @@ public enum AbilityEffect {
     SELF_PROTECT,
     ALLY_PROTECT,
     SPEED,
+    HASTE,
+    RESISTANCE,
     STRENGTH,
     SPELL_STRENGTH,
     SELF_VULNERABLE,

@@ -24,8 +24,8 @@ final class BuiltInClassDefinitions {
                 new FoundationSkillPair(SkillType.ARMOR, SkillType.SWORDS),
                 new RootClassKit(ClassResourceType.STAMINA,
                         ability("adventurer", AbilitySlot.MOBILITY, "Dodge", "Dash a short distance along your aim.")),
-                ability("adventurer", AbilitySlot.SIGNATURE, "Quick Strike", "Strike one foe within melee reach."),
-                ability("adventurer", AbilitySlot.UTILITY, "Second Wind", "Recover a little of your own health."),
+                ability("adventurer", AbilitySlot.SIGNATURE, "Haste", "Gain Haste I to attack and mine faster."),
+                ability("adventurer", AbilitySlot.UTILITY, "Resistance", "Gain Resistance I to reduce incoming damage."),
                 new PassiveDefinition("adventurer.passive", "Take 5% less damage. Practice with any weapon."),
                 java.util.Arrays.stream(SkillType.values()).filter(skill -> skill != SkillType.ARMOR).toList()));
     }
