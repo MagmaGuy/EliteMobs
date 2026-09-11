@@ -37,3 +37,4 @@ target/
 out/
 codex-build.log
 dependency-reduced-pom.xml
+__pycache__/
