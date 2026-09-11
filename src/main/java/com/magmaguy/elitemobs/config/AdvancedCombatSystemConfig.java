@@ -1,8 +1,10 @@
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.magmacore.config.ConfigurationFile;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -13,6 +15,7 @@ import java.util.List;
  * feedback.</p>
  */
 public final class AdvancedCombatSystemConfig extends ConfigurationFile {
+    private static AdvancedCombatSystemConfig instance;
 
     @Getter
     private static boolean enabled;
@@ -23,8 +26,29 @@ public final class AdvancedCombatSystemConfig extends ConfigurationFile {
     @Getter
     private static boolean enableCombatHud;
 
+    @Getter
+    private static boolean showDeveloperMessage;
+
     public AdvancedCombatSystemConfig() {
         super("AdvancedCombatSystem.yml");
+        instance = this;
+    }
+
+    /** Disables the login notice for every administrator, persisting before reporting success. */
+    public static boolean dismissDeveloperMessage() {
+        if (instance == null) return false;
+        if (!showDeveloperMessage) return true;
+        instance.fileConfiguration.set("showDeveloperMessage", false);
+        try {
+            instance.fileConfiguration.save(instance.file);
+            showDeveloperMessage = false;
+            return true;
+        } catch (IOException exception) {
+            instance.fileConfiguration.set("showDeveloperMessage", true);
+            Logger.warn("Could not save the advanced combat developer message dismissal: "
+                    + exception.getMessage());
+            return false;
+        }
     }
 
     @Override
@@ -53,6 +77,14 @@ public final class AdvancedCombatSystemConfig extends ConfigurationFile {
                         "The text display is also used automatically when ResourcePackManager is absent or disabled."),
                 fileConfiguration,
                 "enableCombatHud",
+                true);
+        showDeveloperMessage = ConfigurationEngine.setBoolean(
+                List.of(
+                        "Shows administrators MagmaGuy's message about the new combat system when they log in.",
+                        "Clicking Dismiss permanently sets this to false for the entire server.",
+                        "Set this back to true to show the message again. This does not enable or disable combat."),
+                fileConfiguration,
+                "showDeveloperMessage",
                 true);
     }
 }

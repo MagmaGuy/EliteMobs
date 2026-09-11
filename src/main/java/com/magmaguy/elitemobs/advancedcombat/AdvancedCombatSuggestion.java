@@ -2,8 +2,6 @@ package com.magmaguy.elitemobs.advancedcombat;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig;
-import com.magmaguy.elitemobs.utils.DiscordLinks;
-import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.SpigotMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,30 +10,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.IOException;
-import java.nio.file.Path;
-
-/** Reminds administrators about the opt-in test until that administrator dismisses it. */
+/** Shows the developer's combat announcement until an administrator disables it for the server. */
 public final class AdvancedCombatSuggestion implements Listener {
     private static final long REMINDER_DELAY_TICKS = 100L;
-    private static AdvancedCombatSuggestion instance;
-
-    private final AdvancedCombatSuggestionState state;
-
-    public AdvancedCombatSuggestion() {
-        AdvancedCombatSuggestionState loaded = null;
-        Path stateFile = MetadataHandler.PLUGIN.getDataFolder().toPath()
-                .resolve(".state")
-                .resolve("advanced-combat-suggestion.yml");
-        try {
-            loaded = new AdvancedCombatSuggestionState(stateFile);
-        } catch (IOException exception) {
-            Logger.warn("Could not read [Alpha] Advanced Combat System suggestion dismissals: "
-                    + exception.getMessage());
-        }
-        state = loaded;
-        instance = this;
-    }
+    private static final String DEVELOPER_MESSAGE_URL = "https://www.patreon.com/posts/169211257";
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -50,39 +28,22 @@ public final class AdvancedCombatSuggestion implements Listener {
         }.runTaskLater(MetadataHandler.PLUGIN, REMINDER_DELAY_TICKS);
     }
 
-    public static boolean dismiss(Player player) {
-        if (instance == null || instance.state == null) return false;
-        try {
-            instance.state.dismiss(player.getUniqueId());
-            return true;
-        } catch (IOException exception) {
-            Logger.warn("Could not save the [Alpha] Advanced Combat System suggestion dismissal: "
-                    + exception.getMessage());
-            return false;
-        }
-    }
-
     private boolean shouldSuggest(Player player) {
-        return !AdvancedCombatSystemConfig.isEnabled()
-                && player.hasPermission("elitemobs.advancedcombat.admin")
-                && (state == null || !state.isDismissed(player.getUniqueId()));
+        return AdvancedCombatSystemConfig.isShowDeveloperMessage()
+                && player.hasPermission("elitemobs.advancedcombat.admin");
     }
 
     private static void sendSuggestion(Player player) {
-        Logger.sendSimpleMessage(player, "<g:#9B59FF:#FFB347>[Alpha] Advanced Combat System needs testers</g>");
-        Logger.sendSimpleMessage(player,
-                "&7Enable it in &fAdvancedCombatSystem.yml &7to test classes and the new dungeon combat model.");
-        Logger.sendSimpleMessage(player,
-                "&7The combat system is still in alpha, but testers have found it extremely enjoyable. &fPlease share your feedback with the developer&7!");
         player.spigot().sendMessage(
+                SpigotMessage.simpleMessage("&6[EliteMobs] &fA message from the MagmaGuy, the developer about the new combat system. "),
                 SpigotMessage.hoverLinkMessage(
-                        "<g:#6EE7B7:#22C55E>Open the testing community</g>",
-                        "&7Open the EliteMobs Discord",
-                        DiscordLinks.mainLink),
-                SpigotMessage.simpleMessage(" &8• "),
+                        "&a[Click to read!]",
+                        "&7Read MagmaGuy's free Patreon post",
+                        DEVELOPER_MESSAGE_URL),
+                SpigotMessage.simpleMessage(" "),
                 SpigotMessage.commandHoverMessage(
-                        "<g:#EF4444:#F97316>Dismiss this reminder</g>",
-                        "&7Stop showing this tester reminder to you",
+                        "&c[Dismiss permanently]",
+                        "&7Stop showing this message to all administrators on this server",
                         "/em advancedcombat dismiss"));
     }
 }
