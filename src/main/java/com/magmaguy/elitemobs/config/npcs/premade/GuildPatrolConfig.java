@@ -18,7 +18,7 @@ public final class GuildPatrolConfig extends NPCsConfigFields {
                 List.of(), List.of(), List.of(), false, 3,
                 NPCInteractions.NPCInteractionType.COMMAND);
         setCommand("em dungeontp goblin_kingdom.yml");
-        setCustomModel("em_goblin_hunter");
+        setCustomModel("em_ag_gribble");
         setPatrolPauseNearPlayersRadius(3D);
         setPatrolFaceNearbyPlayers(true);
         setSyncMovement(true);
