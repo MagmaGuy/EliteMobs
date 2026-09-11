@@ -1,6 +1,8 @@
 package com.magmaguy.elitemobs.skills;
 
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponAPI;
+import com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponKind;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -8,22 +10,16 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import javax.annotation.Nullable;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 
 /**
  * Canonical item-to-weapon boundary.
  *
- * <p>An EliteMobs identity is authoritative. Material inference is used only when no identity is
- * stored, so a staff carried by {@code WOODEN_SPEAR} can never silently become a spear.</p>
+ * <p>FMM owns authored item identity and weapon family. An unresolved FMM item never
+ * falls through to material inference, including while its provider is unavailable.</p>
  */
 public final class WeaponIdentityResolver {
-    public static final NamespacedKey STAFF_ID = NamespacedKey.fromString("elitemobs:staff");
-    public static final NamespacedKey WAND_ID = NamespacedKey.fromString("elitemobs:wand");
-
-    private static final String WEAPON_TYPE_KEY_NAME = "weapon_type";
-    private static final Map<NamespacedKey, WeaponIdentity> EXPLICIT_IDENTITIES = explicitIdentities();
+    private static final NamespacedKey FMM_ITEM_ID = NamespacedKey.fromString("freeminecraftmodels:fmm_item_id");
 
     private WeaponIdentityResolver() {
     }
@@ -32,13 +28,23 @@ public final class WeaponIdentityResolver {
         if (itemStack == null || itemStack.getType().isAir()) return new WeaponResolution.NotWeapon();
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta != null) {
-            String storedValue = itemMeta.getPersistentDataContainer().get(key(), PersistentDataType.STRING);
+            String storedValue = itemMeta.getPersistentDataContainer().get(FMM_ITEM_ID, PersistentDataType.STRING);
             if (storedValue != null) {
-                NamespacedKey parsed = NamespacedKey.fromString(storedValue);
-                WeaponIdentity identity = parsed == null ? null : EXPLICIT_IDENTITIES.get(parsed);
-                return identity == null
-                        ? new WeaponResolution.InvalidExplicit(storedValue, parsed)
-                        : new WeaponResolution.Resolved(identity);
+                NamespacedKey id = NamespacedKey.fromString("freeminecraftmodels:" + storedValue);
+                MagicWeaponKind kind = null;
+                boolean knownItem = false;
+                if (Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")) {
+                    try {
+                        kind = MagicWeaponAPI.weaponKind(storedValue);
+                        knownItem = com.magmaguy.freeminecraftmodels.api.ScriptedItemAPI.isValidItemId(storedValue);
+                    }
+                    catch (LinkageError incompatibleFmm) { /* The integration reports incompatible providers. */ }
+                }
+                if (!knownItem || id == null) return new WeaponResolution.InvalidExplicit(storedValue, id);
+                if (kind != null) {
+                    SkillType skill = kind == MagicWeaponKind.WAND ? SkillType.WANDS : SkillType.STAVES;
+                    return new WeaponResolution.Resolved(new WeaponIdentity(id, skill));
+                }
             }
         }
 
@@ -80,31 +86,4 @@ public final class WeaponIdentityResolver {
         return skill == SkillType.STAVES || skill == SkillType.WANDS;
     }
 
-    public static void stamp(ItemStack itemStack, SkillType progressionSkill) {
-        NamespacedKey weaponId = switch (progressionSkill) {
-            case STAVES -> STAFF_ID;
-            case WANDS -> WAND_ID;
-            default -> throw new IllegalArgumentException(
-                    "Only explicitly modeled weapon identities may be stamped: " + progressionSkill);
-        };
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta == null) throw new IllegalArgumentException("Item has no metadata");
-        itemMeta.getPersistentDataContainer().set(key(), PersistentDataType.STRING, weaponId.toString());
-        itemStack.setItemMeta(itemMeta);
-    }
-
-    public static NamespacedKey storageKey() {
-        return key();
-    }
-
-    private static NamespacedKey key() {
-        return new NamespacedKey(MetadataHandler.PLUGIN, WEAPON_TYPE_KEY_NAME);
-    }
-
-    private static Map<NamespacedKey, WeaponIdentity> explicitIdentities() {
-        Map<NamespacedKey, WeaponIdentity> identities = new LinkedHashMap<>();
-        identities.put(STAFF_ID, new WeaponIdentity(STAFF_ID, SkillType.STAVES));
-        identities.put(WAND_ID, new WeaponIdentity(WAND_ID, SkillType.WANDS));
-        return Map.copyOf(identities);
-    }
 }

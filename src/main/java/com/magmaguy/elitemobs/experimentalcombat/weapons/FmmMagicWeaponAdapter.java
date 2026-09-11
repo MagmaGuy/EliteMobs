@@ -25,7 +25,7 @@ import java.util.Objects;
 /** FMM-linked implementation loaded only after the optional plugin is present. */
 final class FmmMagicWeaponAdapter
         implements ExperimentalMagicWeaponIntegration.Connection, MagicAttackResolver {
-    private static final int REQUIRED_CAPABILITY_VERSION = 4;
+    private static final int REQUIRED_CAPABILITY_VERSION = 6;
 
     private final Plugin owner;
     private volatile boolean registered;
