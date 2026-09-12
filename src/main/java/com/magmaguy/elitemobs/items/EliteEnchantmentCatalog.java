@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.items;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.magmacore.enchantments.*;
 import com.magmaguy.magmacore.scripting.ScriptHook;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
@@ -49,19 +48,8 @@ public final class EliteEnchantmentCatalog {
                 if (HOST_SETTINGS.contains(stem)
                         || org.bukkit.enchantments.Enchantment.getByKey(org.bukkit.NamespacedKey.minecraft(stem)) != null)
                     return false;
-                try {
-                    var yaml = new YamlConfiguration();
-                    yaml.load(path.toFile());
-                    if (!yaml.contains("script") && yaml.contains("maxLevelV2")) {
-                        plugin.getLogger().warning("Skipping retired enchantment configuration " + path
-                                + "; supply the current YAML/Lua definition. No content was converted.");
-                        return false;
-                    }
-                    selectedNames.add(stem);
-                    return true;
-                } catch (Exception failure) {
-                    throw new UncheckedIOException(new IOException("Cannot read " + path, failure));
-                }
+                selectedNames.add(stem);
+                return true;
             });
             catalog = candidate;
             sharedNames = Set.copyOf(selectedNames);

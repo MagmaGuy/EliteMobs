@@ -354,69 +354,35 @@ public class EliteMobs extends JavaPlugin {
     }
 
     private static final String MODELS_PLUGIN = "FreeMinecraftModels";
-    // How long to let FreeMinecraftModels finish rebuilding before giving up and carrying on.
-    private static final long MODEL_REGISTRY_TIMEOUT_MS = 15_000L;
-    // How long to wait for the rebuild to even START. The importer fires the event and returns
-    // immediately, so FreeMinecraftModels may not have flipped to INITIALIZING yet; without this
-    // grace window the readiness check would pass instantly and the wait would be useless.
-    private static final long MODEL_REGISTRY_START_GRACE_MS = 2_000L;
+    private static final long MODEL_REGISTRY_TIMEOUT_MS = 300_000L;
     private static final long MODEL_REGISTRY_POLL_MS = 100L;
 
-    /**
-     * Blocks the async initialization thread until FreeMinecraftModels has finished rebuilding its
-     * model registry, but only when this boot actually installed models.
-     * <p>
-     * The importer moves a DLC's models into FreeMinecraftModels and fires ModelInstallationEvent,
-     * which triggers an ASYNCHRONOUS registry rebuild. EliteMobs' dependency gate already ran long
-     * before that, so nothing stops the sync phase from spawning modelled bosses and wormholes while
-     * the registry is empty - they spawn without their model, get silently dropped, and are never
-     * retried. That is why a fresh install showed no training dummies and no portal until a restart:
-     * on the second boot there is nothing left to import, so no rebuild and no race.
-     * <p>
-     * This must stay on the async thread. The sync phase runs as a single main-thread task with no
-     * tick boundaries, so waiting there would freeze the server and risk tripping the watchdog.
-     * Timing out is deliberate: carrying on degrades to exactly the old behaviour, whereas waiting
-     * forever on a crashed or missing FreeMinecraftModels would hang startup, which is far worse.
-     */
+    /** Import dispatch acknowledges FMM's reload before returning; only its completed state is usable. */
     private void waitForModelRegistryRebuild(com.magmaguy.magmacore.dlc.ConfigurationImporter importer) {
         if (importer == null || !importer.isModelsInstalled()) return;
-
-        long deadline = System.currentTimeMillis() + MODEL_REGISTRY_START_GRACE_MS;
-        boolean rebuildObserved = false;
-        while (System.currentTimeMillis() < deadline) {
-            if (!com.magmaguy.magmacore.initialization.PluginInitializationManager.isPluginReady(MODELS_PLUGIN)) {
-                rebuildObserved = true;
-                break;
+        org.bukkit.plugin.Plugin models = Bukkit.getPluginManager().getPlugin(MODELS_PLUGIN);
+        if (models == null) return;
+        long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(MODEL_REGISTRY_TIMEOUT_MS);
+        boolean announced = false;
+        while (true) {
+            if (MagmaCore.isShutdownRequested(this)) return;
+            var state = com.magmaguy.magmacore.initialization.PluginInitializationManager.getState(MODELS_PLUGIN);
+            if (!models.isEnabled() || state == com.magmaguy.magmacore.initialization.PluginInitializationState.FAILED)
+                throw new IllegalStateException("FreeMinecraftModels failed to reload imported content; EliteMobs initialization stopped.");
+            if (state == com.magmaguy.magmacore.initialization.PluginInitializationState.INITIALIZED) return;
+            if (!announced) {
+                Logger.info("Imported new models; waiting for " + MODELS_PLUGIN + " to rebuild its model registry...");
+                announced = true;
             }
-            if (!sleepQuietly(MODEL_REGISTRY_POLL_MS)) return;
-        }
-        // Never went busy - either the rebuild already finished or FreeMinecraftModels is not
-        // installed, and isPluginReady treats an absent plugin as ready. Either way, nothing to wait for.
-        if (!rebuildObserved) return;
-
-        Logger.info("Imported new models; waiting for " + MODELS_PLUGIN + " to rebuild its model registry...");
-        deadline = System.currentTimeMillis() + MODEL_REGISTRY_TIMEOUT_MS;
-        while (System.currentTimeMillis() < deadline) {
-            if (com.magmaguy.magmacore.initialization.PluginInitializationManager.isPluginReady(MODELS_PLUGIN)) {
-                Logger.info(MODELS_PLUGIN + " finished rebuilding its model registry.");
-                return;
+            if (System.nanoTime() >= deadline)
+                throw new IllegalStateException("Timed out waiting for FreeMinecraftModels to reload imported content; "
+                        + "EliteMobs initialization stopped before loading incomplete models and items.");
+            try {
+                Thread.sleep(MODEL_REGISTRY_POLL_MS);
+            } catch (InterruptedException interrupted) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Interrupted while waiting for imported model reload", interrupted);
             }
-            if (!sleepQuietly(MODEL_REGISTRY_POLL_MS)) return;
-        }
-        Logger.warn("Timed out after " + (MODEL_REGISTRY_TIMEOUT_MS / 1000) + "s waiting for " + MODELS_PLUGIN
-                + " to rebuild its model registry. Continuing startup anyway. Custom-modeled bosses, NPCs and "
-                + "wormholes from newly imported content may spawn without their models until the server is "
-                + "restarted - restarting resolves it because there is nothing left to import on the next boot.");
-    }
-
-    /** @return false if the thread was interrupted, in which case the caller should stop waiting. */
-    private boolean sleepQuietly(long millis) {
-        try {
-            Thread.sleep(millis);
-            return true;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return false;
         }
     }
 
@@ -639,15 +605,15 @@ public class EliteMobs extends JavaPlugin {
         MetadataHandler.PLUGIN = this;
         MagmaCore.createInstance(this, NIGHTBREAK_PLUGIN_SPEC);
 
-        //WorldGuard hook
-        try {
-            worldGuardIsEnabled = WorldGuardCompatibility.initialize();
-        } catch (NoClassDefFoundError | IllegalStateException ex) {
-            Logger.warn("Error loading WorldGuard. EliteMob-specific flags will not work." + " Except if you just reloaded the plugin, in which case they will totally work.");
-            worldGuardIsEnabled = false;
+        // Check the optional dependency before loading a class that references its types.
+        worldGuardIsEnabled = false;
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
+            try {
+                worldGuardIsEnabled = WorldGuardCompatibility.initialize();
+            } catch (NoClassDefFoundError | IllegalStateException ex) {
+                Logger.warn("Error loading WorldGuard. EliteMobs-specific flags are unavailable: " + ex);
+            }
         }
-        if (!worldGuardIsEnabled)
-            if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) worldGuardIsEnabled = true;
 
     }
 

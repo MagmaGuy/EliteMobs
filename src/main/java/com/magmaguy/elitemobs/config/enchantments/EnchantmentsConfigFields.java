@@ -40,7 +40,7 @@ public class EnchantmentsConfigFields extends CustomConfigFields {
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.name = translatable(filename, "name", processString("name", name, "name", true));
-        this.maxLevel = processInt("maxLevelV2", maxLevel, 1, true);
+        this.maxLevel = processInt("maxLevel", maxLevel, 1, true);
         String cleanName = this.filename.replace(".yml", "").toUpperCase(Locale.ROOT);
         try {
             this.enchantment = Enchantment.getByName(cleanName);

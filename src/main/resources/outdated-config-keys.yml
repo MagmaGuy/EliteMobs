@@ -1,0 +1,4 @@
+# Files containing these retired top-level keys are preserved by MagmaCore
+# before configuration loading. Current defaults regenerate through their owners.
+enchantments:
+  - maxLevelV2

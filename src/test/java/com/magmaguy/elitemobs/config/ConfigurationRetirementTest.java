@@ -1,0 +1,68 @@
+package com.magmaguy.elitemobs.config;
+
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
+import com.magmaguy.magmacore.config.OutdatedConfigurationArchive;
+import com.magmaguy.magmacore.enchantments.EnchantmentCatalog;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockbukkit.mockbukkit.MockBukkit;
+
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class ConfigurationRetirementTest {
+    private ResourcePlugin plugin;
+
+    public static class ResourcePlugin extends JavaPlugin {
+        @Override public InputStream getResource(String name) {
+            return ConfigurationRetirementTest.class.getClassLoader().getResourceAsStream(name);
+        }
+    }
+
+    @BeforeEach void open() {
+        MockBukkit.mock();
+        plugin = MockBukkit.loadSimple(ResourcePlugin.class);
+        MetadataHandler.PLUGIN = plugin;
+    }
+    @AfterEach void close() { MockBukkit.unmock(); }
+
+    @Test void retiredSharedDefaultIsArchivedBeforeItsRealBundledReplacementIsGenerated() throws Exception {
+        Path directory = plugin.getDataFolder().toPath().resolve("enchantments");
+        Files.createDirectories(directory);
+        Path old = directory.resolve("loud_strikes.yml");
+        String contents = "# customized\r\nisEnabled: true\r\nname: Custom old name\r\nmaxLevelV2: 99\r\n";
+        Files.writeString(old, contents);
+        OutdatedConfigurationArchive.archive(plugin);
+        assertFalse(Files.exists(old));
+        EnchantmentCatalog.initializeDefaults(plugin, directory, List.of("loud_strikes"));
+        var replacement = YamlConfiguration.loadConfiguration(old.toFile());
+        assertEquals("loud_strikes.lua", replacement.getString("script"));
+        assertTrue(Files.isRegularFile(directory.resolve("loud_strikes.lua")));
+        assertFalse(replacement.contains("maxLevelV2"));
+        Path archive = plugin.getDataFolder().toPath().getParent().resolve("MagmaCore/outdated files");
+        try (var files = Files.walk(archive)) {
+            var originals = files.filter(Files::isRegularFile).toList();
+            assertEquals(1, originals.size());
+            assertEquals(contents, Files.readString(originals.getFirst()));
+        }
+        OutdatedConfigurationArchive.archive(plugin);
+        assertTrue(Files.exists(old));
+    }
+
+    @Test void nativeDefaultsNoLongerRegenerateTheRetiredKey() {
+        var fields = new EnchantmentsConfigFields("sharpness.yml", true, "Sharpness", 5, 1, true, 10);
+        var yaml = new YamlConfiguration();
+        fields.setFileConfiguration(yaml);
+        fields.processConfigFields();
+        assertEquals(5, yaml.getInt("maxLevel"));
+        assertFalse(yaml.contains("maxLevelV2"));
+    }
+}
