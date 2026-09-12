@@ -166,29 +166,11 @@ and commons-io.
 
 If you change MagmaCore locally, run its `publishToMavenLocal` task before rebuilding EliteMobs. Do the same for locally changed plugin API dependencies using their own build tools.
 
-## Developer integration
+## Developer API
 
-Use EliteMobs as an installed plugin dependency; compile against its API without shading EliteMobs into your own JAR.
+Events, tracked entities, item helpers and Lua power services: [EliteMobs developer reference](https://wiki.nightbreak.io/developers/elitemobs). See the [Java API index](https://wiki.nightbreak.io/developers) for dependency setup and lifecycle guidance.
 
-```xml
-<repository>
-    <id>magmaguy-releases</id>
-    <url>https://repo.magmaguy.com/releases</url>
-</repository>
-
-<dependency>
-    <groupId>com.magmaguy</groupId>
-    <artifactId>EliteMobs</artifactId>
-    <version>10.9.0</version>
-    <scope>provided</scope>
-</dependency>
-```
-
-For Gradle, add the same Maven repository and `compileOnly("com.magmaguy:EliteMobs:10.9.0")`.
-
-Useful entry points include `EliteItemManager` for Elite items, `EntityTracker` for identifying tracked entities, and `EliteEntity`, `CustomBossEntity`, and `RegionalBossEntity` for boss instances. The [API package](src/main/java/com/magmaguy/elitemobs/api) contains the current Bukkit event contracts for combat, quests, NPCs, teleports, and instances. Check each event's cancellation and lifecycle semantics before using it.
-
-`EliteSkillXpGainEvent` exposes eligible combat skill-XP awards after native and permission multipliers. Listeners can change the nonnegative XP amount or cancel the award. Class XP and administrative XP writes are separate flows.
+Maven: `com.magmaguy:EliteMobs:10.9.0` from [MagmaGuy's repository](https://repo.magmaguy.com/releases). Use `provided` or `compileOnly` scope for the installed plugin.
 
 ## Troubleshooting and support
 
