@@ -51,6 +51,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NPCEntity implements PersistentObject, PersistentMovingEntity {
 
+    private static final float NAMEPLATE_SCALE = 1F;
+    private static final double NAMEPLATE_LINE_GAP = 0.06;
     private static final ArrayListMultimap<String, InstancedNPCContainer> instancedNPCEntities = ArrayListMultimap.create();
     public NPCsConfigFields npCsConfigFields;
     @Getter
@@ -504,9 +506,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         if (!role.isBlank()) lines.add(role);
         if (!name.isBlank()) lines.add(name);
         nameplateLineCount = lines.stream().mapToInt(line -> line.split("\\R", -1).length).sum();
-        float scale = (float) npCsConfigFields.getNameplateScale();
-        double gap = npCsConfigFields.getNameplateLineGap();
-        if (customModel != null && customModel.setNpcNameLines(lines, scale, gap)) {
+        if (customModel != null && customModel.setNpcNameLines(lines, NAMEPLATE_SCALE, NAMEPLATE_LINE_GAP)) {
             villager.setCustomNameVisible(false);
             villager.setCustomName(null);
             return;
@@ -520,8 +520,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         }
         nameplate = new StackedText();
         nameplate.setLines(lines);
-        nameplate.setScale(scale);
-        nameplate.setLineGap(gap);
+        nameplate.setScale(NAMEPLATE_SCALE);
+        nameplate.setLineGap(NAMEPLATE_LINE_GAP);
         updateNameplateLocation();
     }
 
@@ -542,8 +542,8 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     public Location getQuestIndicatorLocation() {
         // StackedText rows occupy 0.225 blocks at native scale; the bottom row is the anchor.
         double stackHeight = (nameplateLineCount * 0.225
-                + Math.max(0, nameplateLineCount - 1) * npCsConfigFields.getNameplateLineGap())
-                * npCsConfigFields.getNameplateScale();
+                + Math.max(0, nameplateLineCount - 1) * NAMEPLATE_LINE_GAP)
+                * NAMEPLATE_SCALE;
         return getNameplateLocation().add(0, stackHeight - 0.08, 0);
     }
 
