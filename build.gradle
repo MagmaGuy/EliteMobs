@@ -22,11 +22,6 @@ java {
 
 //Fixes issues with utf-8 in the translations files.
 processResources {
-    // The automatic combat HUD ships through the existing checksum-based pack exporter.
-    // Keep the generated art in one location so previews and deployed assets cannot diverge.
-    from('design/combat-hud-probe/mods') {
-        into 'em_rsp_defaults'
-    }
     def props = [version: version]
     inputs.properties props
     filteringCharset 'UTF-8'

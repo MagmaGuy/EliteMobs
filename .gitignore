@@ -38,3 +38,19 @@ out/
 codex-build.log
 dependency-reduced-pom.xml
 __pycache__/
+
+# Local documentation and development material stay outside version control.
+*.[mM][dD]
+*.[mM][dD][xX]
+*.[mM][aA][rR][kK][dD][oO][wW][nN]
+!/[rR][eE][aA][dD][mM][eE].[mM][dD]
+/design/
+/docs/
+[Dd]esign/
+[Dd]ocs/
+[Ll]ogs/
+*.log.gz
+*.hprof
+*.jfr
+__pycache__/
+*.pyc
