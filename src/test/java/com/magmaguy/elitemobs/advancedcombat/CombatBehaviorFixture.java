@@ -107,7 +107,8 @@ abstract class CombatBehaviorFixture {
         for (var member : Bukkit.getOnlinePlayers())
             assertTrue(PlayerData.isDataLoaded(member.getUniqueId()), "Timed out loading temporary player data");
         scheduler.performOneTick();
-        PartyManager.create(player);
+        player.addAttachment(MetadataHandler.PLUGIN, "elitemobs.party", true);
+        assertEquals(com.magmaguy.elitemobs.parties.PartyOperationResult.SUCCESS, PartyManager.create(player, false));
         assertNotNull(PartyManager.getParty(player.getUniqueId()));
         for (var member : members) {
             assertTrue(PlayerData.isDataLoaded(member.getUniqueId()));
@@ -179,8 +180,11 @@ abstract class CombatBehaviorFixture {
             return profiles.computeIfAbsent(id, ignored -> {
                 // Skill behavior starts after root trials; unlocking classes is
                 // a separate feature. New party members need the same baseline.
-                for (var root : BuiltInClassContent.catalog().roots())
-                    rows(id).put(root.id(), new StoredClassProgress(id, root.id(), 0, version, true));
+                for (var root : BuiltInClassContent.catalog().roots()) {
+                    long xp = root.band() == com.magmaguy.elitemobs.advancedcombat.classes.ClassBand.STARTER
+                            ? com.magmaguy.elitemobs.skills.SkillXPCalculator.totalXPForLevel(root.band().effectiveEnd()) : 0;
+                    rows(id).put(root.id(), new StoredClassProgress(id, root.id(), xp, version, true));
+                }
                 return new StoredClassProfile(id, "spellcaster", InputProfile.DEFAULT.storedId(),
                         version);
             });

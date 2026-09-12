@@ -16,6 +16,30 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CombatProtectionBehaviorTest extends CombatBehaviorFixture {
+    @ParameterizedTest
+    @CsvSource({"SIGNATURE,HASTE,5", "UTILITY,RESISTANCE,3"})
+    void adventurerBuffConsumesStaminaAndLeavesBystandersUnchanged(AbilitySlot slot, String effect, int fundedCasts) {
+        assertTrue(module.setClassLevelForAdministration(player, "adventurer", 1).applied());
+        var type = effect.equals("HASTE") ? PotionEffectType.HASTE : PotionEffectType.RESISTANCE;
+        var bystander = MockBukkit.getMock().addPlayer();
+        bystander.teleport(player.getLocation());
+        assertTrue(module.useAbility(player, slot).successful());
+        var applied = player.getPotionEffect(type);
+        assertNotNull(applied);
+        assertEquals(0, applied.getAmplifier());
+        assertEquals(100, applied.getDuration());
+        assertFalse(bystander.hasPotionEffect(type));
+        // Exhaust the remaining stamina through actual casts, then prove refusal has no effect.
+        for (int cast = 1; cast < fundedCasts; cast++) {
+            player.removePotionEffect(type);
+            assertTrue(module.useAbility(player, slot).successful());
+            assertNotNull(player.getPotionEffect(type));
+        }
+        player.removePotionEffect(type);
+        assertFalse(module.useAbility(player, slot).successful());
+        assertFalse(player.hasPotionEffect(type));
+    }
+
     @Test
     void bulwarkGuardRestrictsOnlyItsCasterAndRetiresOnTeleportOrClassChange() throws Exception {
         assertTrue(module.setClassLevelForAdministration(player, "bulwark", 91).applied());

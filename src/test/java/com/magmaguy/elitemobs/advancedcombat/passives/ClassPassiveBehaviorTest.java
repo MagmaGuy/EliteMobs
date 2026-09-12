@@ -74,6 +74,7 @@ class ClassPassiveBehaviorTest {
 
     @ParameterizedTest
     @CsvSource({
+            "adventurer,10,9.5,9.5,0.1,0.1",
             "paladin,9.88,9.7465,9.7465,0.099,0.099",
             "berserker,10.2535,10.182,10.182,0.1,0.1",
             "ranger,10.152,10.121,10.334,0.106075,0.096845",
