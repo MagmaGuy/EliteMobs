@@ -276,6 +276,18 @@ public class EliteMobs extends JavaPlugin {
                     MetadataHandler.pluginState = PluginState.INITIALIZED;
                     EventsRegistrer.registerPostInitializationEvents();
                     com.magmaguy.elitemobs.transport.TransportModule.initialize();
+                    // FMM publishes its authored magic-weapon registry while the
+                    // importer rebuilds model content asynchronously.  The first
+                    // custom-item construction can therefore run before the
+                    // staff/wand definitions are visible and leave the Advanced
+                    // Combat debug prototypes absent from CustomItem's registry.
+                    // Retry registration after the normal post-enable work so the
+                    // /em loot debug loadout is deterministic on a cold boot.
+                    Bukkit.getScheduler().runTaskLater(this, () -> {
+                        if (!MetadataHandler.shutdownRequested && isEnabled()) {
+                            com.magmaguy.elitemobs.advancedcombat.weapons.AdvancedMagicWeaponItems.register();
+                        }
+                    }, 40L);
                     Bukkit.getPluginManager().callEvent(new EliteMobsInitializedEvent());
                     Logger.info("EliteMobs fully initialized!");
                     NightbreakPluginUpdater.autoDownloadPluginUpdateIfEnabled(this, NIGHTBREAK_PLUGIN_SPEC);
