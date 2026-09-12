@@ -20,7 +20,7 @@ public class YggdrasilRealm extends ContentPackagesConfigFields {
                 true,
                 "em_yggdrasil,-321.5,-22.0,102.5,141.5,0.0",
                 "em_yggdrasil,-322.5,-22.0,101.5,141.5,0.0",
-                0,
+                9,
                 "Difficulty: &6Hard\n" +
                         "$bossCount bosses, from level $lowestTier to $highestTier\n" +
                         "&5A mythic journey through Yggdrasil''s roots\n"+

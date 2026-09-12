@@ -16,7 +16,7 @@ public class AdventurersGuildHub extends ContentPackagesConfigFields {
                 World.Environment.NORMAL,
                 true,
                 "em_adventurers_guild,208.5,88,236.5,-80,0",
-                0,
+                24,
                 "Difficulty: &cHard\n" +
                         "$bossCount level $lowestTier Big Boss!\n" +
                         "&6Face fierce beasts at their home turf!",

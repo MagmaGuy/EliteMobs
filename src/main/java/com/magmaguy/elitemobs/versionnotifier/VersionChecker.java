@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class VersionChecker {
     private static final List<EMPackage> outdatedPackages = Collections.synchronizedList(new ArrayList<>());
@@ -43,6 +44,9 @@ public class VersionChecker {
     private static NightbreakAccount.TokenChangeListenerRegistration
             tokenChangeListener;
     private static BukkitTask scheduledCheckTask;
+    /** Slugs present in the catalog but not published yet (no currentVersion/file). */
+    private static final Set<String> unpublishedSlugs = ConcurrentHashMap.newKeySet();
+    private static final Set<String> catalogSlugs = ConcurrentHashMap.newKeySet();
 
     private VersionChecker() {
     }
@@ -177,6 +181,8 @@ public class VersionChecker {
      */
     private static Map<String, Integer> parseNightbreakDlcResponse(String json) {
         Map<String, Integer> versions = new HashMap<>();
+        unpublishedSlugs.clear();
+        catalogSlugs.clear();
 
         // Parse DLC entries from all categories (accessible, patreonRequired, purchaseAvailable)
         String[] categories = {"accessible", "patreonRequired", "purchaseAvailable"};
@@ -237,6 +243,7 @@ public class VersionChecker {
 
             String slug = extractJsonString(objectJson, "slug");
             String versionStr = extractJsonString(objectJson, "currentVersion");
+            if (slug != null) catalogSlugs.add(slug);
 
             if (slug != null && versionStr != null && !versionStr.isEmpty()) {
                 try {
@@ -248,8 +255,10 @@ public class VersionChecker {
                     Logger.warn("Failed to parse version '" + versionStr + "' for slug '" + slug + "'");
                 }
             } else if (slug != null && (versionStr == null || versionStr.isEmpty())) {
-                // Slug exists but no version - this is expected for some free content
-                // Only log at debug level to avoid spam
+                // The catalog can expose a newly-created package before its first
+                // archive is uploaded. Keep the slug for display, but do not treat
+                // it as an update target or call the authenticated access endpoint.
+                unpublishedSlugs.add(slug);
             }
 
             pos = objectEnd + 1;
@@ -396,6 +405,11 @@ public class VersionChecker {
 
             Integer remoteVersion = remoteVersions.get(slug);
             if (remoteVersion == null) {
+                if (unpublishedSlugs.contains(slug)) {
+                    emPackage.setOutOfDate(false);
+                    outdatedPackages.remove(emPackage);
+                    continue;
+                }
                 Logger.warn("No version info found on Nightbreak for content: " + emPackage.getContentPackagesConfigFields().getName() + " (slug: " + slug + ")");
                 emPackage.setOutOfDate(false);
                 outdatedPackages.remove(emPackage);
@@ -688,6 +702,7 @@ public class VersionChecker {
 
             String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
             if (slug == null || slug.isEmpty()) continue;
+            if (!catalogSlugs.contains(slug) || unpublishedSlugs.contains(slug)) continue;
 
             NightbreakAccount.AccessInfo info;
             if (slugCache.containsKey(slug)) {
