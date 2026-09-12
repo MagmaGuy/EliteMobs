@@ -227,8 +227,10 @@ public class EliteMobs extends JavaPlugin {
             if (com.magmaguy.elitemobs.items.ItemTagger.isEliteItem(item))
                 return "Use the EliteMobs enchanter for elite items.";
             if (item.getType() == org.bukkit.Material.ENCHANTED_BOOK)
-                for (var entry : com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems.nativeLevels(item).entrySet())
-                    if (entry.getValue() > entry.getKey().getMaxLevel())
+                for (var enchantment : org.bukkit.enchantments.Enchantment.values())
+                    if (enchantment.getKey().getNamespace().equals("minecraft")
+                            && com.magmaguy.elitemobs.items.ItemTagger.getEnchantment(item.getItemMeta(), enchantment.getKey())
+                            > enchantment.getMaxLevel())
                         return "Use the EliteMobs enchanter for extended native enchantment books.";
             return null;
         });

@@ -9,7 +9,6 @@ import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -57,23 +56,31 @@ public class CustomFetchObjective extends Objective {
         progressNonlinearObjective(questObjectives, player);
     }
 
-    private void turnItemsIn(Player player) {
-        int deletedItems = 0;
-        for (ItemStack itemStack : player.getInventory()) {
-            if (ItemTagger.hasKey(itemStack, this.key)) {
-                int existingAmount = itemStack.getAmount();
-                int missingAmount = targetAmount - deletedItems;
-                if (existingAmount >= missingAmount) {
-                    existingAmount -= missingAmount;
-                    deletedItems += missingAmount;
-                } else
-                    existingAmount = 0;
-                itemStack.setAmount(existingAmount);
-                if (deletedItems == targetAmount)
-                    return;
+    /** Validates all fetch requirements against one inventory snapshot before changing any slot. */
+    public static boolean prepareTurnIn(QuestObjectives objectives, Player player, boolean consume) {
+        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Quest turn-in must run on the server thread");
+        ItemStack[] planned = player.getInventory().getContents();
+        for (int slot = 0; slot < planned.length; slot++)
+            if (planned[slot] != null) planned[slot] = planned[slot].clone();
+        boolean hasFetch = false;
+        for (Objective objective : objectives.getObjectives()) {
+            if (!(objective instanceof CustomFetchObjective fetch)) continue;
+            hasFetch = true;
+            fetch.fullUpdate(player);
+            fetch.objectiveCompleted = fetch.currentAmount >= fetch.targetAmount;
+            int remaining = fetch.targetAmount;
+            for (int slot = 0; slot < planned.length && remaining > 0; slot++) {
+                ItemStack item = planned[slot];
+                if (!ItemTagger.hasKey(item, fetch.key)) continue;
+                int taken = Math.min(remaining, item.getAmount());
+                remaining -= taken;
+                item.setAmount(item.getAmount() - taken);
+                if (item.getAmount() == 0) planned[slot] = null;
             }
+            if (remaining > 0) return false;
         }
-        Logger.warn("Player " + player.getName() + " managed to complete objective " + objectiveName + " without turning in the required amount of items! This isn't good, tell the developer!");
+        if (consume && hasFetch) player.getInventory().setContents(planned);
+        return true;
     }
 
     /**
@@ -88,8 +95,8 @@ public class CustomFetchObjective extends Objective {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!player.isOnline() || questObjectives.isTurnedIn()) return;
                 fullUpdate(player);
-                if (questObjectives.isTurnedIn()) return;
                 objectiveCompleted = currentAmount >= targetAmount;
                 QuestProgressionEvent questProgressionEvent = new QuestProgressionEvent(
                         Bukkit.getPlayer(questObjectives.getQuest().getPlayerUUID()),
@@ -133,19 +140,12 @@ public class CustomFetchObjective extends Objective {
 
         @EventHandler(ignoreCancelled = true)
         public void onQuestCompleteEvent(QuestCompleteEvent event) {
-            for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
-                if (objective instanceof CustomFetchObjective) {
-                    objective.progressNonlinearObjective(event.getQuest().getQuestObjectives(), event.getPlayer());
-                    if (objective.getCurrentAmount() < objective.getTargetAmount())
-                        event.setCancelled(true);
-                }
+            if (!prepareTurnIn(event.getQuest().getQuestObjectives(), event.getPlayer(), false))
+                event.setCancelled(true);
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onQuestRewardEvent(QuestRewardEvent event) {
-            for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
-                if (objective instanceof CustomFetchObjective)
-                    ((CustomFetchObjective) objective).turnItemsIn(event.getPlayer());
             for (Quest quest : PlayerData.getQuests(event.getPlayer().getUniqueId()))
                 for (Objective objective : quest.getQuestObjectives().getObjectives())
                     if (objective instanceof CustomFetchObjective)

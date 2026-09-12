@@ -43,6 +43,12 @@ public class QuestCompleteEvent extends Event implements Cancellable {
     public static class QuestCompleteEventHandler implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestComplete(QuestCompleteEvent event) {
+            if (event.quest.getQuestObjectives().isTurnedIn()
+                    || !com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective.prepareTurnIn(
+                    event.quest.getQuestObjectives(), event.getPlayer(), true)) {
+                event.setCancelled(true);
+                return;
+            }
             new EventCaller(new QuestRewardEvent(event.getPlayer(), event.quest));
             if (event.getQuest() instanceof CustomQuest customQuest &&
                     customQuest.getCustomQuestsConfigFields().getQuestCompleteSound() != null)

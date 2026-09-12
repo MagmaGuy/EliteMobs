@@ -22,7 +22,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityKnockbackByEntityEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.inventory.EquipmentSlotGroup;
@@ -130,14 +129,12 @@ public final class ClassPassiveRuntime implements Listener {
             state.recordEliteKill(killer.getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onKnockback(EntityKnockbackByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player player)
-                || !combatActive.test(player)
-                || eliteSource(event.getSourceEntity()) == null) return;
-        double multiplier = PassiveRuntimePolicy.knockbackMultiplier(mechanics(player));
-        if (Math.abs(multiplier - 1D) < 1.0E-9D) return;
-        event.setFinalKnockback(event.getFinalKnockback().clone().multiply(multiplier));
+    public void registerKnockback(org.bukkit.plugin.Plugin plugin) {
+        com.magmaguy.magmacore.util.KnockbackEvents.registerEntityScale(plugin, this, (entity, source) -> {
+            if (!(entity instanceof Player player) || !combatActive.test(player) || eliteSource(source) == null)
+                return 1D;
+            return PassiveRuntimePolicy.knockbackMultiplier(mechanics(player));
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

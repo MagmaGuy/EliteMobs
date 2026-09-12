@@ -190,7 +190,12 @@ public final class ClassProgressionModule {
         if (closed.get() || state == null) return Optional.empty();
         synchronized (state.monitor) {
             if (state.readiness != ProgressionReadiness.READY) return Optional.empty();
-            return Optional.of(snapshotLocked(playerId, state, captureFoundationLevels(playerId)));
+            if (players.get(playerId) != state) return Optional.empty();
+            return foundationLevels.snapshot(playerId).map(foundation -> {
+                if (!playerId.equals(foundation.playerId()))
+                    throw new IllegalStateException("Foundation adapter returned another player's levels");
+                return snapshotLocked(playerId, state, foundation.levels());
+            });
         }
     }
 

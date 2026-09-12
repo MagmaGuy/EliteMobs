@@ -390,8 +390,7 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     }
 
     private void permanentlyRemove() {
-        if (phaseBossEntity != null)
-            phaseBossEntity.silentReset();
+        // Keep the terminal phase until the deferred removal event has applied its block cleanup.
         EntityTracker.getEliteMobEntities().remove(super.eliteUUID);
         removed = true;
         if (respawnTask != null) {
@@ -399,7 +398,10 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
             respawnTask = null;
         }
         //Temporary regionals were never written to the configuration, so there is nothing to sync.
-        if (!isTemporary()) getCustomBossesConfigFields().setFilesOutOfSync(true);
+        if (!isTemporary()) {
+            var persistedConfig = phaseBossEntity == null ? getCustomBossesConfigFields() : phaseBossEntity.getPhase1Config();
+            persistedConfig.setFilesOutOfSync(true);
+        }
     }
 
     /**

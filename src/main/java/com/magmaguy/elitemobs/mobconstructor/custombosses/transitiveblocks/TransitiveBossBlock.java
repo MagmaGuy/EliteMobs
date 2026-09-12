@@ -104,6 +104,11 @@ public class TransitiveBossBlock implements Listener {
         // defeats, so the clearing must be gated to them.
         RemovalReason reason = event.getRemovalReason();
         if (reason != RemovalReason.DEATH && reason != RemovalReason.KILL_COMMAND) return;
+        clearPhaseBlocks(regionalBossEntity);
+    }
+
+    /** Called before an advancing phase replaces its outgoing block configuration. */
+    public static void clearPhaseBlocks(RegionalBossEntity regionalBossEntity) {
         if (regionalBossEntity.getOnRemoveTransitiveBlocks() != null && !regionalBossEntity.getOnRemoveTransitiveBlocks().isEmpty())
             for (TransitiveBlock transitiveBlock : regionalBossEntity.getOnRemoveTransitiveBlocks())
                 setBlockData(regionalBossEntity, transitiveBlock, regionalBossEntity.getSpawnLocation());

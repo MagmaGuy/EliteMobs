@@ -42,13 +42,7 @@ public final class EliteEnchantmentCatalog {
         var plugin = MetadataHandler.PLUGIN;
         Path directory = plugin.getDataFolder().toPath().resolve("enchantments");
         try {
-            if (Files.notExists(directory)) {
-                Files.createDirectories(directory);
-                for (String name : SHARED) {
-                    plugin.saveResource("enchantments/" + name + ".yml", false);
-                    plugin.saveResource("enchantments/" + name + ".lua", false);
-                }
-            }
+            EnchantmentCatalog.initializeDefaults(plugin, directory, SHARED);
             Set<String> selectedNames = new HashSet<>(SHARED);
             var candidate = EnchantmentCatalog.load("elitemobs", directory, ALL_HOOKS, path -> {
                 String stem = path.getFileName().toString().toLowerCase(Locale.ROOT).replaceFirst("\\.ya?ml$", "");
@@ -165,8 +159,11 @@ public final class EliteEnchantmentCatalog {
         Map<String, Integer> levels;
         try { levels = EnchantmentItems.inspectCustom(item.getItemMeta()); }
         catch (IllegalArgumentException corrupt) { return 0; }
+        if (levels.isEmpty()) return 0;
         var requests = new ArrayList<EnchantmentQueries.Query>();
-        var profile = EnchantmentItems.classify(item);
+        EnchantmentItemProfile profile;
+        try { profile = EnchantmentItems.classify(item); }
+        catch (IllegalArgumentException unavailable) { return 0; }
         for (var entry : new TreeMap<>(levels).entrySet()) {
             var definition = definition(entry.getKey());
             if (definition == null || entry.getValue() < 1

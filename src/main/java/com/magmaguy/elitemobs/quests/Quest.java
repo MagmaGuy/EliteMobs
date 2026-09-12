@@ -80,10 +80,11 @@ public class Quest implements Serializable {
         Quest quest = PlayerData.getQuest(player.getUniqueId(), questUUID);
         if (quest == null) return null;
         if (!quest.getQuestID().equals(questUUID)) return null;
+        if (quest.getQuestObjectives().isTurnedIn()) return null;
         if (!quest.getQuestObjectives().isOver()) return null;
         QuestCompleteEvent questCompleteEvent = new QuestCompleteEvent(player, quest);
         new EventCaller(questCompleteEvent);
-        return quest;
+        return questCompleteEvent.isCancelled() ? null : quest;
     }
 
     public String getQuestTaker() {

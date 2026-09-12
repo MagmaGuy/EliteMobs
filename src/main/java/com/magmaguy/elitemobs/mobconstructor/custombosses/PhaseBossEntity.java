@@ -57,12 +57,15 @@ public class PhaseBossEntity {
             Logger.warn("Attempted to change the boss phase to what it already was.", true);
             return;
         }
-        customBossEntity.remove(removalReason);
-        if (customBossEntity.getCustomModel() != null) customBossEntity.getCustomModel().switchPhase();
         if (bossPhase.customBossesConfigFields == null) {
             Logger.warn("A phase for phase boss " + bossPhases.get(0).customBossesConfigFields.getFilename() + " was not valid! The boss will not be able to switch phases until it is fixed.");
             return;
         }
+        if (removalReason == RemovalReason.PHASE_BOSS_PHASE_END
+                && customBossEntity instanceof RegionalBossEntity regional)
+            com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBossBlock.clearPhaseBlocks(regional);
+        customBossEntity.remove(removalReason);
+        if (customBossEntity.getCustomModel() != null) customBossEntity.getCustomModel().switchPhase();
         customBossEntity.setCustomBossesConfigFields(bossPhase.customBossesConfigFields);
         if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
             if (bossPhase.customBossesConfigFields.getSong() != null)

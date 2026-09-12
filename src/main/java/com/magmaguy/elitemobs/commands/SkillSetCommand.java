@@ -37,7 +37,8 @@ public class SkillSetCommand extends AdvancedCommand {
     public void execute(CommandData commandData) {
         String playerName = commandData.getStringArgument("player");
         String skillTypeName = commandData.getStringArgument("skillType");
-        int level = commandData.getIntegerArgument("level");
+        Integer level = commandData.getIntegerArgument("level");
+        if (level == null) return;
 
         Player targetPlayer = Bukkit.getPlayer(playerName);
         if (targetPlayer == null) {

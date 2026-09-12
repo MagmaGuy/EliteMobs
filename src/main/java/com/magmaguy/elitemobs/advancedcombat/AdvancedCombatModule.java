@@ -227,6 +227,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
         if (updateTask != null) throw new IllegalStateException("Combat gameplay is already started");
         Bukkit.getPluginManager().registerEvents(this, MetadataHandler.PLUGIN);
         Bukkit.getPluginManager().registerEvents(passiveRuntime, MetadataHandler.PLUGIN);
+        passiveRuntime.registerKnockback(MetadataHandler.PLUGIN);
         Bukkit.getPluginManager().registerEvents(inputRouter, MetadataHandler.PLUGIN);
         Bukkit.getPluginManager().registerEvents(weaponAffinity, MetadataHandler.PLUGIN);
         updateTask = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, this::tick, 1L, 1L);
@@ -534,9 +535,12 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
     }
 
     private void load(Player player) {
+        PlayerData loadedData = PlayerData.getPlayerData(player.getUniqueId());
+        if (loadedData == null || !PlayerData.isDataLoaded(player.getUniqueId())) return;
         progression.load(player.getUniqueId()).whenComplete((snapshot, failure) ->
                 Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
-                    if (!player.isOnline() || instance != this) return;
+                    if (!player.isOnline() || Bukkit.getPlayer(player.getUniqueId()) != player || instance != this
+                            || PlayerData.getPlayerData(player.getUniqueId()) != loadedData) return;
                     if (failure != null) {
                         progressionFailureWarnings.add(player.getUniqueId());
                         Logger.warn("Could not load [Alpha] Advanced Combat System class data for " + player.getName()

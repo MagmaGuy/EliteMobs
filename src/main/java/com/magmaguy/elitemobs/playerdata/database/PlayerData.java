@@ -44,7 +44,7 @@ public class PlayerData {
     private static final String PLAYER_DATA_TABLE_NAME = "PlayerData";
     @Getter
     private static final ConcurrentHashMap<UUID, PlayerData> playerDataHashMap = new ConcurrentHashMap<>();
-    private static final Set<UUID> loadingPlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, PlayerData> loadingPlayers = new ConcurrentHashMap<>();
     private static final Map<UUID, List<DeferredDatabaseValue>> deferredDatabaseValues = new HashMap<>();
     // Currency stored as cents (1.00 coin = 100 cents) to eliminate IEEE 754 drift.
     private long currencyCents;
@@ -150,7 +150,7 @@ public class PlayerData {
         PermissionAttachment permissionAttachment = player.addAttachment(MetadataHandler.PLUGIN);
         permissionAttachment.setPermission("elitequest.*", false);
         String playerName = player.getName();
-        if (!loadingPlayers.add(uuid)) return;
+        if (loadingPlayers.putIfAbsent(uuid, this) != null) return;
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -161,12 +161,12 @@ public class PlayerData {
                     while (true) {
                         List<DeferredDatabaseValue> deferred;
                         synchronized (PlayerDataRepository.stateMonitor()) {
-                            if (!loadingPlayers.contains(uuid)) return;
+                            if (loadingPlayers.get(uuid) != PlayerData.this) return;
                             deferred = deferredDatabaseValues.remove(uuid);
                             if (deferred == null || deferred.isEmpty()) {
                                 databaseDataLoaded = true;
                                 playerDataHashMap.put(uuid, PlayerData.this);
-                                loadingPlayers.remove(uuid);
+                                loadingPlayers.remove(uuid, PlayerData.this);
                                 break;
                             }
                         }
@@ -181,11 +181,11 @@ public class PlayerData {
                     Logger.warn(e.getClass().getName() + ": " + e.getMessage());
                     playerDataHashMap.remove(uuid, PlayerData.this);
                     synchronized (PlayerDataRepository.stateMonitor()) {
-                        loadingPlayers.remove(uuid);
-                        deferredDatabaseValues.remove(uuid);
+                        if (loadingPlayers.remove(uuid, PlayerData.this))
+                            deferredDatabaseValues.remove(uuid);
                     }
                 }
-                if (databaseDataLoaded) scheduleBukkitInitialization(uuid);
+                if (databaseDataLoaded) scheduleBukkitInitialization(uuid, player);
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
     }
@@ -411,7 +411,7 @@ public class PlayerData {
         if ("Score".equals(key) && value instanceof Number number)
             PlayerDataRepository.updateCachedScore(uuid, number.intValue());
         synchronized (PlayerDataRepository.stateMonitor()) {
-            if (loadingPlayers.contains(uuid)) {
+            if (loadingPlayers.containsKey(uuid)) {
                 deferredDatabaseValues.computeIfAbsent(uuid, ignored -> new ArrayList<>())
                         .add(new DeferredDatabaseValue(key, value));
                 return;
@@ -977,11 +977,11 @@ public class PlayerData {
         Logger.info("No player entry detected, generating new entry!");
     }
 
-    private void scheduleBukkitInitialization(UUID uuid) {
+    private void scheduleBukkitInitialization(UUID uuid, Player sessionPlayer) {
         if (!MetadataHandler.PLUGIN.isEnabled()) return;
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
             Player player = Bukkit.getPlayer(uuid);
-            if (player == null) {
+            if (player != sessionPlayer || playerDataHashMap.get(uuid) != this) {
                 playerDataHashMap.remove(uuid, this);
                 return;
             }
@@ -998,10 +998,15 @@ public class PlayerData {
         @EventHandler(priority = EventPriority.LOWEST)
         public void onPlayerLogin(PlayerJoinEvent event) {
             UUID playerUuid = event.getPlayer().getUniqueId();
+            Player sessionPlayer = event.getPlayer();
+            synchronized (PlayerDataRepository.stateMonitor()) {
+                loadingPlayers.remove(playerUuid);
+                clearPlayerData(playerUuid);
+            }
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (Bukkit.getPlayer(playerUuid) == null) return;
+                    if (Bukkit.getPlayer(playerUuid) != sessionPlayer) return;
                     new PlayerData(playerUuid);
                 }
             }.runTaskLater(MetadataHandler.PLUGIN, 20);
@@ -1014,6 +1019,7 @@ public class PlayerData {
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    if (Bukkit.getPlayer(playerUuid) != null) return;
                     clearPlayerData(playerUuid);
                     setDisplayName(playerUuid, playerName);
                 }

@@ -32,6 +32,7 @@ public class PlayerPotionEffects implements Listener {
     private static final int STANDARD_REFRESH_THRESHOLD_TICKS = 20;
     private static final int NIGHT_VISION_REFRESH_THRESHOLD_TICKS = 12 * 20;
     private final Map<UUID, Map<PotionEffectType, AppliedContinuousEffect>> appliedContinuousEffects = new HashMap<>();
+    private final Set<UUID> failedEquipmentQueries = new HashSet<>();
 
     public PlayerPotionEffects() {
         new BukkitRunnable() {
@@ -44,7 +45,15 @@ public class PlayerPotionEffects implements Listener {
                         continue;
                     }
 
-                    applyContinuousPotionEffects(inventory.getContinuousPotionEffects(true), player);
+                    try {
+                        applyContinuousPotionEffects(inventory.getContinuousPotionEffects(true), player);
+                        failedEquipmentQueries.remove(player.getUniqueId());
+                    } catch (RuntimeException failure) {
+                        reconcileContinuousPotionEffects(player, Map.of());
+                        if (failedEquipmentQueries.add(player.getUniqueId()))
+                            MetadataHandler.PLUGIN.getLogger().log(java.util.logging.Level.WARNING,
+                                    "Could not refresh equipment effects for " + player.getUniqueId(), failure);
+                    }
                 }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20L, 20L);
@@ -178,6 +187,7 @@ public class PlayerPotionEffects implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
+        failedEquipmentQueries.remove(event.getPlayer().getUniqueId());
         removeOwnedContinuousEffects(event.getPlayer());
     }
 
