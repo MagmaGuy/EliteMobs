@@ -6,6 +6,7 @@ import com.magmaguy.easyminecraftgoals.internal.FollowingText;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.combatsystem.combattag.PlayerCombatState;
 import com.magmaguy.elitemobs.config.SkillsConfig;
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.advancedcombat.CombatHealthFormatter;
 import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -35,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Manages combat level text displays above players using packet-based FakeText.
  * <p>
  * The display shows the player's combat level calculated from their skills.
- * Follows players without a passenger attachment, preserving vanilla name tags.
+ * Uses client-positioned passengers when available, with following text for occupied players.
  */
 public class CombatLevelDisplay implements Listener {
 
@@ -58,6 +59,24 @@ public class CombatLevelDisplay implements Listener {
             this.display = display;
             this.tracking = tracking;
             this.text = text;
+        }
+
+        private boolean isPassenger() {
+            return tracking == null;
+        }
+
+        private boolean isValid(Player player) {
+            return tracking != null ? tracking.isValid()
+                    : display.isAutoTracked() && player.equals(display.getVehicle());
+        }
+
+        private void close() {
+            if (tracking != null) {
+                tracking.close();
+            } else {
+                display.detach();
+                display.remove();
+            }
         }
     }
 
@@ -94,18 +113,30 @@ public class CombatLevelDisplay implements Listener {
         // The bottom of this label sits above the native name; extra lines grow upward.
         boolean showHealth = shouldShowHealth(player);
         String text = renderText(player, showHealth);
+        boolean passenger = shouldUsePassenger(player);
         FakeText fakeText = NMSManager.getAdapter().fakeTextBuilder()
                 .text(ChatColorConverter.convert(text))
                 .billboard(Display.Billboard.CENTER)
                 .shadow(true)
                 .seeThrough(false)
+                .translation(0, passenger ? getDisplayHeight(player) : 0, 0)
                 .viewerFilter(viewer -> canSeeNameTag(player, viewer))
                 .build(player.getLocation());
 
-        FollowingText tracking = new FollowingText(fakeText, player,
-                () -> player.getLocation().add(0, player.getHeight() + getDisplayHeight(player), 0),
-                viewer -> canSeeNameTag(player, viewer));
+        FollowingText tracking = null;
+        if (passenger) {
+            fakeText.attachTo(player);
+        } else {
+            tracking = new FollowingText(fakeText, player,
+                    () -> player.getLocation().add(0, player.getHeight() + getDisplayHeight(player), 0),
+                    viewer -> canSeeNameTag(player, viewer));
+        }
         playerDisplays.put(player.getUniqueId(), new PlayerDisplay(fakeText, tracking, text));
+    }
+
+    private static boolean shouldUsePassenger(Player player) {
+        // Our text is packet-only, so it never appears in Bukkit's passenger list.
+        return DefaultConfig.isUsePassengerCombatLevelDisplay() && player.getPassengers().isEmpty();
     }
 
     /**
@@ -143,7 +174,7 @@ public class CombatLevelDisplay implements Listener {
     public static void removeDisplay(Player player) {
         PlayerDisplay display = playerDisplays.remove(player.getUniqueId());
         if (display != null) {
-            display.tracking.close();
+            display.close();
         }
     }
 
@@ -159,7 +190,8 @@ public class CombatLevelDisplay implements Listener {
         }
 
         PlayerDisplay display = playerDisplays.get(player.getUniqueId());
-        if (display != null && display.tracking.isValid()) {
+        if (display != null && display.isValid(player)
+                && display.isPassenger() == shouldUsePassenger(player)) {
             boolean showHealth = shouldShowHealth(player);
             String text = renderText(player, showHealth);
             if (!text.equals(display.text)) {
@@ -195,7 +227,7 @@ public class CombatLevelDisplay implements Listener {
         }
         combatState = null;
         for (PlayerDisplay display : playerDisplays.values()) {
-            display.tracking.close();
+            display.close();
         }
         playerDisplays.clear();
     }

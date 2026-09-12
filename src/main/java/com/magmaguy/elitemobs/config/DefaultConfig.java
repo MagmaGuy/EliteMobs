@@ -25,6 +25,8 @@ public class DefaultConfig extends ConfigurationFile {
     @Getter
     private static boolean alwaysShowNametags;
     @Getter
+    private static boolean usePassengerCombatLevelDisplay;
+    @Getter
     private static boolean preventEliteMobConversionOfNamedMobs;
     @Getter
     private static boolean doStrictSpawningRules;
@@ -130,6 +132,11 @@ public class DefaultConfig extends ConfigurationFile {
         alwaysShowNametags = ConfigurationEngine.setBoolean(
                 List.of("Sets whether elites and bosses spawned by elitemobs will always show their nametags.", "Not recommended!"),
                 fileConfiguration, "alwaysShowEliteMobNameTags", false);
+        usePassengerCombatLevelDisplay = ConfigurationEngine.setBoolean(
+                List.of("Mounts player combat labels as packet-only passengers for smooth movement.",
+                        "Automatically uses the following-text fallback while another entity rides the player.",
+                        "Set to false to always use following text. Passenger mode follows Minecraft's native passenger name-tag rules."),
+                fileConfiguration, "usePassengerCombatLevelDisplay", true);
         preventEliteMobConversionOfNamedMobs = ConfigurationEngine.setBoolean(
                 List.of("Sets whether EliteMobs will prevent converting named mobs to elites.", "Especially important for compatibility with other plugins."),
                 fileConfiguration, "preventEliteMobConversionOfNamedMobs", true);
