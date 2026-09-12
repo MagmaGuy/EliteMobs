@@ -54,3 +54,6 @@ __pycache__/
 *.jfr
 __pycache__/
 *.pyc
+
+# Authored Guild content belongs to the separately published DLC.
+/content/adventurers_guild/
