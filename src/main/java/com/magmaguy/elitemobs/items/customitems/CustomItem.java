@@ -507,7 +507,7 @@ public class CustomItem {
                 if (java.util.Set.of("multicast", "blast_radius", "ignition", "repair", "unbind", "lucky_source", "enchanted_source", "loud_strikes", "critical_strikes", "drilling", "ice_breaker", "summon_wolf", "summon_merchant", "flamethrower", "lightning", "hunter", "earthquake", "plasma_boots", "grappling_hook", "meteor_shower")
                         .contains(name.toLowerCase(Locale.ROOT))) {
                     customItemsConfigFields.setEnabled(false);
-                    Logger.warn("Custom item " + customItemsConfigFields.getFilename()
+                    Logger.info("Custom item " + customItemsConfigFields.getFilename()
                             + " disabled: retired custom enchantment format " + name
                             + ". Author the current namespaced enchantment or consumable role; old formats are not converted.");
                     return false;
