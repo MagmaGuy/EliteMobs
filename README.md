@@ -168,9 +168,11 @@ If you change MagmaCore locally, run its `publishToMavenLocal` task before rebui
 
 ## Developer API
 
+[Java class and method reference](https://wiki.nightbreak.io/javadoc/elitemobs/index.html).
+
 Events, tracked entities, item helpers and Lua power services: [EliteMobs developer reference](https://wiki.nightbreak.io/developers/elitemobs). See the [Java API index](https://wiki.nightbreak.io/developers) for dependency setup and lifecycle guidance.
 
-Maven: `com.magmaguy:EliteMobs:10.9.0` from [MagmaGuy's repository](https://repo.magmaguy.com/releases). Use `provided` or `compileOnly` scope for the installed plugin.
+Maven: `com.magmaguy:EliteMobs:10.9.0` from [MagmaGuy's repository](https://repo.magmaguy.com/#/releases). Use `provided` or `compileOnly` scope for the installed plugin.
 
 ## Troubleshooting and support
 
