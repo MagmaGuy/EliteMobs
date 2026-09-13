@@ -15,6 +15,9 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public class DungeonUtils {
+    static boolean shouldRefuseUnload(boolean hasPlayers, boolean fallbackAvailable, boolean teleportSucceeded) {
+        return hasPlayers && (!fallbackAvailable || !teleportSucceeded);
+    }
     public static Pair getLowestAndHighestLevels(List<CustomBossEntity> customBossEntities) {
         int lowestLevel = 0;
         int highestLevel = 0;
