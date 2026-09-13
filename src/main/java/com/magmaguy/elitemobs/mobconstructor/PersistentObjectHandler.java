@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
+import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.InstancedDungeonRemoveEvent;
 import com.magmaguy.elitemobs.utils.ChunkVectorizer;
@@ -19,9 +20,13 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -36,6 +41,15 @@ public class PersistentObjectHandler {
      */
     private static final ListMultimap<String, PersistentObjectHandler> persistentObjects =
             Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
+    // Accessed on the server thread. Keys retain no Chunk or World references while waiting.
+    private static final Map<PendingChunk, BukkitTask> pendingChunkLoads = new HashMap<>();
+
+    private record PendingChunk(UUID worldId, int x, int z) {
+        static PendingChunk of(Chunk chunk) {
+            return new PendingChunk(chunk.getWorld().getUID(), chunk.getX(), chunk.getZ());
+        }
+    }
+
     private final PersistentObject persistentObject;
     private final String worldName;
     @Getter
@@ -63,6 +77,8 @@ public class PersistentObjectHandler {
      * Clears all data for a correct shutdown
      */
     public static void shutdown() {
+        pendingChunkLoads.values().forEach(BukkitTask::cancel);
+        pendingChunkLoads.clear();
         persistentObjects.clear();
     }
 
@@ -222,9 +238,33 @@ public class PersistentObjectHandler {
         //Store world names and serialized locations
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
         public void chunkLoadEvent(ChunkLoadEvent event) {
-            int chunkLocation = chunkLocation(event.getChunk());
-            List<PersistentObjectHandler> simplePersistentEntityList = snapshot(chunkLocation + "");
-            Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> loadChunk(simplePersistentEntityList), 1L);
+            PendingChunk key = PendingChunk.of(event.getChunk());
+            String bucket = chunkLocation(event.getChunk()) + "";
+            if (snapshot(bucket).isEmpty() || pendingChunkLoads.containsKey(key)) return;
+            BukkitTask task = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    World world = Bukkit.getWorld(key.worldId());
+                    List<PersistentObjectHandler> handlers = snapshot(bucket);
+                    if (world == null || !world.isChunkLoaded(key.x(), key.z()) || handlers.isEmpty()) {
+                        finish();
+                        return;
+                    }
+                    // A loaded chunk can still reject tracking for an otherwise accepted entity.
+                    // One scheduler tick is not a readiness guarantee on first visits in Spigot.
+                    Location location = new Location(world, key.x() * 16D + 8, world.getMinHeight(), key.z() * 16D + 8);
+                    if (NMSManager.isEnabled() && !NMSManager.getAdapter().isPositionEntityTicking(location)) return;
+                    finish();
+                    // Resolve current registrations, not a snapshot that may have been removed while waiting.
+                    loadChunk(handlers);
+                }
+
+                private void finish() {
+                    pendingChunkLoads.remove(key);
+                    cancel();
+                }
+            }.runTaskTimer(MetadataHandler.PLUGIN, 1L, 1L);
+            pendingChunkLoads.put(key, task);
         }
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
