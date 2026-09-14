@@ -77,7 +77,10 @@ public class DungeonBossLockoutHandler implements Listener {
 
         for (Player player : damagers) {
             if (player.hasMetadata("NPC")) continue;
-            if (!PlayerData.isInMemory(player.getUniqueId())) continue;
+            if (!PlayerData.isDataLoaded(player.getUniqueId())) {
+                lockedOutPlayers.add(player);
+                continue;
+            }
 
             DungeonBossLockout lockout = PlayerData.getDungeonBossLockout(player.getUniqueId());
             if (lockout == null) {

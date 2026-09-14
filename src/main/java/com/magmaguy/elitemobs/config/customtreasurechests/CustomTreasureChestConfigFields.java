@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.config.customtreasurechests;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
+import com.magmaguy.elitemobs.playerdata.database.DungeonRuntimeData;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.util.Logger;
@@ -107,15 +108,20 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         this.mimicChance = processDouble("mimicChance", mimicChance, 0, true);
         this.mimicCustomBossesList = processStringList("mimicCustomBossesList", mimicCustomBossesList, new ArrayList<>(), true);
         this.restockTime = processLong("restockTime", restockTime, 0, false);
-        this.restockTimers = processStringList("restockTimers", restockTimers, new ArrayList<>(), false);
+        List<String> legacyRestockTimers = processStringList("restockTimers", restockTimers, new ArrayList<>(), false);
+        this.restockTimers = DungeonRuntimeData.loadTreasureChestPlayerCooldowns(filename, legacyRestockTimers);
         if (this.restockTimers == null) this.restockTimers = new ArrayList<>();
         this.effects = processStringList("effects", effects, new ArrayList<>(), false);
         this.locationsString = processStringList("locations", locationsString, new ArrayList<>(), false);
         this.locationString = processString("location", locationString, null, false);
         this.instanced = processBoolean("instanced", instanced, false, false);
-        if (locationString != null)
-            new TreasureChest(this, locationString, restockTime);
-        else if (locationsString != null)
+        boolean migrated = false;
+        if (locationString != null) {
+            long storedRestockTime = DungeonRuntimeData.loadTreasureChestCooldown(filename, locationString, restockTime);
+            new TreasureChest(this, locationString, storedRestockTime);
+            migrated = restockTime > 0;
+        } else if (locationsString != null) {
+            List<String> authoredLocations = new ArrayList<>();
             for (String string : locationsString) {
                 String[] strings = string.split(":");
                 long timestamp = 0;
@@ -126,9 +132,26 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
                         Logger.warn("Bad unix timestamp in locations for " + filename + " . Entry: " + strings[0]);
                     }
                 }
-                new TreasureChest(this, strings[0], timestamp);
+                String authoredLocation = strings[0];
+                authoredLocations.add(authoredLocation);
+                long storedRestockTime = DungeonRuntimeData.loadTreasureChestCooldown(filename, authoredLocation, timestamp);
+                new TreasureChest(this, authoredLocation, storedRestockTime);
+                migrated |= strings.length > 1;
             }
-        else Logger.warn("No locations found for chest " + filename);
+            if (DungeonRuntimeData.isAvailable()) this.locationsString = authoredLocations;
+        } else Logger.warn("No locations found for chest " + filename);
+
+        if (DungeonRuntimeData.isAvailable() && (migrated || hasLegacyRestockTimers(legacyRestockTimers))) {
+            fileConfiguration.set("locations", locationsString);
+            fileConfiguration.set("restockTime", null);
+            fileConfiguration.set("restockTimers", null);
+            ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
+            restockTime = 0;
+        }
+    }
+
+    static boolean hasLegacyRestockTimers(List<String> legacyRestockTimers) {
+        return legacyRestockTimers != null && !legacyRestockTimers.isEmpty();
     }
 
     /**
@@ -146,7 +169,12 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
                 index = locationsString.indexOf(string);
                 break;
             }
-        String serializedUpdatedLocation = deserializedLocation + ":" + unixTimeStamp;
+        boolean storedInDatabase = unixTimeStamp > 0
+                ? DungeonRuntimeData.saveTreasureChestCooldown(filename, deserializedLocation, unixTimeStamp)
+                : DungeonRuntimeData.clearTreasureChestCooldown(filename, deserializedLocation);
+        if (!storedInDatabase)
+            Logger.warn("Failed to queue the runtime cooldown for treasure chest " + filename + ".");
+        String serializedUpdatedLocation = deserializedLocation;
         TreasureChest treasureChest = null;
         if (index != -1) {
             //case for existing treasure chest getting a cooldown
@@ -163,21 +191,13 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
 
     public void setRestockTime(Location location, long newRestockTime) {
         if (isInstanced()) return;
-        if (!locationsString.isEmpty()) {
-            addTreasureChest(location, newRestockTime);
-            return;
-        }
-
-        this.restockTime = newRestockTime;
-        this.fileConfiguration.set("restockTime", newRestockTime);
-        try {
-            fileConfiguration.save(file);
-        } catch (Exception ex) {
-            Logger.warn("Attempted to update restock time for a custom treasure chest and failed, did you delete it during runtime?");
-        }
+        String serializedLocation = ConfigurationLocation.deserialize(location.getBlock().getLocation());
+        if (!DungeonRuntimeData.saveTreasureChestCooldown(filename, serializedLocation, newRestockTime))
+            Logger.warn("Failed to queue the runtime cooldown for treasure chest " + filename + ".");
     }
 
     public void purgeLocations() {
+        DungeonRuntimeData.clearTreasureChestCooldowns(filename);
         this.locationsString = new ArrayList<>();
         ConfigurationEngine.writeValue(null, file, fileConfiguration, "locations");
         this.locationString = null;

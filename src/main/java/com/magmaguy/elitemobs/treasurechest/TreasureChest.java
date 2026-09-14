@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
+import com.magmaguy.elitemobs.playerdata.database.DungeonRuntimeData;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WeightedProbability;
@@ -251,28 +252,21 @@ public class TreasureChest implements PersistentObject {
             if (customTreasureChestConfigFields.isInstanced()) {
                 blacklistedPlayersInstance.add(player.getUniqueId());
             } else if (customTreasureChestConfigFields.getRestockTimers() != null) {
-                customTreasureChestConfigFields.getRestockTimers().add(cooldownStringConstructor(player));
-
-                // Save the updated restockTimers to the config file
-                customTreasureChestConfigFields.getFileConfiguration().set("restockTimers", customTreasureChestConfigFields.getRestockTimers());
-                try {
-                    customTreasureChestConfigFields.getFileConfiguration().save(customTreasureChestConfigFields.getFile());
-                } catch (Exception ex) {
-                    Logger.warn("Failed to save restock timers for treasure chest " + customTreasureChestConfigFields.getFilename());
-                }
+                long playerRestockTime = cooldownTime();
+                customTreasureChestConfigFields.getRestockTimers().add(player.getUniqueId() + ":" + playerRestockTime);
+                if (!DungeonRuntimeData.saveTreasureChestPlayerCooldown(
+                        customTreasureChestConfigFields.getFilename(), player.getUniqueId(), playerRestockTime))
+                    Logger.warn("Failed to queue a player cooldown for treasure chest "
+                            + customTreasureChestConfigFields.getFilename() + ".");
 
                 new BukkitRunnable() {
                     @Override
                     public void run() {
                         customTreasureChestConfigFields.getRestockTimers().removeIf(restockTime -> restockTime.split(":")[0].equals(player.getUniqueId().toString()));
-
-                        // Save the updated restockTimers to the config file after removal
-                        customTreasureChestConfigFields.getFileConfiguration().set("restockTimers", customTreasureChestConfigFields.getRestockTimers());
-                        try {
-                            customTreasureChestConfigFields.getFileConfiguration().save(customTreasureChestConfigFields.getFile());
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to save restock timers for treasure chest " + customTreasureChestConfigFields.getFilename());
-                        }
+                        if (!DungeonRuntimeData.clearTreasureChestPlayerCooldown(
+                                customTreasureChestConfigFields.getFilename(), player.getUniqueId()))
+                            Logger.warn("Failed to clear a player cooldown for treasure chest "
+                                    + customTreasureChestConfigFields.getFilename() + ".");
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 20L * 60 * customTreasureChestConfigFields.getRestockTimer());
             }
@@ -397,31 +391,35 @@ public class TreasureChest implements PersistentObject {
             return blacklistedPlayersInstance.contains(player.getUniqueId());
         if (customTreasureChestConfigFields.getRestockTimers() == null) return false;
         long now = Instant.now().getEpochSecond();
-        boolean saveNeeded = false;
+        boolean removedInvalidEntry = false;
+        List<UUID> expiredPlayers = new ArrayList<>();
         for (Iterator<String> iterator = customTreasureChestConfigFields.getRestockTimers().iterator(); iterator.hasNext(); ) {
             String string = iterator.next();
-            String[] split = string.split(":");
-            if (split.length < 2) continue;
+            String[] split = string.split(":", 2);
+            if (split.length < 2) {
+                iterator.remove();
+                removedInvalidEntry = true;
+                continue;
+            }
+            UUID playerId;
             long targetTime;
             try {
+                playerId = UUID.fromString(split[0]);
                 targetTime = Long.parseLong(split[1]);
             } catch (Exception ex) {
                 iterator.remove();
-                saveNeeded = true;
+                removedInvalidEntry = true;
                 continue;
             }
             if (targetTime <= now) {
                 iterator.remove();
-                saveNeeded = true;
+                expiredPlayers.add(playerId);
                 continue;
             }
-            if (split[0].equals(player.getUniqueId().toString())) {
-                if (saveNeeded) saveRestockTimers();
-                return true;
-            }
+            if (playerId.equals(player.getUniqueId()))
+                return persistRemovedCooldowns(expiredPlayers, removedInvalidEntry, true);
         }
-        if (saveNeeded) saveRestockTimers();
-        return false;
+        return persistRemovedCooldowns(expiredPlayers, removedInvalidEntry, false);
     }
 
     private long getPlayerCooldown(Player player) {
@@ -437,10 +435,6 @@ public class TreasureChest implements PersistentObject {
             }
         }
         return Instant.now().getEpochSecond();
-    }
-
-    private String cooldownStringConstructor(Player player) {
-        return player.getUniqueId() + ":" + cooldownTime();
     }
 
     private long cooldownTime() {
@@ -459,14 +453,15 @@ public class TreasureChest implements PersistentObject {
             return Round.twoDecimalPlaces(seconds / 60D / 60 / 24) + "days";
     }
 
-    private void saveRestockTimers() {
-        if (customTreasureChestConfigFields.getRestockTimers() == null) return;
-        customTreasureChestConfigFields.getFileConfiguration().set("restockTimers", customTreasureChestConfigFields.getRestockTimers());
-        try {
-            customTreasureChestConfigFields.getFileConfiguration().save(customTreasureChestConfigFields.getFile());
-        } catch (Exception ex) {
-            Logger.warn("Failed to save restock timers for treasure chest " + customTreasureChestConfigFields.getFilename());
-        }
+    private boolean persistRemovedCooldowns(List<UUID> expiredPlayers, boolean removedInvalidEntry, boolean result) {
+        boolean storedInDatabase = DungeonRuntimeData.isAvailable();
+        for (UUID playerId : expiredPlayers)
+            storedInDatabase &= DungeonRuntimeData.clearTreasureChestPlayerCooldown(
+                    customTreasureChestConfigFields.getFilename(), playerId);
+        if ((!expiredPlayers.isEmpty() || removedInvalidEntry) && !storedInDatabase)
+            Logger.warn("Failed to clear expired player cooldowns for treasure chest "
+                    + customTreasureChestConfigFields.getFilename() + ".");
+        return result;
     }
 
     public void removeTreasureChest() {

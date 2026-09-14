@@ -49,6 +49,7 @@ public class GenerateDatabase {
         statement.executeUpdate(sql);
         statement.close();
 
+        DungeonRuntimeData.initializeSchema(PlayerData.getConnection());
         createAdvancedCombatTables();
 
         // Check and add missing columns if any

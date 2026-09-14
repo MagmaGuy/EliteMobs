@@ -200,10 +200,10 @@ final class PlayerDataRepository {
         synchronized (JDBC_MONITOR) {
             try (Statement statement = connection().createStatement()) {
                 int currencyRows = statement.executeUpdate("UPDATE " + PlayerData.getPLAYER_DATA_TABLE_NAME()
-                        + " SET CurrencyCents = CAST(ROUND(CurrencyV2 * 100) AS INTEGER)"
+                        + " SET CurrencyCents = ROUND(CurrencyV2 * 100)"
                         + " WHERE (CurrencyCents IS NULL OR CurrencyCents = 0) AND CurrencyV2 > 0");
                 int debtRows = statement.executeUpdate("UPDATE " + PlayerData.getPLAYER_DATA_TABLE_NAME()
-                        + " SET GamblingDebtCents = CAST(ROUND(GamblingDebt * 100) AS INTEGER)"
+                        + " SET GamblingDebtCents = ROUND(GamblingDebt * 100)"
                         + " WHERE (GamblingDebtCents IS NULL OR GamblingDebtCents = 0) AND GamblingDebt > 0");
                 if (currencyRows > 0) Logger.info("Migrated " + currencyRows + " player currency rows to cent precision");
                 if (debtRows > 0) Logger.info("Migrated " + debtRows + " player gambling debt rows to cent precision");

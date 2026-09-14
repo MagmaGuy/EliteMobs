@@ -13,6 +13,7 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBlock;
 import com.magmaguy.elitemobs.pathfinding.Navigation;
 import com.magmaguy.elitemobs.pathfinding.patrol.PatrolService;
+import com.magmaguy.elitemobs.playerdata.database.DungeonRuntimeData;
 import com.magmaguy.elitemobs.powers.specialpowers.SpiritWalkSupport;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.util.AttributeManager;
@@ -59,8 +60,8 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
     public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, String rawString) {
         super(customBossesConfigFields);
-        this.rawString = rawString;
         this.rawLocationString = rawString.split(":")[0];
+        this.rawString = rawLocationString;
         this.respawnCoolDownInMinutes = customBossesConfigFields.getSpawnCooldown();
         this.leashRadius = customBossesConfigFields.getLeashRadius();
         this.onSpawnTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
@@ -68,9 +69,13 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
         regionalBossesFromConfigFields.put(customBossesConfigFields, this);
 
-        unixRespawnTime = 0;
+        long legacyRespawnTime = 0;
         if (rawString.contains(":"))
-            unixRespawnTime = Long.parseLong(rawString.split(":")[1]);
+            legacyRespawnTime = Long.parseLong(rawString.split(":")[1]);
+        unixRespawnTime = DungeonRuntimeData.loadRegionalBossCooldown(
+                customBossesConfigFields.getFilename(), rawLocationString, legacyRespawnTime);
+        if (legacyRespawnTime > 0 && DungeonRuntimeData.isAvailable())
+            customBossesConfigFields.setFilesOutOfSync(true);
         ticksBeforeRespawn = 0;
         if (unixRespawnTime > 0)
             ticksBeforeRespawn = (unixRespawnTime - System.currentTimeMillis()) / 1000 * 20 < 0 ?
@@ -268,11 +273,10 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         this.isRespawning = true;
         unixRespawnTime = (respawnCoolDownInMinutes * 60L * 1000L) + System.currentTimeMillis();
         ticksBeforeRespawn = respawnCoolDownInMinutes * 60L * 20L;
-        rawString = rawLocationString + ":" + unixRespawnTime;
-        if (phaseBossEntity != null)
-            phaseBossEntity.getPhase1Config().setFilesOutOfSync(true);
-        else
-            customBossesConfigFields.setFilesOutOfSync(true);
+        CustomBossesConfigFields persistenceConfig = persistenceConfig();
+        if (!DungeonRuntimeData.saveRegionalBossCooldown(
+                persistenceConfig.getFilename(), rawLocationString, unixRespawnTime))
+            Logger.warn("Failed to queue the respawn cooldown for regional boss " + persistenceConfig.getFilename() + ".");
         queueSpawn(false);
     }
 
@@ -316,6 +320,9 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     protected void spawn(SpawnLifecycle.Context spawnContext) {
         super.spawn(spawnContext);
         this.isRespawning = false;
+        if (unixRespawnTime > 0 && DungeonRuntimeData.isAvailable())
+            DungeonRuntimeData.clearRegionalBossCooldown(persistenceConfig().getFilename(), rawLocationString);
+        unixRespawnTime = 0;
         if (!ItemSettingsConfig.isRegionalBossesDropVanillaLoot())
             super.vanillaLoot = false;
         if (NMSManager.isEnabled()) {
@@ -399,9 +406,13 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         }
         //Temporary regionals were never written to the configuration, so there is nothing to sync.
         if (!isTemporary()) {
-            var persistedConfig = phaseBossEntity == null ? getCustomBossesConfigFields() : phaseBossEntity.getPhase1Config();
-            persistedConfig.setFilesOutOfSync(true);
+            DungeonRuntimeData.clearRegionalBossCooldown(persistenceConfig().getFilename(), rawLocationString);
+            getCustomBossesConfigFields().setFilesOutOfSync(true);
         }
+    }
+
+    private CustomBossesConfigFields persistenceConfig() {
+        return phaseBossEntity == null ? customBossesConfigFields : phaseBossEntity.getPhase1Config();
     }
 
     /**
