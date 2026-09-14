@@ -109,10 +109,10 @@ dependencies {
     //Model Engine - legacy
     compileOnly "com.ticxo.modelengine:api:R3.1.7"
     //Free Minecraft Models
-    compileOnly (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.11.2'){
+    compileOnly (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.12.1'){
         changing = true
     }
-    testImplementation (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.11.2'){
+    testImplementation (group: 'com.magmaguy', name: 'FreeMinecraftModels', version: '2.12.1'){
         changing = true
     }
     // Mythic Mobs integration - currently only for arenas
@@ -130,7 +130,7 @@ dependencies {
     testImplementation 'org.mockbukkit.mockbukkit:mockbukkit-v26.2:4.116.1'
     testImplementation 'io.papermc.paper:paper-api:26.2.build.111-stable'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testRuntimeOnly 'org.xerial:sqlite-jdbc:3.32.3'
+    testRuntimeOnly 'org.xerial:sqlite-jdbc:3.53.4.0'
 }
 
 tasks.named('test') {

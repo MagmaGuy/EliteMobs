@@ -21,7 +21,7 @@ class DungeonRuntimeDataTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        DatabaseConfig.mysqlRuntimeNamespace = "test-server";
+        DatabaseConfig.mysqlServerId = "test-server";
         connection = DriverManager.getConnection("jdbc:sqlite::memory:");
         DungeonRuntimeData.initializeSchema(connection);
     }
@@ -72,7 +72,7 @@ class DungeonRuntimeDataTest {
         DungeonRuntimeData.upsertCooldown(connection, DungeonRuntimeData.REGIONAL_BOSS_TABLE,
                 "RespawnAt", "boss.yml", location, 100L);
 
-        DatabaseConfig.mysqlRuntimeNamespace = "other-server";
+        DatabaseConfig.mysqlServerId = "other-server";
 
         assertNull(DungeonRuntimeData.readCooldown(connection,
                 DungeonRuntimeData.REGIONAL_BOSS_TABLE, "RespawnAt", "boss.yml", location));

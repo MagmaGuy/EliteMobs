@@ -43,7 +43,7 @@ public final class DungeonRuntimeData {
     static void initializeSchema(Connection connection) throws SQLException {
         available = false;
         if (runtimeNamespace().length() > 64)
-            throw new SQLException("mysqlRuntimeNamespace may not exceed 64 characters");
+            throw new SQLException("mysqlServerId may not exceed 64 characters");
         ensureRuntimeTable(connection, REGIONAL_BOSS_TABLE, "LocationKey CHAR(64) NOT NULL", "RespawnAt");
         ensureRuntimeTable(connection, TREASURE_CHEST_TABLE, "LocationKey CHAR(64) NOT NULL", "RestockAt");
         ensureRuntimeTable(connection, TREASURE_CHEST_PLAYER_TABLE, "PlayerUUID VARCHAR(36) NOT NULL", "RestockAt");
@@ -532,7 +532,7 @@ public final class DungeonRuntimeData {
     }
 
     private static String runtimeNamespace() {
-        String configured = DatabaseConfig.getMysqlRuntimeNamespace();
+        String configured = DatabaseConfig.getMysqlServerId();
         return configured == null || configured.isBlank() ? "default" : configured;
     }
 

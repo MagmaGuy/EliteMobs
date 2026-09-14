@@ -19,7 +19,7 @@ public class DatabaseConfig extends ConfigurationFile {
     @Getter
     public static String mysqlPassword;
     @Getter
-    public static String mysqlRuntimeNamespace;
+    public static String mysqlServerId;
     @Getter
     public static boolean useSSL;
 
@@ -35,7 +35,7 @@ public class DatabaseConfig extends ConfigurationFile {
         mysqlDatabaseName = ConfigurationEngine.setString(List.of("The name of the database"), file, fileConfiguration, "mysqlDatabaseName", "elitemobs", false);
         mysqlUsername = ConfigurationEngine.setString(List.of("The username for MySQl"), file, fileConfiguration, "mysqlUsername", "your_username_mysql_here", false);
         mysqlPassword = ConfigurationEngine.setString(List.of("The password for your MysSQL database"), file, fileConfiguration, "mysqlPassword", "your_mysql_password_here", false);
-        mysqlRuntimeNamespace = ConfigurationEngine.setString(List.of("Separates server-local boss and treasure chest timers when several servers share one MySQL database"), file, fileConfiguration, "mysqlRuntimeNamespace", "default", false);
+        mysqlServerId = ConfigurationEngine.setString(List.of("Unique server identifier used to keep server-local boss and treasure chest timers separate when several servers share one MySQL database"), file, fileConfiguration, "mysqlServerId", "default", false);
         useSSL = ConfigurationEngine.setBoolean(List.of("Whether to use SSL"), fileConfiguration, "useSSL", true);
     }
 }
