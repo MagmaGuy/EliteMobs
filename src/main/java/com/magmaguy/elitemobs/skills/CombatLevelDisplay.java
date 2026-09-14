@@ -144,7 +144,7 @@ public class CombatLevelDisplay implements Listener {
      * are not represented by Player or Scoreboard state and therefore cannot be detected here.
      */
     private static boolean canSeeNameTag(Player player, Player viewer) {
-        if (viewer.equals(player) || !viewer.canSee(player) || player.isInvisible()) return false;
+        if (!viewer.canSee(player) || player.isInvisible()) return false;
         if (player.isSneaking() && viewer.getLocation().distanceSquared(player.getLocation()) >= 32D * 32D)
             return false;
 
