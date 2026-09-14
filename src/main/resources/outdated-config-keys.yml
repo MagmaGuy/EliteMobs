@@ -2,3 +2,15 @@
 # before configuration loading. Current defaults regenerate through their owners.
 enchantments:
   - maxLevelV2
+
+# Only these plugin defaults regenerate automatically. Match the retired name
+# before the comma in an enchantments list entry; preserve other custom items.
+customitems:
+  - files:
+      - elite_scrap_tiny.yml
+      - elite_scrap_small.yml
+      - elite_scrap_medium.yml
+      - elite_scrap_large.yml
+      - elite_scrap_huge.yml
+    key: enchantments
+    listEntryNames: [repair]

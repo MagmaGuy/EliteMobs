@@ -2,6 +2,9 @@ package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
+import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
+import com.magmaguy.elitemobs.items.ItemConsumables;
+import com.magmaguy.magmacore.MagmaCore;
 import com.magmaguy.magmacore.config.OutdatedConfigurationArchive;
 import com.magmaguy.magmacore.enchantments.EnchantmentCatalog;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -64,5 +67,41 @@ class ConfigurationRetirementTest {
         fields.processConfigFields();
         assertEquals(5, yaml.getInt("maxLevel"));
         assertFalse(yaml.contains("maxLevelV2"));
+    }
+
+    @Test void archivedScrapDefaultsRegenerateWithoutRetiredEnchantments() throws Exception {
+        Path directory = plugin.getDataFolder().toPath().resolve("customitems");
+        Files.createDirectories(directory);
+        List<String> sizes = List.of("tiny", "small", "medium", "large", "huge");
+        for (int index = 0; index < sizes.size(); index++) {
+            Files.writeString(directory.resolve("elite_scrap_" + sizes.get(index) + ".yml"),
+                    "# customized old scrap\nisEnabled: true\nname: My scrap\nenchantments: ['repair," + (index + 1) + "']\n");
+        }
+        Path current = directory.resolve("my_item.yml");
+        String currentYaml = "isEnabled: true\nmaterial: DIAMOND_SWORD\nname: My weapon\nlore: []\nenchantments: ['elitemobs:hunter,3']\n";
+        Files.writeString(current, currentYaml);
+        OutdatedConfigurationArchive.archive(plugin);
+        for (String size : sizes) assertFalse(Files.exists(directory.resolve("elite_scrap_" + size + ".yml")));
+        assertEquals(currentYaml, Files.readString(current));
+        MagmaCore.createInstance(plugin);
+        new CustomItemsConfig();
+        for (int index = 0; index < sizes.size(); index++) {
+            String name = "elite_scrap_" + sizes.get(index) + ".yml";
+            var fields = CustomItemsConfig.getCustomItems().get(name);
+            assertTrue(fields.isEnabled());
+            assertEquals(new ItemConsumables.Definition(ItemConsumables.Type.REPAIR_SCRAP, index + 1), fields.getConsumable());
+            assertTrue(fields.getEnchantments().isEmpty());
+            var yaml = YamlConfiguration.loadConfiguration(directory.resolve(name).toFile());
+            assertEquals("repair_scrap", yaml.getString("consumable.type"));
+            assertEquals(index + 1, yaml.getInt("consumable.tier"));
+        }
+        OutdatedConfigurationArchive.archive(plugin);
+        for (String size : sizes) assertTrue(Files.exists(directory.resolve("elite_scrap_" + size + ".yml")));
+        Path archive = plugin.getDataFolder().toPath().getParent().resolve("MagmaCore/outdated files");
+        try (var files = Files.walk(archive)) {
+            var originals = files.filter(Files::isRegularFile).toList();
+            assertEquals(5, originals.size());
+            for (Path original : originals) assertTrue(Files.readString(original).startsWith("# customized old scrap\n"));
+        }
     }
 }
