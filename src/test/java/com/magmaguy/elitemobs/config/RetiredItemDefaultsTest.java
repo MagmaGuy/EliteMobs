@@ -45,6 +45,7 @@ class RetiredItemDefaultsTest {
         instance.setAccessible(true);
         instance.set(null, previousCore);
         CustomItemsConfig.getCustomItems().clear();
+        OutdatedConfigurationArchive.unregister(plugin);
         MockBukkit.unmock();
     }
 
@@ -83,7 +84,7 @@ class RetiredItemDefaultsTest {
 
         assertTrue(expectedEnchantments.size() > 45, "fixture must exercise the shipped retired defaults");
 
-        OutdatedConfigurationArchive.archive(plugin);
+        OutdatedConfigurationArchive.archiveFor(plugin);
         assertAll(expectedEnchantments.keySet().stream().map(filename ->
                 () -> assertFalse(Files.exists(directory.resolve(filename)), "obsolete default retained: " + filename)));
         assertEquals(currentYaml, Files.readString(current));
@@ -104,7 +105,7 @@ class RetiredItemDefaultsTest {
             assertEquals(expectedEnchantments.get(filename), replacement.getEnchantments(), filename);
             assertEquals(expectedConsumables.get(filename), replacement.getConsumable(), filename);
         }
-        OutdatedConfigurationArchive.archive(plugin);
+        OutdatedConfigurationArchive.archiveFor(plugin);
         assertEquals(archived.size(), archiveContents().size(), "second startup must not archive replacements");
     }
 

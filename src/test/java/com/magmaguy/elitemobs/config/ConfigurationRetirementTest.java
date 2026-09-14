@@ -36,8 +36,10 @@ class ConfigurationRetirementTest {
         MockBukkit.mock();
         plugin = MockBukkit.loadSimple(ResourcePlugin.class);
         MetadataHandler.PLUGIN = plugin;
+        OutdatedConfigurationArchive.register(plugin);
     }
     @AfterEach void close() throws Exception {
+        OutdatedConfigurationArchive.unregister(plugin);
         MockBukkit.unmock();
         resetMagmaCoreInstance();
     }
@@ -55,7 +57,7 @@ class ConfigurationRetirementTest {
         Path old = directory.resolve("loud_strikes.yml");
         String contents = "# customized\r\nisEnabled: true\r\nname: Custom old name\r\nmaxLevelV2: 99\r\n";
         Files.writeString(old, contents);
-        OutdatedConfigurationArchive.archive(plugin);
+        OutdatedConfigurationArchive.archiveFor(plugin);
         assertFalse(Files.exists(old));
         EnchantmentCatalog.initializeDefaults(plugin, directory, List.of("loud_strikes"));
         var replacement = YamlConfiguration.loadConfiguration(old.toFile());
@@ -68,7 +70,7 @@ class ConfigurationRetirementTest {
             assertEquals(1, originals.size());
             assertEquals(contents, Files.readString(originals.getFirst()));
         }
-        OutdatedConfigurationArchive.archive(plugin);
+        OutdatedConfigurationArchive.archiveFor(plugin);
         assertTrue(Files.exists(old));
     }
 
@@ -79,7 +81,7 @@ class ConfigurationRetirementTest {
         String contents = "# customized welcome quest\r\nname: My welcome quest\r\ncustomObjectives:\r\n"
                 + "  Objective13:\r\n    objectiveType: DIALOG\r\n    filename: scroll_applier_config.yml\r\n    npcName: Scotty\r\n";
         Files.writeString(quest, contents);
-        OutdatedConfigurationArchive.archive(plugin);
+        OutdatedConfigurationArchive.archiveFor(plugin);
         assertFalse(Files.exists(quest));
         MagmaCore.createInstance(plugin);
         new CustomQuestsConfig();
@@ -97,7 +99,7 @@ class ConfigurationRetirementTest {
         assertEquals("story_dungeons_quest_giver.yml", objectives.getString("Objective15.filename"));
         assertEquals("training_dummy_lv1.yml", objectives.getString("Objective16.filename"));
         String regenerated = Files.readString(quest);
-        OutdatedConfigurationArchive.archive(plugin);
+        OutdatedConfigurationArchive.archiveFor(plugin);
         assertEquals(regenerated, Files.readString(quest));
         Path archive = plugin.getDataFolder().toPath().getParent().resolve("MagmaCore/outdated files");
         try (var files = Files.walk(archive)) {
@@ -127,7 +129,7 @@ class ConfigurationRetirementTest {
         Path current = directory.resolve("my_item.yml");
         String currentYaml = "isEnabled: true\nmaterial: DIAMOND_SWORD\nname: My weapon\nlore: []\nenchantments: ['elitemobs:hunter,3']\n";
         Files.writeString(current, currentYaml);
-        OutdatedConfigurationArchive.archive(plugin);
+        OutdatedConfigurationArchive.archiveFor(plugin);
         for (String size : sizes) assertFalse(Files.exists(directory.resolve("elite_scrap_" + size + ".yml")));
         assertEquals(currentYaml, Files.readString(current));
         MagmaCore.createInstance(plugin);
@@ -142,7 +144,7 @@ class ConfigurationRetirementTest {
             assertEquals("repair_scrap", yaml.getString("consumable.type"));
             assertEquals(index + 1, yaml.getInt("consumable.tier"));
         }
-        OutdatedConfigurationArchive.archive(plugin);
+        OutdatedConfigurationArchive.archiveFor(plugin);
         for (String size : sizes) assertTrue(Files.exists(directory.resolve("elite_scrap_" + size + ".yml")));
         Path archive = plugin.getDataFolder().toPath().getParent().resolve("MagmaCore/outdated files");
         try (var files = Files.walk(archive)) {
