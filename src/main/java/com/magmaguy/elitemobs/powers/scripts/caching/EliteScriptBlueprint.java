@@ -38,10 +38,10 @@ public class EliteScriptBlueprint {
         this.scriptName = scriptName;
         this.customConfigFields = customConfigFields;
         this.scriptEventsBlueprint = new ScriptEventsBlueprint(configurationValues, scriptName, filename);
-        this.scriptConditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) configurationValues.get("Conditions"), scriptName, filename);
+        this.scriptConditionsBlueprint = new ScriptConditionsBlueprint(optionalMap(configurationValues, "Conditions"), scriptName, filename);
         this.scriptZoneBlueprint = new ScriptZoneBlueprint(configurationValues, scriptName, filename);
         this.scriptActionsBlueprint = new ScriptActionsBlueprint(configurationValues, scriptName, filename);
-        this.scriptCooldownsBlueprint = new ScriptCooldownsBlueprint((Map<?, ?>) configurationValues.get("Cooldowns"), scriptName, filename);
+        this.scriptCooldownsBlueprint = new ScriptCooldownsBlueprint(optionalMap(configurationValues, "Cooldowns"), scriptName, filename);
         blueprints.put(customConfigFields, this);
     }
 
@@ -53,6 +53,14 @@ public class EliteScriptBlueprint {
 
     public static void shutdown() {
         blueprints.clear();
+    }
+
+    private static Map<?, ?> optionalMap(Map<String, Object> values, String key) {
+        Object value = values.get(key);
+        if (value == null) return null;
+        if (value instanceof Map<?, ?> map) return map;
+        throw new IllegalArgumentException(key + " must contain key/value pairs, not "
+                + (value instanceof List<?> ? "a list" : value.getClass().getSimpleName()));
     }
 
     public static List<EliteScriptBlueprint> parseBossScripts(ConfigurationSection configurationSection,
@@ -72,7 +80,13 @@ public class EliteScriptBlueprint {
                 Logger.warn("Script " + entry.getKey() + " in " + customConfigFields.getFilename() + " is not a valid map!");
                 continue;
             }
-            eliteScripts.add(new EliteScriptBlueprint(customConfigFields, ScriptValueNormalizer.normalizeMap(scriptValues), entry.getKey()));
+            try {
+                eliteScripts.add(new EliteScriptBlueprint(customConfigFields,
+                        ScriptValueNormalizer.normalizeMap(scriptValues), entry.getKey()));
+            } catch (RuntimeException invalid) {
+                Logger.warn("Skipped script " + entry.getKey() + " in " + customConfigFields.getFilename()
+                        + ": " + invalid.getMessage());
+            }
         }
         return eliteScripts;
     }

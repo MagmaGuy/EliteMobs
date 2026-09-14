@@ -1,0 +1,127 @@
+items:
+  - file: assassin_charm_patreon.yml
+    retired: CRITICAL_STRIKES
+  - file: assassin_charm_vanish.yml
+    retired: CRITICAL_STRIKES
+  - file: elite_lucky_ticket.yml
+    retired: LUCKY_SOURCE
+  - file: elite_scrap_huge.yml
+    retired: repair
+  - file: elite_scrap_large.yml
+    retired: repair
+  - file: elite_scrap_medium.yml
+    retired: repair
+  - file: elite_scrap_small.yml
+    retired: repair
+  - file: elite_scrap_tiny.yml
+    retired: repair
+  - file: enchanted_book_arrow_damage.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_arrow_fire.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_arrow_infinite.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_arrow_knockback.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_channeling.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_critical_strikes.yml
+    retired: CRITICAL_STRIKES
+  - file: enchanted_book_damage_all.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_damage_arthropods.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_damage_undead.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_depth_strider.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_dig_speed.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_drilling.yml
+    retired: DRILLING
+  - file: enchanted_book_durability.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_earthquake.yml
+    retired: EARTHQUAKE
+  - file: enchanted_book_flamethrower.yml
+    retired: FLAMETHROWER
+  - file: enchanted_book_frost_walker.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_hunter.yml
+    retired: HUNTER
+  - file: enchanted_book_ice_breaker.yml
+    retired: ICE_BREAKER
+  - file: enchanted_book_impaling.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_knockback.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_lightning.yml
+    retired: LIGHTNING
+  - file: enchanted_book_loot_bonus_blocks.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_loot_bonus_mobs.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_loud_strikes.yml
+    retired: LOUD_STRIKES
+  - file: enchanted_book_loyalty.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_luck.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_lure.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_mending.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_meteor_shower.yml
+    retired: METEOR_SHOWER
+  - file: enchanted_book_multishot.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_oxygen.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_piercing.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_plasma_boots.yml
+    retired: PLASMA_BOOTS
+  - file: enchanted_book_protection_environmental.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_protection_explosions.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_protection_fall.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_protection_fire.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_protection_projectile.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_quick_charge.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_riptide.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_silk_touch.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_soul_speed.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_sweeping_edge.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_thorns.yml
+    retired: ENCHANTED_SOURCE
+  - file: enchanted_book_water_worker.yml
+    retired: ENCHANTED_SOURCE
+  - file: grappling_arrow_patreon.yml
+    retired: GRAPPLING_HOOK
+  - file: grappling_arrow.yml
+    retired: GRAPPLING_HOOK
+  - file: meteor_shower_scroll_patreon.yml
+    retired: METEOR_SHOWER
+  - file: meteor_shower_scroll_vanish.yml
+    retired: METEOR_SHOWER
+  - file: meteor_shower_scroll.yml
+    retired: METEOR_SHOWER
+  - file: pantalones_plata_vip.yml
+    retired: CRITICAL_STRIKES
+  - file: summon_merchant_scroll.yml
+    retired: SUMMON_MERCHANT
+  - file: summon_wolf_scroll_patreon.yml
+    retired: SUMMON_WOLF
+  - file: summon_wolf_scroll.yml
+    retired: SUMMON_WOLF
+  - file: unbind_scroll.yml
+    retired: UNBIND

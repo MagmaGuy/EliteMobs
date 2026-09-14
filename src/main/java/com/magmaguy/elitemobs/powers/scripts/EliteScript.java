@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeOwner, ScriptExecutable {
+    private final EliteScriptBlueprint scriptBlueprint;
     protected ScriptActions scriptActions;
     //Parse from power file
     private ScriptEvents scriptEvents;
@@ -32,9 +34,12 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
     @Setter
     //Set by halt action
     private boolean halt = false;
+    private boolean closed = false;
+    private boolean finishDeathActions = false;
 
     public EliteScript(EliteScriptBlueprint scriptBlueprint, Map<String, ScriptExecutable> eliteScriptMap, EliteEntity eliteEntity) {
         super(scriptBlueprint.getCustomConfigFields());
+        this.scriptBlueprint = scriptBlueprint;
         if (halt) return;
         this.eliteScriptMap = eliteScriptMap;
         this.scriptEvents = new ScriptEvents(scriptBlueprint.getScriptEventsBlueprint());
@@ -108,7 +113,7 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
      * @param directTarget
      */
     public void check(EliteEntity eliteEntity, LivingEntity directTarget, ScriptActionData previousScriptActionData) {
-        if (suppressed(eliteEntity)) return;
+        if (suppressed(eliteEntity, previousScriptActionData)) return;
         //Check if the event conditions are met
         if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(eliteEntity, directTarget))
             return;
@@ -124,7 +129,7 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
      * @param landingLocation Location where the projectile or block landed
      */
     public void check(Location landingLocation, ScriptActionData previousScriptActionData) {
-        if (suppressed(previousScriptActionData.getEliteEntity())) return;
+        if (suppressed(previousScriptActionData.getEliteEntity(), previousScriptActionData)) return;
         //Check if the event conditions are met
         if (scriptConditions != null && !scriptConditions.meetsPreActionConditions(previousScriptActionData.getEliteEntity(), null))
             return;
@@ -135,6 +140,13 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
     }
 
     public void initializeCustomEvents(EliteEntity eliteEntity) {
+        if (closed) {
+            scriptActions.close(false);
+            scriptZone = new ScriptZone(scriptBlueprint.getScriptZoneBlueprint(), this);
+            scriptActions = new ScriptActions(scriptBlueprint.getScriptActionsBlueprint(), eliteScriptMap, this);
+            finishDeathActions = false;
+            closed = false;
+        }
         if (scriptEvents.getScriptEventsBlueprint().isZoneListener()) {
             scriptZone.setZoneListener(true);
             scriptZone.startZoneListener(eliteEntity);
@@ -143,11 +155,27 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
 
     @Override
     public void closeRuntime() {
-        if (scriptZone != null) scriptZone.shutdown();
+        closeRuntime(RemovalReason.OTHER);
     }
 
-    private static boolean suppressed(EliteEntity eliteEntity) {
-        return eliteEntity == null || eliteEntity.getPowerSuppression().isSuppressed();
+    /** Death scripts may finish their finite aftermath; every other removal stops all action work. */
+    public void closeRuntime(RemovalReason removalReason) {
+        finishDeathActions = removalReason == RemovalReason.DEATH && (!closed || finishDeathActions);
+        closed = true;
+        try {
+            if (scriptActions != null) scriptActions.close(finishDeathActions);
+        } finally {
+            if (scriptZone != null) scriptZone.shutdown();
+        }
+    }
+
+    private boolean suppressed(EliteEntity eliteEntity) {
+        return suppressed(eliteEntity, null);
+    }
+
+    private boolean suppressed(EliteEntity eliteEntity, ScriptActionData previousData) {
+        return eliteEntity == null || eliteEntity.getPowerSuppression().isSuppressed()
+                || (closed && !(finishDeathActions && previousData != null && previousData.originatesFromDeath()));
     }
 
     public static class EliteScriptEvents implements Listener {

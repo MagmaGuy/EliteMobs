@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
+import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.magmacore.scripting.zones.Shape;
@@ -36,6 +37,22 @@ public class ScriptActionData {
     private ScriptActionData inheritedScriptActionData = null;
     @Getter
     private Event event;
+
+    /** Nested RUN_SCRIPT actions retain the event that admitted the original action. */
+    boolean originatesFromDeath() {
+        for (ScriptActionData data = this; data != null; data = data.inheritedScriptActionData) {
+            if (data.event != null) return data.event instanceof EliteMobDeathEvent;
+        }
+        return false;
+    }
+
+    /** Each action owns its targets, so this identifies a RUN_SCRIPT cycle without another registry. */
+    boolean repeatsActionInChain() {
+        for (ScriptActionData data = inheritedScriptActionData; data != null; data = data.inheritedScriptActionData) {
+            if (data.scriptTargets == scriptTargets) return true;
+        }
+        return false;
+    }
 
     //previousEntityTargets and previousLocationTargets only have values when other scripts call this script
     //in which case the targets are inherited by this script so they can be reused

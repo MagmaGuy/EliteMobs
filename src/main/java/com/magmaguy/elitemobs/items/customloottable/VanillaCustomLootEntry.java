@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class VanillaCustomLootEntry extends CustomLootEntry implements Serializable {
     @Getter
@@ -112,24 +111,26 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
     }
 
     @Override
-    public void locationDrop(int itemTier, Player player, Location location) {
+    public boolean locationDrop(int itemTier, Player player, Location location) {
+        if (material == null || material.isAir() || getAmount() <= 0) return false;
         for (int i = 0; i < getAmount(); i++)
             location.getWorld().dropItem(location, generateItemStack());
+        return true;
     }
 
     @Override
-    public void locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
-        for (int i = 0; i < getAmount(); i++)
-            location.getWorld().dropItem(location, generateItemStack());
+    public boolean locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
+        return locationDrop(itemTier, player, location);
     }
 
     @Override
-    public void directDrop(int itemTier, Player player) {
+    public boolean directDrop(int itemTier, Player player) {
+        if (material == null || material.isAir() || getAmount() <= 0) return false;
         String name = null;
         for (int i = 0; i < getAmount(); i++) {
-            if (ThreadLocalRandom.current().nextDouble() > getChance()) return;
             ItemStack itemStack = generateItemStack();
-            player.getInventory().addItem(itemStack);
+            var overflow = player.getInventory().addItem(itemStack);
+            overflow.values().forEach(leftover -> player.getWorld().dropItem(player.getLocation(), leftover));
             if (name == null && itemStack.getItemMeta() != null) {
                 if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
                 else name = itemStack.getType().toString().replace("_", " ");
@@ -137,6 +138,7 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
         }
         if (name != null)
             player.sendMessage(ItemSettingsConfig.getDirectDropMinecraftLootMessage().replace("$itemName", getAmount() + "x " + name));
+        return true;
     }
 
     @Override

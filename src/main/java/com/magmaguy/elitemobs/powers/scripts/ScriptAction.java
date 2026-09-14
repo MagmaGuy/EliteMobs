@@ -61,6 +61,9 @@ public class ScriptAction {
     private final ScriptRuntimeOwner runtimeOwner;
     private final ScriptTargets finalScriptTargets;
     private final ScriptWorldActionExecutor worldActions;
+    private final Set<ScheduledAction> scheduledActions = new HashSet<>();
+    private boolean closed;
+    private boolean finishDeathActions;
 
     /**
      * Constructs a new ScriptAction with the given blueprint, script map, and elite script.
@@ -142,14 +145,13 @@ public class ScriptAction {
         }
 
         if (blueprint.getWait().getValue() > 0) {
-            new BukkitRunnable() {
+            new ScheduledAction(scriptActionData) {
                 @Override
-                public void run() {
-                    if (powerSuppressed(scriptActionData)) return;
+                protected void runAction() {
                     cancel();
                     runScriptTask(scriptActionData);
                 }
-            }.runTaskTimer(MetadataHandler.PLUGIN, blueprint.getWait().getValue(), 1L);
+            }.schedule(blueprint.getWait().getValue(), 1L);
         } else {
             runScriptTask(scriptActionData);
         }
@@ -164,12 +166,11 @@ public class ScriptAction {
         if (powerSuppressed(scriptActionData)) return;
         if (blueprint.getRepeatEvery().getValue() > 0) {
             // If it's a repeating task, schedule it accordingly.
-            new BukkitRunnable() {
+            new ScheduledAction(scriptActionData) {
                 int counter = 0;
 
                 @Override
-                public void run() {
-                    if (powerSuppressed(scriptActionData)) return;
+                protected void runAction() {
                     counter++;
 
                     //Cancel if the entity's world is no longer loaded (e.g. world/chunk unloaded)
@@ -211,7 +212,7 @@ public class ScriptAction {
 
                     runActions(scriptActionData);
                 }
-            }.runTaskTimer(MetadataHandler.PLUGIN, 0, blueprint.getRepeatEvery().getValue());
+            }.schedule(0, blueprint.getRepeatEvery().getValue());
         } else {
             if (blueprint.getConditionsBlueprint() != null
                     && !scriptConditions.meetsActionConditions(scriptActionData)) {
@@ -301,10 +302,84 @@ public class ScriptAction {
         }
     }
 
-    private static boolean powerSuppressed(ScriptActionData scriptActionData) {
+    private boolean powerSuppressed(ScriptActionData scriptActionData) {
         return scriptActionData == null
                 || scriptActionData.getEliteEntity() == null
+                || (closed && !canFinishAfterDeath(scriptActionData))
                 || scriptActionData.getEliteEntity().getPowerSuppression().isSuppressed();
+    }
+
+    private boolean canFinishAfterDeath(ScriptActionData data) {
+        return finishDeathActions && data != null && data.originatesFromDeath()
+                && !data.repeatsActionInChain() && sourceWorldIsLoaded(data)
+                && (blueprint.getRepeatEvery().getValue() <= 0 || blueprint.getTimes().getValue() > 0);
+    }
+
+    private boolean sourceWorldIsLoaded(ScriptActionData data) {
+        Location location = data.getEliteEntity() == null ? null : data.getEliteEntity().getLocation();
+        return location != null && location.getWorld() != null
+                && Bukkit.getWorld(location.getWorld().getUID()) != null;
+    }
+
+    /** Landing callbacks still belong to the action that launched them, even after its owner resumes. */
+    boolean canRunContinuation(ScriptActionData data) {
+        return !powerSuppressed(data);
+    }
+
+    /**
+     * A phase switch keeps the logical boss alive, so entity validity cannot own these callbacks.
+     * Cancel them with this action; temporary-state restoration tasks retain their existing lifetime.
+     */
+    void close(boolean finishDeathActions) {
+        this.finishDeathActions = finishDeathActions && (!closed || this.finishDeathActions);
+        closed = true;
+        for (ScheduledAction action : new ArrayList<>(scheduledActions))
+            if (!canFinishAfterDeath(action.data)) action.cancel();
+    }
+
+    private abstract class ScheduledAction extends BukkitRunnable {
+        private final ScriptActionData data;
+
+        private ScheduledAction(ScriptActionData data) {
+            this.data = data;
+        }
+
+        final void schedule(long delay, long period) {
+            if (closed && !canFinishAfterDeath(data)) return;
+            scheduledActions.add(this);
+            try {
+                runTaskTimer(MetadataHandler.PLUGIN, delay, period);
+            } catch (RuntimeException | Error failure) {
+                scheduledActions.remove(this);
+                throw failure;
+            }
+        }
+
+        @Override
+        public final void run() {
+            if (closed && !canFinishAfterDeath(data)) {
+                cancel();
+                return;
+            }
+            if (powerSuppressed(data)) return;
+            try {
+                runAction();
+            } catch (RuntimeException | Error failure) {
+                cancel();
+                throw failure;
+            }
+        }
+
+        protected abstract void runAction();
+
+        @Override
+        public synchronized void cancel() throws IllegalStateException {
+            try {
+                super.cancel();
+            } finally {
+                scheduledActions.remove(this);
+            }
+        }
     }
 
     /**

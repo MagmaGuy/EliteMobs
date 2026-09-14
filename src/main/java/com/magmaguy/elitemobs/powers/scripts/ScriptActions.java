@@ -41,4 +41,9 @@ public class ScriptActions {
         return true;
     }
 
+    /** Cancels action work when the owning script is removed or replaced. */
+    void close(boolean finishDeathActions) {
+        scriptActionsList.forEach(action -> action.close(finishDeathActions));
+    }
+
 }

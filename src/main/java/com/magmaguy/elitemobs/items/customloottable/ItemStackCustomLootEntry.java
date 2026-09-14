@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.items.customloottable;
 
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
 import com.magmaguy.magmacore.util.Logger;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -27,11 +28,23 @@ public class ItemStackCustomLootEntry extends CustomLootEntry implements Seriali
     }
 
     @Override
-    public void directDrop(int itemTier, Player player) {
+    public boolean directDrop(int itemTier, Player player) {
         ItemStack itemStack = generateItemStack();
-        if (itemStack == null) return;
+        if (itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0 || getAmount() <= 0) return false;
+        for (int i = 0; i < getAmount(); i++) {
+            var overflow = player.getInventory().addItem(itemStack.clone());
+            overflow.values().forEach(leftover -> player.getWorld().dropItem(player.getLocation(), leftover));
+        }
+        return true;
+    }
+
+    @Override
+    public boolean locationDrop(int itemTier, Player player, Location location) {
+        ItemStack itemStack = generateItemStack();
+        if (itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0 || getAmount() <= 0) return false;
         for (int i = 0; i < getAmount(); i++)
-            player.getInventory().addItem(itemStack);
+            location.getWorld().dropItem(location, itemStack.clone());
+        return true;
     }
 
     @Override

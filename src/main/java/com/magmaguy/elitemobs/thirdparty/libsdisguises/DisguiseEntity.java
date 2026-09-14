@@ -112,7 +112,7 @@ public class DisguiseEntity {
     }
 
     /**
-     * Removes any active disguise before an entity is discarded. LibsDisguises keeps
+     * Removes any active disguise when an entity is discarded. LibsDisguises keeps
      * every active disguise in a static registry that holds a hard reference to the
      * entity, and its world-unload handler saves disguises instead of removing them —
      * without this call every disguised boss in an instanced world can pin that

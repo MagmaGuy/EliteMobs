@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FreshCustomEnchantmentTest {
     private final Map<NamespacedKey, ItemType> originalItemTypes = new java.util.HashMap<>();
+    private final Map<Material, Object> originalItemTypeSuppliers = new java.util.HashMap<>();
     private MagmaCore previousCore;
     private static final CustomItemTagContainer EMPTY_OLD_TAGS = (CustomItemTagContainer) Proxy.newProxyInstance(
             CustomItemTagContainer.class.getClassLoader(), new Class<?>[]{CustomItemTagContainer.class},
@@ -102,6 +103,8 @@ class FreshCustomEnchantmentTest {
         var mapField = RegistryMock.class.getDeclaredField("keyedMap");
         mapField.setAccessible(true);
         var entries = (Map<NamespacedKey, ItemType>) mapField.get(Registry.ITEM);
+        var itemTypeField = Material.class.getDeclaredField("itemType");
+        itemTypeField.setAccessible(true);
         for (String name : new String[]{"leather_helmet", "diamond_helmet"}) {
             var key = NamespacedKey.minecraft(name);
             var original = Registry.ITEM.get(key);
@@ -118,6 +121,10 @@ class FreshCustomEnchantmentTest {
                         catch (InvocationTargetException failure) { throw failure.getCause(); }
                     });
             entries.put(key, replacement);
+            // Material caches its own ItemType supplier independently of Registry.ITEM.
+            Material material = Material.matchMaterial(name);
+            originalItemTypeSuppliers.put(material, itemTypeField.get(material));
+            itemTypeField.set(material, (java.util.function.Supplier<ItemType>) () -> replacement);
         }
     }
 
@@ -134,6 +141,10 @@ class FreshCustomEnchantmentTest {
         var mapField = RegistryMock.class.getDeclaredField("keyedMap");
         mapField.setAccessible(true);
         ((Map<NamespacedKey, ItemType>) mapField.get(Registry.ITEM)).putAll(originalItemTypes);
+        var itemTypeField = Material.class.getDeclaredField("itemType");
+        itemTypeField.setAccessible(true);
+        for (var entry : originalItemTypeSuppliers.entrySet())
+            itemTypeField.set(entry.getKey(), entry.getValue());
         MockBukkit.unmock();
         var coreInstance = MagmaCore.class.getDeclaredField("instance");
         coreInstance.setAccessible(true);
@@ -182,6 +193,109 @@ class FreshCustomEnchantmentTest {
         int hunter = EnchantmentItems.inspectCustom(item.getItemMeta()).getOrDefault("elitemobs:hunter", 0);
         assertTrue(hunter >= 1 && hunter <= 3, "Guaranteed custom-enchantment roll must produce Hunter");
         assertHunter(item, hunter);
+    }
+
+    @Test void oasisFinalPhaseAwardsRealEquipmentWithoutFmmOrAdvancedCombat() throws Exception {
+        // The Beacon final phase's actual ordinary helmet entry from Oasis v27. The other
+        // two candidates use its actual staff/wand material and role to exercise exclusion.
+        new com.magmaguy.elitemobs.config.ClassLootSettingsConfig();
+        var itemYaml = new YamlConfiguration();
+        itemYaml.loadFromString("""
+                isEnabled: true
+                itemType: CLASS_LOOT
+                material: DIAMOND_HELMET
+                name: '&dEnlightened Fedora'
+                lore: ['&dThe light shall never fade.']
+                classLootFamily: DPS_HELMETS
+                """);
+        String helmetName = "cl_the_oasis_adventure_coast_legacy_7_dps_helmets_e4ea7446.yml";
+        var helmetFields = new CustomItemsConfigFields(helmetName, true);
+        helmetFields.setFileConfiguration(itemYaml);
+        helmetFields.processConfigFields();
+        new CustomItem(helmetFields);
+        for (String[] magic : new String[][]{
+                {"cl_the_oasis_adventure_coast_legacy_7_staves_751d9dd8.yml", "WOODEN_SPEAR", "STAVES", "Tide Measure Staff"},
+                {"cl_the_oasis_adventure_coast_legacy_7_wands_a647820b.yml", "BLAZE_ROD", "WANDS", "Lamp Tender Baton"}}) {
+            var yaml = new YamlConfiguration();
+            yaml.set("isEnabled", true);
+            yaml.set("itemType", "CLASS_LOOT");
+            yaml.set("material", magic[1]);
+            yaml.set("name", magic[3]);
+            yaml.set("lore", List.of());
+            yaml.set("weaponType", magic[2]);
+            var fields = new CustomItemsConfigFields(magic[0], true);
+            fields.setFileConfiguration(yaml);
+            fields.processConfigFields();
+            new CustomItem(fields);
+        }
+        var bossYaml = new YamlConfiguration();
+        bossYaml.loadFromString("""
+                isEnabled: true
+                entityType: IRON_GOLEM
+                name: '$bossLevel &6The Beacon'
+                level: 45
+                bossType: BOSS
+                classLoot: true
+                classLootRank: BOSS
+                classLootDifficulty: AUTO
+                dropsVanillaLoot: false
+                uniqueLootList:
+                - filename: cl_the_oasis_adventure_coast_legacy_7_dps_helmets_e4ea7446.yml
+                  chance: 1
+                - filename: cl_the_oasis_adventure_coast_legacy_7_staves_751d9dd8.yml
+                  chance: 1
+                - filename: cl_the_oasis_adventure_coast_legacy_7_wands_a647820b.yml
+                  chance: 1
+                """);
+        var bossFields = new com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields(
+                "oasis_45_the_beacon_phase_4.yml", true);
+        bossFields.setFileConfiguration(bossYaml);
+        bossFields.setFile(MetadataHandler.PLUGIN.getDataFolder().toPath()
+                .resolve("oasis_45_the_beacon_phase_4.yml").toFile());
+        // This fixture does not initialize entity spawning; provide only the known actor type.
+        try (var actorTypes = org.mockito.Mockito.mockStatic(
+                com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties.class)) {
+            actorTypes.when(() -> com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties
+                    .getPluginData(org.bukkit.entity.EntityType.IRON_GOLEM)).thenReturn(org.mockito.Mockito.mock(
+                    com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties.class));
+            bossFields.processConfigFields();
+        }
+        var player = MockBukkit.getMock().addPlayer();
+        var boss = org.mockito.Mockito.mock(com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity.class);
+        var liveFields = com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity.class
+                .getDeclaredField("customBossesConfigFields");
+        liveFields.setAccessible(true);
+        liveFields.set(boss, bossFields);
+        org.mockito.Mockito.when(boss.getCustomBossesConfigFields()).thenReturn(bossFields);
+        org.mockito.Mockito.when(boss.getDamagers()).thenReturn(new java.util.HashMap<>(Map.of(player, 100D)));
+        org.mockito.Mockito.when(boss.getMaxHealth()).thenReturn(100D);
+        org.mockito.Mockito.when(boss.getLevel()).thenReturn(45);
+        org.mockito.Mockito.when(boss.getName()).thenReturn("The Beacon");
+        org.mockito.Mockito.when(boss.getLocation()).thenReturn(player.getLocation());
+        var directField = ItemSettingsConfig.class.getDeclaredField("putLootDirectlyIntoPlayerInventory");
+        directField.setAccessible(true);
+        boolean previousDirect = directField.getBoolean(null);
+        directField.setBoolean(null, true);
+        try (var data = org.mockito.Mockito.mockStatic(com.magmaguy.elitemobs.playerdata.database.PlayerData.class)) {
+            data.when(() -> com.magmaguy.elitemobs.playerdata.database.PlayerData.isInMemory(player.getUniqueId())).thenReturn(true);
+            assertFalse(org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels"));
+            assertFalse(com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule.isInitialized());
+            assertEquals(List.of(ClassLootFamily.DPS_HELMETS), ClassLootCoverage.availableFamilies(bossFields,
+                    com.magmaguy.elitemobs.config.ClassLootSettingsConfig.Difficulty.NORMAL,
+                    com.magmaguy.elitemobs.config.ClassLootSettingsConfig.Rank.BOSS, player));
+            var death = org.mockito.Mockito.mock(org.bukkit.event.entity.EntityDeathEvent.class);
+            org.mockito.Mockito.when(death.getDrops()).thenReturn(new java.util.ArrayList<>());
+            new com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossDeath().onEliteMobDeath(
+                    new com.magmaguy.elitemobs.api.EliteMobDeathEvent(boss, death));
+            var equipment = java.util.Arrays.stream(player.getInventory().getStorageContents())
+                    .filter(java.util.Objects::nonNull).toList();
+            assertEquals(1, equipment.size());
+            assertEquals(Material.DIAMOND_HELMET, equipment.getFirst().getType());
+            assertEquals("Enlightened Fedora", ChatColor.stripColor(equipment.getFirst().getItemMeta().getDisplayName()));
+            assertEquals(helmetName, ItemTagger.getCustomItemId(equipment.getFirst()));
+        } finally {
+            directField.setBoolean(null, previousDirect);
+        }
     }
 
     @Test void templatePositionSurvivesBookUpgradeAndRemovalThenReaddition() {

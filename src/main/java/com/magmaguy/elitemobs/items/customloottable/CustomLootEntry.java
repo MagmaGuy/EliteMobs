@@ -36,26 +36,28 @@ public class CustomLootEntry implements Serializable {
     }
 
     public boolean willDrop(Player player) {
-        if (!permission.isEmpty() && !player.hasPermission(permission)) return false;
+        if (amount <= 0 || !Double.isFinite(chance) || chance <= 0) return false;
+        if (!permission.isEmpty() && (player == null || !player.hasPermission(permission))) return false;
         return ThreadLocalRandom.current().nextDouble() < chance;
     }
 
-    public void locationDrop(int itemTier, Player player, Location dropLocation) {
-        //meant to be overriden by the classes that extend it
+    /** Returns whether delivery was accepted; chance is rolled once by the owning loot table. */
+    public boolean locationDrop(int itemTier, Player player, Location dropLocation) {
+        return false;
     }
 
-    public void directDrop(int itemTier, Player player) {
-        //meant to be overriden by the classes that extend it
-    }
-
-    //used specifically so loot can be attributed to the right source
-    public void locationDrop(int itemTier, Player player, Location dropLocation, EliteEntity eliteEntity) {
-        //meant to be overriden by the classes that extend it
+    public boolean directDrop(int itemTier, Player player) {
+        return false;
     }
 
     //used specifically so loot can be attributed to the right source
-    public void directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
-        //meant to be overriden by the classes that extend it
+    public boolean locationDrop(int itemTier, Player player, Location dropLocation, EliteEntity eliteEntity) {
+        return locationDrop(itemTier, player, dropLocation);
+    }
+
+    //used specifically so loot can be attributed to the right source
+    public boolean directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
+        return directDrop(itemTier, player);
     }
 
     //Used to preview rewards for quests

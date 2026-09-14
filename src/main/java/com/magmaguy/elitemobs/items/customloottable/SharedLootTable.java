@@ -73,7 +73,7 @@ public class SharedLootTable {
             partyLootTables.put(party.getId(), table);
         }
         List<Player> newParticipants = table.addParticipants(eligiblePlayers);
-        table.addLoot(itemStack, eligiblePlayers);
+        if (!table.addLoot(itemStack, eligiblePlayers)) return false;
         if (!created && !newParticipants.isEmpty()) table.messagePlayersLater(newParticipants);
         return true;
     }
@@ -145,17 +145,19 @@ public class SharedLootTable {
         return loot.stream().map(LootRollEntry::itemStack).toList();
     }
 
-    public void addLoot(ItemStack itemStack) {
-        addLoot(itemStack, participants.values());
+    public boolean addLoot(ItemStack itemStack) {
+        return addLoot(itemStack, participants.values());
     }
 
-    private void addLoot(ItemStack itemStack, Collection<Player> eligiblePlayers) {
-        if (itemStack == null || closed) return;
+    private boolean addLoot(ItemStack itemStack, Collection<Player> eligiblePlayers) {
+        if (itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0
+                || closed || eligiblePlayers.isEmpty()) return false;
         loot.add(new LootRollEntry(
                 UUID.randomUUID(),
                 itemStack,
                 eligiblePlayers.stream().map(Player::getUniqueId).collect(Collectors.toUnmodifiableSet())));
         lastLootAddedNanos = System.nanoTime();
+        return true;
     }
 
     private List<Player> addParticipants(Collection<Player> players) {

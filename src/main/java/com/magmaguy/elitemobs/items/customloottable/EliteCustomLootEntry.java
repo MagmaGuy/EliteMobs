@@ -165,108 +165,91 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         return customItem != null && customItem.getScalability() == CustomItem.Scalability.SCALABLE;
     }
 
-    //treasure chest
     @Override
-    public void locationDrop(int itemTier, Player player, Location location) {
-        CustomItem customItem = generateCustomItem();
-        if (customItem == null) {
-            Logger.warn("Invalid loot entry for treasure chest! Entry: " + filename);
-            return;
-        }
-        for (int i = 0; i < getAmount(); i++)
-            customItem.dropPlayerLoot(player, itemTier, location, null);
+    public boolean willDrop(Player player) {
+        return matchesDungeonDifficulty(player) && super.willDrop(player);
     }
 
-    public void locationDropExactLevel(int itemTier, Player player, Location location) {
-        CustomItem customItem = generateCustomItem();
-        if (customItem == null) {
-            Logger.warn("Invalid loot entry for treasure chest! Entry: " + filename);
-            return;
-        }
-        for (int i = 0; i < getAmount(); i++)
-            customItem.dropPlayerLootExact(player, itemTier, location, null);
+    private boolean matchesDungeonDifficulty(Player player) {
+        if (difficultyIDs == null) return true;
+        MatchInstance instance = player == null ? null : PlayerData.getMatchInstance(player);
+        return !(instance instanceof DungeonInstance dungeon)
+                || dungeon.matchesDifficulty(difficultyIDs, configFilename);
     }
 
-    //This is for the custom boss drop
+    // Chests deliver personal loot, but retain the entry's dungeon difficulty filter.
     @Override
-    public void locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
-        if (isGroupLoot(itemTier, player, eliteEntity)) return;
-        CustomItem customItem = generateCustomItem();
-        if (customItem == null) {
-            Logger.warn("Invalid loot entry for boss " + eliteEntity.getName() + "! Entry: " + filename);
-            if (eliteEntity instanceof CustomBossEntity customBossEntity)
-                Logger.warn("Boss filename: " + customBossEntity.getCustomBossesConfigFields().getFilename());
-            return;
-        }
-        for (int i = 0; i < getAmount(); i++)
-            customItem.dropPlayerLoot(player, itemTier, location, eliteEntity);
+    public boolean locationDrop(int itemTier, Player player, Location location) {
+        return dropPhysical(itemTier, player, location, null, false);
+    }
+
+    public boolean locationDropExactLevel(int itemTier, Player player, Location location) {
+        return dropPhysical(itemTier, player, location, null, true);
     }
 
     @Override
-    public void directDrop(int itemTier, Player player) {
-        CustomItem customItem = generateCustomItem();
-        if (customItem == null) {
-            Logger.warn("Invalid loot entry for direct drop! Entry: " + filename);
-            return;
+    public boolean locationDrop(int itemTier, Player player, Location location, EliteEntity eliteEntity) {
+        GroupDelivery group = groupDelivery(itemTier, player, eliteEntity);
+        if (group != GroupDelivery.PERSONAL) return group == GroupDelivery.DELIVERED;
+        return dropPhysical(itemTier, player, location, eliteEntity, false);
+    }
+
+    private boolean dropPhysical(int level, Player player, Location location, EliteEntity source, boolean exactLevel) {
+        if (!matchesDungeonDifficulty(player) || getAmount() <= 0) return false;
+        CustomItem item = generateCustomItem();
+        if (item == null) {
+            Logger.warn("Invalid loot entry for " + (source == null ? "treasure chest" : "boss " + source.getName())
+                    + "! Entry: " + filename);
+            return false;
+        }
+        boolean delivered = false;
+        for (int copy = 0; copy < getAmount(); copy++)
+            delivered |= (exactLevel ? item.dropPlayerLootExact(player, level, location, source)
+                    : item.dropPlayerLoot(player, level, location, source)) != null;
+        return delivered;
+    }
+
+    @Override
+    public boolean directDrop(int itemTier, Player player) {
+        return dropDirect(itemTier, player, null, false);
+    }
+
+    public boolean directDropExactLevel(int itemTier, Player player) {
+        return dropDirect(itemTier, player, null, true);
+    }
+
+    @Override
+    public boolean directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
+        GroupDelivery group = groupDelivery(itemTier, player, eliteEntity);
+        if (group != GroupDelivery.PERSONAL) return group == GroupDelivery.DELIVERED;
+        return dropDirect(itemTier, player, eliteEntity, false);
+    }
+
+    private boolean dropDirect(int level, Player player, EliteEntity source, boolean exactLevel) {
+        if (!matchesDungeonDifficulty(player) || getAmount() <= 0) return false;
+        CustomItem item = generateCustomItem();
+        if (item == null) {
+            Logger.warn("Invalid loot entry for " + (source == null ? "direct drop" : "boss " + source.getName())
+                    + "! Entry: " + filename);
+            return false;
         }
         String name = null;
-        int delivered = 0;
-        for (int i = 0; i < getAmount(); i++) {
-            ItemStack itemStack = customItem.generateItemStack(itemTier, player, null);
-            if (itemStack == null) continue;
-            delivered += deliver(player, itemStack);
-            if (name == null && itemStack.getItemMeta() != null) {
-                if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
-                else name = itemStack.getType().toString().replace("_", " ");
-            }
+        int stored = 0;
+        boolean delivered = false;
+        for (int copy = 0; copy < getAmount(); copy++) {
+            ItemStack stack = exactLevel ? item.generateItemStackExact(level, player, source)
+                    : item.generateItemStack(level, player, source);
+            if (stack == null || stack.getType().isAir() || stack.getAmount() <= 0) continue;
+            stored += deliver(player, stack);
+            // Overflow is awarded on the ground even when nothing fits in the inventory.
+            delivered = true;
+            if (name == null && stack.getItemMeta() != null)
+                name = stack.getItemMeta().hasDisplayName() ? stack.getItemMeta().getDisplayName()
+                        : stack.getType().toString().replace("_", " ");
         }
-        if (name != null && delivered > 0)
-            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", delivered + "x " + name));
-    }
-
-    public void directDropExactLevel(int itemTier, Player player) {
-        CustomItem customItem = generateCustomItem();
-        if (customItem == null) {
-            Logger.warn("Invalid loot entry for direct drop! Entry: " + filename);
-            return;
-        }
-        String name = null;
-        int delivered = 0;
-        for (int i = 0; i < getAmount(); i++) {
-            ItemStack itemStack = customItem.generateItemStackExact(itemTier, player, null);
-            if (itemStack == null) continue;
-            delivered += deliver(player, itemStack);
-            if (name == null && itemStack.getItemMeta() != null) {
-                if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
-                else name = itemStack.getType().toString().replace("_", " ");
-            }
-        }
-        if (name != null && delivered > 0)
-            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", delivered + "x " + name));
-    }
-
-    //This is the drop for boss loot
-    @Override
-    public void directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
-        if (isGroupLoot(itemTier, player, eliteEntity)) return;
-        CustomItem customItem = generateCustomItem();
-        if (customItem == null) {
-            Logger.warn("Invalid loot entry for boss " + eliteEntity.getName() + "! Entry: " + filename);
-            return;
-        }
-        String name = null;
-        int delivered = 0;
-        for (int i = 0; i < getAmount(); i++) {
-            ItemStack itemStack = customItem.generateItemStack(itemTier, player, eliteEntity);
-            if (itemStack == null) continue;
-            delivered += deliver(player, itemStack);
-            if (name == null && itemStack.getItemMeta() != null) {
-                if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
-                else name = itemStack.getType().toString().replace("_", " ");
-            }
-        }
-        if (name != null && delivered > 0)
-            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", delivered + "x " + name));
+        if (name != null && stored > 0)
+            player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", stored + "x " + name));
+        return delivered;
     }
 
     private static int deliver(Player player, ItemStack item) {
@@ -300,69 +283,67 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
         return com.magmaguy.elitemobs.items.LootItemPolicy.isEquipment(generateCustomItem());
     }
 
-    private boolean isGroupLoot(int itemTier, Player player, EliteEntity eliteEntity) {
+    private enum GroupDelivery { PERSONAL, SKIPPED, DELIVERED }
+
+    private GroupDelivery groupDelivery(int itemTier, Player player, EliteEntity eliteEntity) {
+        if (!matchesDungeonDifficulty(player) || getAmount() <= 0) return GroupDelivery.SKIPPED;
         if (difficultyIDs != null) {
             MatchInstance matchInstance = PlayerData.getMatchInstance(player);
-            if (matchInstance instanceof DungeonInstance dungeonInstance) {
-                // Beyond this point the item is for an instanced dungeon. A mismatched difficulty suppresses it.
-                if (!dungeonInstance.matchesDifficulty(difficultyIDs, configFilename)) return true;
-                if (!isEquipment()) return false;
-                addGroupLoot(CustomItem.limitItemLevel(player, itemTier), eliteEntity);
-                return true;
+            if (matchInstance instanceof DungeonInstance) {
+                if (!isEquipment()) return GroupDelivery.PERSONAL;
+                return addGroupLoot(CustomItem.limitItemLevel(player, itemTier), eliteEntity)
+                        ? GroupDelivery.DELIVERED : GroupDelivery.SKIPPED;
             }
         }
 
-        if (!isEquipment() || !PartyManager.shouldUsePartyLoot(player, eliteEntity)) return false;
+        if (!isEquipment() || !PartyManager.shouldUsePartyLoot(player, eliteEntity)) return GroupDelivery.PERSONAL;
         return addPartyLoot(CustomItem.limitItemLevel(player, itemTier), player, eliteEntity);
     }
 
-    private void addGroupLoot(int itemTier, EliteEntity eliteEntity) {
+    private boolean addGroupLoot(int itemTier, EliteEntity eliteEntity) {
         SharedLootTable sharedLootTable = SharedLootTable.getSharedLootTables().get(eliteEntity);
-        String name = null;
+        boolean delivered = false;
         for (int i = 0; i < getAmount(); i++) {
             CustomItem customItem = generateCustomItem();
             if (customItem == null) {
                 Logger.warn("Failed to generate a custom item for the boss " + eliteEntity.getName() + "! The configuration file for one of its loot items is not correctly configured.");
-                return;
+                return delivered;
             }
             ItemStack itemStack = customItem.generateItemStack(itemTier, null, eliteEntity);
-            if (sharedLootTable == null) sharedLootTable = new SharedLootTable(eliteEntity);
             if (itemStack == null) {
                 Logger.warn("A custom item for boss " + eliteEntity.getName() + " was null! This item will be skipped.");
-                return;
+                return delivered;
             }
-            sharedLootTable.addLoot(itemStack);
-            if (name == null && itemStack.getItemMeta() != null) {
-                if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
-                else name = itemStack.getType().toString().replace("_", " ");
-            }
+            if (sharedLootTable == null) sharedLootTable = new SharedLootTable(eliteEntity);
+            delivered |= sharedLootTable.addLoot(itemStack);
         }
+        return delivered;
     }
 
-    private boolean addPartyLoot(int itemTier, Player contributor, EliteEntity eliteEntity) {
+    private GroupDelivery addPartyLoot(int itemTier, Player contributor, EliteEntity eliteEntity) {
         boolean pooledAnyItem = false;
         for (int i = 0; i < getAmount(); i++) {
             CustomItem customItem = generateCustomItem();
             if (customItem == null) {
                 Logger.warn("Failed to generate a custom item for the boss " + eliteEntity.getName()
                         + "! The configuration file for one of its loot items is not correctly configured.");
-                return true;
+                return pooledAnyItem ? GroupDelivery.DELIVERED : GroupDelivery.SKIPPED;
             }
             ItemStack itemStack = customItem.generateItemStack(itemTier, null, eliteEntity);
             if (itemStack == null) {
                 Logger.warn("A custom item for boss " + eliteEntity.getName()
                         + " was null! This item will be skipped.");
-                return true;
+                return pooledAnyItem ? GroupDelivery.DELIVERED : GroupDelivery.SKIPPED;
             }
             if (!SharedLootTable.addPartyLoot(eliteEntity, contributor, itemStack)) {
                 // The lockout-aware eligibility check may reject a pool which looked viable before
                 // the item was generated. Fall back to the normal personal path only if nothing was
                 // already committed to the vote, preventing either item loss or duplication.
-                return pooledAnyItem;
+                return pooledAnyItem ? GroupDelivery.DELIVERED : GroupDelivery.PERSONAL;
             }
             pooledAnyItem = true;
         }
-        return true;
+        return pooledAnyItem ? GroupDelivery.DELIVERED : GroupDelivery.SKIPPED;
     }
 
     @Override

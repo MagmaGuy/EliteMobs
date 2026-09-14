@@ -127,6 +127,9 @@ dependencies {
 
     testImplementation platform('org.junit:junit-bom:6.1.3')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core:5.23.0'
+    testRuntimeOnly('LibsDisguises:LibsDisguises:10.0.26') { transitive = false }
+    testRuntimeOnly('com.comphenix.protocol:ProtocolLib:4.7.0') { transitive = false }
     testImplementation 'org.mockbukkit.mockbukkit:mockbukkit-v26.2:4.116.1'
     testImplementation 'io.papermc.paper:paper-api:26.2.build.111-stable'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

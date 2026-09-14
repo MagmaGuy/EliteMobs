@@ -453,35 +453,23 @@ public class CustomItem {
 
     public Item dropPlayerLoot(Player player, int tier, Location location, EliteEntity eliteEntity) {
         if (!permission.isEmpty() && !player.hasPermission(permission)) return null;
-        Item loot = null;
         int itemTier = limitItemLevel(player, tier);
-
-        switch (getScalability()) {
-            case LIMITED:
-                loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructLimitedItem(itemTier, this, player, eliteEntity));
-                break;
-            case SCALABLE:
-                loot = location.getWorld().dropItem(location,
-                        ScalableItemConstructor.constructScalableItem(itemTier, this, player, eliteEntity));
-                break;
-            case FIXED:
-                loot = location.getWorld().dropItem(location, generateItemStack(itemLevel, player, eliteEntity));
-            default:
-        }
-
-        if (player != null) loot.setOwner(player.getUniqueId());
-        SoulbindEnchantment.addPhysicalDisplay(loot, player);
-        loot.setCustomName(loot.getItemStack().getItemMeta().getDisplayName());
-        loot.setCustomNameVisible(true);
-
-        return loot;
+        ItemStack itemStack = switch (getScalability()) {
+            case LIMITED -> ScalableItemConstructor.constructLimitedItem(itemTier, this, player, eliteEntity);
+            case SCALABLE -> ScalableItemConstructor.constructScalableItem(itemTier, this, player, eliteEntity);
+            case FIXED -> generateItemStack(itemLevel, player, eliteEntity);
+        };
+        return dropConstructedLoot(itemStack, player, location);
     }
 
     public Item dropPlayerLootExact(Player player, int level, Location location, EliteEntity eliteEntity) {
         if (!permission.isEmpty() && !player.hasPermission(permission)) return null;
         ItemStack itemStack = generateItemStackExact(level, player, eliteEntity);
-        if (itemStack == null) return null;
+        return dropConstructedLoot(itemStack, player, location);
+    }
+
+    private Item dropConstructedLoot(ItemStack itemStack, Player player, Location location) {
+        if (itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0) return null;
         Item loot = location.getWorld().dropItem(location, itemStack);
         if (player != null) loot.setOwner(player.getUniqueId());
         SoulbindEnchantment.addPhysicalDisplay(loot, player);

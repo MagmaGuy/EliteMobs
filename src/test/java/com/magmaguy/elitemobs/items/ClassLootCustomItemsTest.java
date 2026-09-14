@@ -102,10 +102,10 @@ class ClassLootCustomItemsTest {
         // Null drop context would fail inside a normal item drop. CLASS_LOOT must be excluded before rolling.
         table.bossDrop(null, 100, null, null);
         var ordinary = new CustomLootEntry() {
-            @Override public void locationDrop(int level, org.bukkit.entity.Player player,
-                    org.bukkit.Location location, com.magmaguy.elitemobs.mobconstructor.EliteEntity entity) { delivered++; }
-            @Override public void directDrop(int level, org.bukkit.entity.Player player,
-                    com.magmaguy.elitemobs.mobconstructor.EliteEntity entity) { delivered++; }
+            @Override public boolean locationDrop(int level, org.bukkit.entity.Player player,
+                    org.bukkit.Location location, com.magmaguy.elitemobs.mobconstructor.EliteEntity entity) { delivered++; return true; }
+            @Override public boolean directDrop(int level, org.bukkit.entity.Player player,
+                    com.magmaguy.elitemobs.mobconstructor.EliteEntity entity) { delivered++; return true; }
         };
         table.getEntries().add(ordinary);
         table.bossDrop(null, 100, null, null);

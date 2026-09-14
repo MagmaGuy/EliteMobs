@@ -16,13 +16,15 @@ import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
@@ -261,6 +263,16 @@ public class NPCInteractions implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void playerNPCInteract(PlayerInteractAtEntityEvent event) {
+        interactWithNPC(event);
+    }
+
+    // Bukkit gives these event types separate handler lists; clients may send both packets.
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void playerNPCInteractGeneric(PlayerInteractEntityEvent event) {
+        interactWithNPC(event);
+    }
+
+    private void interactWithNPC(PlayerInteractEntityEvent event) {
         if (event.isCancelled()) return;
         NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());
         if (npcEntity == null) return;
@@ -280,15 +292,10 @@ public class NPCInteractions implements Listener {
 
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent event) {
-
-        if (!event.getInventory().getType().equals(InventoryType.MERCHANT)) return;
-
-        for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values())
-            if (event.getView().getTitle().equals(npcEntity.getNPCsConfigFields().getName())) {
-                event.setCancelled(true);
-                return;
-            }
-
+        if (event.getInventory() instanceof MerchantInventory inventory
+                && inventory.getMerchant() instanceof Entity merchant
+                && EntityTracker.getNPCEntity(merchant) != null)
+            event.setCancelled(true);
     }
 
     public enum NPCInteractionType {

@@ -10,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class CommandLootTable extends CustomLootEntry implements Serializable {
     @Getter
@@ -69,19 +68,18 @@ public class CommandLootTable extends CustomLootEntry implements Serializable {
 
     //treasure chest
     @Override
-    public void locationDrop(int itemTier, Player player, Location location) {
-        if (!getPermission().isEmpty() && !player.hasPermission(getPermission())) return;
-        if (ThreadLocalRandom.current().nextDouble() < getChance()) return;
-        for (int i = 0; i < getAmount(); i++)
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
+    public boolean locationDrop(int itemTier, Player player, Location location) {
+        return directDrop(itemTier, player);
     }
 
     @Override
-    public void directDrop(int itemTier, Player player) {
-        if (!getPermission().isEmpty() && !player.hasPermission(getPermission())) return;
-        if (ThreadLocalRandom.current().nextDouble() < getChance()) return;
+    public boolean directDrop(int itemTier, Player player) {
+        if (command == null || command.isBlank() || getAmount() <= 0) return false;
+        if (!getPermission().isEmpty() && !player.hasPermission(getPermission())) return false;
+        boolean dispatched = false;
         for (int i = 0; i < getAmount(); i++)
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
+            dispatched |= Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
+        return dispatched;
     }
 
     @Override

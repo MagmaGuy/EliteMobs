@@ -94,16 +94,20 @@ public class CurrencyCustomLootEntry extends CustomLootEntry implements Serializ
 
 
     @Override
-    public void locationDrop(int itemTier, Player player, Location location) {
+    public boolean locationDrop(int itemTier, Player player, Location location) {
+        if (currencyAmount <= 0 || getAmount() <= 0) return false;
         new ItemLootShower(location, player, currencyAmount);
+        return true;
     }
 
     @Override
-    public void directDrop(int itemTier, Player player) {
+    public boolean directDrop(int itemTier, Player player) {
+        if (currencyAmount <= 0 || getAmount() <= 0) return false;
         EconomyHandler.addCurrency(player.getUniqueId(), currencyAmount);
         player.sendMessage(ItemSettingsConfig.getDirectDropCoinMessage()
                 .replace("$amount", currencyAmount + "")
                 .replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
+        return true;
     }
 
     @Override

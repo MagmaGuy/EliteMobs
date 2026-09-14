@@ -32,6 +32,8 @@ public class ScriptListener implements Listener {
     }
 
     public static void runEvent(FallingEntityDataPair fallingEntityDataPair, Location landingLocation) {
+        if (!fallingEntityDataPair.getScriptAction().canRunContinuation(fallingEntityDataPair.getScriptActionData()))
+            return;
         for (String string : fallingEntityDataPair.getScriptAction().getBlueprint().getLandingScripts()) {
             ScriptExecutable iteratedScript = fallingEntityDataPair.getScriptAction().getEliteScriptMap().get(string);
             if (iteratedScript == null) {

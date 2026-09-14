@@ -686,10 +686,10 @@ public class EliteEntity {
                 try {
                     if (body != null) {
                         try {
+                            body.remove();
+                        } finally {
                             if (org.bukkit.Bukkit.getPluginManager().isPluginEnabled("LibsDisguises"))
                                 com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity.undisguise(body);
-                        } finally {
-                            body.remove();
                         }
                     }
                 } finally {
@@ -1425,7 +1425,7 @@ public class EliteEntity {
         beginRemovalCall();
         try {
             closePowerStances();
-            closeAllPowerRuntimes();
+            closeAllPowerRuntimes(removalReason);
             closeEliteLuaPowerBinding();
             closePowerSuppression();
             // Persistent bosses can dispose of a body without a terminal remove event.
@@ -1436,21 +1436,23 @@ public class EliteEntity {
             //Custom bosses have their own tracking removal rules
             if (livingEntity != null && (!(this instanceof CustomBossEntity)))
                 EntityTracker.getEliteMobEntities().remove(eliteUUID);
+            LivingEntity removedBody = livingEntity;
+            // Invalidating the body first prevents LibsDisguises from scheduling a
+            // tracker refresh that can reveal the discarded body after a phase switch.
+            if (removedBody != null && !removalReason.equals(RemovalReason.DEATH))
+                removedBody.remove();
             //LibsDisguises' registry holds a hard reference to disguised entities and does
             //not reliably release it when the entity or its world goes away, pinning
             //instanced-world ServerLevels in memory. On death the undisguise is delayed
             //so the death animation still plays on the disguised form.
-            if (livingEntity != null && org.bukkit.Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
+            if (removedBody != null && org.bukkit.Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
                 if (removalReason.equals(RemovalReason.DEATH)) {
-                    org.bukkit.entity.LivingEntity disguisedEntity = livingEntity;
                     org.bukkit.Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN,
-                            () -> com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity.undisguise(disguisedEntity), 60L);
+                            () -> com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity.undisguise(removedBody), 60L);
                 } else {
-                    com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity.undisguise(livingEntity);
+                    com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity.undisguise(removedBody);
                 }
             }
-            if (livingEntity != null && !removalReason.equals(RemovalReason.DEATH))
-                livingEntity.remove();
             if (livingEntity instanceof EnderDragon enderDragon && removalReason.equals(RemovalReason.DEATH)) {
                 enderDragon.setPhase(EnderDragon.Phase.DYING);
                 if (enderDragon.getDragonBattle() != null)
@@ -1480,9 +1482,16 @@ public class EliteEntity {
     }
 
     private void closeAllPowerRuntimes() {
+        closeAllPowerRuntimes(RemovalReason.OTHER);
+    }
+
+    private void closeAllPowerRuntimes(RemovalReason removalReason) {
         for (ElitePower elitePower : elitePowers) {
             try {
-                elitePower.closeRuntime();
+                if (elitePower instanceof EliteScript eliteScript)
+                    eliteScript.closeRuntime(removalReason);
+                else
+                    elitePower.closeRuntime();
             } catch (RuntimeException exception) {
                 Logger.warn("Failed to close an EliteMobs power runtime: "
                         + exception.getMessage());

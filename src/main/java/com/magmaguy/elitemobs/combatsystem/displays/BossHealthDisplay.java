@@ -113,7 +113,10 @@ public class BossHealthDisplay implements Listener {
         EliteOverheadHealthDisplay display = getOrCreateDisplay(eliteEntity);
         display.resetCombatTimer();
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
-            if (eliteEntity.isValid()) display.rebuild();
+            // A phase switch can remove this display and respawn the same logical boss
+            // before the queued refresh runs. Only the current display still owns labels.
+            if (eliteEntity.isValid() && activeDisplays.get(eliteEntity.getEliteUUID()) == display)
+                display.rebuild();
         });
     }
 
