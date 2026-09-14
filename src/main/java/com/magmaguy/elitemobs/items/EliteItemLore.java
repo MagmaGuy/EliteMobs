@@ -51,6 +51,8 @@ public class EliteItemLore {
     private List<String> customLore = new ArrayList<>();
     private int prestigeLevel = 0;
     private List<String> thirdPartyLore = null;
+    private boolean hasCustomEnchantments;
+    private int customEnchantmentsPosition = -1;
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth) {
         this(itemStack, showItemWorth, false);
@@ -90,13 +92,14 @@ public class EliteItemLore {
         constructPotionEffects();
 
         constructItemWorth();
+        hasCustomEnchantments = !EnchantmentItems.inspectCustom(this.itemMeta).isEmpty();
 
         this.itemStack.setItemMeta(this.itemMeta);
         ItemStack rendered = ENCHANTMENT_PRESENTATION.refreshPresentation(this.itemStack, hostLore -> {
             if (isNewItem && !hostLore.isEmpty()) thirdPartyLore = hostLore;
             writeNewLore();
             return lore;
-        });
+        }, hostLore -> customEnchantmentsPosition);
         if (!itemStack.setItemMeta(rendered.getItemMeta()))
             throw new IllegalArgumentException("Elite item rejected its rebuilt metadata");
         this.itemStack = itemStack;
@@ -207,6 +210,7 @@ public class EliteItemLore {
     }
 
     private void writeNewLore() {
+        customEnchantmentsPosition = -1;
         if (thirdPartyLore != null)
             lore.addAll(thirdPartyLore);
 
@@ -245,7 +249,7 @@ public class EliteItemLore {
                 for (String entry : potionListLore)
                     lore.add(ItemSettingsConfig.getPotionEffectColor() + entry);
             } else if (string.contains("$customEnchantments")) {
-                // Shared Minecraft-style lines are composed by ENCHANTMENT_PRESENTATION.
+                if (customEnchantmentsPosition == -1) customEnchantmentsPosition = lore.size();
             } else if (string.contains("$loreResaleValue")) {
                 lore.add(itemWorth);
             } else if (string.contains("$customLore")) {
@@ -264,7 +268,8 @@ public class EliteItemLore {
                 if (!customLore.isEmpty())
                     lore.add(string.replace("$ifLore", ""));
             } else if (string.contains("$ifCustomEnchantments")) {
-                // Shared presentation owns the custom enchantment section.
+                if (hasCustomEnchantments)
+                    lore.add(string.replace("$ifCustomEnchantments", ""));
             } else if (!string.isEmpty())
                 lore.add(ChatColorConverter.convert(string));
         }

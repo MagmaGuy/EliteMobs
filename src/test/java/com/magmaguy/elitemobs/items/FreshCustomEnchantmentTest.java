@@ -10,6 +10,8 @@ import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems;
+import com.magmaguy.elitemobs.items.upgradesystem.UpgradeSystem;
 import com.magmaguy.magmacore.MagmaCore;
 import com.magmaguy.magmacore.enchantments.EnchantmentItems;
 import org.bukkit.ChatColor;
@@ -28,6 +30,7 @@ import java.nio.file.Files;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.List;
 import com.google.common.collect.ImmutableMultimap;
 import org.mockbukkit.mockbukkit.registry.RegistryMock;
 import org.mockbukkit.mockbukkit.inventory.meta.ArmorMetaMock;
@@ -39,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FreshCustomEnchantmentTest {
     private final Map<NamespacedKey, ItemType> originalItemTypes = new java.util.HashMap<>();
+    private MagmaCore previousCore;
     private static final CustomItemTagContainer EMPTY_OLD_TAGS = (CustomItemTagContainer) Proxy.newProxyInstance(
             CustomItemTagContainer.class.getClassLoader(), new Class<?>[]{CustomItemTagContainer.class},
             (proxy, method, arguments) -> {
@@ -73,6 +77,11 @@ class FreshCustomEnchantmentTest {
         supplyHelmetHandAttributes();
         var plugin = MockBukkit.loadSimple(ResourcePlugin.class);
         MetadataHandler.PLUGIN = plugin;
+        // Production initializes once per plugin classloader. Each mocked server needs its own owner.
+        var coreInstance = MagmaCore.class.getDeclaredField("instance");
+        coreInstance.setAccessible(true);
+        previousCore = MagmaCore.getInstance();
+        coreInstance.set(null, null);
         MagmaCore.createInstance(plugin);
         Files.createDirectories(plugin.getDataFolder().toPath());
         Files.writeString(plugin.getDataFolder().toPath().resolve("ProceduralItemGenerationSettings.yml"),
@@ -126,6 +135,9 @@ class FreshCustomEnchantmentTest {
         mapField.setAccessible(true);
         ((Map<NamespacedKey, ItemType>) mapField.get(Registry.ITEM)).putAll(originalItemTypes);
         MockBukkit.unmock();
+        var coreInstance = MagmaCore.class.getDeclaredField("instance");
+        coreInstance.setAccessible(true);
+        coreInstance.set(null, previousCore);
     }
 
     @Test void reportedHelmetRetainsHunterDataAndVisibleLoreOnCreationAndRedraw() throws Exception {
@@ -165,10 +177,77 @@ class FreshCustomEnchantmentTest {
     }
 
     @Test void proceduralHelmetRetainsRolledHunterDataAndVisibleLore() {
+        assertEquals(1.0, ProceduralItemGenerationSettingsConfig.getCustomEnchantmentChance());
         var item = ItemConstructor.constructItemWithMaterial(Material.DIAMOND_HELMET, 70, null, false);
         int hunter = EnchantmentItems.inspectCustom(item.getItemMeta()).getOrDefault("elitemobs:hunter", 0);
         assertTrue(hunter >= 1 && hunter <= 3, "Guaranteed custom-enchantment roll must produce Hunter");
         assertHunter(item, hunter);
+    }
+
+    @Test void templatePositionSurvivesBookUpgradeAndRemovalThenReaddition() {
+        var structure = ItemSettingsConfig.getLoreStructure();
+        structure.clear();
+        structure.addAll(List.of("Before", "$ifCustomEnchantmentsCustom Enchants", "$customEnchantments", "After"));
+        var item = ItemConstructor.constructItemWithMaterial(Material.DIAMOND_HELMET, 70, null, false);
+        item = EliteEnchantmentItems.ITEMS.previewAuthoredCustom(item, Map.of("elitemobs:hunter", 1)).apply(item);
+        var blankBook = new ItemStack(Material.ENCHANTED_BOOK);
+        var book = EliteEnchantmentItems.ITEMS.previewAuthoredCustom(blankBook, Map.of("elitemobs:hunter", 1)).apply(blankBook);
+        var upgraded = UpgradeSystem.upgrade(item, book);
+        assertEquals(List.of("Before", "Custom Enchants", "Hunter II", "After"), plainLore(upgraded));
+        assertEquals(2, EnchantmentItems.inspectCustom(upgraded.getItemMeta()).get("elitemobs:hunter"));
+        assertEquals(plainLore(upgraded), plainLore(EliteEnchantmentItems.ITEMS.refreshPresentation(upgraded)));
+
+        var removed = EliteEnchantmentItems.ITEMS.previewAuthoredCustom(upgraded, Map.of()).apply(upgraded);
+        new EliteItemLore(removed, false);
+        assertEquals(List.of("Before", "After"), plainLore(removed));
+        assertTrue(EnchantmentItems.inspectCustom(removed.getItemMeta()).isEmpty());
+        var readded = UpgradeSystem.upgrade(removed, book);
+        assertEquals(List.of("Before", "Custom Enchants", "Hunter I", "After"), plainLore(readded));
+    }
+
+    @Test void omittedPlaceholderHidesOnlyPresentationAndCanBeRestored() {
+        var item = ItemConstructor.constructItemWithMaterial(Material.DIAMOND_HELMET, 70, null, false);
+        var levels = EnchantmentItems.inspectCustom(item.getItemMeta());
+        var structure = ItemSettingsConfig.getLoreStructure();
+        var original = List.copyOf(structure);
+        structure.clear();
+        structure.add("Host lore");
+        new EliteItemLore(item, false);
+        assertEquals(List.of("Host lore"), plainLore(item));
+        assertEquals(levels, EnchantmentItems.inspectCustom(item.getItemMeta()));
+        assertEquals(List.of("Host lore"), plainLore(EliteEnchantmentItems.ITEMS.refreshPresentation(item)));
+        structure.clear();
+        structure.addAll(original);
+        new EliteItemLore(item, false);
+        assertHunter(item, levels.get("elitemobs:hunter"));
+    }
+
+    @Test void existingPrefixMovesToTemplateAndExternalEditsStillFailAtomically() {
+        var item = ItemConstructor.constructItemWithMaterial(Material.DIAMOND_HELMET, 70, null, false);
+        var levels = EnchantmentItems.inspectCustom(item.getItemMeta());
+        item = EliteEnchantmentItems.ITEMS.refreshPresentation(item, java.util.function.UnaryOperator.identity(), host -> 0);
+        var meta = item.getItemMeta();
+        var root = new NamespacedKey("magmacore", "enchantment_presentation");
+        var record = meta.getPersistentDataContainer().get(root, org.bukkit.persistence.PersistentDataType.TAG_CONTAINER);
+        assertNotNull(record);
+        record.remove(new NamespacedKey("magmacore", "position"));
+        meta.getPersistentDataContainer().set(root, org.bukkit.persistence.PersistentDataType.TAG_CONTAINER, record);
+        item.setItemMeta(meta);
+        new EliteItemLore(item, false);
+        assertHunter(item, levels.get("elitemobs:hunter"));
+        meta = item.getItemMeta();
+        var lore = meta.getLore();
+        lore.set(indexContaining(plainLore(item), "Hunter"), "Externally changed");
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        var snapshot = item.clone();
+        var modified = item;
+        assertThrows(IllegalArgumentException.class, () -> new EliteItemLore(modified, false));
+        assertEquals(snapshot, item);
+    }
+
+    private static List<String> plainLore(ItemStack item) {
+        return item.getItemMeta().getLore().stream().map(ChatColor::stripColor).toList();
     }
 
     private static void assertHunter(ItemStack item, int level) {
@@ -177,5 +256,17 @@ class FreshCustomEnchantmentTest {
         assertNotNull(item.getItemMeta().getLore());
         assertTrue(item.getItemMeta().getLore().stream().map(ChatColor::stripColor)
                 .anyMatch(line -> line.contains("Hunter")), "Hunter must be visible in the tooltip");
+        var lore = item.getItemMeta().getLore().stream().map(ChatColor::stripColor).toList();
+        int hunter = indexContaining(lore, "Hunter");
+        int header = indexContaining(lore, "Custom Enchants");
+        assertTrue(header >= 0 && hunter > header,
+                "Hunter must appear in the configured Custom Enchants section: " + lore);
+        int effects = indexContaining(lore, "Effects");
+        assertTrue(effects < 0 || hunter < effects, "Hunter must precede the Effects section");
+    }
+
+    private static int indexContaining(java.util.List<String> lore, String text) {
+        for (int index = 0; index < lore.size(); index++) if (lore.get(index).contains(text)) return index;
+        return -1;
     }
 }
