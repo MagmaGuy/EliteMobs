@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.config;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
+import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
 import com.magmaguy.elitemobs.items.ItemConsumables;
 import com.magmaguy.magmacore.MagmaCore;
 import com.magmaguy.magmacore.config.OutdatedConfigurationArchive;
@@ -30,12 +31,23 @@ class ConfigurationRetirementTest {
         }
     }
 
-    @BeforeEach void open() {
+    @BeforeEach void open() throws Exception {
+        resetMagmaCoreInstance();
         MockBukkit.mock();
         plugin = MockBukkit.loadSimple(ResourcePlugin.class);
         MetadataHandler.PLUGIN = plugin;
     }
-    @AfterEach void close() { MockBukkit.unmock(); }
+    @AfterEach void close() throws Exception {
+        MockBukkit.unmock();
+        resetMagmaCoreInstance();
+    }
+
+    private static void resetMagmaCoreInstance() throws Exception {
+        // Each MockBukkit server owns a different plugin data directory.
+        var instance = MagmaCore.class.getDeclaredField("instance");
+        instance.setAccessible(true);
+        instance.set(null, null);
+    }
 
     @Test void retiredSharedDefaultIsArchivedBeforeItsRealBundledReplacementIsGenerated() throws Exception {
         Path directory = plugin.getDataFolder().toPath().resolve("enchantments");
@@ -58,6 +70,41 @@ class ConfigurationRetirementTest {
         }
         OutdatedConfigurationArchive.archive(plugin);
         assertTrue(Files.exists(old));
+    }
+
+    @Test void welcomeQuestWithScottyIsArchivedAndRegeneratedWithoutHim() throws Exception {
+        Path directory = plugin.getDataFolder().toPath().resolve("customquests");
+        Files.createDirectories(directory);
+        Path quest = directory.resolve("ag_welcome_quest_1.yml");
+        String contents = "# customized welcome quest\r\nname: My welcome quest\r\ncustomObjectives:\r\n"
+                + "  Objective13:\r\n    objectiveType: DIALOG\r\n    filename: scroll_applier_config.yml\r\n    npcName: Scotty\r\n";
+        Files.writeString(quest, contents);
+        OutdatedConfigurationArchive.archive(plugin);
+        assertFalse(Files.exists(quest));
+        MagmaCore.createInstance(plugin);
+        new CustomQuestsConfig();
+        var fields = CustomQuestsConfig.getCustomQuests().get("ag_welcome_quest_1.yml");
+        assertNotNull(fields);
+        assertTrue(fields.isEnabled());
+        var replacement = YamlConfiguration.loadConfiguration(quest.toFile());
+        var objectives = replacement.getConfigurationSection("customObjectives");
+        assertNotNull(objectives);
+        assertEquals(15, objectives.getKeys(false).size());
+        assertFalse(objectives.contains("Objective13"));
+        for (String objective : objectives.getKeys(false))
+            assertNotEquals("scroll_applier_config.yml", objectives.getString(objective + ".filename"));
+        assertEquals("wood_league_arena_master.yml", objectives.getString("Objective14.filename"));
+        assertEquals("story_dungeons_quest_giver.yml", objectives.getString("Objective15.filename"));
+        assertEquals("training_dummy_lv1.yml", objectives.getString("Objective16.filename"));
+        String regenerated = Files.readString(quest);
+        OutdatedConfigurationArchive.archive(plugin);
+        assertEquals(regenerated, Files.readString(quest));
+        Path archive = plugin.getDataFolder().toPath().getParent().resolve("MagmaCore/outdated files");
+        try (var files = Files.walk(archive)) {
+            var originals = files.filter(Files::isRegularFile).toList();
+            assertEquals(1, originals.size());
+            assertEquals(contents, Files.readString(originals.getFirst()));
+        }
     }
 
     @Test void nativeDefaultsNoLongerRegenerateTheRetiredKey() {

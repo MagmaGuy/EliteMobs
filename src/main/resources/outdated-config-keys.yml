@@ -1,5 +1,12 @@
-# Files containing these retired top-level keys are preserved by MagmaCore
+# Files matching these retirement rules are preserved by MagmaCore
 # before configuration loading. Current defaults regenerate through their owners.
+# Scotty does not spawn with scrolls disabled. Regenerate the old welcome quest
+# without his objective; its replacement no longer matches this rule.
+customquests:
+  - files: [ag_welcome_quest_1.yml]
+    key: customObjectives.Objective13.filename
+    value: scroll_applier_config.yml
+
 enchantments:
   - maxLevelV2
 
