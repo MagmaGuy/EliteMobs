@@ -164,6 +164,8 @@ public final class AdvancedMagicWeaponIntegration implements Listener, AutoClose
     }
 
     private synchronized void warnUnavailable() {
+        // EliteMobs owns the single boot notice when the optional plugin is absent.
+        if (!Bukkit.getPluginManager().isPluginEnabled(FMM_PLUGIN_NAME)) return;
         if (warningSent || closed) return;
         warningSent = true;
         cancelReadinessWarning();

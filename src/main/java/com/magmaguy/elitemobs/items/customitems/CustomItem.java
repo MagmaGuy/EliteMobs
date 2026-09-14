@@ -80,6 +80,7 @@ public class CustomItem {
         if (itemLevel == 0 && customItemsConfigFields.getItemType() != ItemType.CLASS_LOOT)
             itemLevel = (int) EliteItemManager.getItemLevel(new ItemStack(customItemsConfigFields.getMaterial()));
         this.permission = customItemsConfigFields.getPermission();
+        if (isUnavailableWithoutModels(customItemsConfigFields)) return;
         if (!customItemsConfigFields.isEnabled()) return;
         if (customItemsConfigFields.getMaterial() == null) return;
         if (!parseEnchantments()) return;
@@ -113,6 +114,21 @@ public class CustomItem {
         if (!customItems.containsKey(fileName))
             return null;
         return customItems.get(fileName);
+    }
+
+    /** Missing optional FMM content is unavailable, not an invalid loot reference. */
+    public static boolean isUnavailableWithoutModels(String filename) {
+        if (filename == null) return false;
+        String key = filename.endsWith(".yml") ? filename : filename + ".yml";
+        return isUnavailableWithoutModels(CustomItemsConfig.getCustomItems().get(key));
+    }
+
+    private static boolean isUnavailableWithoutModels(CustomItemsConfigFields config) {
+        if (config == null || org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels"))
+            return false;
+        if (config.getWeaponType() == com.magmaguy.elitemobs.skills.SkillType.STAVES
+                || config.getWeaponType() == com.magmaguy.elitemobs.skills.SkillType.WANDS) return true;
+        return config.getEnchantments().stream().anyMatch(entry -> entry.startsWith("freeminecraftmodels:"));
     }
 
     private static void addCustomItem(String fileName, CustomItem customItem) {

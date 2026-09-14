@@ -25,6 +25,7 @@ public final class AdvancedMagicWeaponItems {
     }
 
     public static void register() {
+        if (!org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")) return;
         if (CustomItem.getCustomItem(STAFF_ITEM_ID) == null) new CustomItem(staff());
         if (CustomItem.getCustomItem(WAND_ITEM_ID) == null) new CustomItem(wand());
     }
@@ -35,6 +36,7 @@ public final class AdvancedMagicWeaponItems {
      * requested item level, generated lore and FMM presentation data in the debug loadout.
      */
     public static List<ItemStack> generateDebugLoadout(int itemLevel, Player player) {
+        if (!org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")) return List.of();
         List<ItemStack> items = new ArrayList<>(DEBUG_LOADOUT_IDS.size());
         for (String itemId : DEBUG_LOADOUT_IDS) {
             CustomItem customItem = CustomItem.getCustomItem(itemId);

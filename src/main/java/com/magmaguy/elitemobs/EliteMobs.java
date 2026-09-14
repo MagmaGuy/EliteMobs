@@ -135,6 +135,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EliteMobs extends JavaPlugin {
+    private boolean missingModelsWarningSent;
 
     public static final NightbreakPluginSpec NIGHTBREAK_PLUGIN_SPEC = new NightbreakPluginSpec(
             "EliteMobs",
@@ -223,6 +224,11 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("By MagmaGuy - v. " + MetadataHandler.PLUGIN.getDescription().getVersion());
 
         MagmaCore.onEnable(this);
+        if (!missingModelsWarningSent && !Bukkit.getPluginManager().isPluginEnabled(MODELS_PLUGIN)) {
+            missingModelsWarningSent = true;
+            Logger.warn("Wands, staves, their enchantments, and the mage class require FreeMinecraftModels. "
+                    + "These optional features are unavailable. Download: https://nightbreak.io/plugin/freeminecraftmodels/");
+        }
         enchantmentAnvil = com.magmaguy.magmacore.enchantments.EnchantmentAnvil.register(this, item -> null, item -> {
             if (com.magmaguy.elitemobs.items.ItemTagger.isEliteItem(item))
                 return "Use the EliteMobs enchanter for elite items.";

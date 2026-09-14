@@ -42,6 +42,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
             parseNewFormat(rawString, configFilename);
         }
         if (filename == null) return;
+        if (CustomItem.isUnavailableWithoutModels(filename)) return;
         CustomItem customItem = CustomItem.getCustomItem(filename);
         if (customItem == null && MetadataHandler.pluginState != PluginState.INITIALIZING)
             errorMessage(rawString, configFilename, "filename");
@@ -64,7 +65,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
                 default -> Logger.warn("Failed to read custom loot option " + key + " in " + configFilename);
             }
         }
-        entries.add(this);
+        if (!CustomItem.isUnavailableWithoutModels(filename)) entries.add(this);
     }
 
     //Format: filename.yml:chance:permission
@@ -152,6 +153,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     }
 
     public ItemStack generateItemStack(int level, Player player, EliteEntity eliteEntity) {
+        if (CustomItem.isUnavailableWithoutModels(filename)) return null;
         CustomItem customItem = generateCustomItem();
         if (customItem == null) {
             Logger.warn("Invalid custom item entry! Entry: " + filename);
@@ -195,6 +197,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     }
 
     private boolean dropPhysical(int level, Player player, Location location, EliteEntity source, boolean exactLevel) {
+        if (CustomItem.isUnavailableWithoutModels(filename)) return false;
         if (!matchesDungeonDifficulty(player) || getAmount() <= 0) return false;
         CustomItem item = generateCustomItem();
         if (item == null) {
@@ -226,6 +229,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     }
 
     private boolean dropDirect(int level, Player player, EliteEntity source, boolean exactLevel) {
+        if (CustomItem.isUnavailableWithoutModels(filename)) return false;
         if (!matchesDungeonDifficulty(player) || getAmount() <= 0) return false;
         CustomItem item = generateCustomItem();
         if (item == null) {
@@ -286,6 +290,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     private enum GroupDelivery { PERSONAL, SKIPPED, DELIVERED }
 
     private GroupDelivery groupDelivery(int itemTier, Player player, EliteEntity eliteEntity) {
+        if (CustomItem.isUnavailableWithoutModels(filename)) return GroupDelivery.SKIPPED;
         if (!matchesDungeonDifficulty(player) || getAmount() <= 0) return GroupDelivery.SKIPPED;
         if (difficultyIDs != null) {
             MatchInstance matchInstance = PlayerData.getMatchInstance(player);

@@ -45,6 +45,10 @@ public class ItemConstructor {
                                           String scriptedItem,
                                           SkillType weaponType,
                                           String fmmItemModel) {
+        if (!org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")
+                && (weaponType == SkillType.STAVES || weaponType == SkillType.WANDS
+                || customEnchantments.keySet().stream().anyMatch(id -> id.startsWith("freeminecraftmodels:"))))
+            return null;
         if (weaponType == SkillType.STAVES || weaponType == SkillType.WANDS) {
             enchantments = new HashMap<>(enchantments);
             enchantments.remove(Enchantment.PUNCH);
