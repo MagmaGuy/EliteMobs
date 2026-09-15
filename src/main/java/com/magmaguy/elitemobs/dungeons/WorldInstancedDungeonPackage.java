@@ -51,7 +51,9 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
         this.level = contentPackagesConfigFields.getContentLevel();
         File file = new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() +
                 File.separatorChar + "world_blueprints" + File.separatorChar + contentPackagesConfigFields.getDungeonConfigFolderName());
-        if (!file.exists()) {
+        if (!file.exists() || !com.magmaguy.elitemobs.utils.WorldInstantiator.validateBlueprint(
+                contentPackagesConfigFields.getWorldName(), contentPackagesConfigFields.getDungeonConfigFolderName(),
+                contentPackagesConfigFields.getEnvironment())) {
             this.isDownloaded = false;
             this.isInstalled = false;
             return;

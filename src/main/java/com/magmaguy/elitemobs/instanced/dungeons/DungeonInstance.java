@@ -266,7 +266,7 @@ public class DungeonInstance extends MatchInstance {
     }
 
     protected static File cloneWorldFiles(ContentPackagesConfigFields instancedDungeonsConfigFields, String instancedWordName) {
-        return WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName, instancedDungeonsConfigFields.getDungeonConfigFolderName());
+        return WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName, instancedDungeonsConfigFields.getDungeonConfigFolderName(), instancedDungeonsConfigFields.getEnvironment());
     }
 
     protected static DungeonInstance initializeInstancedWorld(ContentPackagesConfigFields instancedDungeonsConfigFields,

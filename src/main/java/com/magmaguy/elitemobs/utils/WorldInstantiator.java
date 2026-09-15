@@ -3,16 +3,13 @@ package com.magmaguy.elitemobs.utils;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.WorldFolderResolver;
+import com.magmaguy.magmacore.util.WorldBlueprint;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -20,61 +17,43 @@ import java.util.Locale;
 public class WorldInstantiator {
 
     public static File cloneWorld(String worldName, String targetWorldName, String dungeonConfigurationFolderName) {
-        File blueprintWorld = new File(MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath() + File.separatorChar +
-                "world_blueprints" + File.separatorChar + dungeonConfigurationFolderName + File.separatorChar + worldName);
-        if (!blueprintWorld.exists()) {
-            Logger.warn("Blueprint world " + worldName + " does not exist! Path: " + blueprintWorld.getAbsolutePath());
-            return null;
-        }
-        if (!blueprintWorld.isDirectory()) {
-            Logger.warn("Blueprint world " + worldName + " is not a directory!");
-            return null;
-        }
-        File levelData = new File(blueprintWorld, "level.dat");
-        if (!levelData.isFile()) {
-            Logger.warn("Blueprint world " + worldName + " is incomplete because its required level.dat file is missing. " +
-                    "Reinstall or update the content package before starting this dungeon. Path: " +
-                    blueprintWorld.getAbsolutePath());
-            return null;
-        }
+        return cloneWorld(worldName, targetWorldName, dungeonConfigurationFolderName, World.Environment.NORMAL);
+    }
 
-        // Wipe both legacy and Paper-26.1+ modern paths so the blueprint clone
-        // doesn't collide with leftovers from a previous instance of this world.
-        WorldFolderResolver.deleteAllLayouts(targetWorldName);
-        if (WorldFolderResolver.folderExists(targetWorldName)) {
-            Logger.warn("Could not prepare instance world " + targetWorldName +
-                    " because an existing world folder could not be removed.");
-            return null;
-        }
+    private static Path blueprintFolder(String worldName, String configurationFolder) {
+        Path root = MetadataHandler.PLUGIN.getDataFolder().toPath().resolve("world_blueprints").toAbsolutePath().normalize();
+        Path result = root.resolve(configurationFolder).resolve(worldName).normalize();
+        if (!result.startsWith(root) || result.equals(root)) throw new IllegalArgumentException("Blueprint path escapes world_blueprints");
+        return result;
+    }
 
-        File destinationWorld = new File(Bukkit.getWorldContainer(), targetWorldName);
+    public static boolean validateBlueprint(String worldName, String configurationFolder, World.Environment environment) {
         try {
-            copyAll(blueprintWorld.toPath(), destinationWorld.toPath());
-            return destinationWorld;
-        } catch (IOException | RuntimeException exception) {
-            Logger.warn("Failed to clone blueprint world " + blueprintWorld + " to " + destinationWorld +
-                    ": " + exception.getMessage());
-            WorldFolderResolver.deleteAllLayouts(targetWorldName);
-            return null;
+            WorldBlueprint.inspect(blueprintFolder(worldName, configurationFolder), environment)
+                    .requireCompatibleServer(WorldFolderResolver.usesModernStorage());
+            return true;
+        } catch (IOException | RuntimeException failure) {
+            Logger.warn("Cannot prepare blueprint " + worldName + ": " + failure.getMessage());
+            return false;
         }
     }
 
-    private static void copyAll(Path sourceRoot, Path destinationRoot) throws IOException {
-        Files.walkFileTree(sourceRoot, new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path directory, BasicFileAttributes attributes)
-                    throws IOException {
-                Files.createDirectories(destinationRoot.resolve(sourceRoot.relativize(directory)));
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
-                Files.copy(file, destinationRoot.resolve(sourceRoot.relativize(file)),
-                        StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-                return FileVisitResult.CONTINUE;
-            }
-        });
+    public static File cloneWorld(String worldName, String targetWorldName, String configurationFolder,
+                                  World.Environment environment) {
+        try {
+            if (!targetWorldName.matches("[a-zA-Z0-9_-]+")) throw new IOException("Invalid instance world name");
+            var blueprint = WorldBlueprint.inspect(blueprintFolder(worldName, configurationFolder), environment);
+            boolean modern = WorldFolderResolver.usesModernStorage();
+            if (Bukkit.getWorld(targetWorldName) != null || WorldFolderResolver.folderExists(targetWorldName))
+                throw new IOException("Instance destination already exists: " + targetWorldName);
+            Path destination = blueprint.usesModernDestination(modern)
+                    ? WorldFolderResolver.modernFolder(targetWorldName) : WorldFolderResolver.legacyFolder(targetWorldName);
+            blueprint.copyTo(destination, environment, modern);
+            return destination.toFile();
+        } catch (IOException | RuntimeException failure) {
+            Logger.warn("Failed to prepare blueprint " + worldName + " as " + targetWorldName + ": " + failure.getMessage());
+            return null;
+        }
     }
 
     public static void recursivelyDelete(File file) {

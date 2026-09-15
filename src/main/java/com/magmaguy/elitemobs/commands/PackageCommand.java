@@ -2,6 +2,9 @@ package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
+import com.magmaguy.elitemobs.utils.WorldInstantiator;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.ZipFile;
 import org.bukkit.command.CommandSender;
@@ -30,6 +33,15 @@ public class PackageCommand {
         }
 
         this.dungeonFolderName = dungeonFolderName;
+        for (ContentPackagesConfigFields fields : java.util.stream.Stream.concat(
+                ContentPackagesConfig.getDungeonPackages().values().stream(),
+                ContentPackagesConfig.getEnchantedChallengeDungeonPackages().values().stream()).toList()) {
+            if (!dungeonFolderName.equals(fields.getDungeonConfigFolderName())) continue;
+            Path blueprint = MetadataHandler.PLUGIN.getDataFolder().toPath().resolve("world_blueprints")
+                    .resolve(dungeonFolderName).resolve(fields.getWorldName());
+            if (Files.exists(blueprint) && !WorldInstantiator.validateBlueprint(fields.getWorldName(),
+                    dungeonFolderName, fields.getEnvironment())) return;
+        }
         clearPreviousContents();
         packContents("custombosses");
         packContents("customevents");
