@@ -4,10 +4,10 @@ import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.api.EliteMobSpawnEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
-import com.magmaguy.magmacore.util.ChunkLocationChecker;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
@@ -18,7 +18,6 @@ public class TransitiveBossBlock implements Listener {
 
     private static void setBlockData(RegionalBossEntity regionalBossEntity, TransitiveBlock transitiveBlock, Location spawnLocation) {
         Location location;
-        if (!ChunkLocationChecker.chunkAtLocationIsLoaded(spawnLocation)) return;
         double rotation = 0;
 
         BlockData blockData = transitiveBlock.getBlockData().clone();
@@ -31,9 +30,11 @@ public class TransitiveBossBlock implements Listener {
                 ((Directional) blockData).setFacing(rotateBlockFace(((Directional) blockData).getFacing(), rotation));
         }
 
+        // Load the target chunk before applying the transition, even when the spawn chunk is unloaded.
+        Block block = location.getChunk().getBlock(location.getBlockX() & 15, location.getBlockY(), location.getBlockZ() & 15);
         //Minor optimization, does not replace blocks that are already identical
-        if (!location.getBlock().getBlockData().equals(blockData))
-            location.getBlock().setBlockData(blockData, blockData.getMaterial() == Material.WATER || blockData.getMaterial() == Material.LAVA);
+        if (!block.getBlockData().equals(blockData))
+            block.setBlockData(blockData, blockData.getMaterial() == Material.WATER || blockData.getMaterial() == Material.LAVA);
 
     }
 

@@ -962,13 +962,16 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
 
     private static final long CONTROL_TOGGLE_NOTICE_DELAY_TICKS = 100L;
 
-    /** Announces the new outside-content control toggle five seconds after login. */
+    /** Announces the outside-content control toggle to players with an unlocked class. */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoinControlToggleNotice(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
             if (!player.isOnline() || !AdvancedCombatSystemConfig.isEnabled()) return;
             if (!outsideControlsAllowed() || !fLayerSupported(player)) return;
+            if (!progression.snapshot(player.getUniqueId())
+                    .map(profile -> profile.forms().values().stream().anyMatch(FormProgressSnapshot::unlocked))
+                    .orElse(false)) return;
             player.sendMessage(ChatColorConverter.convert(
                     ClassPresentationTheme.gradient(ClassPresentationTheme.ELITE, "[Alpha] Advanced Combat System")
                             + " &8» &7New: hold &fsneak&7 and double-tap &fF&7 to toggle class"
