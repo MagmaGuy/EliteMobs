@@ -162,6 +162,7 @@ artifacts { // task 'build' runs generates uberjar
 }
 
 jar {
+    archiveVersion.set('') // Local outputs replace the previous build; Maven coordinates keep project.version.
     archiveClassifier.set('min') // we want the Uberjar to be distributed, this is the minified version
 }
 
