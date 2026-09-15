@@ -19,10 +19,30 @@ import java.util.UUID;
  * player's teleport or a later event.
  */
 public final class InstancePlayerMovement {
+    private static final String WITHIN_INSTANCE_PERMISSION = "elitemobs.instanced.teleport.within";
     private static final double DESTINATION_EPSILON_SQUARED = 1.0E-10D;
     private static final ThreadLocal<Deque<Authorization>> AUTHORIZATIONS = new ThreadLocal<>();
 
     private InstancePlayerMovement() {
+    }
+
+    /** Allows explicitly authorized command/plugin movement within one ongoing match. */
+    static boolean permitsWithinInstance(PlayerTeleportEvent event, MatchInstance instance) {
+        Player player = event.getPlayer();
+        Location destination = event.getTo();
+        if (instance == null || instance.isDefunct() || instance.isDestroyingMatch()
+                || instance.state != MatchInstance.InstancedRegionState.ONGOING
+                || !player.isOnline() || !player.isValid()
+                || !player.hasPermission(WITHIN_INSTANCE_PERMISSION)) return false;
+        if (event.getCause() != PlayerTeleportEvent.TeleportCause.COMMAND
+                && event.getCause() != PlayerTeleportEvent.TeleportCause.PLUGIN) return false;
+        return PlayerData.getMatchInstance(player) == instance
+                && MatchInstance.getAnyPlayerInstance(player) == instance
+                && instance.world != null
+                && instance.world.equals(event.getFrom().getWorld())
+                && destination != null && instance.world.equals(destination.getWorld())
+                && instance.isInRegion(event.getFrom())
+                && instance.isInRegion(destination);
     }
 
     /**

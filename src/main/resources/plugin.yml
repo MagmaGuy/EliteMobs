@@ -30,6 +30,9 @@ commands:
     aliases:
       - ag
 permissions:
+  elitemobs.instanced.teleport.within:
+    description: Allows command and plugin teleports within the same ongoing dungeon or arena instance
+    default: false
   elitemobs.*:
     description: Gives access to all elitemobs commands
     default: op

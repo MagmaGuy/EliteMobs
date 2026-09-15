@@ -34,6 +34,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 public abstract class MatchInstance {
@@ -535,6 +536,8 @@ public abstract class MatchInstance {
 
     public static class MatchInstanceEvents implements Listener {
         public static boolean teleportBypass = false;
+        // Remember only events accepted by the permission exception, for final validation.
+        private final Map<PlayerTeleportEvent, MatchInstance> permissionTeleports = new IdentityHashMap<>();
 
         @EventHandler
         public void onPlayerLeave(PlayerQuitEvent event) {
@@ -620,6 +623,12 @@ public abstract class MatchInstance {
                 return;
             }
 
+            MatchInstance currentInstance = MatchInstance.getAnyPlayerInstance(event.getPlayer());
+            if (InstancePlayerMovement.permitsWithinInstance(event, currentInstance)) {
+                permissionTeleports.put(event, currentInstance);
+                return;
+            }
+
             for (MatchInstance instance : instances) {
                 if (instance.world == null) continue;
                 // Only block if the player is actually in this instance
@@ -651,8 +660,15 @@ public abstract class MatchInstance {
             event.setCancelled(true);
         }
 
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+        @EventHandler(priority = EventPriority.HIGHEST)
         public void validateAuthorizedPlayerMovement(PlayerTeleportEvent event) {
+            MatchInstance permittedInstance = permissionTeleports.remove(event);
+            if (event.isCancelled()) return;
+            if (permittedInstance != null
+                    && !InstancePlayerMovement.permitsWithinInstance(event, permittedInstance)) {
+                event.setCancelled(true);
+                return;
+            }
             if (InstancePlayerMovement.hasAuthorization(event.getPlayer())
                     && !InstancePlayerMovement.authorizes(event))
                 event.setCancelled(true);
