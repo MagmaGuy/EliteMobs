@@ -27,6 +27,9 @@ public final class AdvancedCombatSystemConfig extends ConfigurationFile {
     private static boolean enableCombatHud;
 
     @Getter
+    private static boolean showJoinMessage;
+
+    @Getter
     private static boolean showDeveloperMessage;
 
     public AdvancedCombatSystemConfig() {
@@ -77,6 +80,13 @@ public final class AdvancedCombatSystemConfig extends ConfigurationFile {
                         "The text display is also used automatically when ResourcePackManager is absent or disabled."),
                 fileConfiguration,
                 "enableCombatHud",
+                true);
+        showJoinMessage = ConfigurationEngine.setBoolean(
+                List.of(
+                        "Shows the class control toggle notice on login to players with at least one unlocked class.",
+                        "Set to false to hide this notice. This does not enable or disable combat."),
+                fileConfiguration,
+                "showJoinMessage",
                 true);
         showDeveloperMessage = ConfigurationEngine.setBoolean(
                 List.of(

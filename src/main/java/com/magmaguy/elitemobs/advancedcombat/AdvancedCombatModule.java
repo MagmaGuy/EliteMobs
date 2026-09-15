@@ -968,6 +968,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
             if (!player.isOnline() || !AdvancedCombatSystemConfig.isEnabled()) return;
+            if (!AdvancedCombatSystemConfig.isShowJoinMessage()) return;
             if (!outsideControlsAllowed() || !fLayerSupported(player)) return;
             if (!progression.snapshot(player.getUniqueId())
                     .map(profile -> profile.forms().values().stream().anyMatch(FormProgressSnapshot::unlocked))
