@@ -56,15 +56,15 @@ public class AlternativeDurabilityLoss implements Listener {
                 int durabilityLoss = (int) (maxDurability * durabilityLoss(itemStack));
                 int currentDurability = damageable.getDamage();
                 int newDurability = currentDurability + durabilityLoss;
+                if (newDurability >= maxDurability) {
+                    if (!ItemSettingsConfig.isPreventEliteItemsFromBreaking()) {
+                        itemStack.setAmount(0);
+                        continue;
+                    }
+                    newDurability = maxDurability - 1;
+                }
                 damageable.setDamage(newDurability);
                 itemStack.setItemMeta(damageable);
-                if (newDurability >= maxDurability)
-                    if (ItemSettingsConfig.isPreventEliteItemsFromBreaking()) {
-                        damageable.setDamage(maxDurability - 1);
-                        itemStack.setItemMeta(damageable);
-                    } else {
-                        itemStack.setAmount(0);
-                    }
             }
         }
     }
