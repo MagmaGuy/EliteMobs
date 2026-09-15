@@ -112,8 +112,9 @@ public class CustomBossMegaConsumer {
         boolean accepted = false;
         try {
             disguiseQueued = queueDisguise(parseName(customBossEntity, level));
+            // Boss configuration owns initialization; vanilla randomization can create unwanted jockey mounts.
             livingEntity = bodyFactory == null ? (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
-                    customBossesConfigFields.getEntityType().getEntityClass(),
+                    customBossesConfigFields.getEntityType().getEntityClass(), false,
                     entity -> applyBossFeatures((LivingEntity) entity)) : bodyFactory.apply(this::applyBossFeatures);
             if (livingEntity == null || !livingEntity.isValid()) return null;
             setCustomModel(livingEntity);
