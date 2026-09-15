@@ -173,10 +173,7 @@ public class EliteMobs extends JavaPlugin {
         new ValidWorldsConfig();
 
         new MenusConfig();
-        new LuaPowersConfig();
-        new PowersConfig();
         MobPropertiesConfig.initializeConfigs();
-        new EliteMobPowersConfig();
 
         new MobCombatSettingsConfig();
         CommandsConfig.initializeConfigs();
@@ -337,8 +334,6 @@ public class EliteMobs extends JavaPlugin {
         initializationContext.step("Events");
         ActionEvent.initializeBlueprintEvents();
         TimedEvent.initializeBlueprintEvents();
-        initializationContext.step("Mob Properties");
-        PluginMobProperties.initializePluginMobValues();
         initializationContext.step("Power Stances");
         MinorPowerStanceMath.initializeVectorCache();
         MajorPowerStanceMath.initializeVectorCache();
@@ -348,6 +343,12 @@ public class EliteMobs extends JavaPlugin {
         //files are on disk when the config classes scan for them.
         initializationContext.step("Content Importer");
         waitForModelRegistryRebuild(MagmaCore.initializeImporter(this));
+        initializationContext.step("Powers Config");
+        new LuaPowersConfig();
+        new PowersConfig();
+        new EliteMobPowersConfig();
+        initializationContext.step("Mob Properties");
+        PluginMobProperties.initializePluginMobValues();
         initializationContext.step("Custom Items");
         new CustomItemsConfig();
         CustomItem.initializeCustomItems(initializationContext::isShutdownRequested);
