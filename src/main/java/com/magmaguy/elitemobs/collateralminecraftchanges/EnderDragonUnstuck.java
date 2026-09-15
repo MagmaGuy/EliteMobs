@@ -4,6 +4,7 @@ import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Wolf;
@@ -29,8 +30,12 @@ public class EnderDragonUnstuck implements Listener {
         public void onTarget(EntityTargetLivingEntityEvent event) {
             EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(event.getEntity());
             if (eliteEntity == null) return;
-            // Neutral bosses still need the same elite-to-elite protection.
-            // Their vanilla targets can otherwise create endless golem/illager fights.
+            // Neutral bosses retain vanilla targeting, including fights with other elites.
+            if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.getCustomBossesConfigFields().isNeutral())
+                return;
+            EliteEntity targetElite = EntityTracker.getEliteMobEntity(event.getTarget());
+            if (targetElite instanceof CustomBossEntity customBossEntity && customBossEntity.getCustomBossesConfigFields().isNeutral())
+                return;
             if (event.getEntity().getType().equals(EntityType.WOLF) && !((Wolf) event.getEntity()).isAngry() ||
                     event.getTarget() != null &&
                             event.getTarget().getType().equals(EntityType.WOLF) && !((Wolf) event.getTarget()).isAngry())
