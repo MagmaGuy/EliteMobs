@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.testing;
 
+import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.combatsystem.ArmorDefenseCalculator;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
@@ -352,7 +353,7 @@ public class CombatSimulator {
 
             // Disable invulnerability frames so dummy can take damage every tick
             entity.setMaximumNoDamageTicks(0);
-            entity.setNoDamageTicks(0);
+            NMSManager.getAdapter().setDamageCooldownTicks(entity, 0);
 
             // Set custom name showing the skill being tested
             String skillName = skill.getBonusName();
@@ -409,7 +410,7 @@ public class CombatSimulator {
         if (target == null || !target.isValid()) return -1;
 
         // Reset iframes before attack
-        target.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(target, 0);
 
         double healthBefore = target.getHealth();
         // Use actual player attack - attack speed is set very high to bypass cooldown
@@ -457,7 +458,7 @@ public class CombatSimulator {
         if (target == null || !target.isValid()) return -1;
 
         // Reset iframes before attack
-        target.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(target, 0);
 
         double healthBefore = target.getHealth();
 
@@ -493,7 +494,7 @@ public class CombatSimulator {
         if (target == null || !target.isValid()) return -1;
 
         // Reset iframes before attack
-        target.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(target, 0);
 
         double healthBefore = target.getHealth();
 
@@ -526,7 +527,7 @@ public class CombatSimulator {
         if (attacker == null) return 0;
 
         // Reset player iframes so we can take damage every tick
-        player.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(player, 0);
 
         // Set full health and add large absorption buffer to prevent death
         player.setHealth(player.getMaxHealth());
@@ -602,7 +603,7 @@ public class CombatSimulator {
         LivingEntity target = getDummyEntity(skillId);
         if (target == null || !target.isValid()) return -1;
 
-        target.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(target, 0);
         double healthBefore = target.getHealth();
 
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
@@ -658,7 +659,7 @@ public class CombatSimulator {
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
         if (eliteEntity == null || !eliteEntity.isValid()) return false;
 
-        target.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(target, 0);
         // One point of health left, so any real swing is lethal regardless of skill level or gear.
         target.setHealth(1.0);
         player.attack(target);
@@ -686,7 +687,7 @@ public class CombatSimulator {
         if (attacker == null) return 0;
 
         // Reset player iframes so we can take damage every tick
-        player.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(player, 0);
 
         // Set health to specified percentage instead of max
         player.setHealth(player.getMaxHealth() * healthPercent);
@@ -727,7 +728,7 @@ public class CombatSimulator {
         LivingEntity attacker = getDummyEntity(skillId);
         if (attacker == null) return 0;
 
-        player.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(player, 0);
         player.setHealth(player.getMaxHealth());
         player.setAbsorptionAmount(1000.0);
 
@@ -794,7 +795,7 @@ public class CombatSimulator {
         LivingEntity target = getDummyEntity(skillId);
         if (target == null || !target.isValid()) return -1;
 
-        target.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(target, 0);
         double healthBefore = target.getHealth();
 
         EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
@@ -826,7 +827,7 @@ public class CombatSimulator {
             return 0;
         }
 
-        player.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(player, 0);
         player.setHealth(5.0);
         // Absorption catches the hit if all prevention skills fail. EliteMobs determines whether
         // the hit is fatal from health and event damage, so this still exercises the actual
@@ -970,7 +971,7 @@ public class CombatSimulator {
         if (dummy.getLivingEntity() != null) {
             LivingEntity entity = dummy.getLivingEntity();
             entity.setMaximumNoDamageTicks(0);
-            entity.setNoDamageTicks(0);
+            NMSManager.getAdapter().setDamageCooldownTicks(entity, 0);
             entity.setCustomName("§eDamage Test Dummy §7[Baseline]");
             entity.setCustomNameVisible(true);
             entity.setGlowing(true);

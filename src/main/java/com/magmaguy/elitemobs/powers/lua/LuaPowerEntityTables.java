@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.powers.lua;
 
+import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.api.EliteDamageEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
@@ -104,14 +105,14 @@ final class LuaPowerEntityTables {
                         || target.equals(playerDamage.getEliteMobEntity().getLivingEntity())) return LuaValue.FALSE;
                 EliteEntity recipient = EntityTracker.getEliteMobEntity(living);
                 if (recipient == null) throw new IllegalArgumentException("Damage transfers require an elite recipient");
-                int previousTicks = living.getNoDamageTicks();
+                int previousTicks = NMSManager.getAdapter().getDamageCooldownTicks(living);
                 double previousDamage = living.getLastDamage();
                 try {
-                    living.setNoDamageTicks(0);
+                    NMSManager.getAdapter().setDamageCooldownTicks(living, 0);
                     CombatDamageContext.runPlayerToEliteTransfer(() -> living.damage(amount, playerDamage.getPlayer()));
                 } finally {
                     if (isAlive(living)) {
-                        living.setNoDamageTicks(previousTicks);
+                        NMSManager.getAdapter().setDamageCooldownTicks(living, previousTicks);
                         living.setLastDamage(previousDamage);
                     }
                 }

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.testing;
 
+import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.combatsystem.DamageBreakdown;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -27,7 +28,7 @@ final class CombatBreakdownDiagnostics {
         LivingEntity target = simulator.getDummyEntity(skillId);
         if (target == null || !target.isValid()) return null;
         DamageBreakdown.startTracking(player);
-        target.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(target, 0);
         player.attack(target);
         DamageBreakdown result = DamageBreakdown.stopTracking(player);
         if (result != null) result.compute();
@@ -121,7 +122,7 @@ final class CombatBreakdownDiagnostics {
         }
         LivingEntity entity = dummy.getLivingEntity();
         entity.setMaximumNoDamageTicks(0);
-        entity.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(entity, 0);
         entity.setCustomName("§eDamage Test Dummy §7(Lv " + dummyLevel + ")");
         entity.setCustomNameVisible(true);
         entity.setGlowing(true);

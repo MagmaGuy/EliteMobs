@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.events;
 
+import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
@@ -18,7 +19,7 @@ public class BossCustomAttackDamage {
                     ((Player) damagee).getGameMode().equals(GameMode.ADVENTURE))) return 0;
 
         CombatDamageContext.runEliteToPlayerBypass(() -> damagee.damage(damage, damager));
-        damagee.setNoDamageTicks(0);
+        NMSManager.getAdapter().setDamageCooldownTicks(damagee, 0);
 
         return damage;
     }

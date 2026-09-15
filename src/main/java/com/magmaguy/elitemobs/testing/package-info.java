@@ -12,7 +12,7 @@
  * <b>0-Tick Trick:</b>
  * For melee/armor skills, 200 attacks happen in a single tick by:
  * <ul>
- *   <li>Clearing iframes (setNoDamageTicks(0)) before each attack</li>
+ *   <li>Clearing damage cooldowns through the native adapter before each attack</li>
  *   <li>Resetting skill cooldowns (endCooldown()) before each attack</li>
  * </ul>
  * <p>
