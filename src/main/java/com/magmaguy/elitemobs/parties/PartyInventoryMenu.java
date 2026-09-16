@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
-import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
+import com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import org.bukkit.Bukkit;
@@ -30,7 +30,7 @@ public final class PartyInventoryMenu implements Listener {
     private static final int PAGE_SIZE = 45;
 
     public static boolean usesInventoryFallback(Player player) {
-        return GeyserDetector.bedrockPlayer(player)
+        return BedrockChecker.isBedrock(player)
                 || DefaultConfig.isOnlyUseBedrockMenus()
                 || !PlayerData.getUseBookMenus(player.getUniqueId());
     }

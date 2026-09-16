@@ -256,7 +256,7 @@ public final class ActionBarCompositor implements Listener {
     private static void render(Player player, PlayerState state) {
         // CLASS_HUD and ability feedback remain published below as the resource-pack-free fallback.
         if (AdvancedCombatSystemConfig.isEnableCombatHud()
-                && !com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector.bedrockPlayer(player)
+                && !com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker.isBedrock(player)
                 && Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager")
                 && AdvancedCombatRuntime.isActive(player)) {
             var frame = COMBAT_HUD.frame(player, AdvancedCombatModule.isAbilityGestureOpen(player.getUniqueId()));

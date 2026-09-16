@@ -10,7 +10,7 @@ import com.magmaguy.elitemobs.quests.DynamicQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.menus.QuestMenu;
-import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
+import com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker;
 import com.magmaguy.elitemobs.utils.BossBarOrderManager;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -87,7 +87,7 @@ public class QuestDialogueBossBarManager {
     private static boolean canShowQuestDialogueBossBars(Player player) {
         return QuestsConfig.isUseQuestDialogueBossBars()
                 && player != null
-                && !GeyserDetector.bedrockPlayer(player);
+                && !BedrockChecker.isBedrock(player);
     }
 
     public static boolean consumeRecentlyShownQuestCompleteDialog(Player player, Quest quest) {

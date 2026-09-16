@@ -14,7 +14,7 @@ import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.objectives.DynamicKillObjective;
 import com.magmaguy.elitemobs.quests.objectives.KillObjective;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
-import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
+import com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import com.magmaguy.elitemobs.utils.DialogMaker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
@@ -49,7 +49,7 @@ public class QuestMenu {
 
     public static void generateQuestMenu(List<? extends Quest> quests, Player player, NPCEntity npcEntity,
                                          boolean returnToPlayerStatus) {
-        if (!PlayerData.getUseBookMenus(player.getUniqueId()) || GeyserDetector.bedrockPlayer(player) || DefaultConfig.isOnlyUseBedrockMenus()) {
+        if (!PlayerData.getUseBookMenus(player.getUniqueId()) || BedrockChecker.isBedrock(player) || DefaultConfig.isOnlyUseBedrockMenus()) {
             generateInventoryQuestEntries(quests, player, npcEntity, returnToPlayerStatus);
         } else if (VersionChecker.serverVersionOlderThan(21,6)) {
             generateBookQuestEntries(quests, player, npcEntity);

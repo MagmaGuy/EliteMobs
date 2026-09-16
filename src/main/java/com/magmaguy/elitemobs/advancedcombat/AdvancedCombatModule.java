@@ -67,7 +67,7 @@ import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import com.magmaguy.elitemobs.skills.CombatLevelDisplay;
 import com.magmaguy.elitemobs.skills.PlayerIdentityLabelRenderer;
 import com.magmaguy.elitemobs.skills.SkillType;
-import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
+import com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
@@ -321,7 +321,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
 
     @Override
     public boolean fLayerSupported(Player player) {
-        return !GeyserDetector.bedrockPlayer(player);
+        return !BedrockChecker.isBedrock(player);
     }
 
     /** Weapon affinities of the active form; empty without an active class. */

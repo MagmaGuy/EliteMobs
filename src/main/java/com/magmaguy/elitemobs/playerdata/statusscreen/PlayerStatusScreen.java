@@ -4,7 +4,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
+import com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker;
 import com.magmaguy.elitemobs.utils.BookMaker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.VersionChecker;
@@ -22,7 +22,7 @@ public class PlayerStatusScreen implements Listener {
     }
 
     public PlayerStatusScreen(Player player) {
-        if (!PlayerData.getUseBookMenus(player.getUniqueId()) || GeyserDetector.bedrockPlayer(player) || DefaultConfig.isOnlyUseBedrockMenus()) {
+        if (!PlayerData.getUseBookMenus(player.getUniqueId()) || BedrockChecker.isBedrock(player) || DefaultConfig.isOnlyUseBedrockMenus()) {
             generateChestMenu(player, player);
         } else if (VersionChecker.serverVersionOlderThan(21,6)){
             generateBook(player, player);

@@ -14,7 +14,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
-import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
+import com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
@@ -515,7 +515,7 @@ public final class PatrolEditor implements Listener {
         }
 
         private void showPoint(Player player, Location location) {
-            if (GeyserDetector.bedrockPlayer(player)) {
+            if (BedrockChecker.isBedrock(player)) {
                 Location block = location.getBlock().getLocation();
                 if (!block.getWorld().isChunkLoaded(block.getBlockX() >> 4, block.getBlockZ() >> 4)) return;
                 if (bedrockPreview.size() >= 256 || bedrockPreview.containsKey(block)) return;

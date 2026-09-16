@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.menus;
 
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
+import com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker;
 import com.magmaguy.magmacore.util.VersionChecker;
 import org.bukkit.entity.Player;
 
@@ -13,7 +13,7 @@ public final class MenuPresentation {
 
     public static boolean supportsDialogs(Player player) {
         return PlayerData.getUseBookMenus(player.getUniqueId())
-                && !GeyserDetector.bedrockPlayer(player)
+                && !BedrockChecker.isBedrock(player)
                 && !DefaultConfig.isOnlyUseBedrockMenus()
                 && !VersionChecker.serverVersionOlderThan(21, 6);
     }

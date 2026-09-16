@@ -8,7 +8,7 @@ import com.magmaguy.elitemobs.combatsystem.combattag.PlayerCombatState;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.advancedcombat.CombatHealthFormatter;
-import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
+import com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
@@ -163,7 +163,7 @@ public class CombatLevelDisplay implements Listener {
     }
 
     private static float getDisplayHeight(Player player) {
-        return DEFAULT_Y_TRANSLATION + (GeyserDetector.bedrockPlayer(player) ? BEDROCK_Y_TRANSLATION_BONUS : 0f);
+        return DEFAULT_Y_TRANSLATION + (BedrockChecker.isBedrock(player) ? BEDROCK_Y_TRANSLATION_BONUS : 0f);
     }
 
     /**

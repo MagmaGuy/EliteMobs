@@ -4,7 +4,7 @@ import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.easyminecraftgoals.customentity.BedrockCustomEntityBridgeRegistry;
 import com.magmaguy.easyminecraftgoals.customentity.CustomEntityPropertySchema;
 import com.magmaguy.easyminecraftgoals.customentity.FakeCustomEntity;
-import com.magmaguy.elitemobs.thirdparty.geyser.GeyserDetector;
+import com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -101,7 +101,7 @@ final class BedrockWormholeMarker {
     private void syncViewers(Collection<Player> nearbyPlayers) {
         Set<UUID> shouldSee = new HashSet<>();
         for (Player player : nearbyPlayers) {
-            if (player == null || !player.isOnline() || !GeyserDetector.bedrockPlayer(player)) {
+            if (player == null || !player.isOnline() || !BedrockChecker.isBedrock(player)) {
                 continue;
             }
             shouldSee.add(player.getUniqueId());
