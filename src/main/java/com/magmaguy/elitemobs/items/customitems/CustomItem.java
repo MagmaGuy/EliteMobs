@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.ScalableItemConstructor;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
+import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructionContext;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -75,12 +76,17 @@ public class CustomItem {
      * @param customItemsConfigFields Config fields upon which the values are based.
      */
     public CustomItem(CustomItemsConfigFields customItemsConfigFields) {
+        this(customItemsConfigFields, null);
+    }
+
+    public CustomItem(CustomItemsConfigFields customItemsConfigFields, ItemConstructionContext construction) {
         this.customItemsConfigFields = customItemsConfigFields;
         this.itemLevel = customItemsConfigFields.getLevel();
         if (itemLevel == 0 && customItemsConfigFields.getItemType() != ItemType.CLASS_LOOT)
             itemLevel = (int) EliteItemManager.getItemLevel(new ItemStack(customItemsConfigFields.getMaterial()));
         this.permission = customItemsConfigFields.getPermission();
-        if (isUnavailableWithoutModels(customItemsConfigFields)) return;
+        if (construction == null ? isUnavailableWithoutModels(customItemsConfigFields)
+                : !construction.modelsEnabled() && requiresModels(customItemsConfigFields)) return;
         if (!customItemsConfigFields.isEnabled()) return;
         if (customItemsConfigFields.getMaterial() == null) return;
         if (!parseEnchantments()) return;
@@ -91,18 +97,18 @@ public class CustomItem {
             scalability = Scalability.SCALABLE;
             itemLevel = Math.max(1, customItemsConfigFields.getLevel());
             addCustomItem(customItemsConfigFields.getFilename(), this);
-            addCustomItem(this);
+            addCustomItem(this, construction);
             return;
         }
-        if (!parseItemLevel()) return;
+        if (!parseItemLevel(construction)) return;
         //give getloot menu items to work with
         addCustomItem(customItemsConfigFields.getFilename(), this);
-        addCustomItem(this);
-        addTieredLoot(this);
+        addCustomItem(this, construction);
+        addTieredLoot(this, construction);
         if (parseDropWeight()) {
             //item is weighed and fixed
             addFixedItem(this);
-            addWeighedFixedItems(this);
+            addWeighedFixedItems(this, construction);
             this.scalability = Scalability.FIXED;
             return;
         }
@@ -126,6 +132,10 @@ public class CustomItem {
     private static boolean isUnavailableWithoutModels(CustomItemsConfigFields config) {
         if (config == null || org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels"))
             return false;
+        return requiresModels(config);
+    }
+
+    private static boolean requiresModels(CustomItemsConfigFields config) {
         if (config.getWeaponType() == com.magmaguy.elitemobs.skills.SkillType.STAVES
                 || config.getWeaponType() == com.magmaguy.elitemobs.skills.SkillType.WANDS) return true;
         return config.getEnchantments().stream().anyMatch(entry -> entry.startsWith("freeminecraftmodels:"));
@@ -136,22 +146,26 @@ public class CustomItem {
     }
 
     // Adds custom items to the list used by the getloot GUI
-    private static void addCustomItem(CustomItem customItem) {
-        ItemStack sample = customItem.generateDefaultsItemStack(null, false, null);
+    private static void addCustomItem(CustomItem customItem, ItemConstructionContext construction) {
+        ItemStack sample = customItem.generateDefaultsItemStack(null, false, null, false, construction);
         if (sample == null) return;
         customItemStackList.add(sample);
         if (isShopExcluded(customItem.getItemType())) return;
-        customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null));
+        customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null, false, construction));
     }
 
     // Adds weighed static items
-    private static void addWeighedFixedItems(CustomItem customItem) {
-        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false, null);
+    private static void addWeighedFixedItems(CustomItem customItem, ItemConstructionContext construction) {
+        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false, null, false, construction);
         weighedFixedItems.put(itemStack, customItem.getDropWeight());
     }
 
     public static void addTieredLoot(CustomItem customItem) {
-        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false, null);
+        addTieredLoot(customItem, null);
+    }
+
+    private static void addTieredLoot(CustomItem customItem, ItemConstructionContext construction) {
+        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false, null, false, construction);
         int itemTier = customItem.getItemLevel();
 
         if (tieredLoot.get(itemTier) == null)
@@ -182,29 +196,31 @@ public class CustomItem {
      * Initializes all config items on startup. Needs to run after the config initialization as it relies on those values.
      */
     public static void initializeCustomItems(BooleanSupplier cancelled) {
-        Iterator<CustomItemsConfigFields> configs = List.copyOf(CustomItemsConfig.getCustomItems().values()).iterator();
-        while (configs.hasNext()) {
-            constructOnServerThread(() -> {
-                long started = System.nanoTime();
-                int built = 0;
-                do {
-                    CustomItemsConfigFields config = configs.next();
-                    try {
-                        new CustomItem(config);
-                    } catch (Exception exception) {
-                        Logger.warn("Failed to generate custom item in file " + config.getFilename() + " !");
-                        exception.printStackTrace();
-                    }
-                } while (configs.hasNext() && ++built < 16 && System.nanoTime() - started < 5_000_000L
-                        && !cancelled.getAsBoolean());
-            }, cancelled);
+        List<CustomItemsConfigFields> configs = List.copyOf(CustomItemsConfig.getCustomItems().values());
+        ItemConstructionContext construction = prepareConstruction(configs, cancelled);
+        for (CustomItemsConfigFields config : configs) {
+            if (cancelled.getAsBoolean()) throw new CancellationException("Item construction cancelled");
+            try {
+                new CustomItem(config, construction);
+            } catch (Exception exception) {
+                Logger.warn("Failed to generate custom item " + config.getFilename() + ": " + exception.getMessage());
+                exception.printStackTrace();
+            }
         }
         if (com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig.isEnabled())
-            constructOnServerThread(com.magmaguy.elitemobs.advancedcombat.weapons.AdvancedMagicWeaponItems::register, cancelled);
+            com.magmaguy.elitemobs.advancedcombat.weapons.AdvancedMagicWeaponItems.register(construction);
+        onServerThread(construction::requireCurrent, cancelled);
     }
 
-    /** The worker waits between bounded server-thread batches; the server thread never waits. */
-    private static void constructOnServerThread(Runnable construction, BooleanSupplier cancelled) {
+    private static ItemConstructionContext prepareConstruction(Collection<CustomItemsConfigFields> configs,
+                                                               BooleanSupplier cancelled) {
+        var result = new java.util.concurrent.atomic.AtomicReference<ItemConstructionContext>();
+        onServerThread(() -> result.set(ItemConstructionContext.capture(configs)), cancelled);
+        return result.get();
+    }
+
+    /** Only dependency capture and final publication checks cross to the server thread. */
+    private static void onServerThread(Runnable construction, BooleanSupplier cancelled) {
         Runnable guarded = () -> {
             if (cancelled.getAsBoolean() || com.magmaguy.elitemobs.MetadataHandler.shutdownRequested)
                 throw new CancellationException("Item construction was cancelled");
@@ -246,8 +262,7 @@ public class CustomItem {
      * Call this after all plugins have finished loading to ensure custom skins are applied.
      */
     public static void regenerateCachedItemStacks() {
-        // Keep the old caches usable while a worker coordinates bounded construction
-        // batches on the server thread. Provider resolution must never run on the worker.
+        // Keep the old caches usable while detached items are rebuilt by the worker.
         CacheRegenerationLifecycle.Attempt<CustomItem> attempt = cacheRegenerationLifecycle.beginIf(
                 () -> !com.magmaguy.elitemobs.MetadataHandler.shutdownRequested
                         && com.magmaguy.elitemobs.MetadataHandler.PLUGIN != null
@@ -278,6 +293,9 @@ public class CustomItem {
 
     private static void rebuildCachedItemStacks(CacheRegenerationLifecycle.Attempt<CustomItem> attempt) {
         try {
+            ItemConstructionContext construction = prepareConstruction(
+                    attempt.snapshot().stream().map(CustomItem::getCustomItemsConfigFields).toList(),
+                    () -> !cacheRegenerationLifecycle.isCurrent(attempt.generation()));
             ArrayList<ItemStack> rebuiltItemStackList = new ArrayList<>();
             ArrayList<ItemStack> rebuiltItemStackShopList = new ArrayList<>();
             HashMap<Integer, ArrayList<ItemStack>> rebuiltTieredLoot = new HashMap<>();
@@ -289,7 +307,7 @@ public class CustomItem {
                         rebuiltItemStackList,
                         rebuiltItemStackShopList,
                         rebuiltTieredLoot,
-                        rebuiltWeighedFixedItems))
+                        rebuiltWeighedFixedItems, construction))
                     return;
             } catch (Exception exception) {
                 //Existing caches are left alone, so the server keeps the items it already had.
@@ -312,7 +330,7 @@ public class CustomItem {
                                 rebuiltItemStackList,
                                 rebuiltItemStackShopList,
                                 rebuiltTieredLoot,
-                                rebuiltWeighedFixedItems));
+                                rebuiltWeighedFixedItems, construction));
             } catch (RuntimeException exception) {
                 if (cacheRegenerationLifecycle.isCurrent(attempt.generation())
                         && !com.magmaguy.elitemobs.MetadataHandler.shutdownRequested) {
@@ -324,6 +342,12 @@ public class CustomItem {
 
             if (!trackCacheTask(attempt.generation(), scheduledSwap, false))
                 scheduledSwap.cancel();
+        } catch (Exception exception) {
+            if (cacheRegenerationLifecycle.isCurrent(attempt.generation())
+                    && !com.magmaguy.elitemobs.MetadataHandler.shutdownRequested) {
+                Logger.warn("Failed to prepare cached item construction; existing caches were retained.");
+                exception.printStackTrace();
+            }
         } finally {
             clearTrackedCacheTask(attempt.generation(), true);
         }
@@ -333,20 +357,17 @@ public class CustomItem {
                                                  ArrayList<ItemStack> itemStackList,
                                                  ArrayList<ItemStack> itemStackShopList,
                                                  HashMap<Integer, ArrayList<ItemStack>> tieredLootTarget,
-                                                 HashMap<ItemStack, Double> weighedFixedItemsTarget) {
-        Iterator<CustomItem> remaining = attempt.snapshot().iterator();
-        BooleanSupplier cancelled = () -> !cacheRegenerationLifecycle.isCurrent(attempt.generation());
-        while (remaining.hasNext()) {
-            constructOnServerThread(() -> {
-                long started = System.nanoTime();
-                int built = 0;
-                do {
-                    CustomItem item = remaining.next();
-                    if (!cacheRegenerationLifecycle.runIfCurrent(attempt.generation(),
-                            () -> appendCachedItemStacks(item, itemStackList, itemStackShopList,
-                                    tieredLootTarget, weighedFixedItemsTarget))) return;
-                } while (remaining.hasNext() && ++built < 16 && System.nanoTime() - started < 5_000_000L);
-            }, cancelled);
+                                                 HashMap<ItemStack, Double> weighedFixedItemsTarget, ItemConstructionContext construction) {
+        for (CustomItem item : attempt.snapshot()) {
+            if (!cacheRegenerationLifecycle.runIfCurrent(attempt.generation(), () -> {
+                try {
+                    appendCachedItemStacks(item, itemStackList, itemStackShopList,
+                            tieredLootTarget, weighedFixedItemsTarget, construction);
+                } catch (Exception failure) {
+                    throw new IllegalStateException("Failed to rebuild custom item "
+                            + item.getCustomItemsConfigFields().getFilename(), failure);
+                }
+            })) return false;
         }
 
         return cacheRegenerationLifecycle.isCurrent(attempt.generation());
@@ -356,7 +377,7 @@ public class CustomItem {
                                                ArrayList<ItemStack> itemStackList,
                                                ArrayList<ItemStack> itemStackShopList,
                                                HashMap<Integer, ArrayList<ItemStack>> tieredLootTarget,
-                                               HashMap<ItemStack, Double> weighedFixedItemsTarget) {
+                                               HashMap<ItemStack, Double> weighedFixedItemsTarget, ItemConstructionContext construction) {
         if (customItem.getCustomItemsConfigFields() == null || !customItem.getCustomItemsConfigFields().isEnabled())
             return;
         if (customItem.getCustomItemsConfigFields().getMaterial() == null) return;
@@ -367,14 +388,14 @@ public class CustomItem {
         //an item rewrites its whole lore, which recalculates DPS, attack speed and defence.
         //Copies rather than one shared instance, so each list still owns a separate stack the
         //way it did before.
-        ItemStack defaultsItemStack = customItem.generateDefaultsItemStack(null, false, null);
+        ItemStack defaultsItemStack = customItem.generateDefaultsItemStack(null, false, null, false, construction);
 
         if (defaultsItemStack == null) return;
         // Regenerate loot menu items
         itemStackList.add(defaultsItemStack);
         if (customItem.getItemType() == ItemType.CLASS_LOOT) return;
         if (!isShopExcluded(customItem.getItemType()))
-            itemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null));
+            itemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null, false, construction));
 
         // Regenerate tiered loot
         ItemStack itemStack = defaultsItemStack.clone();
@@ -395,9 +416,10 @@ public class CustomItem {
                                                ArrayList<ItemStack> rebuiltItemStackList,
                                                ArrayList<ItemStack> rebuiltItemStackShopList,
                                                HashMap<Integer, ArrayList<ItemStack>> rebuiltTieredLoot,
-                                               HashMap<ItemStack, Double> rebuiltWeighedFixedItems) {
+                                               HashMap<ItemStack, Double> rebuiltWeighedFixedItems, ItemConstructionContext construction) {
         try {
             cacheRegenerationLifecycle.runIfCurrent(generation, () -> {
+                construction.requireCurrent();
                 //Refilled in place inside one main-thread task, so no main-thread reader ever observes a partially built cache. The collections are static final and aliased via their getters, so the references themselves must not be swapped.
                 customItemStackList.clear();
                 customItemStackList.addAll(rebuiltItemStackList);
@@ -408,6 +430,8 @@ public class CustomItem {
                 weighedFixedItems.clear();
                 weighedFixedItems.putAll(rebuiltWeighedFixedItems);
             });
+        } catch (Exception exception) {
+            Logger.warn("Failed to publish refreshed item stacks; existing caches were retained: " + exception.getMessage());
         } finally {
             clearTrackedCacheTask(generation, false);
         }
@@ -608,8 +632,8 @@ public class CustomItem {
         }
     }
 
-    private boolean parseItemLevel() {
-        ItemStack itemStack = generateDefaultsItemStack(null, false, null);
+    private boolean parseItemLevel(ItemConstructionContext construction) {
+        ItemStack itemStack = generateDefaultsItemStack(null, false, null, false, construction);
         if (itemStack == null) return false;
         this.itemLevel = (int) Math.round(EliteItemManager.getItemLevel(itemStack));
         return true;
@@ -620,8 +644,12 @@ public class CustomItem {
     }
 
     public ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth, EliteEntity eliteEntity, boolean bypass) {
+        return generateDefaultsItemStack(player, showItemWorth, eliteEntity, bypass, null);
+    }
+
+    private ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth, EliteEntity eliteEntity, boolean bypass, ItemConstructionContext construction) {
         if (!bypass && player != null && !permission.isEmpty() && !player.hasPermission(permission)) return null;
-        if (itemType == ItemType.CLASS_LOOT) return generateClassLootItem(itemLevel, player, eliteEntity);
+        if (itemType == ItemType.CLASS_LOOT) return generateClassLootItem(itemLevel, player, eliteEntity, construction);
         ItemStack itemStack =
                 ItemConstructor.constructItem(
                         itemLevel,
@@ -642,7 +670,7 @@ public class CustomItem {
                         getCustomItemsConfigFields().getFilename(),
                         customItemsConfigFields.getScriptedItem(),
                         customItemsConfigFields.getWeaponType(),
-                        customItemsConfigFields.getFmmItemModel()
+                        customItemsConfigFields.getFmmItemModel(), construction
                 );
         return itemStack;
     }
@@ -683,13 +711,17 @@ public class CustomItem {
     }
 
     private ItemStack generateClassLootItem(int level, Player player, EliteEntity entity) {
+        return generateClassLootItem(level, player, entity, null);
+    }
+
+    private ItemStack generateClassLootItem(int level, Player player, EliteEntity entity, ItemConstructionContext construction) {
         var boss = entity instanceof com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity custom ? custom : null;
         var difficulty = boss == null ? com.magmaguy.elitemobs.config.ClassLootSettingsConfig.defaultDifficulty()
                 : com.magmaguy.elitemobs.items.ClassLootCoverage.difficulty(boss);
         var rank = boss == null ? com.magmaguy.elitemobs.config.ClassLootSettingsConfig.Rank.TRASH
                 : com.magmaguy.elitemobs.items.ClassLootCoverage.rank(boss);
         return com.magmaguy.elitemobs.items.itemconstructor.ClassLootItemConstructor.construct(this,
-                level, difficulty, rank, entity, player);
+                level, difficulty, rank, entity, player, entity == null ? "Elite" : entity.getName(), construction);
     }
 
     public enum ItemType {

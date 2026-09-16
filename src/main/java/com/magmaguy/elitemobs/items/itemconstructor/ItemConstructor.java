@@ -45,7 +45,28 @@ public class ItemConstructor {
                                           String scriptedItem,
                                           SkillType weaponType,
                                           String fmmItemModel) {
-        if (!org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")
+        return constructItem(level, rawName, material, enchantments, customEnchantments, potionEffects, lore, eliteEntity, player, showItemWorth, customModelID, equipmentModelID, soulbound, filename, scriptedItem, weaponType, fmmItemModel, null);
+    }
+
+    public static ItemStack constructItem(int level,
+                                          String rawName,
+                                          Material material,
+                                          HashMap<Enchantment, Integer> enchantments,
+                                          HashMap<String, Integer> customEnchantments,
+                                          List<String> potionEffects,
+                                          List<String> lore,
+                                          EliteEntity eliteEntity,
+                                          Player player,
+                                          boolean showItemWorth,
+                                          String customModelID,
+                                          String equipmentModelID,
+                                          boolean soulbound,
+                                          String filename,
+                                          String scriptedItem,
+                                          SkillType weaponType,
+                                          String fmmItemModel, ItemConstructionContext construction) {
+        boolean modelsEnabled = construction == null ? org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels") : construction.modelsEnabled();
+        if (!modelsEnabled
                 && (weaponType == SkillType.STAVES || weaponType == SkillType.WANDS
                 || customEnchantments.keySet().stream().anyMatch(id -> id.startsWith("freeminecraftmodels:"))))
             return null;
@@ -61,7 +82,7 @@ public class ItemConstructor {
         Set the item level
          */
         if (level != -1)
-            EliteItemManager.setEliteLevel(itemStack, level);
+            EliteItemManager.initializeEliteLevel(itemStack, level);
         /*
         Get meta
          */
@@ -117,24 +138,39 @@ public class ItemConstructor {
         itemStack.setItemMeta(itemMeta);
 
         // FMM assigns its sole authored identity. Other model IDs remain presentation-only.
-        if (fmmItemModel != null && !fmmItemModel.isEmpty())
-            applyFmmItemData(itemStack, fmmItemModel, filename);
-        if (weaponType != null && WeaponIdentityResolver.progressionSkill(itemStack) != weaponType) {
+        if (fmmItemModel != null && !fmmItemModel.isEmpty() && modelsEnabled) {
+            if (construction == null) applyFmmItemData(itemStack, fmmItemModel, filename);
+            else {
+                var model = construction.model(fmmItemModel);
+                if (model == null || (model.kind() == null && model.model() == null))
+                    com.magmaguy.magmacore.util.Logger.warn("FMM presentation model '" + fmmItemModel
+                            + "' was not found for custom item " + filename + "; its vanilla material will be used.");
+                else if (model.kind() != null) model.apply(itemStack);
+                else new com.magmaguy.freeminecraftmodels.api.ItemConstructionSnapshot.ItemData(null, model.model(), null).apply(itemStack);
+            }
+        }
+        if (weaponType != null && (construction == null ? WeaponIdentityResolver.progressionSkill(itemStack) : construction.skill(itemStack)) != weaponType) {
             com.magmaguy.magmacore.util.Logger.warn("Custom item " + filename + " requires an available FMM authored weapon matching " + weaponType + ".");
             return null;
         }
 
         // Apply FMM scripted item data if configured and FMM is installed
         if (scriptedItem != null && !scriptedItem.isEmpty()
-                && org.bukkit.Bukkit.getPluginManager().getPlugin("FreeMinecraftModels") != null) {
-            if (WeaponIdentityResolver.isMagicWeapon(itemStack)) {
+                && modelsEnabled) {
+            var skill = construction == null ? WeaponIdentityResolver.progressionSkill(itemStack) : construction.skill(itemStack);
+            if (skill == SkillType.WANDS || skill == SkillType.STAVES) {
                 com.magmaguy.magmacore.util.Logger.warn("Custom item " + filename
                         + " cannot combine an authored FMM weapon with the old scriptedItem path.");
                 return null;
             }
             try {
-                boolean applied = com.magmaguy.freeminecraftmodels.api.ScriptedItemAPI
-                        .applyScriptedItemData(itemStack, scriptedItem);
+                boolean applied;
+                if (construction == null) applied = com.magmaguy.freeminecraftmodels.api.ScriptedItemAPI.applyScriptedItemData(itemStack, scriptedItem);
+                else {
+                    var data = construction.scriptedItem(scriptedItem);
+                    applied = data != null && data.authoredId() != null;
+                    if (applied) data.apply(itemStack);
+                }
                 if (!applied) {
                     com.magmaguy.magmacore.util.Logger.warn("Scripted item '" + scriptedItem
                             + "' not found in FreeMinecraftModels! Referenced by custom item: " + filename);
@@ -145,8 +181,9 @@ public class ItemConstructor {
             }
         }
 
-        com.magmaguy.elitemobs.items.ItemDurability.prepareMagicWeapon(itemStack);
-        return commonFeatures(itemStack, eliteEntity, player, enchantments, customEnchantments, showItemWorth, soulbound);
+        var skill = construction == null ? WeaponIdentityResolver.progressionSkill(itemStack) : construction.skill(itemStack);
+        com.magmaguy.elitemobs.items.ItemDurability.prepareMagicWeapon(itemStack, skill == SkillType.WANDS || skill == SkillType.STAVES);
+        return commonFeatures(itemStack, eliteEntity, player, enchantments, customEnchantments, showItemWorth, soulbound, construction);
     }
 
     private static void applyFmmItemData(ItemStack itemStack, String fmmItemModel, String filename) {
@@ -194,7 +231,7 @@ public class ItemConstructor {
         if (type == null || !type.isAvailable()) return null;
         int level = (int) Math.round(itemTier);
         ItemStack itemStack = ItemStackGenerator.generateItemStack(type.material());
-        EliteItemManager.setEliteLevel(itemStack, level);
+        EliteItemManager.initializeEliteLevel(itemStack, level);
         ItemMeta itemMeta = itemStack.getItemMeta();
         HashMap<Enchantment, Integer> enchantmentMap = EnchantmentGenerator.generateEnchantments(
                 itemTier, type.material(), type.magicSkill(), itemMeta);
@@ -218,6 +255,16 @@ public class ItemConstructor {
                                             HashMap<String, Integer> customEnchantments,
                                             boolean showItemWorth,
                                             boolean soulbound) {
+        return commonFeatures(itemStack, eliteEntity, player, enchantments, customEnchantments, showItemWorth, soulbound, null);
+    }
+
+    private static ItemStack commonFeatures(ItemStack itemStack,
+                                            EliteEntity eliteEntity,
+                                            Player player,
+                                            HashMap<Enchantment, Integer> enchantments,
+                                            HashMap<String, Integer> customEnchantments,
+                                            boolean showItemWorth,
+                                            boolean soulbound, ItemConstructionContext construction) {
 
         ItemMeta itemMeta = itemStack.getItemMeta();
 
@@ -233,15 +280,16 @@ public class ItemConstructor {
         /*
         Register item source for lore redraw
          */
-        if (com.magmaguy.elitemobs.items.LootItemPolicy.keepsMobProvenance(itemStack))
+        if (com.magmaguy.elitemobs.items.LootItemPolicy.keepsMobProvenance(itemStack, construction))
             ItemTagger.registerItemSource(eliteEntity, itemMeta);
 
         //Tag the item
         ItemTagger.registerEnchantments(itemMeta, enchantments);
         itemStack.setItemMeta(itemMeta);
         if (!customEnchantments.isEmpty()) {
-            var items = com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems.ITEMS;
-            itemStack = items.previewAuthoredCustom(itemStack, customEnchantments).apply(itemStack);
+            itemStack = construction == null
+                    ? com.magmaguy.elitemobs.items.upgradesystem.EliteEnchantmentItems.ITEMS.previewAuthoredCustom(itemStack, customEnchantments).apply(itemStack)
+                    : construction.enchantments().applyCustom(itemStack, customEnchantments);
         }
 
         /*
@@ -252,7 +300,7 @@ public class ItemConstructor {
         /*
         Update lore
          */
-        new EliteItemLore(itemStack, showItemWorth);
+        new EliteItemLore(itemStack, showItemWorth, false, construction);
 
         return itemStack;
 

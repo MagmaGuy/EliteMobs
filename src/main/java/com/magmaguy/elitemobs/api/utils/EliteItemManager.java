@@ -271,7 +271,11 @@ public class EliteItemManager {
     }
 
     public static boolean isWeapon(@Nullable ItemStack itemStack) {
-        if (com.magmaguy.elitemobs.skills.WeaponIdentityResolver.isMagicWeapon(itemStack)) return true;
+        return isWeapon(itemStack, com.magmaguy.elitemobs.skills.WeaponIdentityResolver.isMagicWeapon(itemStack));
+    }
+
+    public static boolean isWeapon(@Nullable ItemStack itemStack, boolean magicWeapon) {
+        if (magicWeapon) return true;
         if (itemStack == null) return false;
         //Wooden axe stats are so bad they can't even get detected properly
         if (itemStack.getType().equals(Material.WOODEN_AXE) || itemStack.getType().equals(Material.CROSSBOW))
@@ -321,6 +325,13 @@ public class EliteItemManager {
 
     public static void setEliteLevel(@Nullable ItemStack itemStack, int level) {
         if (itemStack == null) return;
+        initializeEliteLevel(itemStack, level);
+        new EliteItemLore(itemStack, false);
+    }
+
+    /** Sets level metadata during construction; the caller renders lore after completing the item. */
+    public static void initializeEliteLevel(@Nullable ItemStack itemStack, int level) {
+        if (itemStack == null) return;
         registerEliteItem(itemStack);
         ItemTagger.setItemLevel(itemStack, level);
         if (isWeapon(itemStack)) {
@@ -332,7 +343,6 @@ public class EliteItemManager {
             if (defense > 0)
                 ItemTagger.setEliteDefenseAttribute(itemStack, defense);
         }
-        new EliteItemLore(itemStack, false);
     }
 
     public static void setEliteLevel(@Nullable ItemStack itemStack, int level, boolean onlyArmorOrWeapons) {

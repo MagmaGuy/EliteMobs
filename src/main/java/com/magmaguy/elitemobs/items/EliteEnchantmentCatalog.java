@@ -136,6 +136,11 @@ public final class EliteEnchantmentCatalog {
         return current == null ? null : current.definitions().get(id);
     }
 
+    public static Set<String> definitionIds() {
+        var current = catalog;
+        return current == null ? Set.of() : current.definitions().keySet();
+    }
+
     public static String text(String id, String parameter, String fallback) {
         var definition = definition(id);
         Object value = definition == null ? null : definition.parameters().get(parameter);

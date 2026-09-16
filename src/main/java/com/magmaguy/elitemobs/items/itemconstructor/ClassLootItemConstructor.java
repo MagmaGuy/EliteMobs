@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.items.itemconstructor;
 
+import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.ClassLootSettingsConfig;
 import com.magmaguy.elitemobs.config.ClassLootSettingsConfig.Difficulty;
 import com.magmaguy.elitemobs.config.ClassLootSettingsConfig.Rank;
@@ -19,12 +21,27 @@ public final class ClassLootItemConstructor {
     private ClassLootItemConstructor() {}
 
     public static boolean available(CustomItem item, Difficulty difficulty, Rank rank) {
+        return available(item, difficulty, rank, null);
+    }
+
+    private static boolean available(CustomItem item, Difficulty difficulty, Rank rank, ItemConstructionContext construction) {
         var fields = item.getCustomItemsConfigFields();
         var family = fields.getClassLootFamily();
         if (!fields.isEnabled() || family == null || fields.getMaterial() == null
                 || ClassLootSettingsConfig.profile(difficulty, rank, family) == null) return false;
         var magic = family.magicType();
         if (magic == null) return true;
+        if (construction != null) {
+            if (magic.magicSkill() == SkillType.STAVES
+                    && !ProceduralItemGenerationSettingsConfig.isStavesEnabled()) return false;
+            if (magic.magicSkill() == SkillType.WANDS
+                    && !ProceduralItemGenerationSettingsConfig.isWandsEnabled()) return false;
+            var defaultWeapon = construction.model(magic.fmmItemId());
+            if (defaultWeapon == null || defaultWeapon.kind() == null) return false;
+            String id = fields.getFmmItemModel();
+            var prepared = construction.model(id == null || id.isBlank() ? magic.fmmItemId() : id);
+            return prepared != null && prepared.kind() != null;
+        }
         if (!magic.isAvailable()) return false;
         try {
             String model = fields.getFmmItemModel();
@@ -40,7 +57,12 @@ public final class ClassLootItemConstructor {
 
     public static ItemStack construct(CustomItem item, int level, Difficulty difficulty, Rank rank,
                                       EliteEntity source, Player owner, String sourceName) {
-        if (!available(item, difficulty, rank)) return null;
+        return construct(item, level, difficulty, rank, source, owner, sourceName, null);
+    }
+
+    public static ItemStack construct(CustomItem item, int level, Difficulty difficulty, Rank rank,
+                                      EliteEntity source, Player owner, String sourceName, ItemConstructionContext construction) {
+        if (!available(item, difficulty, rank, construction)) return null;
         if (owner != null && !item.getPermission().isEmpty() && !owner.hasPermission(item.getPermission())) return null;
         var fields = item.getCustomItemsConfigFields();
         var family = fields.getClassLootFamily();
@@ -64,8 +86,8 @@ public final class ClassLootItemConstructor {
                 fields.getMaterial(), nativeEnchantments, customEnchantments, effects,
                 fields.getLore().stream().map(expand).toList(), source, owner, false,
                 fields.getCustomModelID(), fields.getEquipmentModelID(), fields.isSoulbound(), fields.getFilename(),
-                fields.getScriptedItem(), fields.getWeaponType(), model);
-        if (family.isWeapon() && WeaponIdentityResolver.progressionSkill(result) != family.skill())
+                fields.getScriptedItem(), fields.getWeaponType(), model, construction);
+        if (family.isWeapon() && (construction == null ? WeaponIdentityResolver.progressionSkill(result) : construction.skill(result)) != family.skill())
             throw new IllegalStateException("Custom item " + fields.getFilename() + " lost its " + family.skill() + " identity");
         return result;
     }

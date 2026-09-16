@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.items;
 
+import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructionContext;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import org.bukkit.Material;
@@ -10,8 +12,14 @@ public final class LootItemPolicy {
     private LootItemPolicy() { }
 
     public static boolean isEquipment(ItemStack item) {
-        return item != null && (WeaponIdentityResolver.progressionSkillIncludingArmor(item) != null
-                || item.getType() == Material.SHIELD);
+        return isEquipment(item, null);
+    }
+
+    private static boolean isEquipment(ItemStack item, ItemConstructionContext construction) {
+        if (item == null) return false;
+        var skill = construction == null ? WeaponIdentityResolver.progressionSkillIncludingArmor(item) : construction.skill(item);
+        return skill != null || item.getType() == Material.SHIELD
+                || SkillType.fromMaterialIncludingArmor(item.getType()) == SkillType.ARMOR;
     }
 
     public static boolean isEquipment(CustomItem item) {
@@ -21,7 +29,11 @@ public final class LootItemPolicy {
     }
 
     public static boolean keepsMobProvenance(ItemStack item) {
-        return isEquipment(item) || item.getMaxStackSize() == 1;
+        return keepsMobProvenance(item, null);
+    }
+
+    public static boolean keepsMobProvenance(ItemStack item, ItemConstructionContext construction) {
+        return isEquipment(item, construction) || item.getMaxStackSize() == 1;
     }
 
     public static boolean shouldSoulbind(ItemStack item) {

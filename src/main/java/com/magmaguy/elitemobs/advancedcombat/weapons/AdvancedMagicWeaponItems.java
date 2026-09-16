@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.advancedcombat.weapons;
 
+import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructionContext;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.skills.SkillType;
@@ -25,9 +26,13 @@ public final class AdvancedMagicWeaponItems {
     }
 
     public static void register() {
-        if (!org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")) return;
-        if (CustomItem.getCustomItem(STAFF_ITEM_ID) == null) new CustomItem(staff());
-        if (CustomItem.getCustomItem(WAND_ITEM_ID) == null) new CustomItem(wand());
+        register(null);
+    }
+
+    public static void register(ItemConstructionContext construction) {
+        if (construction == null ? !org.bukkit.Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels") : !construction.modelsEnabled()) return;
+        if (CustomItem.getCustomItem(STAFF_ITEM_ID) == null) new CustomItem(staff(), construction);
+        if (CustomItem.getCustomItem(WAND_ITEM_ID) == null) new CustomItem(wand(), construction);
     }
 
     /**

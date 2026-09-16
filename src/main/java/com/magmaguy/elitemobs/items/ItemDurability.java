@@ -14,13 +14,24 @@ public final class ItemDurability {
         if (item == null || item.getType().isAir()) return 0;
         if (item.getItemMeta() instanceof Damageable meta && meta.hasMaxDamage())
             return meta.getMaxDamage();
-        if (WeaponIdentityResolver.isMagicWeapon(item)) return MAGIC_WEAPON_DURABILITY;
+        return WeaponIdentityResolver.isMagicWeapon(item) ? MAGIC_WEAPON_DURABILITY : item.getType().getMaxDurability();
+    }
+
+    public static int maximum(ItemStack item, boolean magicWeapon) {
+        if (item == null || item.getType().isAir()) return 0;
+        if (item.getItemMeta() instanceof Damageable meta && meta.hasMaxDamage())
+            return meta.getMaxDamage();
+        if (magicWeapon) return MAGIC_WEAPON_DURABILITY;
         return item.getType().getMaxDurability();
     }
 
     /** Retains authored durability and damage while upgrading legacy magic items in place. */
     public static void prepareMagicWeapon(ItemStack item) {
-        if (!WeaponIdentityResolver.isMagicWeapon(item)
+        prepareMagicWeapon(item, WeaponIdentityResolver.isMagicWeapon(item));
+    }
+
+    public static void prepareMagicWeapon(ItemStack item, boolean magicWeapon) {
+        if (!magicWeapon
                 || !(item.getItemMeta() instanceof Damageable meta)) return;
         if (!meta.hasMaxDamage()) meta.setMaxDamage(MAGIC_WEAPON_DURABILITY);
         meta.setMaxStackSize(1);

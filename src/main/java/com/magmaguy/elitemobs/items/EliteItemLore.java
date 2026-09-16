@@ -1,5 +1,8 @@
 package com.magmaguy.elitemobs.items;
 
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
+import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructionContext;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
@@ -52,6 +55,7 @@ public class EliteItemLore {
     private int prestigeLevel = 0;
     private List<String> thirdPartyLore = null;
     private boolean hasCustomEnchantments;
+    private boolean magicWeapon;
     private int customEnchantmentsPosition = -1;
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth) {
@@ -59,10 +63,16 @@ public class EliteItemLore {
     }
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth, boolean isNewItem) {
-        initialize(itemStack, showItemWorth, isNewItem);
+        this(itemStack, showItemWorth, isNewItem, null);
     }
 
-    private void initialize(ItemStack itemStack, boolean showItemWorth, boolean isNewItem) {
+    public EliteItemLore(ItemStack itemStack, boolean showItemWorth, boolean isNewItem,
+                         ItemConstructionContext construction) {
+        initialize(itemStack, showItemWorth, isNewItem, construction);
+    }
+
+    private void initialize(ItemStack itemStack, boolean showItemWorth, boolean isNewItem,
+                             ItemConstructionContext construction) {
 
         if (!EliteItemManager.isEliteMobsItem(itemStack)) {
 //            Logger.warn("Attempted to rewrite the lore of a non-elitemobs item! This is not supposed to happen.");
@@ -73,6 +83,11 @@ public class EliteItemLore {
         // until the shared renderer accepts the original prefix and the complete new lore.
         this.itemStack = itemStack.clone();
         this.itemMeta = this.itemStack.getItemMeta();
+        var skill = construction == null
+                ? WeaponIdentityResolver.progressionSkill(this.itemStack)
+                : construction.skill(this.itemStack);
+        magicWeapon = skill == SkillType.STAVES
+                || skill == SkillType.WANDS;
         this.lore = new ArrayList<>();
         this.showItemWorth = showItemWorth;
 
@@ -95,11 +110,14 @@ public class EliteItemLore {
         hasCustomEnchantments = !EnchantmentItems.inspectCustom(this.itemMeta).isEmpty();
 
         this.itemStack.setItemMeta(this.itemMeta);
-        ItemStack rendered = ENCHANTMENT_PRESENTATION.refreshPresentation(this.itemStack, hostLore -> {
+        java.util.function.UnaryOperator<List<String>> rebuild = hostLore -> {
             if (isNewItem && !hostLore.isEmpty()) thirdPartyLore = hostLore;
             writeNewLore();
             return lore;
-        }, hostLore -> customEnchantmentsPosition);
+        };
+        ItemStack rendered = construction == null
+                ? ENCHANTMENT_PRESENTATION.refreshPresentation(this.itemStack, rebuild, hostLore -> customEnchantmentsPosition)
+                : construction.enchantments().refreshPresentation(this.itemStack, rebuild, hostLore -> customEnchantmentsPosition);
         if (!itemStack.setItemMeta(rendered.getItemMeta()))
             throw new IllegalArgumentException("Elite item rejected its rebuilt metadata");
         this.itemStack = itemStack;
@@ -217,7 +235,7 @@ public class EliteItemLore {
         for (String string : ItemSettingsConfig.getLoreStructure()) {
 
             if (string.contains("$weaponOrArmorStats")) {
-                if (EliteItemManager.isWeapon(itemStack))
+                if (EliteItemManager.isWeapon(itemStack, magicWeapon))
                     string = ItemSettingsConfig.getWeaponEntry();
                 else if (EliteItemManager.isArmor(itemStack))
                     string = ItemSettingsConfig.getArmorEntry();
@@ -226,8 +244,8 @@ public class EliteItemLore {
             }
 
             if (string.contains("$itemMaxDurability")) {
-                if (com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack) <= 0 || itemMeta.isUnbreakable()) continue;
-                string = stringReplacer(string, "$itemMaxDurability", com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack));
+                if (com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack, magicWeapon) <= 0 || itemMeta.isUnbreakable()) continue;
+                string = stringReplacer(string, "$itemMaxDurability", com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack, magicWeapon));
             }
 
             string = stringReplacer(string, "$itemMaterial", materialDisplayName(itemStack.getType()));
