@@ -285,7 +285,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         if (livingEntity != null && livingEntity.isValid())
             return;
 
-        Location effectiveSpawnLocation = PatrolService.materializationLocation(this).orElse(spawnLocation);
+        Location effectiveSpawnLocation = resolveSpawnLocation();
         if (effectiveSpawnLocation != null) persistentLocation = effectiveSpawnLocation.clone();
 
         if (isPersistent && persistentObjectHandler == null)
@@ -307,8 +307,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             getDynamicLevel(effectiveSpawnLocation);
         }
 
-        if (!effectiveSpawnLocation.equals(spawnLocation))
-            setRespawnOverrideLocation(effectiveSpawnLocation);
+        // The body must use the same destination as persistence and the chunk readiness check.
+        setRespawnOverrideLocation(effectiveSpawnLocation);
         super.livingEntity = new CustomBossMegaConsumer(this).spawn(bodyFactory);
         if (super.livingEntity == null)
             Logger.warn("Something just prevented EliteMobs from spawning a Custom Boss! More info up next.");
@@ -364,6 +364,12 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                     }));
 
         CommandRunner.runCommandFromList(customBossesConfigFields.getOnSpawnCommands(), new ArrayList<>());
+    }
+
+    private Location resolveSpawnLocation() {
+        // Phase transitions supply a destination without moving the boss's original spawn point.
+        if (respawnOverrideLocation != null) return respawnOverrideLocation;
+        return PatrolService.materializationLocation(this).orElse(spawnLocation);
     }
 
     private void setNormalizedHealth() {
@@ -558,6 +564,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     @Override
     public Location getPersistentLocation() {
+        if (respawnOverrideLocation != null) return respawnOverrideLocation;
         Location patrolLocation = PatrolService.materializationLocation(this).orElse(null);
         if (patrolLocation != null) return patrolLocation;
         if (persistentLocation == null && getLocation() != null) persistentLocation = getLocation();
@@ -696,7 +703,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     protected final void restorePersistedSpawn(SpawnLifecycle.Context spawnContext) {
         Objects.requireNonNull(spawnContext, "context");
-        setRespawnOverrideLocation(persistentLocation);
+        if (respawnOverrideLocation == null)
+            setRespawnOverrideLocation(PatrolService.materializationLocation(this).orElse(persistentLocation));
         spawn(spawnContext);
     }
 
@@ -721,7 +729,9 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             spawnLocation.setWorld(world);
         if (persistentLocation != null)
             persistentLocation.setWorld(world);
-        Location effectiveLocation = PatrolService.materializationLocation(this).orElse(spawnLocation);
+        if (respawnOverrideLocation != null)
+            respawnOverrideLocation.setWorld(world);
+        Location effectiveLocation = resolveSpawnLocation();
         if (effectiveLocation == null || effectiveLocation.getWorld() == null) return;
         //Deliberately mirrors WormholeEntry: leave unloaded chunks to the ChunkLoadEvent path rather than letting
         //spawn() fail and log a protection/incompatibility warning for a chunk that simply is not there yet.
@@ -737,6 +747,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         //regional bosses stay tracked across world reloads and pinned their old world otherwise.
         if (spawnLocation != null) spawnLocation.setWorld(null);
         if (persistentLocation != null) persistentLocation.setWorld(null);
+        if (respawnOverrideLocation != null) respawnOverrideLocation.setWorld(null);
     }
 
     /**
