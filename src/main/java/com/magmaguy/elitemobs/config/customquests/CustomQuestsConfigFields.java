@@ -198,7 +198,8 @@ public class CustomQuestsConfigFields extends CustomConfigFields {
         for (Map.Entry<String, Object> entry : objectiveValues.entrySet())
             if (entry.getKey().equals("dialog"))
                 parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + objectiveName + "." + entry.getKey(), (List<String>) entry.getValue()));
-            else if (entry.getKey().equals("npcName") || entry.getKey().equals("location"))
+            else if (entry.getKey().equals("npcName") || entry.getKey().equals("itemName")
+                    || entry.getKey().equals("name") || entry.getKey().equals("location"))
                 parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + objectiveName + "." + entry.getKey(), (String) entry.getValue()));
             else
                 parsedMap.put(entry.getKey(), entry.getValue());
