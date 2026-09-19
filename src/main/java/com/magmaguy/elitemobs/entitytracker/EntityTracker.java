@@ -236,15 +236,16 @@ public class EntityTracker implements Listener {
 
     /**
      * Leak canary: a successfully unloaded world should become garbage-collectable.
-     * If it is still strongly reachable minutes later, some plugin retains it — a
-     * condition otherwise only visible in a heap dump.
+     * A surviving weak reference alone does not prove strong retention: collection
+     * may not have examined the world yet. A heap dump can identify retaining paths.
      */
     private static void scheduleWorldRetentionCanary(World world) {
         String worldName = world.getName();
         UUID worldUUID = world.getUID();
+        long unloadedAtNanos = System.nanoTime();
         java.lang.ref.WeakReference<World> reference = new java.lang.ref.WeakReference<>(world);
         //Test/diagnostic override: -Delitemobs.worldRetentionCanaryTicks=<ticks> checks sooner,
-        //forces a GC first so the weak reference is meaningful, and also logs the healthy case,
+        //requests GC (the JVM may ignore it) and also logs when the reference clears,
         //giving automated tests a positive line to assert instead of the absence of a warning.
         Long canaryTicksOverride = Long.getLong("elitemobs.worldRetentionCanaryTicks");
         long delayTicks = canaryTicksOverride != null ? canaryTicksOverride : 5L * 60L * 20L;
@@ -257,10 +258,17 @@ public class EntityTracker implements Listener {
                             + " was garbage collected after unloading.");
                 return;
             }
-            com.magmaguy.magmacore.util.Logger.warn("World " + worldName + " was unloaded " + (delayTicks / 20L)
-                    + " seconds ago but may still be retained in memory. If this appears after every instanced" +
-                    " dungeon, a plugin is holding references to unloaded worlds (this leaks RAM) - take a heap" +
-                    " dump and look for the retaining plugin.");
+            long elapsedSeconds = java.util.concurrent.TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - unloadedAtNanos);
+            com.magmaguy.magmacore.util.Logger.warn("World " + worldName + " (" + worldUUID + ") has not been garbage"
+                    + " collected " + elapsedSeconds + " seconds after unloading. This does not confirm a memory leak"
+                    + " or identify a responsible plugin; garbage collection may not have examined the world yet.");
+            com.magmaguy.magmacore.util.Logger.warn("If this repeats, capture a heap dump while the server is still running."
+                    + " On the server host/container, as the server OS user, run the JDK command: jcmd "
+                    + ProcessHandle.current().pid() + " GC.heap_dump elitemobs-heap-" + System.currentTimeMillis() + ".hprof"
+                    + " (capture can pause the server and create a large file; keep the dump private).");
+            com.magmaguy.magmacore.util.Logger.warn("In Eclipse Memory Analyzer, locate this world by name/UUID and inspect"
+                    + " Paths to GC Roots, excluding weak references, to identify retaining fields, tasks or registries"
+                    + " in any plugin or the server. If the world was collected during capture, no retaining path will remain.");
         }, delayTicks);
     }
 
