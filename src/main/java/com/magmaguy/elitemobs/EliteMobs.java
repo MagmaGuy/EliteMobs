@@ -463,7 +463,6 @@ public class EliteMobs extends JavaPlugin {
         if (GamblingConfig.isGamblingEnabled()) {
             com.magmaguy.elitemobs.economy.GamblingEconomyHandler.initialize();
             com.magmaguy.elitemobs.gambling.DebtCollectorManager.initialize();
-            com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.initialize();
         }
 
         //Get world list
@@ -750,7 +749,6 @@ public class EliteMobs extends JavaPlugin {
         com.magmaguy.elitemobs.menus.gambling.HigherLowerGame.shutdown();
         com.magmaguy.elitemobs.menus.gambling.SlotMachineGame.shutdown();
         com.magmaguy.elitemobs.gambling.DebtCollectorManager.shutdown();
-        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.shutdown();
         com.magmaguy.elitemobs.economy.GamblingEconomyHandler.shutdown();
         DynamicDungeonBrowser.shutdown();
         InstancedDungeonBrowser.shutdown();

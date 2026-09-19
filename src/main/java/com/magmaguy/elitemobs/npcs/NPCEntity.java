@@ -8,6 +8,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.NPCEntityRemoveEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.config.GamblingConfig;
+import com.magmaguy.elitemobs.economy.GamblingEconomyHandler;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -63,6 +65,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private Location spawnLocation;
     private boolean isTalking = false;
     private StackedText nameplate;
+    private List<String> nameplateLines;
     private int nameplateLineCount;
     private static BukkitTask nameplateTask;
     private boolean isDisguised = false;
@@ -186,8 +189,6 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         runScripts(ScriptableNPC.ON_REMOVE, npcEntityRemoveEvent, null);
         shutdownScriptInstances();
         removeNameplate();
-        // Remove house earnings display if this is the gambling den owner
-        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.removeDisplay(uuid);
         if (villager != null) {
             //Release the LibsDisguises registry entry before discarding the entity, or
             //it keeps a hard reference that can pin an unloaded world in memory.
@@ -239,7 +240,6 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         runScripts(ScriptableNPC.ON_REMOVE, npcEntityRemoveEvent, null);
         shutdownScriptInstances();
         removeNameplate();
-        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.removeDisplay(uuid);
         if (villager != null) {
             villager.remove();
             villager = null;
@@ -297,8 +297,6 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         runScripts(ScriptHook.ON_SPAWN, null, null);
         initializeNameplate();
         setTimeout();
-        // Create house earnings display if this is the gambling den owner
-        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.createDisplay(this);
     }
 
     private void initializeScripts() {
@@ -484,7 +482,6 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     /** Keeps role entities attached to the moving villager without driving the villager by teleport. */
     public void syncPatrolVisuals() {
         if (villager == null || !villager.isValid()) return;
-        com.magmaguy.elitemobs.gambling.GamblingDenOwnerDisplay.syncDisplay(this);
         updateNameplateLocation();
     }
 
@@ -500,28 +497,47 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
 
     private void initializeNameplate() {
         removeNameplate();
+        refreshNameplate();
+    }
+
+    private boolean isGamblingDenOwner() {
+        return "gambling_den_owner.yml".equals(npCsConfigFields.getFilename());
+    }
+
+    /** Changes rows in the existing role/name stack, including the model provider's stack. */
+    private void refreshNameplate() {
         List<String> lines = new ArrayList<>();
+        if (isGamblingDenOwner() && GamblingConfig.isGamblingEnabled())
+            lines.add(ChatColorConverter.convert(GamblingConfig.getHouseEarningsLabel()
+                    + GamblingEconomyHandler.getFormattedHouseEarnings()));
         String role = ChatColorConverter.convert(npCsConfigFields.getRole());
         String name = ChatColorConverter.convert(npCsConfigFields.getName());
         if (!role.isBlank()) lines.add(role);
         if (!name.isBlank()) lines.add(name);
+        if (lines.equals(nameplateLines)) return;
         nameplateLineCount = lines.stream().mapToInt(line -> line.split("\\R", -1).length).sum();
         if (customModel != null && customModel.setNpcNameLines(lines, NAMEPLATE_SCALE, NAMEPLATE_LINE_GAP)) {
             villager.setCustomNameVisible(false);
             villager.setCustomName(null);
+            nameplateLines = List.copyOf(lines);
             return;
         }
-        // ModelEngine keeps its own name. EliteMobs still renders its role rows.
-        if (customModel != null) lines = role.isBlank() ? List.of() : List.of(role);
-        else {
+        List<String> completeLines = List.copyOf(lines);
+        // ModelEngine keeps its own name. EliteMobs renders the role and any earnings row.
+        if (customModel != null) {
+            if (!name.isBlank()) lines.remove(lines.size() - 1);
+        } else {
             villager.setCustomNameVisible(false);
             villager.setCustomName(null);
             if (isDisguised) DisguiseEntity.setDisguiseNameVisibility(false, villager, name);
         }
-        nameplate = new StackedText();
+        if (nameplate == null) {
+            nameplate = new StackedText();
+            nameplate.setScale(NAMEPLATE_SCALE);
+            nameplate.setLineGap(NAMEPLATE_LINE_GAP);
+        }
         nameplate.setLines(lines);
-        nameplate.setScale(NAMEPLATE_SCALE);
-        nameplate.setLineGap(NAMEPLATE_LINE_GAP);
+        nameplateLines = completeLines;
         updateNameplateLocation();
     }
 
@@ -550,23 +566,33 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private void removeNameplate() {
         if (nameplate != null) nameplate.remove();
         nameplate = null;
+        nameplateLines = null;
     }
 
     /** One task owns ordinary NPC nameplate viewers. FMM owns modeled NPC nameplates. */
     public static void startNameplates() {
         if (nameplateTask != null) return;
-        nameplateTask = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, () -> {
-            var players = List.copyOf(Bukkit.getOnlinePlayers());
-            for (NPCEntity npc : EntityTracker.getNpcEntities().values()) {
-                if (npc.nameplate == null || !npc.isValid()) continue;
-                npc.updateNameplateLocation();
-                Location location = npc.villager.getLocation();
-                npc.nameplate.syncViewers(players.stream()
-                        .filter(player -> player.getWorld().equals(location.getWorld())
-                                && player.getLocation().distanceSquared(location) <= 64 * 64
-                                && player.canSee(npc.villager)).toList());
+        nameplateTask = new BukkitRunnable() {
+            private int refreshCounter;
+
+            @Override
+            public void run() {
+                boolean refreshEarnings = ++refreshCounter >= 10;
+                if (refreshEarnings) refreshCounter = 0;
+                var players = List.copyOf(Bukkit.getOnlinePlayers());
+                for (NPCEntity npc : EntityTracker.getNpcEntities().values()) {
+                    if (!npc.isValid()) continue;
+                    if (refreshEarnings && npc.isGamblingDenOwner()) npc.refreshNameplate();
+                    if (npc.nameplate == null) continue;
+                    npc.updateNameplateLocation();
+                    Location location = npc.villager.getLocation();
+                    npc.nameplate.syncViewers(players.stream()
+                            .filter(player -> player.getWorld().equals(location.getWorld())
+                                    && player.getLocation().distanceSquared(location) <= 64 * 64
+                                    && player.canSee(npc.villager)).toList());
+                }
             }
-        }, 1L, 2L);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 1L, 2L);
     }
 
     /**
