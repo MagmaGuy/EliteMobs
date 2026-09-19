@@ -35,7 +35,6 @@ public class CustomBossMegaConsumer {
     private final int level;
     private final boolean bypassesWorldGuardSpawn;
     private final Location spawnLocation;
-    private boolean disguiseQueued = false;
     CustomBossEntity customBossEntity;
 
     /**
@@ -111,12 +110,14 @@ public class CustomBossMegaConsumer {
         LivingEntity livingEntity = null;
         boolean accepted = false;
         try {
-            disguiseQueued = queueDisguise(parseName(customBossEntity, level));
             // Boss configuration owns initialization; vanilla randomization can create unwanted jockey mounts.
             livingEntity = bodyFactory == null ? (LivingEntity) spawnLocation.getWorld().spawn(spawnLocation,
                     customBossesConfigFields.getEntityType().getEntityClass(), false,
                     entity -> applyBossFeatures((LivingEntity) entity)) : bodyFactory.apply(this::applyBossFeatures);
             if (livingEntity == null || !livingEntity.isValid()) return null;
+            // Bind the actual body before this tick publishes it to clients. A future disguise
+            // guesses an entity ID and may expire before the new body is tracked.
+            setDisguise(livingEntity);
             setCustomModel(livingEntity);
             customBossEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
             accepted = customBossEntity.getLivingEntity() == livingEntity && livingEntity.isValid()
@@ -138,7 +139,6 @@ public class CustomBossMegaConsumer {
 
 
     private void setDisguise(LivingEntity livingEntity) {
-        if (disguiseQueued) return;
         if (customBossesConfigFields.getDisguise() == null ||
                 CustomModel.customModelsEnabled() &&
                         customBossesConfigFields.isCustomModelExists() &&
@@ -151,23 +151,6 @@ public class CustomBossMegaConsumer {
         } catch (Exception ex) {
             Logger.warn("Failed to load LibsDisguises disguise correctly!");
         }
-    }
-
-    private boolean queueDisguise(String displayName) {
-        if (customBossesConfigFields.getDisguise() == null ||
-                CustomModel.customModelsEnabled() &&
-                        customBossesConfigFields.isCustomModelExists() &&
-                        customBossesConfigFields.getCustomModel() != null &&
-                        !customBossesConfigFields.getCustomModel().isEmpty())
-            return false;
-        if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return false;
-        boolean showName = DefaultConfig.isAlwaysShowNametags() || customBossesConfigFields.isAlwaysShowName();
-        return DisguiseEntity.disguiseNext(
-                customBossesConfigFields.getDisguise(),
-                displayName,
-                showName,
-                customBossesConfigFields.getCustomDisguiseData(),
-                customBossesConfigFields.getFilename());
     }
 
     private void setCustomModel(LivingEntity livingEntity) {
@@ -261,8 +244,9 @@ public class CustomBossMegaConsumer {
             elitePower.applyPowers(livingEntity);
         setEquipment(livingEntity);
         setBaby(livingEntity);
-        setDisguise(livingEntity);
         setName(livingEntity, customBossEntity, level);
+        // Resetting an existing body has no later spawn callback.
+        if (livingEntity.isValid()) setDisguise(livingEntity);
         setFollowRange(livingEntity);
         setMovementSpeed(livingEntity);
         setFrozen(livingEntity);

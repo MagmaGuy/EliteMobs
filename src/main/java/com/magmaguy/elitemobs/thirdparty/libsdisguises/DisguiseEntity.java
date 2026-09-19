@@ -100,7 +100,8 @@ public class DisguiseEntity {
 
     private static void applyDisguise(Disguise disguise, Entity entity) {
         disguise.setEntity(entity);
-        configureDisguiseName(disguise, entity.getCustomName(), DefaultConfig.isAlwaysShowNametags() || entity.getType().equals(EntityType.VILLAGER));
+        configureDisguiseName(disguise, entity.getCustomName(), DefaultConfig.isAlwaysShowNametags()
+                || entity.isCustomNameVisible() || entity.getType().equals(EntityType.VILLAGER));
         disguise.startDisguise();
     }
 
