@@ -14,95 +14,30 @@ import java.util.Locale;
 import java.util.Map;
 
 public class VanillaCustomLootEntry extends CustomLootEntry implements Serializable {
+    private static final long serialVersionUID = 849502628548667093L;
+
     @Getter
     private Material material = null;
 
     public VanillaCustomLootEntry(List<CustomLootEntry> entries, String rawString, String configFilename) {
-        parseAllFormats(rawString, configFilename);
-        if (this.material == null) return;
+        parse(fields(rawString));
         entries.add(this);
     }
 
     public VanillaCustomLootEntry(List<CustomLootEntry> entries, Map<String, Object> configMap, String configFilename) {
-        parseAllFormats(configMap, configFilename);
-        if (this.material == null) return;
+        parse(fields(configMap));
         entries.add(this);
     }
 
-    private void parseAllFormats(Map<String, Object> configMap, String configFilename) {
-        for (Map.Entry<String, Object> entry : configMap.entrySet()) {
-            String key = entry.getKey().toLowerCase(Locale.ROOT);
-            String value = entry.getValue().toString();
-            switch (key) {
-                case "type":
-                case "material":
-                    try {
-                        // Use toUpperCase() to ensure it matches the enum naming conventions
-                        this.material = Material.valueOf(value.toUpperCase());
-                    } catch (Exception ex) {
-                        errorMessage(value, configFilename, "material");
-                    }
-                    break;
-                case "amount":
-                    try {
-                        super.setAmount(Integer.parseInt(value));
-                    } catch (Exception ex) {
-                        errorMessage(value, configFilename, "amount");
-                    }
-                    break;
-                case "chance":
-                    try {
-                        super.setChance(Double.parseDouble(value));
-                    } catch (Exception ex) {
-                        errorMessage(value, configFilename, "chance");
-                    }
-                    break;
-                case "wave":
-                    try {
-                        super.setWave(Integer.parseInt(value));
-                    } catch (Exception ex) {
-                        errorMessage(value, configFilename, "wave");
-                    }
-                    break;
-            }
-        }
-    }
-
-
-    private void parseAllFormats(String rawString, String configFilename) {
-        for (String processedString : rawString.split(":")) {
-            String[] strings = processedString.split("=");
-            switch (strings[0].toLowerCase(Locale.ROOT)) {
-                case "type":
-                case "material":
-                    try {
-                        this.material = Material.valueOf(strings[1]);
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "material");
-                    }
-                    break;
-                case "amount":
-                    try {
-                        super.setAmount(Integer.parseInt(strings[1]));
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "amount");
-                    }
-                    break;
-                case "chance":
-                    try {
-                        super.setChance(Double.parseDouble(strings[1]));
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "chance");
-                    }
-                    break;
-                case "wave":
-                    try {
-                        super.setWave(Integer.parseInt(strings[1]));
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "wave");
-                    }
-                    break;
-            }
+    private void parse(Map<String, Object> definition) {
+        commonFields(definition, false, "material", "type");
+        if (definition.containsKey("material") && definition.containsKey("type"))
+            throw new IllegalArgumentException("material and type specify the same field");
+        String value = text(definition, definition.containsKey("material") ? "material" : "type");
+        try {
+            material = Material.valueOf(value.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException failure) {
+            throw new IllegalArgumentException("invalid material " + value, failure);
         }
     }
 

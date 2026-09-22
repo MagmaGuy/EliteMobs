@@ -17,6 +17,8 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomLootTable implements Serializable {
+    private static final long serialVersionUID = -3145961375108085416L;
+
 
     @Getter
     private final List<CustomLootEntry> entries = new ArrayList<>();
@@ -47,31 +49,24 @@ public class CustomLootTable implements Serializable {
 
     private void parseConfig(List<?> lootTable, String filename) {
         if (lootTable == null) return;
-        for (Object object : lootTable)
-            if (object instanceof String rawString) {
-                switch (rawString.split(":")[0].toLowerCase(Locale.ROOT)) {
-                    case "minecraft":
-                        new VanillaCustomLootEntry(entries, rawString, filename);
-                        break;
-                    default:
-                        if (rawString.toLowerCase(Locale.ROOT).contains("currencyamount="))
-                            new CurrencyCustomLootEntry(entries, rawString, filename);
-                        else if (rawString.contains("material="))
-                            new VanillaCustomLootEntry(entries, rawString, filename);
-                        else if (rawString.contains("command=")) new CommandLootTable(entries, rawString, filename);
-                        else new EliteCustomLootEntry(entries, rawString, filename);
+        for (Object raw : lootTable) {
+            try {
+                if (raw instanceof String value && !value.contains("=")) {
+                    new EliteCustomLootEntry(entries, value, filename);
+                } else {
+                    Map<String, Object> definition = CustomLootEntry.fields(raw);
+                    if (definition.containsKey("currencyamount"))
+                        new CurrencyCustomLootEntry(entries, definition, filename);
+                    else if (definition.containsKey("material") || definition.containsKey("type"))
+                        new VanillaCustomLootEntry(entries, definition, filename);
+                    else if (definition.containsKey("command"))
+                        new CommandLootTable(entries, definition, filename);
+                    else new EliteCustomLootEntry(entries, definition, filename);
                 }
+            } catch (RuntimeException failure) {
+                CustomLootEntry.errorMessage(String.valueOf(raw), filename, failure.getMessage());
             }
-            else if (object instanceof Map<?, ?> configMap) {
-                //This is used for the instanced loot
-                if (((Map<?, ?>) object).containsKey("currencyAmount") ||
-                        ((Map<?, ?>) object).containsKey("currencyamount")) {
-                    new CurrencyCustomLootEntry(entries, configMap, filename);
-                } else if (((Map<?, ?>) object).containsKey("material")) {
-                    new VanillaCustomLootEntry(entries, (Map<String, Object>) configMap, filename);
-                } else
-                    new EliteCustomLootEntry(entries, configMap, filename);
-            }
+        }
         for (CustomLootEntry customLootEntry : entries) {
             if (customLootEntry.getWave() > 0) {
                 if (this.waveRewards.get(customLootEntry.getWave()) != null) {

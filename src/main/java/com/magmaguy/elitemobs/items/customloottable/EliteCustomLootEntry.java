@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.parties.PartyManager;
-import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -20,10 +19,11 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class EliteCustomLootEntry extends CustomLootEntry implements Serializable {
+    private static final long serialVersionUID = 6544054339653615367L;
+
     @Getter
     private String filename = null;
     public List<String> getDifficultyIDs() { return difficultyIDs == null ? null : List.copyOf(difficultyIDs); }
@@ -31,121 +31,44 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     private final String configFilename;
 
     public EliteCustomLootEntry(List<CustomLootEntry> entries, String rawString, String configFilename) {
-        super();
         this.configFilename = configFilename;
-        //old format
-        if (!rawString.contains("filename=")) {
-            parseLegacyFormat(rawString, configFilename);
-        }
-        //new format
-        else {
-            parseNewFormat(rawString, configFilename);
-        }
-        if (filename == null) return;
-        if (CustomItem.isUnavailableWithoutModels(filename)) return;
-        CustomItem customItem = CustomItem.getCustomItem(filename);
-        if (customItem == null && MetadataHandler.pluginState != PluginState.INITIALIZING)
-            errorMessage(rawString, configFilename, "filename");
-        entries.add(this);
+        Map<String, Object> definition;
+        if (!rawString.contains("=")) {
+            String[] legacy = rawString.split(":", -1);
+            if (legacy.length > 3) throw new IllegalArgumentException("legacy loot expects filename:chance:permission");
+            definition = new java.util.LinkedHashMap<>();
+            definition.put("filename", legacy[0]);
+            if (legacy.length > 1) definition.put("chance", legacy[1]);
+            if (legacy.length > 2) definition.put("permission", legacy[2]);
+        } else definition = fields(rawString);
+        parse(definition);
+        register(entries, rawString);
     }
 
     public EliteCustomLootEntry(List<CustomLootEntry> entries, Map<?, ?> configMap, String configFilename) {
         this.configFilename = configFilename;
-        for (Map.Entry<?, ?> mapEntry : configMap.entrySet()) {
-            String key = (String) mapEntry.getKey();
-            switch (key.toLowerCase(Locale.ROOT)) {
-                case "filename" -> filename = MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename);
-                case "chance" ->
-                        super.setChance(MapListInterpreter.parseDouble(key, mapEntry.getValue(), configFilename));
-                case "difficultyid" ->
-                        difficultyIDs = DifficultyResolver.parseFilter(mapEntry.getValue(), configFilename);
-                case "permission" ->
-                        super.setPermission(MapListInterpreter.parseString(key, mapEntry.getValue(), configFilename));
-                case "amount" -> setAmount(MapListInterpreter.parseInteger(key, mapEntry.getValue(), configFilename));
-                default -> Logger.warn("Failed to read custom loot option " + key + " in " + configFilename);
-            }
-        }
-        if (!CustomItem.isUnavailableWithoutModels(filename)) entries.add(this);
+        parse(fields(configMap));
+        register(entries, configMap.toString());
     }
 
-    //Format: filename.yml:chance:permission
-    private void parseLegacyFormat(String rawString, String configFilename) {
-        String[] stringArray = rawString.split(":");
-        try {
-            filename = stringArray[0];
-        } catch (Exception ex) {
-            errorMessage(rawString, configFilename, "filename");
-            return;
+    private void parse(Map<String, Object> definition) {
+        commonFields(definition, true, "filename", "difficultyid");
+        filename = text(definition, "filename");
+        if (definition.containsKey("difficultyid")) {
+            Object raw = definition.get("difficultyid");
+            List<?> values = raw instanceof List<?> list ? list : java.util.Collections.singletonList(raw);
+            if (values.isEmpty() || values.stream().anyMatch(value ->
+                    !(value instanceof String || value instanceof Number) || value.toString().isBlank()))
+                throw new IllegalArgumentException("difficultyID must contain nonempty IDs");
+            difficultyIDs = DifficultyResolver.parseFilter(raw, configFilename);
         }
-
-        try {
-            super.setChance(Double.parseDouble(stringArray[1]));
-        } catch (Exception ex) {
-            errorMessage(rawString, configFilename, "chance");
-            return;
-        }
-
-        if (stringArray.length > 2)
-            try {
-                super.setPermission(stringArray[2]);
-            } catch (Exception ex) {
-                errorMessage(rawString, configFilename, "permission");
-            }
     }
 
-    //Format: filename=filename.yml:chance=X.Y:amount=X:permission=per.miss.ion
-    private void parseNewFormat(String rawString, String configFilename) {
-        for (String string : rawString.split(":")) {
-            String[] strings = string.split("=");
-            switch (strings[0].toLowerCase(Locale.ROOT)) {
-                case "difficultyid":
-                    difficultyIDs = DifficultyResolver.parseFilter(strings.length > 1 ? strings[1] : null, configFilename);
-                    break;
-                case "filename":
-                    try {
-                        this.filename = strings[1];
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "filename");
-                    }
-                    break;
-                case "amount":
-                    try {
-                        super.setAmount(Integer.parseInt(strings[1]));
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "amount");
-                    }
-                    break;
-                case "chance":
-                    try {
-                        super.setChance(Double.parseDouble(strings[1]));
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "chance");
-                    }
-                    break;
-                case "permission":
-                    try {
-                        super.setPermission(strings[1]);
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "permission");
-                    }
-                    break;
-                case "itemlevel":
-                    try {
-                        super.setItemLevel(Integer.parseInt(strings[1]));
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "level");
-                    }
-                    break;
-                case "wave":
-                    try {
-                        super.setWave(Integer.parseInt(strings[1]));
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "wave");
-                    }
-                    break;
-                default:
-            }
-        }
+    private void register(List<CustomLootEntry> entries, String raw) {
+        if (CustomItem.isUnavailableWithoutModels(filename)) return;
+        if (CustomItem.getCustomItem(filename) == null && MetadataHandler.pluginState != PluginState.INITIALIZING)
+            errorMessage(raw, configFilename, "filename");
+        entries.add(this);
     }
 
     private CustomItem generateCustomItem() {

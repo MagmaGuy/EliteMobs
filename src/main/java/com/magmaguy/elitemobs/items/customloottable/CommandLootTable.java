@@ -12,58 +12,19 @@ import java.util.List;
 import java.util.Locale;
 
 public class CommandLootTable extends CustomLootEntry implements Serializable {
+    private static final long serialVersionUID = -8058067487928551461L;
+
     @Getter
     private String command = null;
 
     public CommandLootTable(List<CustomLootEntry> entries, String rawString, String configFilename) {
-        super();
-        parseNewFormat(rawString, configFilename);
-        entries.add(this);
+        this(entries, fields(rawString), configFilename);
     }
 
-    //Format: command=my cool command:chance=X.Y:amount=X:permission=per.miss.ion
-    private void parseNewFormat(String rawString, String configFilename) {
-        for (String string : rawString.split(":")) {
-            String[] strings = string.split("=");
-            switch (strings[0].toLowerCase(Locale.ROOT)) {
-                case "command":
-                    try {
-                        this.command = strings[1];
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "filename");
-                    }
-                    break;
-                case "amount":
-                    try {
-                        super.setAmount(Integer.parseInt(strings[1]));
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "amount");
-                    }
-                    break;
-                case "chance":
-                    try {
-                        super.setChance(Double.parseDouble(strings[1]));
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "chance");
-                    }
-                    break;
-                case "permission":
-                    try {
-                        super.setPermission(strings[1]);
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "permission");
-                    }
-                    break;
-                case "wave":
-                    try {
-                        super.setWave(Integer.parseInt(strings[1]));
-                    } catch (Exception ex) {
-                        errorMessage(rawString, configFilename, "wave");
-                    }
-                    break;
-                default:
-            }
-        }
+    CommandLootTable(List<CustomLootEntry> entries, java.util.Map<String, Object> definition, String configFilename) {
+        commonFields(definition, true, "command");
+        command = text(definition, "command");
+        entries.add(this);
     }
 
     //treasure chest
