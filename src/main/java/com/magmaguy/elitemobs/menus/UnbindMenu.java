@@ -25,26 +25,35 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 
 public class UnbindMenu extends EliteMenu {
-    private static final int eliteItemInputSlot = UnbinderMenuConfig.getEliteItemInputSlot();
-    private static final int unbindScrollItemInputSlot = UnbinderMenuConfig.getEliteUnbindInputSlot();
-    private static final int outputSlot = UnbinderMenuConfig.getOutputSlot();
-    private static final int eliteItemInformationInputSlot = UnbinderMenuConfig.getEliteItemInputInformationSlot();
-    private static final int unbindScrollInformationInputSlot = UnbinderMenuConfig.getEliteScrapInputInformationSlot();
-    private static final int informationOutputSlot = UnbinderMenuConfig.getOutputInformationSlot();
+    private static final Map<Inventory, RecipeLayout> layouts = new IdentityHashMap<>();
     public static Set<Inventory> inventories = new HashSet<>();
 
     public static void shutdown() {
-        inventories.clear();
+        for (Inventory inventory : List.copyOf(inventories)) {
+            if (!(inventory.getHolder() instanceof Player player)) continue;
+            close(player, inventory);
+            if (player.getOpenInventory().getTopInventory() == inventory) player.closeInventory();
+        }
     }
 
-    private static void calculateOutput(Inventory UnbinderInventory) {
-        if (UnbinderInventory.getItem(UnbinderMenuConfig.getEliteUnbindInputSlot()) == null ||
-                UnbinderInventory.getItem(UnbinderMenuConfig.getEliteItemInputSlot()) == null) {
-            UnbinderInventory.setItem(UnbinderMenuConfig.getOutputSlot(), null);
+    private static void close(Player player, Inventory inventory) {
+        RecipeLayout layout = layouts.get(inventory);
+        if (layout == null || !inventories.remove(inventory)) return;
+        EliteMenu.cancel(player, inventory, player.getInventory(), List.of(layout.item(), layout.consumable()));
+        inventory.clear(layout.output());
+        layouts.remove(inventory);
+    }
+
+    private static void calculateOutput(Inventory unbinderInventory) {
+        RecipeLayout layout = layouts.get(unbinderInventory);
+        if (layout == null) return;
+        if (unbinderInventory.getItem(layout.consumable()) == null ||
+                unbinderInventory.getItem(layout.item()) == null) {
+            unbinderInventory.setItem(layout.output(), null);
             return;
         }
-        ItemStack outputItem = UnbinderInventory.getItem(UnbinderMenuConfig.getEliteItemInputSlot()).clone();
-        UnbinderInventory.setItem(outputSlot, ItemConsumables.unbind(outputItem));
+        ItemStack outputItem = unbinderInventory.getItem(layout.item()).clone();
+        unbinderInventory.setItem(layout.output(), ItemConsumables.unbind(outputItem));
     }
 
     /**
@@ -53,15 +62,18 @@ public class UnbindMenu extends EliteMenu {
      * @param player Player for whom the inventory will be created
      */
     public void constructUnbinderMenu(Player player) {
+        RecipeLayout layout = new RecipeLayout(UnbinderMenuConfig.getEliteItemInputSlot(), UnbinderMenuConfig.getEliteUnbindInputSlot(), UnbinderMenuConfig.getOutputSlot(),
+                UnbinderMenuConfig.getEliteItemInputInformationSlot(), UnbinderMenuConfig.getEliteScrapInputInformationSlot(), UnbinderMenuConfig.getOutputInformationSlot(),
+                UnbinderMenuConfig.getInfoSlot(), UnbinderMenuConfig.getCancelSlot(), UnbinderMenuConfig.getConfirmSlot());
         String menuName = UnbinderMenuConfig.getShopName();
         if (DefaultConfig.useResourcePackModels())
             menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE09\uDB83\uDEF5          " + menuName;
-        Inventory UnbinderInventory = Bukkit.createInventory(player, 54, menuName);
+        Inventory unbinderInventory = Bukkit.createInventory(player, 54, menuName);
 
-        for (int i = 0; i < UnbinderInventory.getSize(); i++) {
+        for (int i = 0; i < unbinderInventory.getSize(); i++) {
 
-            if (i == UnbinderMenuConfig.getInfoSlot()) {
-                ItemStack infoButton = UnbinderMenuConfig.getInfoButton();
+            if (i == layout.info()) {
+                ItemStack infoButton = UnbinderMenuConfig.getInfoButton().clone();
                 if (DefaultConfig.useResourcePackModels()) {
                     infoButton.setType(Material.PAPER);
                     ItemMeta itemMeta = infoButton.getItemMeta();
@@ -69,32 +81,32 @@ public class UnbindMenu extends EliteMenu {
                         itemMeta.setItemModel(NamespacedKey.fromString("elitemobs:ui/goldenquestionmark"));
                     infoButton.setItemMeta(itemMeta);
                 }
-                UnbinderInventory.setItem(i, infoButton);
+                unbinderInventory.setItem(i, infoButton);
                 continue;
             }
 
-            if (i == UnbinderMenuConfig.getCancelSlot()) {
-                UnbinderInventory.setItem(i, UnbinderMenuConfig.getCancelButton());
+            if (i == layout.cancel()) {
+                unbinderInventory.setItem(i, UnbinderMenuConfig.getCancelButton());
                 continue;
             }
 
-            if (i == eliteItemInformationInputSlot) {
-                UnbinderInventory.setItem(i, UnbinderMenuConfig.getEliteItemInputInfoButton());
+            if (i == layout.itemInfo()) {
+                unbinderInventory.setItem(i, UnbinderMenuConfig.getEliteItemInputInfoButton());
                 continue;
             }
 
-            if (i == unbindScrollInformationInputSlot) {
-                UnbinderInventory.setItem(i, UnbinderMenuConfig.getEliteUnbindInputInfoButton());
+            if (i == layout.consumableInfo()) {
+                unbinderInventory.setItem(i, UnbinderMenuConfig.getEliteUnbindInputInfoButton());
                 continue;
             }
 
-            if (i == informationOutputSlot) {
-                UnbinderInventory.setItem(i, UnbinderMenuConfig.getOutputInfoButton());
+            if (i == layout.outputInfo()) {
+                unbinderInventory.setItem(i, UnbinderMenuConfig.getOutputInfoButton());
                 continue;
             }
 
 
-            if (i == UnbinderMenuConfig.getConfirmSlot()) {
+            if (i == layout.confirm()) {
 
                 ItemStack clonedConfirmButton = UnbinderMenuConfig.getConfirmButton().clone();
 
@@ -105,21 +117,26 @@ public class UnbindMenu extends EliteMenu {
                 ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
                 clonedMeta.setLore(lore);
                 clonedConfirmButton.setItemMeta(clonedMeta);
-                UnbinderInventory.setItem(i, clonedConfirmButton);
+                unbinderInventory.setItem(i, clonedConfirmButton);
                 continue;
 
             }
 
 
-            if (i == UnbinderMenuConfig.getEliteItemInputSlot() || i == UnbinderMenuConfig.getEliteUnbindInputSlot() || i == UnbinderMenuConfig.getOutputSlot())
+            if (i == layout.item() || i == layout.consumable() || i == layout.output())
                 continue;
             if (DefaultConfig.isUseGlassToFillMenuEmptySpace())
-                UnbinderInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
+                unbinderInventory.setItem(i, ItemStackGenerator.generateItemStack(Material.GLASS_PANE));
 
         }
 
-        player.openInventory(UnbinderInventory);
-        createEliteMenu(UnbinderInventory, inventories);
+        layouts.put(unbinderInventory, layout);
+        createEliteMenu(unbinderInventory, inventories);
+        try {
+            player.openInventory(unbinderInventory);
+        } finally {
+            if (player.getOpenInventory().getTopInventory() != unbinderInventory) close(player, unbinderInventory);
+        }
     }
 
     public static class UnbinderMenuEvents implements Listener {
@@ -132,6 +149,8 @@ public class UnbindMenu extends EliteMenu {
             ItemStack currentItem = event.getCurrentItem();
             int clickedSlot = event.getSlot();
             Inventory unbinderInventory = event.getView().getTopInventory();
+            RecipeLayout layout = layouts.get(unbinderInventory);
+            if (layout == null) return;
             Inventory playerInventory = event.getView().getBottomInventory();
 
             if (currentItem == null) return;
@@ -139,8 +158,8 @@ public class UnbindMenu extends EliteMenu {
             if (isBottomMenu(event)) {
                 //Item is unbind scroll
                 if (ItemConsumables.is(currentItem, ItemConsumables.Type.UNBIND) && SoulbindEnchantment.isValidSoulbindUser(currentItem.getItemMeta(), player)) {
-                    if (unbinderInventory.getItem(unbindScrollItemInputSlot) == null) {
-                        moveOneItemUp(unbindScrollItemInputSlot, event);
+                    if (unbinderInventory.getItem(layout.consumable()) == null) {
+                        moveOneItemUp(layout.consumable(), event);
                         calculateOutput(unbinderInventory);
                     }
                     return;
@@ -149,8 +168,8 @@ public class UnbindMenu extends EliteMenu {
                 //Item is elite item
                 if (EliteItemManager.isEliteMobsItem(currentItem))
                     if (currentItem.getItemMeta() instanceof Damageable)
-                        if (unbinderInventory.getItem(eliteItemInputSlot) == null) {
-                            unbinderInventory.setItem(eliteItemInputSlot, currentItem);
+                        if (unbinderInventory.getItem(layout.item()) == null) {
+                            unbinderInventory.setItem(layout.item(), currentItem);
                             playerInventory.clear(event.getSlot());
                             calculateOutput(unbinderInventory);
                         }
@@ -160,24 +179,24 @@ public class UnbindMenu extends EliteMenu {
                 if (currentItem == null) return;
 
                 //return item to inventory
-                if (event.getSlot() == unbindScrollItemInputSlot || event.getSlot() == eliteItemInputSlot) {
+                if (event.getSlot() == layout.consumable() || event.getSlot() == layout.item()) {
                     moveItemDown(event.getView().getTopInventory(), clickedSlot, player);
                     calculateOutput(unbinderInventory);
                     return;
                 }
 
                 //cancel button
-                if (event.getSlot() == UnbinderMenuConfig.getCancelSlot()) {
+                if (event.getSlot() == layout.cancel()) {
                     player.closeInventory();
                     return;
                 }
 
                 //confirm button
-                if (event.getSlot() == UnbinderMenuConfig.getConfirmSlot()) {
-                    if (unbinderInventory.getItem(outputSlot) != null) {
-                        unbinderInventory.setItem(UnbinderMenuConfig.getEliteItemInputSlot(), null);
-                        unbinderInventory.setItem(UnbinderMenuConfig.getEliteUnbindInputSlot(), null);
-                        moveItemDown(unbinderInventory, outputSlot, player);
+                if (event.getSlot() == layout.confirm()) {
+                    if (unbinderInventory.getItem(layout.output()) != null) {
+                        unbinderInventory.setItem(layout.item(), null);
+                        unbinderInventory.setItem(layout.consumable(), null);
+                        moveItemDown(unbinderInventory, layout.output(), player);
                     }
                 }
 
@@ -187,12 +206,7 @@ public class UnbindMenu extends EliteMenu {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            if (inventories.contains(event.getInventory())) {
-                inventories.remove(event.getInventory());
-                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), new ArrayList<>(List.of(eliteItemInputSlot, unbindScrollItemInputSlot)));
-            }
+            if (event.getPlayer() instanceof Player player) close(player, event.getInventory());
         }
-
     }
-
 }

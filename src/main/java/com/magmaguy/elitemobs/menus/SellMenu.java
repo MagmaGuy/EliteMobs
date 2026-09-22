@@ -27,7 +27,8 @@ import java.util.Set;
 
 public class SellMenu extends EliteMenu implements Listener {
 
-    private static final java.util.Map<Inventory, List<Integer>> inputSlots = new java.util.IdentityHashMap<>();
+    private record SaleSession(StoreLayout layout, ItemStack confirmButton) {}
+    private static final java.util.Map<Inventory, SaleSession> sessions = new java.util.IdentityHashMap<>();
 
     public static Set<Inventory> inventories = new HashSet<>();
     private static final Set<Inventory> selling = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
@@ -46,14 +47,15 @@ public class SellMenu extends EliteMenu implements Listener {
     }
 
     private static List<Integer> slotsFor(Inventory inventory) {
-        return inputSlots.getOrDefault(inventory, List.of());
+        SaleSession session = sessions.get(inventory);
+        return session == null ? List.of() : session.layout.inputs();
     }
 
     private static void close(Player player, Inventory inventory) {
         if (!inventories.remove(inventory)) return;
-        List<Integer> slots = inputSlots.remove(inventory);
-        if (slots == null) return;
-        EliteMenu.cancel(player, inventory, player.getInventory(), slots);
+        SaleSession session = sessions.remove(inventory);
+        if (session == null) return;
+        EliteMenu.cancel(player, inventory, player.getInventory(), session.layout.inputs());
     }
 
     private static double calculateShopValue(Inventory shopInventory, Player player) {
@@ -66,8 +68,8 @@ public class SellMenu extends EliteMenu implements Listener {
         return itemWorth;
     }
 
-    private static ItemStack updateConfirmButton(double itemWorth) {
-        ItemStack clonedConfirmButton = SellMenuConfig.confirmButton.clone();
+    private static ItemStack updateConfirmButton(SaleSession session, double itemWorth) {
+        ItemStack clonedConfirmButton = session.confirmButton.clone();
 
         List<String> lore = new ArrayList<>();
         for (String string : clonedConfirmButton.getItemMeta().getLore())
@@ -88,7 +90,9 @@ public class SellMenu extends EliteMenu implements Listener {
      */
     public void constructSellMenu(Player player) {
 
-        List<Integer> validSlots = List.copyOf(SellMenuConfig.storeSlots);
+        StoreLayout layout = new StoreLayout(SellMenuConfig.storeSlots, SellMenuConfig.infoSlot,
+                SellMenuConfig.cancelSlot, SellMenuConfig.confirmSlot);
+        SaleSession session = new SaleSession(layout, SellMenuConfig.confirmButton.clone());
         String menuName = SellMenuConfig.shopName;
         if (DefaultConfig.useResourcePackModels())
             menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE05\uDB83\uDEF5          " + menuName;
@@ -97,17 +101,17 @@ public class SellMenu extends EliteMenu implements Listener {
 
         for (int i = 0; i < 54; i++) {
 
-            if (i == SellMenuConfig.infoSlot) {
+            if (i == layout.info()) {
                 sellInventory.setItem(i, SellMenuConfig.infoButton);
                 continue;
             }
 
-            if (i == SellMenuConfig.cancelSlot) {
+            if (i == layout.cancel()) {
                 sellInventory.setItem(i, SellMenuConfig.cancelButton);
                 continue;
             }
 
-            if (i == SellMenuConfig.confirmSlot) {
+            if (i == layout.confirm()) {
 
                 ItemStack clonedConfirmButton = SellMenuConfig.confirmButton.clone();
 
@@ -125,7 +129,7 @@ public class SellMenu extends EliteMenu implements Listener {
 
             }
 
-            if (validSlots.contains(i))
+            if (layout.inputs().contains(i))
                 continue;
 
             if (DefaultConfig.isUseGlassToFillMenuEmptySpace())
@@ -133,7 +137,7 @@ public class SellMenu extends EliteMenu implements Listener {
 
         }
 
-        inputSlots.put(sellInventory, validSlots);
+        sessions.put(sellInventory, session);
         createEliteMenu(sellInventory, inventories);
         try {
             player.openInventory(sellInventory);
@@ -152,6 +156,9 @@ public class SellMenu extends EliteMenu implements Listener {
         Player player = (Player) event.getWhoClicked();
         ItemStack currentItem = event.getCurrentItem();
         Inventory shopInventory = event.getView().getTopInventory();
+        SaleSession session = sessions.get(shopInventory);
+        if (session == null) return;
+        StoreLayout layout = session.layout;
         Inventory playerInventory = event.getView().getBottomInventory();
 
         if (!SharedShopElements.itemNullPointerPrevention(event)) return;
@@ -185,17 +192,17 @@ public class SellMenu extends EliteMenu implements Listener {
             playerInventory.clear(event.getSlot());
 
             //Update worth of things to be sold, now using cached prices
-            event.getInventory().setItem(SellMenuConfig.confirmSlot, updateConfirmButton(calculateShopValue(shopInventory, player)));
+            event.getInventory().setItem(layout.confirm(), updateConfirmButton(session, calculateShopValue(shopInventory, player)));
 
         } else {
             //CASE: Player clicked on the shop
 
             //Signature item, does nothing
-            if (currentItem.equals(SellMenuConfig.infoButton))
+            if (event.getSlot() == layout.info())
                 return;
 
             //sell items in shop
-            if (event.getSlot() == SellMenuConfig.confirmSlot) {
+            if (event.getSlot() == layout.confirm()) {
 
                 if (!EconomyHandler.isReady(player.getUniqueId())) {
                     player.sendMessage(EconomySettingsConfig.getShopTransactionFailedMessage());
@@ -251,12 +258,12 @@ public class SellMenu extends EliteMenu implements Listener {
                             .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
                 }
                 if (inventories.contains(shopInventory))
-                    shopInventory.setItem(SellMenuConfig.confirmSlot, updateConfirmButton(calculateShopValue(shopInventory, player)));
+                    shopInventory.setItem(layout.confirm(), updateConfirmButton(session, calculateShopValue(shopInventory, player)));
                 return;
             }
 
             //cancel, transfer items back to player inv and exit
-            if (event.getSlot() == SellMenuConfig.cancelSlot) {
+            if (event.getSlot() == layout.cancel()) {
                 event.getWhoClicked().closeInventory();
                 return;
             }
@@ -268,7 +275,7 @@ public class SellMenu extends EliteMenu implements Listener {
             //If player clicks on one of the items already in the shop, return to their inventory
             moveItemDown(shopInventory, event.getSlot(), player);
 
-            event.getInventory().setItem(SellMenuConfig.confirmSlot, updateConfirmButton(calculateShopValue(shopInventory, player)));
+            event.getInventory().setItem(layout.confirm(), updateConfirmButton(session, calculateShopValue(shopInventory, player)));
 
         }
     }

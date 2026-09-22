@@ -26,12 +26,23 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ScrapperMenu extends EliteMenu {
-    private static final List<Integer> validSlots = ScrapperMenuConfig.storeSlots;
+    private record ScrapSession(StoreLayout layout, double chance) {}
+    private static final Map<Inventory, ScrapSession> sessions = new IdentityHashMap<>();
 
     public static Set<Inventory> inventories = new HashSet<>();
 
     public static void shutdown() {
-        inventories.clear();
+        for (Inventory inventory : List.copyOf(inventories)) {
+            if (!(inventory.getHolder() instanceof Player player)) continue;
+            close(player, inventory);
+            if (player.getOpenInventory().getTopInventory() == inventory) player.closeInventory();
+        }
+    }
+
+    private static void close(Player player, Inventory inventory) {
+        if (!inventories.remove(inventory)) return;
+        ScrapSession session = sessions.remove(inventory);
+        if (session != null) EliteMenu.cancel(player, inventory, player.getInventory(), session.layout.inputs());
     }
 
     /**
@@ -40,6 +51,9 @@ public class ScrapperMenu extends EliteMenu {
      * @param player Player for whom the inventory will be created
      */
     public void constructScrapMenu(Player player) {
+        StoreLayout layout = new StoreLayout(ScrapperMenuConfig.storeSlots, ScrapperMenuConfig.infoSlot,
+                ScrapperMenuConfig.cancelSlot, ScrapperMenuConfig.confirmSlot);
+        ScrapSession session = new ScrapSession(layout, ScrapperMenuConfig.scrapChance);
 
         String menuName = ScrapperMenuConfig.shopName;
         if (DefaultConfig.useResourcePackModels())
@@ -49,15 +63,15 @@ public class ScrapperMenu extends EliteMenu {
 
         for (int i = 0; i < 54; i++) {
 
-            if (i == ScrapperMenuConfig.infoSlot) {
-                ItemStack infoButton = ScrapperMenuConfig.infoButton;
+            if (i == layout.info()) {
+                ItemStack infoButton = ScrapperMenuConfig.infoButton.clone();
                 if (DefaultConfig.useResourcePackModels()) {
                     infoButton.setType(Material.PAPER);
                     CustomModelAdder.addCustomModel(infoButton, CustomModelsConfig.goldenQuestionMark);
 
                     ItemMeta itemMeta = infoButton.getItemMeta();
                     List<String> parsedLore = new ArrayList<>();
-                    itemMeta.getLore().forEach(entry -> parsedLore.add(entry.replace("$chance", ScrapperMenuConfig.scrapChance * 100 + "")));
+                    itemMeta.getLore().forEach(entry -> parsedLore.add(entry.replace("$chance", session.chance * 100 + "")));
                     itemMeta.setLore(parsedLore);
                     infoButton.setItemMeta(itemMeta);
                 }
@@ -65,18 +79,18 @@ public class ScrapperMenu extends EliteMenu {
                 continue;
             }
 
-            if (i == ScrapperMenuConfig.cancelSlot) {
+            if (i == layout.cancel()) {
                 scrapInventory.setItem(i, ScrapperMenuConfig.cancelButton);
                 continue;
             }
 
-            if (i == ScrapperMenuConfig.confirmSlot) {
+            if (i == layout.confirm()) {
 
                 ItemStack clonedConfirmButton = ScrapperMenuConfig.confirmButton.clone();
 
                 List<String> lore = new ArrayList<>();
                 for (String string : ScrapperMenuConfig.confirmButton.getItemMeta().getLore())
-                    lore.add(string.replace("$chance", ScrapperMenuConfig.scrapChance * 100 + ""));
+                    lore.add(string.replace("$chance", session.chance * 100 + ""));
                 ScrapperMenuConfig.confirmButton.getItemMeta().setLore(lore);
                 ItemMeta clonedMeta = clonedConfirmButton.getItemMeta();
                 clonedMeta.setLore(lore);
@@ -86,7 +100,7 @@ public class ScrapperMenu extends EliteMenu {
 
             }
 
-            if (validSlots.contains(i))
+            if (layout.inputs().contains(i))
                 continue;
 
             if (DefaultConfig.isUseGlassToFillMenuEmptySpace())
@@ -94,8 +108,13 @@ public class ScrapperMenu extends EliteMenu {
 
         }
 
-        player.openInventory(scrapInventory);
+        sessions.put(scrapInventory, session);
         createEliteMenu(scrapInventory, inventories);
+        try {
+            player.openInventory(scrapInventory);
+        } finally {
+            if (player.getOpenInventory().getTopInventory() != scrapInventory) close(player, scrapInventory);
+        }
 
     }
 
@@ -108,6 +127,9 @@ public class ScrapperMenu extends EliteMenu {
             Player player = (Player) event.getWhoClicked();
             ItemStack currentItem = event.getCurrentItem();
             Inventory shopInventory = event.getView().getTopInventory();
+            ScrapSession session = sessions.get(shopInventory);
+            if (session == null) return;
+            StoreLayout layout = session.layout;
             Inventory playerInventory = event.getView().getBottomInventory();
 
             if (currentItem == null) return;
@@ -128,7 +150,7 @@ public class ScrapperMenu extends EliteMenu {
                 }
 
                 //Do transfer
-                for (int slot : ScrapperMenuConfig.storeSlots)
+                for (int slot : layout.inputs())
                     if (shopInventory.getItem(slot) == null) {
                         shopInventory.setItem(slot, currentItem);
                         playerInventory.clear(event.getSlot());
@@ -140,15 +162,15 @@ public class ScrapperMenu extends EliteMenu {
                 //CASE: Player clicked on the shop
 
                 //Signature item, does nothing
-                if (currentItem.equals(ScrapperMenuConfig.infoButton))
+                if (event.getSlot() == layout.info())
                     return;
 
                 //sell items in shop
-                if (event.getSlot() == ScrapperMenuConfig.confirmSlot) {
+                if (event.getSlot() == layout.confirm()) {
                     int successes = 0;
                     int failures = 0;
                     boolean generationFailed = false;
-                    for (Integer validSlot : validSlots) {
+                    for (Integer validSlot : layout.inputs()) {
                         ItemStack itemStack = shopInventory.getItem(validSlot);
                         if (itemStack == null)
                             continue;
@@ -161,7 +183,7 @@ public class ScrapperMenu extends EliteMenu {
                         }
 
                         for (int i = 0; i < itemStack.getAmount(); i++) {
-                            if (ThreadLocalRandom.current().nextDouble() > ScrapperMenuConfig.scrapChance) {
+                            if (ThreadLocalRandom.current().nextDouble() > session.chance) {
                                 failures++;
                                 continue;
                             }
@@ -184,13 +206,13 @@ public class ScrapperMenu extends EliteMenu {
                 }
 
                 //cancel, transfer items back to player inv and exit
-                if (event.getSlot() == ScrapperMenuConfig.cancelSlot) {
+                if (event.getSlot() == layout.cancel()) {
                     player.closeInventory();
                     return;
                 }
 
                 //If player clicks on a border glass pane, do nothing
-                if (!validSlots.contains(event.getSlot())) return;
+                if (!layout.inputs().contains(event.getSlot())) return;
 
 
                 //If player clicks on one of the items already in the shop, return to their inventory
@@ -201,12 +223,7 @@ public class ScrapperMenu extends EliteMenu {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            if (inventories.contains(event.getInventory())) {
-                inventories.remove(event.getInventory());
-                EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), validSlots);
-            }
+            if (event.getPlayer() instanceof Player player) close(player, event.getInventory());
         }
-
     }
-
 }

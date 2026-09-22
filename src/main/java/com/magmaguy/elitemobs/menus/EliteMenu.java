@@ -7,10 +7,35 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 
 public class EliteMenu implements Listener {
+    protected static void validateSlots(int size, Collection<Integer> slots) {
+        Set<Integer> occupied = new HashSet<>();
+        for (Integer slot : slots)
+            if (slot == null || slot < 0 || slot >= size || !occupied.add(slot))
+                throw new IllegalArgumentException("Menu slots must be distinct and between 0 and " + (size - 1) + ": " + slots);
+    }
+
+    protected record StoreLayout(List<Integer> inputs, int info, int cancel, int confirm) {
+        protected StoreLayout {
+            inputs = List.copyOf(inputs);
+            var slots = new java.util.ArrayList<>(inputs);
+            slots.addAll(List.of(info, cancel, confirm));
+            validateSlots(54, slots);
+        }
+    }
+
+    protected record RecipeLayout(int item, int consumable, int output, int itemInfo,
+                                  int consumableInfo, int outputInfo, int info, int cancel, int confirm) {
+        protected RecipeLayout {
+            validateSlots(54, List.of(item, consumable, output, itemInfo, consumableInfo, outputInfo, info, cancel, confirm));
+        }
+    }
+
 
     public static void createEliteMenu(Inventory inventory, Set<Inventory> inventories) {
         inventories.add(inventory);
