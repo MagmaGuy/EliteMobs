@@ -58,17 +58,24 @@ public class QuickReloadSkill extends SkillBonus {
         if (attr == null) return;
 
         NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
-        AttributeModifier existing = attr.getModifiers().stream()
-                .filter(modifier -> modifier.getKey().equals(key)).findFirst().orElse(null);
-        if (existing == null || existing.getAmount() != speedBonus) {
-            if (existing != null) attr.removeModifier(existing);
-            attr.addModifier(new AttributeModifier(key, speedBonus, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
-        }
-        BuffExpiry previous = expiries.remove(player.getUniqueId());
-        if (previous != null) previous.cancel();
         BuffExpiry expiry = new BuffExpiry(player, key);
         expiry.runTaskLater(MetadataHandler.PLUGIN, BUFF_DURATION_TICKS);
-        expiries.put(player.getUniqueId(), expiry);
+        try {
+            AttributeModifier existing = attr.getModifiers().stream()
+                    .filter(modifier -> modifier.getKey().equals(key)).findFirst().orElse(null);
+            if (existing == null || existing.getAmount() != speedBonus) {
+                if (existing != null) attr.removeModifier(existing);
+                attr.addModifier(new AttributeModifier(key, speedBonus, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
+            }
+        } catch (RuntimeException | Error failure) {
+            expiry.cancel();
+            throw failure;
+        }
+        BuffExpiry previous = expiries.put(player.getUniqueId(), expiry);
+        if (previous != null) {
+            previous.cancel();
+            if (previous.player != player) previous.removeModifier();
+        }
     }
 
     private double getSpeedBonus(int skillLevel) {
