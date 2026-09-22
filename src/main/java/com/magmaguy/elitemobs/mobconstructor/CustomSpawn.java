@@ -168,6 +168,16 @@ public class CustomSpawn {
                     if (!MoonPhaseDetector.detectMoonPhase(spawnLocation.getWorld()).equals(customSpawnConfigFields.getMoonPhase()))
                         return;
 
+                if (!keepTrying) {
+                    cancel();
+                    releaseSummoningEntities();
+                    return;
+                }
+                if (timedEvent == null) spawnPreparedBosses();
+                else timedEvent.trySpawn(this::spawnPreparedBosses);
+            }
+
+            private void spawnPreparedBosses() {
                 //One last check
                 //Last line of defense - spawn a test mob. If some unknown protection system prevents spawning it should prevent this
                 LivingEntity testEntity = spawnLocation.getWorld().spawn(spawnLocation, Zombie.class, spawnEntity -> spawnEntity.setAdult());
@@ -215,7 +225,8 @@ public class CustomSpawn {
             releaseSummoningEntities();
             return;
         }
-        if (timedEvent != null && System.currentTimeMillis() < TimedEvent.getNextEventStartMinimum()) {
+        if (timedEvent != null && (!timedEvent.startConditions.areValid()
+                || System.currentTimeMillis() < TimedEvent.getNextEventStartMinimum())) {
             scheduleLocationSearchRetry();
             return;
         }

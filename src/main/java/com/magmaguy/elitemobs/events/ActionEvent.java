@@ -2,6 +2,9 @@ package com.magmaguy.elitemobs.events;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.CustomEventStartEvent;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
+import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.EventsConfig;
 import com.magmaguy.elitemobs.config.PeaceBannerConfig;
 import com.magmaguy.elitemobs.config.customevents.CustomEventsConfig;
@@ -22,6 +25,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -33,6 +37,7 @@ public class ActionEvent extends CustomEvent {
     private final double chance;
     private final List<Material> breakableMaterials;
     private Player player;
+    private BukkitTask playerCooldownTask;
 
     public ActionEvent(CustomEventsConfigFields customEventsConfigFields) {
         super(customEventsConfigFields);
@@ -79,32 +84,68 @@ public class ActionEvent extends CustomEvent {
 
     public void instantiateEvent(Location location, Player player) {
         if (PeaceBannerConfig.isSuppressEvents() && PeaceBannerManager.isProtected(location)) return;
-        ActionEvent actionEvent = new ActionEvent(customEventsConfigFields);
-        actionEvent.player = player;
-        actionEvent.setEventStartLocation(location);
-        CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(actionEvent);
-        new EventCaller(customEventStartEvent);
-        if (customEventStartEvent.isCancelled()) return;
-        if (!actionEvent.startConditions.areValid()) return;
+        UUID playerId = player.getUniqueId();
+        if (!playerCooldowns.add(playerId)) return;
+        ActionEvent actionEvent = null;
+        boolean started = false;
+        try {
+            actionEvent = new ActionEvent(customEventsConfigFields);
+            actionEvent.player = player;
+            actionEvent.setEventStartLocation(location);
+            CustomEventStartEvent customEventStartEvent = new CustomEventStartEvent(actionEvent);
+            new EventCaller(customEventStartEvent);
+            if (customEventStartEvent.isCancelled() || !actionEvent.startConditions.areValid()) return;
 
-        for (String filename : primaryCustomBossFilenames) {
-            CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(filename);
-            if (customBossEntity == null) {
-                Logger.warn("Failed to generate custom boss " + filename + " ! This has cancelled action event " + customEventsConfigFields.getFilename() + " !");
+            List<CustomBossesConfigFields> definitions = new ArrayList<>();
+            for (String filename : primaryCustomBossFilenames) {
+                CustomBossesConfigFields definition = CustomBossesConfig.getCustomBoss(filename);
+                if (definition == null) {
+                    Logger.warn("Missing custom boss " + filename + "; cancelled action event " + customEventsConfigFields.getFilename());
+                    return;
+                }
+                definitions.add(definition);
+            }
+            if (definitions.isEmpty()) {
+                Logger.warn("No bosses configured; cancelled action event " + customEventsConfigFields.getFilename());
                 return;
             }
-            customBossEntity.spawn(actionEvent.getEventStartLocation(), false);
-            actionEvent.primaryEliteMobs.add(customBossEntity);
+            for (CustomBossesConfigFields definition : definitions)
+                actionEvent.primaryEliteMobs.add(new CustomBossEntity(definition));
+            for (CustomBossEntity customBossEntity : actionEvent.primaryEliteMobs) {
+                customBossEntity.spawn(actionEvent.getEventStartLocation(), false);
+                if (!customBossEntity.exists()) {
+                    Logger.warn("Boss spawn was refused; cancelled action event " + customEventsConfigFields.getFilename());
+                    return;
+                }
+            }
+            actionEvent.start();
+            started = true;
+        } finally {
+            if (!started) {
+                playerCooldowns.remove(playerId);
+                if (actionEvent != null) actionEvent.rollbackStartup();
+            }
         }
+    }
 
-        actionEvent.start();
+    private void rollbackStartup() {
+        if (playerCooldownTask != null) playerCooldownTask.cancel();
+        if (eventWatchdog != null) eventWatchdog.cancel();
+        for (CustomBossEntity boss : primaryEliteMobs) {
+            try {
+                boss.remove(RemovalReason.OTHER);
+            } catch (RuntimeException cleanupFailure) {
+                Logger.warn("Failed to remove rejected action-event boss "
+                        + boss.getCustomBossesConfigFields().getFilename() + ": " + cleanupFailure.getMessage());
+            }
+        }
     }
 
     @Override
     public void startModifiers() {
         UUID playerUUID = player.getUniqueId();
         playerCooldowns.add(playerUUID);
-        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> playerCooldowns.remove(playerUUID), 20L * 60L * EventsConfig.getActionEventMinimumCooldown());
+        playerCooldownTask = Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> playerCooldowns.remove(playerUUID), 20L * 60L * EventsConfig.getActionEventMinimumCooldown());
     }
 
     @Override

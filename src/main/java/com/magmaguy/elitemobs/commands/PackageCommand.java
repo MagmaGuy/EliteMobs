@@ -9,116 +9,167 @@ import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.ZipFile;
 import org.bukkit.command.CommandSender;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.List;
 
 public class PackageCommand {
-    CommandSender commandSender;
-    String dungeonFolderName;
+    private static final List<String> CONTENT_DIRECTORIES = List.of(
+            "custombosses", "customevents", "npcs", "npc_scripts", "transport_routes", "customitems",
+            "customquests", "customarenas", "customspawns", "customtreasurechests", "wormholes",
+            "world_blueprints", "powers", "behaviors");
 
     public PackageCommand(CommandSender commandSender, String dungeonFolderName, String versionNumber) {
-        this.commandSender = commandSender;
-        if (dungeonFolderName == null || dungeonFolderName.isEmpty()) {
+        if (dungeonFolderName == null || dungeonFolderName.isBlank()) {
             commandSender.sendMessage(CommandMessagesConfig.getPackageNeedsDungeonNameMessage());
             return;
         }
-        int version = 0;
         try {
-            version = Integer.parseInt(versionNumber);
-        } catch (Exception exception) {
+            Integer.parseInt(versionNumber);
+        } catch (NumberFormatException exception) {
             commandSender.sendMessage(CommandMessagesConfig.getPackageNeedsNumberMessage());
             return;
         }
 
-        this.dungeonFolderName = dungeonFolderName;
-        for (ContentPackagesConfigFields fields : java.util.stream.Stream.concat(
-                ContentPackagesConfig.getDungeonPackages().values().stream(),
-                ContentPackagesConfig.getEnchantedChallengeDungeonPackages().values().stream()).toList()) {
-            if (!dungeonFolderName.equals(fields.getDungeonConfigFolderName())) continue;
-            Path blueprint = MetadataHandler.PLUGIN.getDataFolder().toPath().resolve("world_blueprints")
-                    .resolve(dungeonFolderName).resolve(fields.getWorldName());
-            if (Files.exists(blueprint) && !WorldInstantiator.validateBlueprint(fields.getWorldName(),
-                    dungeonFolderName, fields.getEnvironment())) return;
-        }
-        clearPreviousContents();
-        packContents("custombosses");
-        packContents("customevents");
-        packContents("npcs");
-        packContents("npc_scripts");
-        packContents("transport_routes");
-        packContents("customitems");
-        packContents("customquests");
-        packContents("customarenas");
-        packContents("customspawns");
-        packContents("customtreasurechests");
-        packContents("wormholes");
-        packContents("world_blueprints");
-        packContents("powers");
-        packContents("behaviors");
-
-        commandSender.sendMessage(CommandMessagesConfig.getPackageDoneMessage());
-        commandSender.sendMessage(CommandMessagesConfig.getPackageDontForgetMessage());
-
+        Path staging = null;
+        Path temporaryZip = null;
+        Path exports = null;
         try {
-            ZipFile.ZipUtility.zip(new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + "exports" + File.separatorChar + dungeonFolderName),
-                    MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + "exports" + File.separatorChar + dungeonFolderName + "_packaged.zip");
-        } catch (Exception exception) {
-            commandSender.sendMessage(CommandMessagesConfig.getPackageZipFailedMessage());
-        }
+            validateFolderName(dungeonFolderName);
+            Path data = MetadataHandler.PLUGIN.getDataFolder().toPath().toRealPath();
+            Map<String, Path> sources = new LinkedHashMap<>();
+            for (String directory : CONTENT_DIRECTORIES) {
+                Path source = data.resolve(directory).resolve(dungeonFolderName);
+                try {
+                    BasicFileAttributes attributes = Files.readAttributes(source, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+                    if (attributes.isSymbolicLink() || !attributes.isDirectory())
+                        throw new IOException("Content source is not an unlinked directory: " + source);
+                    sources.put(directory, realOwnedDirectory(data, source));
+                } catch (NoSuchFileException missingSource) {
+                    commandSender.sendMessage(CommandMessagesConfig.getPackageNoSubdirectoryMessage()
+                            .replace("$subdirectory", directory));
+                }
+            }
+            if (sources.isEmpty()) throw new IOException("No content folders exist for " + dungeonFolderName);
 
-        commandSender.sendMessage(CommandMessagesConfig.getPackageZippedMessage());
-    }
+            for (ContentPackagesConfigFields fields : java.util.stream.Stream.concat(
+                    ContentPackagesConfig.getDungeonPackages().values().stream(),
+                    ContentPackagesConfig.getEnchantedChallengeDungeonPackages().values().stream()).toList()) {
+                if (!dungeonFolderName.equals(fields.getDungeonConfigFolderName())) continue;
+                Path blueprintRoot = sources.get("world_blueprints");
+                if (fields.getWorldName() == null || blueprintRoot == null) continue;
+                Path blueprint = blueprintRoot.resolve(fields.getWorldName()).normalize();
+                if (blueprint.equals(blueprintRoot) || !blueprint.startsWith(blueprintRoot))
+                    throw new IOException("World blueprint is outside its content folder: " + blueprint);
+                if (Files.exists(blueprint, LinkOption.NOFOLLOW_LINKS)) {
+                    realOwnedDirectory(blueprintRoot, blueprint);
+                    if (!WorldInstantiator.validateBlueprint(fields.getWorldName(), dungeonFolderName, fields.getEnvironment()))
+                        return;
+                }
+            }
 
-    private void clearPreviousContents() {
-        File targetFolder = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + "exports" + File.separatorChar + dungeonFolderName);
-        if (targetFolder.exists()) delete(targetFolder.toPath());
-        if (new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + "exports" + File.separatorChar + dungeonFolderName + "_packaged.zip").exists())
-            delete(Path.of(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + "exports" + File.separatorChar + dungeonFolderName + "_packaged.zip"));
-    }
+            Path exportDirectory = data.resolve("exports");
+            Files.createDirectories(exportDirectory);
+            exports = realOwnedDirectory(data, exportDirectory);
+            staging = Files.createTempDirectory(exports, ".package-");
+            for (Map.Entry<String, Path> source : sources.entrySet()) {
+                Path destination = staging.resolve(source.getKey()).resolve(dungeonFolderName);
+                copyContents(source.getValue(), destination);
+            }
+            temporaryZip = Files.createTempFile(exports, ".package-", ".zip");
+            ZipFile.ZipUtility.zip(staging.toFile(), temporaryZip.toString());
 
-    private void delete(Path path) {
-        for (File file : path.toFile().listFiles()) {
-            if (file.isDirectory()) delete(file.toPath());
-            else file.delete();
-        }
-    }
-
-    private void packContents(String subdirectory) {
-        Path path = Path.of(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + subdirectory + File.separatorChar + dungeonFolderName);
-
-        if (!Files.exists(path) || !Files.isDirectory(path)) {
-            commandSender.sendMessage(CommandMessagesConfig.getPackageNoSubdirectoryMessage().replace("$subdirectory", subdirectory));
-            return;
-        }
-        File sourceFolder = new File(path.toString());
-        File targetFolder = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + File.separatorChar + "exports" + File.separatorChar + dungeonFolderName + File.separatorChar + subdirectory + File.separatorChar + dungeonFolderName);
-        if (!targetFolder.exists()) {
+            // Keep the previous archive until its complete replacement is ready.
+            Path expandedExport = exports.resolve(dungeonFolderName);
+            if (Files.exists(expandedExport, LinkOption.NOFOLLOW_LINKS)) deleteOwnedTree(exports, expandedExport);
+            Files.move(staging, expandedExport);
+            Path archive = exports.resolve(dungeonFolderName + "_packaged.zip");
+            if (Files.isSymbolicLink(archive)) throw new IOException("Export archive must not be a symbolic link");
             try {
-                targetFolder.mkdirs();
-                targetFolder.mkdir();
-            } catch (Exception ex) {
-                commandSender.sendMessage(CommandMessagesConfig.getPackageFailedDirectoryMessage().replace("$path", targetFolder.getPath()));
-                ex.printStackTrace();
-                return;
+                Files.move(temporaryZip, archive, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException unsupported) {
+                Files.move(temporaryZip, archive, StandardCopyOption.REPLACE_EXISTING);
+            }
+            commandSender.sendMessage(CommandMessagesConfig.getPackageDoneMessage());
+            commandSender.sendMessage(CommandMessagesConfig.getPackageDontForgetMessage());
+            commandSender.sendMessage(CommandMessagesConfig.getPackageZippedMessage());
+        } catch (IOException | InvalidPathException failure) {
+            Logger.warn("Failed to package dungeon " + dungeonFolderName + ": " + failure.getMessage());
+            commandSender.sendMessage(CommandMessagesConfig.getPackageZipFailedMessage());
+        } finally {
+            try {
+                if (temporaryZip != null) Files.deleteIfExists(temporaryZip);
+            } catch (IOException cleanupFailure) {
+                Logger.warn("Failed to clean temporary dungeon archive: " + cleanupFailure.getMessage());
+            }
+            try {
+                if (staging != null && Files.exists(staging, LinkOption.NOFOLLOW_LINKS)) deleteOwnedTree(exports, staging);
+            } catch (IOException cleanupFailure) {
+                Logger.warn("Failed to clean temporary dungeon export: " + cleanupFailure.getMessage());
             }
         }
-        for (File file : sourceFolder.listFiles())
-            recursivelyGetFiles(file, targetFolder);
     }
 
-    private void recursivelyGetFiles(File scannedFile, File destination) {
-        try {
-            if (scannedFile.isDirectory()) {
-                File newDestination = new File(destination.getAbsolutePath() + File.separatorChar + scannedFile.getName());
-                newDestination.mkdir();
-                for (File file : scannedFile.listFiles())
-                    recursivelyGetFiles(file, newDestination);
-            } else
-                Files.copy(scannedFile.toPath(), Path.of(destination.getAbsolutePath() + File.separatorChar + scannedFile.getName()), StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception exception) {
-            Logger.warn("Failed to recursively pack dungeon!");
-        }
+    private static void validateFolderName(String name) throws IOException {
+        Path path = Path.of(name);
+        if (name.isBlank() || path.isAbsolute() || path.getNameCount() != 1
+                || name.equals(".") || name.equals("..") || name.contains("/") || name.contains("\\")
+                || name.contains(":") || name.endsWith(".") || name.endsWith(" "))
+            throw new IOException("Expected one content folder name: " + name);
+    }
+
+    private static Path realOwnedDirectory(Path owner, Path directory) throws IOException {
+        Path real = directory.toRealPath();
+        if (real.equals(owner) || !real.startsWith(owner)
+                || !real.equals(directory.toRealPath(LinkOption.NOFOLLOW_LINKS))
+                || !Files.isDirectory(real))
+            throw new IOException("Directory is not an unlinked child of " + owner + ": " + directory);
+        return real;
+    }
+
+    private static void copyContents(Path source, Path destination) throws IOException {
+        Files.walkFileTree(source, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path directory, BasicFileAttributes attributes) throws IOException {
+                if (!directory.toRealPath().equals(directory)) throw new IOException("Linked content directory: " + directory);
+                Files.createDirectories(destination.resolve(source.relativize(directory)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
+                if (!attributes.isRegularFile() || attributes.isSymbolicLink())
+                    throw new IOException("Unsupported linked or special content file: " + file);
+                Files.copy(file, destination.resolve(source.relativize(file)));
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
+    private static void deleteOwnedTree(Path exports, Path directory) throws IOException {
+        Path owned = realOwnedDirectory(exports, directory);
+        Files.walkFileTree(owned, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path current, BasicFileAttributes attributes) throws IOException {
+                if (!current.toRealPath().equals(current)) throw new IOException("Linked export directory: " + current);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path current, IOException failure) throws IOException {
+                if (failure != null) throw failure;
+                Files.delete(current);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 }

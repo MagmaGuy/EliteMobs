@@ -26,6 +26,7 @@ public class TimedEvent extends CustomEvent implements Listener {
     protected static List<TimedEvent> blueprintEvents = new ArrayList<>();
     protected static List<TimedEvent> timedEvents = new ArrayList<>();
     private static BukkitTask eventPickerTask = null;
+    private static TimedEvent startingEvent;
     //stores the time of the last global trigger
     @Getter
     private static double nextEventTrigger = System.currentTimeMillis() + 5D * 60D * 1000D;
@@ -54,6 +55,7 @@ public class TimedEvent extends CustomEvent implements Listener {
         }
         blueprintEvents.clear();
         timedEvents.clear();
+        startingEvent = null;
     }
 
     public static void initializeBlueprintEvents() {
@@ -78,6 +80,7 @@ public class TimedEvent extends CustomEvent implements Listener {
     private static void pickEvent() {
         HashMap<String, Double> weighedProbabilities = new HashMap<>();
         for (TimedEvent timedEvent : blueprintEvents) {
+            if (!timedEvent.startConditions.areValid()) continue;
             boolean isRunning = false;
             for (TimedEvent activeTimedEvent : timedEvents)
                 if (activeTimedEvent != null &&
@@ -166,6 +169,22 @@ public class TimedEvent extends CustomEvent implements Listener {
     }
 
     /**
+     * Reserves the synchronous spawn attempt, including any callbacks fired by the native spawn.
+     * A failed attempt releases the reservation without starting the minimum cooldown.
+     */
+    public boolean trySpawn(Runnable spawnAttempt) {
+        if (startingEvent != null || !startConditions.areValid()
+                || System.currentTimeMillis() < nextEventStartMinimum) return false;
+        startingEvent = this;
+        try {
+            spawnAttempt.run();
+            return true;
+        } finally {
+            startingEvent = null;
+        }
+    }
+
+    /**
      * Queues an event to start when the start conditions are met
      */
     public void queueEvent() {
@@ -191,10 +210,10 @@ public class TimedEvent extends CustomEvent implements Listener {
 
         primaryEliteMobs.forEach(CustomBossEntity::announceSpawn);
 
-        //Use the event's configured global cooldown
+        start();
+        //Commit cooldowns only after the event has successfully started.
         setNextEventTrigger();
         nextEventStartMinimum = System.currentTimeMillis() + (EventsConfig.getTimedEventMinimumCooldown() * 60 * 1000D);
-        start();
     }
 
     @Override
