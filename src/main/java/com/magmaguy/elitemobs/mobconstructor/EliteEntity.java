@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.mobconstructor;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobHealEvent;
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
+import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.collateralminecraftchanges.KeepNeutralsAngry;
 import com.magmaguy.elitemobs.combatsystem.LevelScaling;
@@ -28,6 +29,7 @@ import com.magmaguy.elitemobs.powerstances.MinorPowerPowerStance;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.elitemobs.utils.EntitySearch;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -153,8 +155,8 @@ public class EliteEntity {
     @Getter
     protected boolean inAntiExploitCooldown = false;
     @Getter
-    @Setter
     protected boolean inCombat = false;
+    private BukkitTask combatWatchdog;
     @Getter
     protected boolean inCombatGracePeriod = false;
     @Getter
@@ -215,13 +217,11 @@ public class EliteEntity {
                        int level,
                        CreatureSpawnEvent.SpawnReason spawnReason) {
         setLevel(level);
+        isNaturalEntity = spawnReason == CreatureSpawnEvent.SpawnReason.NATURAL;
         // Ordinary actors retain the historical event boundary in setLivingEntity. Native Mind
         // actors use the explicit prepare/commit transaction below.
         setLivingEntity(livingEntity, spawnReason);
         if (this.livingEntity == null) return;
-        if (spawnReason == CreatureSpawnEvent.SpawnReason.NATURAL) {
-            isNaturalEntity = true;
-        }
         EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity);
         setDefaultName(eliteMobProperties);
         setArmor();
@@ -234,17 +234,13 @@ public class EliteEntity {
                                         CreatureSpawnEvent.SpawnReason spawnReason,
                                         boolean randomizePowers) {
         setLevel(level);
+        isNaturalEntity = spawnReason == CreatureSpawnEvent.SpawnReason.NATURAL;
         normalizeLivingEntity(livingEntity, spawnReason);
-        if (spawnReason == CreatureSpawnEvent.SpawnReason.NATURAL) {
-            isNaturalEntity = true;
-        }
         //Get correct instance of plugin data, necessary for settings names and health among other things
         EliteMobProperties eliteMobProperties = EliteMobProperties.getPluginData(livingEntity);
         NativeMindActorDefaults.requireRandomizedPowerSupport(
                 livingEntity.getType(), eliteMobProperties, randomizePowers);
-        setDefaultName(eliteMobProperties);
         setArmor();
-        setMaxHealth();
         if (randomizePowers) randomizePowers(eliteMobProperties);
     }
 
@@ -703,6 +699,7 @@ public class EliteEntity {
 
     private void normalizeLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
         if (livingEntity == null) return;
+        if (this.livingEntity != livingEntity) setInCombat(false);
         if (this.livingEntity != livingEntity || !Double.isFinite(nativeBaseMaxHealth))
             nativeBaseMaxHealth = AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health");
         this.removalEventCalled = false;
@@ -1421,9 +1418,54 @@ public class EliteEntity {
         return null;
     }
 
+    public void setInCombat(boolean inCombat) {
+        this.inCombat = inCombat;
+        if (!inCombat) stopCombatWatchdog();
+    }
+
+    public void startCombatWatchdog() {
+        stopCombatWatchdog();
+        LivingEntity encounterBody = livingEntity;
+        combatWatchdog = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!ownsWatchdog() || !inCombat || livingEntity != encounterBody) {
+                    cancel();
+                    return;
+                }
+                EliteMobExitCombatEvent.EliteMobExitCombatReason reason = null;
+                if (!isValid()) reason = EliteMobExitCombatEvent.EliteMobExitCombatReason.ELITE_NOT_VALID;
+                else if (!isInCombatGracePeriod()) {
+                    double followRange = encounterBody.getType() == EntityType.ENDER_DRAGON ? 200
+                            : AttributeManager.getAttributeBaseValue(encounterBody, "generic_follow_range");
+                    if (!EntitySearch.hasNearbyCombatPlayer(getLocation(), followRange))
+                        reason = EliteMobExitCombatEvent.EliteMobExitCombatReason.NO_NEARBY_PLAYERS;
+                }
+                if (reason == null) return;
+                cancel();
+                EliteMobExitCombatEvent.EliteMobExitCombatReason exitReason = reason;
+                org.bukkit.Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                    if (ownsWatchdog() && inCombat && livingEntity == encounterBody)
+                        new EventCaller(new EliteMobExitCombatEvent(EliteEntity.this, exitReason));
+                });
+            }
+
+            private boolean ownsWatchdog() {
+                return combatWatchdog != null && combatWatchdog.getTaskId() == getTaskId();
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20L, 20L);
+    }
+
+    private void stopCombatWatchdog() {
+        if (combatWatchdog == null) return;
+        combatWatchdog.cancel();
+        combatWatchdog = null;
+    }
+
     public void remove(RemovalReason removalReason) {
         beginRemovalCall();
         try {
+            stopCombatWatchdog();
             closePowerStances();
             closeAllPowerRuntimes(removalReason);
             closeEliteLuaPowerBinding();

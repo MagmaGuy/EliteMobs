@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.api.EliteMobHealEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -49,6 +48,7 @@ public class BossHealthDisplay implements Listener {
                             continue;
                         }
 
+                        display.refreshIfDirty();
                         display.updatePositions();
                     } catch (RuntimeException exception) {
                         MetadataHandler.PLUGIN.getLogger().log(
@@ -66,6 +66,7 @@ public class BossHealthDisplay implements Listener {
                 updateSafely("combat popups", CombatPopupManager::update);
                 updateSafely("hit effects", HitEffectManager::update);
                 updateSafely("XP popups", XpPopupManager::update);
+                LeashReturnDamageIndicator.expire();
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
     }
@@ -112,12 +113,7 @@ public class BossHealthDisplay implements Listener {
         if (!anyHealthDisplayEnabled()) return;
         EliteOverheadHealthDisplay display = getOrCreateDisplay(eliteEntity);
         display.resetCombatTimer();
-        Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
-            // A phase switch can remove this display and respawn the same logical boss
-            // before the queued refresh runs. Only the current display still owns labels.
-            if (eliteEntity.isValid() && activeDisplays.get(eliteEntity.getEliteUUID()) == display)
-                display.rebuild();
-        });
+        display.markDirty();
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -128,7 +124,7 @@ public class BossHealthDisplay implements Listener {
         if (!anyHealthDisplayEnabled()) return;
 
         EliteOverheadHealthDisplay display = activeDisplays.get(eliteEntity.getEliteUUID());
-        if (display != null) display.rebuild();
+        if (display != null) display.markDirty();
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

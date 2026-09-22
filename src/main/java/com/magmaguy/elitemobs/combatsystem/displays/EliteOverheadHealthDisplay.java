@@ -13,6 +13,11 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /** Owns the overhead visual and numeric health display for one elite entity. */
 final class EliteOverheadHealthDisplay {
@@ -28,9 +33,12 @@ final class EliteOverheadHealthDisplay {
 
     private final EliteEntity eliteEntity;
     private final List<FakeText> healthBarDisplays = new ArrayList<>();
+    private final Map<FakeText, Set<UUID>> audiences = new HashMap<>();
     private final double healthMultiplier;
     private FakeText numericDisplay;
     private long lastCombatTime;
+    private boolean dirty = true;
+    private boolean audienceDirty = true;
 
     EliteOverheadHealthDisplay(EliteEntity eliteEntity) {
         this.eliteEntity = eliteEntity;
@@ -57,13 +65,23 @@ final class EliteOverheadHealthDisplay {
         return System.currentTimeMillis() - lastCombatTime > timeoutMillis;
     }
 
-    void rebuild() {
-        if (!isValid()) return;
-        cleanupVisualDisplays();
+    void markDirty() {
+        dirty = true;
+    }
+
+    void refreshIfDirty() {
+        if (!dirty || !isValid()) return;
+        dirty = false;
         double currentHealth = eliteEntity.getHealth();
         double maxHealth = eliteEntity.getMaxHealth();
         if (MobCombatSettingsConfig.isDisplayVisualHealthBars()) createHealthBars(currentHealth, maxHealth);
+        else while (!healthBarDisplays.isEmpty()) removeText(healthBarDisplays.removeLast());
         if (MobCombatSettingsConfig.isDisplayNumericHealth()) createNumericDisplay(currentHealth, maxHealth);
+        else if (numericDisplay != null) {
+            removeText(numericDisplay);
+            numericDisplay = null;
+        }
+        audienceDirty = true;
     }
 
     void updatePositions() {
@@ -78,6 +96,10 @@ final class EliteOverheadHealthDisplay {
             int rows = MobCombatSettingsConfig.isDisplayVisualHealthBars() ? calculateBarLayout().rows() : 0;
             numericDisplay.teleport(baseLocation.clone().add(0, rows * 0.22, 0));
         }
+        if (audienceDirty) {
+            reconcileViewers();
+            audienceDirty = false;
+        }
     }
 
     void cleanup() {
@@ -89,6 +111,7 @@ final class EliteOverheadHealthDisplay {
         if (baseLocation == null) return;
 
         BarLayout layout = calculateBarLayout();
+        while (healthBarDisplays.size() > layout.rows()) removeText(healthBarDisplays.removeLast());
         double healthRatio = maxHealth <= 0 ? 0 : Math.max(0, Math.min(1, currentHealth / maxHealth));
         int filledBars = (int) Math.ceil(healthRatio * layout.totalBars());
         String filledColor = healthColor(healthRatio * 100);
@@ -102,10 +125,13 @@ final class EliteOverheadHealthDisplay {
             for (int index = 0; index < filledInRow; index++) text.append(filledColor).append(FULL_BAR);
             for (int index = filledInRow; index < rowSize; index++) text.append(COLOR_EMPTY).append(EMPTY_BAR);
 
-            FakeText display = createFakeText(
-                    baseLocation.clone().add(0, row * 0.22, 0),
-                    ChatColorConverter.convert(text.toString()));
-            if (display != null) healthBarDisplays.add(display);
+            String rendered = ChatColorConverter.convert(text.toString());
+            if (row < healthBarDisplays.size()) {
+                setTextIfChanged(healthBarDisplays.get(row), rendered);
+            } else {
+                FakeText display = createFakeText(baseLocation.clone().add(0, row * 0.22, 0), rendered);
+                if (display != null) healthBarDisplays.add(display);
+            }
             barsRemaining -= filledInRow;
             totalBarsRemaining -= rowSize;
         }
@@ -123,9 +149,10 @@ final class EliteOverheadHealthDisplay {
         if (baseLocation == null) return;
 
         int rows = MobCombatSettingsConfig.isDisplayVisualHealthBars() ? calculateBarLayout().rows() : 0;
-        numericDisplay = createFakeText(
-                baseLocation.clone().add(0, rows * 0.22, 0),
-                ChatColorConverter.convert(text));
+        String rendered = ChatColorConverter.convert(text);
+        if (numericDisplay == null)
+            numericDisplay = createFakeText(baseLocation.clone().add(0, rows * 0.22, 0), rendered);
+        else setTextIfChanged(numericDisplay, rendered);
     }
 
     private BarLayout calculateBarLayout() {
@@ -166,18 +193,47 @@ final class EliteOverheadHealthDisplay {
         FakeText display = VisualDisplay.createStyledFakeText(
                 location, text, Color.fromARGB(80, 0, 0, 0), true, 1.0f);
         if (display == null) return null;
-        for (Player player : location.getWorld().getPlayers())
-            if (player.getLocation().distanceSquared(location) <= 900) display.displayTo(player);
+        audiences.put(display, new HashSet<>());
         return display;
+    }
+
+    private static void setTextIfChanged(FakeText display, String text) {
+        if (!text.equals(display.getText())) display.setText(text);
+    }
+
+    private void reconcileViewers() {
+        Location base = getBaseLocation();
+        if (base == null || base.getWorld() == null) return;
+        Map<UUID, Location> playerLocations = new HashMap<>();
+        for (Player player : base.getWorld().getPlayers())
+            playerLocations.put(player.getUniqueId(), player.getLocation());
+        audiences.forEach((display, viewers) -> {
+            Location location = display.getLocation();
+            playerLocations.forEach((playerId, playerLocation) -> {
+                if (playerLocation.distanceSquared(location) <= 900) {
+                    if (viewers.add(playerId)) display.displayTo(playerId);
+                } else if (viewers.remove(playerId)) display.hideFrom(playerId);
+            });
+            viewers.removeIf(playerId -> {
+                if (playerLocations.containsKey(playerId)) return false;
+                display.hideFrom(playerId);
+                return true;
+            });
+        });
+    }
+
+    private void removeText(FakeText display) {
+        audiences.remove(display);
+        display.remove();
     }
 
     private void cleanupVisualDisplays() {
         if (numericDisplay != null) {
-            numericDisplay.remove();
+            removeText(numericDisplay);
             numericDisplay = null;
         }
         healthBarDisplays.forEach(display -> {
-            if (display != null) display.remove();
+            if (display != null) removeText(display);
         });
         healthBarDisplays.clear();
     }

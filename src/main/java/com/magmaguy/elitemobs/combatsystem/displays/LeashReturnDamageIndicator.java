@@ -20,6 +20,7 @@ public final class LeashReturnDamageIndicator {
 
     private static final int POPUP_DURATION_TICKS = 20;
     private static final Map<PopupKey, Long> popupExpiry = new HashMap<>();
+    private static long nextExpirySweep;
 
     private LeashReturnDamageIndicator() {
     }
@@ -35,9 +36,6 @@ public final class LeashReturnDamageIndicator {
         // the combat popup lifecycle.
         PopupKey popupKey = new PopupKey(livingEntity.getUniqueId(), viewer.getUniqueId());
         long now = System.currentTimeMillis();
-        // Prune expired entries so the map stays bounded: boss entity UUIDs churn on every
-        // respawn, so without this the map only ever grows until shutdown.
-        popupExpiry.values().removeIf(expiryTime -> expiryTime <= now);
         Long expiry = popupExpiry.get(popupKey);
         if (expiry != null && now < expiry) return;
         popupExpiry.put(popupKey, now + POPUP_DURATION_TICKS * 50L);
@@ -54,6 +52,15 @@ public final class LeashReturnDamageIndicator {
 
     public static void shutdown() {
         popupExpiry.clear();
+        nextExpirySweep = 0;
+    }
+
+    static void expire() {
+        if (popupExpiry.isEmpty()) return;
+        long now = System.currentTimeMillis();
+        if (now < nextExpirySweep) return;
+        nextExpirySweep = now + POPUP_DURATION_TICKS * 50L;
+        popupExpiry.values().removeIf(expiryTime -> expiryTime <= now);
     }
 
     private record PopupKey(UUID bossUuid, UUID viewerUuid) {

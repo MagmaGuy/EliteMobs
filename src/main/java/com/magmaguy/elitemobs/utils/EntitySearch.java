@@ -11,6 +11,15 @@ public class EntitySearch {
     private EntitySearch() {
     }
 
+    public static boolean hasNearbyCombatPlayer(Location location, double distance) {
+        double distanceSquared = distance * distance;
+        for (Player player : location.getWorld().getPlayers()) {
+            if (player.getGameMode() == GameMode.SPECTATOR) continue;
+            if (player.getLocation().distanceSquared(location) <= distanceSquared) return true;
+        }
+        return false;
+    }
+
     public static List<Player> getNearbyCombatPlayers(Location location, double distance) {
         List<Player> players = new ArrayList<>();
         List<Player> worldPlayers = location.getWorld().getPlayers();

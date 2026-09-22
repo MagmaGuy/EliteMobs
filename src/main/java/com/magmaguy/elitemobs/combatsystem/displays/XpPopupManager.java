@@ -120,6 +120,7 @@ final class XpPopupManager {
         private final Location startLocation;
         private final String text;
         private final float baseScale;
+        private final String[] gradientFrames = new String[20];
         private int ticksAlive;
 
         private XpPopup(FakeText display, Location startLocation, String text, float baseScale) {
@@ -135,7 +136,10 @@ final class XpPopupManager {
 
             float progress = (float) ticksAlive / DURATION_TICKS;
             display.teleport(startLocation.clone().add(0, progress * 1.2, 0));
-            display.setText(shiftedGradient(text, (ticksAlive % 20) / 20f));
+            int frame = ticksAlive % gradientFrames.length;
+            if (gradientFrames[frame] == null)
+                gradientFrames[frame] = shiftedGradient(text, frame / 20f);
+            display.setText(gradientFrames[frame]);
             float pulse = (float) Math.sin(ticksAlive * 0.15) * 0.1f;
             float scaleMultiplier;
             if (progress < 0.1f)
