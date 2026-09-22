@@ -72,7 +72,7 @@ public class EliteMobDamagedByEliteMobEvent extends EliteDamageEvent {
             EliteMobDamagedByEliteMobEvent eliteMobDamagedByEliteMobEvent = new EliteMobDamagedByEliteMobEvent(damager, damagee, event, damage);
             new EventCaller(eliteMobDamagedByEliteMobEvent);
             if (eliteMobDamagedByEliteMobEvent.isCancelled()) return;
-            event.setDamage(damage);
+            event.setDamage(eliteMobDamagedByEliteMobEvent.getDamage());
             if (damagee instanceof RegionalBossEntity regionalBossEntity) regionalBossEntity.removeSlow();
         }
     }

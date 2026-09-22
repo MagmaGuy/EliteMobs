@@ -34,6 +34,8 @@ public final class AdvancedClassTestSetCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        Integer parsedLevel = commandData.getIntegerArgument("level");
+        if (parsedLevel == null) return;
         if (!AdvancedCombatModule.isInitialized()) {
             Logger.sendMessage(commandData.getCommandSender(),
                     "&c[Alpha] Advanced Combat System is disabled on this server.");
@@ -47,7 +49,7 @@ public final class AdvancedClassTestSetCommand extends AdvancedCommand {
             return;
         }
         String formId = commandData.getStringArgument("class");
-        int level = commandData.getIntegerArgument("level");
+        int level = parsedLevel;
         ClassProgressionSetResult result = AdvancedCombatModule.get()
                 .setClassLevelForAdministration(player, formId, level);
         report(commandData, player, result);

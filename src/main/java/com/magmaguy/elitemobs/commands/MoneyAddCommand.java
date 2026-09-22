@@ -20,9 +20,11 @@ public class MoneyAddCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        Double parsedAmount = commandData.getDoubleArgument("amount");
+        if (parsedAmount == null) return;
         CurrencyCommandsHandler.addCommand(
                 commandData.getCommandSender(),
                 commandData.getStringArgument("player"),
-                commandData.getDoubleArgument("amount"));
+                parsedAmount);
     }
 }

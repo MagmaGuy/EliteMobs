@@ -420,17 +420,20 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             double scaledDamage = baseDamage * skillAdjustment * gearAdjustment;
 
             // 5. Distance attenuation for explosions (creeper, ghast)
-            if (eliteEntity.getLivingEntity() != null && player.isValid() &&
-                    player.getLocation().getWorld().equals(eliteEntity.getLivingEntity().getWorld())) {
-                if (eliteEntity.getLivingEntity().getType().equals(EntityType.CREEPER)) {
+            if (eliteEntity.getLivingEntity() != null && player.isValid()) {
+                if (eliteEntity.getLivingEntity().getType().equals(EntityType.CREEPER)
+                        && player.getWorld().equals(eliteEntity.getLivingEntity().getWorld())) {
                     Creeper creeper = (Creeper) eliteEntity.getLivingEntity();
                     double distance = player.getLocation().distance(eliteEntity.getLivingEntity().getLocation());
                     double distanceAttenuation = Math.max(0, 1 - distance / creeper.getExplosionRadius());
                     scaledDamage *= distanceAttenuation;
                 } else if (eliteEntity.getLivingEntity().getType().equals(EntityType.GHAST) &&
-                        event.getDamager().getType().equals(EntityType.FIREBALL)) {
-                    double distance = player.getLocation().distance(eliteEntity.getLivingEntity().getLocation());
-                    double distanceAttenuation = Math.max(0, 1 - distance / ((Fireball) event.getDamager()).getYield());
+                        event.getDamager().getType().equals(EntityType.FIREBALL)
+                        && player.getWorld().equals(event.getDamager().getWorld())) {
+                    Fireball fireball = (Fireball) event.getDamager();
+                    double distance = player.getLocation().distance(fireball.getLocation());
+                    double distanceAttenuation = fireball.getYield() > 0
+                            ? Math.max(0, 1 - distance / fireball.getYield()) : 0;
                     scaledDamage *= distanceAttenuation;
                 }
             }

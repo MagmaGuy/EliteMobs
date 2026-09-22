@@ -22,8 +22,10 @@ public class KillTypeRadiusCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        Integer parsedRange = commandData.getIntegerArgument("range");
+        if (parsedRange == null) return;
         KillHandler.radiusKillSpecificMobs(commandData.getPlayerSender(),
                 EliteEntityTypeCommandArgument.parse(commandData.getStringArgument("type")),
-                commandData.getIntegerArgument("range"));
+                parsedRange);
     }
 }

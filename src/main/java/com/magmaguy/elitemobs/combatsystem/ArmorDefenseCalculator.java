@@ -7,8 +7,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Centralized, read-only defense reader for any ItemStack (elite or vanilla).
@@ -250,7 +252,10 @@ public class ArmorDefenseCalculator {
      *       which was impossible in the old system where vanilla armor was completely ignored</li>
      * </ul>
      */
-    private static final Map<Material, Integer> VANILLA_ARMOR_LEVELS = Map.ofEntries(
+    private static final Map<Material, Integer> VANILLA_ARMOR_LEVELS = vanillaArmorLevels();
+
+    private static Map<Material, Integer> vanillaArmorLevels() {
+        Map<Material, Integer> levels = new HashMap<>(Map.ofEntries(
             // Leather = 1
             Map.entry(Material.LEATHER_HELMET, 1), Map.entry(Material.LEATHER_CHESTPLATE, 1),
             Map.entry(Material.LEATHER_LEGGINGS, 1), Map.entry(Material.LEATHER_BOOTS, 1),
@@ -271,7 +276,14 @@ public class ArmorDefenseCalculator {
             // Netherite = 7
             Map.entry(Material.NETHERITE_HELMET, 7), Map.entry(Material.NETHERITE_CHESTPLATE, 7),
             Map.entry(Material.NETHERITE_LEGGINGS, 7), Map.entry(Material.NETHERITE_BOOTS, 7)
-    );
+        ));
+        // Copper shares gold's defense tier; resolve optional newer materials once at startup.
+        for (String name : new String[]{"COPPER_HELMET", "COPPER_CHESTPLATE", "COPPER_LEGGINGS", "COPPER_BOOTS"}) {
+            Material copper = Material.getMaterial(name);
+            if (copper != null) levels.put(copper, 2);
+        }
+        return Map.copyOf(levels);
+    }
 
     private ArmorDefenseCalculator() {
     }
@@ -329,17 +341,19 @@ public class ArmorDefenseCalculator {
      * @return The enchant bonus in armor-level-equivalent units (0 if null or no enchants)
      */
     public static double getEnchantBonus(ItemStack item, DamageType type) {
-        if (item == null || item.getItemMeta() == null) return 0;
+        if (item == null) return 0;
+        ItemMeta itemMeta = item.getItemMeta();
+        if (itemMeta == null) return 0;
 
-        int total = ItemTagger.getEnchantment(item.getItemMeta(), Enchantment.PROTECTION.getKey());
+        int total = ItemTagger.getEnchantment(itemMeta, Enchantment.PROTECTION.getKey());
 
         switch (type) {
             case PROJECTILE ->
-                    total += ItemTagger.getEnchantment(item.getItemMeta(), Enchantment.PROJECTILE_PROTECTION.getKey());
+                    total += ItemTagger.getEnchantment(itemMeta, Enchantment.PROJECTILE_PROTECTION.getKey());
             case EXPLOSION ->
-                    total += ItemTagger.getEnchantment(item.getItemMeta(), Enchantment.BLAST_PROTECTION.getKey());
+                    total += ItemTagger.getEnchantment(itemMeta, Enchantment.BLAST_PROTECTION.getKey());
             case FIRE ->
-                    total += ItemTagger.getEnchantment(item.getItemMeta(), Enchantment.FIRE_PROTECTION.getKey());
+                    total += ItemTagger.getEnchantment(itemMeta, Enchantment.FIRE_PROTECTION.getKey());
             default -> {
                 // MELEE and OTHER: only general Protection applies
             }

@@ -20,6 +20,8 @@ public class KillRadiusCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
-        KillHandler.radiusKillAggressiveMobs(commandData.getPlayerSender(), commandData.getIntegerArgument("radius"));
+        Integer parsedRadius = commandData.getIntegerArgument("radius");
+        if (parsedRadius == null) return;
+        KillHandler.radiusKillAggressiveMobs(commandData.getPlayerSender(), parsedRadius);
     }
 }

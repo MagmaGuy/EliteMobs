@@ -390,14 +390,12 @@ public class ItemLootShower {
      * Used on 1.21.4+
      */
     private class FakeCoin {
-        private final UUID playerUUID;
         private final double value;
         private final FakeItem fakeItem;
         private Location currentLocation;
         private Vector velocity;
 
         public FakeCoin(double value, Player player, FakeItem fakeItem, Location spawnLocation) {
-            this.playerUUID = player.getUniqueId();
             this.value = value;
             this.fakeItem = fakeItem;
             this.currentLocation = spawnLocation.clone();
@@ -409,14 +407,6 @@ public class ItemLootShower {
                     (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.3
             );
 
-            // Remove after 5 minutes if not collected
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    fakeItem.remove();
-                }
-            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60 * 5);
-
             // Animation task
             new BukkitRunnable() {
                 int counter = 0;
@@ -427,34 +417,39 @@ public class ItemLootShower {
 
                 @Override
                 public void run() {
+                    if (counter >= 20 * 60 * 5 - 1) {
+                        cancel();
+                        fakeItem.remove();
+                        return;
+                    }
                     Player targetPlayer = player.isOnline() ? player : null;
 
                     // Player disconnected or invalid
                     if (targetPlayer == null || !targetPlayer.isValid()) {
-                        fakeItem.remove();
                         cancel();
+                        fakeItem.remove();
                         return;
                     }
 
                     // Different world
                     if (!targetPlayer.getWorld().equals(currentLocation.getWorld())) {
-                        fakeItem.remove();
                         cancel();
+                        fakeItem.remove();
                         return;
                     }
 
                     // Check if close enough to "collect"
                     double distanceSquared = targetPlayer.getLocation().add(0, 1, 0).distanceSquared(currentLocation);
                     if (distanceSquared <= 1.5) {
-                        collectCoin(targetPlayer);
                         cancel();
+                        collectCoin(targetPlayer);
                         return;
                     }
 
                     // Too far away - give up after some time
                     if (counter > 20 * 10 && distanceSquared > 900) {
-                        fakeItem.remove();
                         cancel();
+                        fakeItem.remove();
                         return;
                     }
 

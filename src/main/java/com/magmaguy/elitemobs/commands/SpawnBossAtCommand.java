@@ -27,13 +27,17 @@ public class SpawnBossAtCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        Double parsedX = commandData.getDoubleArgument("x");
+        Double parsedY = commandData.getDoubleArgument("y");
+        Double parsedZ = commandData.getDoubleArgument("z");
+        if (parsedX == null || parsedY == null || parsedZ == null) return;
         SpawnCommand.spawnCustomBossCommand(
                 commandData.getCommandSender(),
                 commandData.getStringArgument("filename"),
                 commandData.getStringArgument("worldName"),
                 new Vector(
-                        commandData.getDoubleArgument("x"),
-                        commandData.getDoubleArgument("y"),
-                        commandData.getDoubleArgument("z")));
+                        parsedX,
+                        parsedY,
+                        parsedZ));
     }
 }

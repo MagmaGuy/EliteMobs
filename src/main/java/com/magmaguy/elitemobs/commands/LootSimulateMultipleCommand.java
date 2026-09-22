@@ -24,10 +24,13 @@ public class LootSimulateMultipleCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        Integer parsedLevel = commandData.getIntegerArgument("level");
+        Integer parsedTimes = commandData.getIntegerArgument("times");
+        if (parsedLevel == null || parsedTimes == null) return;
         SimLootCommand.runMultipleTimes(
                 commandData.getPlayerSender(),
-                commandData.getIntegerArgument("level"),
-                commandData.getIntegerArgument("times"),
+                parsedLevel,
+                parsedTimes,
                 commandData.getStringArgument("playerName"));
     }
 }

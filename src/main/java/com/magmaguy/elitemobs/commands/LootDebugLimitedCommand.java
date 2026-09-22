@@ -22,6 +22,8 @@ public class LootDebugLimitedCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
-        GetTierCommand.getLimited(commandData.getPlayerSender(), commandData.getIntegerArgument("level"));
+        Integer parsedLevel = commandData.getIntegerArgument("level");
+        if (parsedLevel == null) return;
+        GetTierCommand.getLimited(commandData.getPlayerSender(), parsedLevel);
     }
 }

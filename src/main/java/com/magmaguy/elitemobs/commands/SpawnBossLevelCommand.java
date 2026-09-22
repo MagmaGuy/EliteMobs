@@ -23,9 +23,11 @@ public class SpawnBossLevelCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        Integer parsedLevel = commandData.getIntegerArgument("level");
+        if (parsedLevel == null) return;
         SpawnCommand.spawnCustomBossCommand(
                 commandData.getPlayerSender(),
                 commandData.getStringArgument("filename"),
-                commandData.getIntegerArgument("level"));
+                parsedLevel);
     }
 }

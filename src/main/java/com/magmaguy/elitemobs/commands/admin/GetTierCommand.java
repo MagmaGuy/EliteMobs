@@ -34,6 +34,13 @@ public class GetTierCommand {
     }
 
     private static void grantLoadout(Player player, int tierLevel, boolean limited) {
+        long targetXP;
+        try {
+            targetXP = SkillXPCalculator.totalXPForLevel(tierLevel);
+        } catch (IllegalArgumentException unsupportedLevel) {
+            Logger.sendMessage(player, "&c" + unsupportedLevel.getMessage());
+            return;
+        }
         ItemStack helmet = new ItemStack(Material.IRON_HELMET);
         addDurability(helmet);
         ItemStack chestplate = new ItemStack(Material.IRON_CHESTPLATE);
@@ -146,7 +153,6 @@ public class GetTierCommand {
         if (!limited) giveItem(player, new ItemStack(Material.ARROW, 64));
 
         // Also set all skill levels to match the tier level
-        long targetXP = SkillXPCalculator.totalXPForLevel(tierLevel);
         for (SkillType skillType : SkillType.values()) {
             PlayerData.setSkillXP(player.getUniqueId(), skillType, targetXP);
         }

@@ -357,7 +357,6 @@ public class EventsRegistrer {
         register(new NPCDamageEvent());
         register(new NPCInteractions());
         register(new NPCProximitySensor());
-        register(new NPCEntity.NPCEntityEvents());
         register(new FindNewWorlds());
         register(new WorldGuardSpawnEventBypasser());
         if (EliteMobs.worldGuardIsEnabled) {

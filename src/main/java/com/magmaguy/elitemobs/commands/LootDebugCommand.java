@@ -23,7 +23,9 @@ public class LootDebugCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
-        int level = commandData.getIntegerArgument("level");
+        Integer parsedLevel = commandData.getIntegerArgument("level");
+        if (parsedLevel == null) return;
+        int level = parsedLevel;
         GetTierCommand.getUnbreakable(commandData.getPlayerSender(), level);
         if (!AdvancedCombatModule.isInitialized()) return;
         int formsAtLevel = AdvancedCombatModule.get()

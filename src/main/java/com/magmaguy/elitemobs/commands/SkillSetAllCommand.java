@@ -29,8 +29,10 @@ public class SkillSetAllCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        Integer parsedLevel = commandData.getIntegerArgument("level");
+        if (parsedLevel == null) return;
         String playerName = commandData.getStringArgument("player");
-        int level = commandData.getIntegerArgument("level");
+        int level = parsedLevel;
 
         Player targetPlayer = Bukkit.getPlayer(playerName);
         if (targetPlayer == null) {
@@ -48,7 +50,13 @@ public class SkillSetAllCommand extends AdvancedCommand {
         }
 
         // Calculate the XP needed for the target level
-        long targetXP = SkillXPCalculator.totalXPForLevel(level);
+        long targetXP;
+        try {
+            targetXP = SkillXPCalculator.totalXPForLevel(level);
+        } catch (IllegalArgumentException unsupportedLevel) {
+            Logger.sendMessage(commandData.getCommandSender(), "&c" + unsupportedLevel.getMessage());
+            return;
+        }
 
         // Set all skills
         for (SkillType skillType : SkillType.values()) {

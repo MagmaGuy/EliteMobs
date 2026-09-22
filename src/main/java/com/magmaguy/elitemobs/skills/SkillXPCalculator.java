@@ -10,6 +10,7 @@ package com.magmaguy.elitemobs.skills;
  * - Soft cap beyond level 100 makes progression exponentially harder
  */
 public class SkillXPCalculator {
+    private static final int MAX_REPRESENTABLE_LEVEL = levelFromTotalXP(Long.MAX_VALUE);
 
     private SkillXPCalculator() {
         // Static utility class
@@ -69,10 +70,13 @@ public class SkillXPCalculator {
      */
     public static long totalXPForLevel(int targetLevel) {
         if (targetLevel <= 1) return 0;
+        if (targetLevel > MAX_REPRESENTABLE_LEVEL)
+            throw new IllegalArgumentException("Skill level must be at most " + MAX_REPRESENTABLE_LEVEL
+                    + " for the supported XP range.");
 
         long total = 0;
         for (int level = 1; level < targetLevel; level++) {
-            total += xpToNextLevel(level);
+            total = Math.addExact(total, xpToNextLevel(level));
         }
         return total;
     }

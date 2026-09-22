@@ -66,7 +66,13 @@ public class SkillSetCommand extends AdvancedCommand {
         }
 
         // Calculate the XP needed for the target level
-        long targetXP = SkillXPCalculator.totalXPForLevel(level);
+        long targetXP;
+        try {
+            targetXP = SkillXPCalculator.totalXPForLevel(level);
+        } catch (IllegalArgumentException unsupportedLevel) {
+            Logger.sendMessage(commandData.getCommandSender(), "&c" + unsupportedLevel.getMessage());
+            return;
+        }
 
         // Set the player's skill XP
         PlayerData.setSkillXP(targetPlayer.getUniqueId(), skillType, targetXP);

@@ -22,10 +22,12 @@ public class SpawnElite extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        Integer parsedLevel = commandData.getIntegerArgument("level");
+        if (parsedLevel == null) return;
         SpawnCommand.spawnEliteEntityTypeCommand(
                 commandData.getPlayerSender(),
                 EliteEntityTypeCommandArgument.parse(commandData.getStringArgument("entityType")),
-                commandData.getIntegerArgument("level"),
+                parsedLevel,
                 Optional.empty());
     }
 }

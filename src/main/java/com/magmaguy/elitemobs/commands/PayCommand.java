@@ -21,9 +21,11 @@ public class PayCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        Double parsedAmount = commandData.getDoubleArgument("amount");
+        if (parsedAmount == null) return;
         CurrencyCommandsHandler.payCommand(
                commandData.getPlayerSender(),
                 commandData.getStringArgument("player"),
-                commandData.getDoubleArgument("amount"));
+                parsedAmount);
     }
 }

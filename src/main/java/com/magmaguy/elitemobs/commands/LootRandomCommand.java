@@ -21,6 +21,8 @@ public class LootRandomCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
-        SimLootCommand.forcePositiveLoot(commandData.getCommandSender(), commandData.getStringArgument("playerName"), commandData.getIntegerArgument("level"));
+        Integer parsedLevel = commandData.getIntegerArgument("level");
+        if (parsedLevel == null) return;
+        SimLootCommand.forcePositiveLoot(commandData.getCommandSender(), commandData.getStringArgument("playerName"), parsedLevel);
     }
 }

@@ -39,10 +39,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Event;
-import org.bukkit.event.Listener;
-import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -655,19 +652,6 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         if (strings != null && !strings.isEmpty())
             return strings.get(ThreadLocalRandom.current().nextInt(strings.size()));
         return null;
-    }
-
-    public static class NPCEntityEvents implements Listener {
-        @EventHandler
-        public void worldUnloadEvent(WorldUnloadEvent event) {
-            for (NPCEntity npcEntity : EntityTracker.getNpcEntities().values()) {
-                if (npcEntity.getSpawnLocation() != null && npcEntity.getSpawnLocation().getWorld() == event.getWorld()) {
-                    npcEntity.worldUnload();
-                }
-            }
-        }
-
-
     }
 
     private class InstancedNPCContainer {

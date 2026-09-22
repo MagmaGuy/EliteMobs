@@ -22,7 +22,7 @@ public class EliteMobDamagedByEliteMobHandler implements Listener {
             if (event.getEntityDamageByEntityEvent().isApplicable(modifier))
                 event.getEntityDamageByEntityEvent().setDamage(modifier, 0);
 
-        event.getEntityDamageByEntityEvent().setDamage(damage);
+        event.setDamage(damage);
 
     }
 

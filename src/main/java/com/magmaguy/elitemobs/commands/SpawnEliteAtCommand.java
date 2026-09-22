@@ -29,6 +29,11 @@ public class SpawnEliteAtCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        Double parsedX = commandData.getDoubleArgument("x");
+        Double parsedY = commandData.getDoubleArgument("y");
+        Double parsedZ = commandData.getDoubleArgument("z");
+        Integer parsedLevel = commandData.getIntegerArgument("level");
+        if (parsedX == null || parsedY == null || parsedZ == null || parsedLevel == null) return;
         String powersArg = commandData.getStringSequenceArgument("powers");
         Optional<String> powers = (powersArg == null || powersArg.isBlank()) ? Optional.empty() : Optional.of(powersArg.trim());
         SpawnCommand.spawnEliteEntityTypeCommand(
@@ -36,10 +41,10 @@ public class SpawnEliteAtCommand extends AdvancedCommand {
                 EliteEntityTypeCommandArgument.parse(commandData.getStringArgument("entityType")),
                 commandData.getStringArgument("world"),
                 new Vector(
-                        commandData.getIntegerArgument("x"),
-                        commandData.getIntegerArgument("y"),
-                        commandData.getIntegerArgument("z")),
-                commandData.getIntegerArgument("level"),
+                        parsedX,
+                        parsedY,
+                        parsedZ),
+                parsedLevel,
                 powers);
     }
 }

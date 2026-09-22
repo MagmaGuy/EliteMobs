@@ -23,9 +23,11 @@ public class LootSimulateCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
+        Integer parsedLevel = commandData.getIntegerArgument("level");
+        if (parsedLevel == null) return;
         SimLootCommand.run(
                 commandData.getPlayerSender(),
-                commandData.getIntegerArgument("level"),
+                parsedLevel,
                 commandData.getStringArgument("playerName"));
     }
 }

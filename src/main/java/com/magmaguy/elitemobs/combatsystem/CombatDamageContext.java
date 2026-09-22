@@ -19,15 +19,15 @@ public final class CombatDamageContext {
 
     private static final DamageOverride DEFAULT_OVERRIDE = new DamageOverride(false, 1.0);
     private static final ThreadLocal<Deque<PendingOverride>> PLAYER_TO_ELITE =
-            ThreadLocal.withInitial(ArrayDeque::new);
+            new ThreadLocal<>();
     private static final ThreadLocal<Deque<PendingOverride>> ELITE_TO_PLAYER =
-            ThreadLocal.withInitial(ArrayDeque::new);
+            new ThreadLocal<>();
     private static final ThreadLocal<Integer> ACTIVE_PLAYER_TO_ELITE_BYPASS = new ThreadLocal<>();
     private static final ThreadLocal<Boolean> ACTIVE_DAMAGE_TRANSFER = new ThreadLocal<>();
     private static final ThreadLocal<Deque<ClassAbilityDamageDomain>> ACTIVE_CLASS_ABILITY_DAMAGE =
-            ThreadLocal.withInitial(ArrayDeque::new);
+            new ThreadLocal<>();
     private static final ThreadLocal<Deque<PlayerDamageSource>> ACTIVE_PLAYER_TO_ELITE_SOURCES =
-            ThreadLocal.withInitial(ArrayDeque::new);
+            new ThreadLocal<>();
 
     private CombatDamageContext() {
     }
@@ -56,7 +56,7 @@ public final class CombatDamageContext {
     public static void runPlayerToEliteBypass(PlayerDamageSource source, Runnable damageCall) {
         Integer previousDepth = ACTIVE_PLAYER_TO_ELITE_BYPASS.get();
         ACTIVE_PLAYER_TO_ELITE_BYPASS.set(previousDepth == null ? 1 : previousDepth + 1);
-        if (source != null) ACTIVE_PLAYER_TO_ELITE_SOURCES.get().addLast(source);
+        if (source != null) stackForPush(ACTIVE_PLAYER_TO_ELITE_SOURCES).addLast(source);
         try (Scope ignored = bypassPlayerToElite()) {
             damageCall.run();
         } finally {
@@ -88,7 +88,7 @@ public final class CombatDamageContext {
             Runnable damageCall) {
         if (domain == null) throw new IllegalArgumentException("domain must not be null");
         if (damageCall == null) throw new IllegalArgumentException("damageCall must not be null");
-        Deque<ClassAbilityDamageDomain> domains = ACTIVE_CLASS_ABILITY_DAMAGE.get();
+        Deque<ClassAbilityDamageDomain> domains = stackForPush(ACTIVE_CLASS_ABILITY_DAMAGE);
         domains.addLast(domain);
         try {
             runPlayerToEliteBypass(damageCall);
@@ -125,6 +125,7 @@ public final class CombatDamageContext {
 
     public static boolean isClassAbilityDamageActive() {
         Deque<ClassAbilityDamageDomain> domains = ACTIVE_CLASS_ABILITY_DAMAGE.get();
+        if (domains == null) return false;
         boolean active = !domains.isEmpty();
         if (!active) ACTIVE_CLASS_ABILITY_DAMAGE.remove();
         return active;
@@ -132,6 +133,7 @@ public final class CombatDamageContext {
 
     public static Optional<ClassAbilityDamageDomain> currentClassAbilityDamageDomain() {
         Deque<ClassAbilityDamageDomain> domains = ACTIVE_CLASS_ABILITY_DAMAGE.get();
+        if (domains == null) return Optional.empty();
         ClassAbilityDamageDomain domain = domains.peekLast();
         if (domains.isEmpty()) ACTIVE_CLASS_ABILITY_DAMAGE.remove();
         return Optional.ofNullable(domain);
@@ -139,6 +141,7 @@ public final class CombatDamageContext {
 
     public static Optional<PlayerDamageSource> currentPlayerToEliteSource() {
         Deque<PlayerDamageSource> sources = ACTIVE_PLAYER_TO_ELITE_SOURCES.get();
+        if (sources == null) return Optional.empty();
         PlayerDamageSource source = sources.peekLast();
         if (sources.isEmpty()) ACTIVE_PLAYER_TO_ELITE_SOURCES.remove();
         return Optional.ofNullable(source);
@@ -164,12 +167,22 @@ public final class CombatDamageContext {
         return consume(ELITE_TO_PLAYER);
     }
 
+    private static <T> Deque<T> stackForPush(ThreadLocal<Deque<T>> owner) {
+        Deque<T> stack = owner.get();
+        if (stack == null) {
+            stack = new ArrayDeque<>();
+            owner.set(stack);
+        }
+        return stack;
+    }
+
     private static Scope push(ThreadLocal<Deque<PendingOverride>> owner, DamageOverride override) {
         PendingOverride pendingOverride = new PendingOverride(override);
-        Deque<PendingOverride> overrides = owner.get();
+        Deque<PendingOverride> overrides = stackForPush(owner);
         overrides.addLast(pendingOverride);
         return () -> {
             Deque<PendingOverride> currentOverrides = owner.get();
+            if (currentOverrides == null) return;
             currentOverrides.removeLastOccurrence(pendingOverride);
             if (currentOverrides.isEmpty()) owner.remove();
         };
@@ -177,6 +190,7 @@ public final class CombatDamageContext {
 
     private static DamageOverride consume(ThreadLocal<Deque<PendingOverride>> owner) {
         Deque<PendingOverride> overrides = owner.get();
+        if (overrides == null) return DEFAULT_OVERRIDE;
         PendingOverride pendingOverride = overrides.pollLast();
         if (overrides.isEmpty()) owner.remove();
         return pendingOverride == null ? DEFAULT_OVERRIDE : pendingOverride.override;
