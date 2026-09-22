@@ -17,6 +17,8 @@ public class CommandMessagesConfig extends ConfigurationFile {
     @Getter
     private static String currencyPlayerNotValidMessage;
     @Getter
+    private static String currencyDataNotReadyMessage;
+    @Getter
     private static String currencyAddedMessage;
     @Getter
     private static String currencyNowHasMessage;
@@ -533,6 +535,10 @@ public class CommandMessagesConfig extends ConfigurationFile {
         payPlayerNotOnlineMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when a player tries to pay an offline player", "$player - the target player name"),
                 file, fileConfiguration, "payPlayerNotOnlineMessage", "&8[EliteMobs] &4Player $player is not online and can therefore not get a payment.", true);
+        currencyDataNotReadyMessage = ConfigurationEngine.setString(
+                List.of("Shown when an online player's economy data is still loading", "$player - the target player name"),
+                file, fileConfiguration, "currencyDataNotReadyMessage",
+                "&8[EliteMobs] &c$player's economy data is still loading. Try again shortly.", true);
         currencyPlayerNotValidMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when a player name is not valid for currency commands", "$player - the target player name"),
                 file, fileConfiguration, "currencyPlayerNotValidMessage", "&8[EliteMobs] &4Player $player is not valid!", true);

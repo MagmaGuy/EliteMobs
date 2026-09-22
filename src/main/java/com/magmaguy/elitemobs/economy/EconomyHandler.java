@@ -14,7 +14,17 @@ import java.util.UUID;
  */
 public class EconomyHandler {
 
+    public static boolean isReady(UUID user) {
+        return user != null && PlayerData.isDataLoaded(user);
+    }
+
+    private static void requireReady(UUID user) {
+        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Economy mutation off server thread");
+        if (!isReady(user)) throw new IllegalStateException("Player economy data is not loaded for " + user);
+    }
+
     public static void addCurrency(UUID user, double amount) {
+        requireReady(user);
         double debt = PlayerData.getGamblingDebt(user);
         if (debt > 0) {
             double debtPayment = Math.min(debt, amount);
@@ -45,7 +55,7 @@ public class EconomyHandler {
 
     /** Checked purchase path. Call on the server thread with loaded player data. */
     public static boolean tryWithdraw(UUID user, double amount) {
-        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Economy purchase off server thread");
+        requireReady(user);
         if (!Double.isFinite(amount) || amount < 0) throw new IllegalArgumentException("Invalid purchase price");
         if (VaultCompatibility.VAULT_ENABLED) {
             var economy = VaultCompatibility.getEconomy();
@@ -59,7 +69,7 @@ public class EconomyHandler {
 
     /** Returns an aborted purchase without diverting the refund into gambling debt. */
     public static boolean refundPayment(UUID user, double amount) {
-        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Economy refund off server thread");
+        requireReady(user);
         if (!Double.isFinite(amount) || amount < 0) throw new IllegalArgumentException("Invalid refund");
         if (VaultCompatibility.VAULT_ENABLED) {
             var economy = VaultCompatibility.getEconomy();
@@ -70,6 +80,7 @@ public class EconomyHandler {
     }
 
     public static void subtractCurrency(UUID user, double amount) {
+        requireReady(user);
         if (VaultCompatibility.VAULT_ENABLED) {
             VaultCompatibility.subtractCurrency(user, amount);
             return;
@@ -79,6 +90,7 @@ public class EconomyHandler {
     }
 
     public static void setCurrency(UUID user, double amount) {
+        requireReady(user);
 
         if (VaultCompatibility.VAULT_ENABLED) {
             VaultCompatibility.setCurrency(user, amount);

@@ -28,6 +28,8 @@ public class CurrencyCommandsHandler {
             return;
         }
 
+        if (!ready(sender, sender) || !ready(sender, recipient)) return;
+
         //CASE: Insufficient funds
         double senderCurrency = EconomyHandler.checkCurrency(sender.getUniqueId());
         if (senderCurrency - amount < 0) {
@@ -82,14 +84,17 @@ public class CurrencyCommandsHandler {
             commandSender.sendMessage(CommandMessagesConfig.getCurrencyPlayerNotValidMessage().replace("$player", onlinePlayer));
             return;
         }
+        if (!ready(commandSender, player)) return;
         addCommand(player, amount);
         commandSender.sendMessage(CommandMessagesConfig.getCurrencyAddedMessage().replace("$amount", EconomyHandler.formatCurrency(amount)).replace("$player", onlinePlayer));
         commandSender.sendMessage(CommandMessagesConfig.getCurrencyNowHasMessage().replace("$amount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId()))));
     }
 
     public static void addAllCommand(CommandSender commandSender, double amount) {
-        for (Player player : Bukkit.getOnlinePlayers())
-            addCommand(player, amount);
+        var players = java.util.List.copyOf(Bukkit.getOnlinePlayers());
+        for (Player player : players)
+            if (!ready(commandSender, player)) return;
+        for (Player player : players) addCommand(player, amount);
         commandSender.sendMessage(CommandMessagesConfig.getCurrencyAddedAllMessage().replace("$amount", EconomyHandler.formatCurrency(amount)));
     }
 
@@ -103,6 +108,7 @@ public class CurrencyCommandsHandler {
             commandSender.sendMessage(CommandMessagesConfig.getCurrencyPlayerNotValidMessage().replace("$player", onlinePlayer));
             return;
         }
+        if (!ready(commandSender, player)) return;
         subtractCommand(onlinePlayer, amount);
         commandSender.sendMessage(CommandMessagesConfig.getCurrencySubtractedMessage().replace("$amount", EconomyHandler.formatCurrency(amount)).replace("$player", onlinePlayer));
         commandSender.sendMessage(CommandMessagesConfig.getCurrencyNowHasMessage().replace("$amount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId()))));
@@ -114,6 +120,7 @@ public class CurrencyCommandsHandler {
             commandSender.sendMessage(CommandMessagesConfig.getCurrencyPlayerNotValidMessage().replace("$player", onlinePlayer));
             return;
         }
+        if (!ready(commandSender, player)) return;
         EconomyHandler.setCurrency(player.getUniqueId(), amount);
         commandSender.sendMessage(CommandMessagesConfig.getCurrencySetMessage().replace("$player", onlinePlayer).replace("$currencyName", EconomySettingsConfig.getCurrencyName()).replace("$amount", EconomyHandler.formatCurrency(amount)));
     }
@@ -125,15 +132,23 @@ public class CurrencyCommandsHandler {
             commandSender.sendMessage(CommandMessagesConfig.getCurrencyPlayerNotValidMessage().replace("$player", playerName));
             return;
         }
+        if (!ready(commandSender, player)) return;
         double money = EconomyHandler.checkCurrency(player.getUniqueId());
         commandSender.sendMessage(CommandMessagesConfig.getCurrencyCheckMessage().replace("$player", playerName).replace("$amount", EconomyHandler.formatCurrency(money)).replace("$currencyName", EconomySettingsConfig.getCurrencyName()));
     }
 
     public static void walletCommand(Player player) {
+        if (!ready(player, player)) return;
         player.sendMessage(
                         EconomySettingsConfig.getEconomyWalletCommand()
                                 .replace("$balance", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId())))
                                 .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
+    }
+
+    private static boolean ready(CommandSender sender, Player target) {
+        if (EconomyHandler.isReady(target.getUniqueId())) return true;
+        sender.sendMessage(CommandMessagesConfig.getCurrencyDataNotReadyMessage().replace("$player", target.getName()));
+        return false;
     }
 
 }
