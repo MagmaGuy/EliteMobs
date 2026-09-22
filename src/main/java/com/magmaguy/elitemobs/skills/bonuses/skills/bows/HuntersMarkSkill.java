@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.bows;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
+import com.magmaguy.elitemobs.skills.bonuses.SkillTargetMarks;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.TargetDebuffBonus;
@@ -29,8 +30,7 @@ public class HuntersMarkSkill extends SkillBonus implements ProcSkill, TargetDeb
     private static final double BASE_BONUS_DAMAGE = 0.11; // 11% bonus to marked
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
-    private static final Map<UUID, UUID> markedTargets = new ConcurrentHashMap<>(); // Target UUID -> Marker UUID
-    private static final Map<UUID, Long> markExpiry = new ConcurrentHashMap<>();
+    private static final SkillTargetMarks marks = new SkillTargetMarks();
 
     public HuntersMarkSkill() {
         super(SkillType.BOWS, 25, "Hunter's Mark",
@@ -50,21 +50,12 @@ public class HuntersMarkSkill extends SkillBonus implements ProcSkill, TargetDeb
         if (event.getEliteMobEntity().getLivingEntity() == null) return;
 
         LivingEntity target = event.getEliteMobEntity().getLivingEntity();
-        markedTargets.put(target.getUniqueId(), player.getUniqueId());
-        markExpiry.put(target.getUniqueId(), System.currentTimeMillis() + MARK_DURATION);
+        marks.mark(player.getUniqueId(), target.getUniqueId(), MARK_DURATION);
         target.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, (int)(MARK_DURATION / 50), 0));
     }
 
     public static boolean isMarkedBy(LivingEntity target, Player player) {
-        UUID markerUUID = markedTargets.get(target.getUniqueId());
-        if (markerUUID == null) return false;
-        Long expiry = markExpiry.get(target.getUniqueId());
-        if (expiry == null || System.currentTimeMillis() > expiry) {
-            markedTargets.remove(target.getUniqueId());
-            markExpiry.remove(target.getUniqueId());
-            return false;
-        }
-        return markerUUID.equals(player.getUniqueId());
+        return marks.isMarkedBy(target.getUniqueId(), player.getUniqueId());
     }
 
     /**
@@ -137,7 +128,6 @@ public class HuntersMarkSkill extends SkillBonus implements ProcSkill, TargetDeb
     @Override
     public void shutdown() {
         activePlayers.clear();
-        markedTargets.clear();
-        markExpiry.clear();
+        marks.clear();
     }
 }

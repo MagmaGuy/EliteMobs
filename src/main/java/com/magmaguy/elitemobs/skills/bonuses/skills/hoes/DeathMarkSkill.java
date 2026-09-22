@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
+import com.magmaguy.elitemobs.skills.bonuses.SkillTargetMarks;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.TargetDebuffBonus;
@@ -31,8 +32,7 @@ public class DeathMarkSkill extends SkillBonus implements ProcSkill, TargetDebuf
     private static final long MARK_DURATION = 15000; // 15 seconds
     private static final double BASE_DAMAGE_BONUS = 0.11; // 11% extra damage
 
-    private static final Map<UUID, UUID> markedTargets = new ConcurrentHashMap<>(); // EntityUUID -> PlayerUUID
-    private static final Map<UUID, Long> markExpiry = new ConcurrentHashMap<>();
+    private static final SkillTargetMarks marks = new SkillTargetMarks();
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public DeathMarkSkill() {
@@ -59,8 +59,7 @@ public class DeathMarkSkill extends SkillBonus implements ProcSkill, TargetDebuf
         UUID entityUUID = target.getUniqueId();
 
         // Apply mark
-        markedTargets.put(entityUUID, player.getUniqueId());
-        markExpiry.put(entityUUID, System.currentTimeMillis() + MARK_DURATION);
+        marks.mark(player.getUniqueId(), target.getUniqueId(), MARK_DURATION);
 
         // Visual effects
         target.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, (int)(MARK_DURATION / 50), 0));
@@ -72,20 +71,7 @@ public class DeathMarkSkill extends SkillBonus implements ProcSkill, TargetDebuf
      * Checks if a target is marked for death by this player.
      */
     public static boolean isMarkedForDeath(LivingEntity target, Player player) {
-        UUID entityUUID = target.getUniqueId();
-        UUID markerUUID = markedTargets.get(entityUUID);
-
-        if (markerUUID == null) return false;
-
-        // Check if mark has expired
-        Long expiry = markExpiry.get(entityUUID);
-        if (expiry == null || System.currentTimeMillis() > expiry) {
-            markedTargets.remove(entityUUID);
-            markExpiry.remove(entityUUID);
-            return false;
-        }
-
-        return markerUUID.equals(player.getUniqueId());
+        return marks.isMarkedBy(target.getUniqueId(), player.getUniqueId());
     }
 
     /**
@@ -130,9 +116,7 @@ public class DeathMarkSkill extends SkillBonus implements ProcSkill, TargetDebuf
     @Override
     public void removeBonus(Player player) {
         activePlayers.remove(player.getUniqueId());
-        // Clean up marks created by this player
-        UUID playerUUID = player.getUniqueId();
-        markedTargets.entrySet().removeIf(entry -> entry.getValue().equals(playerUUID));
+        marks.clearSource(player.getUniqueId());
     }
 
     @Override
@@ -178,8 +162,7 @@ public class DeathMarkSkill extends SkillBonus implements ProcSkill, TargetDebuf
 
     @Override
     public void shutdown() {
-        markedTargets.clear();
-        markExpiry.clear();
+        marks.clear();
         activePlayers.clear();
     }
 }
