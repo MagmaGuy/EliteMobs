@@ -218,8 +218,17 @@ public class PlayerData {
                         }
                         // New writes are deferred into the next batch while this one is persisted.
                         // Publish only after all batches are replayed, without blocking state access on SQL.
-                        for (DeferredDatabaseValue value : deferred)
-                            PlayerDataRepository.updateNow(uuid, value.column(), value.value());
+                        try {
+                            for (DeferredDatabaseValue value : deferred)
+                                PlayerDataRepository.updateNow(uuid, value.values());
+                        } catch (RuntimeException failure) {
+                            synchronized (PlayerDataRepository.stateMonitor()) {
+                                List<DeferredDatabaseValue> newer = deferredDatabaseValues.remove(uuid);
+                                if (newer != null) deferred.addAll(newer);
+                                deferredDatabaseValues.put(uuid, deferred);
+                            }
+                            throw failure;
+                        }
                         PlayerDataRepository.readPlayer(uuid, resultSet -> readExistingData(uuid, resultSet));
                     }
                 } catch (Exception e) {
@@ -228,8 +237,7 @@ public class PlayerData {
                     if (playerDataHashMap.remove(uuid, PlayerData.this))
                         CombatLevelCalculator.invalidateOnlineCombatLevel();
                     synchronized (PlayerDataRepository.stateMonitor()) {
-                        if (loadingPlayers.remove(uuid, PlayerData.this))
-                            deferredDatabaseValues.remove(uuid);
+                        loadingPlayers.remove(uuid, PlayerData.this);
                     }
                 }
                 if (databaseDataLoaded) scheduleBukkitInitialization(uuid, player);
@@ -304,9 +312,7 @@ public class PlayerData {
 
     public static void setCurrency(UUID uuid, double currency) {
         long cents = Math.round(currency * 100.0);
-        setDatabaseValue(uuid, "CurrencyCents", cents);
-        // TODO: remove dual-write of CurrencyV2 in EliteMobs 11.x (kept for downgrade safety)
-        setDatabaseValue(uuid, "CurrencyV2", cents / 100.0);
+        setDatabaseValues(uuid, Map.of("CurrencyCents", cents, "CurrencyV2", cents / 100.0));
         if (playerDataHashMap.containsKey(uuid))
             playerDataHashMap.get(uuid).currencyCents = cents;
     }
@@ -460,16 +466,21 @@ public class PlayerData {
     }
 
     public static void setDatabaseValue(UUID uuid, String key, Object value) {
-        if ("Score".equals(key) && value instanceof Number number)
+        setDatabaseValues(uuid, java.util.Collections.singletonMap(key, value));
+    }
+
+    private static void setDatabaseValues(UUID uuid, Map<String, Object> values) {
+        if (values.get("Score") instanceof Number number)
             PlayerDataRepository.updateCachedScore(uuid, number.intValue());
+        Map<String, Object> snapshot = java.util.Collections.unmodifiableMap(new java.util.LinkedHashMap<>(values));
         synchronized (PlayerDataRepository.stateMonitor()) {
             if (loadingPlayers.containsKey(uuid)) {
                 deferredDatabaseValues.computeIfAbsent(uuid, ignored -> new ArrayList<>())
-                        .add(new DeferredDatabaseValue(key, value));
+                        .add(new DeferredDatabaseValue(snapshot));
                 return;
             }
         }
-        PlayerDataRepository.enqueueUpdate(uuid, key, value);
+        PlayerDataRepository.enqueueUpdate(uuid, snapshot);
     }
 
     private static Object getDatabaseBlob(UUID uuid, String value) {
@@ -798,9 +809,7 @@ public class PlayerData {
         // Clamp debt to valid range (0 to max debt)
         debt = Math.max(0, Math.min(500, debt));
         long cents = Math.round(debt * 100.0);
-        setDatabaseValue(uuid, "GamblingDebtCents", cents);
-        // TODO: remove dual-write of GamblingDebt in EliteMobs 11.x (kept for downgrade safety)
-        setDatabaseValue(uuid, "GamblingDebt", cents / 100.0);
+        setDatabaseValues(uuid, Map.of("GamblingDebtCents", cents, "GamblingDebt", cents / 100.0));
         if (playerDataHashMap.containsKey(uuid))
             playerDataHashMap.get(uuid).gamblingDebtCents = cents;
     }
@@ -860,8 +869,9 @@ public class PlayerData {
     public static void initializeDatabaseConnection() {
         new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data").mkdirs();
         try {
-            Logger.info("Opened database successfully");
+            PlayerDataRepository.beginInitialization();
             GenerateDatabase.generate();
+            Logger.info("Opened database successfully");
             PlayerDataRepository.migrateCurrencyToCents();
             // Legacy import owns one transaction and completes before any asynchronous player load
             // can observe or modify the migrated rows.
@@ -877,12 +887,16 @@ public class PlayerData {
     }
 
     public static void closeConnection() {
+        Map<UUID, List<DeferredDatabaseValue>> remaining;
         synchronized (PlayerDataRepository.stateMonitor()) {
             playerDataHashMap.clear();
             CombatLevelCalculator.invalidateOnlineCombatLevel();
             loadingPlayers.clear();
+            remaining = new HashMap<>(deferredDatabaseValues);
             deferredDatabaseValues.clear();
         }
+        remaining.forEach((uuid, updates) -> updates.forEach(update ->
+                PlayerDataRepository.enqueueUpdate(uuid, update.values())));
         PlayerDataRepository.close();
     }
 
@@ -1082,7 +1096,7 @@ public class PlayerData {
         }
     }
 
-    private record DeferredDatabaseValue(String column, Object value) {
+    private record DeferredDatabaseValue(Map<String, Object> values) {
     }
 
 }

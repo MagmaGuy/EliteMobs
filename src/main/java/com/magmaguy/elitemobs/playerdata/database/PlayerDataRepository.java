@@ -27,6 +27,10 @@ final class PlayerDataRepository {
     private static final Map<UUID, Integer> scoreUpdatesBeforeCacheLoad = new HashMap<>();
     private static Connection connection;
     private static boolean drainScheduled;
+    private static long nextDrainAttemptNanos;
+    private static volatile long lifecycleGeneration;
+    private static volatile boolean closed;
+    private static final Map<UUID, Deque<DatabaseUpdate>> missingPlayerUpdates = new HashMap<>();
     private static volatile boolean scoreRankingCacheLoaded;
     private static long scoreRankingLoadGeneration;
 
@@ -43,8 +47,17 @@ final class PlayerDataRepository {
         return JDBC_MONITOR;
     }
 
+    static void beginInitialization() {
+        synchronized (JDBC_MONITOR) {
+            closed = false;
+            ++lifecycleGeneration;
+            synchronized (QUEUE_MONITOR) { drainScheduled = false; nextDrainAttemptNanos = 0; }
+        }
+    }
+
     static Connection connection() throws Exception {
         synchronized (JDBC_MONITOR) {
+            if (closed) throw new IllegalStateException("Player database is closed");
             File databaseFile = new File(MetadataHandler.PLUGIN.getDataFolder(), "data/" + PlayerData.getDATABASE_NAME());
             if (connection == null || connection.isClosed()) {
                 if (!DatabaseConfig.isUseMySQL()) {
@@ -66,6 +79,8 @@ final class PlayerDataRepository {
 
     static boolean readPlayer(UUID playerId, ResultSetReader reader) throws Exception {
         synchronized (JDBC_MONITOR) {
+            releaseMissingPlayerUpdates(playerId);
+            drainUpdatesLocked();
             String sql = "SELECT * FROM " + PlayerData.getPLAYER_DATA_TABLE_NAME() + " WHERE PlayerUUID = ?";
             try (PreparedStatement statement = connection().prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
@@ -91,29 +106,58 @@ final class PlayerDataRepository {
                 statement.setString(2, playerName);
                 statement.executeUpdate();
             }
+            releaseMissingPlayerUpdates(playerId);
+            drainUpdatesLocked();
             updateCachedScore(playerId, 0);
         }
     }
 
-    static void enqueueUpdate(UUID playerId, String column, Object value) {
-        validateColumn(column);
+    private static void releaseMissingPlayerUpdates(UUID playerId) {
         synchronized (QUEUE_MONITOR) {
-            pendingUpdates.addLast(new DatabaseUpdate(playerId, column, value));
-            if (drainScheduled) return;
+            Deque<DatabaseUpdate> held = missingPlayerUpdates.remove(playerId);
+            if (held != null) while (!held.isEmpty()) pendingUpdates.addFirst(held.removeLast());
+        }
+    }
+
+    static void enqueueUpdate(UUID playerId, String column, Object value) {
+        enqueueUpdate(playerId, java.util.Collections.singletonMap(column, value));
+    }
+
+    static void enqueueUpdate(UUID playerId, Map<String, Object> values) {
+        DatabaseUpdate update = snapshot(playerId, values);
+        long generation;
+        synchronized (QUEUE_MONITOR) {
+            pendingUpdates.addLast(update);
+            if (closed || drainScheduled || System.nanoTime() < nextDrainAttemptNanos) return;
             drainScheduled = true;
+            generation = lifecycleGeneration;
         }
-        if (!MetadataHandler.PLUGIN.isEnabled()) {
-            drainUpdates();
-            return;
+        try {
+            if (!MetadataHandler.PLUGIN.isEnabled()) drainUpdates(generation);
+            else Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> drainUpdates(generation));
+        } catch (RuntimeException failure) {
+            synchronized (QUEUE_MONITOR) { drainScheduled = false; }
+            Logger.warn("Player database write submission failed; pending updates were retained: " + failure.getMessage());
         }
-        Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, PlayerDataRepository::drainUpdates);
     }
 
     static void updateNow(UUID playerId, String column, Object value) {
-        validateColumn(column);
+        updateNow(playerId, java.util.Collections.singletonMap(column, value));
+    }
+
+    static void updateNow(UUID playerId, Map<String, Object> values) {
+        DatabaseUpdate update = snapshot(playerId, values);
         synchronized (JDBC_MONITOR) {
-            executeUpdate(new DatabaseUpdate(playerId, column, value));
+            drainUpdatesLocked();
+            executeUpdate(update);
         }
+    }
+
+    private static DatabaseUpdate snapshot(UUID playerId, Map<String, Object> values) {
+        if (values.isEmpty()) throw new IllegalArgumentException("Empty player update");
+        values.keySet().forEach(PlayerDataRepository::validateColumn);
+        return new DatabaseUpdate(playerId,
+                java.util.Collections.unmodifiableMap(new java.util.LinkedHashMap<>(values)));
     }
 
     static Object getBlob(UUID playerId, String column) {
@@ -196,20 +240,18 @@ final class PlayerDataRepository {
         }
     }
 
-    static void migrateCurrencyToCents() {
+    static void migrateCurrencyToCents() throws Exception {
         synchronized (JDBC_MONITOR) {
             try (Statement statement = connection().createStatement()) {
+                String integralType = DatabaseConfig.isUseMySQL() ? "SIGNED" : "INTEGER";
                 int currencyRows = statement.executeUpdate("UPDATE " + PlayerData.getPLAYER_DATA_TABLE_NAME()
-                        + " SET CurrencyCents = CAST(ROUND(CurrencyV2 * 100) AS INTEGER)"
-                        + " WHERE (CurrencyCents IS NULL OR CurrencyCents = 0) AND CurrencyV2 > 0");
+                        + " SET CurrencyCents = CAST(ROUND(CurrencyV2 * 100) AS " + integralType + ")"
+                        + " WHERE CurrencyCents IS NULL AND CurrencyV2 IS NOT NULL");
                 int debtRows = statement.executeUpdate("UPDATE " + PlayerData.getPLAYER_DATA_TABLE_NAME()
-                        + " SET GamblingDebtCents = CAST(ROUND(GamblingDebt * 100) AS INTEGER)"
-                        + " WHERE (GamblingDebtCents IS NULL OR GamblingDebtCents = 0) AND GamblingDebt > 0");
+                        + " SET GamblingDebtCents = CAST(ROUND(GamblingDebt * 100) AS " + integralType + ")"
+                        + " WHERE GamblingDebtCents IS NULL AND GamblingDebt IS NOT NULL");
                 if (currencyRows > 0) Logger.info("Migrated " + currencyRows + " player currency rows to cent precision");
                 if (debtRows > 0) Logger.info("Migrated " + debtRows + " player gambling debt rows to cent precision");
-            } catch (Exception exception) {
-                Logger.warn("Failed to migrate legacy currency/gambling debt columns to cents!");
-                exception.printStackTrace();
             }
         }
     }
@@ -249,7 +291,19 @@ final class PlayerDataRepository {
 
     static void close() {
         synchronized (JDBC_MONITOR) {
-            drainUpdatesLocked();
+            try {
+                drainUpdatesLocked();
+            } catch (RuntimeException failure) {
+                Logger.warn("Player database shutdown flush failed; queued intent remains available in this process: " + failure.getMessage());
+            }
+            closed = true;
+            ++lifecycleGeneration;
+            synchronized (QUEUE_MONITOR) {
+                drainScheduled = false;
+                if (!pendingUpdates.isEmpty() || !missingPlayerUpdates.isEmpty())
+                    Logger.warn("Unpersisted player updates remain: " + pendingUpdates.size()
+                            + " queued; " + missingPlayerUpdates.size() + " missing player rows.");
+            }
             try {
                 if (connection != null) connection.close();
             } catch (Exception exception) {
@@ -266,9 +320,18 @@ final class PlayerDataRepository {
         }
     }
 
-    private static void drainUpdates() {
+    private static void drainUpdates(long generation) {
         synchronized (JDBC_MONITOR) {
-            drainUpdatesLocked();
+            if (closed || generation != lifecycleGeneration) return;
+            try {
+                drainUpdatesLocked();
+            } catch (RuntimeException failure) {
+                synchronized (QUEUE_MONITOR) {
+                    drainScheduled = false;
+                    nextDrainAttemptNanos = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(5);
+                }
+                Logger.warn("Player database update failed; ordered pending writes retained: " + failure.getMessage());
+            }
         }
     }
 
@@ -276,27 +339,49 @@ final class PlayerDataRepository {
         while (true) {
             DatabaseUpdate update;
             synchronized (QUEUE_MONITOR) {
-                update = pendingUpdates.pollFirst();
+                update = pendingUpdates.peekFirst();
                 if (update == null) {
                     drainScheduled = false;
+                    nextDrainAttemptNanos = 0;
                     return;
                 }
+                Deque<DatabaseUpdate> held = missingPlayerUpdates.get(update.playerId());
+                if (held != null) {
+                    held.addLast(pendingUpdates.removeFirst());
+                    continue;
+                }
             }
-            // Neither state updates nor enqueueing wait for this JDBC operation.
-            executeUpdate(update);
+            // Never hold the short-lived state/queue monitor over JDBC. Remove only after success.
+            try {
+                executeUpdate(update);
+            } catch (MissingPlayerRow failure) {
+                synchronized (QUEUE_MONITOR) {
+                    missingPlayerUpdates.computeIfAbsent(update.playerId(), ignored -> new ArrayDeque<>()).addLast(update);
+                }
+                Logger.warn(failure.getMessage() + "; retained until this player's row is inserted.");
+            }
+            synchronized (QUEUE_MONITOR) { pendingUpdates.removeFirst(); }
         }
     }
 
     private static void executeUpdate(DatabaseUpdate update) {
-        String sql = "UPDATE " + PlayerData.getPLAYER_DATA_TABLE_NAME() + " SET " + update.column() + " = ? WHERE PlayerUUID = ?";
+        String assignments = update.values().keySet().stream().map(column -> column + " = ?")
+                .collect(java.util.stream.Collectors.joining(", "));
+        String sql = "UPDATE " + PlayerData.getPLAYER_DATA_TABLE_NAME() + " SET " + assignments + " WHERE PlayerUUID = ?";
         try (PreparedStatement statement = connection().prepareStatement(sql)) {
-            statement.setObject(1, update.value());
-            statement.setString(2, update.playerId().toString());
-            statement.executeUpdate();
-        } catch (Exception exception) {
-            Logger.warn("Failed to update player database value " + update.column() + ".");
-            exception.printStackTrace();
+            int index = 1;
+            for (Object value : update.values().values()) statement.setObject(index++, value);
+            statement.setString(index, update.playerId().toString());
+            if (statement.executeUpdate() != 1) throw new MissingPlayerRow(update.playerId());
+        } catch (MissingPlayerRow failure) {
+            throw failure;
+        } catch (Exception failure) {
+            throw new IllegalStateException("Could not persist " + update.values().keySet() + " for " + update.playerId(), failure);
         }
+    }
+
+    private static final class MissingPlayerRow extends IllegalStateException {
+        private MissingPlayerRow(UUID playerId) { super("No player row accepted the update for " + playerId); }
     }
 
     private static <T> T query(UUID playerId, String column, ColumnReader<T> reader, T fallback, String type) {
@@ -326,7 +411,7 @@ final class PlayerDataRepository {
     record LegacyPlayerData(UUID playerId, String displayName, double currency) {
     }
 
-    private record DatabaseUpdate(UUID playerId, String column, Object value) {
+    private record DatabaseUpdate(UUID playerId, Map<String, Object> values) {
     }
 
     @FunctionalInterface
