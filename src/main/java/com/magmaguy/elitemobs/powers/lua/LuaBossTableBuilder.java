@@ -344,50 +344,54 @@ final class LuaBossTableBuilder {
         if (!isAlive(source) || source.getWorld() == null) {
             return new LuaTable();
         }
-        Map<UUID, EliteEntity> tracked = new HashMap<>(EntityTracker.getEliteMobEntities());
-        Map<UUID, EliteEntity> byId = new HashMap<>();
-        List<NearbyEliteSelectionPolicy.Candidate> candidates = new ArrayList<>();
-        Location sourceLocation = source.getLocation();
-        for (Map.Entry<UUID, EliteEntity> entry : tracked.entrySet()) {
-            EliteEntity candidate = entry.getValue();
-            if (candidate == null || candidate == eliteEntity) {
-                continue;
-            }
-            LivingEntity living = candidate.getLivingEntity();
-            Location location = living == null ? null : living.getLocation();
-            if (location == null || location.getWorld() == null) {
-                continue;
-            }
-            UUID candidateId = candidate.getEliteUUID();
-            boolean isTracked = entry.getKey().equals(candidateId)
-                    && tracked.get(candidateId) == candidate;
-            boolean alive = candidate.exists() && candidate.isValid() && isAlive(living);
-            double dx = location.getX() - sourceLocation.getX();
-            double dy = location.getY() - sourceLocation.getY();
-            double dz = location.getZ() - sourceLocation.getZ();
-            candidates.add(new NearbyEliteSelectionPolicy.Candidate(
-                    candidateId,
-                    location.getWorld().getUID(),
-                    isTracked,
-                    alive,
-                    dx * dx + dy * dy + dz * dz));
-            byId.put(candidateId, candidate);
-        }
-
-        List<NearbyEliteSelectionPolicy.Candidate> selected;
         try {
-            selected = NearbyEliteSelectionPolicy.select(
-                    source.getWorld().getUID(), radius, candidates);
+            NearbyEliteSelectionPolicy.validateRadius(radius);
         } catch (IllegalArgumentException exception) {
             return LuaValue.argerror(1, exception.getMessage());
         }
+        Map<UUID, EliteEntity> byId = new HashMap<>();
+        List<NearbyEliteSelectionPolicy.Candidate> candidates = new ArrayList<>();
+        Location sourceLocation = source.getLocation();
+        double radiusSquared = radius * radius;
+        for (LivingEntity living : support.filterEntities(sourceLocation, radius, radius, radius, "living")) {
+            EliteEntity candidate = EntityTracker.getEliteMobEntity(living);
+            if (candidate == null || candidate == eliteEntity || candidate.getLivingEntity() != living
+                    || !candidate.exists() || !candidate.isValid() || !isAlive(living)) {
+                continue;
+            }
+            Location location = living.getLocation();
+            if (!sourceLocation.getWorld().equals(location.getWorld())) {
+                continue;
+            }
+            UUID candidateId = candidate.getEliteUUID();
+            if (EntityTracker.getEliteMobEntities().get(candidateId) != candidate) {
+                continue;
+            }
+            double dx = location.getX() - sourceLocation.getX();
+            double dy = location.getY() - sourceLocation.getY();
+            double dz = location.getZ() - sourceLocation.getZ();
+            double distanceSquared = dx * dx + dy * dy + dz * dz;
+            if (distanceSquared > radiusSquared) {
+                continue;
+            }
+            candidates.add(new NearbyEliteSelectionPolicy.Candidate(
+                    candidateId,
+                    location.getWorld().getUID(),
+                    true,
+                    true,
+                    distanceSquared));
+            byId.put(candidateId, candidate);
+        }
+
+        List<NearbyEliteSelectionPolicy.Candidate> selected = NearbyEliteSelectionPolicy.select(
+                source.getWorld().getUID(), radius, candidates);
         LuaTable result = new LuaTable();
         int index = 1;
         for (NearbyEliteSelectionPolicy.Candidate selectedCandidate : selected) {
             EliteEntity candidate = byId.get(selectedCandidate.entityId());
             LivingEntity living = candidate == null ? null : candidate.getLivingEntity();
             if (candidate != null
-                    && tracked.get(selectedCandidate.entityId()) == candidate
+                    && EntityTracker.getEliteMobEntities().get(selectedCandidate.entityId()) == candidate
                     && candidate.exists()
                     && candidate.isValid()
                     && isAlive(living)) {

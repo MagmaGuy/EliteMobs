@@ -20,10 +20,7 @@ final class NearbyEliteSelectionPolicy {
             List<Candidate> candidates) {
         Objects.requireNonNull(sourceWorldId, "sourceWorldId");
         Objects.requireNonNull(candidates, "candidates");
-        if (!Double.isFinite(radius) || radius <= 0 || radius > MAXIMUM_RADIUS) {
-            throw new IllegalArgumentException(
-                    "Elite query radius must be finite and between 0 and " + MAXIMUM_RADIUS);
-        }
+        validateRadius(radius);
         double radiusSquared = radius * radius;
         return candidates.stream()
                 .filter(Candidate::tracked)
@@ -34,6 +31,13 @@ final class NearbyEliteSelectionPolicy {
                         .thenComparing(Candidate::entityId))
                 .limit(MAXIMUM_RESULTS)
                 .toList();
+    }
+
+    static void validateRadius(double radius) {
+        if (!Double.isFinite(radius) || radius <= 0 || radius > MAXIMUM_RADIUS) {
+            throw new IllegalArgumentException(
+                    "Elite query radius must be finite and between 0 and " + MAXIMUM_RADIUS);
+        }
     }
 
     record Candidate(
