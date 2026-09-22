@@ -58,8 +58,6 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SPEARS);
         double baseDamage = event.getDamageWithoutCriticalStrike();
         double bleedDamage = baseDamage * getBleedDamagePercent(skillLevel);
-        // Cap bleed per tick to 15% of hit damage to prevent insane DoT
-        bleedDamage = Math.min(bleedDamage, baseDamage * 0.15);
 
         applyBleed(player, eliteEntity, bleedDamage);
     }
@@ -82,9 +80,9 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
 
             @Override
             public void run() {
-                if (ticksRemaining <= 0 || target.getLivingEntity() == null ||
-                    target.getLivingEntity().isDead()) {
-                    activeBleedTasks.remove(targetUUID);
+                if (activeBleedTasks.get(targetUUID) != this || ticksRemaining <= 0
+                        || target.getLivingEntity() != livingTarget || !livingTarget.isValid() || livingTarget.isDead()) {
+                    activeBleedTasks.remove(targetUUID, this);
                     cancel();
                     return;
                 }
@@ -106,11 +104,11 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
                     }
                 }
 
-                ticksRemaining--;
+                ticksRemaining -= BLEED_TICK_INTERVAL;
             }
         };
 
-        bleedTask.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        bleedTask.runTaskTimer(MetadataHandler.PLUGIN, 0, BLEED_TICK_INTERVAL);
         activeBleedTasks.put(targetUUID, bleedTask);
     }
 
@@ -118,7 +116,7 @@ public class ImpalingStrikeSkill extends SkillBonus implements ProcSkill {
         // Power budget: 5 bleed ticks at 15% of the hit each is 75% of a hit at level 50, on a
         // 27% proc rate (E = 0.267 * 0.75 = 0.20). Hardcoded rather than read from config so
         // every server runs the same numbers while the rebalance is being validated.
-        return scaled(BASE_BLEED_DAMAGE, 0.0014, skillLevel); // 8% base + 0.14% per level
+        return scaled(BASE_BLEED_DAMAGE, 0.0014, 0.15, skillLevel); // At most 15% per payload, also used by lore.
     }
 
     @Override

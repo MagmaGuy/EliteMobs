@@ -160,7 +160,9 @@ public class SkillBonusRegistry {
      * @param player The player
      */
     public static void removeAllBonuses(Player player) {
+        com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcCooldownTracker.clear(player);
         for (SkillBonus bonus : getAllBonuses()) {
+            bonus.resetProcCount(player);
             if (bonus.isActive(player)) {
                 bonus.removeBonus(player);
             }
@@ -226,6 +228,7 @@ public class SkillBonusRegistry {
      * Called on plugin shutdown.
      */
     public static void shutdown() {
+        com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcCooldownTracker.clearAll();
         // Shutdown each bonus
         for (SkillBonus bonus : getAllBonuses()) {
             bonus.shutdown();

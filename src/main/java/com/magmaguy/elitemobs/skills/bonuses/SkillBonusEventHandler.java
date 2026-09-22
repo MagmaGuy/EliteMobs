@@ -128,7 +128,7 @@ public class SkillBonusEventHandler implements Listener {
     /**
      * Handles weapon switching - applies/removes passive weapon skill effects.
      */
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onItemHeldChange(PlayerItemHeldEvent event) {
         if (!SkillsConfig.isSkillSystemEnabled()) return;
         Player player = event.getPlayer();
@@ -170,6 +170,10 @@ public class SkillBonusEventHandler implements Listener {
 
         // Apply effects for new weapon type
         if (newType == SkillType.SWORDS) {
+            if (FlurrySkill.hasActiveSkill(uuid)) {
+                int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS);
+                FlurrySkill.applyAttackSpeedModifier(player, FlurrySkill.getAttackSpeedBonus(player, skillLevel));
+            }
             if (SwiftStrikesSkill.hasActiveSkill(uuid)) {
                 int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS);
                 SwiftStrikesSkill.applySpeedBonus(player, skillLevel);
@@ -219,15 +223,16 @@ public class SkillBonusEventHandler implements Listener {
 
     /**
      * Handles bow shoot for Overdraw skill - snapshots draw duration for the damage event.
-     * We do NOT clear the draw time here; the arrow damage event needs it.
-     * The draw time is cleared on next draw start or weapon switch instead.
+     * Each released projectile owns its draw time independently of later shots.
      */
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBowShoot(EntityShootBowEvent event) {
         if (!SkillsConfig.isSkillSystemEnabled()) return;
         if (event.getEntity() instanceof Player player) {
             if (SkillsConfig.isWorldExcludedFromSkills(player)) return;
-            OverdrawSkill.snapshotDrawDuration(player.getUniqueId());
+            if (event.isCancelled()) OverdrawSkill.stopDrawing(player.getUniqueId());
+            else if (event.getProjectile() instanceof org.bukkit.entity.Projectile projectile)
+                OverdrawSkill.snapshotDrawDuration(player.getUniqueId(), projectile);
         }
     }
 
@@ -243,8 +248,9 @@ public class SkillBonusEventHandler implements Listener {
         UUID uuid = event.getPlayer().getUniqueId();
 
         // Check if player actually moved (not just head rotation)
-        boolean moved = event.getFrom().getBlockX() != event.getTo().getBlockX() ||
-                event.getFrom().getBlockZ() != event.getTo().getBlockZ();
+        boolean moved = event.getFrom().getX() != event.getTo().getX() ||
+                event.getFrom().getY() != event.getTo().getY() ||
+                event.getFrom().getZ() != event.getTo().getZ();
 
         if (SteadyAimSkill.hasActiveSkill(uuid)) {
             SteadyAimSkill.updatePlayerMovement(uuid, moved);

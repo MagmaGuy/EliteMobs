@@ -83,10 +83,7 @@ public class AdrenalineSurgeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void removeBonus(Player player) {
-        // The surge now carries a damage reduction, so an in-flight window has to be closed when
-        // the skill is unslotted - otherwise it would keep reducing damage for a skill the player
-        // no longer has.
-        surgeActiveMap.remove(player.getUniqueId());
+        onDeactivate(player);
     }
 
     @Override

@@ -9,7 +9,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -43,12 +43,10 @@ public class ElitePlayerInventory {
     }
 
     public static ElitePlayerInventory getPlayer(Player player) {
-        if (player == null) return null;
+        if (player == null || !player.isOnline() || player.hasMetadata("NPC")) return null;
 
         ElitePlayerInventory elitePlayerInventory = playerInventories.get(player.getUniqueId());
-        if (elitePlayerInventory != null) return elitePlayerInventory;
-
-        if (!player.isOnline() || player.hasMetadata("NPC")) return null;
+        if (elitePlayerInventory != null && elitePlayerInventory.player == player) return elitePlayerInventory;
         return new ElitePlayerInventory(player);
     }
 
@@ -58,7 +56,7 @@ public class ElitePlayerInventory {
 
     public static void initialize() {
         for (Player player : Bukkit.getOnlinePlayers())
-            playerInventories.put(player.getUniqueId(), new ElitePlayerInventory(player));
+            getPlayer(player);
     }
 
     public static ItemStack[] getHeldAndEquippedItems(PlayerInventory inventory) {
@@ -240,13 +238,14 @@ public class ElitePlayerInventory {
 
     public static class ElitePlayerInventoryEvents implements Listener {
         @EventHandler
-        public void onPlayerLogin(PlayerLoginEvent event) {
-            playerInventories.put(event.getPlayer().getUniqueId(), new ElitePlayerInventory(event.getPlayer()));
+        public void onPlayerJoin(PlayerJoinEvent event) {
+            getPlayer(event.getPlayer());
         }
 
         @EventHandler
         public void onPlayerLogout(PlayerQuitEvent event) {
-            playerInventories.remove(event.getPlayer().getUniqueId());
+            playerInventories.computeIfPresent(event.getPlayer().getUniqueId(),
+                    (id, inventory) -> inventory.player == event.getPlayer() ? null : inventory);
             // The per-slot broken-item bars live in BossBarUtil, keyed by UUID; without
             // this they leak across relogs and their stale entries block the bar from
             // ever being shown again for that slot.

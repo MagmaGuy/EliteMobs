@@ -10,13 +10,13 @@ import java.util.List;
 public class CrossbowsQuickReloadConfig extends SkillBonusConfigFields {
     public CrossbowsQuickReloadConfig() {
         super("crossbows_quick_reload.yml", true, "&eQuick Reload",
-              List.of("&7Gain haste after hitting", "&7for faster reloading."),
+              List.of("&7Successful hits briefly", "&7increase movement speed."),
               SkillType.CROSSBOWS, SkillBonusType.PASSIVE, 1, 0.5, 0.01, Material.SUGAR);
         this.loreTemplates = List.of(
-                "&7Haste Level: &f$hasteLevel",
+                "&7Movement speed: &f+$speedPercent%",
                 "&7Duration: &f3 seconds",
                 "&7Triggers on hit"
         );
-        this.formattedBonusTemplate = "Haste $hasteLevel on hit";
+        this.formattedBonusTemplate = "+$speedPercent% movement speed on hit";
     }
 }

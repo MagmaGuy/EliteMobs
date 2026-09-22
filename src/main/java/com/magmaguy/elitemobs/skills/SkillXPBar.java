@@ -186,6 +186,7 @@ public class SkillXPBar implements Listener {
             this.displayLevel = oldLevel;
             this.currentDisplayProgress = oldProgress;
 
+            bossBar.setTitle(getBarTitle(skillType, displayLevel, xpGained));
             // First animate to full, then level up effects, then animate from 0
             animationTask = new BukkitRunnable() {
                 int tick = 0;
@@ -205,7 +206,6 @@ public class SkillXPBar implements Listener {
                         double progress = currentDisplayProgress + (1.0 - currentDisplayProgress) * (tick / (double) (ANIMATION_TICKS / 2));
                         progress = Math.min(1.0, progress);
                         bossBar.setProgress(progress);
-                        bossBar.setTitle(getBarTitle(skillType, displayLevel, xpGained));
 
                         if (tick >= ANIMATION_TICKS / 2) {
                             filledBar = true;
@@ -225,8 +225,10 @@ public class SkillXPBar implements Listener {
                         double progress = newProgress * (tick / (double) ANIMATION_TICKS);
                         progress = Math.min(newProgress, progress);
                         bossBar.setProgress(progress);
-                        bossBar.setColor(getBarColor(skillType));
-                        bossBar.setTitle(getBarTitle(skillType, newLevel, xpGained));
+                        if (tick == 1) {
+                            bossBar.setColor(getBarColor(skillType));
+                            bossBar.setTitle(getBarTitle(skillType, newLevel, xpGained));
+                        }
 
                         if (tick >= ANIMATION_TICKS) {
                             bossBar.setProgress(newProgress);
@@ -243,6 +245,7 @@ public class SkillXPBar implements Listener {
         private void animateProgress(long xpGained) {
             final double startProgress = currentDisplayProgress;
             final double endProgress = targetProgress;
+            bossBar.setTitle(getBarTitle(skillType, displayLevel, xpGained));
 
             animationTask = new BukkitRunnable() {
                 int tick = 0;
@@ -259,7 +262,6 @@ public class SkillXPBar implements Listener {
                     progress = Math.min(Math.max(0, progress), 1.0);
 
                     bossBar.setProgress(progress);
-                    bossBar.setTitle(getBarTitle(skillType, displayLevel, xpGained));
 
                     if (tick >= ANIMATION_TICKS) {
                         bossBar.setProgress(endProgress);

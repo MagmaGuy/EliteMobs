@@ -61,7 +61,12 @@ public class StunningForceSkill extends SkillBonus {
 
         // Apply enhanced knockback
         double knockbackMultiplier = getKnockbackMultiplier(skillLevel);
-        Vector direction = target.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
+        Vector direction = target.getLocation().toVector().subtract(player.getLocation().toVector());
+        if (direction.lengthSquared() < 1.0E-6) {
+            double yaw = Math.toRadians(player.getLocation().getYaw());
+            direction = new Vector(-Math.sin(yaw), 0, Math.cos(yaw));
+        }
+        direction.normalize();
         direction.setY(0.3); // Add upward component
         target.setVelocity(direction.multiply(knockbackMultiplier));
 

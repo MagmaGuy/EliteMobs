@@ -54,7 +54,7 @@ public class GritSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public void removeBonus(Player player) {
-        // No persistent bonus to remove
+        onDeactivate(player);
     }
 
     @Override

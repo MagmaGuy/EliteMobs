@@ -54,7 +54,7 @@ public class FortifySkill extends SkillBonus implements StackingSkill {
 
     @Override
     public void removeBonus(Player player) {
-        // No persistent bonus to remove
+        onDeactivate(player);
     }
 
     @Override

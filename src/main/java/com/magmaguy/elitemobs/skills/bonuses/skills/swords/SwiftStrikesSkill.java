@@ -3,6 +3,8 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.swords;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class SwiftStrikesSkill extends SkillBonus {
     private static final double BASE_SPEED_BONUS = 0.05; // 5% movement speed
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, SpeedLease> appliedSpeeds = new ConcurrentHashMap<>();
 
     public SwiftStrikesSkill() {
         super(SkillType.SWORDS, 10, "Swift Strikes",
@@ -48,20 +51,33 @@ public class SwiftStrikesSkill extends SkillBonus {
      * Applies the speed bonus to the player's walk speed attribute.
      */
     public static void applySpeedBonus(Player player, int skillLevel) {
-        double bonus = getSpeedBonus(skillLevel);
-        player.setWalkSpeed(Math.min(1.0f, 0.2f + (float) bonus));
+        if (!hasActiveSkill(player.getUniqueId())) return;
+        SpeedLease current = appliedSpeeds.get(player.getUniqueId());
+        float actual = player.getWalkSpeed();
+        float baseline = current != null && current.player() == player
+                && Float.compare(actual, current.applied()) == 0 ? current.baseline() : actual;
+        float applied = Math.min(1.0f, baseline + (float) getSpeedBonus(skillLevel));
+        if (Float.compare(actual, applied) != 0) player.setWalkSpeed(applied);
+        appliedSpeeds.put(player.getUniqueId(), new SpeedLease(player, baseline, applied));
     }
 
     /**
-     * Removes the speed bonus, restoring default walk speed.
+     * Restores this activation's baseline only while its write still owns the value.
      */
     public static void removeSpeedBonus(Player player) {
-        player.setWalkSpeed(0.2f);
+        SpeedLease lease = appliedSpeeds.get(player.getUniqueId());
+        if (lease == null || lease.player() != player) return;
+        appliedSpeeds.remove(player.getUniqueId(), lease);
+        if (Float.compare(player.getWalkSpeed(), lease.applied()) == 0)
+            player.setWalkSpeed(lease.baseline());
     }
 
     @Override
     public void applyBonus(Player player, int skillLevel) {
         activePlayers.add(player.getUniqueId());
+        if (WeaponIdentityResolver.progressionSkill(player.getInventory().getItemInMainHand()) == SkillType.SWORDS)
+            applySpeedBonus(player, skillLevel);
+        else removeSpeedBonus(player);
     }
 
     @Override
@@ -72,7 +88,7 @@ public class SwiftStrikesSkill extends SkillBonus {
 
     @Override
     public void onActivate(Player player) {
-        activePlayers.add(player.getUniqueId());
+        applyBonus(player, SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS));
     }
 
     @Override
@@ -114,6 +130,9 @@ public class SwiftStrikesSkill extends SkillBonus {
 
     @Override
     public void shutdown() {
+        for (SpeedLease lease : List.copyOf(appliedSpeeds.values())) removeSpeedBonus(lease.player());
         activePlayers.clear();
     }
+
+    private record SpeedLease(Player player, float baseline, float applied) {}
 }

@@ -43,7 +43,7 @@ public class LastStandSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void removeBonus(Player player) {
-        // No persistent bonus to remove
+        onDeactivate(player);
     }
 
     @Override

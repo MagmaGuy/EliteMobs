@@ -81,6 +81,8 @@ public class RangersFocusSkill extends SkillBonus implements StackingSkill {
     }
 
     public void setTargetedEnemy(Player player, UUID targetUUID) {
+        // Retire the previous hit before assigning the current hit's target.
+        getCurrentStacks(player);
         UUID currentTarget = targetedEnemy.get(player.getUniqueId());
         if (currentTarget != null && !currentTarget.equals(targetUUID)) {
             // Switched targets, reset stacks

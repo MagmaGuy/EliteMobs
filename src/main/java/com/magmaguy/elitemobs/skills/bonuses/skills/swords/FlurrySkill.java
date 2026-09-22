@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.swords;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
@@ -103,6 +104,7 @@ public class FlurrySkill extends SkillBonus implements StackingSkill {
     public void resetStacks(Player player) {
         playerStacks.remove(player.getUniqueId());
         cancelDecayTimer(player.getUniqueId());
+        removeAttackSpeedModifier(player);
     }
 
     @Override
@@ -117,7 +119,7 @@ public class FlurrySkill extends SkillBonus implements StackingSkill {
     public static double getAttackSpeedBonus(Player player, int skillLevel) {
         if (!activePlayers.contains(player.getUniqueId())) return 0;
         int stacks = playerStacks.getOrDefault(player.getUniqueId(), 0);
-        double bonusPerStack = ATTACK_SPEED_PER_STACK + (skillLevel * 0.001);
+        double bonusPerStack = scaled(ATTACK_SPEED_PER_STACK, 0.001, skillLevel);
         return stacks * bonusPerStack;
     }
 
@@ -135,14 +137,25 @@ public class FlurrySkill extends SkillBonus implements StackingSkill {
         BukkitRunnable decayTask = new BukkitRunnable() {
             @Override
             public void run() {
+                if (decayTasks.get(uuid) != this) return;
+                decayTasks.remove(uuid, this);
+                if (!player.isOnline() || !hasActiveSkill(uuid)) {
+                    resetStacks(player);
+                    return;
+                }
                 int current = playerStacks.getOrDefault(uuid, 0);
                 if (current > 0) {
                     playerStacks.put(uuid, current - 1);
+                    double bonus = WeaponIdentityResolver.progressionSkill(
+                            player.getInventory().getItemInMainHand()) == SkillType.SWORDS
+                            ? (current - 1) * getBonusPerStack(SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS))
+                            : 0D;
+                    applyAttackSpeedModifier(player, bonus);
                     if (current - 1 > 0) {
                         // Schedule next decay
                         resetDecayTimer(player);
                     } else {
-                        decayTasks.remove(uuid);
+                        playerStacks.remove(uuid);
                     }
                 }
             }

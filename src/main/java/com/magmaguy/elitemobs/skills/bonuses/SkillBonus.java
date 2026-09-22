@@ -23,6 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Skills unlock at different level tiers (10, 25, 50, 75).
  */
 public abstract class SkillBonus {
+    private static final java.util.regex.Pattern UNRESOLVED_TEMPLATE_TOKEN =
+            java.util.regex.Pattern.compile("\\$[A-Za-z][A-Za-z0-9_]*");
 
     /**
      * Hard cap on how much any single defensive skill may reduce incoming damage.
@@ -76,19 +78,19 @@ public abstract class SkillBonus {
     protected final SkillType skillType;
 
     @Getter
-    protected final int requiredLevel;
+    protected int requiredLevel;
 
     @Getter
-    protected final String bonusName;
+    protected String bonusName;
 
     @Getter
-    protected final String description;
+    protected String description;
 
     @Getter
     protected final SkillBonusType bonusType;
 
     @Getter
-    protected final int unlockTier;
+    protected int unlockTier;
 
     @Getter
     protected final String skillId;
@@ -109,7 +111,8 @@ public abstract class SkillBonus {
      * @param player The player who triggered the proc
      */
     public void incrementProcCount(Player player) {
-        procCounts.merge(player.getUniqueId(), 1, Integer::sum);
+        if (com.magmaguy.elitemobs.testing.SkillSystemTest.hasActiveSession(player.getUniqueId()))
+            procCounts.merge(player.getUniqueId(), 1, Integer::sum);
     }
 
     /**
@@ -186,6 +189,22 @@ public abstract class SkillBonus {
         this.configFields = configFields;
         if (configFields != null) {
             this.enabled = configFields.isEnabled();
+            if (configFields.getSkillType() != skillType || configFields.getBonusType() != bonusType) {
+                this.enabled = false;
+                com.magmaguy.magmacore.util.Logger.warn("Skill " + skillId
+                        + " has an unsupported skillType/bonusType; expected " + skillType + "/" + bonusType);
+                return;
+            }
+            this.requiredLevel = configFields.getRequiredLevel();
+            this.unlockTier = configFields.getUnlockTier();
+            this.bonusName = configFields.getName();
+            this.description = String.join(" ", configFields.getDescription());
+            String formatted = getFormattedBonus(requiredLevel);
+            if (formatted != null) {
+                java.util.regex.Matcher unresolved = UNRESOLVED_TEMPLATE_TOKEN.matcher(formatted);
+                if (unresolved.find()) com.magmaguy.magmacore.util.Logger.warn("Skill " + skillId
+                        + " formattedBonusTemplate contains unsupported token " + unresolved.group());
+            }
         }
     }
 

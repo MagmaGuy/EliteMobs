@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.swords;
 
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 import java.util.Map;
@@ -27,8 +26,8 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
     private static final double BASE_COOLDOWN = 10.0; // 10 seconds
     private static final double BASE_DAMAGE_MULTIPLIER = 1.83; // 83% bonus damage
 
-    private static final Set<UUID> playersOnCooldown = ConcurrentHashMap.newKeySet();
-    private static final Set<UUID> playersWithRiposteReady = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Long> cooldownEnds = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> readyEnds = new ConcurrentHashMap<>();
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public RiposteSkill() {
@@ -48,32 +47,26 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public boolean isOnCooldown(Player player) {
-        return playersOnCooldown.contains(player.getUniqueId());
+        return getRemainingCooldown(player) > 0L;
     }
 
     @Override
     public void startCooldown(Player player, int skillLevel) {
-        UUID uuid = player.getUniqueId();
-        playersOnCooldown.add(uuid);
-        long seconds = getCooldownSeconds(skillLevel);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                playersOnCooldown.remove(uuid);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, seconds * 20L);
+        cooldownEnds.put(player.getUniqueId(), GameClock.getCurrentTick() + getCooldownSeconds(skillLevel) * 20L);
     }
 
     @Override
     public long getRemainingCooldown(Player player) {
-        // This would require tracking start times - simplified for now
-        return 0;
+        Long end = cooldownEnds.get(player.getUniqueId());
+        if (end == null) return 0L;
+        long ticks = end - GameClock.getCurrentTick();
+        if (ticks <= 0L) cooldownEnds.remove(player.getUniqueId(), end);
+        return Math.max(0L, (ticks + 19L) / 20L);
     }
 
     @Override
     public void endCooldown(Player player) {
-        playersOnCooldown.remove(player.getUniqueId());
+        cooldownEnds.remove(player.getUniqueId());
     }
 
     @Override
@@ -86,7 +79,7 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
         if (!(context instanceof EliteMobDamagedByPlayerEvent event)) return;
 
         // Check if riposte is ready
-        if (!playersWithRiposteReady.contains(player.getUniqueId())) return;
+        if (!hasRiposteReady(player.getUniqueId())) return;
 
         // Apply bonus damage
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS);
@@ -94,7 +87,7 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
         event.setDamage(event.getDamage() * multiplier);
 
         // Consume riposte
-        playersWithRiposteReady.remove(player.getUniqueId());
+        readyEnds.remove(player.getUniqueId());
 
         // Start cooldown
         startCooldown(player, skillLevel);
@@ -108,24 +101,20 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
     public static void onPlayerBlock(Player player) {
         UUID uuid = player.getUniqueId();
         if (!activePlayers.contains(uuid)) return;
-        if (playersOnCooldown.contains(uuid)) return;
-
-        playersWithRiposteReady.add(uuid);
-
-        // Riposte window expires after 3 seconds
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                playersWithRiposteReady.remove(uuid);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 60L);
+        if (cooldownEnds.getOrDefault(uuid, 0L) > GameClock.getCurrentTick()) return;
+        // Another block refreshes this player's one readiness window.
+        readyEnds.put(uuid, GameClock.getCurrentTick() + 60L);
     }
 
     /**
      * Checks if a player has riposte ready.
      */
     public static boolean hasRiposteReady(UUID playerUUID) {
-        return playersWithRiposteReady.contains(playerUUID);
+        Long end = readyEnds.get(playerUUID);
+        if (end == null) return false;
+        if (end > GameClock.getCurrentTick()) return true;
+        readyEnds.remove(playerUUID, end);
+        return false;
     }
 
     private double getDamageMultiplier(int skillLevel) {
@@ -143,8 +132,8 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
     public void removeBonus(Player player) {
         UUID uuid = player.getUniqueId();
         activePlayers.remove(uuid);
-        playersOnCooldown.remove(uuid);
-        playersWithRiposteReady.remove(uuid);
+        cooldownEnds.remove(uuid);
+        readyEnds.remove(uuid);
     }
 
     @Override
@@ -190,8 +179,8 @@ public class RiposteSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void shutdown() {
-        playersOnCooldown.clear();
-        playersWithRiposteReady.clear();
+        cooldownEnds.clear();
+        readyEnds.clear();
         activePlayers.clear();
     }
 }

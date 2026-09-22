@@ -1,6 +1,6 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.bows;
 
-import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,6 @@ public class DeadEyeSkill extends SkillBonus implements CooldownSkill {
     private static final double BASE_DAMAGE_MULTIPLIER = 3.3; // 330% damage
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
-    private static final Set<UUID> onCooldown = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, Long> cooldownEndTimes = new ConcurrentHashMap<>();
 
     public DeadEyeSkill() {
@@ -45,35 +43,26 @@ public class DeadEyeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public boolean isOnCooldown(Player player) {
-        return onCooldown.contains(player.getUniqueId());
+        return getRemainingCooldown(player) > 0L;
     }
 
     @Override
     public void startCooldown(Player player, int skillLevel) {
         UUID uuid = player.getUniqueId();
-        long cooldownMs = getCooldownSeconds(skillLevel) * 1000L;
-        onCooldown.add(uuid);
-        cooldownEndTimes.put(uuid, System.currentTimeMillis() + cooldownMs);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                endCooldown(player);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, getCooldownSeconds(skillLevel) * 20L);
+        cooldownEndTimes.put(uuid, GameClock.getCurrentTick() + getCooldownSeconds(skillLevel) * 20L);
     }
 
     @Override
     public long getRemainingCooldown(Player player) {
         Long endTime = cooldownEndTimes.get(player.getUniqueId());
         if (endTime == null) return 0;
-        long remaining = endTime - System.currentTimeMillis();
-        return remaining > 0 ? remaining / 1000 : 0;
+        long remaining = endTime - GameClock.getCurrentTick();
+        if (remaining <= 0L) cooldownEndTimes.remove(player.getUniqueId(), endTime);
+        return Math.max(0L, (remaining + 19L) / 20L);
     }
 
     @Override
     public void endCooldown(Player player) {
-        onCooldown.remove(player.getUniqueId());
         cooldownEndTimes.remove(player.getUniqueId());
     }
 
@@ -152,7 +141,6 @@ public class DeadEyeSkill extends SkillBonus implements CooldownSkill {
     @Override
     public void shutdown() {
         activePlayers.clear();
-        onCooldown.clear();
         cooldownEndTimes.clear();
     }
 }

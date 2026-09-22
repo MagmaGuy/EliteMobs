@@ -85,32 +85,35 @@ public class ImpalerSkill extends SkillBonus implements CooldownSkill {
      * Returns the damage multiplier if successful, 1.0 otherwise.
      */
     public double checkAndApply(Player player, EliteMobDamagedByPlayerEvent event) {
-        if (!isActive(player) || isOnCooldown(player)) return 1.0;
+        return activateIfEligible(player, event)
+                ? getDamageMultiplier(SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SPEARS)) : 1D;
+    }
+
+    private boolean activateIfEligible(Player player, EliteMobDamagedByPlayerEvent event) {
+        if (!isActive(player) || isOnCooldown(player)) return false;
 
         EliteEntity eliteEntity = event.getEliteMobEntity();
-        if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return 1.0;
+        if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return false;
 
         // Don't impale if already pinned
-        if (pinnedEntities.contains(eliteEntity.getLivingEntity().getUniqueId())) return 1.0;
+        if (pinnedEntities.contains(eliteEntity.getLivingEntity().getUniqueId())) return false;
 
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SPEARS);
-        double multiplier = getDamageMultiplier(skillLevel);
 
         // Execute the impale
         activateImpale(player, eliteEntity, skillLevel);
 
-        return multiplier;
+        return true;
     }
 
     /**
      * Reports whether the impale actually landed, so the caller only consumes the cooldown and the
-     * damage bonus on a real activation. Returning 1.0 from checkAndApply means the target was
-     * already pinned (or the skill was unavailable) and nothing happened.
+     * damage bonus on a real activation, independently of its configured damage amount.
      */
     @Override
     public boolean tryActivate(Player player, Object event) {
         if (!(event instanceof EliteMobDamagedByPlayerEvent damageEvent)) return false;
-        return checkAndApply(player, damageEvent) > 1.0;
+        return activateIfEligible(player, damageEvent);
     }
 
     private void activateImpale(Player player, EliteEntity target, int skillLevel) {

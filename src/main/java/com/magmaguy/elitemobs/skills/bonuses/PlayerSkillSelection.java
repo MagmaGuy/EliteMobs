@@ -30,6 +30,8 @@ public class PlayerSkillSelection {
     // In-memory cache: UUID -> SkillType -> List<SkillId>
     private static final Map<UUID, Map<SkillType, List<String>>> activeSkills = new ConcurrentHashMap<>();
 
+    private static final Set<UUID> failedLoads = ConcurrentHashMap.newKeySet();
+
     private PlayerSkillSelection() {
         // Static utility class
     }
@@ -47,12 +49,9 @@ public class PlayerSkillSelection {
         if (playerSkills == null) {
             return Collections.emptyList();
         }
-        if (sanitizeSkillList(playerSkills, skillType)) {
-            saveToDatabase(uuid);
-        }
         List<String> skillIds = playerSkills.get(skillType);
         if (skillIds == null || skillIds.isEmpty()) return Collections.emptyList();
-        return List.copyOf(skillIds);
+        return skillIds;
     }
 
     /**
@@ -83,8 +82,9 @@ public class PlayerSkillSelection {
         if (!isSkillEnabledForType(skillType, normalizedSkillId)) {
             return false;
         }
-        Map<SkillType, List<String>> playerSkills = activeSkills.computeIfAbsent(uuid, k -> new EnumMap<>(SkillType.class));
-        List<String> typeSkills = playerSkills.computeIfAbsent(skillType, k -> new ArrayList<>());
+        Map<SkillType, List<String>> playerSkills = activeSkills.get(uuid);
+        if (playerSkills == null) return false;
+        List<String> typeSkills = new ArrayList<>(playerSkills.getOrDefault(skillType, List.of()));
 
         // Check if already at max (unless bypassed for testing)
         if (!bypassLimit && typeSkills.size() >= MAX_ACTIVE_SKILLS) {
@@ -97,6 +97,7 @@ public class PlayerSkillSelection {
         }
 
         typeSkills.add(normalizedSkillId);
+        playerSkills.put(skillType, List.copyOf(typeSkills));
         saveToDatabase(uuid);
         return true;
     }
@@ -123,8 +124,10 @@ public class PlayerSkillSelection {
             return false;
         }
 
-        boolean removed = typeSkills.remove(normalizedSkillId);
+        List<String> updated = new ArrayList<>(typeSkills);
+        boolean removed = updated.remove(normalizedSkillId);
         if (removed) {
+            playerSkills.put(skillType, List.copyOf(updated));
             saveToDatabase(uuid);
         }
         return removed;
@@ -140,7 +143,6 @@ public class PlayerSkillSelection {
         Map<SkillType, List<String>> playerSkills = activeSkills.get(uuid);
         if (playerSkills == null) return false;
 
-        if (sanitizeAllSkillLists(playerSkills)) saveToDatabase(uuid);
         return playerSkills.values().stream().anyMatch(skills -> skills.contains(normalizedSkillId));
     }
 
@@ -159,7 +161,6 @@ public class PlayerSkillSelection {
         ensureLoaded(uuid);
         Map<SkillType, List<String>> playerSkills = activeSkills.get(uuid);
         if (playerSkills == null) return List.of();
-        if (sanitizeAllSkillLists(playerSkills)) saveToDatabase(uuid);
 
         List<String> allSkills = new ArrayList<>();
         playerSkills.values().forEach(allSkills::addAll);
@@ -167,7 +168,9 @@ public class PlayerSkillSelection {
     }
 
     public static void clearAllSkills(UUID uuid) {
-        activeSkills.remove(uuid);
+        if (!PlayerData.isDataLoaded(uuid)) return;
+        failedLoads.remove(uuid);
+        activeSkills.put(uuid, new EnumMap<>(SkillType.class));
         saveToDatabase(uuid);
     }
 
@@ -177,7 +180,7 @@ public class PlayerSkillSelection {
      * @param uuid The player's UUID
      */
     private static void ensureLoaded(UUID uuid) {
-        if (!activeSkills.containsKey(uuid)) {
+        if (!activeSkills.containsKey(uuid) && !failedLoads.contains(uuid) && PlayerData.isDataLoaded(uuid)) {
             loadFromDatabase(uuid);
         }
     }
@@ -188,6 +191,8 @@ public class PlayerSkillSelection {
      * @param uuid The player's UUID
      */
     public static void loadFromDatabase(UUID uuid) {
+        if (!PlayerData.isDataLoaded(uuid)) return;
+        failedLoads.remove(uuid);
         String json = PlayerData.getSkillBonusSelections(uuid);
         if (json == null || json.isEmpty() || json.equals("{}")) {
             activeSkills.put(uuid, new EnumMap<>(SkillType.class));
@@ -211,18 +216,20 @@ public class PlayerSkillSelection {
                         }
                         converted.put(skillType, normalizedIds);
                     } catch (IllegalArgumentException e) {
-                        Logger.warn("Unknown skill type in database: " + entry.getKey());
+                        throw new IllegalArgumentException("Unknown skill type in database: " + entry.getKey(), e);
                     }
                 }
             }
 
+            if (parsed == null) throw new IllegalArgumentException("Skill selections must be a JSON object");
+            boolean sanitized = sanitizeAllSkillLists(converted);
+            converted.replaceAll((type, skills) -> List.copyOf(skills));
             activeSkills.put(uuid, converted);
-            if (sanitizeAllSkillLists(converted)) {
-                saveToDatabase(uuid);
-            }
+            if (sanitized) saveToDatabase(uuid);
         } catch (Exception e) {
             Logger.warn("Failed to parse skill selections for player " + uuid + ": " + e.getMessage());
-            activeSkills.put(uuid, new EnumMap<>(SkillType.class));
+            activeSkills.remove(uuid);
+            failedLoads.add(uuid);
         }
     }
 
@@ -233,7 +240,8 @@ public class PlayerSkillSelection {
      */
     public static void saveToDatabase(UUID uuid) {
         Map<SkillType, List<String>> playerSkills = activeSkills.get(uuid);
-        if (playerSkills == null || playerSkills.isEmpty()) {
+        if (playerSkills == null || failedLoads.contains(uuid) || !PlayerData.isDataLoaded(uuid)) return;
+        if (playerSkills.isEmpty()) {
             PlayerData.setSkillBonusSelections(uuid, "{}");
             return;
         }
@@ -267,10 +275,12 @@ public class PlayerSkillSelection {
     public static void onPlayerLeave(Player player) {
         saveToDatabase(player.getUniqueId());
         activeSkills.remove(player.getUniqueId());
+        failedLoads.remove(player.getUniqueId());
     }
 
     public static void clearCache(UUID uuid) {
         activeSkills.remove(uuid);
+        failedLoads.remove(uuid);
     }
 
     /**
@@ -283,11 +293,14 @@ public class PlayerSkillSelection {
             saveToDatabase(uuid);
         }
         activeSkills.clear();
+        failedLoads.clear();
     }
 
     private static boolean isSkillEnabledForType(SkillType skillType, String skillId) {
         SkillBonusConfigFields config = SkillBonusesConfig.getBySkillId(skillId);
-        return config != null && config.isEnabled() && config.getSkillType() == skillType;
+        SkillBonus implementation = SkillBonusRegistry.getSkillById(skillId);
+        return config != null && config.isEnabled() && config.getSkillType() == skillType
+                && implementation != null && implementation.isEnabled();
     }
 
     private static boolean sanitizeSkillList(Map<SkillType, List<String>> playerSkills, SkillType skillType) {

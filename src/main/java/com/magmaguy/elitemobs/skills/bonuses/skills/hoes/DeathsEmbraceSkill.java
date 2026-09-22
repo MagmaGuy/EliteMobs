@@ -171,7 +171,7 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public boolean affectsDamage() {
-        return false; // Death prevention skill - doesn't modify offensive damage
+        return false; // Passive damage is separate from the defensive cooldown activation.
     }
 
     @Override

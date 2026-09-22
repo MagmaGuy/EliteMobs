@@ -934,6 +934,7 @@ public class SkillSystemTest implements Listener {
         cleanupSafely("test projectiles", combatSimulator::cleanupTestEntities);
         cleanupSafely("player state", playerState::restore);
         activeSessions.remove(playerUUID);
+        for (SkillBonus skill : SkillBonusRegistry.getAllBonuses()) skill.resetProcCount(player);
     }
 
     private void cleanupSafely(String state, Runnable cleanupAction) {

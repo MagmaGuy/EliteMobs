@@ -60,6 +60,11 @@ public class SteadyAimSkill extends SkillBonus implements ConditionalSkill {
     }
 
     public double calculateBonus(Player player, int skillLevel) {
+        return getConditionalBonus(player, skillLevel);
+    }
+
+    @Override
+    public double getConditionalBonus(Player player, int skillLevel) {
         Long stillSince = standingStillSince.get(player.getUniqueId());
         if (stillSince == null) return 0;
         long standTime = System.currentTimeMillis() - stillSince;

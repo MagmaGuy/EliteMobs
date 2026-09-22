@@ -46,6 +46,8 @@ public class ItemTagger {
     private static final NamespacedKey ARROW_LAUNCH_VELOCITY = new NamespacedKey(MetadataHandler.PLUGIN, "arrowLaunchVelocity");
     private static final NamespacedKey ARROW_CRITICAL = new NamespacedKey(MetadataHandler.PLUGIN, "arrowCritical");
     private static final NamespacedKey ARROW_LOUD_STRIKES = new NamespacedKey(MetadataHandler.PLUGIN, "arrowLoudStrikes");
+    private static final NamespacedKey ARROW_SECONDARY = new NamespacedKey(MetadataHandler.PLUGIN, "arrowSecondary");
+    private static final NamespacedKey ARROW_DRAW_MILLIS = new NamespacedKey(MetadataHandler.PLUGIN, "arrowDrawMillis");
 
     public static String itemValue = "ItemValue";
 
@@ -259,6 +261,53 @@ public class ItemTagger {
 
     // ==================== ARROW COMBAT DATA ====================
 
+    public static boolean isSecondaryArrow(Projectile projectile) {
+        return projectile.getPersistentDataContainer().has(ARROW_SECONDARY, PersistentDataType.BYTE);
+    }
+
+    public static void setArrowDrawMillis(Projectile projectile, long millis) {
+        projectile.getPersistentDataContainer().set(ARROW_DRAW_MILLIS, PersistentDataType.LONG, Math.max(0L, millis));
+    }
+
+    public static long getArrowDrawMillis(Projectile projectile) {
+        return projectile.getPersistentDataContainer().getOrDefault(ARROW_DRAW_MILLIS, PersistentDataType.LONG, 0L);
+    }
+
+    /** Captures only this plugin's attack data, before delayed child arrows are published. */
+    public static ArrowCombatSnapshot snapshotArrowCombat(Projectile projectile) {
+        PersistentDataContainer data = projectile.getPersistentDataContainer();
+        return new ArrowCombatSnapshot(
+                data.get(ELITE_DAMAGE, PersistentDataType.DOUBLE),
+                data.get(ARROW_WEAPON_LEVEL, PersistentDataType.DOUBLE),
+                data.get(ARROW_WEAPON_MATERIAL, PersistentDataType.STRING),
+                data.get(ARROW_SKILL_TYPE, PersistentDataType.STRING),
+                data.get(ARROW_SKILL_LEVEL, PersistentDataType.INTEGER),
+                data.get(ARROW_CRITICAL, PersistentDataType.BYTE),
+                data.get(ARROW_LOUD_STRIKES, PersistentDataType.DOUBLE),
+                projectile instanceof org.bukkit.entity.AbstractArrow arrow ? arrow.getDamage() : null);
+    }
+
+    public record ArrowCombatSnapshot(Double eliteDamage, Double weaponLevel, String weaponMaterial,
+                                      String skillType, Integer skillLevel, Byte critical, Double loudStrikes,
+                                      Double nativeDamage) {
+        public void applyToSecondary(Projectile projectile, double damageMultiplier) {
+            clearArrowCombatData(projectile);
+            PersistentDataContainer data = projectile.getPersistentDataContainer();
+            if (eliteDamage != null) data.set(ELITE_DAMAGE, PersistentDataType.DOUBLE, eliteDamage);
+            if (weaponLevel != null) data.set(ARROW_WEAPON_LEVEL, PersistentDataType.DOUBLE, weaponLevel);
+            if (weaponMaterial != null) data.set(ARROW_WEAPON_MATERIAL, PersistentDataType.STRING, weaponMaterial);
+            if (skillType != null) data.set(ARROW_SKILL_TYPE, PersistentDataType.STRING, skillType);
+            if (skillLevel != null) data.set(ARROW_SKILL_LEVEL, PersistentDataType.INTEGER, skillLevel);
+            if (critical != null) data.set(ARROW_CRITICAL, PersistentDataType.BYTE, critical);
+            if (loudStrikes != null) data.set(ARROW_LOUD_STRIKES, PersistentDataType.DOUBLE, loudStrikes);
+            if (nativeDamage != null && projectile instanceof org.bukkit.entity.AbstractArrow arrow)
+                arrow.setDamage(nativeDamage);
+            data.set(ARROW_SECONDARY, PersistentDataType.BYTE, (byte) 1);
+            setArrowDamageMultiplier(projectile, damageMultiplier);
+            setArrowLaunchVelocity(projectile, projectile.getVelocity().length());
+        }
+    }
+
     public static void setArrowWeaponMaterial(Projectile projectile, ItemStack weapon) {
         if (weapon == null || weapon.getType().isAir()) projectile.getPersistentDataContainer().remove(ARROW_WEAPON_MATERIAL);
         else projectile.getPersistentDataContainer().set(ARROW_WEAPON_MATERIAL, PersistentDataType.STRING, weapon.getType().name());
@@ -382,6 +431,11 @@ public class ItemTagger {
         data.remove(ARROW_SKILL_LEVEL);
         data.remove(ARROW_DAMAGE_MULTIPLIER);
         data.remove(ARROW_LAUNCH_VELOCITY);
+        data.remove(ARROW_WEAPON_MATERIAL);
+        data.remove(ARROW_CRITICAL);
+        data.remove(ARROW_LOUD_STRIKES);
+        data.remove(ARROW_SECONDARY);
+        data.remove(ARROW_DRAW_MILLIS);
     }
 
     public static double getEliteDefenseAttribute(@Nullable ItemStack itemStack) {

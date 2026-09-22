@@ -32,6 +32,7 @@ public class QuickReloadSkill extends SkillBonus {
     private static final int BUFF_DURATION_TICKS = 60; // 3 seconds
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, BuffExpiry> expiries = new ConcurrentHashMap<>();
 
     public QuickReloadSkill() {
         super(SkillType.CROSSBOWS, 10, "Quick Reload",
@@ -49,6 +50,7 @@ public class QuickReloadSkill extends SkillBonus {
     }
 
     public void applyHaste(Player player) {
+        if (!isActive(player)) return;
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.CROSSBOWS);
         double speedBonus = getSpeedBonus(skillLevel);
 
@@ -56,21 +58,17 @@ public class QuickReloadSkill extends SkillBonus {
         if (attr == null) return;
 
         NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
-        removeModifierByKey(attr, key);
-        attr.addModifier(new AttributeModifier(key, speedBonus, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
-
-        // Remove the modifier after the buff duration
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (player.isOnline()) {
-                    AttributeInstance a = player.getAttribute(Attribute.MOVEMENT_SPEED);
-                    if (a != null) {
-                        removeModifierByKey(a, key);
-                    }
-                }
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, BUFF_DURATION_TICKS);
+        AttributeModifier existing = attr.getModifiers().stream()
+                .filter(modifier -> modifier.getKey().equals(key)).findFirst().orElse(null);
+        if (existing == null || existing.getAmount() != speedBonus) {
+            if (existing != null) attr.removeModifier(existing);
+            attr.addModifier(new AttributeModifier(key, speedBonus, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
+        }
+        BuffExpiry previous = expiries.remove(player.getUniqueId());
+        if (previous != null) previous.cancel();
+        BuffExpiry expiry = new BuffExpiry(player, key);
+        expiry.runTaskLater(MetadataHandler.PLUGIN, BUFF_DURATION_TICKS);
+        expiries.put(player.getUniqueId(), expiry);
     }
 
     private double getSpeedBonus(int skillLevel) {
@@ -81,11 +79,19 @@ public class QuickReloadSkill extends SkillBonus {
     @Override
     public void applyBonus(Player player, int skillLevel) { activePlayers.add(player.getUniqueId()); }
     @Override
-    public void removeBonus(Player player) { activePlayers.remove(player.getUniqueId()); }
+    public void removeBonus(Player player) {
+        activePlayers.remove(player.getUniqueId());
+        BuffExpiry expiry = expiries.get(player.getUniqueId());
+        if (expiry != null && expiry.player == player) {
+            expiries.remove(player.getUniqueId(), expiry);
+            expiry.cancel();
+            expiry.removeModifier();
+        }
+    }
     @Override
     public void onActivate(Player player) { activePlayers.add(player.getUniqueId()); }
     @Override
-    public void onDeactivate(Player player) { activePlayers.remove(player.getUniqueId()); }
+    public void onDeactivate(Player player) { removeBonus(player); }
     @Override
     public boolean isActive(Player player) { return activePlayers.contains(player.getUniqueId()); }
 
@@ -108,5 +114,32 @@ public class QuickReloadSkill extends SkillBonus {
     @Override
     public boolean affectsDamage() { return false; }
     @Override
-    public void shutdown() { activePlayers.clear(); }
+    public void shutdown() {
+        for (BuffExpiry expiry : expiries.values()) {
+            expiry.cancel();
+            expiry.removeModifier();
+        }
+        expiries.clear();
+        activePlayers.clear();
+    }
+
+    private static final class BuffExpiry extends BukkitRunnable {
+        private final Player player;
+        private final NamespacedKey key;
+
+        private BuffExpiry(Player player, NamespacedKey key) {
+            this.player = player;
+            this.key = key;
+        }
+
+        @Override
+        public void run() {
+            if (expiries.remove(player.getUniqueId(), this)) removeModifier();
+        }
+
+        private void removeModifier() {
+            AttributeInstance attribute = player.getAttribute(Attribute.MOVEMENT_SPEED);
+            if (attribute != null) removeModifierByKey(attribute, key);
+        }
+    }
 }

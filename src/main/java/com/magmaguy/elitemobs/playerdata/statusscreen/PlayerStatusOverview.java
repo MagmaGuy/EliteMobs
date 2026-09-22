@@ -19,16 +19,15 @@ final class PlayerStatusOverview {
         List<String> configuredLines = PlayerStatusMenuConfig.getLandingOverviewLines();
         if (configuredLines == null || configuredLines.isEmpty()) return List.of();
 
-        String money = EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId()));
-        String combatLevel = String.valueOf(CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
-        List<?> quests = PlayerData.getQuests(player.getUniqueId());
-        String activeQuests = String.valueOf(quests == null ? 0 : quests.size());
-        String score = String.valueOf(PlayerData.getScore(player.getUniqueId()));
+        return lines(configuredLines, capture(player));
+    }
 
+    private static List<String> lines(List<String> configuredLines, Values values) {
+        if (configuredLines == null || configuredLines.isEmpty()) return List.of();
         List<String> parsedLines = new ArrayList<>(configuredLines.size());
         for (String configuredLine : configuredLines) {
             if (configuredLine == null) continue;
-            parsedLines.add(resolve(configuredLine, money, combatLevel, activeQuests, score));
+            parsedLines.add(values.resolve(configuredLine));
         }
         return parsedLines;
     }
@@ -44,13 +43,14 @@ final class PlayerStatusOverview {
         ItemMeta meta = header.getItemMeta();
         if (meta == null) return header;
 
-        List<String> overviewLines = lines(player);
-        if (meta.hasDisplayName()) meta.setDisplayName(resolveForPlayer(meta.getDisplayName(), player));
+        Values values = capture(player);
+        List<String> overviewLines = lines(PlayerStatusMenuConfig.getLandingOverviewLines(), values);
+        if (meta.hasDisplayName()) meta.setDisplayName(values.resolve(meta.getDisplayName()));
 
         List<String> lore = meta.hasLore() && meta.getLore() != null
                 ? new ArrayList<>(meta.getLore())
                 : new ArrayList<>();
-        lore.replaceAll(line -> resolveForPlayer(line, player));
+        lore.replaceAll(values::resolve);
         if (!lore.isEmpty() && !overviewLines.isEmpty()) lore.add("");
         lore.addAll(overviewLines);
         meta.setLore(lore);
@@ -58,13 +58,18 @@ final class PlayerStatusOverview {
         return header;
     }
 
-    private static String resolveForPlayer(String line, Player player) {
+    private static Values capture(Player player) {
         String money = EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId()));
         String combatLevel = String.valueOf(CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
         List<?> quests = PlayerData.getQuests(player.getUniqueId());
         String activeQuests = String.valueOf(quests == null ? 0 : quests.size());
         String score = String.valueOf(PlayerData.getScore(player.getUniqueId()));
-        return resolve(line, money, combatLevel, activeQuests, score);
+
+        return new Values(money, combatLevel, activeQuests, score);
+    }
+
+    private record Values(String money, String combatLevel, String activeQuests, String score) {
+        String resolve(String line) { return PlayerStatusOverview.resolve(line, money, combatLevel, activeQuests, score); }
     }
 
     private static String resolve(String line, String money, String combatLevel, String activeQuests, String score) {

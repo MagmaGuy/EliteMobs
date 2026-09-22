@@ -53,80 +53,28 @@ public class PlayerStatusScreen implements Listener {
     }
 
     private ItemStack generateBook(Player requestingPlayer, Player targetPlayer) {
-        TextComponent[] pages = new TextComponent[100];
-        int pageCounter = 1;
-        pageCounter++;
-        int statsPage = -1;
-        int gearPage = -1;
-        int teleportsPage = -1;
-        int commandsPage = -1;
-        int questsPage = -1;
-        int bossTrackingPage = -1;
-        int skillsPage = -1;
-        if (PlayerStatusMenuConfig.isDoStatsPage()) {
-            statsPage = pageCounter;
-            pages[pageCounter] = StatsPage.statsPage(targetPlayer);
-            pageCounter++;
+        java.util.List<TextComponent> pages = new java.util.ArrayList<>();
+        pages.add(new TextComponent()); // Cover is filled after physical page indices are known.
+        int statsPage = PlayerStatusMenuConfig.isDoStatsPage() ? appendPages(pages, StatsPage.statsPage(targetPlayer)) : -1;
+        int gearPage = PlayerStatusMenuConfig.isDoGearPage() ? appendPages(pages, GearPage.gearPage(targetPlayer)) : -1;
+        int teleportsPage = PlayerStatusMenuConfig.isDoTeleportsPage() ? appendPages(pages, TeleportsPage.teleportsPage()) : -1;
+        int commandsPage = PlayerStatusMenuConfig.isDoCommandsPage() ? appendPages(pages, CommandsPage.commandsPage()) : -1;
+        int questsPage = PlayerStatusMenuConfig.isDoQuestTrackingPage() ? appendPages(pages, QuestsPage.questsPage(targetPlayer)) : -1;
+        int bossTrackingPage = PlayerStatusMenuConfig.isDoBossTrackingPage() ? appendPages(pages, BossTrackingPage.bossTrackingPage(targetPlayer)) : -1;
+        int skillsPage = SkillsConfig.isSkillSystemEnabled() ? appendPages(pages, SkillsPage.skillsPage(targetPlayer)) : -1;
+        if (pages.size() > 100) {
+            requestingPlayer.sendMessage("[EliteMobs] This status book exceeds Minecraft's 100-page limit. Use the inventory status menu.");
+            if (requestingPlayer == targetPlayer) generateChestMenu(requestingPlayer, targetPlayer);
+            return null;
         }
-        if (PlayerStatusMenuConfig.isDoGearPage()) {
-            gearPage = pageCounter;
-            pages[pageCounter] = GearPage.gearPage(targetPlayer);
-            pageCounter++;
-        }
-        if (PlayerStatusMenuConfig.isDoTeleportsPage()) {
-            teleportsPage = pageCounter;
-            for (TextComponent textComponent : TeleportsPage.teleportsPage()) {
-                pages[pageCounter] = textComponent;
-                pageCounter++;
-            }
-        }
-        if (PlayerStatusMenuConfig.isDoCommandsPage()) {
-            commandsPage = pageCounter;
-            pages[pageCounter] = CommandsPage.commandsPage();
-            pageCounter++;
-        }
-        if (PlayerStatusMenuConfig.isDoQuestTrackingPage()) {
-            questsPage = pageCounter;
-            for (TextComponent textComponent : QuestsPage.questsPage(targetPlayer)) {
-                pages[pageCounter] = textComponent;
-                pageCounter++;
-            }
-        }
-
-        if (PlayerStatusMenuConfig.isDoBossTrackingPage()) {
-            bossTrackingPage = pageCounter;
-            for (TextComponent textComponent : BossTrackingPage.bossTrackingPage(targetPlayer)) {
-                pages[pageCounter] = textComponent;
-                pageCounter++;
-            }
-        }
-
-        if (SkillsConfig.isSkillSystemEnabled()) {
-            skillsPage = pageCounter;
-            pages[pageCounter] = SkillsPage.skillsPage(targetPlayer);
-            pageCounter++;
-        }
-
-        pages[0] = CoverPage.coverPage(requestingPlayer, statsPage, gearPage, teleportsPage,
-                commandsPage, questsPage, bossTrackingPage, skillsPage);
-
-        int counter = 0;
-        for (TextComponent textComponent : pages) {
-            if (textComponent != null)
-                counter++;
-        }
-
-        TextComponent[] finalPages = new TextComponent[counter];
-        int secondCounter = 0;
-        for (TextComponent textComponent : pages) {
-            if (textComponent != null) {
-                finalPages[secondCounter] = textComponent;
-                secondCounter++;
-            }
-        }
-
-        return BookMaker.generateBook(requestingPlayer, finalPages);
+        pages.set(0, CoverPage.coverPage(requestingPlayer, statsPage, gearPage, teleportsPage,
+                commandsPage, questsPage, bossTrackingPage, skillsPage));
+        return BookMaker.generateBook(requestingPlayer, pages.toArray(TextComponent[]::new));
     }
 
-
+    private static int appendPages(java.util.List<TextComponent> pages, TextComponent... section) {
+        int firstPage = pages.size() + 1;
+        for (TextComponent page : section) if (page != null) pages.add(page);
+        return pages.size() < firstPage ? -1 : firstPage;
+    }
 }

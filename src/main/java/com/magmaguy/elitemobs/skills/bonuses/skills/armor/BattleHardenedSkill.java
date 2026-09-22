@@ -48,7 +48,7 @@ public class BattleHardenedSkill extends SkillBonus {
 
     @Override
     public void removeBonus(Player player) {
-        // No persistent bonus to remove
+        onDeactivate(player);
     }
 
     @Override

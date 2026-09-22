@@ -69,7 +69,7 @@ public class TeleportsPage {
             return textComponent;
         } else {
             double elementsPerPage = 5D;
-            TextComponent[] textComponent = new TextComponent[(int) Math.floor(counter + 2 / elementsPerPage) + 1];
+            TextComponent[] textComponent = new TextComponent[(int) Math.ceil((counter + 2) / elementsPerPage)];
             int internalCounter = 2;
             textComponent[0] = configTextComponent;
             for (TextComponent text : textComponents) {

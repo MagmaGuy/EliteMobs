@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
+import com.magmaguy.elitemobs.skills.bonuses.skills.hoes.DeathsEmbraceSkill;
+
 import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
@@ -406,6 +408,10 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
      * This prevents weapon-switch bugs where the player switches weapons between firing and impact.
      */
     public void applySkillBonuses() {
+        // Child arrows keep formula damage and source identity, but cannot proc another skill.
+        if (entityDamageByEntityEvent != null
+                && entityDamageByEntityEvent.getDamager() instanceof Projectile projectile
+                && ItemTagger.isSecondaryArrow(projectile)) return;
         if (player == null || player.hasMetadata("NPC")) return;
         if (SkillsConfig.isWorldExcludedFromSkills(player)) return;
         if (!ElitePlayerInventory.playerInventories.containsKey(player.getUniqueId())) return;
@@ -442,6 +448,14 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             SkillBonus skill = SkillBonusRegistry.getSkillById(skillId);
             if (skill == null || !skill.isEnabled()) continue;
             if (!skill.meetsLevelRequirement(skillLevel)) continue;
+
+            if (skill instanceof DeathsEmbraceSkill deathsEmbrace) {
+                double passiveMultiplier = 1D + deathsEmbrace.getPassiveDamageBonus(skillLevel);
+                damageMultiplier = mergeOffensiveMultiplier(damageMultiplier, passiveMultiplier);
+                if (debug) debugLog.append(skill.getBonusName()).append("=")
+                        .append(String.format("%.2fx", passiveMultiplier)).append(" ");
+                continue;
+            }
 
             // Skip skills that don't affect damage - they'll be processed in second pass
             // Exception: Avatar of Judgment applies damage boost via buff check even though

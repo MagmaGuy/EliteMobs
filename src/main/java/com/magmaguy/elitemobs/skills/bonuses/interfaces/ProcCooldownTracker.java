@@ -43,6 +43,8 @@ public final class ProcCooldownTracker {
     /**
      * Clears all tracked proc state for a player (e.g. on logout).
      */
+    public static void clearAll() { LAST_PROC_MILLIS.clear(); }
+
     public static void clear(Player player) {
         LAST_PROC_MILLIS.remove(player.getUniqueId());
     }

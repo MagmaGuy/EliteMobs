@@ -40,14 +40,10 @@ public class DuelistSkill extends SkillBonus implements ConditionalSkill {
         EliteEntity target = event.getEliteMobEntity();
         if (target == null || target.getLivingEntity() == null) return false;
 
-        // Count elite mobs within detection radius
-        long nearbyElites = target.getLivingEntity().getNearbyEntities(DETECTION_RADIUS, DETECTION_RADIUS, DETECTION_RADIUS)
+        return target.getLivingEntity().getNearbyEntities(DETECTION_RADIUS, DETECTION_RADIUS, DETECTION_RADIUS)
                 .stream()
-                .filter(e -> com.magmaguy.elitemobs.entitytracker.EntityTracker.isEliteMob(e))
                 .filter(e -> !e.getUniqueId().equals(target.getLivingEntity().getUniqueId()))
-                .count();
-
-        return nearbyElites == 0;
+                .noneMatch(com.magmaguy.elitemobs.entitytracker.EntityTracker::isEliteMob);
     }
 
     @Override

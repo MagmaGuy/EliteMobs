@@ -71,7 +71,7 @@ public class BossTrackingPage {
             textComponent = new TextComponent[1];
             textComponent[0] = configTextComponent;
         } else {
-            textComponent = new TextComponent[(int) Math.floor(counter / 6D) + 1];
+            textComponent = new TextComponent[(int) Math.ceil(counter / 6D)];
             int internalCounter = 0;
             textComponent[0] = configTextComponent;
             for (TextComponent text : textComponents) {

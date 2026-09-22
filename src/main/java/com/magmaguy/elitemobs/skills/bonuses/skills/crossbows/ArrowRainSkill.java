@@ -1,22 +1,17 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.crossbows;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
-import com.magmaguy.elitemobs.api.utils.EliteItemManager;
-import com.magmaguy.elitemobs.combatsystem.WeaponOffenseCalculator;
 import com.magmaguy.elitemobs.items.ItemTagger;
-import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.skills.SkillType;
-import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
 import com.magmaguy.elitemobs.testing.CombatSimulator;
 import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -38,8 +33,8 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
     private static final double BASE_ARROW_DAMAGE = 0.12; // 12% of original, per arrow
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
-    private static final Set<UUID> onCooldown = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, Long> cooldownEndTimes = new ConcurrentHashMap<>();
+    private static final Map<UUID, BukkitRunnable> volleys = new ConcurrentHashMap<>();
 
     public ArrowRainSkill() {
         super(SkillType.CROSSBOWS, 75, "Arrow Rain",
@@ -56,87 +51,86 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public boolean isOnCooldown(Player player) {
-        return onCooldown.contains(player.getUniqueId());
+        return getRemainingCooldown(player) > 0L;
     }
 
     @Override
     public void startCooldown(Player player, int skillLevel) {
         UUID uuid = player.getUniqueId();
-        long cooldownMs = getCooldownSeconds(skillLevel) * 1000L;
-        onCooldown.add(uuid);
-        cooldownEndTimes.put(uuid, System.currentTimeMillis() + cooldownMs);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                endCooldown(player);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, getCooldownSeconds(skillLevel) * 20L);
+        cooldownEndTimes.put(uuid, GameClock.getCurrentTick() + getCooldownSeconds(skillLevel) * 20L);
     }
 
     @Override
     public long getRemainingCooldown(Player player) {
         Long endTime = cooldownEndTimes.get(player.getUniqueId());
         if (endTime == null) return 0;
-        long remaining = endTime - System.currentTimeMillis();
-        return remaining > 0 ? remaining / 1000 : 0;
+        long remaining = endTime - GameClock.getCurrentTick();
+        if (remaining <= 0L) cooldownEndTimes.remove(player.getUniqueId(), endTime);
+        return Math.max(0L, (remaining + 19L) / 20L);
     }
 
     @Override
     public void endCooldown(Player player) {
-        onCooldown.remove(player.getUniqueId());
         cooldownEndTimes.remove(player.getUniqueId());
     }
 
     @Override
     public void onActivate(Player player, Object event) {
         if (CombatSimulator.isTestingActive()) return;
+        if (!isActive(player) || isOnCooldown(player)) return;
         if (!(event instanceof EliteMobDamagedByPlayerEvent damageEvent)) return;
         if (damageEvent.getEliteMobEntity().getLivingEntity() == null) return;
+        if (damageEvent.getEntityDamageByEntityEvent() == null
+                || !(damageEvent.getEntityDamageByEntityEvent().getDamager() instanceof org.bukkit.entity.Projectile origin)) return;
+        if (ItemTagger.isSecondaryArrow(origin)) return;
 
-        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.CROSSBOWS);
+        int skillLevel = damageEvent.getRangedSkillLevel();
         double damageMultiplier = getArrowDamageMultiplier(skillLevel);
         Location targetLoc = damageEvent.getEliteMobEntity().getLivingEntity().getLocation().add(0, 10, 0);
 
-        // Capture combat data NOW (at activation time) since the BukkitRunnable fires later
-        // and the player may have switched weapons by then.
-        // These arrows are spawned via world.spawn() and do NOT fire ProjectileLaunchEvent,
-        // so they need ALL PDC combat data set manually.
-        ItemStack weapon = player.getInventory().getItemInMainHand();
-        double weaponLevel = WeaponOffenseCalculator.getEffectiveWeaponLevel(weapon);
-        long crossbowXP = PlayerData.getSkillXP(player.getUniqueId(), SkillType.CROSSBOWS);
-        int crossbowSkillLevel = Math.max(1, SkillXPCalculator.levelFromTotalXP(crossbowXP));
-
-        new BukkitRunnable() {
+        ItemTagger.ArrowCombatSnapshot attack = ItemTagger.snapshotArrowCombat(origin);
+        stopVolley(player.getUniqueId());
+        startCooldown(player, skillLevel);
+        BukkitRunnable volley = new BukkitRunnable() {
             int count = 0;
             @Override
             public void run() {
-                if (count >= 5) {
+                if (volleys.get(player.getUniqueId()) != this || count >= 5
+                        || !player.isOnline() || !isActive(player)
+                        || !player.getWorld().equals(targetLoc.getWorld())) {
+                    volleys.remove(player.getUniqueId(), this);
                     cancel();
                     return;
                 }
+                try {
                 for (int i = 0; i < 3; i++) {
                     Location spawnLoc = targetLoc.clone().add(
                             ThreadLocalRandom.current().nextDouble(-2, 2),
                             0,
                             ThreadLocalRandom.current().nextDouble(-2, 2)
                     );
-                    Arrow arrow = player.getWorld().spawn(spawnLoc, Arrow.class);
+                    Arrow arrow = targetLoc.getWorld().spawn(spawnLoc, Arrow.class);
                     arrow.setShooter(player);
                     arrow.setVelocity(new Vector(0, -2, 0));
                     arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
 
-                    // Stamp all combat PDC data (no ProjectileLaunchEvent for world.spawn arrows)
-                    ItemTagger.setArrowWeaponLevel(arrow, weaponLevel);
-                    ItemTagger.setArrowSkillType(arrow, SkillType.CROSSBOWS.name());
-                    ItemTagger.setArrowSkillLevel(arrow, crossbowSkillLevel);
-                    ItemTagger.setArrowDamageMultiplier(arrow, damageMultiplier);
-                    ItemTagger.setArrowLaunchVelocity(arrow, arrow.getVelocity().length());
-                    EliteItemManager.tagArrow(arrow);
+                    attack.applyToSecondary(arrow, damageMultiplier);
                 }
                 count++;
+                } catch (RuntimeException | Error failure) {
+                    volleys.remove(player.getUniqueId(), this);
+                    cancel();
+                    throw failure;
+                }
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
+        };
+        try {
+            volley.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
+            volleys.put(player.getUniqueId(), volley);
+        } catch (RuntimeException failure) {
+            endCooldown(player);
+            throw failure;
+        }
     }
 
     /**
@@ -153,14 +147,14 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
     @Override
     public void removeBonus(Player player) {
         activePlayers.remove(player.getUniqueId());
+        stopVolley(player.getUniqueId());
         endCooldown(player);
     }
     @Override
     public void onActivate(Player player) { activePlayers.add(player.getUniqueId()); }
     @Override
     public void onDeactivate(Player player) {
-        activePlayers.remove(player.getUniqueId());
-        endCooldown(player);
+        removeBonus(player);
     }
     @Override
     public boolean isActive(Player player) { return activePlayers.contains(player.getUniqueId()); }
@@ -183,7 +177,13 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
     @Override
     public void shutdown() {
         activePlayers.clear();
-        onCooldown.clear();
+        volleys.values().forEach(BukkitRunnable::cancel);
+        volleys.clear();
         cooldownEndTimes.clear();
+    }
+
+    private static void stopVolley(UUID playerId) {
+        BukkitRunnable volley = volleys.remove(playerId);
+        if (volley != null) volley.cancel();
     }
 }

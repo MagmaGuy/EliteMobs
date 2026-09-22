@@ -44,10 +44,8 @@ public class PackHunterSkill extends SkillBonus implements ConditionalSkill {
     @Override
     public boolean conditionMet(Player player, Object context) {
         if (testOverrideNearbyPlayers) return true;
-        long nearbyPlayers = player.getNearbyEntities(ALLY_RANGE, ALLY_RANGE, ALLY_RANGE).stream()
-                .filter(e -> e instanceof Player && !e.equals(player))
-                .count();
-        return nearbyPlayers >= 1;
+        return player.getNearbyEntities(ALLY_RANGE, ALLY_RANGE, ALLY_RANGE).stream()
+                .anyMatch(e -> e instanceof Player && !e.equals(player));
     }
 
     @Override

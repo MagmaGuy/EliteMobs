@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
-import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcSkill;
 import com.magmaguy.elitemobs.testing.CombatSimulator;
@@ -46,13 +45,13 @@ public class MultishotSkill extends SkillBonus implements ProcSkill {
     public void onProc(Player player, Object context) {
         if (CombatSimulator.isTestingActive()) return;
         if (!(context instanceof EliteMobDamagedByPlayerEvent event)) return;
+        if (event.getEntityDamageByEntityEvent() == null
+                || !(event.getEntityDamageByEntityEvent().getDamager() instanceof org.bukkit.entity.Projectile origin)) return;
+        if (ItemTagger.isSecondaryArrow(origin)) return;
+        ItemTagger.ArrowCombatSnapshot attack = ItemTagger.snapshotArrowCombat(origin);
+        int skillLevel = event.getRangedSkillLevel();
 
-        int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.BOWS);
-
-        // Spawn additional arrows
-        // launchProjectile triggers ProjectileLaunchEvent synchronously, so the handler
-        // in EliteMobDamagedByPlayerEvent will tag weapon level, skill type, and skill level.
-        // We add a damage multiplier PDC tag so the formula scales the damage down to 50%.
+        // Aim uses the player's current direction; damage identity belongs to the original shot.
         Vector direction = player.getLocation().getDirection();
         double spread = 0.15;
 
@@ -64,7 +63,7 @@ public class MultishotSkill extends SkillBonus implements ProcSkill {
                     (ThreadLocalRandom.current().nextDouble() - 0.5) * spread
             );
             Arrow arrow = player.launchProjectile(Arrow.class, direction.clone().add(offset).normalize().multiply(2));
-            ItemTagger.setArrowDamageMultiplier(arrow, 0.5);
+            attack.applyToSecondary(arrow, 0.5);
             arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
         }
     }

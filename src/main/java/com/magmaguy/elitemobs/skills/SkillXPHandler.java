@@ -66,9 +66,10 @@ public class SkillXPHandler implements Listener {
         Location deathLocation = eliteEntity.getLocation();
 
         // Calculate total damage for proportional XP distribution
-        double totalDamage = eliteEntity.getDamagers().values().stream()
-                .mapToDouble(Double::doubleValue)
-                .sum();
+        Map<java.util.UUID, Double> damageByPlayer = new java.util.HashMap<>();
+        for (var contribution : eliteEntity.getDamagers().entrySet())
+            damageByPlayer.merge(contribution.getKey().getUniqueId(), contribution.getValue(), Double::sum);
+        double totalDamage = damageByPlayer.values().stream().mapToDouble(Double::doubleValue).sum();
 
         if (totalDamage <= 0) return;
 
@@ -96,10 +97,7 @@ public class SkillXPHandler implements Listener {
 
         // Award XP to each meaningful participant.
         for (Player player : meaningfulParticipants) {
-            double damageDealt = eliteEntity.getDamagers().entrySet().stream()
-                    .filter(entry -> entry.getKey().getUniqueId().equals(player.getUniqueId()))
-                    .mapToDouble(Map.Entry::getValue)
-                    .sum();
+            double damageDealt = damageByPlayer.getOrDefault(player.getUniqueId(), 0D);
 
             // Skip NPCs and players not in memory
             if (player.hasMetadata("NPC")) continue;

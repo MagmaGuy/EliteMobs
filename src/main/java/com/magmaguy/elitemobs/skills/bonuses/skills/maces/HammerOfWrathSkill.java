@@ -80,35 +80,38 @@ public class HammerOfWrathSkill extends SkillBonus implements CooldownSkill {
      * Returns the damage multiplier if applicable, 1.0 if not.
      */
     public double checkAndApply(Player player, EliteMobDamagedByPlayerEvent event) {
-        if (!isActive(player) || isOnCooldown(player)) return 1.0;
+        return activateIfEligible(player, event)
+                ? getDamageMultiplier(SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.MACES)) : 1D;
+    }
+
+    private boolean activateIfEligible(Player player, EliteMobDamagedByPlayerEvent event) {
+        if (!isActive(player) || isOnCooldown(player)) return false;
 
         EliteEntity eliteEntity = event.getEliteMobEntity();
-        if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return 1.0;
+        if (eliteEntity == null || eliteEntity.getLivingEntity() == null) return false;
 
         LivingEntity target = eliteEntity.getLivingEntity();
 
         // Check if target is below health threshold
         double healthPercent = target.getHealth() / target.getMaxHealth();
-        if (healthPercent > HEALTH_THRESHOLD) return 1.0;
+        if (healthPercent > HEALTH_THRESHOLD) return false;
 
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.MACES);
-        double multiplier = getDamageMultiplier(skillLevel);
 
         // Activate the skill
         activateHammer(player, target, skillLevel);
 
-        return multiplier;
+        return true;
     }
 
     /**
      * Reports whether the health gate actually passed, so the caller only consumes the cooldown
-     * and the damage bonus on a real activation. Returning 1.0 from checkAndApply means the
-     * target was above the health threshold and the hammer did not fire.
+     * and the damage bonus on a real activation, independently of its configured damage amount.
      */
     @Override
     public boolean tryActivate(Player player, Object event) {
         if (!(event instanceof EliteMobDamagedByPlayerEvent damageEvent)) return false;
-        return checkAndApply(player, damageEvent) > 1.0;
+        return activateIfEligible(player, damageEvent);
     }
 
     private void activateHammer(Player player, LivingEntity target, int skillLevel) {

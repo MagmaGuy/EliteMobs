@@ -42,26 +42,21 @@ public class ReapWhatYouSowSkill extends SkillBonus implements ConditionalSkill 
         return scaled(BASE_BONUS, 0.01, skillLevel); // 50% base + 1% per level
     }
 
+    @Override
+    public double getConditionalBonus(Player player, int skillLevel) {
+        double healthPercent = Math.max(0D, Math.min(1D, player.getHealth() / player.getMaxHealth()));
+        if (healthPercent >= HEALTH_THRESHOLD) return 0D;
+        return getConditionalBonus(skillLevel) * (1D + (HEALTH_THRESHOLD - healthPercent) * 2D);
+    }
+
     /**
      * Calculates the scaled bonus based on player's current health.
      * Lower health = higher bonus.
      */
     public static double calculateRiskBonus(Player player, int skillLevel) {
-        double healthPercent = player.getHealth() / player.getMaxHealth();
-
-        if (healthPercent >= HEALTH_THRESHOLD) return 0.0;
-
-        // Get base bonus
         SkillBonus skill = com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry.getSkillById(SKILL_ID);
-        double baseBonus = 0.5;
-        if (skill instanceof ReapWhatYouSowSkill reapSkill) {
-            baseBonus = reapSkill.getConditionalBonus(skillLevel);
-        }
-
-        // Scale bonus: more bonus the lower the health
-        // At 50% HP: 0% extra, At 0% HP: full bonus * 2
-        double riskMultiplier = Math.min(3.0, 1 + (HEALTH_THRESHOLD - healthPercent) * 2);
-        return baseBonus * riskMultiplier;
+        return skill instanceof ReapWhatYouSowSkill reapSkill
+                ? reapSkill.getConditionalBonus(player, skillLevel) : 0D;
     }
 
     @Override

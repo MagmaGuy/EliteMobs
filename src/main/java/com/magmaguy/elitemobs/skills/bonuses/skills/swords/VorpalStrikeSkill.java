@@ -29,7 +29,7 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
     private static final double BASE_COOLDOWN = 8.0; // 8 seconds
     private static final double BASE_DAMAGE_MULTIPLIER = 1.45; // 45% bonus damage
 
-    private static final Set<UUID> playersOnCooldown = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, BukkitRunnable> cooldownTasks = new ConcurrentHashMap<>();
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
 
     public VorpalStrikeSkill() {
@@ -49,25 +49,27 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public boolean isOnCooldown(Player player) {
-        return playersOnCooldown.contains(player.getUniqueId());
+        return cooldownTasks.containsKey(player.getUniqueId());
     }
 
     @Override
     public void startCooldown(Player player, int skillLevel) {
         UUID uuid = player.getUniqueId();
-        playersOnCooldown.add(uuid);
+        endCooldown(player);
         long seconds = getCooldownSeconds(skillLevel);
 
-        new BukkitRunnable() {
+        BukkitRunnable expiry = new BukkitRunnable() {
             @Override
             public void run() {
-                playersOnCooldown.remove(uuid);
+                if (!cooldownTasks.remove(uuid, this)) return;
                 Player p = org.bukkit.Bukkit.getPlayer(uuid);
-                if (p != null && p.isOnline()) {
+                if (p == player && player.isOnline() && isActive(player)) {
                     p.sendMessage(DungeonsConfig.getVorpalStrikeReadyMessage());
                 }
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, seconds * 20L);
+        };
+        expiry.runTaskLater(MetadataHandler.PLUGIN, seconds * 20L);
+        cooldownTasks.put(uuid, expiry);
     }
 
     @Override
@@ -77,7 +79,8 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void endCooldown(Player player) {
-        playersOnCooldown.remove(player.getUniqueId());
+        BukkitRunnable task = cooldownTasks.remove(player.getUniqueId());
+        if (task != null) task.cancel();
     }
 
     @Override
@@ -142,7 +145,7 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
     public void removeBonus(Player player) {
         UUID uuid = player.getUniqueId();
         activePlayers.remove(uuid);
-        playersOnCooldown.remove(uuid);
+        endCooldown(player);
     }
 
     @Override
@@ -190,7 +193,8 @@ public class VorpalStrikeSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void shutdown() {
-        playersOnCooldown.clear();
+        cooldownTasks.values().forEach(BukkitRunnable::cancel);
+        cooldownTasks.clear();
         activePlayers.clear();
     }
 }

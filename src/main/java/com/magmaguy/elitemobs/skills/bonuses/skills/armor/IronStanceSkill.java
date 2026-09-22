@@ -57,12 +57,12 @@ public class IronStanceSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public void removeBonus(Player player) {
-        // No persistent bonus to remove
+        onDeactivate(player);
     }
 
     @Override
     public void onActivate(Player player) {
-        activePlayers.add(player.getUniqueId());
+        if (activePlayers.add(player.getUniqueId())) lastMoveTime.put(player.getUniqueId(), System.currentTimeMillis());
     }
 
     @Override
@@ -78,7 +78,7 @@ public class IronStanceSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public void applyBonus(Player player, int skillLevel) {
-        activePlayers.add(player.getUniqueId());
+        if (activePlayers.add(player.getUniqueId())) lastMoveTime.put(player.getUniqueId(), System.currentTimeMillis());
     }
 
     @Override
@@ -145,7 +145,7 @@ public class IronStanceSkill extends SkillBonus implements ConditionalSkill {
      * @param isMoving Whether the player is currently moving
      */
     public static void updatePlayerMovement(UUID uuid, boolean isMoving) {
-        if (isMoving) {
+        if (isMoving && activePlayers.contains(uuid)) {
             lastMoveTime.put(uuid, System.currentTimeMillis());
         }
     }

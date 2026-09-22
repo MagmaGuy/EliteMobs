@@ -63,7 +63,7 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
 
     private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
-    private static final Set<UUID> buffedPlayers = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, BukkitRunnable> buffTasks = new ConcurrentHashMap<>();
 
     public AvatarOfJudgmentSkill() {
         super(SkillType.MACES, 75, "Avatar of Judgment",
@@ -121,8 +121,7 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
 
         int skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.MACES);
 
-        // Add to buffed players
-        buffedPlayers.add(player.getUniqueId());
+        stopBuff(player.getUniqueId());
 
         // Apply visual buff effects
         player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, BUFF_DURATION_TICKS, 0));
@@ -135,13 +134,17 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
             player.getLocation().add(0, 1, 0), 100, 1, 1, 1, 0.3);
 
         // Particle aura while active
-        new BukkitRunnable() {
+        BukkitRunnable aura = new BukkitRunnable() {
             int ticksRemaining = BUFF_DURATION_TICKS;
 
             @Override
             public void run() {
-                if (ticksRemaining <= 0 || !player.isOnline() || !buffedPlayers.contains(player.getUniqueId())) {
-                    buffedPlayers.remove(player.getUniqueId());
+                if (buffTasks.get(player.getUniqueId()) != this) {
+                    cancel();
+                    return;
+                }
+                if (ticksRemaining <= 0 || !player.isOnline()) {
+                    buffTasks.remove(player.getUniqueId(), this);
                     if (player.isOnline()) {
                         ActionBarCompositor.show(player, ActionBarCompositor.Source.SKILL_FEEDBACK,
                                 DungeonsConfig.getAvatarFadesMessage());
@@ -162,9 +165,11 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
                     }
                 }
 
-                ticksRemaining--;
+                ticksRemaining -= 5;
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        };
+        aura.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
+        buffTasks.put(player.getUniqueId(), aura);
 
         startCooldown(player, skillLevel);
         incrementProcCount(player);
@@ -174,7 +179,7 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
      * Checks if the player currently has the Avatar buff active.
      */
     public static boolean hasAvatarBuff(Player player) {
-        return buffedPlayers.contains(player.getUniqueId());
+        return buffTasks.containsKey(player.getUniqueId());
     }
 
     /**
@@ -197,7 +202,7 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
     @Override
     public void removeBonus(Player player) {
         activePlayers.remove(player.getUniqueId());
-        buffedPlayers.remove(player.getUniqueId());
+        stopBuff(player.getUniqueId());
         cooldowns.remove(player.getUniqueId());
     }
 
@@ -245,7 +250,13 @@ public class AvatarOfJudgmentSkill extends SkillBonus implements CooldownSkill {
     @Override
     public void shutdown() {
         activePlayers.clear();
-        buffedPlayers.clear();
+        buffTasks.values().forEach(BukkitRunnable::cancel);
+        buffTasks.clear();
         cooldowns.clear();
+    }
+
+    private static void stopBuff(UUID playerId) {
+        BukkitRunnable task = buffTasks.remove(playerId);
+        if (task != null) task.cancel();
     }
 }

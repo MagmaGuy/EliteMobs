@@ -4,6 +4,8 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
+import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -55,11 +57,17 @@ public class PoiseSkill extends SkillBonus {
      * Applies the knockback resistance modifier to the player.
      */
     public static void applyKnockbackResistance(Player player, int skillLevel) {
+        if (!hasActiveSkill(player.getUniqueId())) return;
         AttributeInstance attr = player.getAttribute(Attribute.KNOCKBACK_RESISTANCE);
         if (attr == null) return;
         NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MODIFIER_KEY_STRING);
-        removeModifierByKey(attr, key);
         double reduction = getKnockbackReduction(skillLevel);
+        for (AttributeModifier modifier : attr.getModifiers()) {
+            if (!modifier.getKey().equals(key)) continue;
+            if (modifier.getAmount() == reduction) return;
+            attr.removeModifier(modifier);
+            break;
+        }
         attr.addModifier(new AttributeModifier(key, reduction, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.ANY));
     }
 
@@ -84,6 +92,9 @@ public class PoiseSkill extends SkillBonus {
     @Override
     public void applyBonus(Player player, int skillLevel) {
         activePlayers.add(player.getUniqueId());
+        if (WeaponIdentityResolver.progressionSkill(player.getInventory().getItemInMainHand()) == SkillType.SWORDS)
+            applyKnockbackResistance(player, skillLevel);
+        else removeKnockbackResistance(player);
     }
 
     @Override
@@ -94,7 +105,7 @@ public class PoiseSkill extends SkillBonus {
 
     @Override
     public void onActivate(Player player) {
-        activePlayers.add(player.getUniqueId());
+        applyBonus(player, SkillBonusRegistry.getPlayerSkillLevel(player, SkillType.SWORDS));
     }
 
     @Override

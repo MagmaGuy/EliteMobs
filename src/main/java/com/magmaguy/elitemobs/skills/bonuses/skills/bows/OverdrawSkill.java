@@ -1,6 +1,10 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.bows;
 
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
+import com.magmaguy.elitemobs.items.ItemTagger;
+import com.magmaguy.elitemobs.testing.CombatSimulator;
+import org.bukkit.entity.Projectile;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
@@ -27,7 +31,6 @@ public class OverdrawSkill extends SkillBonus implements ConditionalSkill {
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, Long> drawStartTimes = new ConcurrentHashMap<>();
-    private static final Map<UUID, Long> snapshotDrawDurations = new ConcurrentHashMap<>();
 
     public OverdrawSkill() {
         super(SkillType.BOWS, 25, "Overdraw",
@@ -40,39 +43,35 @@ public class OverdrawSkill extends SkillBonus implements ConditionalSkill {
     }
 
     public static void startDrawing(UUID uuid) {
-        drawStartTimes.put(uuid, System.currentTimeMillis());
-        snapshotDrawDurations.remove(uuid);
+        drawStartTimes.put(uuid, System.nanoTime());
     }
 
     /**
      * Called on bow shoot to snapshot the draw duration before the draw start is cleared.
-     * The snapshot persists until the arrow hits and the damage event reads it.
+     * Released shots keep independent data even after another draw or weapon switch.
      */
-    public static void snapshotDrawDuration(UUID uuid) {
+    public static void snapshotDrawDuration(UUID uuid, Projectile projectile) {
         Long startTime = drawStartTimes.remove(uuid);
-        if (startTime != null) {
-            snapshotDrawDurations.put(uuid, System.currentTimeMillis() - startTime);
-        }
+        ItemTagger.setArrowDrawMillis(projectile, startTime == null ? 0L : (System.nanoTime() - startTime) / 1_000_000L);
     }
 
     public static void stopDrawing(UUID uuid) {
         drawStartTimes.remove(uuid);
-        snapshotDrawDurations.remove(uuid);
     }
 
     public static long getDrawTime(UUID uuid) {
-        // First check snapshot (set at bow release, used at arrow impact)
-        Long snapshot = snapshotDrawDurations.get(uuid);
-        if (snapshot != null) return snapshot;
-        // Fallback: still drawing
         Long startTime = drawStartTimes.get(uuid);
         if (startTime == null) return 0;
-        return System.currentTimeMillis() - startTime;
+        return (System.nanoTime() - startTime) / 1_000_000L;
     }
 
     @Override
     public boolean conditionMet(Player player, Object context) {
-        return getDrawTime(player.getUniqueId()) >= FULL_DRAW_TIME;
+        if (context instanceof EliteMobDamagedByPlayerEvent event
+                && event.getEntityDamageByEntityEvent() != null
+                && event.getEntityDamageByEntityEvent().getDamager() instanceof Projectile projectile)
+            return ItemTagger.getArrowDrawMillis(projectile) >= FULL_DRAW_TIME;
+        return CombatSimulator.isTestingActive() && getDrawTime(player.getUniqueId()) >= FULL_DRAW_TIME;
     }
 
     @Override
@@ -95,9 +94,7 @@ public class OverdrawSkill extends SkillBonus implements ConditionalSkill {
      * Backdates the draw start time so the skill thinks the bow was drawn for 2 seconds.
      */
     public static void simulateFullDraw(UUID uuid) {
-        // Set draw start to 2 seconds ago (exceeds FULL_DRAW_TIME of 1000ms)
-        drawStartTimes.put(uuid, System.currentTimeMillis() - 2000);
-        snapshotDrawDuration(uuid);
+        drawStartTimes.put(uuid, System.nanoTime() - 2_000_000_000L);
     }
 
     @Override
@@ -141,6 +138,5 @@ public class OverdrawSkill extends SkillBonus implements ConditionalSkill {
     public void shutdown() {
         activePlayers.clear();
         drawStartTimes.clear();
-        snapshotDrawDurations.clear();
     }
 }
