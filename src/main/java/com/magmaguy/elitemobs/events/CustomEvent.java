@@ -37,7 +37,7 @@ public abstract class CustomEvent {
     public List<String> startEventCommands, endEventCommands;
     public List<String> primaryCustomBossFilenames;
     public Location eventStartLocation;
-    public float eventStartTime;
+    private long eventStartNanos;
     public int currentDay;
 
     /**
@@ -102,7 +102,7 @@ public abstract class CustomEvent {
             AnnouncementPriority.announce(this.startMessage, eventStartLocation.getWorld(), this.announcementPriority);
         if (this.startEventCommands != null)
             CommandRunner.runCommandFromList(this.startEventCommands, new ArrayList<>());
-        eventStartTime = System.currentTimeMillis();
+        eventStartNanos = System.nanoTime();
         currentDay = dayCalculator();
         eventWatchdog = new BukkitRunnable() {
             @Override
@@ -133,7 +133,7 @@ public abstract class CustomEvent {
                 return;
             }
         if (customEventsConfigFields.getEventDuration() > 0)
-            if (System.currentTimeMillis() - eventStartTime > customEventsConfigFields.getEventDuration() * 60 * 1000) {
+            if (System.nanoTime() - eventStartNanos > customEventsConfigFields.getEventDuration() * 60_000_000_000D) {
                 end();
                 return;
             }

@@ -91,11 +91,7 @@ public class EconomySettingsConfig extends ConfigurationFile {
     }
 
     public static double getMaterialWorth(Material material) {
-        try {
-            return thisConfiguration.getDouble("materialWorth." + material.name());
-        } catch (Exception ex) {
-            return defaultMaterialWorth;
-        }
+        return thisConfiguration.getDouble("materialWorth." + material.name(), defaultMaterialWorth);
     }
 
     @Override

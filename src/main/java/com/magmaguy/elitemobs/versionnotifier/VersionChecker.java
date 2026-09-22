@@ -1,5 +1,9 @@
 package com.magmaguy.elitemobs.versionnotifier;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.magmaguy.magmacore.nightbreak.NightbreakChatStyle;
 
 import com.magmaguy.elitemobs.EliteMobs;
@@ -28,7 +32,6 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class VersionChecker {
     private static final List<EMPackage> outdatedPackages = Collections.synchronizedList(new ArrayList<>());
@@ -44,9 +47,9 @@ public class VersionChecker {
     private static NightbreakAccount.TokenChangeListenerRegistration
             tokenChangeListener;
     private static BukkitTask scheduledCheckTask;
-    /** Slugs present in the catalog but not published yet (no currentVersion/file). */
-    private static final Set<String> unpublishedSlugs = ConcurrentHashMap.newKeySet();
-    private static final Set<String> catalogSlugs = ConcurrentHashMap.newKeySet();
+    private record DlcCatalog(Map<String, Integer> versions, Set<String> slugs, Set<String> unpublishedSlugs) {}
+
+    private static volatile DlcCatalog dlcCatalog = new DlcCatalog(Map.of(), Set.of(), Set.of());
 
     private VersionChecker() {
     }
@@ -173,148 +176,45 @@ public class VersionChecker {
         }
     }
 
-    /**
-     * Parses the Nightbreak /api/dlc response and extracts slug -> version mappings
-     *
-     * @param json The JSON response from the API
-     * @return Map of slug to version number
-     */
-    private static Map<String, Integer> parseNightbreakDlcResponse(String json) {
-        Map<String, Integer> versions = new HashMap<>();
-        unpublishedSlugs.clear();
-        catalogSlugs.clear();
-
-        // Parse DLC entries from all categories (accessible, patreonRequired, purchaseAvailable)
-        String[] categories = {"accessible", "patreonRequired", "purchaseAvailable"};
-
-        for (String category : categories) {
-            String categoryKey = "\"" + category + "\":";
-            int categoryStart = json.indexOf(categoryKey);
-            if (categoryStart == -1) continue;
-
-            // Find the array for this category
-            int arrayStart = json.indexOf("[", categoryStart);
-            if (arrayStart == -1) continue;
-
-            int arrayEnd = findMatchingBracket(json, arrayStart);
-            if (arrayEnd == -1) continue;
-
-            String arrayContent = json.substring(arrayStart, arrayEnd + 1);
-            parseEntriesFromArray(arrayContent, versions);
-        }
-
-        return versions;
-    }
-
-    /**
-     * Finds the matching closing bracket for an opening bracket
-     */
-    private static int findMatchingBracket(String json, int openPos) {
-        int depth = 0;
-        boolean inString = false;
-        for (int i = openPos; i < json.length(); i++) {
-            char c = json.charAt(i);
-            if (c == '"' && (i == 0 || json.charAt(i - 1) != '\\')) {
-                inString = !inString;
-            } else if (!inString) {
-                if (c == '[') depth++;
-                else if (c == ']') {
-                    depth--;
-                    if (depth == 0) return i;
+    private static DlcCatalog parseNightbreakDlcResponse(String json) throws IOException {
+        try {
+            JsonObject root = JsonParser.parseString(json).getAsJsonObject();
+            Map<String, Integer> versions = new HashMap<>();
+            Set<String> slugs = new HashSet<>();
+            Set<String> unpublished = new HashSet<>();
+            boolean foundCategory = false;
+            for (String category : List.of("accessible", "patreonRequired", "purchaseAvailable")) {
+                JsonElement entries = root.get(category);
+                if (entries == null) continue;
+                foundCategory = true;
+                for (JsonElement element : entries.getAsJsonArray()) {
+                    JsonObject entry = element.getAsJsonObject();
+                    String slug = catalogString(entry, "slug");
+                    if (slug == null || slug.isBlank())
+                        throw new IllegalStateException("DLC entry has no slug");
+                    slugs.add(slug);
+                    String version = catalogString(entry, "currentVersion");
+                    if (version == null || version.isEmpty()) {
+                        unpublished.add(slug);
+                    } else {
+                        versions.put(slug, Integer.parseInt(version.startsWith("v") ? version.substring(1) : version));
+                        unpublished.remove(slug);
+                    }
                 }
             }
-        }
-        return -1;
-    }
-
-    /**
-     * Parses individual DLC entries from a JSON array and extracts slug/version
-     */
-    private static void parseEntriesFromArray(String arrayJson, Map<String, Integer> versions) {
-        int pos = 0;
-        while (pos < arrayJson.length()) {
-            int objectStart = arrayJson.indexOf("{", pos);
-            if (objectStart == -1) break;
-
-            int objectEnd = findMatchingBrace(arrayJson, objectStart);
-            if (objectEnd == -1) break;
-
-            String objectJson = arrayJson.substring(objectStart, objectEnd + 1);
-
-            String slug = extractJsonString(objectJson, "slug");
-            String versionStr = extractJsonString(objectJson, "currentVersion");
-            if (slug != null) catalogSlugs.add(slug);
-
-            if (slug != null && versionStr != null && !versionStr.isEmpty()) {
-                try {
-                    // Version format is "v11" or similar, strip the 'v' prefix
-                    String numericVersion = versionStr.startsWith("v") ? versionStr.substring(1) : versionStr;
-                    int version = Integer.parseInt(numericVersion);
-                    versions.put(slug, version);
-                } catch (NumberFormatException e) {
-                    Logger.warn("Failed to parse version '" + versionStr + "' for slug '" + slug + "'");
-                }
-            } else if (slug != null && (versionStr == null || versionStr.isEmpty())) {
-                // The catalog can expose a newly-created package before its first
-                // archive is uploaded. Keep the slug for display, but do not treat
-                // it as an update target or call the authenticated access endpoint.
-                unpublishedSlugs.add(slug);
-            }
-
-            pos = objectEnd + 1;
+            if (!foundCategory) throw new IllegalStateException("DLC catalog has no recognized categories");
+            return new DlcCatalog(Map.copyOf(versions), Set.copyOf(slugs), Set.copyOf(unpublished));
+        } catch (JsonParseException | IllegalStateException | NumberFormatException exception) {
+            throw new IOException("Invalid Nightbreak DLC catalog", exception);
         }
     }
 
-    /**
-     * Finds the matching closing brace for an opening brace
-     */
-    private static int findMatchingBrace(String json, int openPos) {
-        int depth = 0;
-        boolean inString = false;
-        for (int i = openPos; i < json.length(); i++) {
-            char c = json.charAt(i);
-            if (c == '"' && (i == 0 || json.charAt(i - 1) != '\\')) {
-                inString = !inString;
-            } else if (!inString) {
-                if (c == '{') depth++;
-                else if (c == '}') {
-                    depth--;
-                    if (depth == 0) return i;
-                }
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Extracts a string value from a JSON object
-     */
-    private static String extractJsonString(String json, String key) {
-        String searchKey = "\"" + key + "\":";
-        int keyIndex = json.indexOf(searchKey);
-        if (keyIndex == -1) return null;
-
-        int valueStart = keyIndex + searchKey.length();
-        // Skip whitespace
-        while (valueStart < json.length() && Character.isWhitespace(json.charAt(valueStart))) {
-            valueStart++;
-        }
-
-        if (valueStart >= json.length()) return null;
-
-        // Check for null value
-        if (json.substring(valueStart).startsWith("null")) {
-            return null;
-        }
-
-        // Check for string value
-        if (json.charAt(valueStart) == '"') {
-            int stringEnd = json.indexOf("\"", valueStart + 1);
-            if (stringEnd == -1) return null;
-            return json.substring(valueStart + 1, stringEnd);
-        }
-
-        return null;
+    private static String catalogString(JsonObject entry, String key) {
+        JsonElement value = entry.get(key);
+        if (value == null || value.isJsonNull()) return null;
+        if (!value.isJsonPrimitive() || !value.getAsJsonPrimitive().isString())
+            throw new IllegalStateException("DLC " + key + " must be a string");
+        return value.getAsString();
     }
 
     private static void checkContentVersion() {
@@ -328,10 +228,12 @@ public class VersionChecker {
                 if (MetadataHandler.shutdownRequested) return;
                 String jsonResponse = fetchFromNightbreak("https://nightbreak.io/api/dlc");
                 if (MetadataHandler.shutdownRequested) return;
+                DlcCatalog parsedCatalog = parseNightbreakDlcResponse(jsonResponse);
+                dlcCatalog = parsedCatalog;
                 connectionFailed = false;
                 connectionRetryCount = 0;
 
-                Map<String, Integer> remoteVersions = parseNightbreakDlcResponse(jsonResponse);
+                Map<String, Integer> remoteVersions = parsedCatalog.versions();
                 Logger.info("Parsed " + remoteVersions.size() + " content versions from Nightbreak API");
                 processContentVersionData(remoteVersions, true);
 
@@ -405,7 +307,7 @@ public class VersionChecker {
 
             Integer remoteVersion = remoteVersions.get(slug);
             if (remoteVersion == null) {
-                if (unpublishedSlugs.contains(slug)) {
+                if (dlcCatalog.unpublishedSlugs().contains(slug)) {
                     emPackage.setOutOfDate(false);
                     outdatedPackages.remove(emPackage);
                     continue;
@@ -702,7 +604,7 @@ public class VersionChecker {
 
             String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
             if (slug == null || slug.isEmpty()) continue;
-            if (!catalogSlugs.contains(slug) || unpublishedSlugs.contains(slug)) continue;
+            if (!dlcCatalog.slugs().contains(slug) || dlcCatalog.unpublishedSlugs().contains(slug)) continue;
 
             NightbreakAccount.AccessInfo info;
             if (slugCache.containsKey(slug)) {

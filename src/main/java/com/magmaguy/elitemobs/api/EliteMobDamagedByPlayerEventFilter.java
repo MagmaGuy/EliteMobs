@@ -134,7 +134,7 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
      * Returns a multiplier (e.g. 1.05 for 5% bonus) rather than flat damage.
      */
     private static double getSecondaryEnchantmentMultiplier(Player player, LivingEntity livingEntity) {
-        if (ItemSettingsConfig.isUseEliteEnchantments()) return 1.0;
+        if (!ItemSettingsConfig.isUseEliteEnchantments()) return 1.0;
         if (livingEntity instanceof Spider || livingEntity instanceof Silverfish) {
             int level = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).mainhand.getDamageArthropodsLevel(player.getInventory().getItemInMainHand(), false);
             level -= Enchantment.BANE_OF_ARTHROPODS.getMaxLevel();

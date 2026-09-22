@@ -18,6 +18,6 @@ public class DiscordCommand extends AdvancedCommand {
 
     @Override
     public void execute(CommandData commandData) {
-        Logger.sendMessage(commandData.getPlayerSender(), CommandMessagesConfig.getDiscordMessage() + DiscordLinks.mainLink);
+        Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getDiscordMessage() + DiscordLinks.mainLink);
     }
 }

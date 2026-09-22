@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.thirdparty.worldguard;
 
 import com.magmaguy.magmacore.util.Logger;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.IntegerFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
@@ -51,82 +52,42 @@ public class WorldGuardCompatibility {
             return false;
         }
 
-//        Logger.info(" Enabling flags:");
         try {
-            ELITEMOBS_SPAWN_FLAG = new StateFlag("elitemob-spawning", true);
-            registry.register(ELITEMOBS_SPAWN_FLAG);
-//            Logger.info(" - elitemob-spawning");
-        } catch (FlagConflictException | IllegalStateException e) {
-//            Logger.warn(" Warning: flag elitemob-spawning already exists! This is normal if you've just now reloaded EliteMobs.");
-            ELITEMOBS_SPAWN_FLAG = (StateFlag) registry.get("elitemob-spawning");
-        }
-        try {
-            ELITEMOBS_ONLY_SPAWN_FLAG = new StateFlag("elitemob-only-spawning", false);
-            registry.register(ELITEMOBS_ONLY_SPAWN_FLAG);
-//            Logger.info(" - elitemob-only-spawning");
-        } catch (FlagConflictException | IllegalStateException e) {
-//            Logger.warn(" Warning: flag elitemob-only-spawning already exists! This is normal if you've just now reloaded EliteMobs.");
-            ELITEMOBS_ONLY_SPAWN_FLAG = (StateFlag) registry.get("elitemob-only-spawning");
-        }
-        try {
-            ELITEMOBS_ANTIEXPLOIT = new StateFlag("elitemobs-antiexploit", true);
-            registry.register(ELITEMOBS_ANTIEXPLOIT);
-//            Logger.info(" - elitemobs-antiexploit");
-        } catch (FlagConflictException | IllegalStateException e) {
-//            Logger.warn(" Warning: flag elitemob-antiexploit already exists! This is normal if you've just now reloaded EliteMobs.");
-            ELITEMOBS_ANTIEXPLOIT = (StateFlag) registry.get("elitemobs-antiexploit");
-        }
-        try {
-            ELITEMOBS_DUNGEON = new StateFlag("elitemobs-dungeon", false);
-            registry.register(ELITEMOBS_DUNGEON);
-//            Logger.info(" - elitemobs-dungeon");
-        } catch (FlagConflictException | IllegalStateException e) {
-//            Logger.warn(" Warning: flag elitemob-dungeon already exists! This is normal if you've just now reloaded EliteMobs.");
-            ELITEMOBS_DUNGEON = (StateFlag) registry.get("elitemobs-dungeon");
-        }
-        try {
-            ELITEMOBS_EVENTS = new StateFlag("elitemobs-events", true);
-            registry.register(ELITEMOBS_EVENTS);
-//            Logger.info(" - elitemobs-events");
-        } catch (FlagConflictException | IllegalStateException e) {
-//            Logger.warn("Warning: flag elitemob-events already exists! This is normal if you've just now reloaded EliteMobs.");
-            ELITEMOBS_EVENTS = (StateFlag) registry.get("elitemobs-events");
-        }
-        try {
-            ELITEMOBS_MINIMUM_LEVEL = new IntegerFlag("elitemobs-minimum-level");
-            registry.register(ELITEMOBS_MINIMUM_LEVEL);
-//            Logger.info(" - elitemobs-minimum-level");
-        } catch (FlagConflictException | IllegalStateException e) {
-//            Logger.warn(" Warning: flag elitemob-minimum-level already exists! This is normal if you've just now reloaded EliteMobs.");
-            ELITEMOBS_MINIMUM_LEVEL = (IntegerFlag) registry.get("elitemobs-minimum-level");
-        }
-        try {
-            ELITEMOBS_MAXIMUM_LEVEL = new IntegerFlag("elitemobs-maximum-level");
-            registry.register(ELITEMOBS_MAXIMUM_LEVEL);
-//            Logger.info("- elitemobs-maximum-level");
-        } catch (FlagConflictException | IllegalStateException e) {
-//            Logger.warn("Warning: flag elitemob-maximum-level already exists! This is normal if you've just now reloaded EliteMobs.");
-            ELITEMOBS_MAXIMUM_LEVEL = (IntegerFlag) registry.get("elitemobs-maximum-level");
-        }
+            StateFlag spawn = register(registry, new StateFlag("elitemob-spawning", true), StateFlag.class);
+            StateFlag onlySpawn = register(registry, new StateFlag("elitemob-only-spawning", false), StateFlag.class);
+            StateFlag antiExploit = register(registry, new StateFlag("elitemobs-antiexploit", true), StateFlag.class);
+            StateFlag dungeon = register(registry, new StateFlag("elitemobs-dungeon", false), StateFlag.class);
+            StateFlag events = register(registry, new StateFlag("elitemobs-events", true), StateFlag.class);
+            IntegerFlag minimum = register(registry, new IntegerFlag("elitemobs-minimum-level"), IntegerFlag.class);
+            IntegerFlag maximum = register(registry, new IntegerFlag("elitemobs-maximum-level"), IntegerFlag.class);
+            StateFlag regeneration = register(registry, new StateFlag("elitemobs-explosion-regen", true), StateFlag.class);
+            StateFlag blockDamage = register(registry, new StateFlag("elitemobs-explosion-block-damage", true), StateFlag.class);
 
-        try {
-            ELITEMOBS_EXPLOSION_REGEN = new StateFlag("elitemobs-explosion-regen", true);
-            registry.register(ELITEMOBS_EXPLOSION_REGEN);
-//            Logger.info(" - elitemobs-explosion-regen");
-        } catch (FlagConflictException | IllegalStateException e) {
-//            Logger.warn("Warning: flag elitemob-explosion-regen already exists! This is normal if you've just now reloaded EliteMobs.");
-            ELITEMOBS_EXPLOSION_REGEN = (StateFlag) registry.get("elitemobs-explosion-regen");
+            ELITEMOBS_SPAWN_FLAG = spawn;
+            ELITEMOBS_ONLY_SPAWN_FLAG = onlySpawn;
+            ELITEMOBS_ANTIEXPLOIT = antiExploit;
+            ELITEMOBS_DUNGEON = dungeon;
+            ELITEMOBS_EVENTS = events;
+            ELITEMOBS_MINIMUM_LEVEL = minimum;
+            ELITEMOBS_MAXIMUM_LEVEL = maximum;
+            ELITEMOBS_EXPLOSION_REGEN = regeneration;
+            ELITEMOBS_EXPLOSION_BLOCK_DAMAGE = blockDamage;
+            return true;
+        } catch (IllegalStateException failure) {
+            Logger.warn("Could not initialize EliteMobs WorldGuard flags: " + failure.getMessage());
+            return false;
         }
+    }
 
+    private static <T extends Flag<?>> T register(FlagRegistry registry, T requested, Class<T> type) {
         try {
-            ELITEMOBS_EXPLOSION_BLOCK_DAMAGE = new StateFlag("elitemobs-explosion-block-damage", true);
-            registry.register(ELITEMOBS_EXPLOSION_BLOCK_DAMAGE);
-//            Logger.info(" - elitemobs-explosion-block-damage");
-        } catch (FlagConflictException | IllegalStateException e) {
-//            Logger.warn(" Warning: flag elitemobs-explosion-block-damage already exists! This is normal if you've just now reloaded EliteMobs.");
-            ELITEMOBS_EXPLOSION_REGEN = (StateFlag) registry.get("elitemobs-explosion-block-damage");
+            registry.register(requested);
+            return requested;
+        } catch (FlagConflictException | IllegalStateException conflict) {
+            Flag<?> existing = registry.get(requested.getName());
+            if (!type.isInstance(existing))
+                throw new IllegalStateException("Flag " + requested.getName() + " is missing or is not a " + type.getSimpleName(), conflict);
+            return type.cast(existing);
         }
-
-        return true;
     }
 }

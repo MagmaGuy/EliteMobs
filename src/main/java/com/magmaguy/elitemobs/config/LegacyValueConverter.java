@@ -98,7 +98,7 @@ public class LegacyValueConverter {
             case "SLIME":
                 return Particle.ITEM_SLIME.toString();
             case "DRIP_LAVA":
-                return Particle.DRIPPING_WATER.toString();
+                return Particle.DRIPPING_LAVA.toString();
             case "EXPLOSION_HUGE":
                 return Particle.EXPLOSION.toString();
             case "SNOWBALL":

@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
+import com.magmaguy.magmacore.command.SenderType;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 
@@ -13,6 +14,7 @@ public class FireballCommand extends AdvancedCommand {
         super(List.of("fireball"));
         setUsage("/em fireball");
         setPermission("elitemobs.fireball");
+        setSenderType(SenderType.PLAYER);
         setDescription("Shoots a fireball, to test terrain protections and explosion regeneration.");
     }
 

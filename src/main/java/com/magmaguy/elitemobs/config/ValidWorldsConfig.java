@@ -21,7 +21,7 @@ public class ValidWorldsConfig extends ConfigurationFile {
     }
 
     public static void addWorld(String worldName) {
-        if (instance.fileConfiguration.getKeys(true).contains("validWorlds." + worldName)) return;
+        if (instance.fileConfiguration.contains("validWorlds." + worldName)) return;
 
         ConfigurationEngine.setBoolean(
                 List.of("Whether elites will spawn in this world."),
@@ -38,6 +38,8 @@ public class ValidWorldsConfig extends ConfigurationFile {
 
         ConfigurationSection validWorldsSection = fileConfiguration.getConfigurationSection("validWorlds");
 
+        validWorlds.clear();
+        if (validWorldsSection == null) return;
         for (String key : validWorldsSection.getKeys(false))
             if (validWorldsSection.getBoolean(key))
                 validWorlds.add(key);
