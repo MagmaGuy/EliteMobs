@@ -1,16 +1,69 @@
 package com.magmaguy.elitemobs.advancedcombat;
 
 import com.magmaguy.elitemobs.advancedcombat.classes.AbilitySlot;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
+import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.Location;
+import org.bukkit.WorldCreator;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockbukkit.mockbukkit.MockBukkit;
+import org.mockbukkit.mockbukkit.world.WorldMock;
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CombatPassiveIntegrationTest extends CombatBehaviorFixture {
+    @ParameterizedTest
+    @CsvSource({"shaman", "lifewarden", "saint", "fateweaver"})
+    void healingLineageIncreasesActualAllyRecoveryOnlyWhileItsPassivesAreActive(String form) throws Exception {
+        int level = module.catalog().require(form).band().effectiveStart();
+        var server = MockBukkit.getMock();
+        var original = player.getLocation();
+        // The two players occupy open air. MockBukkit has no block ray implementation;
+        // supplying that scene's no-collision result leaves production targeting and healing intact.
+        var world = new WorldMock(new WorldCreator("healing-passive")) {
+            @Override public RayTraceResult rayTraceBlocks(Location start, Vector direction, double distance,
+                    FluidCollisionMode fluids, boolean ignorePassable) { return null; }
+        };
+        server.addWorld(world);
+        EliteMobsWorld.create(world.getUID(), new ContentPackagesConfigFields("healing-passive.yml", true));
+        try {
+            var ally = server.addPlayer();
+            var origin = new Location(world, 0, 64, 0);
+            assertTrue(player.teleport(origin));
+            assertTrue(ally.teleport(origin.clone().add(0, 0, 2)));
+            openParty(ally);
+            double ordinaryHealing = 0D;
+            for (int phase = 0; phase < 3; phase++) {
+                // A real class transition releases the previous cast and starts a funded class session.
+                assertTrue(module.selectForm(player, "spellcaster").accepted());
+                fullCombatActive = phase == 1;
+                assertTrue(module.setClassLevelForAdministration(player, form, level).applied());
+                ally.setHealth(1D);
+                double casterHealth = player.getHealth();
+                assertTrue(module.useAbility(player, AbilitySlot.SIGNATURE).successful());
+                double healed = ally.getHealth() - 1D;
+                assertTrue(healed > 0D && ally.getHealth() < ally.getAttribute(Attribute.MAX_HEALTH).getValue(),
+                        "Compare effective ally healing without a maximum-health cap");
+                assertEquals(casterHealth, player.getHealth(), "The aimed support must not heal its caster");
+                if (phase == 0) ordinaryHealing = healed;
+                if (fullCombatActive) assertTrue(healed > ordinaryHealing,
+                        "The active healing lineage must improve the same cast's actual recovery");
+                else assertEquals(ordinaryHealing, healed, .000001,
+                        "Leaving combat must remove the inherited healing benefit");
+            }
+        } finally {
+            assertTrue(player.teleport(original));
+            EliteMobsWorld.destroy(world.getUID());
+        }
+    }
+
     @ParameterizedTest
     @CsvSource({"priest,31,SIGNATURE,false,11.336802,9.5", "hierophant,61,SIGNATURE,false,13.381253,9.25",
             "hierophant,61,SIGNATURE,true,13.839487,9.25", "spiritcaller,61,UTILITY,false,9.1406984,9.45"})
