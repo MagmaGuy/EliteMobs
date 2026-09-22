@@ -39,7 +39,7 @@ public class PhaseBossEntity {
                 double healthPercentage = Double.parseDouble(phaseConfigFile.split(":")[1]);
                 unsortedBossPhases.add(new BossPhase(customBossesConfigFields, healthPercentage));
             }
-            unsortedBossPhases.sort((o1, o2) -> (int) (o2.healthPercentage * 100 - o1.healthPercentage * 100));
+            unsortedBossPhases.sort((o1, o2) -> Double.compare(o2.healthPercentage, o1.healthPercentage));
             this.bossPhases = unsortedBossPhases;
             currentPhase = bossPhases.get(0);
         } catch (Exception ex) {

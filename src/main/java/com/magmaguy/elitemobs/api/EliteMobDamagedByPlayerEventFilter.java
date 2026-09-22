@@ -413,25 +413,24 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
             breakdown.setSweepAttack(isSweep);
         }
 
-        // Debug logging
-        DebugMessage.log(player, "[Formula] Base=" + String.format("%.1f", baseDamage) +
-                " Speed=" + String.format("%.2f", attackSpeedFactor) +
-                " Skill=" + String.format("%.3f", skillAdjustment) +
-                " (Lv" + weaponSkillLevel + " vs " + mobLevel + ")" +
-                " Wpn=" + String.format("%.2f", weaponAdjustment) +
-                " (Lv" + (int) weaponLevel + ")" +
-                " CD=" + String.format("%.2f", cooldownOrVelocity) +
-                (ticksSinceLastHit != PlayerAttackCooldownTracker.NO_PREVIOUS_HIT
-                        ? " Δticks=" + ticksSinceLastHit
-                        : "") +
-                (potionMultiplier != 1.0 ? " Pot=" + String.format("%.2f", potionMultiplier) : "") +
-                (isSweep ? " Sweep=" + String.format("%.2f", sweepMultiplier) : "") +
-                (equipmentEnchantmentMultiplier != 1.0 ? " EquipEnchant=" + String.format("%.2f", equipmentEnchantmentMultiplier) + "x" : "") +
-                (arrowDamageMultiplier != 1.0 ? " ArrowMult=" + String.format("%.2f", arrowDamageMultiplier) : "") +
-                " = " + String.format("%.1f", formulaDamage));
-
-        // Per-player diagnostic breakdown (toggle with /em debug)
+        // Construct diagnostic messages only for players who enabled them.
         if (DebugMessage.isDebugEnabled(player)) {
+            DebugMessage.log(player, "[Formula] Base=" + String.format("%.1f", baseDamage) +
+                    " Speed=" + String.format("%.2f", attackSpeedFactor) +
+                    " Skill=" + String.format("%.3f", skillAdjustment) +
+                    " (Lv" + weaponSkillLevel + " vs " + mobLevel + ")" +
+                    " Wpn=" + String.format("%.2f", weaponAdjustment) +
+                    " (Lv" + (int) weaponLevel + ")" +
+                    " CD=" + String.format("%.2f", cooldownOrVelocity) +
+                    (ticksSinceLastHit != PlayerAttackCooldownTracker.NO_PREVIOUS_HIT
+                            ? " Δticks=" + ticksSinceLastHit
+                            : "") +
+                    (potionMultiplier != 1.0 ? " Pot=" + String.format("%.2f", potionMultiplier) : "") +
+                    (isSweep ? " Sweep=" + String.format("%.2f", sweepMultiplier) : "") +
+                    (equipmentEnchantmentMultiplier != 1.0 ? " EquipEnchant=" + String.format("%.2f", equipmentEnchantmentMultiplier) + "x" : "") +
+                    (arrowDamageMultiplier != 1.0 ? " ArrowMult=" + String.format("%.2f", arrowDamageMultiplier) : "") +
+                    " = " + String.format("%.1f", formulaDamage));
+
             DebugMessage.send(player, "§e── Formula (playerToEliteDamageFormula) ──");
             DebugMessage.send(player, "§7Inputs: weaponSkillLv=§f" + weaponSkillLevel
                     + " §7weaponLv=§f" + ((int) weaponLevel)
@@ -797,12 +796,13 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
                 }
             }
 
-            // Debug logging for combat balance tuning
-            DebugMessage.log(player, "[Combat] SkillLv" + getPlayerWeaponSkillLevel(player) +
-                    " vs EliteLv" + eliteEntity.getLevel() +
-                    " | Damage: " + String.format("%.1f", damage) +
-                    " | Elite HP: " + String.format("%.1f", eliteEntity.getHealth()) +
-                    (criticalHit ? " | CRIT" : ""));
+            if (DebugMessage.isDebugEnabled(player)) {
+                DebugMessage.log(player, "[Combat] SkillLv" + getPlayerWeaponSkillLevel(player) +
+                        " vs EliteLv" + eliteEntity.getLevel() +
+                        " | Damage: " + String.format("%.1f", damage) +
+                        " | Elite HP: " + String.format("%.1f", eliteEntity.getHealth()) +
+                        (criticalHit ? " | CRIT" : ""));
+            }
         }
         double damageAfterCrit = damage;
 

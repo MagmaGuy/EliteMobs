@@ -25,7 +25,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -52,7 +51,8 @@ public class ProceduralShopMenu {
     public static void shopInitializer(Player player) {
 
         if (!EconomySettingsConfig.isEnableEconomy()) return;
-        BuyOrSellMenu.constructBuyOrSellMenu(player, BuyOrSellMenuConfig.BUY_PROCEDURAL_ITEM);
+        BuyOrSellMenu.constructBuyOrSellMenu(player, BuyOrSellMenuConfig.BUY_PROCEDURAL_ITEM,
+                () -> shopConstructor(player));
 
     }
 
@@ -155,15 +155,12 @@ public class ProceduralShopMenu {
         public void onClick(InventoryClickEvent event) {
 
             if (!EliteMenu.isEliteMenu(event, menus)) return;
-            if (event.getClickedInventory() == null || !event.getClickedInventory().getType().equals(InventoryType.CHEST)) {
-                event.setCancelled(true);
-                return;
-            }
             event.setCancelled(true);
+            if (!EliteMenu.isTopMenu(event)) return;
             if (!SharedShopElements.itemNullPointerPrevention(event)) return;
 
             //reroll loot button
-            if (event.getCurrentItem().getItemMeta().getDisplayName().equals(ProceduralShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
+            if (event.getSlot() == ProceduralShopMenuConfig.rerollSlot) {
                 if (cooldownPlayers.contains(event.getWhoClicked().getUniqueId())) {
                     event.setCancelled(true);
                     return;
@@ -182,7 +179,7 @@ public class ProceduralShopMenu {
                 return;
             }
 
-            if (!ItemTagger.isEliteItem(event.getCurrentItem())) {
+            if (!validSlots.contains(event.getSlot()) || !ItemTagger.isEliteItem(event.getCurrentItem())) {
                 event.setCancelled(true);
                 return;
             }

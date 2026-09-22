@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -42,6 +43,7 @@ public class GetLootMenu extends EliteMenu implements Listener {
     public boolean filter = false;
     public int filterRank = 0;
     public Inventory inventory;
+    private final Map<Integer, Integer> headerTiers = new HashMap<>();
 
     public GetLootMenu(Player player, GetLootMenu getLootMenu) {
         this.currentHeaderPage = getLootMenu.currentHeaderPage;
@@ -61,6 +63,9 @@ public class GetLootMenu extends EliteMenu implements Listener {
     }
 
     public static void shutdown() {
+        for (GetLootMenu menu : new ArrayList<>(inventories.values()))
+            for (var viewer : new ArrayList<>(menu.inventory.getViewers()))
+                viewer.closeInventory();
         inventories.clear();
     }
 
@@ -87,9 +92,11 @@ public class GetLootMenu extends EliteMenu implements Listener {
         int counter = 1;
         for (int number : tierSlots) {
             if (keySet.size() >= counter + ((currentHeaderPage - 1) * 6)) {
+                int tier = keySet.get((counter - 1) + ((currentHeaderPage - 1) * 6));
+                headerTiers.put(number, tier);
                 ItemStack chest = new ItemStack(Material.CHEST, 1);
                 ItemMeta chestItemMeta = chest.getItemMeta();
-                chestItemMeta.setDisplayName(GetLootMenuConfig.tierTranslation + " " + keySet.get((counter - 1) + ((currentHeaderPage - 1) * 6)));
+                chestItemMeta.setDisplayName(GetLootMenuConfig.tierTranslation + " " + tier);
                 List<String> lore = new ArrayList();
                 lore.add(GetLootMenuConfig.itemFilterTranslation);
                 chestItemMeta.setLore(lore);
@@ -119,6 +126,7 @@ public class GetLootMenu extends EliteMenu implements Listener {
                     inventory.setItem(number, getLootList.get(counter - 1 + ((currentLootPage - 1) * 35)));
             } else {
                 List<ItemStack> currentRankLoot = CustomItem.getTieredLoot().get(filterRank);
+                if (currentRankLoot == null) break;
                 if (currentRankLoot.size() >= counter + ((currentLootPage - 1) * 35))
                     inventory.setItem(number, currentRankLoot.get(counter - 1 + ((currentLootPage - 1) * 35)));
             }
@@ -130,13 +138,8 @@ public class GetLootMenu extends EliteMenu implements Listener {
         @EventHandler
         public void onClick(InventoryClickEvent event) {
 
-            GetLootMenu getLootMenu = null;
-            for (GetLootMenu iteratedMenu : inventories.values())
-                if (iteratedMenu != null && iteratedMenu.inventory.equals(event.getInventory())) {
-                    getLootMenu = iteratedMenu;
-                    break;
-                }
-            if (getLootMenu == null) return;
+            GetLootMenu getLootMenu = inventories.get(event.getWhoClicked().getUniqueId());
+            if (getLootMenu == null || !getLootMenu.inventory.equals(event.getInventory())) return;
             if (event.getClickedInventory() == null) return;
             event.setCancelled(true);
 
@@ -163,7 +166,7 @@ public class GetLootMenu extends EliteMenu implements Listener {
 
             //CASE: Left header arrow, previous tier
             if (event.getSlot() == 0) {
-                if (getLootMenu.currentHeaderPage - 1 > 1) {
+                if (getLootMenu.currentHeaderPage > 1) {
                     getLootMenu.currentHeaderPage--;
                     new GetLootMenu(player, getLootMenu);
                 }
@@ -189,17 +192,20 @@ public class GetLootMenu extends EliteMenu implements Listener {
                 return;
             }
 
-            if (event.getSlot() == 1 ||
-                    event.getSlot() == 2 ||
-                    event.getSlot() == 3 ||
-                    event.getSlot() == 5 ||
-                    event.getSlot() == 6 ||
-                    event.getSlot() == 7) {
+            Integer tier = getLootMenu.headerTiers.get(event.getSlot());
+            if (tier != null) {
                 getLootMenu.filter = true;
-                getLootMenu.filterRank = Integer.parseInt(currentItem.getItemMeta().getDisplayName().split("\\s")[1]);
+                getLootMenu.filterRank = tier;
                 getLootMenu.currentLootPage = 1;
                 new GetLootMenu(player, getLootMenu);
             }
+        }
+
+        @EventHandler
+        public void onClose(InventoryCloseEvent event) {
+            GetLootMenu menu = inventories.get(event.getPlayer().getUniqueId());
+            if (menu != null && menu.inventory.equals(event.getInventory()))
+                inventories.remove(event.getPlayer().getUniqueId(), menu);
         }
 
     }

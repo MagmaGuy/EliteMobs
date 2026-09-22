@@ -17,20 +17,18 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import static com.magmaguy.elitemobs.menus.BuyOrSellMenu.BuyOrSellMenuEvents.menus;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BuyOrSellMenu {
 
-    public static void constructBuyOrSellMenu(Player player, ItemStack buyItemStack) {
+    public static void constructBuyOrSellMenu(Player player, ItemStack buyItemStack, Runnable buyAction) {
         String inventoryName = BuyOrSellMenuConfig.SHOP_NAME;
         if (DefaultConfig.useResourcePackModels())
             inventoryName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE07\uDB83\uDEF5       " + inventoryName;
 
         Inventory shopInventory = Bukkit.createInventory(player, 18, inventoryName);
-        menus.add(shopInventory);
+        BuyOrSellMenuEvents.menus.put(shopInventory, buyAction);
         //information item
         ItemStack info = BuyOrSellMenuConfig.INFORMATION_ITEM;
         if (DefaultConfig.useResourcePackModels()) {
@@ -50,7 +48,7 @@ public class BuyOrSellMenu {
     }
 
     public static class BuyOrSellMenuEvents implements Listener {
-        public static final Set<Inventory> menus = new HashSet<>();
+        private static final Map<Inventory, Runnable> menus = new HashMap<>();
 
         public static void shutdown() {
             menus.clear();
@@ -59,34 +57,28 @@ public class BuyOrSellMenu {
         @EventHandler
         public void onInventoryInteraction(InventoryClickEvent event) {
 
-            if (!EliteMenu.isEliteMenu(event, menus)) return;
+            if (!EliteMenu.isEliteMenu(event, menus.keySet())) return;
             event.setCancelled(true);
+            if (!EliteMenu.isTopMenu(event)) return;
             if (!SharedShopElements.itemNullPointerPrevention(event)) return;
 
             //info button
-            if (event.getCurrentItem().equals(BuyOrSellMenuConfig.INFORMATION_ITEM)) {
+            if (event.getSlot() == BuyOrSellMenuConfig.INFORMATION_SLOT) {
                 return;
             }
 
-            //buy custom items button
-            if (event.getCurrentItem().getItemMeta().getDisplayName().equals(BuyOrSellMenuConfig.BUY_CUSTOM_ITEM.getItemMeta().getDisplayName())) {
-                CustomShopMenu.customShopConstructor((Player) event.getWhoClicked());
-                menus.remove((Player) event.getWhoClicked());
-                return;
-            }
-
-            //buy procedural items button
-            if (event.getCurrentItem().getItemMeta().getDisplayName().equals(BuyOrSellMenuConfig.BUY_PROCEDURAL_ITEM.getItemMeta().getDisplayName())) {
-                ProceduralShopMenu.shopConstructor((Player) event.getWhoClicked());
-                menus.remove((Player) event.getWhoClicked());
+            // The caller binds the buy destination when this menu is constructed.
+            if (event.getSlot() == BuyOrSellMenuConfig.BUY_SLOT) {
+                Runnable buyAction = menus.remove(event.getInventory());
+                buyAction.run();
                 return;
             }
 
             //sell items button
-            if (event.getCurrentItem().getItemMeta().getDisplayName().equals(BuyOrSellMenuConfig.SELL_ITEM.getItemMeta().getDisplayName())) {
+            if (event.getSlot() == BuyOrSellMenuConfig.SELL_SLOT) {
+                menus.remove(event.getInventory());
                 SellMenu sellMenu = new SellMenu();
                 sellMenu.constructSellMenu((Player) event.getWhoClicked());
-                menus.remove((Player) event.getWhoClicked());
             }
 
         }

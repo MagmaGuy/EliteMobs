@@ -50,7 +50,8 @@ public class CustomShopMenu {
     public static void customShopInitializer(Player player) {
 
         if (!EconomySettingsConfig.isEnableEconomy()) return;
-        BuyOrSellMenu.constructBuyOrSellMenu(player, BuyOrSellMenuConfig.BUY_CUSTOM_ITEM);
+        BuyOrSellMenu.constructBuyOrSellMenu(player, BuyOrSellMenuConfig.BUY_CUSTOM_ITEM,
+                () -> customShopConstructor(player));
 
     }
 
@@ -119,10 +120,11 @@ public class CustomShopMenu {
 
             if (!EliteMenu.isEliteMenu(event, menus)) return;
             event.setCancelled(true);
+            if (!EliteMenu.isTopMenu(event)) return;
             if (!SharedShopElements.itemNullPointerPrevention(event)) return;
 
             //reroll loot button
-            if (event.getCurrentItem().getItemMeta().getDisplayName().equals(CustomShopMenuConfig.rerollItem.getItemMeta().getDisplayName())) {
+            if (event.getSlot() == CustomShopMenuConfig.rerollSlot) {
 
                 if (cooldownPlayers.contains(event.getWhoClicked().getUniqueId())) {
                     event.setCancelled(true);
@@ -142,7 +144,8 @@ public class CustomShopMenu {
                 return;
             }
 
-            if (!ItemTagger.isEliteItem(event.getCurrentItem())) {
+            if (!CustomShopMenuConfig.storeSlots.contains(event.getSlot())
+                    || !ItemTagger.isEliteItem(event.getCurrentItem())) {
                 event.setCancelled(true);
                 return;
             }
@@ -160,30 +163,19 @@ public class CustomShopMenu {
                     break;
                 }
 
-            //These slots are for buying items
-            if (EliteMenu.isTopMenu(event)) {
+            if (!inventoryHasFreeSlots) {
+                player.sendMessage(CustomShopMenuConfig.messageFullInventory);
+                player.closeInventory();
+            } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
+                EconomyHandler.subtractCurrency(player.getUniqueId(), itemValue);
+                new EliteItemLore(itemStack, false);
+                player.getInventory().addItem(itemStack);
+                populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
 
-                if (!inventoryHasFreeSlots) {
-
-                    player.sendMessage(CustomShopMenuConfig.messageFullInventory);
-                    player.closeInventory();
-
-                } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
-                    //player has enough money
-                    EconomyHandler.subtractCurrency(player.getUniqueId(), itemValue);
-                    new EliteItemLore(itemStack, false);
-                    player.getInventory().addItem(itemStack);
-                    populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
-
-                    SharedShopElements.buyMessage(player, itemDisplayName, itemValue);
-
-                } else {
-
-                    player.closeInventory();
-                    SharedShopElements.insufficientFundsMessage(player, itemValue);
-
-                }
-
+                SharedShopElements.buyMessage(player, itemDisplayName, itemValue);
+            } else {
+                player.closeInventory();
+                SharedShopElements.insufficientFundsMessage(player, itemValue);
             }
 
         }

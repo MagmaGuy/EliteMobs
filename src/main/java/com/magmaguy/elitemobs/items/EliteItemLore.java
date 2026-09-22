@@ -191,7 +191,7 @@ public class EliteItemLore {
         itemMeta = itemStack.getItemMeta();
         if (showItemWorth)
             itemWorth = ItemSettingsConfig.getLoreWorth()
-                    .replace("$worth", ItemWorthCalculator.determineItemWorth(itemStack, soulboundPlayer) + "")
+                    .replace("$worth", ItemTagger.getItemValue(itemStack) + "")
                     .replace("$currencyName", EconomySettingsConfig.getCurrencyName());
         else
             itemWorth = ItemSettingsConfig.getLoreResale()
@@ -232,6 +232,12 @@ public class EliteItemLore {
         if (thirdPartyLore != null)
             lore.addAll(thirdPartyLore);
 
+        String materialName = null;
+        Double dps = null;
+        Double defense = null;
+        Integer itemLevel = null;
+        Integer maximumDurability = null;
+
         for (String string : ItemSettingsConfig.getLoreStructure()) {
 
             if (string.contains("$weaponOrArmorStats")) {
@@ -244,15 +250,29 @@ public class EliteItemLore {
             }
 
             if (string.contains("$itemMaxDurability")) {
-                if (com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack, magicWeapon) <= 0 || itemMeta.isUnbreakable()) continue;
-                string = stringReplacer(string, "$itemMaxDurability", com.magmaguy.elitemobs.items.ItemDurability.maximum(itemStack, magicWeapon));
+                if (maximumDurability == null) maximumDurability = ItemDurability.maximum(itemStack, magicWeapon);
+                if (maximumDurability <= 0 || itemMeta.isUnbreakable()) continue;
+                string = stringReplacer(string, "$itemMaxDurability", maximumDurability);
             }
 
-            string = stringReplacer(string, "$itemMaterial", materialDisplayName(itemStack.getType()));
-            string = stringReplacer(string, "$EDPS", Round.twoDecimalPlaces(EliteItemManager.getDPS(itemStack)));
-            string = stringReplacer(string, "$EDEF", Round.twoDecimalPlaces(EliteItemManager.getEliteDefense(itemStack) + EliteItemManager.getBonusEliteDefense(itemStack)));
+            if (string.contains("$itemMaterial")) {
+                if (materialName == null) materialName = materialDisplayName(itemStack.getType());
+                string = stringReplacer(string, "$itemMaterial", materialName);
+            }
+            if (string.contains("$EDPS")) {
+                if (dps == null) dps = Round.twoDecimalPlaces(EliteItemManager.getDPS(itemStack));
+                string = stringReplacer(string, "$EDPS", dps);
+            }
+            if (string.contains("$EDEF")) {
+                if (defense == null) defense = Round.twoDecimalPlaces(
+                        EliteItemManager.getEliteDefense(itemStack) + EliteItemManager.getBonusEliteDefense(itemStack));
+                string = stringReplacer(string, "$EDEF", defense);
+            }
             string = stringReplacer(string, "$prestigeLevel", prestigeLevel);
-            string = stringReplacer(string, "$itemLevel", EliteItemManager.getRoundedItemLevel(itemStack));
+            if (string.contains("$itemLevel")) {
+                if (itemLevel == null) itemLevel = EliteItemManager.getRoundedItemLevel(itemStack);
+                string = stringReplacer(string, "$itemLevel", itemLevel);
+            }
 
             if (string.contains("$enchantments")) {
                 for (String entry : vanillaEnchantmentsLore)
