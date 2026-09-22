@@ -43,6 +43,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 
 public class DungeonInstance extends MatchInstance {
@@ -234,11 +235,18 @@ public class DungeonInstance extends MatchInstance {
         if (!launchEvent(instancedDungeonsConfigFields, instancedWorldName, player)) return false;
         if (!reservation.isValid()) return false;
 
+        AtomicBoolean worldFilesCreated = new AtomicBoolean(false);
         WorldOperationQueue.queueOperation(
                 player,
-                () -> !reservation.isValid()
-                        || cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName) != null,
                 () -> {
+                    if (!reservation.isValid()) return true;
+                    boolean created = cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName) != null;
+                    worldFilesCreated.set(created);
+                    return created;
+                },
+                () -> {
+                    // Cancellation before copying owns no files, even if another launch chose this name.
+                    if (!worldFilesCreated.get()) return;
                     if (!reservation.isValid()) {
                         cleanupUnloadedWorldFolder(instancedWorldName);
                         return;
@@ -611,6 +619,10 @@ public class DungeonInstance extends MatchInstance {
     }
 
     protected static void cleanupUnloadedWorldFolder(String instancedWorldName) {
+        if (Bukkit.getWorld(instancedWorldName) != null) {
+            Logger.warn("Cannot clean up instanced dungeon world folder " + instancedWorldName + " while the world is loaded.");
+            return;
+        }
         WorldFolderResolver.deleteAllLayouts(instancedWorldName);
         Logger.info("Cleaned up unloaded instanced dungeon world folder " + instancedWorldName);
     }

@@ -2,13 +2,16 @@ package com.magmaguy.elitemobs.playerdata.database;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.magmacore.util.Logger;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class PortOldData {
@@ -17,57 +20,42 @@ public class PortOldData {
         File playerCache = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data/playerCache.yml");
         File playerMoneyData = new File(MetadataHandler.PLUGIN.getDataFolder().getPath() + "/data/playerMoneyData.yml");
 
-        if (!playerCache.isFile() && !playerMoneyData.isFile())
+        if (!playerCache.exists() && !playerMoneyData.exists())
             return;
-
-        FileConfiguration playerCacheConfig = null,
-                playerMoneyDataConfig = null;
-
-        HashSet<UUID> uuids = new HashSet<>();
-        boolean invalidKeys = false;
-
-        if (playerCache.exists()) {
-            playerCacheConfig = YamlConfiguration.loadConfiguration(playerCache);
-            invalidKeys |= collectValidUuids(playerCacheConfig, uuids, playerCache.getName());
-        }
-
-        if (playerMoneyData.exists()) {
-            playerMoneyDataConfig = YamlConfiguration.loadConfiguration(playerMoneyData);
-            invalidKeys |= collectValidUuids(playerMoneyDataConfig, uuids, playerMoneyData.getName());
-        }
-
-        if (uuids.isEmpty() && !invalidKeys) {
-            deleteConfigs(playerCache, playerMoneyData);
-            return;
-        }
 
         List<PlayerDataRepository.LegacyPlayerData> legacyPlayers = new ArrayList<>();
-        for (UUID uuid : uuids) {
-            String displayName = null;
-            if (playerCacheConfig != null) {
-                if (playerCacheConfig.contains(uuid.toString()))
-                    displayName = playerCacheConfig.getString(uuid.toString());
-            }
-            if (displayName == null) {
-                displayName = "PlaceholderName";
-            }
+        try {
+            Map<UUID, Object> names = loadLegacyValues(playerCache);
+            Map<UUID, Object> balances = loadLegacyValues(playerMoneyData);
+            HashSet<UUID> uuids = new HashSet<>(names.keySet());
+            uuids.addAll(balances.keySet());
 
-            Double currency = null;
-            if (playerMoneyDataConfig != null) {
-                if (playerMoneyDataConfig.contains(uuid.toString()))
-                    currency = playerMoneyDataConfig.getDouble(uuid.toString());
+            // Validate both complete sources before the transaction can insert any player.
+            for (UUID uuid : uuids) {
+                Object name = names.getOrDefault(uuid, "PlaceholderName");
+                if (!(name instanceof String displayName)) {
+                    throw new InvalidConfigurationException("Invalid display name for " + uuid + " in " + playerCache.getName());
+                }
+                Object balance = balances.getOrDefault(uuid, 0.0);
+                if (!(balance instanceof Number number)) {
+                    throw new InvalidConfigurationException("Invalid currency for " + uuid + " in " + playerMoneyData.getName());
+                }
+                double currency = number.doubleValue();
+                double cents = currency * 100.0;
+                if (!Double.isFinite(currency) || cents >= 0x1p63 || cents < -0x1p63) {
+                    throw new InvalidConfigurationException("Currency is outside the supported range for " + uuid + " in " + playerMoneyData.getName());
+                }
+                legacyPlayers.add(new PlayerDataRepository.LegacyPlayerData(uuid, displayName, currency));
             }
-            if (currency == null) {
-                currency = 0.0;
-            }
-
-            legacyPlayers.add(new PlayerDataRepository.LegacyPlayerData(uuid, displayName, currency));
+        } catch (IOException | InvalidConfigurationException exception) {
+            Logger.warn("Failed to read legacy player data; no players were imported and source files were preserved.");
+            Logger.warn(exception.getClass().getName() + ": " + exception.getMessage());
+            return;
         }
 
         try {
-            PlayerDataRepository.importLegacy(legacyPlayers);
-            if (!invalidKeys) deleteConfigs(playerCache, playerMoneyData);
-            else Logger.warn("Legacy player files were preserved because they contain invalid UUID keys.");
+            if (!legacyPlayers.isEmpty()) PlayerDataRepository.importLegacy(legacyPlayers);
+            deleteConfigs(playerCache, playerMoneyData);
         } catch (Exception exception) {
             Logger.warn("Failed to transactionally import legacy player data; source files were preserved.");
             Logger.warn(exception.getClass().getName() + ": " + exception.getMessage());
@@ -89,17 +77,24 @@ public class PortOldData {
         }
     }
 
-    private boolean collectValidUuids(FileConfiguration configuration, HashSet<UUID> uuids, String sourceName) {
-        boolean invalid = false;
-        for (String key : configuration.getKeys(false)) {
+    private Map<UUID, Object> loadLegacyValues(File source) throws IOException, InvalidConfigurationException {
+        Map<UUID, Object> values = new HashMap<>();
+        if (!source.exists()) return values;
+        YamlConfiguration configuration = new YamlConfiguration();
+        configuration.load(source);
+        for (Map.Entry<String, Object> entry : configuration.getValues(false).entrySet()) {
+            UUID uuid;
             try {
-                uuids.add(UUID.fromString(key));
+                uuid = UUID.fromString(entry.getKey());
             } catch (IllegalArgumentException exception) {
-                invalid = true;
-                Logger.warn("Ignoring invalid player UUID '" + key + "' in " + sourceName + ".");
+                throw new InvalidConfigurationException("Invalid player UUID '" + entry.getKey() + "' in " + source.getName(), exception);
             }
+            if (values.containsKey(uuid)) {
+                throw new InvalidConfigurationException("Duplicate player UUID " + uuid + " in " + source.getName());
+            }
+            values.put(uuid, entry.getValue());
         }
-        return invalid;
+        return values;
     }
 
 }

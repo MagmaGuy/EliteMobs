@@ -7,9 +7,6 @@ import com.magmaguy.elitemobs.config.DungeonsConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.magmacore.util.Logger;
-import com.magmaguy.magmacore.util.WorldFolderResolver;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -57,17 +54,9 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
             this.isDownloaded = false;
             this.isInstalled = false;
             return;
-        } else {
-            //This removes all instanced worlds not previously correctly removed
-            //(scans both legacy and Paper-26.1+ modern world layouts).
-            String instancedWorldPattern = java.util.regex.Pattern.quote(contentPackagesConfigFields.getWorldName()) + "_\\d+$";
-            for (String worldName : WorldFolderResolver.listAllWorldNames()) {
-                if (worldName.matches(instancedWorldPattern)) {
-                    WorldFolderResolver.deleteAllLayouts(worldName);
-                    Logger.info("Removing previously instanced world " + worldName);
-                }
-            }
         }
+        // A matching directory name does not establish ownership. Retain crash leftovers;
+        // the running instance lifecycle cleans up worlds it creates.
         this.isDownloaded = true;
         this.isInstalled = contentPackagesConfigFields.isEnabled();
     }

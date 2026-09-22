@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
@@ -126,11 +127,18 @@ public class DynamicDungeonInstance extends DungeonInstance {
         if (!launchEvent(dynamicDungeonConfigFields, instancedWorldName, player)) return false;
         if (!reservation.isValid()) return false;
 
+        AtomicBoolean worldFilesCreated = new AtomicBoolean(false);
         WorldOperationQueue.queueOperation(
                 player,
-                () -> !reservation.isValid()
-                        || cloneWorldFiles(dynamicDungeonConfigFields, instancedWorldName) != null,
                 () -> {
+                    if (!reservation.isValid()) return true;
+                    boolean created = cloneWorldFiles(dynamicDungeonConfigFields, instancedWorldName) != null;
+                    worldFilesCreated.set(created);
+                    return created;
+                },
+                () -> {
+                    // Cancellation before copying owns no files, even if another launch chose this name.
+                    if (!worldFilesCreated.get()) return;
                     if (!reservation.isValid()) {
                         cleanupUnloadedWorldFolder(instancedWorldName);
                         return;
