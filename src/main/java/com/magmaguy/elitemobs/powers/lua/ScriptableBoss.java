@@ -348,6 +348,8 @@ public class ScriptableBoss extends ScriptableEntity {
 
         private void tick() {
             Set<UUID> seen = new HashSet<>();
+            // Callbacks run during this loop and can move a later world candidate into the zone.
+            // Preserve that same-tick behavior; ScriptZone-backed watches collect membership first.
             for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation().getWorld(), filter)) {
                 if (livingEntity.equals(eliteEntity.getLivingEntity())) continue;
                 boolean contains = borderMode ? shape.borderContains(livingEntity) : shape.contains(livingEntity);

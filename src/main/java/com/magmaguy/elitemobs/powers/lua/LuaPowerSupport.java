@@ -251,6 +251,10 @@ final class LuaPowerSupport {
         };
     }
 
+    Collection<LivingEntity> filterEntities(World world, Shape shape, String filter) {
+        return filterEntities(world, shape.getEntityQueryBounds(), filter);
+    }
+
     /** Candidates for point queries; callers retain their exact distance or box predicate. */
     Collection<LivingEntity> filterEntities(Location center, double halfX, double halfY, double halfZ, String filter) {
         World world = center.getWorld();
@@ -262,20 +266,40 @@ final class LuaPowerSupport {
                 || halfZ > MAX_LOCAL_QUERY_HALF_EXTENT) {
             return filterEntities(world, filter);
         }
-        double minX = Math.nextDown(center.getX() - halfX);
-        double minY = Math.nextDown(center.getY() - halfY);
-        double minZ = Math.nextDown(center.getZ() - halfZ);
-        double maxX = Math.nextUp(center.getX() + halfX);
-        double maxY = Math.nextUp(center.getY() + halfY);
-        double maxZ = Math.nextUp(center.getZ() + halfZ);
+        double minX = center.getX() - halfX;
+        double minY = center.getY() - halfY;
+        double minZ = center.getZ() - halfZ;
+        double maxX = center.getX() + halfX;
+        double maxY = center.getY() + halfY;
+        double maxZ = center.getZ() + halfZ;
         if (!Double.isFinite(minX) || !Double.isFinite(minY) || !Double.isFinite(minZ)
                 || !Double.isFinite(maxX) || !Double.isFinite(maxY) || !Double.isFinite(maxZ)) {
             return filterEntities(world, filter);
         }
-        // Native overlap is strict. Expand one representable step to include point queries on a boundary.
-        BoundingBox bounds = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+        return filterEntities(world, new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ), filter);
+    }
+
+    private Collection<LivingEntity> filterEntities(World world, BoundingBox bounds, String filter) {
+        if (world == null) return Collections.emptyList();
+        if (bounds == null || bounds.getWidthX() > MAX_LOCAL_QUERY_HALF_EXTENT * 2
+                || bounds.getHeight() > MAX_LOCAL_QUERY_HALF_EXTENT * 2
+                || bounds.getWidthZ() > MAX_LOCAL_QUERY_HALF_EXTENT * 2) {
+            return filterEntities(world, filter);
+        }
+        double minX = Math.nextDown(bounds.getMinX());
+        double minY = Math.nextDown(bounds.getMinY());
+        double minZ = Math.nextDown(bounds.getMinZ());
+        double maxX = Math.nextUp(bounds.getMaxX());
+        double maxY = Math.nextUp(bounds.getMaxY());
+        double maxZ = Math.nextUp(bounds.getMaxZ());
+        if (!Double.isFinite(minX) || !Double.isFinite(minY) || !Double.isFinite(minZ)
+                || !Double.isFinite(maxX) || !Double.isFinite(maxY) || !Double.isFinite(maxZ)) {
+            return filterEntities(world, filter);
+        }
+        // Native overlap is strict, while point and shape predicates can accept a touching boundary.
+        BoundingBox queryBounds = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
         String normalizedFilter = filter.toLowerCase(Locale.ROOT);
-        return world.getNearbyEntities(bounds, entity -> entity instanceof LivingEntity).stream()
+        return world.getNearbyEntities(queryBounds, entity -> entity instanceof LivingEntity).stream()
                 .map(entity -> (LivingEntity) entity)
                 .filter(entity -> switch (normalizedFilter) {
                     case "player", "players" -> entity instanceof Player;

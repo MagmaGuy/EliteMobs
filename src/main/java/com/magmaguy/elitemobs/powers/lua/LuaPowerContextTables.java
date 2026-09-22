@@ -235,7 +235,7 @@ final class LuaPowerContextTables {
         String filter = support.resolveZoneFilter(optionsValue);
         boolean borderMode = support.resolveZoneMode(optionsValue);
         int index = 1;
-        for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation().getWorld(), filter)) {
+        for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation().getWorld(), shape, filter)) {
             if (eliteEntity.getLivingEntity() != null &&
                     livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
                 continue;

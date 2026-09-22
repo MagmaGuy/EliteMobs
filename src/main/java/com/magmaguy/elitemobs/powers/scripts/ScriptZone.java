@@ -19,7 +19,9 @@ import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
  * and triggering events when entities enter or leave the zone.
  */
 public class ScriptZone {
+
+    private static final double MAX_LOCAL_QUERY_EXTENT = 256;
 
     /** The blueprint defining this script zone. */
     @Getter
@@ -344,7 +348,8 @@ public class ScriptZone {
         Map<World, Collection<? extends LivingEntity>> candidatesByWorld = new HashMap<>();
 
         for (Shape shape : shapes) {
-            Collection<? extends LivingEntity> livingEntities = candidatesByWorld.computeIfAbsent(
+            Collection<? extends LivingEntity> livingEntities = localCandidates(shape);
+            if (livingEntities == null) livingEntities = candidatesByWorld.computeIfAbsent(
                     shape.getCenter().getWorld(), world -> zoneBlueprint.getFilter() != null ? switch (zoneBlueprint.getFilter()) {
                 case PLAYER -> filterByPlayer(shape.getCenter());
                 case ELITE -> filterByElite(shape.getCenter());
@@ -359,6 +364,33 @@ public class ScriptZone {
             }
         }
         return validatedEntities;
+    }
+
+    /** Null retains the existing per-evaluation world fallback for unbounded or very broad shapes. */
+    private Collection<LivingEntity> localCandidates(Shape shape) {
+        World world = shape.getCenter().getWorld();
+        BoundingBox bounds = shape.getEntityQueryBounds();
+        if (world == null || bounds == null || bounds.getWidthX() > MAX_LOCAL_QUERY_EXTENT
+                || bounds.getHeight() > MAX_LOCAL_QUERY_EXTENT || bounds.getWidthZ() > MAX_LOCAL_QUERY_EXTENT) {
+            return null;
+        }
+        double minX = Math.nextDown(bounds.getMinX());
+        double minY = Math.nextDown(bounds.getMinY());
+        double minZ = Math.nextDown(bounds.getMinZ());
+        double maxX = Math.nextUp(bounds.getMaxX());
+        double maxY = Math.nextUp(bounds.getMaxY());
+        double maxZ = Math.nextUp(bounds.getMaxZ());
+        if (!Double.isFinite(minX) || !Double.isFinite(minY) || !Double.isFinite(minZ)
+                || !Double.isFinite(maxX) || !Double.isFinite(maxY) || !Double.isFinite(maxZ)) return null;
+        BoundingBox queryBounds = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+        return world.getNearbyEntities(queryBounds, entity -> entity instanceof LivingEntity).stream()
+                .map(entity -> (LivingEntity) entity)
+                .filter(entity -> zoneBlueprint.getFilter() == null || switch (zoneBlueprint.getFilter()) {
+                    case PLAYER -> entity instanceof Player;
+                    case ELITE -> EntityTracker.getEliteMobEntity(entity) != null;
+                    case LIVING -> true;
+                })
+                .toList();
     }
 
     /**
