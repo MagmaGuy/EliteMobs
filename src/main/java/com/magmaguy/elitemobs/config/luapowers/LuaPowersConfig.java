@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.powers.lua.LuaPowerManager;
 import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.config.ContentFileSelector;
 import lombok.Getter;
 import com.magmaguy.shaded.reflections.Reflections;
 
@@ -24,12 +25,14 @@ public class LuaPowersConfig {
 
     @Getter
     private static LinkedHashMap<String, PowersConfigFields> luaPowers = new LinkedHashMap<>();
+    private static java.util.Set<String> premadeFilenames = java.util.Set.of();
 
     private final LinkedHashMap<String, LuaPowersConfigFields> pendingPremades = new LinkedHashMap<>();
     private final File powersDirectory;
 
     public LuaPowersConfig() {
         luaPowers = new LinkedHashMap<>();
+        premadeFilenames = java.util.Set.of();
         powersDirectory = new File(MetadataHandler.PLUGIN.getDataFolder(), "powers");
         if (!powersDirectory.exists() && !powersDirectory.mkdirs()) {
             Logger.warn("Failed to create powers directory for premade Lua powers.");
@@ -39,11 +42,23 @@ public class LuaPowersConfig {
         for (LuaPowersConfigFields luaPowersConfigFields : discoverPremades()) {
             pendingPremades.put(luaPowersConfigFields.getFilename().toLowerCase(Locale.ROOT), luaPowersConfigFields);
         }
+        premadeFilenames = java.util.Set.copyOf(pendingPremades.keySet());
 
-        directoryCrawler(powersDirectory);
+        List<File> candidates = new ArrayList<>();
+        collectSources(powersDirectory, candidates);
+        for (File selected : ContentFileSelector.select(candidates, LuaPowersConfig::filenameKey))
+            fileInitializer(selected);
         for (LuaPowersConfigFields luaPowersConfigFields : new ArrayList<>(pendingPremades.values())) {
             initialize(luaPowersConfigFields);
         }
+    }
+
+    public static boolean isPremadeFilename(String filename) {
+        return premadeFilenames.contains(filename.toLowerCase(Locale.ROOT));
+    }
+
+    public static String filenameKey(String filename) {
+        return isPremadeFilename(filename) ? filename.toLowerCase(Locale.ROOT) : filename;
     }
 
     private List<LuaPowersConfigFields> discoverPremades() {
@@ -61,7 +76,7 @@ public class LuaPowersConfig {
                 .collect(Collectors.toList());
     }
 
-    private void directoryCrawler(File directory) {
+    private void collectSources(File directory, List<File> candidates) {
         File[] files = directory.listFiles();
         if (files == null) {
             return;
@@ -69,10 +84,8 @@ public class LuaPowersConfig {
         java.util.Arrays.sort(files, Comparator.comparing(File::getName));
         for (File file : files) {
             if (file.isDirectory()) {
-                directoryCrawler(file);
-            } else {
-                fileInitializer(file);
-            }
+                collectSources(file, candidates);
+            } else if (file.getName().toLowerCase(Locale.ROOT).endsWith(".lua")) candidates.add(file);
         }
     }
 

@@ -101,7 +101,7 @@ public class LuaElitePower extends ElitePower {
             return ElitePowerActionResult.REJECTED;
         }
         initializeInstance(false);
-        if (instance == null || scriptableBoss == null) {
+        if (instance == null || instance.isClosed() || scriptableBoss == null) {
             return recordMindAction(ElitePowerActionResult.REJECTED);
         }
 
@@ -114,7 +114,7 @@ public class LuaElitePower extends ElitePower {
         if (query.kind() != ScriptQueryResult.Kind.STRING) {
             Logger.warn("Lua power " + getFileName()
                     + " returned a non-string on_mind_action result; expected accepted, deferred, or rejected.");
-            closeRuntime();
+            instance.shutdown();
             return recordMindAction(ElitePowerActionResult.REJECTED);
         }
         try {
@@ -124,7 +124,7 @@ public class LuaElitePower extends ElitePower {
             Logger.warn("Lua power " + getFileName()
                     + " returned invalid on_mind_action result '"
                     + query.stringValue().orElse("") + "'.");
-            closeRuntime();
+            instance.shutdown();
             return recordMindAction(ElitePowerActionResult.REJECTED);
         }
     }

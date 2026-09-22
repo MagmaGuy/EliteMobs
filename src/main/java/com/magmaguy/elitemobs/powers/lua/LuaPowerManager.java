@@ -1,9 +1,11 @@
 package com.magmaguy.elitemobs.powers.lua;
 
 import com.magmaguy.elitemobs.config.powers.LuaPowerConfigFields;
+import com.magmaguy.elitemobs.config.luapowers.LuaPowersConfig;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields.PowerType;
 import com.magmaguy.magmacore.scripting.ScriptDefinition;
+import com.magmaguy.magmacore.config.ContentFileSelector;
 import com.magmaguy.magmacore.util.Logger;
 
 import java.io.File;
@@ -23,15 +25,21 @@ public final class LuaPowerManager {
         LinkedHashMap<String, PowersConfigFields> discoveredPowers = new LinkedHashMap<>();
         LinkedHashSet<File> powerDirectories = new LinkedHashSet<>();
         Map<java.nio.file.Path, PowersConfigFields> metadata = new HashMap<>();
+        Map<java.nio.file.Path, LuaPowerConfigFields> premades = new HashMap<>();
         for (PowersConfigFields loadedYamlPower : loadedYamlPowers) {
             if (loadedYamlPower.getFile() != null && loadedYamlPower.getFile().getParentFile() != null) {
                 powerDirectories.add(loadedYamlPower.getFile().getParentFile());
-                metadata.put(loadedYamlPower.getFile().toPath().toAbsolutePath().normalize(), loadedYamlPower);
+                java.nio.file.Path source = loadedYamlPower.getFile().toPath().toAbsolutePath().normalize();
+                if (loadedYamlPower instanceof LuaPowerConfigFields lua) {
+                    premades.put(source, lua);
+                } else metadata.put(source, loadedYamlPower);
             }
         }
-        for (File powerDirectory : powerDirectories) {
-            discoverDirectory(powerDirectory, discoveredPowers, metadata);
-        }
+        List<File> candidates = new ArrayList<>();
+        Set<java.nio.file.Path> visitedDirectories = new HashSet<>();
+        for (File powerDirectory : powerDirectories) collectSources(powerDirectory, candidates, visitedDirectories);
+        for (File file : ContentFileSelector.select(candidates, LuaPowersConfig::filenameKey))
+            discoverFile(file, discoveredPowers, metadata, premades);
         return discoveredPowers;
     }
 
@@ -39,8 +47,9 @@ public final class LuaPowerManager {
         definitions.clear();
     }
 
-    private static void discoverDirectory(File directory, Map<String, PowersConfigFields> discoveredPowers,
-                                          Map<java.nio.file.Path, PowersConfigFields> metadata) {
+    private static void collectSources(File directory, List<File> candidates,
+                                       Set<java.nio.file.Path> visitedDirectories) {
+        if (!visitedDirectories.add(directory.toPath().toAbsolutePath().normalize())) return;
         File[] files = directory.listFiles();
         if (files == null) {
             return;
@@ -48,29 +57,45 @@ public final class LuaPowerManager {
         Arrays.sort(files, Comparator.comparing(File::getName));
         for (File file : files) {
             if (file.isDirectory()) {
-                discoverDirectory(file, discoveredPowers, metadata);
+                collectSources(file, candidates, visitedDirectories);
                 continue;
             }
             if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".lua")) {
                 continue;
             }
-            try {
-                String stem = file.getName().substring(0, file.getName().length() - 4);
-                PowersConfigFields settings = metadata.get(file.toPath().resolveSibling(stem + ".yml").toAbsolutePath().normalize());
-                if (settings != null && !settings.isEnabled()) continue;
-                var power = loadLuaPower(file.getName(), file, settings == null ? null : settings.getEffect(),
+            candidates.add(file);
+        }
+    }
+
+    private static void discoverFile(File file, Map<String, PowersConfigFields> discoveredPowers,
+                                      Map<java.nio.file.Path, PowersConfigFields> metadata,
+                                      Map<java.nio.file.Path, LuaPowerConfigFields> premades) {
+        try {
+            String stem = file.getName().substring(0, file.getName().length() - 4);
+            PowersConfigFields settings = metadata.get(file.toPath().resolveSibling(stem + ".yml").toAbsolutePath().normalize());
+            if (settings == null)
+                settings = metadata.get(file.toPath().resolveSibling(stem + ".yaml").toAbsolutePath().normalize());
+            LuaPowerConfigFields power = premades.get(file.toPath().toAbsolutePath().normalize());
+            if (power == null) {
+                // A failed selected premade stays failed; discovery cannot retry or replace it.
+                if (LuaPowersConfig.isPremadeFilename(file.getName())) return;
+                if (settings != null && !settings.isEnabled()) return;
+                power = loadLuaPower(file.getName(), file, settings == null ? null : settings.getEffect(),
                         settings == null || settings.getPowerType() == null ? PowerType.MISCELLANEOUS : settings.getPowerType());
-                if (settings != null) {
-                    power.setPowerCooldown(settings.getPowerCooldown());
-                    power.setGlobalCooldown(settings.getGlobalCooldown());
-                }
-                discoveredPowers.put(file.getName(), power);
-            } catch (IOException exception) {
-                Logger.warn("Failed to read Lua power file " + file.getName() + ".");
-            } catch (Exception exception) {
-                Logger.warn("Failed to load Lua power file " + file.getName() + ".");
-                exception.printStackTrace();
             }
+            if (settings != null) {
+                power.setEnabled(settings.isEnabled());
+                power.setEffect(settings.getEffect());
+                if (settings.getPowerType() != null) power.setPowerType(settings.getPowerType());
+                power.setPowerCooldown(settings.getPowerCooldown());
+                power.setGlobalCooldown(settings.getGlobalCooldown());
+            }
+            discoveredPowers.put(power.getFilename(), power);
+        } catch (IOException exception) {
+            Logger.warn("Failed to read Lua power file " + file.getName() + ".");
+        } catch (Exception exception) {
+            Logger.warn("Failed to load Lua power file " + file.getName() + ".");
+            exception.printStackTrace();
         }
     }
 
@@ -78,7 +103,8 @@ public final class LuaPowerManager {
                                                     File file,
                                                     String effect,
                                                     PowerType powerType) throws IOException {
-        String source = readSource(file.toPath().toRealPath(), file.toPath().toRealPath().getParent(), new HashSet<>(), 0);
+        java.nio.file.Path path = file.toPath().toRealPath();
+        String source = readSource(path, path.getParent(), new HashSet<>(), 0);
         return registerLuaPower(registryKey, file, source, effect, powerType).configFields;
     }
 

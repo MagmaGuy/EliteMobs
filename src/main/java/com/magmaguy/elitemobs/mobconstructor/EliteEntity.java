@@ -350,10 +350,14 @@ public class EliteEntity {
         this.eliteLuaPowerBinding = eliteLuaPowerBinding;
         if (eliteLuaPowerBinding == null) return;
         for (ElitePowerPauseReason reason : ElitePowerPauseReason.values()) {
-            if (powerSuppression.isSuppressed(reason)) {
-                eliteLuaPowerBinding.setPauseReason(reason, true);
-            }
+            eliteLuaPowerBinding.setPauseReason(reason, isPowerPaused(reason));
         }
+    }
+
+    boolean isPowerPaused(ElitePowerPauseReason reason) {
+        return powerSuppression.isSuppressed(reason)
+                || reason == ElitePowerPauseReason.MIND_SERVICE
+                && eliteMindBinding != null && eliteMindBinding.isExplicitlyPaused();
     }
 
     boolean isPreparedMindSpawn() {

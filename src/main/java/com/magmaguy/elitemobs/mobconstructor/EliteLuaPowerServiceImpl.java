@@ -310,6 +310,8 @@ final class EliteLuaPowerServiceImpl implements EliteLuaPowerService, Listener {
             for (EliteLuaPowerCatalog.Entry entry : entries) {
                 LuaElitePower power = entry.registration().newPower();
                 power.setOwnerEntity(eliteEntity);
+                for (ElitePowerPauseReason reason : ElitePowerPauseReason.values())
+                    power.setRuntimePauseReason(reason, eliteEntity.isPowerPaused(reason));
                 power.startRuntimeOrThrow();
                 attached.add(new EliteLuaPowerBinding.AttachedPower(entry, power));
             }

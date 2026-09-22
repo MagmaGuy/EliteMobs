@@ -27,7 +27,6 @@ public class PowersConfig extends CustomConfig {
 
         Map<String, PowersConfigFields> discoveredLuaPowers = LuaPowerManager.discoverLuaPowers(powers.values());
         powers.putAll(discoveredLuaPowers);
-        powers.putAll(premadeLuaPowers);
 
         ElitePower.initializePowers();
         powers.values().forEach(ElitePower::registerConfiguredPower);
