@@ -108,7 +108,8 @@ final class LuaPowerContextTables {
                     results.set(index++, entityTables.createEntityReferenceTable(entity));
                 }
             } else {
-                for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation().getWorld(), filter)) {
+                for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation(),
+                        Math.abs(radius), Math.abs(radius), Math.abs(radius), filter)) {
                     if (eliteEntity.getLivingEntity() != null &&
                             livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
                         continue;
@@ -137,7 +138,7 @@ final class LuaPowerContextTables {
             double maxY = center.getY() + halfY;
             double minZ = center.getZ() - halfZ;
             double maxZ = center.getZ() + halfZ;
-            for (LivingEntity livingEntity : support.filterEntities(center.getWorld(), filter)) {
+            for (LivingEntity livingEntity : support.filterEntities(center, halfX, halfY, halfZ, filter)) {
                 if (eliteEntity.getLivingEntity() != null &&
                         livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
                     continue;

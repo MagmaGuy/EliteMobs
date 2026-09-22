@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.ObjectSerializer;
 import com.magmaguy.magmacore.util.Logger;
@@ -93,38 +94,82 @@ public class PlayerData {
 
     // Skill XP fields - each skill has independent progression
     @Getter
-    @Setter
     private long skillXP_ARMOR = 0;
     @Getter
-    @Setter
     private long skillXP_SWORDS = 0;
     @Getter
-    @Setter
     private long skillXP_AXES = 0;
     @Getter
-    @Setter
     private long skillXP_BOWS = 0;
     @Getter
-    @Setter
     private long skillXP_CROSSBOWS = 0;
     @Getter
-    @Setter
     private long skillXP_TRIDENTS = 0;
     @Getter
-    @Setter
     private long skillXP_HOES = 0;
     @Getter
-    @Setter
     private long skillXP_MACES = 0;
     @Getter
-    @Setter
     private long skillXP_SPEARS = 0;
     @Getter
-    @Setter
     private long skillXP_STAVES = 0;
     @Getter
-    @Setter
     private long skillXP_WANDS = 0;
+
+    public void setSkillXP_ARMOR(long xp) {
+        skillXP_ARMOR = xp;
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
+    }
+
+    public void setSkillXP_SWORDS(long xp) {
+        skillXP_SWORDS = xp;
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
+    }
+
+    public void setSkillXP_AXES(long xp) {
+        skillXP_AXES = xp;
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
+    }
+
+    public void setSkillXP_BOWS(long xp) {
+        skillXP_BOWS = xp;
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
+    }
+
+    public void setSkillXP_CROSSBOWS(long xp) {
+        skillXP_CROSSBOWS = xp;
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
+    }
+
+    public void setSkillXP_TRIDENTS(long xp) {
+        skillXP_TRIDENTS = xp;
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
+    }
+
+    public void setSkillXP_HOES(long xp) {
+        skillXP_HOES = xp;
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
+    }
+
+    public void setSkillXP_MACES(long xp) {
+        skillXP_MACES = xp;
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
+    }
+
+    public void setSkillXP_SPEARS(long xp) {
+        skillXP_SPEARS = xp;
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
+    }
+
+    public void setSkillXP_STAVES(long xp) {
+        skillXP_STAVES = xp;
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
+    }
+
+    public void setSkillXP_WANDS(long xp) {
+        skillXP_WANDS = xp;
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
+    }
 
     // Skill bonus selections - JSON string mapping skill types to selected skill IDs
     @Getter
@@ -166,6 +211,7 @@ public class PlayerData {
                             if (deferred == null || deferred.isEmpty()) {
                                 databaseDataLoaded = true;
                                 playerDataHashMap.put(uuid, PlayerData.this);
+                                CombatLevelCalculator.invalidateOnlineCombatLevel();
                                 loadingPlayers.remove(uuid, PlayerData.this);
                                 break;
                             }
@@ -179,7 +225,8 @@ public class PlayerData {
                 } catch (Exception e) {
                     Logger.warn("Something went wrong while generating a new player entry. This is bad! Tell the dev.");
                     Logger.warn(e.getClass().getName() + ": " + e.getMessage());
-                    playerDataHashMap.remove(uuid, PlayerData.this);
+                    if (playerDataHashMap.remove(uuid, PlayerData.this))
+                        CombatLevelCalculator.invalidateOnlineCombatLevel();
                     synchronized (PlayerDataRepository.stateMonitor()) {
                         if (loadingPlayers.remove(uuid, PlayerData.this))
                             deferredDatabaseValues.remove(uuid);
@@ -208,6 +255,7 @@ public class PlayerData {
 
     public static void clearPlayerData(UUID uuid) {
         playerDataHashMap.remove(uuid);
+        CombatLevelCalculator.invalidateOnlineCombatLevel();
     }
 
     public static boolean isInMemory(Player player) {
@@ -677,17 +725,17 @@ public class PlayerData {
      */
     private static void setSkillXPByType(PlayerData playerData, SkillType skillType, long xp) {
         switch (skillType) {
-            case ARMOR -> playerData.skillXP_ARMOR = xp;
-            case SWORDS -> playerData.skillXP_SWORDS = xp;
-            case AXES -> playerData.skillXP_AXES = xp;
-            case BOWS -> playerData.skillXP_BOWS = xp;
-            case CROSSBOWS -> playerData.skillXP_CROSSBOWS = xp;
-            case TRIDENTS -> playerData.skillXP_TRIDENTS = xp;
-            case HOES -> playerData.skillXP_HOES = xp;
-            case MACES -> playerData.skillXP_MACES = xp;
-            case SPEARS -> playerData.skillXP_SPEARS = xp;
-            case STAVES -> playerData.skillXP_STAVES = xp;
-            case WANDS -> playerData.skillXP_WANDS = xp;
+            case ARMOR -> playerData.setSkillXP_ARMOR(xp);
+            case SWORDS -> playerData.setSkillXP_SWORDS(xp);
+            case AXES -> playerData.setSkillXP_AXES(xp);
+            case BOWS -> playerData.setSkillXP_BOWS(xp);
+            case CROSSBOWS -> playerData.setSkillXP_CROSSBOWS(xp);
+            case TRIDENTS -> playerData.setSkillXP_TRIDENTS(xp);
+            case HOES -> playerData.setSkillXP_HOES(xp);
+            case MACES -> playerData.setSkillXP_MACES(xp);
+            case SPEARS -> playerData.setSkillXP_SPEARS(xp);
+            case STAVES -> playerData.setSkillXP_STAVES(xp);
+            case WANDS -> playerData.setSkillXP_WANDS(xp);
         }
     }
 
@@ -827,6 +875,7 @@ public class PlayerData {
     public static void closeConnection() {
         synchronized (PlayerDataRepository.stateMonitor()) {
             playerDataHashMap.clear();
+            CombatLevelCalculator.invalidateOnlineCombatLevel();
             loadingPlayers.clear();
             deferredDatabaseValues.clear();
         }
@@ -982,7 +1031,8 @@ public class PlayerData {
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player != sessionPlayer || playerDataHashMap.get(uuid) != this) {
-                playerDataHashMap.remove(uuid, this);
+                if (playerDataHashMap.remove(uuid, this))
+                    CombatLevelCalculator.invalidateOnlineCombatLevel();
                 return;
             }
             for (Quest quest : new ArrayList<>(quests))
@@ -1014,6 +1064,7 @@ public class PlayerData {
 
         @EventHandler
         public void onPlayerLogout(PlayerQuitEvent event) {
+            CombatLevelCalculator.invalidateOnlineCombatLevel();
             UUID playerUuid = event.getPlayer().getUniqueId();
             String playerName = event.getPlayer().getName();
             new BukkitRunnable() {

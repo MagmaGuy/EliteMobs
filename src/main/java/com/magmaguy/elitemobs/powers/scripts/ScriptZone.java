@@ -341,13 +341,15 @@ public class ScriptZone {
      */
     private Collection<LivingEntity> getEntitiesInArea(List<Shape> shapes, TargetType targetType) {
         Set<LivingEntity> validatedEntities = new HashSet<>();
+        Map<World, Collection<? extends LivingEntity>> candidatesByWorld = new HashMap<>();
 
         for (Shape shape : shapes) {
-            Collection<? extends LivingEntity> livingEntities = zoneBlueprint.getFilter() != null ? switch (zoneBlueprint.getFilter()) {
+            Collection<? extends LivingEntity> livingEntities = candidatesByWorld.computeIfAbsent(
+                    shape.getCenter().getWorld(), world -> zoneBlueprint.getFilter() != null ? switch (zoneBlueprint.getFilter()) {
                 case PLAYER -> filterByPlayer(shape.getCenter());
                 case ELITE -> filterByElite(shape.getCenter());
                 case LIVING -> filterByLiving(shape.getCenter());
-            } : filterByLiving(shape.getCenter());
+            } : filterByLiving(shape.getCenter()));
 
             for (LivingEntity livingEntity : livingEntities) {
                 boolean contains = targetType.equals(TargetType.ZONE_FULL) ? shape.contains(livingEntity) : shape.borderContains(livingEntity);
@@ -384,10 +386,8 @@ public class ScriptZone {
     private Collection<LivingEntity> filterByElite(Location center) {
         World world = center.getWorld();
         if (world != null) {
-            return world.getEntities().stream()
-                    .filter(entity -> entity instanceof LivingEntity)
+            return world.getLivingEntities().stream()
                     .filter(entity -> EntityTracker.getEliteMobEntity(entity) != null)
-                    .map(entity -> (LivingEntity) entity)
                     .collect(Collectors.toList());
         } else {
             Logger.warn("World is null in filterByElite.");

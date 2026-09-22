@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class Placeholders extends PlaceholderExpansion {
@@ -133,13 +132,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId()));
             case "player_top_tier":
             case "player_top_combat_level":
-                int highestLevel = 0;
-                for (Player iteratedPlayer : Bukkit.getOnlinePlayers()) {
-                    int currentLevel = CombatLevelCalculator.calculateCombatLevel(iteratedPlayer.getUniqueId());
-                    if (currentLevel > highestLevel)
-                        highestLevel = currentLevel;
-                }
-                return "" + highestLevel;
+                return "" + CombatLevelCalculator.highestOnlineCombatLevel();
             case "player_kills":
                 return "" + PlayerData.getKills(player.getUniqueId());
             case "player_deaths":

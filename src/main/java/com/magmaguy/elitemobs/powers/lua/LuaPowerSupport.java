@@ -34,6 +34,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.bukkit.util.BoundingBox;
 import com.magmaguy.shaded.luaj.vm2.LuaTable;
 import com.magmaguy.shaded.luaj.vm2.LuaValue;
 import com.magmaguy.shaded.luaj.vm2.Varargs;
@@ -42,6 +43,7 @@ import com.magmaguy.shaded.luaj.vm2.lib.VarArgFunction;
 import java.util.*;
 
 final class LuaPowerSupport {
+    private static final double MAX_LOCAL_QUERY_HALF_EXTENT = 128;
 
     private final ScriptDefinition definition;
     private final EliteEntity eliteEntity;
@@ -247,6 +249,41 @@ final class LuaPowerSupport {
                     .toList();
             default -> new ArrayList<>(world.getLivingEntities());
         };
+    }
+
+    /** Candidates for point queries; callers retain their exact distance or box predicate. */
+    Collection<LivingEntity> filterEntities(Location center, double halfX, double halfY, double halfZ, String filter) {
+        World world = center.getWorld();
+        if (world == null) return Collections.emptyList();
+        // Keep broad or unbounded requests on the existing world query instead of walking huge section ranges.
+        if (!Double.isFinite(halfX) || !Double.isFinite(halfY) || !Double.isFinite(halfZ)
+                || halfX < 0 || halfY < 0 || halfZ < 0
+                || halfX > MAX_LOCAL_QUERY_HALF_EXTENT || halfY > MAX_LOCAL_QUERY_HALF_EXTENT
+                || halfZ > MAX_LOCAL_QUERY_HALF_EXTENT) {
+            return filterEntities(world, filter);
+        }
+        double minX = Math.nextDown(center.getX() - halfX);
+        double minY = Math.nextDown(center.getY() - halfY);
+        double minZ = Math.nextDown(center.getZ() - halfZ);
+        double maxX = Math.nextUp(center.getX() + halfX);
+        double maxY = Math.nextUp(center.getY() + halfY);
+        double maxZ = Math.nextUp(center.getZ() + halfZ);
+        if (!Double.isFinite(minX) || !Double.isFinite(minY) || !Double.isFinite(minZ)
+                || !Double.isFinite(maxX) || !Double.isFinite(maxY) || !Double.isFinite(maxZ)) {
+            return filterEntities(world, filter);
+        }
+        // Native overlap is strict. Expand one representable step to include point queries on a boundary.
+        BoundingBox bounds = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+        String normalizedFilter = filter.toLowerCase(Locale.ROOT);
+        return world.getNearbyEntities(bounds, entity -> entity instanceof LivingEntity).stream()
+                .map(entity -> (LivingEntity) entity)
+                .filter(entity -> switch (normalizedFilter) {
+                    case "player", "players" -> entity instanceof Player;
+                    case "elite", "elites" -> EntityTracker.getEliteMobEntity(entity) != null;
+                    case "mob", "mobs" -> !(entity instanceof Player);
+                    default -> true;
+                })
+                .toList();
     }
 
     void applyVectorOptions(Vector vector, LuaTable options) {
