@@ -77,9 +77,11 @@ public class CustomSummonPower extends ElitePower implements Listener {
         return new BukkitRunnable() {
             @Override
             public void run() {
-                if (summoningEntity.getGlobalReinforcementsCount() > 30 * summoningEntity.getSpawnLocation().getWorld().getPlayers().size())
-                    return;
+                Location source = summoningEntity.getSpawnLocation();
+                if (source == null || source.getWorld() == null) return;
+                int maximumReinforcements = 30 * source.getWorld().getPlayers().size();
                 for (int i = 0; i < customBossReinforcement.amount; i++) {
+                    if (summoningEntity.getGlobalReinforcementsCount() >= maximumReinforcements) return;
                     CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(customBossReinforcement.bossFileName);
                     if (customBossEntity == null) {
                         Logger.warn("Failed to spawn reinforcement because boss " + customBossReinforcement.bossFileName + " was invalid! Does the file exist? Is it configured correctly?");
@@ -89,12 +91,15 @@ public class CustomSummonPower extends ElitePower implements Listener {
                         customBossEntity.setNormalizedCombat();
                     CustomSpawn customSpawn = new CustomSpawn(customBossReinforcement.customSpawn, customBossEntity);
                     //Case if the spawn fails
-                    if (customSpawn.getCustomSpawnConfigFields() == null) continue;
-                    customSpawn.setWorld(summoningEntity.getSpawnLocation().getWorld());
-                    customSpawn.queueSpawn();
+                    if (customSpawn.getCustomSpawnConfigFields() == null) {
+                        customBossEntity.remove(com.magmaguy.elitemobs.api.internal.RemovalReason.REINFORCEMENT_CULL);
+                        continue;
+                    }
+                    customSpawn.setWorld(source.getWorld());
                     summoningEntity.addGlobalReinforcement(customBossEntity);
-                    customBossReinforcement.isSummoned = true;
                     customBossEntity.setSummoningEntity(summoningEntity);
+                    customSpawn.queueSpawn();
+                    customBossReinforcement.isSummoned = true;
                 }
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20L * 10);
@@ -650,8 +655,9 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             ThreadLocalRandom.current().nextInt(-15, 15),
                             0,
                             ThreadLocalRandom.current().nextInt(-15, 15)));
-                    randomLocation.setY(CustomSpawn.getHighestValidBlock(randomLocation, 256));
-                    if (randomLocation.getY() == -100) continue;
+                    int height = CustomSpawn.getHighestValidBlock(randomLocation, randomLocation.getWorld().getMaxHeight() - 2);
+                    if (height == Integer.MIN_VALUE) continue;
+                    randomLocation.setY(height);
                     spawnLocation = randomLocation;
                     break;
                 }

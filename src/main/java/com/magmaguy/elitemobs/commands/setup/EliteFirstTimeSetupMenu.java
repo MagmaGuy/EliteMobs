@@ -77,6 +77,9 @@ public class EliteFirstTimeSetupMenu {
                 player.closeInventory();
                 DefaultConfig.toggleSetupDone(true);
                 MobCombatSettingsConfig.toggleNaturalMobSpawning(true);
+                SkillsConfig.toggleSkillSystem(true);
+                ItemSettingsConfig.toggleEliteMobsLoot(true);
+                EventsConfig.setEventsEnabled(true);
                 sendPostClickMessages(player,
                         InitializeConfig.getRecommendedPresetClickConfirm(),
                         InitializeConfig.getRecommendedPresetClickNightbreakLogin(),
@@ -104,6 +107,8 @@ public class EliteFirstTimeSetupMenu {
                 player.closeInventory();
                 DefaultConfig.toggleSetupDone(true);
                 MobCombatSettingsConfig.toggleNaturalMobSpawning(false);
+                SkillsConfig.toggleSkillSystem(true);
+                ItemSettingsConfig.toggleEliteMobsLoot(true);
                 EventsConfig.setEventsEnabled(false);
                 sendPostClickMessages(player,
                         InitializeConfig.getContentOnlyPresetClickConfirm(),
@@ -139,6 +144,7 @@ public class EliteFirstTimeSetupMenu {
                 MobCombatSettingsConfig.toggleNaturalMobSpawning(false);
                 SkillsConfig.toggleSkillSystem(false);
                 ItemSettingsConfig.toggleEliteMobsLoot(false);
+                EventsConfig.setEventsEnabled(false);
                 Logger.sendSimpleMessage(player, InitializeConfig.getSeparatorLine());
                 sendText(player, InitializeConfig.getNothingPresetClickConfirm());
                 sendText(player, InitializeConfig.getNothingPresetClickWarning());

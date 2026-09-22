@@ -67,43 +67,19 @@ public class CustomSpawnConfigFields extends CustomConfigFields {
         this.highestYLevel = processInt("highestYLevel", highestYLevel, 320, false);
         this.validWorlds = processWorldList("validWorlds", validWorlds, new ArrayList<>(), false);
         this.validWorldEnvironments = processEnumList("validWorldEnvironments", validWorldEnvironments, new ArrayList<>(), World.Environment.class, false);
-        List<String> extendedDefaults = new ArrayList<>();
-        if (fileConfiguration.getList("validBiomesV2") == null || fileConfiguration.getList("validBiomesV2").isEmpty()) {
-            for (String validBiomesString : validBiomesStrings) {
-                Biome biome;
-                if (!validBiomesString.contains(":")) {
-                    biome = Biome.valueOf(validBiomesString.toLowerCase(Locale.ROOT));
-                } else {
-                    biome = Registry.BIOME.get(new NamespacedKey(validBiomesString.split(":")[0], validBiomesString.split(":")[1].toLowerCase(Locale.ROOT)));
-                }
-                if (biome == null && !validBiomesString.contains("minecraft:custom")) {
-                    Logger.warn("Null biome for " + validBiomesString);
-                    continue;
-                }
-                //todo: reimplement this but using the new biome system
-//                List<String> customBiomes = CustomBiomeCompatibility.getCustomBiomes(biome);
-//                if (customBiomes != null && !customBiomes.isEmpty())
-//                    for (Biome customBiome : customBiomes) {
-//                        String customBiomeString = biome.getKey().getNamespace() + ":" + customBiome.getKey().getKey();
-//                        extendedDefaults.add(customBiomeString);
-//                    }
+        this.validBiomesStrings = processStringList("validBiomesV2", validBiomesStrings, new ArrayList<>(), false);
+        List<Biome> resolvedBiomes = new ArrayList<>();
+        for (String configuredBiome : validBiomesStrings) {
+            NamespacedKey key = NamespacedKey.fromString(configuredBiome.toLowerCase(Locale.ROOT));
+            Biome biome = key == null ? null : Registry.BIOME.get(key);
+            if (biome == null) {
+                Logger.warn("Invalid biome '" + configuredBiome + "' in custom spawn " + filename + "; spawn definition disabled.");
+                this.isEnabled = false;
+                continue;
             }
+            if (!resolvedBiomes.contains(biome)) resolvedBiomes.add(biome);
         }
-
-        validBiomesStrings.addAll(extendedDefaults);
-        fileConfiguration.addDefault("validBiomesV2", validBiomesStrings);
-//        this.validBiomesStrings = processStringList("validBiomesV2", validBiomesStrings, validBiomesStrings, false);
-
-        for (String validBiomesString : validBiomesStrings) {
-            Biome biome;
-            if (!validBiomesString.contains(":")) {
-                biome = Biome.valueOf(validBiomesString.toLowerCase(Locale.ROOT));
-            } else {
-                biome = Registry.BIOME.get(new NamespacedKey(validBiomesString.split(":")[0], validBiomesString.split(":")[1].toLowerCase(Locale.ROOT)));
-            }
-            validBiomes.add(biome);
-//            Logger.debug("Added biome " + biome.getKey().getKey() + " to valid biomes list for generator " + filename + " with namespace " + biome.getKey().getNamespace() + ".");
-        }
+        this.validBiomes = List.copyOf(resolvedBiomes);
         this.earliestTime = processLong("earliestTime", earliestTime, 0, false);
         this.latestTime = processLong("latestTime", latestTime, 24000, false);
         this.moonPhase = processEnum("moonPhase", moonPhase, null, MoonPhaseDetector.MoonPhase.class, false);

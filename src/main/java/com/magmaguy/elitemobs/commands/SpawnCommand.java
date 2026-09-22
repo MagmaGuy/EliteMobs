@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -37,16 +38,8 @@ public class SpawnCommand {
                                                    Vector coords,
                                                    Integer level,
                                                    Optional<String> powers) {
-        try {
-            Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
-            spawnEliteEntityTypeCommand(commandSender,
-                    location,
-                    entityType,
-                    level,
-                    powers);
-        } catch (Exception e) {
-            commandSender.sendMessage(CommandMessagesConfig.getWorldNotValidMessage());
-        }
+        Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
+        spawnEliteEntityTypeCommand(commandSender, location, entityType, level, powers);
     }
 
     public static void spawnEliteEntityTypeCommand(CommandSender commandSender,
@@ -54,6 +47,13 @@ public class SpawnCommand {
                                                    EntityType entityType,
                                                    Integer level,
                                                    Optional<String> powers) {
+        if (level == null) return;
+        if (location == null || location.getWorld() == null
+                || !Double.isFinite(location.getX()) || !Double.isFinite(location.getY())
+                || !Double.isFinite(location.getZ())) {
+            commandSender.sendMessage(CommandMessagesConfig.getWorldNotValidMessage());
+            return;
+        }
         if (EliteMobProperties.getPluginData(entityType) == null) {
             commandSender.sendMessage(CommandMessagesConfig.getInvalidEntityTypeMessage().replace("$type", entityType.toString()));
             return;
@@ -62,6 +62,7 @@ public class SpawnCommand {
         if (powers.isPresent()) {
             String[] powersArray = powers.get().split(" ");
             mobPowers = getPowers(powersArray, commandSender);
+            if (mobPowers == null) return;
         }
         if (EliteMobProperties.getPluginData(entityType).getBehavior() != null) {
             try {
@@ -74,14 +75,27 @@ public class SpawnCommand {
             }
             return;
         }
-        LivingEntity livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
         EliteEntity eliteEntity = new EliteEntity();
         eliteEntity.setLevel(level);
         eliteEntity.setNaturalEntity(true);
-        eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
-        if (eliteEntity.getLivingEntity() == null) return;
-        if (powers.isPresent()) eliteEntity.applyPowers(mobPowers);
-        else eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));
+        LivingEntity livingEntity = (LivingEntity) location.getWorld().spawnEntity(location, entityType);
+        boolean accepted = false;
+        try {
+            if (!livingEntity.isValid()) return;
+            eliteEntity.setLivingEntity(livingEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+            if (eliteEntity.getLivingEntity() == null) return;
+            if (powers.isPresent()) eliteEntity.applyPowers(mobPowers);
+            else eliteEntity.randomizePowers(EliteMobProperties.getPluginData(livingEntity));
+            accepted = true;
+        } finally {
+            if (!accepted) {
+                try {
+                    eliteEntity.remove(RemovalReason.OTHER);
+                } finally {
+                    livingEntity.remove();
+                }
+            }
+        }
     }
 
     public static void spawnCustomBossCommand(CommandSender commandSender,
@@ -167,7 +181,7 @@ public class SpawnCommand {
                     allPowers.append(iteratedField.getFilename()).append(", ");
                 allPowers.append("custom");
                 commandSender.sendMessage(allPowers.toString());
-                return new HashSet<>();
+                return null;
             }
             elitePowers.add(powersConfigFields);
         }

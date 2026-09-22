@@ -7,7 +7,6 @@ import com.magmaguy.elitemobs.utils.DebugBlockLocation;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 public class CustomBossCommandHandler {
     private CustomBossCommandHandler() {
@@ -20,11 +19,13 @@ public class CustomBossCommandHandler {
                 originalLocation.getBlockZ() + 0.5,
                 originalLocation.getYaw(),
                 originalLocation.getPitch());
-        for (int i = 0; i < 4; i++)
-            if (newLocation.add(new Vector(0, i, 0)).getBlock().isPassable()) {
+        for (int i = 0; i < 4; i++) {
+            newLocation.setY(originalLocation.getBlockY() + 0.5 + i);
+            if (newLocation.getBlock().isPassable()) {
                 new DebugBlockLocation(newLocation);
                 return newLocation;
             }
+        }
         return null;
     }
 

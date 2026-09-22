@@ -355,6 +355,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         if (summoningEntity != null)
             summoningEntity.addReinforcement(this);
 
+        cancelGlobalReinforcementTasks();
         if (spawnLocation.getWorld() != null)
             for (ElitePower elitePower : elitePowers)
                 if (elitePower instanceof CustomSummonPower)
@@ -542,8 +543,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
 
     private void cullReinforcements(boolean cullGlobal) {
         if (cullGlobal)
-            globalReinforcementEntities.forEach(customBossEntity -> customBossEntity.remove(RemovalReason.REINFORCEMENT_CULL));
-        for (CustomBossEntity customBossEntity : eliteReinforcementEntities)
+            new ArrayList<>(globalReinforcementEntities).forEach(customBossEntity -> customBossEntity.remove(RemovalReason.REINFORCEMENT_CULL));
+        for (CustomBossEntity customBossEntity : new ArrayList<>(eliteReinforcementEntities))
             if (customBossEntity != null)
                 customBossEntity.remove(RemovalReason.REINFORCEMENT_CULL);
         for (Entity entity : nonEliteReinforcementEntities)
@@ -551,9 +552,15 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                 entity.remove();
 
         if (cullGlobal)
-            globalReinforcements.clear();
+            globalReinforcementEntities.clear();
         eliteReinforcementEntities.clear();
         nonEliteReinforcementEntities.clear();
+    }
+
+    private void cancelGlobalReinforcementTasks() {
+        for (BukkitTask task : globalReinforcements)
+            if (task != null) task.cancel();
+        globalReinforcements.clear();
     }
 
     @Override
@@ -624,6 +631,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     public void remove(RemovalReason removalReason) {
         beginRemovalCall();
         try {
+            cancelGlobalReinforcementTasks();
             dynamicLevelBossEntities.remove(this);
             if (livingEntity != null) persistentLocation = livingEntity.getLocation();
             //Remove the living entity
@@ -646,6 +654,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                         removalReason.equals(RemovalReason.SHUTDOWN) ||
                         removalReason.equals(RemovalReason.ARENA_RESET) ||
                         removalReason.equals(RemovalReason.REMOVE_COMMAND) ||
+                        removalReason.equals(RemovalReason.REINFORCEMENT_CULL) ||
                         removalReason.equals(RemovalReason.WORLD_UNLOAD) && this instanceof InstancedBossEntity;
 
         if (!isPersistent) bossInstanceEnd = true;
@@ -666,19 +675,14 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                     !removalReason.equals(RemovalReason.ARENA_RESET))
                 if (phaseBossEntity != null)
                     phaseBossEntity.silentReset();
-            globalReinforcements.forEach((bukkitTask -> {
-                if (bukkitTask != null)
-                    bukkitTask.cancel();
-            }));
-            globalReinforcements.clear();
-            if (!removalReason.equals(RemovalReason.REINFORCEMENT_CULL)) {
-                if (summoningEntity != null)
-                    summoningEntity.removeReinforcement(this);
-                if (customSpawn != null)
-                    customSpawn.setKeepTrying(false);
-            }
+            if (summoningEntity != null)
+                summoningEntity.removeReinforcement(this);
+            if (customSpawn != null)
+                customSpawn.setKeepTrying(false);
 
             if (customBossesConfigFields.isCullReinforcements()) cullReinforcements(true);
+            else for (CustomBossEntity pending : new ArrayList<>(globalReinforcementEntities))
+                if (!pending.exists()) pending.remove(RemovalReason.REINFORCEMENT_CULL);
 
         } else if (removalReason.equals(RemovalReason.CHUNK_UNLOAD) || removalReason.equals(RemovalReason.WORLD_UNLOAD)) {
             //Cancel boss tracking bar to prevent task leak and potential NPE from stale world references
