@@ -22,7 +22,7 @@ public abstract class KillObjective extends Objective {
             for (Player player : PartyManager.expandSharedCreditParticipants(
                     event.getEliteEntity().getDamagers().keySet(), event.getEliteEntity())) {
                 if (!player.hasMetadata("NPC") && PlayerData.isInMemory(player.getUniqueId()))
-                    for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
+                    for (Quest quest : new java.util.ArrayList<>(PlayerData.getQuests(player.getUniqueId())))
                         if (quest != null)
                             for (Objective objective : quest.getQuestObjectives().getObjectives())
                                 if (objective instanceof KillObjective)

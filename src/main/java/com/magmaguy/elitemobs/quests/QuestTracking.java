@@ -2,7 +2,7 @@ package com.magmaguy.elitemobs.quests;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.QuestAcceptEvent;
-import com.magmaguy.elitemobs.api.QuestCompleteEvent;
+import com.magmaguy.elitemobs.api.QuestRewardEvent;
 import com.magmaguy.elitemobs.api.QuestProgressionEvent;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
@@ -523,13 +523,12 @@ public class QuestTracking {
             if (!isTracking(event.getPlayer())) return;
             if (!getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getQuest().getQuestID().equals(event.getQuest().getQuestID()))
                 return;
-            getPlayerTrackingQuests().get(event.getPlayer().getUniqueId())
-                    .updateLocations(getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getQuest());
+            getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).queueLocationRefresh();
             getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).refreshScoreboard();
         }
 
         @EventHandler(ignoreCancelled = true)
-        public void onQuestCompleteEvent(QuestCompleteEvent event) {
+        public void onQuestCompleteEvent(QuestRewardEvent event) {
             if (!isTracking(event.getPlayer())) return;
             if (!getPlayerTrackingQuests().get(event.getPlayer().getUniqueId()).getQuest().getQuestID().equals(event.getQuest().getQuestID()))
                 return;

@@ -12,6 +12,7 @@ import com.magmaguy.elitemobs.utils.EventCaller;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,10 +21,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+import java.util.*;
 
 public class CustomFetchObjective extends Objective {
+    private static final long serialVersionUID = -3846169815392092956L;
+    private static final Map<UUID, PendingRefresh> pendingRefreshes = new HashMap<>();
 
     @Getter
     private final String key;
@@ -45,6 +50,7 @@ public class CustomFetchObjective extends Objective {
     }
 
     private static void checkEvent(@NotNull Player player, @NotNull ItemStack itemStack) {
+        if (!PlayerData.isInMemory(player)) return;
         for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
             for (Objective objective : quest.getQuestObjectives().getObjectives())
                 if (objective instanceof CustomFetchObjective)
@@ -91,20 +97,64 @@ public class CustomFetchObjective extends Objective {
      */
     @Override
     public void progressNonlinearObjective(QuestObjectives questObjectives, Player player) {
-        CustomFetchObjective customFetchObjective = this;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!player.isOnline() || questObjectives.isTurnedIn()) return;
-                fullUpdate(player);
-                objectiveCompleted = currentAmount >= targetAmount;
-                QuestProgressionEvent questProgressionEvent = new QuestProgressionEvent(
-                        Bukkit.getPlayer(questObjectives.getQuest().getPlayerUUID()),
-                        questObjectives.getQuest(),
-                        customFetchObjective);
-                new EventCaller(questProgressionEvent);
+        if (!PlayerData.isInMemory(player) || questObjectives.isTurnedIn()) return;
+        PendingRefresh pending = pendingRefreshes.get(player.getUniqueId());
+        if (pending == null) {
+            pending = new PendingRefresh(player, PlayerData.getPlayerData(player.getUniqueId()));
+            pendingRefreshes.put(player.getUniqueId(), pending);
+            PendingRefresh scheduled = pending;
+            pending.task = Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> refresh(scheduled), 1L);
+        }
+        pending.objectives.computeIfAbsent(questObjectives, ignored -> new HashSet<>()).add(this);
+    }
+
+    public static void cancelRefresh(UUID playerId) {
+        PendingRefresh pending = pendingRefreshes.remove(playerId);
+        if (pending != null && pending.task != null) pending.task.cancel();
+    }
+
+    private static void refresh(PendingRefresh pending) {
+        Player player = pending.player;
+        if (!pendingRefreshes.remove(player.getUniqueId(), pending) || !player.isOnline()
+                || Bukkit.getPlayer(player.getUniqueId()) != player
+                || PlayerData.getPlayerData(player.getUniqueId()) != pending.owner) return;
+        List<Quest> active = PlayerData.getQuests(player.getUniqueId());
+        pending.objectives.keySet().removeIf(objectives -> objectives.isTurnedIn() || !active.contains(objectives.getQuest()));
+        Map<NamespacedKey, Integer> counts = new HashMap<>();
+        for (Set<CustomFetchObjective> objectives : pending.objectives.values())
+            for (CustomFetchObjective objective : objectives) counts.put(new NamespacedKey(MetadataHandler.PLUGIN, objective.key), 0);
+        if (counts.isEmpty()) return;
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null || !item.hasItemMeta()) continue;
+            var data = item.getItemMeta().getPersistentDataContainer();
+            for (NamespacedKey key : data.getKeys())
+                if (counts.containsKey(key) && data.has(key, PersistentDataType.STRING))
+                    counts.computeIfPresent(key, (ignored, count) -> count + item.getAmount());
+        }
+        List<QuestProgressionEvent> changes = new ArrayList<>();
+        pending.objectives.forEach((questObjectives, objectives) -> {
+            for (CustomFetchObjective objective : objectives) {
+                int amount = counts.get(new NamespacedKey(MetadataHandler.PLUGIN, objective.key));
+                boolean completed = amount >= objective.targetAmount;
+                if (objective.currentAmount == amount && objective.objectiveCompleted == completed) continue;
+                objective.currentAmount = amount;
+                objective.objectiveCompleted = completed;
+                changes.add(new QuestProgressionEvent(player, questObjectives.getQuest(), objective));
             }
-        }.runTaskLater(MetadataHandler.PLUGIN, 1);
+        });
+        QuestProgressionEvent.fireBatch(player, changes);
+    }
+
+    private static final class PendingRefresh {
+        private final Player player;
+        private final PlayerData owner;
+        private final Map<QuestObjectives, Set<CustomFetchObjective>> objectives = new LinkedHashMap<>();
+        private BukkitTask task;
+
+        private PendingRefresh(Player player, PlayerData owner) {
+            this.player = player;
+            this.owner = owner;
+        }
     }
 
     /**

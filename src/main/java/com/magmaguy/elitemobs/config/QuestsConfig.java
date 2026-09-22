@@ -215,15 +215,19 @@ public class QuestsConfig extends ConfigurationFile {
                 EntityType.ZOMBIFIED_PIGLIN.toString()));
         entityTypes.addAll(laterEntities);
 
-        ConfigurationEngine.setList(file, fileConfiguration, "questEntityTypes", entityTypes, false);
+        List<?> configuredTypes = ConfigurationEngine.setList(file, fileConfiguration, "questEntityTypes", entityTypes, false);
 
         List<EntityType> parsedTypes = new ArrayList<>();
-        for (String string : entityTypes)
+        for (Object configured : configuredTypes)
             try {
-                parsedTypes.add(EntityType.valueOf(string));
-            } catch (Exception ex) {
-                Logger.warn("Entity type " + string + " is not a valid entity type from the Spigot API!");
+                EntityType type = EntityType.valueOf(String.valueOf(configured));
+                if (!com.magmaguy.elitemobs.config.mobproperties.MobPropertiesConfig.getMobProperties().containsKey(type))
+                    throw new IllegalArgumentException("Not supported for dynamic kill quests");
+                parsedTypes.add(type);
+            } catch (IllegalArgumentException ex) {
+                Logger.warn("Entity type " + configured + " is not supported for dynamic quests.");
             }
+        if (parsedTypes.isEmpty()) Logger.warn("questEntityTypes has no usable entries. Dynamic quest offers are disabled until this is corrected.");
         return parsedTypes;
     }
 

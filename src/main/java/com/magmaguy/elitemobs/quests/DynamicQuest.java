@@ -38,6 +38,10 @@ public class DynamicQuest extends Quest {
         randomizerTask = new BukkitRunnable() {
             @Override
             public void run() {
+                if (QuestsConfig.getQuestEntityTypes().isEmpty()) {
+                    threeRandomDynamicObjectives.clear();
+                    return;
+                }
                 for (int activeLevel = 1; activeLevel < 21; activeLevel++) {
                     List<QuestObjectives> questObjectives = new ArrayList<>();
                     for (int questNumber = 0; questNumber < 3; questNumber++) {
@@ -114,7 +118,11 @@ public class DynamicQuest extends Quest {
 
     /** The same offer selection as getQuests, without generating pending quests for a marker. */
     public static boolean hasAvailableQuests(Player player) {
-        List<Quest> activeQuests = PlayerData.getQuests(player.getUniqueId());
+        if (!PlayerData.isInMemory(player)) return false;
+        return hasAvailableQuests(player, PlayerData.getQuests(player.getUniqueId()));
+    }
+
+    public static boolean hasAvailableQuests(Player player, List<Quest> activeQuests) {
         if (activeQuests == null) return false;
         for (Quest quest : activeQuests)
             if (quest instanceof DynamicQuest && !quest.isAccepted() && !quest.getQuestObjectives().isTurnedIn())

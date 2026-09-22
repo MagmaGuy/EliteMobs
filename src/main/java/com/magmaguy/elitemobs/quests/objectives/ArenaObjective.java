@@ -23,7 +23,7 @@ public class ArenaObjective extends Objective {
         @EventHandler
         public void onArenaComplete(ArenaCompleteEvent arenaCompleteEvent) {
             for (Player player : arenaCompleteEvent.getArenaInstance().getPlayers())
-                for (Quest quest : PlayerData.getQuests(player.getUniqueId()))
+                for (Quest quest : new java.util.ArrayList<>(PlayerData.getQuests(player.getUniqueId())))
                     if (quest instanceof CustomQuest)
                         for (Objective objective : quest.getQuestObjectives().getObjectives())
                             if (objective instanceof ArenaObjective arenaObjective &&

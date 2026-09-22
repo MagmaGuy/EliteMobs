@@ -35,7 +35,6 @@ import com.magmaguy.elitemobs.config.wormholes.WormholeConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
 import com.magmaguy.elitemobs.economy.VaultCompatibility;
-import com.magmaguy.elitemobs.entitytracker.CustomProjectileData;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.events.ActionEvent;
 import com.magmaguy.elitemobs.events.TimedEvent;
@@ -698,7 +697,6 @@ public class EliteMobs extends JavaPlugin {
         TreasureChest.shutdown();
         WorldOperationQueue.shutdown();
         MatchInstance.shutdown();
-        CustomProjectileData.shutdown();
         DynamicQuest.shutdown();
         ProceduralShopMenu.shutdown();
         EliteMobsWorld.shutdown();
@@ -754,6 +752,7 @@ public class EliteMobs extends JavaPlugin {
         BuyOrSellMenu.BuyOrSellMenuEvents.shutdown();
         Quest.shutdown();
         QuestInventoryMenu.shutdown();
+        com.magmaguy.elitemobs.utils.SimpleScoreboard.shutdown();
         com.magmaguy.elitemobs.quests.menus.QuestScreenSession.shutdown();
         StatsPage.StatsPageEvents.shutdown();
         GearPage.GearPageEvents.shutdown();

@@ -321,12 +321,14 @@ public class EventsRegistrer {
         register(new QuestAcceptEvent.QuestAcceptEventHandler());
         register(new ClassUnlockObjective.Events());
         register(new QuestCompleteEvent.QuestCompleteEventHandler());
+        register(new QuestObjectivesCompletedEvent.QuestObjectivesCompletedEventHandler());
         register(new QuestLeaveEvent.QuestLeaveEventHandler());
         register(new QuestProgressionEvent.QuestProgressionEventHandler());
         register(new QuestTracking.QuestTrackingEvents());
         register(new CustomQuest.CustomQuestEvents());
         register(new QuestDialogueBossBarManager.QuestDialogueBossBarEvents());
         register(new QuestInventoryMenu.QuestInventoryMenuEvents());
+        register(new com.magmaguy.elitemobs.utils.SimpleScoreboard.Events());
         register(new com.magmaguy.elitemobs.quests.menus.QuestScreenSession());
         register(new ArenaCompleteEvent.ArenaCompleteEventHandler());
 

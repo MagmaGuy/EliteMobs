@@ -31,6 +31,7 @@ public class Quest implements Serializable {
     }
 
     public static void releasePlayerSession(UUID playerId) {
+        com.magmaguy.elitemobs.quests.objectives.CustomFetchObjective.cancelRefresh(playerId);
         pendingPlayerQuests.remove(playerId);
         if (!PlayerData.isInMemory(playerId)) return;
         for (Quest quest : PlayerData.getQuests(playerId))

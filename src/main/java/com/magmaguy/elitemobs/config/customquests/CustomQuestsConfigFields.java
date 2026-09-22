@@ -120,6 +120,14 @@ public class CustomQuestsConfigFields extends CustomConfigFields {
         this.questLevel = processInt("questLevel", questLevel, 0, false);
         this.questAcceptSound = processString("questAcceptSound", questAcceptSound, "", false);
         this.questCompleteSound = processString("questCompleteSound", questCompleteSound, "", false);
+        if (isEnabled) {
+            try {
+                com.magmaguy.elitemobs.quests.objectives.CustomObjectivesParser.processCustomObjectives(this);
+            } catch (IllegalArgumentException invalidObjective) {
+                isEnabled = false;
+                Logger.warn("Quest " + filename + " was disabled because an objective is invalid: " + invalidObjective.getMessage());
+            }
+        }
     }
 
     private void updateOldStringFormat(List<String> oldList) {
@@ -174,11 +182,14 @@ public class CustomQuestsConfigFields extends CustomConfigFields {
                 parsedObjectives.put(maps.getKey(), parseQuestObjective(maps.getKey(), maps.getValue()));
             return parsedObjectives;
 
-        } else
-            rawMap = fileConfiguration.getConfigurationSection("customObjectives").getValues(false);
+        } else {
+            ConfigurationSection section = fileConfiguration.getConfigurationSection("customObjectives");
+            rawMap = section == null ? null : section.getValues(false);
+        }
 
         if (rawMap == null) {
             Logger.warn("Failed to parse custom objectives for " + filename);
+            isEnabled = false;
             return new HashMap<>();
         }
         //Parse for the specific translatable elements

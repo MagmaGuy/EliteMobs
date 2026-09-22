@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.quests.CustomQuest;
+import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.utils.MapListInterpreter;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -20,14 +21,21 @@ public class CustomObjectivesParser {
      * ARENA:filename=X.yml
      */
     public static List<Objective> processCustomObjectives(CustomQuest customQuest) {
+        return processCustomObjectives(customQuest.getCustomQuestsConfigFields());
+    }
+
+    public static List<Objective> processCustomObjectives(CustomQuestsConfigFields fields) {
         List<Objective> objectives = new ArrayList<>();
 
-        for (Map<String, Object> maps : customQuest.getCustomQuestsConfigFields().getCustomObjectives().values())
-            objectives.add(processObjectiveType(maps, customQuest));
+        for (Map<String, Object> maps : fields.getCustomObjectives().values()) {
+            Objective objective = processObjectiveType(maps, fields);
+            if (objective == null) throw new IllegalArgumentException("Invalid objective in " + fields.getFilename());
+            objectives.add(objective);
+        }
         return objectives;
     }
 
-    private static Objective processObjectiveType(Map<String, Object> rawMap, CustomQuest customQuest) {
+    private static Objective processObjectiveType(Map<String, Object> rawMap, CustomQuestsConfigFields fields) {
         ObjectiveType objectiveType = null;
         String filename = null;
         String location = null;
@@ -38,28 +46,28 @@ public class CustomObjectivesParser {
         for (Map.Entry<String, Object> entry : rawMap.entrySet()) {
             switch (entry.getKey()) {
                 case "class":
-                    classId = MapListInterpreter.parseString(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename());
+                    classId = MapListInterpreter.parseString(entry.getKey(), entry.getValue(), fields.getFilename());
                     break;
                 case "objectiveType":
-                    objectiveType = MapListInterpreter.parseEnum(entry.getKey(), entry.getValue(), ObjectiveType.class, customQuest.getConfigurationFilename());
+                    objectiveType = MapListInterpreter.parseEnum(entry.getKey(), entry.getValue(), ObjectiveType.class, fields.getFilename());
                     break;
                 case "filename":
-                    filename = MapListInterpreter.parseString(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename());
+                    filename = MapListInterpreter.parseString(entry.getKey(), entry.getValue(), fields.getFilename());
                     break;
                 case "amount":
-                    amount = MapListInterpreter.parseInteger(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename());
-                    if (amount == null) amount = 1;
+                    amount = MapListInterpreter.parseInteger(entry.getKey(), entry.getValue(), fields.getFilename());
+                    if (amount == null || amount < 1) throw new IllegalArgumentException("Objective amount must be positive in " + fields.getFilename());
                     break;
                 case "location":
-                    location = MapListInterpreter.parseString(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename());
+                    location = MapListInterpreter.parseString(entry.getKey(), entry.getValue(), fields.getFilename());
                     break;
                 case "dialog":
-                    dialog = ChatColorConverter.convert(MapListInterpreter.parseStringList(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename()));
+                    dialog = ChatColorConverter.convert(MapListInterpreter.parseStringList(entry.getKey(), entry.getValue(), fields.getFilename()));
                     break;
                 case "npcName":
                 case "itemName":
                 case "name":
-                    name = ChatColorConverter.convert(MapListInterpreter.parseString(entry.getKey(), entry.getValue(), customQuest.getConfigurationFilename()));
+                    name = ChatColorConverter.convert(MapListInterpreter.parseString(entry.getKey(), entry.getValue(), fields.getFilename()));
                     break;
             }
         }
@@ -68,7 +76,7 @@ public class CustomObjectivesParser {
             try{
                 name = CustomItem.getCustomItem(filename).getCustomItemsConfigFields().getName();
             } catch (Exception ex){
-                Logger.warn("Failed to get name for custom item " + filename + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not display the item name.");
+                Logger.warn("Failed to get name for custom item " + filename + " in Custom Quest " + fields.getFilename() + " . This objective will not display the item name.");
             }
         }
 
@@ -76,7 +84,7 @@ public class CustomObjectivesParser {
             var form = classId == null || classId.isBlank() ? null
                     : com.magmaguy.elitemobs.advancedcombat.content.BuiltInClassContent.catalog().find(classId).orElse(null);
             if (form == null || filename == null || filename.isBlank()) {
-                Logger.warn("Invalid CLASS_UNLOCK objective in " + customQuest.getConfigurationFilename()
+                Logger.warn("Invalid CLASS_UNLOCK objective in " + fields.getFilename()
                         + ": a valid class and trainer filename are required. The objective cannot be completed.");
                 // Keep a blocked objective: skipping it would allow the quest to complete without an unlock.
                 return new ClassUnlockObjective(null, name == null ? "Unknown class" : name, filename);
@@ -85,12 +93,12 @@ public class CustomObjectivesParser {
         }
 
         if (filename == null) {
-            Logger.warn("Invalid filename for entry " + rawMap + " in Custom Quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " . This objective will not be registered.");
+            Logger.warn("Invalid filename for entry " + rawMap + " in Custom Quest " + fields.getFilename() + " . This objective will not be registered.");
             return null;
         }
         try {
             if (objectiveType.equals(ObjectiveType.KILL_CUSTOM))
-                return new CustomKillObjective(filename, amount, customQuest.getQuestLevel());
+                return new CustomKillObjective(filename, amount, fields.getQuestLevel());
             else if (objectiveType.equals(ObjectiveType.FETCH_ITEM))
                 return new CustomFetchObjective(amount, name, filename);
             else if (objectiveType.equals(ObjectiveType.DIALOG)) {
@@ -105,7 +113,7 @@ public class CustomObjectivesParser {
             else if (objectiveType.equals(ObjectiveType.ARENA))
                 return new ArenaObjective(name, filename);
         } catch (Exception ex) {
-            Logger.warn("Failed to register objective type for quest " + customQuest.getCustomQuestsConfigFields().getFilename() + " ! This quest will be skipped");
+            Logger.warn("Failed to register objective type for quest " + fields.getFilename() + " ! This quest will be skipped");
             Logger.warn("Invalid entry: " + rawMap);
             ex.printStackTrace();
         }

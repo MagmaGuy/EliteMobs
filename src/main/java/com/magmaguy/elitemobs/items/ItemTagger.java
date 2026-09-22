@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.items;
 
+import org.bukkit.Material;
+
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
@@ -37,6 +39,7 @@ public class ItemTagger {
 
     // Arrow combat data — stored at launch time for accurate ranged damage calculation
     private static final NamespacedKey ARROW_WEAPON_LEVEL = new NamespacedKey(MetadataHandler.PLUGIN, "arrowWeaponLevel");
+    private static final NamespacedKey ARROW_WEAPON_MATERIAL = new NamespacedKey(MetadataHandler.PLUGIN, "arrowWeaponMaterial");
     private static final NamespacedKey ARROW_SKILL_TYPE = new NamespacedKey(MetadataHandler.PLUGIN, "arrowSkillType");
     private static final NamespacedKey ARROW_SKILL_LEVEL = new NamespacedKey(MetadataHandler.PLUGIN, "arrowSkillLevel");
     private static final NamespacedKey ARROW_DAMAGE_MULTIPLIER = new NamespacedKey(MetadataHandler.PLUGIN, "arrowDamageMultiplier");
@@ -255,6 +258,22 @@ public class ItemTagger {
     }
 
     // ==================== ARROW COMBAT DATA ====================
+
+    public static void setArrowWeaponMaterial(Projectile projectile, ItemStack weapon) {
+        if (weapon == null || weapon.getType().isAir()) projectile.getPersistentDataContainer().remove(ARROW_WEAPON_MATERIAL);
+        else projectile.getPersistentDataContainer().set(ARROW_WEAPON_MATERIAL, PersistentDataType.STRING, weapon.getType().name());
+    }
+
+    @Nullable
+    public static Material getArrowWeaponMaterial(Projectile projectile) {
+        String material = projectile.getPersistentDataContainer().get(ARROW_WEAPON_MATERIAL, PersistentDataType.STRING);
+        if (material == null) return null;
+        try {
+            return Material.valueOf(material);
+        } catch (IllegalArgumentException unknownMaterial) {
+            return null;
+        }
+    }
 
     public static void setArrowWeaponLevel(@Nullable Projectile projectile, double level) {
         if (projectile == null) return;

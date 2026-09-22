@@ -8,7 +8,6 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
-import com.magmaguy.elitemobs.entitytracker.CustomProjectileData;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.advancedcombat.abilities.ClassAbilityProjectileCarrier;
 import com.magmaguy.elitemobs.items.ItemTagger;
@@ -618,6 +617,7 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
             Projectile projectile,
             ItemStack weapon) {
         EliteItemManager.tagArrow(projectile, weapon);
+        ItemTagger.setArrowWeaponMaterial(projectile, weapon);
         double weaponLevel = WeaponOffenseCalculator.getEffectiveWeaponLevel(weapon);
         ItemTagger.setArrowWeaponLevel(projectile, weaponLevel);
         if (!ItemTagger.hasArrowEnchantmentCombat(projectile)) {
@@ -748,10 +748,8 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
         double damageModifier = 1;
         if (!bypass) {
             if (event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE))
-                if (CustomProjectileData.getCustomProjectileDataHashMap().get((Projectile) event.getDamager()) == null)
-                    damageModifier = getCustomDamageModifier(eliteEntity, null);
-                else
-                    damageModifier = getCustomDamageModifier(eliteEntity, CustomProjectileData.getCustomProjectileDataHashMap().get(event.getDamager()).getProjectileShooterMaterial());
+                damageModifier = getCustomDamageModifier(eliteEntity,
+                        event.getDamager() instanceof Projectile projectile ? ItemTagger.getArrowWeaponMaterial(projectile) : null);
             else damageModifier = getCustomDamageModifier(eliteEntity, player.getInventory().getItemInMainHand().getType());
         }
 

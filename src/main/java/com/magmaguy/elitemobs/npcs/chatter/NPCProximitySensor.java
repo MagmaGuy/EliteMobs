@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 public class NPCProximitySensor implements Listener {
@@ -67,6 +68,7 @@ public class NPCProximitySensor implements Listener {
                 }
 
                 Map<NPCProximityKey, ProximityDetection> detections = new HashMap<>(Math.max(16, npcEntities.size()));
+                Map<UUID, PlayerQuestFacts> questFacts = new HashMap<>();
                 for (NPCEntity npcEntity : npcEntities) {
                     LivingEntity villager = npcEntity.getVillager();
                     if (villager == null || !villager.isValid()) continue;
@@ -81,6 +83,7 @@ public class NPCProximitySensor implements Listener {
                     Location npcLocation = villager.getLocation();
                     boolean patrolOwnsFacing = npcEntity.getNPCsConfigFields().isPatrolFaceNearbyPlayers()
                             && PatrolService.hasConfiguredPatrol(npcEntity);
+                    Vector facingDirection = null;
                     for (Entity entity : villager.getNearbyEntities(scanRadius, scanRadius, scanRadius)) {
                         if (!(entity instanceof Player player)) continue;
                         if (!player.isValid()) continue;
@@ -90,14 +93,19 @@ public class NPCProximitySensor implements Listener {
                             continue;
                         double distanceSquared = playerLocation.distanceSquared(npcLocation);
                         if (questGiver && distanceSquared <= QUEST_MARKER_RADIUS * QUEST_MARKER_RADIUS)
-                            updateQuestIndicator(npcEntity, player);
+                            updateQuestIndicator(npcEntity, player, questFacts);
                         // Distant markers do not trigger greetings, proximity scripts or NPC facing.
                         if (activationRadius <= 0 || distanceSquared > activationRadiusSquared) continue;
                         Vector direction = playerLocation.toVector().subtract(npcLocation.toVector());
                         if (!patrolOwnsFacing && direction.lengthSquared() > 0) {
-                            villager.teleport(npcLocation.clone().setDirection(direction));
+                            facingDirection = direction;
                         }
                         detections.put(new NPCProximityKey(npcEntity.getUuid(), player.getUniqueId()), new ProximityDetection(npcEntity, player));
+                    }
+                    if (facingDirection != null && villager.isValid()) {
+                        Location facing = npcLocation.clone().setDirection(facingDirection);
+                        if (facing.getYaw() != npcLocation.getYaw() || facing.getPitch() != npcLocation.getPitch())
+                            villager.setRotation(facing.getYaw(), facing.getPitch());
                     }
                 }
 
@@ -153,12 +161,12 @@ public class NPCProximitySensor implements Listener {
     private record ProximityDetection(NPCEntity npcEntity, Player player) {
     }
 
-    private static void updateQuestIndicator(NPCEntity npcEntity, Player player) {
+    private static void updateQuestIndicator(NPCEntity npcEntity, Player player, Map<UUID, PlayerQuestFacts> questFacts) {
         var type = npcEntity.getNPCsConfigFields().getInteractionType();
         if (type != NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER
                 && type != NPCInteractions.NPCInteractionType.QUEST_GIVER) return;
         NPCProximityKey key = new NPCProximityKey(npcEntity.getUuid(), player.getUniqueId());
-        questIndicators.computeIfAbsent(key, ignored -> new QuestIndicator()).update(npcEntity, player, true);
+        questIndicators.computeIfAbsent(key, ignored -> new QuestIndicator()).update(npcEntity, player, true, questFacts);
     }
 
     private static void refreshQuestIndicators() {
@@ -167,6 +175,7 @@ public class NPCProximitySensor implements Listener {
         indicatorBounceOffset = BOUNCE_HEIGHT * 0.5 * (1 + Math.sin(
                 2 * Math.PI * indicatorAnimationTick / BOUNCE_PERIOD_TICKS - Math.PI / 2));
         boolean refreshQuestState = indicatorAnimationTick % 10 == 0;
+        Map<UUID, PlayerQuestFacts> questFacts = refreshQuestState ? new HashMap<>() : null;
         var iterator = questIndicators.entrySet().iterator();
         while (iterator.hasNext()) {
             var entry = iterator.next();
@@ -181,42 +190,55 @@ public class NPCProximitySensor implements Listener {
                 entry.getValue().remove();
                 iterator.remove();
             } else {
-                entry.getValue().update(npc, player, refreshQuestState);
+                entry.getValue().update(npc, player, refreshQuestState, questFacts);
             }
         }
     }
 
-    private static String findQuestState(NPCEntity npcEntity, Player player) {
+    private static String findQuestState(NPCEntity npcEntity, Player player, Map<UUID, PlayerQuestFacts> questFacts) {
         if (!PlayerData.isInMemory(player)) return null;
-        List<Quest> quests = PlayerData.getQuests(player.getUniqueId());
-        if (quests == null) return null;
+        PlayerQuestFacts facts = questFacts.computeIfAbsent(player.getUniqueId(), ignored -> new PlayerQuestFacts(player));
         var type = npcEntity.getNPCsConfigFields().getInteractionType();
         boolean dynamic = type == NPCInteractions.NPCInteractionType.QUEST_GIVER;
         if (!dynamic && type != NPCInteractions.NPCInteractionType.CUSTOM_QUEST_GIVER) return null;
         if (dynamic && !player.hasPermission("elitemobs.quest.npc")) return null;
 
-        Set<String> activeCustomQuests = new HashSet<>();
-        for (Quest quest : quests) {
-            if (quest.getQuestObjectives().isTurnedIn()) continue;
-            if (quest instanceof CustomQuest customQuest && quest.isAccepted())
-                activeCustomQuests.add(customQuest.getConfigurationFilename());
-            boolean canTurnInHere = dynamic ? quest instanceof DynamicQuest
-                    : quest instanceof CustomQuest
-                    && npcEntity.getNPCsConfigFields().getFilename().equals(quest.getQuestTaker());
-            // Inspect every turn-in before considering offers, including NPCs with no offer list.
-            if (canTurnInHere && quest.isAccepted() && quest.getQuestObjectives().isOver())
-                return ChatColor.YELLOW + "" + ChatColor.BOLD + "?";
-        }
+        if (dynamic ? facts.dynamicTurnIn : facts.customTurnIns.contains(npcEntity.getNPCsConfigFields().getFilename()))
+            return ChatColor.YELLOW + "" + ChatColor.BOLD + "?";
 
         if (dynamic)
-            return DynamicQuest.hasAvailableQuests(player) ? ChatColor.YELLOW + "" + ChatColor.BOLD + "!" : null;
+            return facts.dynamicAvailable(player) ? ChatColor.YELLOW + "" + ChatColor.BOLD + "!" : null;
         if (npcEntity.getNPCsConfigFields().getQuestFilenames() != null)
             for (String filename : npcEntity.getNPCsConfigFields().getQuestFilenames()) {
-                if (activeCustomQuests.contains(filename)) continue;
+                if (facts.activeCustomQuests.contains(filename)) continue;
                 if (CustomQuest.hasPermissionForQuest(player, CustomQuestsConfig.getCustomQuests().get(filename)))
                     return ChatColor.YELLOW + "" + ChatColor.BOLD + "!";
             }
         return null;
+    }
+
+    private static final class PlayerQuestFacts {
+        private final List<Quest> quests;
+        private final Set<String> activeCustomQuests = new HashSet<>();
+        private final Set<String> customTurnIns = new HashSet<>();
+        private boolean dynamicTurnIn;
+        private Boolean dynamicAvailable;
+
+        private PlayerQuestFacts(Player player) {
+            quests = PlayerData.getQuests(player.getUniqueId());
+            for (Quest quest : quests) {
+                if (!quest.isAccepted() || quest.getQuestObjectives().isTurnedIn()) continue;
+                if (quest instanceof CustomQuest custom) activeCustomQuests.add(custom.getConfigurationFilename());
+                if (!quest.getQuestObjectives().isOver()) continue;
+                if (quest instanceof DynamicQuest) dynamicTurnIn = true;
+                else if (quest instanceof CustomQuest) customTurnIns.add(quest.getQuestTaker());
+            }
+        }
+
+        private boolean dynamicAvailable(Player player) {
+            if (dynamicAvailable == null) dynamicAvailable = DynamicQuest.hasAvailableQuests(player, quests);
+            return dynamicAvailable;
+        }
     }
 
     private static void removeIndicators(Predicate<NPCProximityKey> matches) {
@@ -233,9 +255,9 @@ public class NPCProximitySensor implements Listener {
     private static final class QuestIndicator {
         private FakeText display;
 
-        private void update(NPCEntity npc, Player player, boolean refreshQuestState) {
+        private void update(NPCEntity npc, Player player, boolean refreshQuestState, Map<UUID, PlayerQuestFacts> questFacts) {
             // Animate every tick, retaining the existing half-second quest-state refresh cadence.
-            String text = refreshQuestState ? findQuestState(npc, player)
+            String text = refreshQuestState ? findQuestState(npc, player, questFacts)
                     : display == null ? null : display.getText();
             if (text == null) {
                 remove();

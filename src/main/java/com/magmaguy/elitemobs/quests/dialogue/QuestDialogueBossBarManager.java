@@ -53,6 +53,20 @@ public class QuestDialogueBossBarManager {
     private static final int DIALOGUE_SLOWNESS_DURATION_TICKS = 20 * 30;
     private static final Map<UUID, DialogueSession> activeSessions = new ConcurrentHashMap<>();
     private static final Map<String, Long> recentlyShownTurnInDialogs = new ConcurrentHashMap<>();
+    private static BukkitTask keyedBarTask;
+
+    private static void suppressExternalBossBars() {
+        Iterator<KeyedBossBar> iterator = Bukkit.getBossBars();
+        while (iterator.hasNext()) {
+            KeyedBossBar bar = iterator.next();
+            for (Player viewer : bar.getPlayers()) {
+                DialogueSession session = activeSessions.get(viewer.getUniqueId());
+                if (session == null || session.closed || session.player != viewer) continue;
+                session.hiddenKeyedBossBars.add(bar);
+                bar.removePlayer(viewer);
+            }
+        }
+    }
 
     private QuestDialogueBossBarManager() {
     }
@@ -63,6 +77,8 @@ public class QuestDialogueBossBarManager {
         }
         activeSessions.clear();
         recentlyShownTurnInDialogs.clear();
+        if (keyedBarTask != null) keyedBarTask.cancel();
+        keyedBarTask = null;
     }
 
     public static boolean showQuestMenuIntro(List<? extends Quest> quests, Player player, NPCEntity npcEntity, Runnable onComplete) {
@@ -196,7 +212,9 @@ public class QuestDialogueBossBarManager {
         private void start() {
             try {
                 bossBarSuspension = BossBarOrderManager.suspendPlayer(player);
-                suppressOtherBossBars();
+                suppressExternalBossBars();
+                if (keyedBarTask == null) keyedBarTask = Bukkit.getScheduler().runTaskTimer(
+                        MetadataHandler.PLUGIN, QuestDialogueBossBarManager::suppressExternalBossBars, 1L, 1L);
                 suppressScoreboard();
                 applyMovementLock();
                 createBars();
@@ -213,7 +231,7 @@ public class QuestDialogueBossBarManager {
             this.pages = paginate(wrapLines(dialogueLines));
             this.onComplete = onComplete;
             this.pageIndex = 0;
-            suppressOtherBossBars();
+            suppressExternalBossBars();
             showCurrentPage();
         }
 
@@ -244,16 +262,6 @@ public class QuestDialogueBossBarManager {
                     false), true);
         }
 
-        private void suppressOtherBossBars() {
-            Iterator<KeyedBossBar> iterator = Bukkit.getBossBars();
-            while (iterator.hasNext()) {
-                KeyedBossBar bossBar = iterator.next();
-                if (!bossBar.getPlayers().contains(player)) continue;
-                hiddenKeyedBossBars.add(bossBar);
-                bossBar.removePlayer(player);
-            }
-        }
-
         private void createBars() {
             for (int i = 0; i < bars.length; i++) {
                 BossBar bossBar = Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID);
@@ -277,7 +285,6 @@ public class QuestDialogueBossBarManager {
                 close(false, false);
                 return;
             }
-            suppressOtherBossBars();
             Page page = pages.get(pageIndex);
             if (visibleCharacters >= page.visibleLength()) return;
             visibleCharacters = Math.min(page.visibleLength(),
@@ -323,6 +330,10 @@ public class QuestDialogueBossBarManager {
             if (closed) return;
             closed = true;
             activeSessions.remove(player.getUniqueId(), this);
+            if (activeSessions.isEmpty() && keyedBarTask != null) {
+                keyedBarTask.cancel();
+                keyedBarTask = null;
+            }
             if (task != null) task.cancel();
             for (BossBar bossBar : bars) {
                 if (bossBar != null) bossBar.removeAll();

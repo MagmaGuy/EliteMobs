@@ -1,7 +1,6 @@
 package com.magmaguy.elitemobs.advancedcombat.abilities;
 
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
-import com.magmaguy.elitemobs.entitytracker.CustomProjectileData;
 import com.magmaguy.elitemobs.items.ItemTagger;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -86,7 +85,6 @@ public final class ClassAbilityProjectileCarrier implements Listener, AutoClosea
             }
             start = positionedStart.get();
             configure(arrow, caster, velocity);
-            CustomProjectileData.getCustomProjectileDataHashMap().remove(arrow);
             ItemTagger.clearArrowCombatData(arrow);
         } catch (RuntimeException | Error failure) {
             arrow.remove();

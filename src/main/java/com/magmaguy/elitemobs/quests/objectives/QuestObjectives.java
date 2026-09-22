@@ -28,6 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class QuestObjectives implements Serializable {
+    private static final long serialVersionUID = -6402858811214459738L;
 
     @Getter
     private final UUID uuid;
@@ -94,8 +95,7 @@ public class QuestObjectives implements Serializable {
         boolean checkOver = true;
         for (Objective objective : objectives) {
             if (objective == null) {
-                Logger.warn("Found a null objective for quest " + quest.getQuestName());
-                continue;
+                return false;
             }
             if (!objective.isObjectiveCompleted()) {
                 checkOver = false;
@@ -138,7 +138,7 @@ public class QuestObjectives implements Serializable {
             PartySidebar.refresh(player);
             return;
         }
-        SimpleScoreboard.lazyScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), getScoreboardObjectiveText());
+        SimpleScoreboard.updateScoreboard(player, ChatColorConverter.convert(getQuest().getQuestName()), getScoreboardObjectiveText());
     }
 
     // While quest dialogue is active the scoreboard is suppressed; otherwise progressing an objective by
@@ -150,10 +150,10 @@ public class QuestObjectives implements Serializable {
 
     public List<String> getScoreboardObjectiveText() {
         List<String> strings = new ArrayList<>();
-        if (!isOver())
+        if (!isOver()) {
             for (Objective objective : objectives)
-                strings.add(QuestsConfig.getQuestScoreboardProgressionLine(objective));
-        else {
+                if (objective != null) strings.add(QuestsConfig.getQuestScoreboardProgressionLine(objective));
+        } else {
             if (quest.getQuestTaker() == null) return strings;
             NPCsConfigFields npCsConfigFields = NPCsConfig.getNpcEntities().get(quest.getQuestTaker());
             if (npCsConfigFields == null) return strings;
