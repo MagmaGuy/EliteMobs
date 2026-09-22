@@ -45,6 +45,8 @@ final class LuaPowerScriptApi {
         int runRepeating(int initialDelayTicks, int intervalTicks, Runnable runnable);
 
         void cancel(int taskId);
+
+        void ownCleanup(Runnable cleanup);
     }
 
     interface CallbackInvoker {

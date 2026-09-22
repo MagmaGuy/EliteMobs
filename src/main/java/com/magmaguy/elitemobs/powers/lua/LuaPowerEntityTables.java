@@ -257,6 +257,7 @@ final class LuaPowerEntityTables {
             return LuaValue.NIL;
         }));
         table.set("remove", method(table, args -> {
+            com.magmaguy.elitemobs.powers.scripts.ScriptListener.forgetFallingEntity(entity);
             entity.remove();
             return LuaValue.NIL;
         }));

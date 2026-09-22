@@ -13,6 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import java.util.ArrayList;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
@@ -21,49 +23,28 @@ import java.util.UUID;
 
 public class TrackingFireballSupport {
 
-    private static final Map<UUID, Controller> activeControllers = new HashMap<>();
     private static final Map<UUID, TrackingFireballTask> trackingFireballs = new HashMap<>();
 
     private TrackingFireballSupport() {
     }
 
-    public static void begin(Monster monster, double fireballSpeed) {
-        if (monster == null || !monster.isValid() || activeControllers.containsKey(monster.getUniqueId())) {
-            return;
+    /** The calling Lua runtime owns when this producer runs; launched shots retain their flight lifetime. */
+    public static void fireAtNearbyPlayers(Monster monster, double fireballSpeed) {
+        for (Entity nearbyEntity : monster.getNearbyEntities(20, 20, 20)) {
+            if (nearbyEntity instanceof Player player
+                    && (player.getGameMode() == GameMode.ADVENTURE || player.getGameMode() == GameMode.SURVIVAL))
+                new TrackingFireballTask(monster, player, fireballSpeed);
         }
-        activeControllers.put(monster.getUniqueId(), new Controller(monster, fireballSpeed));
     }
 
     public static void shutdown() {
-        activeControllers.clear();
-        trackingFireballs.clear();
-    }
-
-    private static final class Controller {
-        private Controller(Monster monster, double fireballSpeed) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!monster.isValid() || monster.getTarget() == null) {
-                        activeControllers.remove(monster.getUniqueId());
-                        cancel();
-                        return;
-                    }
-
-                    for (Entity nearbyEntity : monster.getNearbyEntities(20, 20, 20)) {
-                        if (nearbyEntity instanceof Player player
-                                && (player.getGameMode() == GameMode.ADVENTURE || player.getGameMode() == GameMode.SURVIVAL)) {
-                            new TrackingFireballTask(monster, player, fireballSpeed);
-                        }
-                    }
-                }
-            }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20L * 8);
-        }
+        new ArrayList<>(trackingFireballs.values()).forEach(TrackingFireballTask::close);
     }
 
     private static final class TrackingFireballTask {
         private boolean isAfterPlayer = true;
         private final Fireball repeatingFireball;
+        private BukkitTask task;
 
         private TrackingFireballTask(Entity entity, Player player, double fireballSpeed) {
             Vector targetterToTargetted = player.getLocation().clone().toVector()
@@ -76,7 +57,7 @@ public class TrackingFireballSupport {
             repeatingFireball.setShooter((ProjectileSource) entity);
             trackingFireballs.put(repeatingFireball.getUniqueId(), this);
 
-            new BukkitRunnable() {
+            task = new BukkitRunnable() {
                 int counter = 0;
 
                 @Override
@@ -87,8 +68,7 @@ public class TrackingFireballSupport {
                             || player.isDead()
                             || counter > 20 * 60 * 3
                             || repeatingFireball.getLocation().getWorld() != player.getWorld()) {
-                        trackingFireballs.remove(repeatingFireball.getUniqueId());
-                        cancel();
+                        close();
                         return;
                     }
 
@@ -102,6 +82,12 @@ public class TrackingFireballSupport {
                     counter++;
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
+        }
+
+        private void close() {
+            if (task != null) task.cancel();
+            task = null;
+            trackingFireballs.remove(repeatingFireball.getUniqueId(), this);
         }
 
         private Vector setFireballDirection(Entity target, double fireballSpeed) {

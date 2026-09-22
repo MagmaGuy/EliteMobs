@@ -16,14 +16,37 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityRemoveEvent;
 
 import java.util.HashMap;
 import java.util.function.BiConsumer;
 
 public class ScriptListener implements Listener {
     public static HashMap<FallingBlock, FallingEntityDataPair> fallingBlocks = new HashMap();
-    public static HashMap<FallingBlock, BiConsumer<FallingBlock, Location>> luaFallingBlocks = new HashMap<>();
+    private static final HashMap<FallingBlock, LuaLandingCallback> luaFallingBlocks = new HashMap<>();
     public static HashMap<Entity, FallingEntityDataPair> fallingEntities = new HashMap<>();
+
+    public static void registerLuaFallingBlock(Object owner, FallingBlock entity,
+                                              BiConsumer<FallingBlock, Location> callback) {
+        luaFallingBlocks.put(entity, new LuaLandingCallback(owner, callback));
+    }
+
+    public static void removeLuaFallingBlocks(Object owner) {
+        luaFallingBlocks.values().removeIf(registration -> registration.owner() == owner);
+    }
+
+    public static void forgetFallingEntity(Entity entity) {
+        luaFallingBlocks.remove(entity);
+        fallingBlocks.remove(entity);
+        fallingEntities.remove(entity);
+    }
+
+    private record LuaLandingCallback(Object owner, BiConsumer<FallingBlock, Location> callback) {}
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEntityRemove(EntityRemoveEvent event) {
+        forgetFallingEntity(event.getEntity());
+    }
 
     public static void shutdown() {
         fallingBlocks.clear();
@@ -115,8 +138,8 @@ public class ScriptListener implements Listener {
     //This is use to track falling blocks
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityChangeBlockEvent(EntityChangeBlockEvent event) {
-        FallingEntityDataPair fallingEntityDataPair = fallingBlocks.get(event.getEntity());
-        BiConsumer<FallingBlock, Location> luaCallback = luaFallingBlocks.get(event.getEntity());
+        FallingEntityDataPair fallingEntityDataPair = fallingBlocks.remove(event.getEntity());
+        LuaLandingCallback luaCallback = luaFallingBlocks.remove(event.getEntity());
         if (fallingEntityDataPair == null && luaCallback == null) return;
         event.setCancelled(true);
         if (fallingEntityDataPair != null) {
@@ -126,10 +149,8 @@ public class ScriptListener implements Listener {
             }
         }
         if (luaCallback != null) {
-            luaCallback.accept((FallingBlock) event.getEntity(), event.getBlock().getLocation());
-            luaFallingBlocks.remove(event.getEntity());
+            luaCallback.callback().accept((FallingBlock) event.getEntity(), event.getBlock().getLocation());
         }
-        fallingBlocks.remove(event.getEntity());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

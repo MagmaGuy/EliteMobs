@@ -114,6 +114,11 @@ public class ScriptableBoss extends ScriptableEntity {
             public void cancel(int taskId) {
                 instance.cancelOwned(taskId);
             }
+
+            @Override
+            public void ownCleanup(Runnable cleanup) {
+                instance.ownCleanup(cleanup);
+            }
         };
         LuaPowerScriptApi.CallbackInvoker callbackInvoker = instance::invokeOwnedCallback;
         this.entityTables = new LuaPowerEntityTables(instance.getDefinition(), eliteEntity, support, taskController, callbackInvoker);

@@ -55,6 +55,7 @@ final class LuaWorldTableBuilder {
         this.entityTables = entityTables;
         this.taskController = taskController;
         this.callbackInvoker = callbackInvoker;
+        taskController.ownCleanup(() -> ScriptListener.removeLuaFallingBlocks(this));
     }
 
     LuaTable build() {
@@ -282,7 +283,7 @@ final class LuaWorldTableBuilder {
             }
             if (options.get("on_land").isfunction()) {
                 LuaFunction onLand = options.get("on_land").checkfunction();
-                ScriptListener.luaFallingBlocks.put(fallingBlock, (entity, landingLocation) ->
+                ScriptListener.registerLuaFallingBlock(this, fallingBlock, (entity, landingLocation) ->
                         callbackInvoker.invoke("a falling block landing callback",
                                 onLand,
                                 support.toLocationTable(landingLocation),

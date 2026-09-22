@@ -41,6 +41,7 @@ import java.util.UUID;
  */
 final class LuaBossTableBuilder {
 
+    private Integer trackingFireballTask;
     private final ScriptDefinition definition;
     private final EliteEntity eliteEntity;
     private final LuaPowerSupport support;
@@ -60,6 +61,31 @@ final class LuaBossTableBuilder {
         this.entityTables = entityTables;
         this.taskController = taskController;
         this.callbackInvoker = callbackInvoker;
+        taskController.ownCleanup(this::stopTrackingFireballs);
+    }
+
+    private void startTrackingFireballs(Monster monster, double speed) {
+        if (trackingFireballTask != null || !monster.isValid()) return;
+        if (!Double.isFinite(speed) || speed <= 0) throw new IllegalArgumentException("Fireball speed must be finite and positive");
+        trackingFireballTask = taskController.runRepeating(0, 20 * 8, () -> {
+            try {
+                if (!monster.isValid() || monster.getTarget() == null
+                        || eliteEntity.getUnsyncedLivingEntity() != monster) {
+                    stopTrackingFireballs();
+                    return;
+                }
+                TrackingFireballSupport.fireAtNearbyPlayers(monster, speed);
+            } catch (RuntimeException | Error failure) {
+                stopTrackingFireballs();
+                throw failure;
+            }
+        });
+    }
+
+    private void stopTrackingFireballs() {
+        if (trackingFireballTask == null) return;
+        taskController.cancel(trackingFireballTask);
+        trackingFireballTask = null;
     }
 
     LuaTable build() {
@@ -189,7 +215,7 @@ final class LuaBossTableBuilder {
         // ── Boss-only methods ──
         boss.set("start_tracking_fireball_system", method(boss, args -> {
             if (eliteEntity.getLivingEntity() instanceof Monster monster) {
-                TrackingFireballSupport.begin(monster, args.optdouble(1, 0.5));
+                startTrackingFireballs(monster, args.optdouble(1, 0.5));
             }
             return LuaValue.NIL;
         }));
