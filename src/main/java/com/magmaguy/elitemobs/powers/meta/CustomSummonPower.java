@@ -110,12 +110,14 @@ public class CustomSummonPower extends ElitePower implements Listener {
     }
 
     public void addEntry(Object powerEntry, String filename) {
-        Map<String, ?> map;
-        if (powerEntry instanceof String)
-            processOldFormats((String) powerEntry, filename);
-        else if (powerEntry instanceof Map<?, ?>) {
-            map = (Map<String, ?>) powerEntry;
-            processNewFormat(map, filename);
+        int previousSize = customBossReinforcements.size();
+        try {
+            if (powerEntry instanceof String legacy) processNewFormat(normalizeLegacy(legacy), filename);
+            else if (powerEntry instanceof Map<?, ?> map) processNewFormat((Map<String, ?>) map, filename);
+            else throw new IllegalArgumentException("Expected a summon declaration");
+        } catch (RuntimeException invalidDefinition) {
+            customBossReinforcements.subList(previousSize, customBossReinforcements.size()).clear();
+            Logger.warn("Invalid reinforcement in " + filename + ": " + invalidDefinition.getMessage());
         }
     }
 
@@ -151,8 +153,9 @@ public class CustomSummonPower extends ElitePower implements Listener {
                                 Double.parseDouble(locationString.split(",")[0]),
                                 Double.parseDouble(locationString.split(",")[1]),
                                 Double.parseDouble(locationString.split(",")[2]));
-                    } catch (Exception ex) {
-                        Logger.warn("Failed to get location for string " + locationString + " in " + customBossesConfigFields.getFilename());
+                        location.checkFinite();
+                    } catch (RuntimeException ex) {
+                        throw new IllegalArgumentException("Invalid reinforcement location: " + locationString, ex);
                     }
                     break;
                 case "lightningrod":
@@ -193,6 +196,13 @@ public class CustomSummonPower extends ElitePower implements Listener {
             Logger.warn("No summon type detected in " + customBossesConfigFields.getFilename() + " ! This reinforcement will not work.");
             return;
         }
+
+        if (chance == null || !Double.isFinite(chance))
+            throw new IllegalArgumentException("Invalid summon chance");
+        if (summonType != SummonType.ON_COMBAT_ENTER_PLACE_CRYSTAL && (filename == null || filename.isBlank()))
+            throw new IllegalArgumentException("Missing reinforcement filename");
+        if (summonType == SummonType.ON_COMBAT_ENTER_PLACE_CRYSTAL && location == null)
+            throw new IllegalArgumentException("Missing crystal location");
 
         CustomBossReinforcement customBossReinforcement;
         switch (summonType) {
@@ -239,236 +249,54 @@ public class CustomSummonPower extends ElitePower implements Listener {
         customBossReinforcement.setSpawnLocationOffset(location);
     }
 
-    /**
-     * Important: All this does is covert bosses to the new format!
-     *
-     * @param powerString
-     * @param configFilename
-     */
-    private void processOldFormats(String powerString, String configFilename) {
-        Map<String, Object> newMap = new HashMap<>();
-        /*
-        valid formats:
-        summonable:
-        summonType=ONCE/ON_HIT/ON_COMBAT_ENTER/ON_COMBAT_ENTER_PLACE_CRYSTAL/GLOBAL/ON_DEATH:
-            filename=filename.yml:
-            chance=double;
-            location=x,y,z:
-            lightningRod=true/false:
-            inheritAggro=true/false:
-            amount=int:
-            customSpawn=filename.yml
-
-        summon:once:filename.yml
-        summon:onHit:%:filename.yml
-        summon:onCombatEnter:x,y,z:filename.yml
-        summon:onCombatEnterPlaceCrystal:x,y,z:boolean
-         */
-
-        //this is now considered to be legacy
-        if (powerString.split(":")[0].equalsIgnoreCase("summon")) {
-            if (powerString.split(":")[1].equalsIgnoreCase("once")) {
-                newMap.put("summonType", "ONCE");
-                parseOnce(powerString);
-            } else if (powerString.split(":")[1].equalsIgnoreCase("onHit")) {
-                newMap.put("summonType", "ON_HIT");
-                parseOnHit(powerString);
-            } else if (powerString.split(":")[1].equalsIgnoreCase("onCombatEnter")) {
-                newMap.put("summonType", "ON_COMBAT_ENTER");
-                parseOnCombatEnter(powerString);
-            } else if (powerString.split(":")[1].equalsIgnoreCase("onCombatEnterPlaceCrystal")) {
-                newMap.put("summonType", "ON_COMBAT_ENTER_PLACE_CRYSTAL");
-                parseOnCombatEnterPlaceCrystal(powerString);
-            }
-            replaceOldFormat(powerString, newMap);
-
-            return;
-        }
-
-        //this is the new recommended format for reinforcements
-        if (powerString.split(":")[0].equalsIgnoreCase("summonable")) {
-            SummonType summonType = null;
-            String filename = null;
-            Vector location = null;
-            Double chance = null;
-            boolean lightningRod = false;
-            boolean inheritAggro = false;
-            boolean inheritLevel = false;
-            String customSpawn = "";
-            int amount = 1;
-            boolean spawnNearby = false;
-
-            for (String substring : powerString.split(":")) {
-                switch (substring.split("=")[0].toLowerCase(Locale.ROOT)) {
-                    //this just tags it for parsing
-                    case "summonable":
-                        break;
-                    case "summontype":
-                        try {
-                            summonType = SummonType.valueOf(getSubstringField(substring));
-                            newMap.put("summonType", summonType.toString());
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to determine summon type from " + getSubstringField(substring));
-                        }
-                        break;
-                    case "filename":
-                        try {
-                            filename = getSubstringField(substring);
-                            newMap.put("filename", filename);
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to determine filename from " + getSubstringField(substring));
-                        }
-                        break;
-                    case "chance":
-                        try {
-                            chance = Double.parseDouble(getSubstringField(substring));
-                            newMap.put("chance", chance);
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to determine chance from " + getSubstringField(substring));
-                        }
-                        break;
-                    case "location":
-                        try {
-                            String locationString = getSubstringField(substring);
-                            newMap.put("location", locationString);
-                            location = new Vector(
-                                    Double.parseDouble(locationString.split(",")[0]),
-                                    Double.parseDouble(locationString.split(",")[1]),
-                                    Double.parseDouble(locationString.split(",")[2]));
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to determine location from " + getSubstringField(substring));
-                        }
-                        break;
-                    case "lightningrod":
-                        try {
-                            lightningRod = Boolean.parseBoolean(getSubstringField(substring));
-                            newMap.put("lightningRod", lightningRod);
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to determine lightningRod from " + getSubstringField(substring));
-                        }
-                        break;
-                    case "inheritaggro":
-                        try {
-                            inheritAggro = Boolean.parseBoolean(getSubstringField(substring));
-                            newMap.put("inheritAggro", inheritAggro);
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to determine inheritAggro from " + getSubstringField(substring));
-                        }
-                        break;
-                    case "amount":
-                        try {
-                            amount = Integer.parseInt(getSubstringField(substring));
-                            newMap.put("amount", amount);
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to determine inheritAggro from " + getSubstringField(substring));
-                        }
-                        break;
-                    case "inheritlevel":
-                        try {
-                            inheritLevel = Boolean.parseBoolean(getSubstringField(substring));
-                            newMap.put("inheritLevel", inheritLevel);
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to determine inheritLevel from " + getSubstringField(substring));
-                        }
-                        break;
-                    case "spawnnearby":
-                        try {
-                            spawnNearby = Boolean.parseBoolean(getSubstringField(substring));
-                            newMap.put("spawnNearby", spawnNearby);
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to determine spawnNearby from " + getSubstringField(substring));
-                        }
-                        break;
-                    case "customspawn":
-                        if (CustomSpawnConfig.getCustomEvent(getSubstringField(substring)) == null)
-                            Logger.warn("Failed to determine Custom Spawn file for filename " + substring);
-                        else {
-                            customSpawn = getSubstringField(substring);
-                            newMap.put("customSpawn", customSpawn);
-                        }
-                        break;
-                    default:
-                        Logger.warn("Invalid boss reinforcement string for line " + powerString + " !");
-                        Logger.warn("Problematic entry: " + substring);
+    /** Normalize the existing legacy formats without rewriting the author's source during actor construction. */
+    private static Map<String, Object> normalizeLegacy(String declaration) {
+        String[] parts = declaration.split(":", -1);
+        Map<String, Object> fields = new LinkedHashMap<>();
+        if (parts[0].equalsIgnoreCase("summon")) {
+            if (parts.length < 3) throw new IllegalArgumentException("Incomplete summon declaration");
+            switch (parts[1].toLowerCase(Locale.ROOT)) {
+                case "once" -> {
+                    requireParts(parts, 3);
+                    fields.put("summonType", "ONCE");
+                    fields.put("filename", parts[2]);
                 }
+                case "onhit" -> {
+                    requireParts(parts, 4);
+                    fields.put("summonType", "ON_HIT");
+                    fields.put("chance", parts[2]);
+                    fields.put("filename", parts[3]);
+                }
+                case "oncombatenter" -> {
+                    requireParts(parts, 4);
+                    fields.put("summonType", "ON_COMBAT_ENTER");
+                    fields.put("location", parts[2]);
+                    fields.put("filename", parts[3]);
+                }
+                case "oncombatenterplacecrystal" -> {
+                    requireParts(parts, 4);
+                    fields.put("summonType", "ON_COMBAT_ENTER_PLACE_CRYSTAL");
+                    fields.put("location", parts[2]);
+                    fields.put("lightningRod", parts[3]);
+                }
+                default -> throw new IllegalArgumentException("Unknown summon type: " + parts[1]);
             }
-
-            replaceOldFormat(powerString, newMap);
-
-            if (summonType == null) {
-                Logger.warn("No summon type detected in " + powerString + " ! This reinforcement will not work.");
-                return;
+        } else if (parts[0].equalsIgnoreCase("summonable")) {
+            for (int i = 1; i < parts.length; i++) {
+                String[] field = parts[i].split("=", 2);
+                if (field.length != 2 || field[1].isBlank())
+                    throw new IllegalArgumentException("Incomplete summon field: " + parts[i]);
+                String key = field[0].toLowerCase(Locale.ROOT);
+                if (fields.putIfAbsent(key, field[1]) != null)
+                    throw new IllegalArgumentException("Duplicate summon field: " + key);
             }
-
-            CustomBossReinforcement customBossReinforcement;
-            switch (summonType) {
-                case ONCE:
-                    customBossReinforcement = doOnce(filename);
-                    break;
-                case ON_HIT:
-                    customBossReinforcement = doOnHit(filename, chance);
-                    break;
-                case ON_DEATH:
-                    customBossReinforcement = doOnDeath(filename);
-                    break;
-                case ON_COMBAT_ENTER:
-                    customBossReinforcement = doOnCombatEnter(filename);
-                    break;
-                case ON_COMBAT_ENTER_PLACE_CRYSTAL:
-                    customBossReinforcement = doOnCombatEnterPlaceCrystal(location, lightningRod);
-                    break;
-                case GLOBAL:
-                    customBossReinforcement = doGlobalSummonReinforcement(filename);
-                    break;
-                default:
-                    customBossReinforcement = null;
-                    Logger.warn("Failed to determine summon type for reinforcement " + powerString + " ! Contact the developer with this error!");
-            }
-
-            if (customBossReinforcement == null)
-                return;
-
-            customBossReinforcement.inheritAggro = inheritAggro;
-            customBossReinforcement.amount = amount;
-            customBossReinforcement.inheritLevel = inheritLevel;
-            customBossReinforcement.spawnNearby = spawnNearby;
-            customBossReinforcement.customSpawn = customSpawn;
-            customBossReinforcement.summonChance = chance;
-            customBossReinforcement.setSpawnLocationOffset(location);
-
-            if (customBossReinforcement == null ||
-                    customBossReinforcement.bossFileName == null ||
-                    CustomBossesConfig.getCustomBoss(customBossReinforcement.bossFileName) == null) {
-                Logger.warn("Could not get filename for reinforcement in file " + configFilename);
-            }
-
-        }
+        } else throw new IllegalArgumentException("Unknown summon declaration: " + parts[0]);
+        return fields;
     }
 
-    private void replaceOldFormat(String entry, Map<String, Object> replacement) {
-        Iterator<Object> iterator = customBossesConfigFields.getPowers().iterator();
-        while (iterator.hasNext()) {
-            Object power = iterator.next();
-            if (power.equals(entry)) {
-                iterator.remove();
-                break;
-            }
-        }
-        customBossesConfigFields.getPowers().add(replacement);
-        customBossesConfigFields.getWritableFileConfiguration().set("powers", customBossesConfigFields.getPowers());
-        customBossesConfigFields.saveFile();
-    }
-
-
-    private String getSubstringField(String string) {
-        if (string.split("=").length < 2) return "";
-        return string.split("=")[1];
-    }
-
-    //summon:once:filename.yml
-    private void parseOnce(String powerString) {
-        String[] strings = powerString.split(":");
-        doOnce(strings[2]);
+    private static void requireParts(String[] parts, int expected) {
+        if (parts.length != expected || Arrays.stream(parts).anyMatch(String::isBlank))
+            throw new IllegalArgumentException("Incomplete or extra summon fields");
     }
 
     private CustomBossReinforcement doOnce(String filename) {
@@ -479,12 +307,6 @@ public class CustomSummonPower extends ElitePower implements Listener {
         }
         customBossReinforcements.add(customBossReinforcement);
         return customBossReinforcement;
-    }
-
-    //summon:onHit:%:filename.yml
-    private void parseOnHit(String powerString) {
-        String[] strings = powerString.split(":");
-        doOnHit(strings[3], Double.parseDouble(strings[2]));
     }
 
     private CustomBossReinforcement doOnHit(String filename, double chance) {
@@ -508,22 +330,6 @@ public class CustomSummonPower extends ElitePower implements Listener {
         return customBossReinforcement;
     }
 
-    //summon:onCombatEnter:x,y,z:filename.yml
-    private void parseOnCombatEnter(String powerString) {
-        String[] strings = powerString.split(":");
-        doOnCombatEnter(strings[3], new Vector(
-                Double.parseDouble(strings[2].split(",")[0]),
-                Double.parseDouble(strings[2].split(",")[1]),
-                Double.parseDouble(strings[2].split(",")[2])));
-
-    }
-
-    private CustomBossReinforcement doOnCombatEnter(String filename, Vector vector) {
-        CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_COMBAT_ENTER, filename);
-        customBossReinforcement.setSpawnLocationOffset(vector);
-        return doOnCombatEnter(filename);
-    }
-
     private CustomBossReinforcement doOnCombatEnter(String filename) {
         CustomBossReinforcement customBossReinforcement = new CustomBossReinforcement(SummonType.ON_COMBAT_ENTER, filename);
 
@@ -533,15 +339,6 @@ public class CustomSummonPower extends ElitePower implements Listener {
         }
         customBossReinforcements.add(customBossReinforcement);
         return customBossReinforcement;
-    }
-
-    //summon:onCombatEnterPlaceCrystal:x,y,z:boolean
-    private void parseOnCombatEnterPlaceCrystal(String powerString) {
-        String[] strings = powerString.split(":");
-        doOnCombatEnterPlaceCrystal(new Vector(
-                Double.parseDouble(strings[2].split(",")[0]),
-                Double.parseDouble(strings[2].split(",")[1]),
-                Double.parseDouble(strings[2].split(",")[2])), Boolean.parseBoolean(strings[3]));
     }
 
     private CustomBossReinforcement doOnCombatEnterPlaceCrystal(Vector location, boolean lightningRod) {
