@@ -320,7 +320,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
                 return delivered;
             }
             if (sharedLootTable == null) sharedLootTable = new SharedLootTable(eliteEntity);
-            delivered |= sharedLootTable.addLoot(itemStack);
+            delivered |= sharedLootTable.addLoot(itemStack, getPermission());
         }
         return delivered;
     }
@@ -340,7 +340,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
                         + " was null! This item will be skipped.");
                 return pooledAnyItem ? GroupDelivery.DELIVERED : GroupDelivery.SKIPPED;
             }
-            if (!SharedLootTable.addPartyLoot(eliteEntity, contributor, itemStack)) {
+            if (!SharedLootTable.addPartyLoot(eliteEntity, contributor, itemStack, getPermission(), null)) {
                 // The lockout-aware eligibility check may reject a pool which looked viable before
                 // the item was generated. Fall back to the normal personal path only if nothing was
                 // already committed to the vote, preventing either item loss or duplication.

@@ -161,22 +161,20 @@ public class LootTables implements Listener {
 
         if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus) return null;
 
+        var limited = ScalableItemConstructor.eligibleLimitedItems(itemTier, player);
         HashMap<String, Double> weightedProbability = new HashMap<>();
         if (proceduralItemsOn) weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
         if (customItemsOn) {
             if (weighedItemsExist) weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
             if (fixedItemsExist) if (CustomItem.getFixedItems().containsKey(itemTier))
                 weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
-            if (limitedItemsExist) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
+            if (!limited.isEmpty()) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
             if (scalableItemsExist) weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
         }
 
         String selectedLootSystem = pickWeighedProbability(weightedProbability);
 
-        if (selectedLootSystem == null) {
-            Logger.info("Your EliteMobs loot configuration resulted in no loot getting dropped. This is not a bug. " + "If you want! players to be able to progress at all in the EliteMobs plugin, review your configuration settings.");
-            return null;
-        }
+        if (selectedLootSystem == null) return null;
 
         switch (selectedLootSystem) {
             case "procedural":
@@ -186,7 +184,7 @@ public class LootTables implements Listener {
             case "fixed":
                 return dropFixedItem(eliteEntity, itemTier, player);
             case "limited":
-                return dropLimitedItem(eliteEntity, itemTier, player);
+                return dropLimitedItem(eliteEntity, itemTier, player, limited);
             case "scalable":
                 return dropScalableItem(eliteEntity, itemTier, player);
         }
@@ -203,13 +201,14 @@ public class LootTables implements Listener {
         double dropChanceBonus = ItemSettingsConfig.getLevelIncreaseDropRate() * itemTier;
         if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus) return null;
 
+        var limited = ScalableItemConstructor.eligibleLimitedItems(itemTier, null);
         HashMap<String, Double> weightedProbability = new HashMap<>();
         if (proceduralItemsOn) weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
         if (customItemsOn) {
             if (weighedItemsExist) weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
             if (fixedItemsExist && CustomItem.getFixedItems().containsKey(itemTier))
                 weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
-            if (limitedItemsExist) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
+            if (!limited.isEmpty()) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
             if (scalableItemsExist) weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
         }
 
@@ -219,7 +218,7 @@ public class LootTables implements Listener {
             case "procedural" -> generateProcedurallyGeneratedItem(itemTier, null, eliteEntity);
             case "weighed" -> generateWeighedFixedItemStack(null);
             case "fixed" -> generateFixedItem(itemTier, null, eliteEntity);
-            case "limited" -> generateLimitedItem(itemTier, null, eliteEntity);
+            case "limited" -> generateLimitedItem(itemTier, null, eliteEntity, limited);
             case "scalable" -> generateScalableItem(itemTier, null, eliteEntity);
             default -> null;
         };
@@ -243,18 +242,20 @@ public class LootTables implements Listener {
 
         if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus) return null;
 
+        var limited = ScalableItemConstructor.eligibleLimitedItems(itemLevel, player);
         HashMap<String, Double> weightedProbability = new HashMap<>();
         if (proceduralItemsOn) weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
         if (customItemsOn) {
             if (weighedItemsExist) weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
             if (fixedItemsExist) if (CustomItem.getFixedItems().containsKey(itemLevel))
                 weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
-            if (limitedItemsExist) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
+            if (!limited.isEmpty()) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
             if (scalableItemsExist) weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
         }
 
         String selectedLootSystem = pickWeighedProbability(weightedProbability);
 
+        if (selectedLootSystem == null) return null;
         switch (selectedLootSystem) {
             case "procedural":
                 return dropProcedurallyGeneratedItem(itemLevel, location, player);
@@ -263,7 +264,7 @@ public class LootTables implements Listener {
             case "fixed":
                 return dropFixedItem(location, itemLevel, player);
             case "limited":
-                return dropLimitedItem(location, itemLevel, player);
+                return dropLimitedItem(location, itemLevel, player, limited);
             case "scalable":
                 return dropScalableItem(location, itemLevel, player);
         }
@@ -274,18 +275,20 @@ public class LootTables implements Listener {
 
     public static ItemStack generateItemStack(int itemTier, Player player, EliteEntity eliteEntity) {
 
+        var limited = ScalableItemConstructor.eligibleLimitedItems(itemTier, player);
         HashMap<String, Double> weightedProbability = new HashMap<>();
         if (proceduralItemsOn) weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
         if (customItemsOn) {
             if (weighedItemsExist) weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
             if (fixedItemsExist) if (CustomItem.getFixedItems().containsKey(itemTier))
                 weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
-            if (limitedItemsExist) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
+            if (!limited.isEmpty()) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
             if (scalableItemsExist) weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
         }
 
         String selectedLootSystem = pickWeighedProbability(weightedProbability);
 
+        if (selectedLootSystem == null) return null;
         switch (selectedLootSystem) {
             case "procedural":
                 return generateProcedurallyGeneratedItem(itemTier, player, eliteEntity);
@@ -294,7 +297,7 @@ public class LootTables implements Listener {
             case "fixed":
                 return generateFixedItem(itemTier, player, eliteEntity);
             case "limited":
-                return generateLimitedItem(itemTier, player, eliteEntity);
+                return generateLimitedItem(itemTier, player, eliteEntity, limited);
             case "scalable":
                 return generateScalableItem(itemTier, player, eliteEntity);
         }
@@ -342,28 +345,44 @@ public class LootTables implements Listener {
         return itemStack;
     }
 
+    private static HashMap<ItemStack, Double> eligibleWeightedItems(Player player) {
+        HashMap<ItemStack, Double> eligible = new HashMap<>();
+        for (var entry : CustomItem.getWeighedFixedItems().entrySet()) {
+            String id = ItemTagger.getCustomItemId(entry.getKey());
+            CustomItem definition = id == null ? null : CustomItem.getCustomItem(id);
+            if (definition == null || definition.getItemType() == CustomItem.ItemType.UNIQUE
+                    || !definition.getCustomItemsConfigFields().isEnabled()) continue;
+            if (player != null && !LootItemPolicy.canReceive(definition, player)) continue;
+            eligible.put(entry.getKey(), entry.getValue());
+        }
+        return eligible;
+    }
+
     private static ItemStack generateWeighedFixedItemStack(Player player) {
-        double totalWeight = 0;
+        ItemStack selected = WeightedProbability.pick(eligibleWeightedItems(player));
+        if (selected == null) return null;
+        ItemStack result = selected.clone();
+        if (LootItemPolicy.shouldSoulbind(result)) SoulbindEnchantment.addEnchantment(result, player);
+        return result;
+    }
 
-        for (ItemStack itemStack : CustomItem.getWeighedFixedItems().keySet()) {
-            Double shouldntBeNull = CustomItem.getWeighedFixedItems().get(itemStack);
-            if (shouldntBeNull != null) totalWeight += CustomItem.getWeighedFixedItems().get(itemStack);
-            else Logger.warn("Item " + itemStack.getItemMeta().getDisplayName() + " reported a null weight!");
-        }
+    /** Cheap command admission, without constructing or delivering any item. */
+    public static boolean hasAvailableLoot(int tier, Player player) {
+        if (proceduralItemsOn && positiveWeight(ItemSettingsConfig.getProceduralItemWeight())) return true;
+        if (!customItemsOn) return false;
+        if (weighedItemsExist && positiveWeight(ItemSettingsConfig.getWeighedItemWeight())
+                && !eligibleWeightedItems(player).isEmpty()) return true;
+        if (fixedItemsExist && positiveWeight(ItemSettingsConfig.getFixedItemWeight())
+                && CustomItem.getFixedItems().getOrDefault(tier, new java.util.ArrayList<>()).stream()
+                .anyMatch(item -> LootItemPolicy.canReceive(item, player))) return true;
+        if (limitedItemsExist && positiveWeight(ItemSettingsConfig.getLimitedItemWeight())
+                && !ScalableItemConstructor.eligibleLimitedItems(tier, player).isEmpty()) return true;
+        return scalableItemsExist && positiveWeight(ItemSettingsConfig.getScalableItemWeight())
+                && CustomItem.getScalableItems().stream().anyMatch(item -> LootItemPolicy.canReceive(item, player));
+    }
 
-        ItemStack generatedItemStack = null;
-        double random = Math.random() * totalWeight;
-
-        for (ItemStack itemStack : CustomItem.getWeighedFixedItems().keySet()) {
-            random -= CustomItem.getWeighedFixedItems().get(itemStack);
-            if (random <= 0) {
-                generatedItemStack = itemStack.clone();
-                break;
-            }
-        }
-
-        SoulbindEnchantment.addEnchantment(generatedItemStack, player);
-        return generatedItemStack;
+    private static boolean positiveWeight(double weight) {
+        return Double.isFinite(weight) && weight > 0;
     }
 
     private static ItemStack dropProcedurallyGeneratedItem(int itemLevel, EliteEntity eliteEntity, Player player) {
@@ -402,22 +421,22 @@ public class LootTables implements Listener {
         return ScalableItemConstructor.randomizeScalableItem(itemTier, player, eliteEntity);
     }
 
-    private static ItemStack dropLimitedItem(EliteEntity eliteEntity, int itemLevel, Player player) {
-        ItemStack itemStack = generateLimitedItem(itemLevel, player, eliteEntity);
+    private static ItemStack dropLimitedItem(EliteEntity eliteEntity, int itemLevel, Player player, java.util.List<CustomItem> limited) {
+        ItemStack itemStack = generateLimitedItem(itemLevel, player, eliteEntity, limited);
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(eliteEntity.getLocation(), itemStack, player);
         return itemStack;
     }
 
-    private static ItemStack dropLimitedItem(Location location, int itemTier, Player player) {
-        ItemStack itemStack = generateLimitedItem(itemTier, player, null);
+    private static ItemStack dropLimitedItem(Location location, int itemTier, Player player, java.util.List<CustomItem> limited) {
+        ItemStack itemStack = generateLimitedItem(itemTier, player, null, limited);
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) addToInventoryOrDrop(player, itemStack);
         else processPhysicalItem(location, itemStack, player);
         return itemStack;
     }
 
-    private static ItemStack generateLimitedItem(int itemTier, Player player, EliteEntity eliteEntity) {
-        return ScalableItemConstructor.randomizeLimitedItem(itemTier, player, eliteEntity);
+    private static ItemStack generateLimitedItem(int itemTier, Player player, EliteEntity eliteEntity, java.util.List<CustomItem> limited) {
+        return ScalableItemConstructor.randomizeLimitedItem(itemTier, player, eliteEntity, limited);
     }
 
     private static ItemStack dropFixedItem(EliteEntity eliteEntity, int itemTier, Player player) {
@@ -439,11 +458,13 @@ public class LootTables implements Listener {
     }
 
     private static void addToInventoryOrDrop(Player player, ItemStack itemStack) {
+        if (!LootItemPolicy.canReceive(itemStack, player)) return;
         HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(itemStack);
         leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
     }
 
     private static void processPhysicalItem(Location location, ItemStack itemStack, Player player) {
+        if (!LootItemPolicy.canReceive(itemStack, player)) return;
         Item item = location.getWorld().dropItem(location, itemStack);
         if (item.getItemStack().hasItemMeta() && item.getItemStack().getItemMeta().hasDisplayName()) {
             item.setCustomName(item.getItemStack().getItemMeta().getDisplayName());
@@ -470,7 +491,8 @@ public class LootTables implements Listener {
     }
 
     public static void deliverGeneratedItem(Player player, Location location, ItemStack itemStack) {
-        SoulbindEnchantment.addEnchantment(itemStack, player);
+        if (!LootItemPolicy.canReceive(itemStack, player)) return;
+        if (LootItemPolicy.shouldSoulbind(itemStack)) SoulbindEnchantment.addEnchantment(itemStack, player);
         if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) {
             HashMap<Integer, ItemStack> leftOvers = player.getInventory().addItem(itemStack);
             leftOvers.values().forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));

@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
+import com.magmaguy.elitemobs.items.LootItemPolicy;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.menus.LootMenu;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -58,6 +59,11 @@ public class SharedLootTable {
      * allowing the caller to fall back to the normal personal drop path.
      */
     public static boolean addPartyLoot(EliteEntity eliteEntity, Player contributor, ItemStack itemStack) {
+        return addPartyLoot(eliteEntity, contributor, itemStack, "", null);
+    }
+
+    public static boolean addPartyLoot(EliteEntity eliteEntity, Player contributor, ItemStack itemStack,
+                                       String permission, Collection<Player> originatingAudience) {
         if (itemStack == null || !PartyManager.shouldUsePartyLoot(contributor, eliteEntity)) return false;
         Party party = PartyManager.getParty(contributor.getUniqueId());
         if (party == null) return false;
@@ -65,6 +71,12 @@ public class SharedLootTable {
         if (eliteEntity instanceof InstancedBossEntity instancedBossEntity)
             eligiblePlayers.removeIf(instancedBossEntity.getLockoutPlayers()::contains);
         if (eligiblePlayers.size() < 2) return false;
+        if (originatingAudience != null) {
+            Set<UUID> originalIds = originatingAudience.stream().map(Player::getUniqueId).collect(Collectors.toSet());
+            eligiblePlayers.removeIf(player -> !originalIds.contains(player.getUniqueId()));
+        }
+        eligiblePlayers.removeIf(player -> !mayReceive(itemStack, permission, player));
+        if (eligiblePlayers.isEmpty()) return false;
 
         SharedLootTable table = partyLootTables.get(party.getId());
         boolean created = table == null || table.closed;
@@ -73,7 +85,7 @@ public class SharedLootTable {
             partyLootTables.put(party.getId(), table);
         }
         List<Player> newParticipants = table.addParticipants(eligiblePlayers);
-        if (!table.addLoot(itemStack, eligiblePlayers)) return false;
+        if (!table.addLoot(itemStack, permission, eligiblePlayers)) return false;
         if (!created && !newParticipants.isEmpty()) table.messagePlayersLater(newParticipants);
         return true;
     }
@@ -135,7 +147,7 @@ public class SharedLootTable {
         UUID playerId = player.getUniqueId();
         List<LootRollEntry> visibleLoot = new ArrayList<>();
         for (LootRollEntry entry : loot) {
-            if (entry.eligiblePlayers().contains(playerId)) visibleLoot.add(entry);
+            if (entry.eligiblePlayers().contains(playerId) && mayReceive(entry.itemStack(), entry.permission(), player)) visibleLoot.add(entry);
         }
         return visibleLoot;
     }
@@ -146,18 +158,27 @@ public class SharedLootTable {
     }
 
     public boolean addLoot(ItemStack itemStack) {
-        return addLoot(itemStack, participants.values());
+        return addLoot(itemStack, "", participants.values());
     }
 
-    private boolean addLoot(ItemStack itemStack, Collection<Player> eligiblePlayers) {
-        if (itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0
-                || closed || eligiblePlayers.isEmpty()) return false;
-        loot.add(new LootRollEntry(
-                UUID.randomUUID(),
-                itemStack,
-                eligiblePlayers.stream().map(Player::getUniqueId).collect(Collectors.toUnmodifiableSet())));
+    public boolean addLoot(ItemStack itemStack, String permission) {
+        return addLoot(itemStack, permission, participants.values());
+    }
+
+    public boolean addLoot(ItemStack itemStack, String permission, Collection<Player> originatingAudience) {
+        if (itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0 || closed) return false;
+        Set<UUID> eligible = originatingAudience.stream()
+                .filter(player -> participants.containsKey(player.getUniqueId()))
+                .filter(player -> mayReceive(itemStack, permission, player))
+                .map(Player::getUniqueId).collect(Collectors.toUnmodifiableSet());
+        if (eligible.isEmpty()) return false;
+        loot.add(new LootRollEntry(UUID.randomUUID(), itemStack, eligible, permission));
         lastLootAddedNanos = System.nanoTime();
         return true;
+    }
+
+    private static boolean mayReceive(ItemStack item, String permission, Player player) {
+        return (permission.isEmpty() || player.hasPermission(permission)) && LootItemPolicy.canReceive(item, player);
     }
 
     private List<Player> addParticipants(Collection<Player> players) {
@@ -233,6 +254,7 @@ public class SharedLootTable {
         try {
             for (LootRollEntry entry : loot) {
                 List<Player> eligiblePlayers = activeParticipants(entry.eligiblePlayers());
+                eligiblePlayers.removeIf(player -> !mayReceive(entry.itemStack(), entry.permission(), player));
                 List<Player> needPlayers = new ArrayList<>();
                 for (Player player : eligiblePlayers) {
                     PlayerTable playerTable = playerTables.get(player.getUniqueId());
@@ -240,7 +262,7 @@ public class SharedLootTable {
                     if (playerTable.needs(entry.id())) needPlayers.add(player);
                 }
                 // Players who do not choose Need stay in the Greed pool by default.
-                rollLoot(entry.itemStack(), needPlayers.isEmpty() ? eligiblePlayers : needPlayers);
+                rollLoot(entry, needPlayers.isEmpty() ? eligiblePlayers : needPlayers);
             }
         } finally {
             removeFromRegistry();
@@ -248,8 +270,11 @@ public class SharedLootTable {
         }
     }
 
-    private void rollLoot(ItemStack item, List<Player> players) {
+    private void rollLoot(LootRollEntry entry, List<Player> players) {
+        ItemStack item = entry.itemStack();
         if (players.isEmpty()) {
+            // Permission-restricted loot cannot fall back to an ownerless world drop.
+            if (!entry.permission().isEmpty() || LootItemPolicy.hasRecipientRestriction(item)) return;
             if (fallbackDropLocation != null && fallbackDropLocation.getWorld() != null) {
                 org.bukkit.World loadedWorld = Bukkit.getWorld(fallbackDropLocation.getWorld().getUID());
                 if (loadedWorld != null) loadedWorld.dropItemNaturally(fallbackDropLocation, item);
@@ -340,7 +365,8 @@ public class SharedLootTable {
         }
 
         public void setNeed(LootRollEntry entry, boolean need) {
-            if (entry == null || !entry.eligiblePlayers().contains(player.getUniqueId())) return;
+            if (entry == null || !entry.eligiblePlayers().contains(player.getUniqueId())
+                    || !mayReceive(entry.itemStack(), entry.permission(), player)) return;
             if (need) needEntries.add(entry.id());
             else needEntries.remove(entry.id());
             activeParticipants(null).forEach(participant -> participant.sendMessage(ChatColorConverter.convert(
@@ -373,6 +399,9 @@ public class SharedLootTable {
         }
     }
 
-    public record LootRollEntry(UUID id, ItemStack itemStack, Set<UUID> eligiblePlayers) {
+    public record LootRollEntry(UUID id, ItemStack itemStack, Set<UUID> eligiblePlayers, String permission) {
+        public LootRollEntry(UUID id, ItemStack itemStack, Set<UUID> eligiblePlayers) {
+            this(id, itemStack, eligiblePlayers, "");
+        }
     }
 }

@@ -36,6 +36,25 @@ public final class LootItemPolicy {
         return isEquipment(item, construction) || item.getMaxStackSize() == 1;
     }
 
+    public static boolean canReceive(CustomItem item, org.bukkit.entity.Player player) {
+        return item != null && item.getCustomItemsConfigFields().isEnabled()
+                && (item.getPermission().isEmpty() || player != null && player.hasPermission(item.getPermission()));
+    }
+
+    public static boolean canReceive(ItemStack item, org.bukkit.entity.Player player) {
+        if (item == null || item.getType().isAir() || item.getAmount() <= 0) return false;
+        String id = ItemTagger.getCustomItemId(item);
+        return id == null || canReceive(CustomItem.getCustomItem(id), player);
+    }
+
+    public static boolean hasRecipientRestriction(ItemStack item) {
+        String id = ItemTagger.getCustomItemId(item);
+        if (id == null) return false;
+        CustomItem definition = CustomItem.getCustomItem(id);
+        return definition == null || !definition.getCustomItemsConfigFields().isEnabled()
+                || !definition.getPermission().isEmpty();
+    }
+
     public static boolean shouldSoulbind(ItemStack item) {
         String id = ItemTagger.getCustomItemId(item);
         CustomItem custom = id == null ? null : CustomItem.getCustomItem(id);

@@ -21,15 +21,20 @@ public class SimLootCommand {
             commandSender.sendMessage(CommandMessagesConfig.getSimLootPlayerNotFound().replace("$player", playerName));
             return;
         }
-        int counter = 0;
-        while (true) {
-            counter++;
-            if (run(player, level, false)) break;
-            if (counter > 1000) {
-                Logger.info("Failed to generate loot within 1000 attempts! This is almost certainly an issue with the way the loot is configured in your server.");
-                break;
+        if (!LootTables.hasAvailableLoot(level, player)) {
+            commandSender.sendMessage(ItemSettingsConfig.getSimlootMessageFailure());
+            Logger.info("No eligible loot is configured for " + playerName + " at level " + level + ".");
+            return;
+        }
+        for (int attempt = 0; attempt < 1000; attempt++) {
+            RollOutcome outcome = attempt(player, level, false);
+            if (outcome == RollOutcome.DELIVERED) return;
+            if (outcome == RollOutcome.FAILED) {
+                commandSender.sendMessage(ItemSettingsConfig.getSimlootMessageFailure());
+                return;
             }
         }
+        Logger.info("Failed to generate loot within 1000 attempts. Review the configured drop chances.");
     }
 
     public static void runMultipleTimes(Player player, int level, int timesToRun) {
@@ -52,22 +57,30 @@ public class SimLootCommand {
     }
 
     public static boolean run(Player player, int level, boolean message) {
+        return attempt(player, level, message) == RollOutcome.DELIVERED;
+    }
+
+    private enum RollOutcome { MISS, DELIVERED, FAILED }
+
+    private static RollOutcome attempt(Player player, int level, boolean message) {
         try {
             ItemStack itemStack = LootTables.generateLoot(level, player.getLocation(), player);
             if (itemStack == null) {
                 if (message)
                     player.sendMessage(ItemSettingsConfig.getSimlootMessageFailure());
-                return false;
+                return RollOutcome.MISS;
             } else {
                 EliteItemLore eliteItemLore = new EliteItemLore(itemStack, false);
                 if (message)
                     player.sendMessage(ItemSettingsConfig.getSimlootMessageSuccess().replace("$itemName", eliteItemLore.getItemStack().getItemMeta().getDisplayName()));
-                return true;
+                return RollOutcome.DELIVERED;
             }
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
+            Logger.warn("Loot generation/delivery failed for " + player.getUniqueId() + " at level " + level
+                    + ": " + ex + ". This attempt will not be retried.");
             if (message)
                 player.sendMessage(ItemSettingsConfig.getSimlootMessageFailure());
-            return false;
+            return RollOutcome.FAILED;
         }
     }
 

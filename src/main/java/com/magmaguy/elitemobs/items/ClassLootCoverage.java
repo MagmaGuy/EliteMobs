@@ -60,8 +60,9 @@ public final class ClassLootCoverage {
                 if (dungeonPool) {
                     SharedLootTable table = SharedLootTable.getSharedLootTables().get(boss);
                     if (table == null) table = new SharedLootTable(boss);
-                    table.addLoot(item);
-                } else if (!partyPool || !SharedLootTable.addPartyLoot(boss, player, item))
+                    table.addLoot(item, selected.getPermission(), audience);
+                } else if ((!partyPool || !SharedLootTable.addPartyLoot(boss, player, item, selected.getPermission(), audience))
+                        && (selected.getPermission().isEmpty() || player.hasPermission(selected.getPermission())))
                     LootTables.deliverGeneratedItem(player, boss.getLocation(), item);
             }
         }

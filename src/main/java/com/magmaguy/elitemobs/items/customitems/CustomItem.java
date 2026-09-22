@@ -100,19 +100,23 @@ public class CustomItem {
             addCustomItem(this, construction);
             return;
         }
-        if (!parseItemLevel(construction)) return;
-        //give getloot menu items to work with
-        addCustomItem(customItemsConfigFields.getFilename(), this);
-        addCustomItem(this, construction);
-        addTieredLoot(this, construction);
+        int sampleLevel = itemLevel;
+        ItemStack sample = generateDefaultsItemStack(null, false, null, false, construction);
+        if (sample == null) return;
+        itemLevel = (int) Math.round(EliteItemManager.getItemLevel(sample));
         if (parseDropWeight()) {
-            //item is weighed and fixed
-            addFixedItem(this);
-            addWeighedFixedItems(this, construction);
-            this.scalability = Scalability.FIXED;
-            return;
+            scalability = Scalability.FIXED;
+            if (itemType != ItemType.UNIQUE) addFixedItem(this);
+        } else {
+            parseScalability();
         }
-        parseScalability();
+        addCustomItem(customItemsConfigFields.getFilename(), this);
+        // Reuse only an equivalent deterministic sample; derived levels and random rolls retain
+        // their construction boundary. Each published cache still owns its own mutable stack.
+        ItemStack reusable = sampleLevel == itemLevel && !customItemsConfigFields.isProceduralEnchantments()
+                ? sample : null;
+        appendCachedItemStacks(this, customItemStackList, customItemStackShopList, tieredLoot,
+                weighedFixedItems, construction, reusable);
     }
 
     public static CustomItem getCustomItem(String fileName) {
@@ -152,12 +156,6 @@ public class CustomItem {
         customItemStackList.add(sample);
         if (isShopExcluded(customItem.getItemType())) return;
         customItemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null, false, construction));
-    }
-
-    // Adds weighed static items
-    private static void addWeighedFixedItems(CustomItem customItem, ItemConstructionContext construction) {
-        ItemStack itemStack = customItem.generateDefaultsItemStack(null, false, null, false, construction);
-        weighedFixedItems.put(itemStack, customItem.getDropWeight());
     }
 
     public static void addTieredLoot(CustomItem customItem) {
@@ -378,17 +376,22 @@ public class CustomItem {
                                                ArrayList<ItemStack> itemStackShopList,
                                                HashMap<Integer, ArrayList<ItemStack>> tieredLootTarget,
                                                HashMap<ItemStack, Double> weighedFixedItemsTarget, ItemConstructionContext construction) {
+        appendCachedItemStacks(customItem, itemStackList, itemStackShopList, tieredLootTarget,
+                weighedFixedItemsTarget, construction, null);
+    }
+
+    private static void appendCachedItemStacks(CustomItem customItem,
+                                               ArrayList<ItemStack> itemStackList,
+                                               ArrayList<ItemStack> itemStackShopList,
+                                               HashMap<Integer, ArrayList<ItemStack>> tieredLootTarget,
+                                               HashMap<ItemStack, Double> weighedFixedItemsTarget, ItemConstructionContext construction, ItemStack preparedSample) {
         if (customItem.getCustomItemsConfigFields() == null || !customItem.getCustomItemsConfigFields().isEnabled())
             return;
         if (customItem.getCustomItemsConfigFields().getMaterial() == null) return;
 
-        //Built once and copied, rather than built three times. This is the same call with the
-        //same arguments each time and the result is deterministic, so the extra two builds were
-        //producing identical stacks at full price — and that price is high, since constructing
-        //an item rewrites its whole lore, which recalculates DPS, attack speed and defence.
-        //Copies rather than one shared instance, so each list still owns a separate stack the
-        //way it did before.
-        ItemStack defaultsItemStack = customItem.generateDefaultsItemStack(null, false, null, false, construction);
+        boolean deterministic = !customItem.getCustomItemsConfigFields().isProceduralEnchantments();
+        ItemStack defaultsItemStack = preparedSample != null ? preparedSample
+                : customItem.generateDefaultsItemStack(null, false, null, false, construction);
 
         if (defaultsItemStack == null) return;
         // Regenerate loot menu items
@@ -398,7 +401,8 @@ public class CustomItem {
             itemStackShopList.add(customItem.generateDefaultsItemStack(null, true, null, false, construction));
 
         // Regenerate tiered loot
-        ItemStack itemStack = defaultsItemStack.clone();
+        ItemStack itemStack = deterministic ? defaultsItemStack.clone()
+                : customItem.generateDefaultsItemStack(null, false, null, false, construction);
         int itemTier = customItem.getItemLevel();
         if (tieredLootTarget.get(itemTier) == null)
             tieredLootTarget.put(itemTier, new ArrayList<>(Collections.singletonList(itemStack)));
@@ -406,8 +410,10 @@ public class CustomItem {
             tieredLootTarget.get(itemTier).add(itemStack);
 
         // Regenerate weighed fixed items
-        if (customItem.getScalability() == Scalability.FIXED && customItem.getDropWeight() > 0) {
-            ItemStack weighedStack = defaultsItemStack.clone();
+        if (customItem.getItemType() != ItemType.UNIQUE && customItem.getScalability() == Scalability.FIXED
+                && customItem.getDropWeight() > 0) {
+            ItemStack weighedStack = deterministic ? defaultsItemStack.clone()
+                    : customItem.generateDefaultsItemStack(null, false, null, false, construction);
             weighedFixedItemsTarget.put(weighedStack, customItem.getDropWeight());
         }
     }
@@ -593,15 +599,12 @@ public class CustomItem {
     }
 
     private boolean parseDropWeight() {
-        if (this.customItemsConfigFields.getDropWeight() == null) return false;
-        if (this.customItemsConfigFields.getDropWeight().equalsIgnoreCase("dynamic")) return false;
-        try {
-            this.dropWeight = Double.parseDouble(this.customItemsConfigFields.getDropWeight());
-            return true;
-        } catch (Exception e) {
-            Logger.warn("Item " + customItemsConfigFields.getFilename() + " does not have a valid itemWeight.");
-        }
-        return false;
+        String configured = customItemsConfigFields.getDropWeight();
+        if (configured == null || configured.equalsIgnoreCase("dynamic")) return false;
+        dropWeight = Double.parseDouble(configured);
+        if (!Double.isFinite(dropWeight) || dropWeight <= 0)
+            throw new IllegalArgumentException("dropWeight must be finite and positive for " + customItemsConfigFields.getFilename());
+        return true;
     }
 
     private void parseScalability() {
@@ -630,13 +633,6 @@ public class CustomItem {
                 Logger.warn("Item " + customItemsConfigFields.getFilename() + " does not have a valid scalability type! Defaulting to scalable.");
 
         }
-    }
-
-    private boolean parseItemLevel(ItemConstructionContext construction) {
-        ItemStack itemStack = generateDefaultsItemStack(null, false, null, false, construction);
-        if (itemStack == null) return false;
-        this.itemLevel = (int) Math.round(EliteItemManager.getItemLevel(itemStack));
-        return true;
     }
 
     public ItemStack generateDefaultsItemStack(Player player, boolean showItemWorth, EliteEntity eliteEntity) {
