@@ -492,13 +492,12 @@ public class EliteMobs extends JavaPlugin {
         EMDungeonLocator emDungeonLocator = new EMDungeonLocator();
         LocationQueryRegistry.registerDungeonLocator(emDungeonLocator);
 
-        // Per-dungeon protection check — EliteMobsWorld is only populated for
-        // worlds where the content pack opted into protection (isProtect=true
-        // in the package config). Sandbox/unprotected EM worlds register as
-        // owned but report is_protected=false.
+        // Dungeon ownership includes unprotected worlds. Report protection only
+        // when this dungeon also has active InstanceProtector rules.
         java.util.function.Predicate<org.bukkit.Location> emProtectionFn = loc ->
                 loc != null && loc.getWorld() != null
-                        && com.magmaguy.elitemobs.dungeons.EliteMobsWorld.isEliteMobsWorld(loc.getWorld().getUID());
+                        && com.magmaguy.elitemobs.dungeons.EliteMobsWorld.isEliteMobsWorld(loc.getWorld().getUID())
+                        && com.magmaguy.magmacore.instance.InstanceProtector.isProtectedWorld(loc.getWorld());
 
         // Kind-tagging for typed queries — every EM-owned location reports its
         // package type and DungeonSizeCategory so cross-plugin scripts can branch
