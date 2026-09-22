@@ -160,11 +160,12 @@ public class SpiritWalkSupport implements Listener {
                             }
 
                             finalVehicle.setInvulnerable(false);
+                            LivingEntity returningBody = eliteEntity.getLivingEntity();
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
-                                    PreventMountExploit.bypass = true;
-                                    finalVehicle.addPassenger(eliteEntity.getLivingEntity());
+                                    if (eliteEntity.getLivingEntity() == returningBody)
+                                        PreventMountExploit.addPassenger(finalVehicle, returningBody);
                                 }
                             }.runTaskLater(MetadataHandler.PLUGIN, 1);
                         }
@@ -207,7 +208,7 @@ public class SpiritWalkSupport implements Listener {
                     double randomizedZ = (ThreadLocalRandom.current().nextDouble() - 0.5) * 5;
 
                     Vector normalizedVector = new Vector(randomizedX, randomizedY, randomizedZ).normalize().multiply(7).multiply(counter);
-                    Location newSimulatedLocation = bossLocation.add(normalizedVector).clone();
+                    Location newSimulatedLocation = bossLocation.clone().add(normalizedVector);
                     Location newValidLocation = scanVertically(newSimulatedLocation);
 
                     if (newValidLocation != null) {

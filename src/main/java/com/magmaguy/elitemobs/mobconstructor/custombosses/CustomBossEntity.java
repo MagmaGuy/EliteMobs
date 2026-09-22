@@ -55,6 +55,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     protected static HashSet<CustomBossEntity> trackableCustomBosses = new HashSet<>();
     private static BukkitTask dynamicLevelUpdater = null;
     private final List<BukkitTask> globalReinforcements = new ArrayList<>();
+    BukkitTask mountAttachmentTask;
     @Getter
     protected CustomBossesConfigFields customBossesConfigFields;
     protected CustomBossEntity customBossMount = null;
@@ -632,6 +633,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         beginRemovalCall();
         try {
             cancelGlobalReinforcementTasks();
+            if (mountAttachmentTask != null) {
+                mountAttachmentTask.cancel();
+                mountAttachmentTask = null;
+            }
             dynamicLevelBossEntities.remove(this);
             if (livingEntity != null) persistentLocation = livingEntity.getLocation();
             //Remove the living entity

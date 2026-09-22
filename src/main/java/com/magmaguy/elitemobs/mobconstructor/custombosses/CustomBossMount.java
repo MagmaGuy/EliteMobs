@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.combatsystem.antiexploit.PreventMountExploit;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
@@ -13,57 +14,83 @@ public class CustomBossMount {
     private CustomBossMount() {
     }
 
-    //todo: Now that the boss megaconsumer exists, it's possible that delaying the mount by 5 ticks is no longer necessary and that we can just put it in the consumer... maybe
-    public static CustomBossEntity generateMount(CustomBossEntity customBossEntity) {
-        if (customBossEntity.customBossesConfigFields.getMountedEntity() == null) return null;
-        if (customBossEntity.getLivingEntity() == null) {
-            Logger.warn("Could not spawn mount for boss " + customBossEntity.customBossesConfigFields.getFilename() + " because the boss has no living entity! This probably means some other plugin is preventing this boss from spawning.");
+    public static CustomBossEntity generateMount(CustomBossEntity rider) {
+        String definition = rider.getCustomBossesConfigFields().getMountedEntity();
+        if (definition == null) return null;
+        LivingEntity riderBody = rider.getLivingEntity();
+        if (riderBody == null || !riderBody.isValid()) return null;
+
+        EntityType nativeType;
+        try {
+            nativeType = EntityType.valueOf(definition);
+        } catch (IllegalArgumentException customDefinition) {
+            return generateCustomMount(rider, riderBody, definition);
+        }
+        if (nativeType.getEntityClass() == null || !LivingEntity.class.isAssignableFrom(nativeType.getEntityClass())) {
+            Logger.warn("Mount " + definition + " for " + rider.getCustomBossesConfigFields().getFilename() + " is not a living entity.");
             return null;
         }
+        LivingEntity mount = (LivingEntity) riderBody.getWorld().spawnEntity(riderBody.getLocation(), nativeType);
+        rider.livingEntityMount = mount;
+        boolean attached = false;
         try {
-            EntityType entityType = EntityType.valueOf(customBossEntity.customBossesConfigFields.getMountedEntity());
-            LivingEntity livingEntity = (LivingEntity) customBossEntity.getLivingEntity().getWorld()
-                    .spawnEntity(customBossEntity.getLivingEntity().getLocation(), entityType);
-            PreventMountExploit.bypass = true;
-            livingEntity.addPassenger(customBossEntity.getLivingEntity());
-            livingEntity.setRemoveWhenFarAway(false);
-            customBossEntity.livingEntityMount = livingEntity;
-        } catch (Exception ex) {
-            //This runs when it's not an API entity
-            CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(customBossEntity.customBossesConfigFields.getMountedEntity());
-            if (customBossesConfigFields != null) {
-                CustomBossEntity mountEntity = CustomBossEntity.createCustomBossEntity(customBossEntity.customBossesConfigFields.getMountedEntity());
-                if (mountEntity == null) {
-                    Logger.warn("Mount for boss " + customBossEntity.getCustomBossesConfigFields().getFilename() + " is not valid!");
-                    return null;
-                }
-                mountEntity.setSpawnLocation(customBossEntity.getLivingEntity().getLocation());
-                mountEntity.setBypassesProtections(customBossEntity.getBypassesProtections());
-                mountEntity.setPersistent(false);
-                mountEntity.setMount(true);
-                mountEntity.spawn(false);
-
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (!mountEntity.isValid()) return;
-                        if (customBossEntity.getLivingEntity() == null) return;
-                        if (mountEntity.getCustomModel() != null)
-                            mountEntity.getCustomModel().addPassenger(customBossEntity);
-                        else {
-                            PreventMountExploit.bypass = true;
-                            if (mountEntity.getLivingEntity() != null)
-                                mountEntity.getLivingEntity().addPassenger(customBossEntity.getLivingEntity());
-                        }
-                        customBossEntity.customBossMount = mountEntity;
-                    }
-                }.runTaskLater(MetadataHandler.PLUGIN, 5);
-                return mountEntity;
+            if (rider.getLivingEntity() != riderBody) return null;
+            mount.setRemoveWhenFarAway(false);
+            attached = PreventMountExploit.addPassenger(mount, riderBody);
+        } finally {
+            if (!attached) {
+                if (rider.livingEntityMount == mount) rider.livingEntityMount = null;
+                mount.remove();
             }
-
-            Logger.warn("Attempted to make Custom Boss " + customBossEntity.customBossesConfigFields.getFilename() + " mount invalid" +
-                    " entity or boss " + customBossEntity.customBossesConfigFields.getMountedEntity() + " . Fix this in the configuration file.");
         }
         return null;
+    }
+
+    private static CustomBossEntity generateCustomMount(CustomBossEntity rider, LivingEntity riderBody, String definition) {
+        CustomBossesConfigFields fields = CustomBossesConfig.getCustomBoss(definition);
+        if (fields == null) {
+            Logger.warn("Invalid mount " + definition + " for " + rider.getCustomBossesConfigFields().getFilename());
+            return null;
+        }
+        CustomBossEntity mount = new CustomBossEntity(fields);
+        mount.setSpawnLocation(riderBody.getLocation());
+        mount.setBypassesProtections(rider.getBypassesProtections());
+        mount.setPersistent(false);
+        mount.setMount(true);
+        rider.customBossMount = mount;
+        boolean queued = false;
+        try {
+            mount.spawn(false);
+            if (!mount.isValid() || rider.getLivingEntity() != riderBody || !riderBody.isValid()) return null;
+            rider.mountAttachmentTask = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (rider.customBossMount != mount) {
+                        mount.remove(RemovalReason.REINFORCEMENT_CULL);
+                        return;
+                    }
+                    rider.mountAttachmentTask = null;
+                    boolean attached = false;
+                    try {
+                        if (!mount.isValid() || rider.getLivingEntity() != riderBody || !riderBody.isValid()) return;
+                        if (mount.getCustomModel() != null) {
+                            mount.getCustomModel().addPassenger(rider);
+                            attached = true;
+                        } else attached = PreventMountExploit.addPassenger(mount.getLivingEntity(), riderBody);
+                    } finally {
+                        if (!attached) removeCustomMount(rider, mount);
+                    }
+                }
+            }.runTaskLater(MetadataHandler.PLUGIN, 5L);
+            queued = true;
+            return mount;
+        } finally {
+            if (!queued) removeCustomMount(rider, mount);
+        }
+    }
+
+    private static void removeCustomMount(CustomBossEntity rider, CustomBossEntity mount) {
+        if (rider.customBossMount == mount) rider.customBossMount = null;
+        mount.remove(RemovalReason.REINFORCEMENT_CULL);
     }
 }

@@ -33,6 +33,11 @@ public class KeepNeutralsAngry {
         angryMobTasks.clear();
     }
 
+    public static void release(UUID bodyId) {
+        BukkitTask task = angryMobTasks.remove(bodyId);
+        if (task != null) task.cancel();
+    }
+
     public static void showMeYouWarFace(EliteEntity eliteEntity) {
         //might already contain
         EntityType entityType = eliteEntity.getLivingEntity().getType();
@@ -41,16 +46,17 @@ public class KeepNeutralsAngry {
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
-                if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.getCustomBossesConfigFields().isNeutral())
-                    return;
                 //It is possible for entities to change type during combat, in which case they need to be wiped
                 if (!eliteEntity.isValid() ||
+                        !entityUUID.equals(eliteEntity.getLivingEntity().getUniqueId()) ||
                         !entityType.equals(eliteEntity.getLivingEntity().getType()) ||
                         entityType.equals(EntityType.WOLF) && ((Wolf) eliteEntity.getLivingEntity()).isTamed()) {
                     cancel();
                     angryMobTasks.remove(entityUUID);
                     return;
                 }
+                if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.getCustomBossesConfigFields().isNeutral())
+                    return;
 
                 if (!eliteEntity.getLivingEntity().getType().equals(EntityType.LLAMA) && !eliteEntity.getLivingEntity().getType().equals(EntityType.RABBIT) &&
                         ((Mob) eliteEntity.getLivingEntity()).getTarget() != null)

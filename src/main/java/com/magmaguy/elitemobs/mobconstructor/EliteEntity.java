@@ -669,6 +669,7 @@ public class EliteEntity {
 
     /** Rolls back materialization without ending a persistent logical boss or losing its powers. */
     protected void discardSpawnBody(LivingEntity body) {
+        if (body != null) KeepNeutralsAngry.release(body.getUniqueId());
         EntityTracker.getEliteMobEntities().remove(eliteUUID, this);
         try {
             cleanupPreparedMindSpawnEffects();
@@ -699,7 +700,10 @@ public class EliteEntity {
 
     private void normalizeLivingEntity(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
         if (livingEntity == null) return;
-        if (this.livingEntity != livingEntity) setInCombat(false);
+        if (this.livingEntity != livingEntity) {
+            setInCombat(false);
+            if (this.livingEntity != null) KeepNeutralsAngry.release(this.livingEntity.getUniqueId());
+        }
         if (this.livingEntity != livingEntity || !Double.isFinite(nativeBaseMaxHealth))
             nativeBaseMaxHealth = AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health");
         this.removalEventCalled = false;
@@ -1466,6 +1470,7 @@ public class EliteEntity {
         beginRemovalCall();
         try {
             stopCombatWatchdog();
+            if (livingEntity != null) KeepNeutralsAngry.release(livingEntity.getUniqueId());
             closePowerStances();
             closeAllPowerRuntimes(removalReason);
             closeEliteLuaPowerBinding();

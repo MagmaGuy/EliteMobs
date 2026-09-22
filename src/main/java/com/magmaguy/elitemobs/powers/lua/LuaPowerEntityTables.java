@@ -607,15 +607,7 @@ final class LuaPowerEntityTables {
     }
 
     boolean mountPassenger(Entity vehicle, Entity passenger) {
-        if (vehicle == null || passenger == null || vehicle.equals(passenger) || !vehicle.isValid() || !passenger.isValid()) {
-            return false;
-        }
-        PreventMountExploit.bypass = true;
-        try {
-            return vehicle.addPassenger(passenger);
-        } finally {
-            PreventMountExploit.bypass = false;
-        }
+        return PreventMountExploit.addPassenger(vehicle, passenger);
     }
 
     private boolean isAlive(LivingEntity livingEntity) {
