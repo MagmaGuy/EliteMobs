@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.UUID;
 
 /**
  * Handles skill XP awards when elite mobs are killed.
@@ -96,7 +98,11 @@ public class SkillXPHandler implements Listener {
                 SkillXPCalculator.calculateMobXP(Math.max(1, eliteEntity.getLevel())) * bossMultiplier / 2D));
 
         // Award XP to each meaningful participant.
-        for (Player player : meaningfulParticipants) {
+        Set<UUID> awardedPlayers = new HashSet<>();
+        for (Player participant : meaningfulParticipants) {
+            if (!awardedPlayers.add(participant.getUniqueId())) continue;
+            Player player = org.bukkit.Bukkit.getPlayer(participant.getUniqueId());
+            if (player == null || !player.isOnline() || !player.isValid()) continue;
             double damageDealt = damageByPlayer.getOrDefault(player.getUniqueId(), 0D);
 
             // Skip NPCs and players not in memory

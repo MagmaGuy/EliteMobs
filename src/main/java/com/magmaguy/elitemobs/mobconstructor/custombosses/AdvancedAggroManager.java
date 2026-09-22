@@ -38,7 +38,7 @@ public final class AdvancedAggroManager {
         Player highestThreatPlayer = null;
         double highestThreat = Double.NEGATIVE_INFINITY;
         for (Map.Entry<Player, Double> entry : eliteEntity.getAggro().entrySet()) {
-            Player player = entry.getKey();
+            Player player = Bukkit.getPlayer(entry.getKey().getUniqueId());
             Double threat = entry.getValue();
             if (!isEligibleTarget(mob, player)) continue;
             if (threat == null || !Double.isFinite(threat) || threat <= highestThreat) continue;

@@ -34,10 +34,12 @@ public final class ClassParticipationTracker {
      */
     public void recordSupport(Player player) {
         Set<UUID> supportedPlayers = partyMembers(player);
-        for (EliteEntity elite : EntityTracker.getEliteMobEntities().values()) {
+        var origin = player.getLocation();
+        for (var entity : origin.getWorld().getNearbyEntities(origin, 40D, 40D, 40D)) {
+            EliteEntity elite = EntityTracker.getEliteMobEntity(entity);
             if (elite == null || elite.getLivingEntity() == null || !elite.getLivingEntity().isValid()) continue;
             if (!elite.getLivingEntity().getWorld().equals(player.getWorld())) continue;
-            if (elite.getLivingEntity().getLocation().distanceSquared(player.getLocation())
+            if (elite.getLivingEntity().getLocation().distanceSquared(origin)
                     > SUPPORT_ENCOUNTER_RADIUS_SQUARED) continue;
             boolean engaged = elite.getDamagers().keySet().stream()
                     .map(Player::getUniqueId)
@@ -50,10 +52,12 @@ public final class ClassParticipationTracker {
     }
 
     public Set<Player> participants(EliteEntity elite) {
-        LinkedHashSet<Player> players = new LinkedHashSet<>(elite.getDamagers().keySet());
-        for (UUID playerId : participantsByElite.getOrDefault(elite.getEliteUUID(), Set.of())) {
+        Set<UUID> identities = new HashSet<>(participantsByElite.getOrDefault(elite.getEliteUUID(), Set.of()));
+        for (Player contributor : elite.getDamagers().keySet()) identities.add(contributor.getUniqueId());
+        LinkedHashSet<Player> players = new LinkedHashSet<>();
+        for (UUID playerId : identities) {
             Player player = org.bukkit.Bukkit.getPlayer(playerId);
-            if (player != null) players.add(player);
+            if (player != null && player.isOnline() && player.isValid()) players.add(player);
         }
         return Set.copyOf(players);
     }

@@ -54,6 +54,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EliteEntity {
 
     protected final HashMap<Player, Double> damagers = new HashMap<>();
+    private final Map<UUID, Player> contributionSessions = new HashMap<>();
     private final Map<UUID, EnumMap<SkillType, Double>> skillDamageContributions = new HashMap<>();
     protected final UUID eliteUUID = UUID.randomUUID();
     private boolean removalEventCalled = false;
@@ -568,10 +569,15 @@ public class EliteEntity {
     }
 
     private Player findTrackedPlayer(Player player) {
-        for (Player trackedPlayer : damagers.keySet())
-            if (trackedPlayer.getUniqueId().equals(player.getUniqueId())) return trackedPlayer;
-        for (Player trackedPlayer : aggro.keySet())
-            if (trackedPlayer.getUniqueId().equals(player.getUniqueId())) return trackedPlayer;
+        Player current = org.bukkit.Bukkit.getPlayer(player.getUniqueId());
+        if (current != null) player = current;
+        Player previous = contributionSessions.put(player.getUniqueId(), player);
+        if (previous != null && previous != player) {
+            Double damage = damagers.remove(previous);
+            Double threat = aggro.remove(previous);
+            if (damage != null) damagers.merge(player, damage, Double::sum);
+            if (threat != null) aggro.merge(player, threat, Double::sum);
+        }
         return player;
     }
 
@@ -606,8 +612,10 @@ public class EliteEntity {
         clearForcedTarget();
         aggro.clear();
         summoningEntity.aggro.forEach((player, threat) -> {
-            if (player != null && threat != null && Double.isFinite(threat) && threat > 0D)
-                aggro.put(player, threat);
+            if (player != null && threat != null && Double.isFinite(threat) && threat > 0D) {
+                Player current = org.bukkit.Bukkit.getPlayer(player.getUniqueId());
+                aggro.put(findTrackedPlayer(current == null ? player : current), threat);
+            }
         });
         AdvancedAggroManager.updateTarget(this);
     }
@@ -616,6 +624,7 @@ public class EliteEntity {
      * Clears both reward contribution and combat threat for a fresh encounter.
      */
     public void clearDamagers() {
+        contributionSessions.clear();
         damagers.clear();
         aggro.clear();
         skillDamageContributions.clear();

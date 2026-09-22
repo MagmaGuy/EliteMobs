@@ -45,7 +45,6 @@ final class PlayerActionTokenRegistry {
         Objects.requireNonNull(playerId, "playerId");
         Objects.requireNonNull(action, "action");
         long now = clock.getAsLong();
-        removeExpired(now);
         String token;
         do token = UUID.randomUUID().toString().replace("-", "");
         while (entries.containsKey(token));
