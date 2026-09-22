@@ -46,6 +46,10 @@ public class QuestAcceptEvent extends Event implements Cancellable {
     public static class QuestAcceptEventHandler implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
         public void questAcceptLimiter(QuestAcceptEvent event) {
+            if (!Quest.canAccept(event.player, event.quest)) {
+                event.setCancelled(true);
+                return;
+            }
             if (PlayerData.getQuests(event.getPlayer().getUniqueId()).size() < QuestsConfig.getMaximumActiveQuests())
                 return;
             event.setCancelled(true);
@@ -54,8 +58,13 @@ public class QuestAcceptEvent extends Event implements Cancellable {
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onQuestAccept(QuestAcceptEvent event) {
-            event.getPlayer().sendMessage(QuestsConfig.getQuestJoinMessage().replace("$questName", event.getQuest().getQuestName()));
+            if (!Quest.canAccept(event.player, event.quest)) {
+                event.setCancelled(true);
+                return;
+            }
             event.getQuest().setAccepted(true);
+            PlayerData.addQuest(event.getPlayer().getUniqueId(), event.getQuest());
+            event.getPlayer().sendMessage(QuestsConfig.getQuestJoinMessage().replace("$questName", event.getQuest().getQuestName()));
             if (QuestsConfig.isUseQuestAcceptTitles())
                 event.getPlayer().sendTitle(
                         QuestsConfig.getQuestStartTitle().replace("$questName", event.getQuest().getQuestName()),
@@ -83,7 +92,6 @@ public class QuestAcceptEvent extends Event implements Cancellable {
             }
             if (!QuestsConfig.isAutoTrackQuestsOnAccept())
                 event.getQuest().getQuestObjectives().displayTemporaryObjectivesScoreboard(event.getPlayer());
-            PlayerData.addQuest(event.getPlayer().getUniqueId(), event.getQuest());
             if (!playedCustomSound)
                 event.getPlayer().playSound(event.getPlayer().getLocation(), SoundsConfig.questAcceptSound, 1, 1);
         }

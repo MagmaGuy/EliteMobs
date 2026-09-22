@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class DynamicQuest extends Quest {
+    private static final long serialVersionUID = -2841343780852205224L;
 
     //These are generated fresh every hour
     private static final HashMap<Integer, List<QuestObjectives>> threeRandomDynamicObjectives = new HashMap<>();
@@ -55,6 +56,7 @@ public class DynamicQuest extends Quest {
     }
 
     public static List<DynamicQuest> generateQuests(Player player) {
+        if (!PlayerData.isInMemory(player)) return List.of();
         int combatLevel = DynamicQuestLevel.clamp(CombatLevelCalculator.calculateCombatLevel(player.getUniqueId()));
         int questTemplateBucket = DynamicQuestLevel.toTemplateBucket(combatLevel);
         if (questTemplateBucket == 0) {
@@ -67,6 +69,19 @@ public class DynamicQuest extends Quest {
         if (questTemplates == null) return dynamicQuests;
 
         for (QuestObjectives questTemplate : questTemplates) {
+            if (PlayerData.getQuests(player.getUniqueId()).stream().anyMatch(quest -> quest instanceof DynamicQuest
+                    && quest.getQuestObjectives().getUuid().equals(questTemplate.getUuid()))) continue;
+            DynamicQuest existing = null;
+            for (Quest pending : pendingPlayerQuests.getOrDefault(player.getUniqueId(), List.of()))
+                if (pending instanceof DynamicQuest dynamic && dynamic.getQuestLevel() == combatLevel
+                        && dynamic.getQuestObjectives().getUuid().equals(questTemplate.getUuid())) {
+                    existing = dynamic;
+                    break;
+                }
+            if (existing != null) {
+                dynamicQuests.add(existing);
+                continue;
+            }
             DynamicKillObjective templateObjective = (DynamicKillObjective) questTemplate.getObjectives().get(0);
             QuestObjectives playerQuestObjectives = new QuestObjectives(
                     questTemplate.getUuid(),
@@ -83,6 +98,7 @@ public class DynamicQuest extends Quest {
     }
 
     public static List<DynamicQuest> getQuests(Player player) {
+        if (!PlayerData.isInMemory(player)) return List.of();
         List<DynamicQuest> dynamicQuests = new ArrayList<>();
 
         if (PlayerData.getQuests(player.getUniqueId()) != null)
@@ -91,17 +107,8 @@ public class DynamicQuest extends Quest {
                     dynamicQuests.add(dynamicQuest);
             }
 
-        for (DynamicQuest generatedQuest : generateQuests(player)) {
-            boolean exists = false;
-            for (DynamicQuest dynamicQuest : dynamicQuests) {
-                if (dynamicQuest.getQuestObjectives().getUuid().equals(generatedQuest.getQuestObjectives().getUuid())) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) dynamicQuests.add(generatedQuest);
-        }
-
+        dynamicQuests.addAll(generateQuests(player));
+        replaceOffers(player, dynamicQuests);
         return dynamicQuests;
     }
 

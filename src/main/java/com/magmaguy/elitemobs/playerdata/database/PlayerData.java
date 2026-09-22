@@ -254,6 +254,7 @@ public class PlayerData {
     }
 
     public static void clearPlayerData(UUID uuid) {
+        Quest.releasePlayerSession(uuid);
         playerDataHashMap.remove(uuid);
         CombatLevelCalculator.invalidateOnlineCombatLevel();
     }
@@ -348,6 +349,7 @@ public class PlayerData {
     }
 
     public static void resetQuests(UUID uuid) {
+        Quest.releasePlayerSession(uuid);
         ArrayList<Quest> resetQuests = new ArrayList<>();
         try {
             setDatabaseValue(uuid, "QuestStatus", ObjectSerializer.toString(resetQuests));
@@ -361,11 +363,13 @@ public class PlayerData {
 
     public static void removeQuest(UUID uuid, Quest quest) {
         if (quest == null) return;
+        if (quest instanceof CustomQuest customQuest) customQuest.releaseTemporaryPermissions();
         playerDataHashMap.get(uuid).quests.removeIf(iteratedQuest -> iteratedQuest.getQuestID().equals(quest.getQuestID()));
         updateQuestStatus(uuid);
     }
 
     public static void addQuest(UUID uuid, Quest quest) {
+        if (playerDataHashMap.get(uuid).quests.stream().anyMatch(current -> current.getQuestID().equals(quest.getQuestID()))) return;
         playerDataHashMap.get(uuid).quests.add(quest);
         updateQuestStatus(uuid);
     }
@@ -1036,7 +1040,7 @@ public class PlayerData {
                 return;
             }
             for (Quest quest : new ArrayList<>(quests))
-                if (quest instanceof CustomQuest customQuest)
+                if (quest instanceof CustomQuest customQuest && quest.isAccepted() && !quest.getQuestObjectives().isTurnedIn())
                     customQuest.applyTemporaryPermissions(player);
             if (playerQuestCooldowns != null)
                 playerQuestCooldowns.startCooldowns(uuid);

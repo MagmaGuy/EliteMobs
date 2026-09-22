@@ -4,16 +4,16 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.metadata.LazyMetadataValue;
+import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.UUID;
 
 public class QuestCooldown implements Serializable {
+    private static final long serialVersionUID = 8936646690733915274L;
     @Getter
     private final String permission;
     private final boolean permanent;
@@ -21,35 +21,54 @@ public class QuestCooldown implements Serializable {
     private long targetUnixTime = 0;
     @Getter
     private transient BukkitTask bukkitTask = null;
+    private transient PermissionAttachment permissionAttachment;
 
     public QuestCooldown(int delayInMinutes, String permission, UUID player) {
         this.permanent = delayInMinutes < 1;
         if (!permanent)
             this.targetUnixTime = System.currentTimeMillis() + 60L * 1000 * delayInMinutes;
         this.permission = permission;
-        startCooldown(player);
     }
 
     public void startCooldown(UUID player) {
-        long delay = Math.max((targetUnixTime - System.currentTimeMillis()) / 1000L * 20L, 0L);
-        PermissionAttachment permissionAttachment = Objects.requireNonNull(Bukkit.getPlayer(player)).addAttachment(MetadataHandler.PLUGIN);
-        if (!permanent && delay < 1) {
-            permissionAttachment.unsetPermission(permission);
-            return;
-        }
+        stop();
+        Player session = Bukkit.getPlayer(player);
+        if (session == null || isExpired()) return;
+        permissionAttachment = session.addAttachment(MetadataHandler.PLUGIN);
         permissionAttachment.setPermission(permission, true);
-        Bukkit.getPlayer(player).setMetadata(permission, new LazyMetadataValue(MetadataHandler.PLUGIN, () -> true));
-        if (!permanent)
-            bukkitTask = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (Bukkit.getPlayer(player) != null) {
-                        permissionAttachment.unsetPermission(permission);
-                        Bukkit.getPlayer(player).removeMetadata(permission, MetadataHandler.PLUGIN);
-                        PlayerData.updatePlayerQuestCooldowns(player, PlayerData.getPlayerQuestCooldowns(player));
-                    }
-                }
-            }.runTaskLater(MetadataHandler.PLUGIN, delay);
+        session.setMetadata(permission, new FixedMetadataValue(MetadataHandler.PLUGIN, true));
+        if (!permanent) scheduleExpiration(session);
+    }
+
+    boolean isExpired() {
+        return !permanent && targetUnixTime <= System.currentTimeMillis();
+    }
+
+    private void scheduleExpiration(Player session) {
+        long remaining = targetUnixTime - System.currentTimeMillis();
+        long delay = Math.max(1L, remaining / 50L + (remaining % 50L > 0 ? 1L : 0L));
+        bukkitTask = Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+            bukkitTask = null;
+            if (Bukkit.getPlayer(session.getUniqueId()) != session) {
+                stop();
+                return;
+            }
+            if (!isExpired()) {
+                scheduleExpiration(session);
+                return;
+            }
+            PlayerQuestCooldowns owner = PlayerData.getPlayerQuestCooldowns(session.getUniqueId());
+            if (owner != null) owner.expire(this, session);
+            else stop();
+        }, delay);
+    }
+
+    void stop() {
+        if (bukkitTask != null) bukkitTask.cancel();
+        bukkitTask = null;
+        PermissionAttachment owned = permissionAttachment;
+        permissionAttachment = null;
+        if (owned != null) owned.remove();
     }
 
 }

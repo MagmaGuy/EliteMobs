@@ -1,9 +1,7 @@
 package com.magmaguy.elitemobs.api;
 
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.config.SoundsConfig;
-import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.Quest;
@@ -11,7 +9,6 @@ import com.magmaguy.elitemobs.quests.QuestTracking;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
-import org.bukkit.permissions.PermissionAttachment;
 
 public class QuestLeaveEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
@@ -44,16 +41,6 @@ public class QuestLeaveEvent extends Event {
                         QuestsConfig.getQuestLeaveTitle().replace("$questName", event.getQuest().getQuestName()),
                         QuestsConfig.getQuestLeaveSubtitle().replace("$questName", event.getQuest().getQuestName()),
                         20, 60, 20);
-            if (event.getQuest() instanceof CustomQuest customQuest) {
-                CustomQuestsConfigFields customQuestsConfigFields = customQuest.getCustomQuestsConfigFields();
-                if (customQuestsConfigFields != null) {
-                    if (!customQuestsConfigFields.getTemporaryPermissions().isEmpty()) {
-                        PermissionAttachment permissionAttachment = event.getPlayer().addAttachment(MetadataHandler.PLUGIN);
-                        for (String permission : customQuestsConfigFields.getTemporaryPermissions())
-                            permissionAttachment.setPermission(permission, false);
-                    }
-                }
-            }
 
             QuestTracking questTracking = QuestTracking.getPlayerTrackingQuests().get(event.getPlayer().getUniqueId());
             if (questTracking != null && questTracking.getQuest().getQuestID().equals(event.getQuest().getQuestID()))
