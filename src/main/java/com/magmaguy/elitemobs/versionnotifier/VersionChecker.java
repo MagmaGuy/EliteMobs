@@ -47,6 +47,7 @@ public class VersionChecker {
     private static NightbreakAccount.TokenChangeListenerRegistration
             tokenChangeListener;
     private static BukkitTask scheduledCheckTask;
+    private static volatile long lifecycleGeneration;
     private record DlcCatalog(Map<String, Integer> versions, Set<String> slugs, Set<String> unpublishedSlugs) {}
 
     private static volatile DlcCatalog dlcCatalog = new DlcCatalog(Map.of(), Set.of(), Set.of());
@@ -54,6 +55,25 @@ public class VersionChecker {
     private VersionChecker() {
     }
     private static volatile long lastRefreshTimestamp = 0;
+
+    private static boolean isCurrent(long generation) {
+        return generation == lifecycleGeneration && !MetadataHandler.shutdownRequested;
+    }
+
+    private static void publish(long generation, Runnable publication) {
+        if (!isCurrent(generation)) return;
+        if (Bukkit.isPrimaryThread()) {
+            publication.run();
+            return;
+        }
+        try {
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                if (isCurrent(generation)) publication.run();
+            });
+        } catch (org.bukkit.plugin.IllegalPluginAccessException disabled) {
+            if (isCurrent(generation)) throw disabled;
+        }
+    }
 
     /**
      * Compares a Minecraft version with the current version on the server. Returns true if the version on the server is older.
@@ -64,39 +84,16 @@ public class VersionChecker {
      * @return Whether the version is under the value to be compared
      */
     public static boolean serverVersionOlderThan(int majorVersion, int minorVersion) {
-
-        String[] splitVersion = Bukkit.getBukkitVersion().split("[.]");
-
-        int actualMajorVersion;
-        int actualMinorVersion = 0;
-
-        if (splitVersion[0].equals("1")) {
-            // Legacy format: 1.MAJOR.MINOR-R0.1-SNAPSHOT (e.g. 1.21.11-R0.1-SNAPSHOT)
-            actualMajorVersion = Integer.parseInt(splitVersion[1].split("-")[0]);
-            if (splitVersion.length > 2)
-                actualMinorVersion = Integer.parseInt(splitVersion[2].split("-")[0]);
-        } else {
-            // New year.drop format: MAJOR.MINOR-R0.1-SNAPSHOT (e.g. 26.1-R0.1-SNAPSHOT)
-            actualMajorVersion = Integer.parseInt(splitVersion[0].split("-")[0]);
-            if (splitVersion.length > 1)
-                actualMinorVersion = Integer.parseInt(splitVersion[1].split("-")[0]);
-        }
-
-        if (actualMajorVersion < majorVersion)
-            return true;
-
-        if (actualMajorVersion == majorVersion)
-            return actualMinorVersion < minorVersion;
-
-        return false;
-
+        return com.magmaguy.magmacore.util.VersionChecker.serverVersionOlderThan(majorVersion, minorVersion);
     }
-
     private static void checkPluginVersion() {
+        long generation = lifecycleGeneration;
+        String installedVersion = MetadataHandler.PLUGIN.getDescription().getVersion();
         new BukkitRunnable() {
             @Override
             public void run() {
-                String currentVersion = MetadataHandler.PLUGIN.getDescription().getVersion();
+                if (!isCurrent(generation)) return;
+                String currentVersion = installedVersion;
                 boolean snapshot = false;
                 if (currentVersion.contains("SNAPSHOT")) {
                     snapshot = true;
@@ -111,30 +108,32 @@ public class VersionChecker {
                     try {
                         publicVersion = VersionChecker.readStringFromURL("https://api.spigotmc.org/legacy/update.php?resource=40090");
                     } catch (IOException e) {
-                        handleConnectionError("plugin version check", e);
+                        publish(generation, () -> handleConnectionError("plugin version check", e));
                         return;
                     }
                 }
 
-                Logger.info("Latest public release is " + publicVersion);
-                Logger.info("Your version is " + MetadataHandler.PLUGIN.getDescription().getVersion());
-
-                if (NightbreakPluginUpdater.compareVersions(publicVersion, currentVersion) > 0) {
-                    outOfDateHandler();
-                    return;
-                }
-
-                if (!snapshot)
-                    Logger.info("You are running the latest version!");
-                else
-                    Logger.info("You are running a snapshot version! You can check for updates in the #releases channel on the EliteMobs Discord!");
-
-                pluginIsUpToDate = true;
+                boolean outdated = NightbreakPluginUpdater.compareVersions(publicVersion, currentVersion) > 0;
+                boolean snapshotVersion = snapshot;
+                String latestVersion = publicVersion;
+                publish(generation, () -> {
+                    Logger.info("Latest public release is " + latestVersion);
+                    Logger.info("Your version is " + installedVersion);
+                    if (outdated) {
+                        outOfDateHandler();
+                        return;
+                    }
+                    Logger.info(snapshotVersion
+                            ? "You are running a snapshot version! You can check for updates in the #releases channel on the EliteMobs Discord!"
+                            : "You are running the latest version!");
+                    pluginIsUpToDate = true;
+                });
             }
         }.runTaskAsynchronously(MetadataHandler.PLUGIN);
     }
 
     public static void shutdown() {
+        lifecycleGeneration++;
         if (tokenChangeListener != null) {
             tokenChangeListener.close();
             tokenChangeListener = null;
@@ -148,6 +147,7 @@ public class VersionChecker {
         connectionFailed = false;
         pluginIsUpToDate = true;
         lastRefreshTimestamp = 0;
+        dlcCatalog = new DlcCatalog(Map.of(), Set.of(), Set.of());
     }
 
     /**
@@ -165,14 +165,16 @@ public class VersionChecker {
         connection.setConnectTimeout(10000);
         connection.setReadTimeout(10000);
 
-        int responseCode = connection.getResponseCode();
-        if (responseCode != 200) {
-            throw new IOException("Nightbreak API returned status code: " + responseCode);
-        }
-
-        try (Scanner scanner = new Scanner(connection.getInputStream(), StandardCharsets.UTF_8)) {
-            scanner.useDelimiter("\\A");
-            return scanner.hasNext() ? scanner.next() : "";
+        try {
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200)
+                throw new IOException("Nightbreak API returned status code: " + responseCode);
+            try (Scanner scanner = new Scanner(connection.getInputStream(), StandardCharsets.UTF_8)) {
+                scanner.useDelimiter("\\A");
+                return scanner.hasNext() ? scanner.next() : "";
+            }
+        } finally {
+            connection.disconnect();
         }
     }
 
@@ -195,6 +197,7 @@ public class VersionChecker {
                     slugs.add(slug);
                     String version = catalogString(entry, "currentVersion");
                     if (version == null || version.isEmpty()) {
+                        versions.remove(slug);
                         unpublished.add(slug);
                     } else {
                         versions.put(slug, Integer.parseInt(version.startsWith("v") ? version.substring(1) : version));
@@ -222,76 +225,55 @@ public class VersionChecker {
     }
 
     private static void checkContentVersion(Runnable onComplete) {
-        if (MetadataHandler.shutdownRequested) return;
-        Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
-            try {
-                if (MetadataHandler.shutdownRequested) return;
-                String jsonResponse = fetchFromNightbreak("https://nightbreak.io/api/dlc");
-                if (MetadataHandler.shutdownRequested) return;
-                DlcCatalog parsedCatalog = parseNightbreakDlcResponse(jsonResponse);
-                dlcCatalog = parsedCatalog;
-                connectionFailed = false;
-                connectionRetryCount = 0;
-
-                Map<String, Integer> remoteVersions = parsedCatalog.versions();
-                Logger.info("Parsed " + remoteVersions.size() + " content versions from Nightbreak API");
-                processContentVersionData(remoteVersions, true);
-
-                // Prefetch access info after version check completes
-                if (MetadataHandler.shutdownRequested) return;
-                prefetchAccessInfoInternal();
-
-            } catch (IOException e) {
-                if (MetadataHandler.shutdownRequested) return;
-                // Reset throttle so the next setup menu open can retry immediately
-                lastRefreshTimestamp = 0;
-                handleConnectionError("content version check", e);
-
-                if (connectionRetryCount >= MAX_RETRY_ATTEMPTS ||
-                        !(e instanceof UnknownHostException || e instanceof ConnectException || e instanceof SocketTimeoutException)) {
-                    Logger.info("Using local data for content version checks as remote server is unavailable.");
+        long generation = lifecycleGeneration;
+        publish(generation, () -> {
+            List<EMPackage> packageSnapshot = new ArrayList<>(EMPackage.getEmPackages().values());
+            Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
+                try {
+                    if (!isCurrent(generation)) return;
+                    DlcCatalog parsedCatalog = parseNightbreakDlcResponse(fetchFromNightbreak("https://nightbreak.io/api/dlc"));
+                    publish(generation, () -> {
+                        dlcCatalog = parsedCatalog;
+                        connectionFailed = false;
+                        connectionRetryCount = 0;
+                        Logger.info("Parsed " + parsedCatalog.versions().size() + " content versions from Nightbreak API");
+                        processContentVersionData(parsedCatalog.versions(), true);
+                    });
+                    if (!isCurrent(generation)) return;
+                    prefetchAccessInfoInternal(packageSnapshot, parsedCatalog, generation);
+                } catch (IOException failure) {
+                    publish(generation, () -> {
+                        lastRefreshTimestamp = 0;
+                        handleConnectionError("content version check", failure);
+                        if (connectionRetryCount >= MAX_RETRY_ATTEMPTS ||
+                                !(failure instanceof UnknownHostException || failure instanceof ConnectException || failure instanceof SocketTimeoutException))
+                            Logger.info("Using local data for content version checks as remote server is unavailable.");
+                    });
+                } finally {
+                    if (onComplete != null) publish(generation, onComplete);
                 }
-            } finally {
-                completeRefresh(onComplete);
-            }
+            });
         });
     }
-
     /**
      * Process the content version data from Nightbreak API
      *
      * @param remoteVersions Map of slug to version from Nightbreak
      */
-    private static void processContentVersionData(Map<String, Integer> remoteVersions) {
-        processContentVersionData(remoteVersions, true);
-    }
-
     private static void processContentVersionData(Map<String, Integer> remoteVersions, boolean notifyAdmins) {
         // Track newly found outdated packages
         List<EMPackage> newlyOutdated = new ArrayList<>();
         Set<EMPackage> checkedPackages = new HashSet<>();
         Set<EMPackage> currentlyOutdated = new HashSet<>();
 
-        // Snapshot to avoid ConcurrentModificationException from async iteration
         List<EMPackage> packageSnapshot = new ArrayList<>(EMPackage.getEmPackages().values());
-
+        Set<String> metaChildren = EMPackage.getMetaPackageChildFilenames();
         for (EMPackage emPackage : packageSnapshot) {
             // Skip non-default dungeons unless they have a nightbreak slug for version checking
             String slug = emPackage.getContentPackagesConfigFields().getNightbreakSlug();
             if (!emPackage.getContentPackagesConfigFields().isDefaultDungeon() && (slug == null || slug.isEmpty())) continue;
 
-            // Skip packages contained in meta packages
-            boolean containedInMetaPackage = false;
-            for (EMPackage metaPackage : packageSnapshot) {
-                if (metaPackage.getContentPackagesConfigFields().getContainedPackages() != null &&
-                        !metaPackage.getContentPackagesConfigFields().getContainedPackages().isEmpty() &&
-                        metaPackage.getContentPackagesConfigFields().getContainedPackages().contains(emPackage.getContentPackagesConfigFields().getFilename())) {
-                    containedInMetaPackage = true;
-                    break;
-                }
-            }
-            if (containedInMetaPackage) continue;
-
+            if (metaChildren.contains(emPackage.getContentPackagesConfigFields().getFilename())) continue;
             // slug already fetched above for defaultDungeon check
             if (slug == null || slug.isEmpty()) {
                 // No slug configured, skip version checking for this content
@@ -348,11 +330,6 @@ public class VersionChecker {
         }
     }
 
-    private static void completeRefresh(Runnable onComplete) {
-        if (onComplete == null || MetadataHandler.shutdownRequested) return;
-        Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, onComplete);
-    }
-
     /**
      * Handles connection errors with proper logging and retry logic
      *
@@ -371,8 +348,11 @@ public class VersionChecker {
                         " seconds (Attempt " + connectionRetryCount + "/" + MAX_RETRY_ATTEMPTS + ")");
 
                 // Schedule a retry after delay
+                long generation = lifecycleGeneration;
                 Bukkit.getScheduler().runTaskLaterAsynchronously(MetadataHandler.PLUGIN,
-                        () -> checkContentVersion(), 20L * RETRY_DELAY_SECONDS);
+                        () -> {
+                            if (isCurrent(generation)) checkContentVersion();
+                        }, 20L * RETRY_DELAY_SECONDS);
             } else {
                 Logger.warn("Failed to connect for " + checkType + " after " + MAX_RETRY_ATTEMPTS +
                         " attempts. Will continue without version checking. Error: " + e.getMessage());
@@ -387,7 +367,10 @@ public class VersionChecker {
     }
 
     private static String readStringFromURL(String url) throws IOException {
-        try (Scanner scanner = new Scanner(new URL(url).openStream(),
+        URLConnection connection = new URL(url).openConnection();
+        connection.setConnectTimeout(10000);
+        connection.setReadTimeout(10000);
+        try (Scanner scanner = new Scanner(connection.getInputStream(),
                 StandardCharsets.UTF_8)) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : "";
@@ -405,7 +388,7 @@ public class VersionChecker {
      */
     private static void notifyOnlineAdmins(List<EMPackage> newlyOutdated) {
         // Must run on main thread to access Bukkit
-        Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+        publish(lifecycleGeneration, () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.hasPermission("elitemobs.versionnotification")) continue;
 
@@ -448,6 +431,7 @@ public class VersionChecker {
     }
 
     public static void check() {
+        long generation = lifecycleGeneration;
         // Run immediately on startup
         checkPluginVersion();
         checkContentVersion();
@@ -462,13 +446,13 @@ public class VersionChecker {
             tokenChangeListener.close();
         }
         tokenChangeListener = NightbreakAccount.registerTokenChangeListener(
-                () -> {
+                () -> publish(generation, () -> {
                     invalidateRefreshCooldown();
                     if (NightbreakAccount.hasToken()) {
                         Logger.info("Account token changed; refreshing content access info.");
                         refreshContentAndAccess();
                     }
-                });
+                }));
 
         // Schedule repeating task every 24 hours
         if (scheduledCheckTask != null) {
@@ -476,6 +460,7 @@ public class VersionChecker {
         }
         scheduledCheckTask = Bukkit.getScheduler().runTaskTimer(
                 MetadataHandler.PLUGIN, () -> {
+            if (!isCurrent(generation)) return;
             Logger.info("Running scheduled 24-hour version and access check...");
             checkPluginVersion();
             checkContentVersion();
@@ -510,16 +495,14 @@ public class VersionChecker {
             processContentVersionData(cachedVersions, false);
         }
 
-        NightbreakContentManager.getAccessCache().forEach((slug, accessInfo) -> {
-            if (slug == null || accessInfo == null) return;
-            for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
-                if (slug.equals(emPackage.getContentPackagesConfigFields().getNightbreakSlug())) {
-                    emPackage.setCachedAccessInfo(accessInfo);
-                }
-            }
-        });
+        var accessCache = NightbreakContentManager.getAccessCache();
+        for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
+            String slug = emPackage.getContentPackagesConfigFields().getNightbreakSlug();
+            if (slug == null) continue;
+            NightbreakAccount.AccessInfo accessInfo = accessCache.get(slug);
+            if (accessInfo != null) emPackage.setCachedAccessInfo(accessInfo);
+        }
     }
-
     private static NightbreakPluginUpdater.PluginUpdateCheck currentPluginUpdateCheck() {
         NightbreakPluginUpdater.CachedPluginUpdateCheck snapshot = NightbreakPluginUpdater.getCachedUpdateCheck(
                 (JavaPlugin) MetadataHandler.PLUGIN,
@@ -579,19 +562,16 @@ public class VersionChecker {
      * Prefetches access info for all content packages with Nightbreak slugs.
      * Called internally after version checks complete.
      */
-    private static void prefetchAccessInfoInternal() {
-        if (!NightbreakAccount.hasToken()) return;
-
-        // Snapshot to avoid ConcurrentModificationException from async iteration
-        List<EMPackage> packageSnapshot = new ArrayList<>(EMPackage.getEmPackages().values());
+    private static void prefetchAccessInfoInternal(List<EMPackage> packageSnapshot, DlcCatalog catalog, long generation) {
+        if (!isCurrent(generation) || !NightbreakAccount.hasToken()) return;
 
         // Deduplicate by slug — many packages share the same slug, no need to hit the API repeatedly
         Map<String, NightbreakAccount.AccessInfo> slugCache = new HashMap<>();
+        Map<EMPackage, NightbreakAccount.AccessInfo> resolvedAccess = new HashMap<>();
         List<String> failedSlugs = new ArrayList<>();
-        int prefetched = 0;
         boolean authFailed = NightbreakAccount.hasAuthFailure();
         if (authFailed) {
-            logNightbreakTokenRejected();
+            publish(generation, VersionChecker::logNightbreakTokenRejected);
             return;
         }
 
@@ -600,17 +580,18 @@ public class VersionChecker {
             // checkAccess can take up to 10s on its HTTP timeout, and Bukkit
             // nags ("not properly shutting down its async tasks") if this
             // task is still alive when onDisable returns.
-            if (MetadataHandler.shutdownRequested) return;
+            if (!isCurrent(generation)) return;
 
             String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
             if (slug == null || slug.isEmpty()) continue;
-            if (!dlcCatalog.slugs().contains(slug) || dlcCatalog.unpublishedSlugs().contains(slug)) continue;
+            if (!catalog.slugs().contains(slug) || catalog.unpublishedSlugs().contains(slug)) continue;
 
             NightbreakAccount.AccessInfo info;
             if (slugCache.containsKey(slug)) {
                 info = slugCache.get(slug);
             } else {
                 info = NightbreakAccount.getInstance().checkAccess(slug);
+                if (!isCurrent(generation)) return;
                 if (NightbreakAccount.hasAuthFailure()) {
                     authFailed = true;
                     break;
@@ -622,20 +603,18 @@ public class VersionChecker {
             }
 
             if (info != null) {
-                pkg.setCachedAccessInfo(info);
-                prefetched++;
+                resolvedAccess.put(pkg, info);
             }
         }
-        if (prefetched > 0) {
-            Logger.info("Prefetched Nightbreak access info for " + prefetched + " content packages");
-        }
-        if (authFailed) {
-            logNightbreakTokenRejected();
-            return;
-        }
-        if (!failedSlugs.isEmpty()) {
-            Logger.warn("Failed to prefetch access info for " + failedSlugs.size() + " slugs: " + String.join(", ", failedSlugs));
-        }
+        boolean rejectedToken = authFailed;
+        publish(generation, () -> {
+            resolvedAccess.forEach(EMPackage::setCachedAccessInfo);
+            if (!resolvedAccess.isEmpty())
+                Logger.info("Prefetched Nightbreak access info for " + resolvedAccess.size() + " content packages");
+            if (rejectedToken) logNightbreakTokenRejected();
+            else if (!failedSlugs.isEmpty())
+                Logger.warn("Failed to prefetch access info for " + failedSlugs.size() + " slugs: " + String.join(", ", failedSlugs));
+        });
     }
 
     private static void logNightbreakTokenRejected() {
@@ -652,11 +631,11 @@ public class VersionChecker {
         public void onPlayerLogin(PlayerJoinEvent event) {
 
             if (!event.getPlayer().hasPermission("elitemobs.versionnotification")) return;
-
+            long generation = lifecycleGeneration;
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!event.getPlayer().isOnline()) return;
+                    if (!isCurrent(generation) || !event.getPlayer().isOnline()) return;
 
                     if (connectionFailed && event.getPlayer().hasPermission("elitemobs.admin")) {
                         event.getPlayer().sendMessage(CommandMessagesConfig.getVersionCheckConnectionWarning());
