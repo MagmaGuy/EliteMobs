@@ -60,9 +60,24 @@ public class CustomBossesConfig extends CustomConfig {
 
     public static CustomBossesConfigFields registerRuntimeFile(File file) {
         if (instance == null) throw new IllegalStateException("Custom boss configuration is not initialized");
+        for (var loaded : instance.getCustomConfigFieldsHashMap().values()) {
+            if (loaded.getFilename().equalsIgnoreCase(file.getName()) && !sameFile(loaded.getFile(), file))
+                throw new IllegalArgumentException("Another configuration already owns filename " + file.getName());
+        }
         CustomBossesConfigFields fields = (CustomBossesConfigFields) instance.registerFile(file);
         if (fields != null && fields.isEnabled()) customBosses.put(fields.getFilename(), fields);
         return fields;
+    }
+
+    public static void unregisterRuntimeFile(File file) {
+        if (instance == null) return;
+        instance.getCustomConfigFieldsHashMap().entrySet().removeIf(entry -> sameFile(entry.getValue().getFile(), file));
+        customBosses.entrySet().removeIf(entry -> sameFile(entry.getValue().getFile(), file));
+    }
+
+    private static boolean sameFile(File left, File right) {
+        return left != null && left.toPath().toAbsolutePath().normalize()
+                .equals(right.toPath().toAbsolutePath().normalize());
     }
 
 }

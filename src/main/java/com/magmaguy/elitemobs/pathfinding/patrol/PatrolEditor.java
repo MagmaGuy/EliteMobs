@@ -17,6 +17,7 @@ import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.config.ConfigurationEngine;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,10 +45,8 @@ import org.bukkit.util.RayTraceResult;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -446,11 +445,13 @@ public final class PatrolEditor implements Listener {
         private void persistNpc(NPCEntity npc, PatrolRoute route) throws IOException {
             NPCsConfigFields fields = npc.getNPCsConfigFields();
             FileConfiguration raw = fields.getWritableFileConfiguration();
+            YamlConfiguration prepared = detached(raw);
             List<String> locations = new ArrayList<>(raw.getStringList("spawnLocations"));
             if (locations.size() <= 1) {
+                applyRoute(prepared, route);
+                saveAtomic(prepared, fields.getFile());
                 applyRoute(raw, route);
-                saveAtomic(raw, fields.getFile());
-                if (!fields.reloadPatrolRoute()) throw new IOException("saved route did not parse");
+                fields.setPatrolRoute(route);
                 return;
             }
 
@@ -463,66 +464,120 @@ public final class PatrolEditor implements Listener {
             leaf.set("isEnabled", true);
             leaf.set("spawnLocations", List.of(selected));
             applyRoute(leaf, route);
-            writeFork(fields.getFile(), raw, locations, leafFile, leaf);
-
+            writeFork(fields.getFile(), prepared, locations, leafFile, leaf, () -> {
+                NPCsConfigFields leafFields = NPCsConfig.registerRuntimeFile(leafFile);
+                if (leafFields == null || !leafFields.isEnabled() || leafFields.getPatrolRoute() == null)
+                    throw new IOException("runtime registration of " + leafFile.getName() + " failed");
+                npc.rebindPatrolConfig(leafFields);
+            }, () -> NPCsConfig.unregisterRuntimeFile(leafFile));
+            raw.set("spawnLocations", locations);
+            raw.set("spawnLocation", null);
             fields.setLocations(locations);
-            NPCsConfigFields leafFields = NPCsConfig.registerRuntimeFile(leafFile);
-            if (leafFields == null || leafFields.getPatrolRoute() == null)
-                throw new IOException("runtime registration of " + leafFile.getName() + " failed");
-            npc.rebindPatrolConfig(leafFields);
         }
 
         private void persistBoss(CustomBossEntity boss, PatrolRoute route) throws IOException {
             CustomBossesConfigFields fields = boss.getCustomBossesConfigFields();
-            FileConfiguration raw = fields.getWritableFileConfiguration();
-            List<String> locations = new ArrayList<>(raw.getStringList("spawnLocations"));
-            if (locations.size() <= 1) {
-                applyRoute(raw, route);
-                saveAtomic(raw, fields.getFile());
-                if (!fields.reloadPatrolRoute()) throw new IOException("saved route did not parse");
-                return;
+            // The regional writer holds this same monitor. An older snapshot must finish or be
+            // discarded before either the base file or its runtime ownership can change.
+            synchronized (fields) {
+                fields.discardQueuedRegionalSave();
+                FileConfiguration raw = fields.getWritableFileConfiguration();
+                YamlConfiguration prepared = detached(raw);
+                List<RegionalBossEntity> actors = RegionalBossEntity.getRegionalBossEntities(fields);
+                List<String> locations = actors.isEmpty()
+                        ? new ArrayList<>(raw.getStringList("spawnLocations"))
+                        : new ArrayList<>(actors.stream().filter(actor -> !actor.isRemoved())
+                                .map(RegionalBossEntity::getConfigurationLocationString).toList());
+                prepared.set("spawnLocations", locations);
+                if (locations.size() <= 1) {
+                    applyRoute(prepared, route);
+                    saveAtomic(prepared, fields.getFile());
+                    applyRoute(raw, route);
+                    raw.set("spawnLocations", locations);
+                    fields.setSpawnLocations(locations);
+                    fields.setPatrolRoute(route);
+                    return;
+                }
+                if (!(boss instanceof RegionalBossEntity regionalBoss))
+                    throw new IOException("multi-spawn boss routes require a regional boss instance");
+
+                String current = regionalBoss.getConfigurationLocationString();
+                String selected = locations.stream()
+                        .filter(location -> sameConfiguredLocation(location, current))
+                        .findFirst()
+                        .orElseThrow(() -> new IOException("target boss location is not present in spawnLocations"));
+                locations.remove(selected);
+                File leafFile = nextLeaf(fields.getFile());
+                YamlConfiguration leaf = new YamlConfiguration();
+                leaf.set("extends", fields.getFilename());
+                leaf.set("isEnabled", true);
+                // Include the current respawn timer, which may be newer than the last disk save.
+                leaf.set("spawnLocations", List.of(current));
+                copyExplicitRoots(raw, leaf, List.of("leashRadius", "powers", "eliteScript"));
+                applyRoute(leaf, route);
+                writeFork(fields.getFile(), prepared, locations, leafFile, leaf, () -> {
+                    CustomBossesConfigFields leafFields = CustomBossesConfig.registerRuntimeFile(leafFile);
+                    if (leafFields == null || !leafFields.isEnabled() || leafFields.getPatrolRoute() == null)
+                        throw new IOException("runtime registration of " + leafFile.getName() + " failed");
+                    regionalBoss.rebindPatrolConfig(leafFields);
+                }, () -> CustomBossesConfig.unregisterRuntimeFile(leafFile));
+                raw.set("spawnLocations", locations);
+                raw.set("spawnLocation", null);
+                fields.setSpawnLocations(locations);
             }
-            if (!(boss instanceof RegionalBossEntity regionalBoss))
-                throw new IOException("multi-spawn boss routes require a regional boss instance");
-
-            String current = regionalBoss.getConfigurationLocationString();
-            String selected = locations.stream()
-                    .filter(location -> sameConfiguredLocation(location, current))
-                    .findFirst()
-                    .orElseThrow(() -> new IOException("target boss location is not present in spawnLocations"));
-            locations.remove(selected);
-            File leafFile = nextLeaf(fields.getFile());
-            YamlConfiguration leaf = new YamlConfiguration();
-            leaf.set("extends", fields.getFilename());
-            leaf.set("isEnabled", true);
-            leaf.set("spawnLocations", List.of(selected));
-            copyExplicitRoots(raw, leaf, List.of("leashRadius", "powers", "eliteScript"));
-            applyRoute(leaf, route);
-            writeFork(fields.getFile(), raw, locations, leafFile, leaf);
-
-            fields.setSpawnLocations(locations);
-            CustomBossesConfigFields leafFields = CustomBossesConfig.registerRuntimeFile(leafFile);
-            if (leafFields == null || leafFields.getPatrolRoute() == null)
-                throw new IOException("runtime registration of " + leafFile.getName() + " failed");
-            regionalBoss.rebindPatrolConfig(leafFields);
         }
 
+        @FunctionalInterface
+        private interface ForkBinding { void bind() throws IOException; }
+
         private void writeFork(File baseFile,
-                               FileConfiguration base,
+                               FileConfiguration prepared,
                                List<String> remainingLocations,
                                File leafFile,
-                               YamlConfiguration leaf) throws IOException {
+                               YamlConfiguration leaf,
+                               ForkBinding binding,
+                               Runnable unregister) throws IOException {
             String originalBase = Files.readString(baseFile.toPath(), StandardCharsets.UTF_8);
+            // Exclusive creation establishes which file this attempt may remove on rollback.
+            Files.createFile(leafFile.toPath());
+            boolean basePublished = false;
             try {
                 saveAtomic(leaf, leafFile);
-                base.set("spawnLocations", remainingLocations);
-                base.set("spawnLocation", null);
-                saveAtomic(base, baseFile);
-            } catch (IOException exception) {
-                writeAtomic(baseFile.toPath(), originalBase);
-                Files.deleteIfExists(leafFile.toPath());
-                throw exception;
+                prepared.set("spawnLocations", remainingLocations);
+                prepared.set("spawnLocation", null);
+                saveAtomic(prepared, baseFile);
+                basePublished = true;
+                binding.bind();
+            } catch (IOException | RuntimeException failure) {
+                try {
+                    if (basePublished) writeAtomic(baseFile.toPath(), originalBase);
+                } catch (IOException rollbackFailure) {
+                    failure.addSuppressed(rollbackFailure);
+                    // The leaf retains the selected location for manual recovery. Deleting it now
+                    // would lose the only disk copy after the base location was removed.
+                    Logger.warn("Patrol rollback failed for " + baseFile + ". Retained " + leafFile
+                            + " for recovery: " + rollbackFailure.getMessage());
+                    throw failure;
+                }
+                unregister.run();
+                try {
+                    Files.deleteIfExists(leafFile.toPath());
+                } catch (IOException cleanupFailure) {
+                    failure.addSuppressed(cleanupFailure);
+                    Logger.warn("Could not remove rolled-back patrol leaf " + leafFile + ": " + cleanupFailure.getMessage());
+                }
+                throw failure;
             }
+        }
+
+        private static YamlConfiguration detached(FileConfiguration source) throws IOException {
+            YamlConfiguration copy = new YamlConfiguration();
+            try {
+                copy.loadFromString(source.saveToString());
+            } catch (org.bukkit.configuration.InvalidConfigurationException failure) {
+                throw new IOException("Could not snapshot patrol configuration", failure);
+            }
+            return copy;
         }
 
         private void render(Player player) {
@@ -676,19 +731,13 @@ public final class PatrolEditor implements Listener {
         }
 
         private static void writeAtomic(Path target, String contents) throws IOException {
-            Files.createDirectories(target.toAbsolutePath().normalize().getParent());
-            Path temporary = target.resolveSibling(target.getFileName() + ".patrol-" + UUID.randomUUID() + ".tmp");
             try {
-                Files.writeString(temporary, contents, StandardCharsets.UTF_8);
-                try {
-                    Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-                } catch (AtomicMoveNotSupportedException ignored) {
-                    Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING);
-                }
-            } finally {
-                Files.deleteIfExists(temporary);
+                ConfigurationEngine.fileSaverSerialized(contents, target.toFile());
+            } catch (java.io.UncheckedIOException failure) {
+                throw failure.getCause();
             }
         }
+
     }
 
     private record Snapshot(List<Vector> nodes, PatrolMode mode) {

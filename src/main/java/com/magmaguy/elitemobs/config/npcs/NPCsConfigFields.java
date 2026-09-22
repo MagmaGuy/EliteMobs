@@ -243,6 +243,10 @@ public class NPCsConfigFields extends CustomConfigFields {
         saveSpawnLocations();
     }
 
+    public void setPatrolRoute(PatrolRoute route) {
+        patrolRoute = route;
+    }
+
     public boolean reloadPatrolRoute() {
         try {
             patrolRoute = PatrolRoute.parse(getWritableFileConfiguration());

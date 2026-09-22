@@ -260,21 +260,28 @@ public class TransitiveBlockCommand {
             deserializedData.add(deserializedString);
         }
 
-        switch (transitiveBlockType) {
-            case ON_SPAWN:
-                customBossesConfigFields.setOnSpawnBlockStates(deserializedData);
-                if (regionalBossEntity.getCustomBossesConfigFields().getFilename().equals(customBossesConfigFields.getFilename()))
-                    regionalBossEntity.setOnSpawnTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(deserializedData, customBossesConfigFields.getFilename()));
-                player.sendMessage(CommandMessagesConfig.getTransitiveBlockLocationsRegisteredMessage());
-                break;
-            case ON_REMOVE:
-                customBossesConfigFields.setOnRemoveBlockStates(deserializedData);
-                if (regionalBossEntity.getCustomBossesConfigFields().getFilename().equals(customBossesConfigFields.getFilename()))
-                    regionalBossEntity.setOnRemoveTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(deserializedData, customBossesConfigFields.getFilename()));
-                player.sendMessage(CommandMessagesConfig.getTransitiveBlockLocationsRegisteredMessage());
-                break;
-            default:
-                player.sendMessage(CommandMessagesConfig.getTransitiveBlockLocationsFailedMessage());
+        try {
+            switch (transitiveBlockType) {
+                case ON_SPAWN:
+                    customBossesConfigFields.setOnSpawnBlockStates(deserializedData);
+                    if (regionalBossEntity.getCustomBossesConfigFields().getFilename().equals(customBossesConfigFields.getFilename()))
+                        regionalBossEntity.setOnSpawnTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(deserializedData, customBossesConfigFields.getFilename()));
+                    player.sendMessage(CommandMessagesConfig.getTransitiveBlockLocationsRegisteredMessage());
+                    break;
+                case ON_REMOVE:
+                    customBossesConfigFields.setOnRemoveBlockStates(deserializedData);
+                    if (regionalBossEntity.getCustomBossesConfigFields().getFilename().equals(customBossesConfigFields.getFilename()))
+                        regionalBossEntity.setOnRemoveTransitiveBlocks(TransitiveBlock.serializeTransitiveBlocks(deserializedData, customBossesConfigFields.getFilename()));
+                    player.sendMessage(CommandMessagesConfig.getTransitiveBlockLocationsRegisteredMessage());
+                    break;
+                default:
+                    player.sendMessage(CommandMessagesConfig.getTransitiveBlockLocationsFailedMessage());
+            }
+        } catch (java.io.UncheckedIOException failure) {
+            Logger.warn("Failed to save block capture for " + customBossesConfigFields.getFilename()
+                    + ": " + failure.getMessage());
+            player.sendMessage(CommandMessagesConfig.getTransitiveBlockLocationsFailedMessage());
+            return;
         }
         activePlayers.remove(player.getUniqueId(), this);
     }

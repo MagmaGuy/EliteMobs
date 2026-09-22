@@ -670,8 +670,7 @@ public class EliteMobs extends JavaPlugin {
         com.magmaguy.elitemobs.parties.PartyManager.shutdown();
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
         Wormhole.shutdown();
-        RegionalBossEntity.save();
-        RegionalBossEntity.getRegionalBossEntitySet().clear();
+        RegionalBossEntity.flushOnShutdown();
         InstancedBossEntity.shutdown();
         NPCEntity.shutdown();
         PersistentObjectHandler.shutdown();

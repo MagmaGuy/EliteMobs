@@ -26,9 +26,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -130,30 +127,27 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     }
 
     public static void save() {
-        for (CustomBossesConfigFields customBossesConfigFields : regionalBossesFromConfigFields.keySet()) {
-            if (!customBossesConfigFields.isFilesOutOfSync()) continue;
-            customBossesConfigFields.setFilesOutOfSync(false);
-            List<String> spawnLocations = new ArrayList<>();
-            for (RegionalBossEntity regionalBossEntity : regionalBossesFromConfigFields.get(customBossesConfigFields))
-                if (!regionalBossEntity.removed)
-                    spawnLocations.add(regionalBossEntity.rawString);
-            org.bukkit.configuration.file.FileConfiguration writable =
-                    customBossesConfigFields.getWritableFileConfiguration();
-            writable.set("spawnLocations", spawnLocations);
-            //Serialize on the main thread so nothing off-thread ever touches the live FileConfiguration;
-            //only the resulting string is written to disk asynchronously.
-            String yaml = writable.saveToString();
-            File file = customBossesConfigFields.getFile();
-            String configName = writable.getName();
-            Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
-                synchronized (customBossesConfigFields) {
-                    try {
-                        Files.writeString(file.toPath(), yaml, StandardCharsets.UTF_8);
-                    } catch (Exception ex) {
-                        Logger.warn("Failed to save respawn timer for " + configName + " !");
-                    }
-                }
-            });
+        save(false);
+    }
+
+    /** Flushes inline after Bukkit stops accepting this plugin's scheduled work. */
+    public static void flushOnShutdown() {
+        save(true);
+    }
+
+    private static void save(boolean flush) {
+        for (CustomBossesConfigFields fields : regionalBossesFromConfigFields.keySet()) {
+            if (!fields.isFilesOutOfSync()) continue;
+            List<String> locations = new ArrayList<>();
+            for (RegionalBossEntity boss : regionalBossesFromConfigFields.get(fields))
+                if (!boss.removed) locations.add(boss.rawString);
+            try {
+                fields.saveRegionalSpawnLocations(locations, flush);
+            } catch (RuntimeException failure) {
+                Logger.warn("Failed to save regional state for " + fields.getFilename() + ": " + failure.getMessage());
+                // A failed file must not prevent other saves or unrelated shutdown cleanup.
+                if (flush) Logger.warn("Unsaved spawnLocations for " + fields.getFilename() + ": " + locations);
+            }
         }
     }
 
@@ -176,10 +170,11 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     public void rebindPatrolConfig(CustomBossesConfigFields fields) {
         CustomBossesConfigFields previous = getCustomBossesConfigFields();
         regionalBossesFromConfigFields.remove(previous, this);
-        setCustomBossesConfigFields(Objects.requireNonNull(fields, "fields"));
+        // A patrol fork inherits the same boss definition. Do not rebuild powers or combat state.
+        customBossesConfigFields = Objects.requireNonNull(fields, "fields");
         regionalBossesFromConfigFields.put(fields, this);
-        previous.setFilesOutOfSync(false);
-        fields.setFilesOutOfSync(false);
+        previous.setFilesOutOfSync(true);
+        fields.setFilesOutOfSync(true);
     }
 
     @Nullable

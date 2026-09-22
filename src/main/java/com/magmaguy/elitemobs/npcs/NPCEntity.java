@@ -419,8 +419,9 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     }
 
     public void rebindPatrolConfig(NPCsConfigFields fields) {
-        this.npCsConfigFields = java.util.Objects.requireNonNull(fields, "fields");
+        java.util.Objects.requireNonNull(fields, "fields");
         if (fields.getPatrolRoute() != null) enablePatrolMovementSync();
+        this.npCsConfigFields = fields;
     }
 
     public void enablePatrolMovementSync() {

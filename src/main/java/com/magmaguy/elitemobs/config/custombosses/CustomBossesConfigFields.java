@@ -22,6 +22,11 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+import org.bukkit.Bukkit;
+import com.magmaguy.elitemobs.MetadataHandler;
 
 public class CustomBossesConfigFields extends CustomConfigFields {
 
@@ -194,10 +199,70 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private Double movementSpeedAttribute = null;
-    //this saves files for regional boss respawn cooldowns
-    @Getter
-    @Setter
-    private boolean filesOutOfSync = false;
+    // Only a successful write acknowledges the captured regional revision.
+    private final AtomicLong regionalRevision = new AtomicLong();
+    private volatile long savedRegionalRevision;
+    private volatile long queuedRegionalRevision = -1;
+    private final AtomicReference<RegionalSave> pendingRegionalSave = new AtomicReference<>();
+    private final AtomicBoolean regionalSaveScheduled = new AtomicBoolean();
+
+    public boolean isFilesOutOfSync() {
+        return regionalRevision.get() != savedRegionalRevision;
+    }
+
+    public void setFilesOutOfSync(boolean dirty) {
+        if (dirty) regionalRevision.incrementAndGet();
+        else throw new IllegalArgumentException("Regional state is acknowledged only after successful persistence");
+    }
+
+    /** Main-thread snapshot admission; the worker never reads Bukkit configuration or actors. */
+    public void saveRegionalSpawnLocations(List<String> locations, boolean flush) {
+        long revision = regionalRevision.get();
+        if (!flush && regionalSaveScheduled.get() && queuedRegionalRevision == revision) return;
+        getWritableFileConfiguration().set("spawnLocations", locations);
+        spawnLocations = List.copyOf(locations);
+        pendingRegionalSave.set(new RegionalSave(revision, getWritableFileConfiguration().saveToString()));
+        queuedRegionalRevision = revision;
+        if (flush) {
+            writePendingRegionalSave();
+        } else if (regionalSaveScheduled.compareAndSet(false, true)) {
+            try {
+                Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
+                    try {
+                        writePendingRegionalSave();
+                    } catch (RuntimeException failure) {
+                        Logger.warn("Failed to save regional state for " + filename + ": " + failure.getMessage());
+                    } finally {
+                        regionalSaveScheduled.set(false);
+                    }
+                });
+            } catch (RuntimeException | Error failure) {
+                regionalSaveScheduled.set(false);
+                throw failure;
+            }
+        }
+    }
+
+    private synchronized void writePendingRegionalSave() {
+        RegionalSave snapshot;
+        while ((snapshot = pendingRegionalSave.getAndSet(null)) != null) {
+            try {
+                ConfigurationEngine.fileSaverSerialized(snapshot.yaml(), file);
+                savedRegionalRevision = snapshot.revision();
+            } catch (RuntimeException | Error failure) {
+                // Keep either this failed snapshot or a newer admitted one for the next attempt.
+                pendingRegionalSave.compareAndSet(null, snapshot);
+                throw failure;
+            }
+        }
+    }
+
+    /** Call under this configuration's monitor before a synchronous edit of the same file. */
+    public synchronized void discardQueuedRegionalSave() {
+        pendingRegionalSave.set(null);
+    }
+
+    private record RegionalSave(long revision, String yaml) {}
     @Getter
     private List<String> onSpawnBlockStates = new ArrayList<>(), onRemoveBlockStates = new ArrayList<>();
     @Getter
@@ -306,9 +371,8 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     }
 
     public void runtimeSetLeashRadius(double leashRadius) {
+        persistValue("leashRadius", leashRadius);
         this.leashRadius = leashRadius;
-        this.getWritableFileConfiguration().set("leashRadius", leashRadius);
-        ConfigurationEngine.fileSaverCustomValues(getWritableFileConfiguration(), file);
     }
 
     public double getDamageModifier(Material material) {
@@ -328,23 +392,28 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         }
     }
 
-    public void setOnSpawnBlockStates(List<String> onSpawnBlockStates) {
-        this.onSpawnBlockStates = onSpawnBlockStates;
-        getWritableFileConfiguration().set("onSpawnBlockStates", onSpawnBlockStates);
-        try {
-            getWritableFileConfiguration().save(file);
-        } catch (Exception ex) {
-            Logger.warn("Failed to save on spawn block states!", true);
-        }
+    public void setOnSpawnBlockStates(List<String> values) {
+        List<String> snapshot = List.copyOf(values);
+        persistValue("onSpawnBlockStates", snapshot);
+        onSpawnBlockStates = snapshot;
     }
 
-    public void setOnRemoveBlockStates(List<String> onRemoveBlockStates) {
-        this.onRemoveBlockStates = onRemoveBlockStates;
-        getWritableFileConfiguration().set("onRemoveBlockStates", onRemoveBlockStates);
+    public void setOnRemoveBlockStates(List<String> values) {
+        List<String> snapshot = List.copyOf(values);
+        persistValue("onRemoveBlockStates", snapshot);
+        onRemoveBlockStates = snapshot;
+    }
+
+    private synchronized void persistValue(String key, Object value) {
+        var writable = getWritableFileConfiguration();
+        Object previous = writable.get(key);
+        discardQueuedRegionalSave();
+        writable.set(key, value);
         try {
-            getWritableFileConfiguration().save(file);
-        } catch (Exception ex) {
-            Logger.warn("Failed to save on remove block states!", true);
+            ConfigurationEngine.fileSaverSerialized(writable.saveToString(), file);
+        } catch (RuntimeException | Error failure) {
+            writable.set(key, previous);
+            throw failure;
         }
     }
 
@@ -563,12 +632,13 @@ public class CustomBossesConfigFields extends CustomConfigFields {
                 "&e&l---------------------------------------------"));
     }
 
-    public void saveFile() {
-        try {
-            getWritableFileConfiguration().save(file);
-        } catch (Exception ex) {
-            Logger.warn("Failed to save boss file " + filename + "!");
-        }
+    public synchronized void saveFile() {
+        discardQueuedRegionalSave();
+        ConfigurationEngine.fileSaverSerialized(getWritableFileConfiguration().saveToString(), file);
+    }
+
+    public void setPatrolRoute(PatrolRoute route) {
+        patrolRoute = route;
     }
 
     public boolean reloadPatrolRoute() {

@@ -36,9 +36,24 @@ public class NPCsConfig extends CustomConfig {
 
     public static NPCsConfigFields registerRuntimeFile(File file) {
         if (instance == null) throw new IllegalStateException("NPC configuration is not initialized");
+        for (var loaded : instance.getCustomConfigFieldsHashMap().values()) {
+            if (loaded.getFilename().equalsIgnoreCase(file.getName()) && !sameFile(loaded.getFile(), file))
+                throw new IllegalArgumentException("Another configuration already owns filename " + file.getName());
+        }
         NPCsConfigFields fields = (NPCsConfigFields) instance.registerFile(file);
         if (fields != null) npcEntities.put(fields.getFilename(), fields);
         return fields;
+    }
+
+    public static void unregisterRuntimeFile(File file) {
+        if (instance == null) return;
+        instance.getCustomConfigFieldsHashMap().entrySet().removeIf(entry -> sameFile(entry.getValue().getFile(), file));
+        npcEntities.entrySet().removeIf(entry -> sameFile(entry.getValue().getFile(), file));
+    }
+
+    private static boolean sameFile(File left, File right) {
+        return left != null && left.toPath().toAbsolutePath().normalize()
+                .equals(right.toPath().toAbsolutePath().normalize());
     }
 
 }
