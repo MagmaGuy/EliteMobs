@@ -30,6 +30,17 @@ public final class ClassAbilityActivationFeedback {
             AbilitySlot slot,
             FixedAbilitySpec spec,
             int effectiveLevel) {
+        return message(lineage, slot, spec, effectiveLevel, spec.resourceCost());
+    }
+
+    public static String message(
+            ClassLineage lineage,
+            AbilitySlot slot,
+            FixedAbilitySpec spec,
+            int effectiveLevel,
+            double spentResource) {
+        if (!Double.isFinite(spentResource) || spentResource < 0D)
+            throw new IllegalArgumentException("Spent resource must be finite and non-negative");
         Objects.requireNonNull(lineage, "lineage");
         Objects.requireNonNull(slot, "slot");
         Objects.requireNonNull(spec, "spec");
@@ -43,7 +54,7 @@ public final class ClassAbilityActivationFeedback {
             String summary = summary(spec, effectiveLevel);
             if (!summary.isBlank()) message.append(" &f").append(summary);
         }
-        message.append(" &c-").append(number(spec.resourceCost()))
+        message.append(" &c-").append(number(spentResource))
                 .append(" &f").append(lineage.resourceType().displayName());
         return message.toString();
     }

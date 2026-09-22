@@ -233,20 +233,16 @@ final class AbilityEffects {
             }
             if (effects.contains(AbilityEffect.SLOW)
                     && authorized(caster, enemy, spec, AbilityEffect.SLOW)) {
-                PotionEffect existing = enemy.getPotionEffect(PotionEffectType.SLOWNESS);
                 boolean extend = spec.executionTraits().mechanics()
                         .contains(AbilityMechanic.EXTEND_CONTROL_DURATION);
-                int existingDuration = existing == null ? 0 : existing.getDuration();
-                int duration = extend
-                        ? Math.min(600, existingDuration + Math.max(20, slowPlan.durationTicks()))
-                        : Math.max(Math.max(20, slowPlan.durationTicks()), existingDuration);
-                int amplifier = Math.max(
-                        slowPlan.potionAmplifier(),
-                        existing == null ? 0 : existing.getAmplifier());
+                // Native stacking keeps a weaker, longer slow behind a short root. Combining
+                // the existing amplifier with this duration would create an unowned long root.
+                int duration = Math.max(20, slowPlan.durationTicks());
+                int amplifier = slowPlan.potionAmplifier();
                 enemy.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,
                         duration, amplifier, false, true, true), true);
                 EliteEntity elite = EntityTracker.getEliteMobEntity(enemy);
-                if (elite != null && amplifier == slowPlan.potionAmplifier())
+                if (elite != null)
                     crowdControl.applySlowPotency(caster, elite, slowPlan);
                 appliedControls.add(AbilityEffect.SLOW);
                 if (extend) {
@@ -668,8 +664,12 @@ final class AbilityEffects {
 
     private static void displaceAway(Player caster, LivingEntity target, double horizontal, double vertical) {
         Vector direction = target.getLocation().toVector().subtract(caster.getLocation().toVector());
-        if (direction.lengthSquared() < 1.0E-6) direction = caster.getLocation().getDirection();
-        direction.setY(0).normalize().multiply(Math.max(.1D, horizontal)).setY(vertical);
+        direction.setY(0);
+        if (direction.lengthSquared() < 1.0E-6) {
+            double yaw = Math.toRadians(caster.getLocation().getYaw());
+            direction = new Vector(-Math.sin(yaw), 0, Math.cos(yaw));
+        }
+        direction.normalize().multiply(Math.max(.1D, horizontal)).setY(vertical);
         target.setVelocity(target.getVelocity().add(direction));
     }
 

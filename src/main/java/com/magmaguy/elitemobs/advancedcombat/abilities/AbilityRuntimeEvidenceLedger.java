@@ -33,4 +33,8 @@ public final class AbilityRuntimeEvidenceLedger {
     public synchronized void clear() {
         observations.clear();
     }
+
+    public synchronized void discard(UUID casterId) {
+        observations.remove(casterId);
+    }
 }

@@ -56,12 +56,16 @@ public final class BukkitClassAbilityPresentation {
                 List<? extends Player> allies) {
             ensureCast();
             for (LivingEntity enemy : enemies) {
+                if (!budget.canRender(AbilityPresentationCue.IMPACT)
+                        && !budget.canRender(AbilityPresentationCue.CONTROL)) break;
                 if (enemy == null || !renderedTargets.add(enemy.getUniqueId())) continue;
                 Location target = center(enemy, origin);
                 renderTarget(AbilityPresentationCue.IMPACT, target);
                 renderTarget(AbilityPresentationCue.CONTROL, target);
             }
             for (Player ally : allies) {
+                if (!budget.canRender(AbilityPresentationCue.HEAL)
+                        && !budget.canRender(AbilityPresentationCue.BUFF)) break;
                 if (ally == null || !renderedTargets.add(ally.getUniqueId())) continue;
                 Location target = center(ally, origin);
                 renderTarget(AbilityPresentationCue.HEAL, target);

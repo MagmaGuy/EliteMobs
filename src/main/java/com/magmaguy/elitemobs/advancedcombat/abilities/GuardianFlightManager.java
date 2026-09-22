@@ -309,6 +309,14 @@ final class GuardianFlightManager implements Listener, AutoCloseable {
                 base.clone().add(side).add(0D, height * .5D, 0D),
                 base.clone().subtract(side).add(0D, height * .5D, 0D));
         World world = caster.getWorld();
+        org.bukkit.util.BoundingBox footprint = caster.getBoundingBox().clone();
+        Vector lookahead = direction.clone().multiply(distance);
+        footprint.union(footprint.clone().shift(lookahead));
+        for (Location sample : samples) {
+            footprint.union(sample.toVector());
+            footprint.union(sample.toVector().add(lookahead));
+        }
+        if (!SafeMovement.volumeAvailable(caster, world, footprint)) return false;
         for (Location sample : samples) {
             RayTraceResult collision = world.rayTraceBlocks(
                     sample,

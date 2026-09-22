@@ -230,11 +230,11 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 .toList();
         int count = Math.max(enemies.size(), allies.size());
         if (count == 0) return;
-        BukkitTask task = new BukkitRunnable() {
+        BukkitTask task = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
             private int index;
 
             @Override
-            public void run() {
+            protected void tick() {
                 if (!currentCast(caster, casterLifecycleToken) || index >= count) {
                     BukkitClassAbilityEngine.this.cancelTracked(caster.getUniqueId(), this);
                     return;
@@ -288,11 +288,11 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             BukkitClassAbilityPresentation.Session presentation) {
         long casterLifecycleToken = states.lifecycleToken(caster);
         int pulses = Math.max(2, Math.min(5, spec.tuning().durationTicks() / 20));
-        BukkitTask task = new BukkitRunnable() {
+        BukkitTask task = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
             private int completed;
 
             @Override
-            public void run() {
+            protected void tick() {
                 if (!currentCast(caster, casterLifecycleToken) || completed >= pulses) {
                     BukkitClassAbilityEngine.this.cancelTracked(caster.getUniqueId(), this);
                     return;
@@ -318,36 +318,32 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             int effectiveLevel,
             BukkitClassAbilityPresentation.Session presentation) {
         Set<AbilityMechanic> mechanics = spec.executionTraits().mechanics();
-        AbilityTargeting.TargetSelection selection = targeting.select(player, spec);
+        AbilityTargeting.TargetSelection selection;
         if (mechanics.contains(AbilityMechanic.PIERCING_CAST)) {
             List<LivingEntity> intercepts = targeting.piercingEnemies(player, spec);
             Location origin = intercepts.isEmpty()
                     ? player.getLocation()
                     : intercepts.get(intercepts.size() - 1).getLocation();
             selection = new AbilityTargeting.TargetSelection(intercepts, List.of(), origin);
-        }
+        } else selection = targeting.select(player, spec);
         List<LivingEntity> visibleEnemies = selection.enemies().stream()
                 .filter(enemy -> clearSegment(player.getEyeLocation(),
                         enemy.getLocation().add(0D, enemy.getHeight() * .55D, 0D)))
                 .toList();
         selection = new AbilityTargeting.TargetSelection(
                 visibleEnemies, selection.allies(), selection.origin());
-        if (selection.enemies().isEmpty()) {
-            // State prerequisites (corpses, wind-ups) still gate the cast; a missing target does
-            // not. Like the magic weapons, a lockless cast fires a straight skill-shot instead.
-            if (!states.canActivate(player, spec, selection))
-                return AbilityResult.failure(spec.id(), AbilityFailureReason.NO_VALID_TARGET);
-            return launchUnaimedProjectile(player, spec, effectiveLevel, presentation);
-        }
         if (!states.canActivate(player, spec, selection))
             return AbilityResult.failure(spec.id(), AbilityFailureReason.NO_VALID_TARGET);
-
         long windUp = mechanics.contains(AbilityMechanic.WIND_UP) ? 15L : 0L;
         if (windUp > 0L) {
             player.getWorld().spawnParticle(Particle.ENCHANT, player.getEyeLocation(),
                     24, .35D, .35D, .35D, .03D);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, .7F, 1.5F);
         }
+        if (selection.enemies().isEmpty()) {
+            return launchUnaimedProjectile(player, spec, effectiveLevel, windUp, presentation);
+        }
+
         if (mechanics.contains(AbilityMechanic.CHAINING_CAST)) {
             launchChain(player, spec, selection.enemies(), effectiveLevel, presentation);
         } else if (mechanics.contains(AbilityMechanic.PIERCING_CAST)) {
@@ -428,11 +424,11 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
 
         int period = Math.max(1, totalDuration / spec.tuning().repetitions());
         long casterLifecycleToken = states.lifecycleToken(player);
-        BukkitTask task = new BukkitRunnable() {
+        BukkitTask task = new TrackedAbilityTask(player.getUniqueId(), spec.id()) {
             private int repetitions = 1;
 
             @Override
-            public void run() {
+            protected void tick() {
                 if (!currentCast(player, casterLifecycleToken)
                         || repetitions >= spec.tuning().repetitions()) {
                     BukkitClassAbilityEngine.this.cancelTracked(player.getUniqueId(), this);
@@ -469,12 +465,12 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 spec.tuning().repetitions(),
                 spec.tuning().durationTicks());
         Set<UUID> struck = new HashSet<>();
-        BukkitTask task = new BukkitRunnable() {
+        BukkitTask task = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
             private int age;
             private int nextPulse;
 
             @Override
-            public void run() {
+            protected void tick() {
                 if (!currentCast(caster, casterLifecycleToken)
                         || !caster.getWorld().equals(origin.getWorld())
                         || nextPulse >= plan.pulses().size()) {
@@ -542,11 +538,14 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 fallTicks,
                 spreadSeed);
         int finalImpactTick = plan.impacts().get(plan.impacts().size() - 1).impactTick();
-        BukkitTask task = new BukkitRunnable() {
+        // create() orders both launch and impact ticks; only the active interval needs polling.
+        BukkitTask task = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
             private int age;
+            private int firstActive;
+            private int nextLaunch;
 
             @Override
-            public void run() {
+            protected void tick() {
                 if (!currentCast(caster, casterLifecycleToken)
                         || !caster.getWorld().equals(origin.getWorld())
                         || origin.getWorld() == null
@@ -554,8 +553,12 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                     BukkitClassAbilityEngine.this.cancelTracked(caster.getUniqueId(), this);
                     return;
                 }
-                for (ProjectileBombardmentPlan.Impact impact : plan.impacts()) {
-                    if (age < impact.launchTick() || age > impact.impactTick()) continue;
+                while (nextLaunch < plan.impacts().size()
+                        && plan.impacts().get(nextLaunch).launchTick() <= age) nextLaunch++;
+                while (firstActive < nextLaunch
+                        && plan.impacts().get(firstActive).impactTick() < age) firstActive++;
+                for (int index = firstActive; index < nextLaunch; index++) {
+                    ProjectileBombardmentPlan.Impact impact = plan.impacts().get(index);
                     Location destination = bombardmentImpactLocation(origin, impact);
                     if (age == impact.impactTick()) {
                         applyBombardmentImpact(
@@ -584,8 +587,7 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             double impactRadius,
             int effectiveLevel,
             BukkitClassAbilityPresentation.Session presentation) {
-        List<LivingEntity> target = targeting.select(caster, spec, impact).enemies().stream()
-                .filter(enemy -> enemy.getLocation().distanceSquared(impact) <= impactRadius * impactRadius)
+        List<LivingEntity> target = targeting.enemiesNear(caster, impact, impactRadius, spec).stream()
                 .limit(1)
                 .toList();
         observeProjectileImpact(caster, spec, target.size());
@@ -625,11 +627,11 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 spec.tuning().repetitions(),
                 Math.toRadians(caster.getLocation().getYaw()));
         int finalTick = travelTicks + impacts.get(impacts.size() - 1).delayTicks();
-        BukkitTask task = new BukkitRunnable() {
+        BukkitTask task = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
             private int age;
 
             @Override
-            public void run() {
+            protected void tick() {
                 if (!currentCast(caster, casterLifecycleToken)
                         || !caster.getWorld().equals(origin.getWorld())) {
                     BukkitClassAbilityEngine.this.cancelTracked(caster.getUniqueId(), this);
@@ -684,6 +686,7 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             Player player,
             FixedAbilitySpec spec,
             int effectiveLevel,
+            long delayTicks,
             BukkitClassAbilityPresentation.Session presentation) {
         long casterLifecycleToken = states.lifecycleToken(player);
         Location castOrigin = player.getEyeLocation().clone();
@@ -691,9 +694,9 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 castOrigin.getDirection().normalize().multiply(Math.max(4D, spec.tuning().range())));
         int projectiles = Math.max(1, spec.tuning().projectileCount());
         for (int index = 0; index < projectiles; index++) {
-            BukkitTask launch = new BukkitRunnable() {
+            BukkitTask launch = new TrackedAbilityTask(player.getUniqueId(), spec.id()) {
                 @Override
-                public void run() {
+                protected void tick() {
                     if (currentCast(player, casterLifecycleToken)
                             && player.getWorld().equals(destination.getWorld())) {
                         projectileCarriers.launch(
@@ -708,7 +711,7 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                     }
                     BukkitClassAbilityEngine.this.cancelTracked(player.getUniqueId(), this);
                 }
-            }.runTaskLater(plugin, Math.max(1L, index * 2L));
+            }.runTaskLater(plugin, Math.max(1L, delayTicks + index * 2L));
             track(player.getUniqueId(), launch);
         }
         player.getWorld().spawnParticle(Particle.CRIT, player.getEyeLocation(),
@@ -745,9 +748,9 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
         long casterLifecycleToken = states.lifecycleToken(caster);
         Location castOrigin = caster.getEyeLocation().clone();
         Location destination = primaryTarget.getLocation().add(0D, primaryTarget.getHeight() * .55D, 0D);
-        BukkitTask launch = new BukkitRunnable() {
+        BukkitTask launch = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
             @Override
-            public void run() {
+            protected void tick() {
                 if (currentCast(caster, casterLifecycleToken)
                         && caster.getWorld().equals(destination.getWorld())) {
                     projectileCarriers.launch(
@@ -812,12 +815,12 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
         Location destination = primaryTarget.getLocation().add(0D, primaryTarget.getHeight() * .55D, 0D);
         int travelTicks = Math.max(2, Math.min(18,
                 (int) Math.ceil(start.distance(destination) / PROJECTILE_BLOCKS_PER_TICK)));
-        BukkitTask launch = new BukkitRunnable() {
+        BukkitTask launch = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
             private int age;
             private Location previous = start.clone();
 
             @Override
-            public void run() {
+            protected void tick() {
                 boolean current = currentCast(caster, casterLifecycleToken);
                 if (!current || !caster.getWorld().equals(start.getWorld()) || age >= travelTicks) {
                     if (current && age >= travelTicks) impact();
@@ -879,12 +882,12 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 .limit(spec.tuning().projectileCount())
                 .toList();
         if (chain.isEmpty()) return;
-        BukkitTask task = new BukkitRunnable() {
+        BukkitTask task = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
             private int index;
             private Location previous = caster.getEyeLocation().clone();
 
             @Override
-            public void run() {
+            protected void tick() {
                 if (!currentCast(caster, casterLifecycleToken) || index >= chain.size()) {
                     BukkitClassAbilityEngine.this.cancelTracked(caster.getUniqueId(), this);
                     return;
@@ -915,11 +918,11 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             int effectiveLevel,
             BukkitClassAbilityPresentation.Session presentation) {
         long casterLifecycleToken = states.lifecycleToken(caster);
-        BukkitTask fuse = new BukkitRunnable() {
+        BukkitTask fuse = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
             private int age;
 
             @Override
-            public void run() {
+            protected void tick() {
                 if (!currentCast(caster, casterLifecycleToken)
                         || !attached.isValid() || attached.isDead()
                         || !caster.getWorld().equals(attached.getWorld())) {
@@ -962,11 +965,11 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             BukkitClassAbilityPresentation.Session presentation) {
         long casterLifecycleToken = states.lifecycleToken(caster);
         states.beginWindUp(caster, spec, 30);
-        BukkitTask task = new BukkitRunnable() {
+        BukkitTask task = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
             private int age;
 
             @Override
-            public void run() {
+            protected void tick() {
                 boolean current = currentCast(caster, casterLifecycleToken);
                 if (!current || age >= 30) {
                     if (current && age >= 30) {
@@ -1074,11 +1077,11 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
         int pulseCount = Math.max(1, spec.tuning().repetitions());
         int pulsePeriod = Math.max(2, duration / pulseCount);
         long casterLifecycleToken = states.lifecycleToken(player);
-        BukkitTask task = new BukkitRunnable() {
+        BukkitTask task = new TrackedAbilityTask(player.getUniqueId(), spec.id()) {
             private int completed;
 
             @Override
-            public void run() {
+            protected void tick() {
                 if (!currentCast(player, casterLifecycleToken)
                         || completed >= pulseCount) {
                     BukkitClassAbilityEngine.this.cancelTracked(player.getUniqueId(), this);
@@ -1193,9 +1196,6 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             return AbilityResult.failure(spec.id(), AbilityFailureReason.PATH_BLOCKED);
 
         BlinkPlanner.Plan plan = planned.get();
-        if (!BlinkPlanner.stillValid(player, plan))
-            return AbilityResult.failure(spec.id(), AbilityFailureReason.PATH_BLOCKED);
-
         Location origin = player.getLocation().clone();
         Location destination = plan.destination();
         if (!InstancePlayerMovement.teleportWithinWorld(
@@ -1327,12 +1327,12 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 14, .35D, .1D, .35D, .06D);
 
         long casterLifecycleToken = states.lifecycleToken(player);
-        BukkitTask task = new BukkitRunnable() {
+        BukkitTask task = new TrackedAbilityTask(player.getUniqueId(), spec.id()) {
             private int age;
             private boolean airborne;
 
             @Override
-            public void run() {
+            protected void tick() {
                 if (!currentCast(player, casterLifecycleToken)
                         || !player.getWorld().equals(start.getWorld())) {
                     BukkitClassAbilityEngine.this.cancelTracked(player.getUniqueId(), this);
@@ -1546,6 +1546,30 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
         return anchorMode == ClassConstructVisualRegistry.AnchorMode.FOLLOW_CASTER
                 ? Set.of(AbilityMechanic.FOLLOW_CASTER_FIELD)
                 : Set.of();
+    }
+
+    /** An exceptional pulse is terminal: partial gameplay work must never be replayed. */
+    private abstract class TrackedAbilityTask extends BukkitRunnable {
+        private final UUID casterId;
+        private final String abilityId;
+
+        private TrackedAbilityTask(UUID casterId, String abilityId) {
+            this.casterId = casterId;
+            this.abilityId = abilityId;
+        }
+
+        @Override
+        public final void run() {
+            try {
+                tick();
+            } catch (RuntimeException | Error failure) {
+                cancelTracked(casterId, this);
+                plugin.getLogger().log(Level.SEVERE, "Stopped failed class ability " + abilityId, failure);
+                if (failure instanceof Error error) throw error;
+            }
+        }
+
+        protected abstract void tick();
     }
 
     private void track(UUID casterId, BukkitTask task) {

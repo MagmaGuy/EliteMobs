@@ -32,7 +32,7 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
     private final Map<UUID, List<PlayerModifier>> outgoingModifiers = new HashMap<>();
     private final Map<UUID, List<PlayerModifier>> incomingModifiers = new HashMap<>();
     private final Map<UUID, List<PlayerModifier>> incomingPenalties = new HashMap<>();
-    private final Map<PlayerDamagedByEliteMobEvent, DamageReductionAttribution> pendingWeakening =
+    private final Map<PlayerDamagedByEliteMobEvent, List<PendingReduction>> pendingReductions =
             new IdentityHashMap<>();
     private final TimedOutgoingDamageReduction outgoingReductions =
             new TimedOutgoingDamageReduction(System::nanoTime);
@@ -51,9 +51,13 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
     void markEnemy(Player source, Entity enemy, Set<UUID> beneficiaries, double multiplier,
                    int durationTicks, String abilityId, boolean healthScaled) {
         if (closed || multiplier <= 1D || durationTicks <= 0) return;
-        enemyMarks.computeIfAbsent(enemy.getUniqueId(), ignored -> new ArrayList<>())
-                .add(new EnemyMark(source.getUniqueId(), Set.copyOf(beneficiaries), multiplier,
-                        expiresAt(durationTicks), abilityId, healthScaled));
+        List<EnemyMark> marks = enemyMarks.computeIfAbsent(enemy.getUniqueId(), ignored -> new ArrayList<>());
+        EnemyMark next = new EnemyMark(source.getUniqueId(), Set.copyOf(beneficiaries), multiplier,
+                expiresAt(durationTicks), abilityId, healthScaled);
+        long now = System.nanoTime();
+        marks.removeIf(mark -> mark.expiresAtNanos() <= now
+                || mark.equivalent(next) && mark.expiresAtNanos() <= next.expiresAtNanos());
+        if (marks.stream().noneMatch(mark -> mark.equivalent(next))) marks.add(next);
     }
 
     void modifyOutgoing(Player source, Player target, double multiplier, int durationTicks, String abilityId) {
@@ -77,16 +81,14 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
             String abilityId,
             ModifierDomain domain) {
         if (closed || multiplier <= 1D || durationTicks <= 0) return;
-        outgoingModifiers.computeIfAbsent(target.getUniqueId(), ignored -> new ArrayList<>())
-                .add(new PlayerModifier(source.getUniqueId(), multiplier, expiresAt(durationTicks),
-                        abilityId, domain));
+        refreshModifier(outgoingModifiers, target.getUniqueId(), new PlayerModifier(
+                source.getUniqueId(), multiplier, expiresAt(durationTicks), abilityId, domain));
     }
 
     void modifyIncoming(Player source, Player target, double multiplier, int durationTicks, String abilityId) {
         if (closed || multiplier >= 1D || multiplier < 0D || durationTicks <= 0) return;
-        incomingModifiers.computeIfAbsent(target.getUniqueId(), ignored -> new ArrayList<>())
-                .add(new PlayerModifier(source.getUniqueId(), multiplier, expiresAt(durationTicks),
-                        abilityId, ModifierDomain.ANY));
+        refreshModifier(incomingModifiers, target.getUniqueId(), new PlayerModifier(
+                source.getUniqueId(), multiplier, expiresAt(durationTicks), abilityId, ModifierDomain.ANY));
     }
 
     void modifyIncomingPenalty(
@@ -96,9 +98,17 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
             int durationTicks,
             String abilityId) {
         if (closed || multiplier <= 1D || durationTicks <= 0) return;
-        incomingPenalties.computeIfAbsent(target.getUniqueId(), ignored -> new ArrayList<>())
-                .add(new PlayerModifier(source.getUniqueId(), multiplier, expiresAt(durationTicks),
-                        abilityId, ModifierDomain.ANY));
+        refreshModifier(incomingPenalties, target.getUniqueId(), new PlayerModifier(
+                source.getUniqueId(), multiplier, expiresAt(durationTicks), abilityId, ModifierDomain.ANY));
+    }
+
+    private static void refreshModifier(Map<UUID, List<PlayerModifier>> byTarget,
+                                        UUID targetId, PlayerModifier next) {
+        List<PlayerModifier> modifiers = byTarget.computeIfAbsent(targetId, ignored -> new ArrayList<>());
+        long now = System.nanoTime();
+        modifiers.removeIf(modifier -> modifier.expiresAtNanos() <= now
+                || modifier.equivalent(next) && modifier.expiresAtNanos() <= next.expiresAtNanos());
+        if (modifiers.stream().noneMatch(modifier -> modifier.equivalent(next))) modifiers.add(next);
     }
 
     double weakenOutgoing(
@@ -136,7 +146,10 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
             return entry.getValue().isEmpty();
         });
         outgoingReductions.clearSource(sourceId);
-        pendingWeakening.entrySet().removeIf(entry -> entry.getValue().sourceId().equals(sourceId));
+        pendingReductions.values().removeIf(reductions -> {
+            reductions.removeIf(reduction -> reduction.attribution().sourceId().equals(sourceId));
+            return reductions.isEmpty();
+        });
     }
 
     /** Removes every modifier attached to this player, regardless of who supplied it. */
@@ -147,7 +160,10 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
         incomingModifiers.remove(targetId);
         incomingPenalties.remove(targetId);
         outgoingReductions.clearTarget(targetId);
-        pendingWeakening.entrySet().removeIf(entry -> entry.getValue().targetId().equals(targetId));
+        pendingReductions.values().removeIf(reductions -> {
+            reductions.removeIf(reduction -> reduction.attribution().targetId().equals(targetId));
+            return reductions.isEmpty();
+        });
         enemyMarks.entrySet().removeIf(entry -> {
             entry.getValue().removeIf(mark -> mark.beneficiaries().contains(targetId));
             return entry.getValue().isEmpty();
@@ -213,20 +229,25 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
                     * (penalty == null ? 1D : penalty.multiplier()));
             double prevented = Math.max(0D, damageWithoutWeakening - modifiedDamage);
             if (prevented > 0D) {
-                pendingWeakening.put(event, new DamageReductionAttribution(
+                deferReduction(event, new DamageReductionAttribution(
                         weakening.sourceId(), attacker.getUniqueId(), weakening.abilityId(),
-                        modifiedDamage, prevented));
+                        modifiedDamage, prevented), AbilityEffect.WEAKEN);
             }
         }
 
         if (protectedDamage < weakenedDamage && protection != null) {
-            Player source = Bukkit.getPlayer(protection.sourceId());
-            if (source != null) {
-                AbilityContribution contribution = new AbilityContribution(
-                        0, 0, weakenedDamage - protectedDamage, 0, 0, 1, 0);
-                semantics.recordContribution(source, protection.abilityId(), contribution);
-            }
+            double prevented = (weakenedDamage - protectedDamage)
+                    * (penalty == null ? 1D : penalty.multiplier());
+            deferReduction(event, new DamageReductionAttribution(protection.sourceId(),
+                    player.getUniqueId(), protection.abilityId(), modifiedDamage, prevented),
+                    AbilityEffect.ALLY_PROTECT);
         }
+    }
+
+    private void deferReduction(PlayerDamagedByEliteMobEvent event,
+                                DamageReductionAttribution attribution, AbilityEffect effect) {
+        pendingReductions.computeIfAbsent(event, ignored -> new ArrayList<>(2))
+                .add(new PendingReduction(attribution, effect));
     }
 
     /**
@@ -236,8 +257,13 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEliteDamageFinalized(PlayerDamagedByEliteMobEvent event) {
-        DamageReductionAttribution attribution = pendingWeakening.remove(event);
-        if (attribution == null) return;
+        List<PendingReduction> reductions = pendingReductions.remove(event);
+        if (reductions == null) return;
+        for (PendingReduction reduction : reductions) finalizeReduction(event, reduction);
+    }
+
+    private void finalizeReduction(PlayerDamagedByEliteMobEvent event, PendingReduction reduction) {
+        DamageReductionAttribution attribution = reduction.attribution();
         double prevented = attribution.survivingPreventedDamage(event.getDamage(), event.isCancelled());
         if (prevented <= 0D) return;
         Player source = Bukkit.getPlayer(attribution.sourceId());
@@ -248,7 +274,7 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
         semantics.observe(AbilityRuntimeObservation.effect(
                 AbilityRuntimeObservation.Kind.MODIFIER_TRIGGERED,
                 attribution.sourceId(), attribution.targetId(), attribution.abilityId(),
-                prevented, 0, AbilityEffect.WEAKEN));
+                prevented, 0, reduction.effect()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -356,7 +382,7 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
         outgoingModifiers.clear();
         incomingModifiers.clear();
         incomingPenalties.clear();
-        pendingWeakening.clear();
+        pendingReductions.clear();
         outgoingReductions.close();
     }
 
@@ -369,6 +395,11 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
 
     private record EnemyMark(UUID sourceId, Set<UUID> beneficiaries, double baseMultiplier,
                              long expiresAtNanos, String abilityId, boolean healthScaled) {
+        boolean equivalent(EnemyMark other) {
+            return sourceId.equals(other.sourceId) && beneficiaries.equals(other.beneficiaries)
+                    && baseMultiplier == other.baseMultiplier && abilityId.equals(other.abilityId)
+                    && healthScaled == other.healthScaled;
+        }
         double multiplier(double healthFraction) {
             return healthScaled
                     ? AbilityStateMath.healthScaledMark(baseMultiplier, healthFraction)
@@ -383,5 +414,12 @@ final class TimedCombatModifiers implements Listener, AutoCloseable {
 
     private record PlayerModifier(UUID sourceId, double multiplier, long expiresAtNanos,
                                   String abilityId, ModifierDomain domain) {
+        boolean equivalent(PlayerModifier other) {
+            return sourceId.equals(other.sourceId) && multiplier == other.multiplier
+                    && abilityId.equals(other.abilityId) && domain == other.domain;
+        }
+    }
+
+    private record PendingReduction(DamageReductionAttribution attribution, AbilityEffect effect) {
     }
 }

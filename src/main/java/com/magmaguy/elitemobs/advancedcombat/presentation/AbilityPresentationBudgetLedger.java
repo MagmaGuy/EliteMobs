@@ -37,6 +37,12 @@ public final class AbilityPresentationBudgetLedger {
         return new Grant(particles, sounds);
     }
 
+    boolean canRender(AbilityPresentationCue cue) {
+        return plan.cues().contains(cue)
+                && (!cue.targetScoped() || remainingTargetBursts > 0)
+                && (remainingParticles > 0 || remainingSounds > 0);
+    }
+
     public record Grant(int particles, int sounds) {
         public static final Grant NONE = new Grant(0, 0);
 

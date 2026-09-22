@@ -489,7 +489,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
                 0, 1, Set.of(), abilitySpec.executionTraits().mechanics()));
         recordAbilityContribution(player, result.abilityId(), result.contribution());
         sendFeedback(player, ClassAbilityActivationFeedback.message(
-                lineage, slot, abilitySpec, active.activeEffectiveLevel()));
+                lineage, slot, abilitySpec, active.activeEffectiveLevel(), practicing ? 0D : abilityCost));
         skillTutorial.successfulCast(player, progression, slot);
         return result;
     }
@@ -898,6 +898,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
+        abilityEvidence.discard(playerId);
         endLobbyPractice(player);
         skillTutorial.discard(playerId);
         hudPresentation.discard(playerId);

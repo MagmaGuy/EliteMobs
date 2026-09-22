@@ -209,12 +209,15 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                     .limit(maximum)
                     .toList();
             for (Player ally : redirectedAllies) {
-                redirectsByTarget.computeIfAbsent(
-                                ally.getUniqueId(), ignored -> new ArrayList<>())
-                        .add(new RedirectLink(caster.getUniqueId(), REDIRECT_FRACTION,
-                                REDIRECT_EFFICIENCY,
-                                mechanicModifiers.redirectedDamageMultiplier(),
-                                expires, spec.id(), redirectMechanic));
+                List<RedirectLink> links = redirectsByTarget.computeIfAbsent(
+                        ally.getUniqueId(), ignored -> new ArrayList<>());
+                RedirectLink next = new RedirectLink(caster.getUniqueId(), REDIRECT_FRACTION,
+                        REDIRECT_EFFICIENCY, mechanicModifiers.redirectedDamageMultiplier(),
+                        expires, spec.id(), redirectMechanic);
+                long now = System.nanoTime();
+                links.removeIf(link -> link.expiresAtNanos() <= now
+                        || link.equivalent(next) && link.expiresAtNanos() <= next.expiresAtNanos());
+                if (links.stream().noneMatch(link -> link.equivalent(next))) links.add(next);
                 observeStateArmed(caster, ally, spec, redirectMechanic,
                         REDIRECT_FRACTION, durationTicks);
             }
@@ -535,9 +538,11 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
         if (share != null && !redistributedDamage) {
             List<Player> recipients = share.members().stream()
                     .filter(id -> !id.equals(target.getUniqueId()))
+                    .filter(id -> sharesByMember.get(id) == share)
                     .map(Bukkit::getPlayer)
                     .filter(Objects::nonNull)
                     .filter(Player::isOnline)
+                    .filter(player -> !player.isDead())
                     .filter(player -> player.getWorld().equals(target.getWorld()))
                     .filter(player -> player.getLocation().distanceSquared(target.getLocation()) <= 20D * 20D)
                     .toList();
@@ -768,7 +773,7 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                         triggeredProtections::clear)
                 .bind(AbilityStateOwnership.Bucket.DAMAGE_SHARES,
                         sourceId -> sharesByMember.entrySet().removeIf(entry ->
-                                entry.getKey().equals(sourceId)
+                                entry.getValue().members().contains(sourceId)
                                         || entry.getValue().sourceId().equals(sourceId)),
                         sharesByMember::clear)
                 .bind(AbilityStateOwnership.Bucket.LIFESTEAL_WINDOWS,
@@ -1036,12 +1041,12 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
             long now) {
         Map<UUID, Long> targets = statuses.get(sourceId);
         if (targets == null) return false;
-        targets.entrySet().removeIf(entry -> entry.getValue() <= now);
-        if (targets.isEmpty()) {
-            statuses.remove(sourceId);
-            return false;
-        }
-        return targets.containsKey(targetId);
+        Long expiresAt = targets.get(targetId);
+        if (expiresAt == null) return false;
+        if (expiresAt > now) return true;
+        targets.remove(targetId);
+        if (targets.isEmpty()) statuses.remove(sourceId);
+        return false;
     }
 
     private static Set<UUID> registerStatuses(
@@ -1183,6 +1188,12 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                                 double redirectedDamageMultiplier,
                                 long expiresAtNanos, String abilityId,
                                 AbilityMechanic mechanic) {
+        boolean equivalent(RedirectLink other) {
+            return sourceId.equals(other.sourceId) && fraction == other.fraction
+                    && efficiency == other.efficiency
+                    && redirectedDamageMultiplier == other.redirectedDamageMultiplier
+                    && abilityId.equals(other.abilityId) && mechanic == other.mechanic;
+        }
     }
 
     private record DeathGuard(UUID sourceId, double healingFraction, double shieldFraction,

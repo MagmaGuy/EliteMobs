@@ -147,7 +147,7 @@ final class AbilityTargeting {
                 : Optional.empty();
     }
 
-    private List<LivingEntity> enemiesNear(
+    List<LivingEntity> enemiesNear(
             Player caster,
             Location center,
             double radius,

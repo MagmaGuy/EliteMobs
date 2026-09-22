@@ -107,7 +107,7 @@ public final class ClassPassiveRuntime implements Listener {
                 null));
         event.setDamage(Math.max(0D, event.getDamage() * evaluation.incomingDamageMultiplier()));
         state.recordHit(player.getUniqueId());
-        applyMovementAdjustment(player, evaluatedMovement(player, passive));
+        setMovementAdjustment(player, evaluatedMovement(player, passive));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -224,11 +224,14 @@ public final class ClassPassiveRuntime implements Listener {
         double adjustment = mechanicsActive
                 ? evaluatedMovement(player, passive)
                 : 0D;
+        setMovementAdjustment(player, adjustment);
+    }
+
+    private void setMovementAdjustment(Player player, double adjustment) {
         Double previous = appliedMovementAdjustments.get(player.getUniqueId());
         if (previous != null && Math.abs(previous - adjustment) < 1.0E-9D) return;
-        applyMovementAdjustment(player, adjustment);
-        if (Math.abs(adjustment) < 1.0E-9D) appliedMovementAdjustments.remove(player.getUniqueId());
-        else appliedMovementAdjustments.put(player.getUniqueId(), adjustment);
+        if (applyMovementAdjustment(player, adjustment))
+            appliedMovementAdjustments.put(player.getUniqueId(), adjustment);
     }
 
     /** Checks active item use each tick; full passive evaluation runs only on a transition. */
@@ -269,20 +272,21 @@ public final class ClassPassiveRuntime implements Listener {
         applyMovementAdjustment(player, 0D);
     }
 
-    private static void applyMovementAdjustment(Player player, double adjustment) {
+    private static boolean applyMovementAdjustment(Player player, double adjustment) {
         AttributeInstance movement = player.getAttribute(Attribute.MOVEMENT_SPEED);
-        if (movement == null) return;
+        if (movement == null) return false;
         NamespacedKey key = new NamespacedKey(MetadataHandler.PLUGIN, MOVEMENT_MODIFIER_KEY);
         movement.getModifiers().stream()
                 .filter(modifier -> modifier.getKey().equals(key))
                 .toList()
                 .forEach(movement::removeModifier);
-        if (Math.abs(adjustment) < 1.0E-9D) return;
+        if (Math.abs(adjustment) < 1.0E-9D) return true;
         movement.addModifier(new AttributeModifier(
                 key,
                 Math.max(-.5D, Math.min(.5D, adjustment)),
                 AttributeModifier.Operation.MULTIPLY_SCALAR_1,
                 EquipmentSlotGroup.ANY));
+        return true;
     }
 
     private double evaluatedMovement(Player player, PassiveAggregate passive) {

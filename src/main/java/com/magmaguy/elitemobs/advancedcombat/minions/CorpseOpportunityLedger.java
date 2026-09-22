@@ -69,7 +69,7 @@ public final class CorpseOpportunityLedger {
         Entry entry = entries.get(corpseId);
         if (entry == null) return null;
         if (currentTick < entry.expiresAtTick()) return entry;
-        entries.remove(corpseId);
+        // expire owns removal so it can also retire the corresponding display.
         return null;
     }
 

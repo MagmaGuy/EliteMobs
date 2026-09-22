@@ -98,6 +98,7 @@ public final class ClassMinionManager implements Listener, AutoCloseable {
     private final Map<UUID, ClassMinionRoster<MinionInstance>> rosters = new HashMap<>();
     private final BukkitTask task;
     private long nextCorpseParticleTick;
+    private long nextAutonomousTargetTick;
     private int sequence;
     private boolean closed;
 
@@ -502,21 +503,27 @@ public final class ClassMinionManager implements Listener, AutoCloseable {
                     .forEach(this::renderCorpse);
         }
 
+        boolean acquireTargets = now >= nextAutonomousTargetTick;
+        if (acquireTargets) nextAutonomousTargetTick = now + 20L;
+        Map<UUID, Optional<OwnerProfile>> profiles = new HashMap<>();
         for (MinionInstance minion : new ArrayList<>(minionsByEntity.values())) {
             Player owner = Bukkit.getPlayer(minion.ownerId());
             LivingEntity body = minion.body();
-            OwnerProfile profile = owner == null ? null : ownerProfiles.resolve(owner).orElse(null);
             if (now >= minion.expiresAtTick()
                     || owner == null || !owner.isOnline() || owner.isDead()
-                    || profile == null
-                    || !minion.spec().id().equals(profile.activeFormId() + ".signature")
                     || body == null || !body.isValid() || body.isDead()
                     || !body.getWorld().equals(owner.getWorld())
                     || body.getLocation().distanceSquared(owner.getLocation()) > OWNER_MAX_DISTANCE_SQUARED) {
                 removeMinion(minion, RemovalReason.OTHER);
                 continue;
             }
-            if (now % 20L == 0L && minion.control().target(body).isEmpty()) {
+            OwnerProfile profile = profiles.computeIfAbsent(
+                    minion.ownerId(), ignored -> ownerProfiles.resolve(owner)).orElse(null);
+            if (profile == null || !minion.spec().id().equals(profile.activeFormId() + ".signature")) {
+                removeMinion(minion, RemovalReason.OTHER);
+                continue;
+            }
+            if (acquireTargets && minion.control().target(body).isEmpty()) {
                 nearestEliteTarget(owner, body).ifPresent(
                         target -> minion.control().commandTarget(target, AUTONOMOUS_TARGET_TICKS));
             }

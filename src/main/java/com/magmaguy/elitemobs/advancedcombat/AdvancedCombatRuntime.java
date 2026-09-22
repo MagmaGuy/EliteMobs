@@ -141,10 +141,14 @@ public final class AdvancedCombatRuntime implements Listener, PlayerCombatState.
     }
 
     private void reconcilePlayers() {
-        for (Player player : Bukkit.getOnlinePlayers()) reconcilePlayer(player, false);
+        for (Player player : Bukkit.getOnlinePlayers()) reconcilePlayer(player, false, true);
     }
 
     private void reconcilePlayer(Player player, boolean enteredNewWorld) {
+        reconcilePlayer(player, enteredNewWorld, false);
+    }
+
+    private void reconcilePlayer(Player player, boolean enteredNewWorld, boolean periodicHealing) {
         // The health pool, fixed hunger, and out-of-combat regen are reserved for EliteMobs
         // managed/protected worlds. The outside-worlds class-control toggle must never feed this
         // condition: toggling in a normal world grants ability input only.
@@ -158,7 +162,7 @@ public final class AdvancedCombatRuntime implements Listener, PlayerCombatState.
         } else if (!shouldBeActive && isActive) {
             leave(player);
         } else if (shouldBeActive) {
-            maintain(player);
+            maintain(player, periodicHealing);
             if (enteredNewWorld) player.sendMessage(ChatColorConverter.convert(ENTRY_WARNING));
         }
     }
@@ -199,9 +203,9 @@ public final class AdvancedCombatRuntime implements Listener, PlayerCombatState.
         }
     }
 
-    private void maintain(Player player) {
+    private void maintain(Player player, boolean periodicHealing) {
         boolean healthChanged = updateHealthModifier(player, true);
-        if (!combatState.isInCombat(player.getUniqueId())) {
+        if (periodicHealing && !combatState.isInCombat(player.getUniqueId())) {
             AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
             if (maxHealth != null && player.getHealth() < maxHealth.getValue()) {
                 double healing = maxHealth.getValue()
@@ -477,7 +481,10 @@ public final class AdvancedCombatRuntime implements Listener, PlayerCombatState.
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, this::reconcilePlayers, 1L);
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+            if (instance == this && player.isOnline()) reconcilePlayer(player, false);
+        }, 1L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -491,7 +498,7 @@ public final class AdvancedCombatRuntime implements Listener, PlayerCombatState.
             return;
         }
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
-            if (player.isOnline()) reconcilePlayer(player, true);
+            if (instance == this && player.isOnline()) reconcilePlayer(player, true);
         });
     }
 
@@ -499,7 +506,8 @@ public final class AdvancedCombatRuntime implements Listener, PlayerCombatState.
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
-            reconcilePlayers();
+            if (instance != this || !player.isOnline()) return;
+            reconcilePlayer(player, false);
             if (player.isOnline() && isActive(player)) scheduleHungerRefresh(player);
         });
     }

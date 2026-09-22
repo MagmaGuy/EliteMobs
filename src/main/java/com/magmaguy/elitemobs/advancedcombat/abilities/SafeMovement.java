@@ -174,7 +174,7 @@ final class SafeMovement {
                 location.getZ() + halfWidthZ - BODY_EPSILON);
     }
 
-    private static boolean volumeAvailable(Player player, World world, BoundingBox volume) {
+    static boolean volumeAvailable(Player player, World world, BoundingBox volume) {
         if (volume.getMinY() < world.getMinHeight() || volume.getMaxY() >= world.getMaxHeight()) return false;
         for (int chunkX = minimumBlock(volume.getMinX()) >> 4;
              chunkX <= maximumBlock(volume.getMaxX()) >> 4; chunkX++) {
