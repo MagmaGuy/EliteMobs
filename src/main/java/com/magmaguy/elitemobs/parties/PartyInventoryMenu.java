@@ -129,7 +129,9 @@ public final class PartyInventoryMenu implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)
                 || !player.getUniqueId().equals(state.ownerId)
                 || event.getClickedInventory() != event.getView().getTopInventory()) return;
-        if (!canUse(player)) {
+        boolean ownLeaveAction = state.type == MenuType.CONTROLS && event.getSlot() == 15
+                && PartyManager.isInParty(player.getUniqueId());
+        if (!ownLeaveAction && !canUse(player)) {
             player.closeInventory();
             return;
         }

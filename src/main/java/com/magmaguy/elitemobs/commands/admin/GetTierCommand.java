@@ -130,20 +130,20 @@ public class GetTierCommand {
         player.getInventory().setChestplate(chestplate);
         player.getInventory().setLeggings(leggings);
         player.getInventory().setBoots(boots);
-        player.getInventory().addItem(sword);
-        player.getInventory().addItem(bow);
-        if (axe != null) player.getInventory().addItem(axe);
-        if (scythe != null) player.getInventory().addItem(scythe);
-        if (crossbow != null) player.getInventory().addItem(crossbow);
-        if (trident != null) player.getInventory().addItem(trident);
-        if (mace != null) player.getInventory().addItem(mace);
-        if (spear != null) player.getInventory().addItem(spear);
-        for (ItemStack magicWeapon : magicWeapons) player.getInventory().addItem(magicWeapon);
-        player.getInventory().addItem(cheatSword);
-        player.getInventory().addItem(new ItemStack(Material.SHIELD));
-        player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
-        if (!limited) player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 64));
-        if (!limited) player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
+        giveItem(player, sword);
+        giveItem(player, bow);
+        if (axe != null) giveItem(player, axe);
+        if (scythe != null) giveItem(player, scythe);
+        if (crossbow != null) giveItem(player, crossbow);
+        if (trident != null) giveItem(player, trident);
+        if (mace != null) giveItem(player, mace);
+        if (spear != null) giveItem(player, spear);
+        for (ItemStack magicWeapon : magicWeapons) giveItem(player, magicWeapon);
+        giveItem(player, cheatSword);
+        giveItem(player, new ItemStack(Material.SHIELD));
+        giveItem(player, new ItemStack(Material.ARROW, 64));
+        if (!limited) giveItem(player, new ItemStack(Material.COOKED_BEEF, 64));
+        if (!limited) giveItem(player, new ItemStack(Material.ARROW, 64));
 
         // Also set all skill levels to match the tier level
         long targetXP = SkillXPCalculator.totalXPForLevel(tierLevel);
@@ -160,6 +160,11 @@ public class GetTierCommand {
         Logger.sendMessage(player, CommandMessagesConfig.getGetTierGaveGearMessage().replace("$level", String.valueOf(tierLevel)));
         Logger.sendMessage(player, CommandMessagesConfig.getGetTierIronSwordMessage());
         Logger.sendMessage(player, CommandMessagesConfig.getGetTierCheatSwordMessage());
+    }
+
+    private static void giveItem(Player player, ItemStack itemStack) {
+        for (ItemStack overflow : player.getInventory().addItem(itemStack).values())
+            player.getWorld().dropItem(player.getLocation(), overflow);
     }
 
     private static void addDurability(ItemStack itemStack) {

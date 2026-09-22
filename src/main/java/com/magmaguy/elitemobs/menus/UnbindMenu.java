@@ -151,7 +151,7 @@ public class UnbindMenu extends EliteMenu {
                     if (currentItem.getItemMeta() instanceof Damageable)
                         if (unbinderInventory.getItem(eliteItemInputSlot) == null) {
                             unbinderInventory.setItem(eliteItemInputSlot, currentItem);
-                            playerInventory.remove(currentItem);
+                            playerInventory.clear(event.getSlot());
                             calculateOutput(unbinderInventory);
                         }
 

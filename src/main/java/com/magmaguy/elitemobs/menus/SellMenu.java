@@ -215,8 +215,7 @@ public class SellMenu extends EliteMenu implements Listener {
 
 
             //If player clicks on one of the items already in the shop, return to their inventory
-            playerInventory.addItem(event.getCurrentItem());
-            shopInventory.clear(event.getSlot());
+            moveItemDown(shopInventory, event.getSlot(), player);
 
             event.getInventory().setItem(SellMenuConfig.confirmSlot, updateConfirmButton(calculateShopValue(shopInventory, player)));
 

@@ -19,7 +19,7 @@ public class LootCommand {
             player.sendMessage(CommandMessagesConfig.getInvalidItemFilenameMessage().replace("$filename", args1));
             return;
         }
-        player.getInventory().addItem(customItem.generateDefaultsItemStack(player, false, null, true));
+        giveItem(player, customItem.generateDefaultsItemStack(player, false, null, true));
     }
 
     public static void give(CommandSender commandSender, String playerString, String args1) {
@@ -32,7 +32,7 @@ public class LootCommand {
         if (player == null)
             commandSender.sendMessage(CommandMessagesConfig.getInvalidPlayerForItemMessage());
         else {
-            player.getInventory().addItem(customItem.generateDefaultsItemStack(player, false, null));
+            if (!giveItem(player, customItem.generateDefaultsItemStack(player, false, null))) return;
             commandSender.sendMessage(CommandMessagesConfig.getGaveItemMessage().replace("$player", player.getName()).replace("$item", customItem.getCustomItemsConfigFields().getName()));
         }
     }
@@ -49,13 +49,16 @@ public class LootCommand {
         } else {
             int combatLevel = CombatLevelCalculator.calculateCombatLevel(player.getUniqueId());
             ItemStack itemStack = customItem.generateItemStackExact(combatLevel, player, null);
-            if (itemStack != null) {
-                for (ItemStack overflow : player.getInventory().addItem(itemStack).values()) {
-                    player.getWorld().dropItem(player.getLocation(), overflow);
-                }
-            }
+            if (!giveItem(player, itemStack)) return;
             commandSender.sendMessage(CommandMessagesConfig.getGaveItemMessage().replace("$player", player.getName()).replace("$item", customItem.getCustomItemsConfigFields().getName()));
         }
+    }
+
+    private static boolean giveItem(Player player, ItemStack itemStack) {
+        if (itemStack == null) return false;
+        for (ItemStack overflow : player.getInventory().addItem(itemStack).values())
+            player.getWorld().dropItem(player.getLocation(), overflow);
+        return true;
     }
 
 }

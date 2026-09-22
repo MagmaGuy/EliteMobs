@@ -123,8 +123,11 @@ public class LegacyValueConverter {
     }
 
     public static String parseDeserializedBlocks(String originalDeserializedBlock) {
-        if (originalDeserializedBlock.endsWith("grass"))
-            return originalDeserializedBlock.replace("grass", "grass_block[snowy=false]");
+        int stateStart = originalDeserializedBlock.indexOf('[');
+        String identifier = stateStart < 0 ? originalDeserializedBlock : originalDeserializedBlock.substring(0, stateStart);
+        if (identifier.equals("grass") || identifier.equals("minecraft:grass"))
+            return identifier.replace("grass", "grass_block")
+                    + (stateStart < 0 ? "[snowy=false]" : originalDeserializedBlock.substring(stateStart));
         if (!VersionChecker.serverVersionOlderThan(21,9) && originalDeserializedBlock.contains("minecraft:chain"))
             return originalDeserializedBlock.replace("minecraft:chain", "iron_chain");
         return originalDeserializedBlock;

@@ -156,7 +156,7 @@ public class RepairMenu extends EliteMenu {
                     if (currentItem.getItemMeta() instanceof Damageable)
                         if (repairInventory.getItem(eliteItemInputSlot) == null) {
                             repairInventory.setItem(eliteItemInputSlot, currentItem);
-                            playerInventory.remove(currentItem);
+                            playerInventory.clear(event.getSlot());
                             calculateOutput(repairInventory);
                         }
 

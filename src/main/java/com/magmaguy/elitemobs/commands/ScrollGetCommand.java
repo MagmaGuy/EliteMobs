@@ -9,6 +9,7 @@ import com.magmaguy.magmacore.command.SenderType;
 import com.magmaguy.magmacore.command.arguments.IntegerCommandArgument;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -32,14 +33,9 @@ public class ScrollGetCommand extends AdvancedCommand {
             return;
         }
 
-        int level, amount;
-        try {
-            level = commandData.getIntegerArgument("level");
-            amount = commandData.getIntegerArgument("amount");
-        } catch (NumberFormatException e) {
-            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getScrollInvalidNumberMessage());
-            return;
-        }
+        Integer level = commandData.getIntegerArgument("level");
+        Integer amount = commandData.getIntegerArgument("amount");
+        if (level == null || amount == null) return;
 
         if (level <= 0) {
             Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getScrollLevelZeroMessage());
@@ -54,7 +50,8 @@ public class ScrollGetCommand extends AdvancedCommand {
         Player player = commandData.getPlayerSender();
 
         for (int i = 0; i < amount; i++) {
-            player.getInventory().addItem(EliteScroll.generateScroll(level, player));
+            for (ItemStack overflow : player.getInventory().addItem(EliteScroll.generateScroll(level, player)).values())
+                player.getWorld().dropItem(player.getLocation(), overflow);
         }
 
         Logger.sendMessage(commandData.getCommandSender(),

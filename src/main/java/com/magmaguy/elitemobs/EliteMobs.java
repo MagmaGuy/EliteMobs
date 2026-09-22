@@ -716,6 +716,7 @@ public class EliteMobs extends JavaPlugin {
         TrackingFireballSupport.shutdown();
         VersionChecker.shutdown();
         KeepNeutralsAngry.shutdown();
+        SharedLootTable.shutdown();
         LootMenu.shutdown();
         TeleportsPage.TeleportsPageEvents.shutdown();
         BossTrackingPage.BossTrackingPageEvents.shutdown();
@@ -734,7 +735,6 @@ public class EliteMobs extends JavaPlugin {
         ScriptListener.shutdown();
         CombatEnterScanPower.shutdown();
         QuestTracking.shutdown();
-        SharedLootTable.shutdown();
         // Menu shutdowns
         CustomShopMenu.shutdown();
         SellMenu.shutdown();

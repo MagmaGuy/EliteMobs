@@ -20,7 +20,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import java.util.UUID;
 
@@ -71,14 +70,14 @@ public final class SoulbindEnchantment {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (item == null)
+                if (item == null || !item.isValid())
                     return;
-                FakeText fakeText = VisualDisplay.generateFakeText(item.getLocation().clone().add(new Vector(0, -50, 0)), ChatColorConverter.convert(
+                FakeText fakeText = VisualDisplay.generateFakeText(item.getLocation().add(0, 0.5, 0), ChatColorConverter.convert(
                         SoulbindConfig.hologramStrings.replace("$playerName", player.getName()).replace("$player", player.getDisplayName())), 30);
                 if (fakeText == null) return;
 
                 new BukkitRunnable() {
-                    final Location lastLocation = item.getLocation().clone();
+                    Location lastLocation = item.getLocation();
                     int counter = 0;
 
                     @Override
@@ -89,10 +88,11 @@ public final class SoulbindEnchantment {
                             fakeText.remove();
                             return;
                         }
-                        if (!lastLocation.equals(item.getLocation()))
-                            fakeText.teleport(item.getLocation().clone().add(new Vector(0, 0.5, 0)));
-                        if (counter == 1)
-                            fakeText.teleport(item.getLocation().clone().add(new Vector(0, 0.5, 0)));
+                        Location currentLocation = item.getLocation();
+                        if (!lastLocation.equals(currentLocation)) {
+                            fakeText.teleport(currentLocation.clone().add(0, 0.5, 0));
+                            lastLocation = currentLocation;
+                        }
                     }
                 }.runTaskTimer(MetadataHandler.PLUGIN, 1, 1);
             }

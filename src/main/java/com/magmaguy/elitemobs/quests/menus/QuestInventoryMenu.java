@@ -38,6 +38,11 @@ public class QuestInventoryMenu {
     private static final HashMap<Inventory, QuestInventory> questInventories = new HashMap<>();
 
     public static void shutdown() {
+        List<Inventory> ownedInventories = new ArrayList<>(questDirectories.keySet());
+        ownedInventories.addAll(questInventories.keySet());
+        for (Inventory inventory : ownedInventories)
+            for (var viewer : new ArrayList<>(inventory.getViewers()))
+                viewer.closeInventory();
         questDirectories.clear();
         questInventories.clear();
     }

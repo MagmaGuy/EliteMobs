@@ -44,6 +44,8 @@ public class GetLootMenu extends EliteMenu implements Listener {
     public int filterRank = 0;
     public Inventory inventory;
     private final Map<Integer, Integer> headerTiers = new HashMap<>();
+    private boolean hasNextHeaderPage;
+    private boolean hasNextLootPage;
 
     public GetLootMenu(Player player, GetLootMenu getLootMenu) {
         this.currentHeaderPage = getLootMenu.currentHeaderPage;
@@ -88,6 +90,7 @@ public class GetLootMenu extends EliteMenu implements Listener {
 
         List<Integer> keySet = new ArrayList<>(CustomItem.getTieredLoot().keySet());
         Collections.sort(keySet);
+        hasNextHeaderPage = keySet.size() > currentHeaderPage * 6;
 
         int counter = 1;
         for (int number : tierSlots) {
@@ -115,21 +118,21 @@ public class GetLootMenu extends EliteMenu implements Listener {
 
     private void lootConstructor(Inventory inventory) {
 
-        List<ItemStack> getLootList = new ArrayList<>();
-        for (List<ItemStack> list : CustomItem.getTieredLoot().values())
-            getLootList.addAll(list);
+        List<ItemStack> getLootList;
+        if (filter) {
+            getLootList = CustomItem.getTieredLoot().get(filterRank);
+            if (getLootList == null) getLootList = List.of();
+        } else {
+            getLootList = new ArrayList<>();
+            for (List<ItemStack> list : CustomItem.getTieredLoot().values())
+                getLootList.addAll(list);
+        }
+        hasNextLootPage = getLootList.size() > currentLootPage * lootSlots.size();
 
         int counter = 1;
         for (int number : lootSlots) {
-            if (!filter) {
-                if (getLootList.size() >= counter + ((currentLootPage - 1) * 35))
-                    inventory.setItem(number, getLootList.get(counter - 1 + ((currentLootPage - 1) * 35)));
-            } else {
-                List<ItemStack> currentRankLoot = CustomItem.getTieredLoot().get(filterRank);
-                if (currentRankLoot == null) break;
-                if (currentRankLoot.size() >= counter + ((currentLootPage - 1) * 35))
-                    inventory.setItem(number, currentRankLoot.get(counter - 1 + ((currentLootPage - 1) * 35)));
-            }
+            if (getLootList.size() >= counter + ((currentLootPage - 1) * lootSlots.size()))
+                inventory.setItem(number, getLootList.get(counter - 1 + ((currentLootPage - 1) * lootSlots.size())));
             counter++;
         }
     }
@@ -174,6 +177,7 @@ public class GetLootMenu extends EliteMenu implements Listener {
             }
 
             if (event.getSlot() == 8) {
+                if (!getLootMenu.hasNextHeaderPage) return;
                 getLootMenu.currentHeaderPage++;
                 new GetLootMenu(player, getLootMenu);
                 return;
@@ -187,6 +191,7 @@ public class GetLootMenu extends EliteMenu implements Listener {
             }
 
             if (event.getSlot() == 35) {
+                if (!getLootMenu.hasNextLootPage) return;
                 getLootMenu.currentLootPage++;
                 new GetLootMenu(player, getLootMenu);
                 return;

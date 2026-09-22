@@ -66,6 +66,9 @@ public class LootMenu extends EliteMenu {
     }
 
     public static void shutdown() {
+        for (List<LootMenu> sessions : new ArrayList<>(playerLoot.values()))
+            for (LootMenu menu : new ArrayList<>(sessions))
+                menu.removeMenu();
         playerLoot.clear();
         nextSessionIndex.clear();
     }
@@ -135,9 +138,9 @@ public class LootMenu extends EliteMenu {
     }
 
     public void removeMenu() {
+        if (player.isOnline() && player.getOpenInventory().getTopInventory().equals(inventory)) player.closeInventory();
         List<LootMenu> sessions = playerLoot.get(player.getUniqueId());
         if (sessions == null) return;
-        if (player.isOnline() && player.getOpenInventory().getTopInventory().equals(inventory)) player.closeInventory();
         sessions.remove(this);
         if (sessions.isEmpty()) {
             playerLoot.remove(player.getUniqueId());

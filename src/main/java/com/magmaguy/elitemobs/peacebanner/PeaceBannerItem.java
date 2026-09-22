@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.peacebanner;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.PeaceBannerConfig;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -83,23 +84,29 @@ public class PeaceBannerItem {
      * Does nothing if crafting is disabled in config.
      */
     public static void registerRecipe() {
-        if (!PeaceBannerConfig.isCraftable()) return;
+        if (!PeaceBannerConfig.isEnabled() || !PeaceBannerConfig.isCraftable()) return;
 
         ShapedRecipe recipe = new ShapedRecipe(RECIPE_KEY, createPeaceBanner());
-        List<String> shape = PeaceBannerConfig.getRecipeShape();
-        recipe.shape(shape.toArray(new String[0]));
+        try {
+            List<String> shape = PeaceBannerConfig.getRecipeShape();
+            recipe.shape(shape.toArray(new String[0]));
 
-        for (Map.Entry<String, String> entry : PeaceBannerConfig.getRecipeIngredients().entrySet()) {
-            String value = entry.getValue();
-            if (value.equals("ANY_BANNER")) {
-                recipe.setIngredient(entry.getKey().charAt(0),
-                        new RecipeChoice.MaterialChoice(ALL_BANNERS));
-            } else {
-                recipe.setIngredient(entry.getKey().charAt(0), Material.valueOf(value));
+            for (Map.Entry<String, String> entry : PeaceBannerConfig.getRecipeIngredients().entrySet()) {
+                String value = entry.getValue();
+                if (entry.getKey().length() != 1 || value == null)
+                    throw new IllegalArgumentException("Each recipe ingredient needs one character and a material name");
+                if (value.equals("ANY_BANNER")) {
+                    recipe.setIngredient(entry.getKey().charAt(0),
+                            new RecipeChoice.MaterialChoice(ALL_BANNERS));
+                } else {
+                    recipe.setIngredient(entry.getKey().charAt(0), Material.valueOf(value));
+                }
             }
+            if (!Bukkit.addRecipe(recipe))
+                Logger.warn("Peace Banner crafting recipe was rejected by the server; crafting is unavailable.");
+        } catch (IllegalArgumentException invalidRecipe) {
+            Logger.warn("Invalid Peace Banner crafting recipe; crafting is unavailable: " + invalidRecipe.getMessage());
         }
-
-        Bukkit.addRecipe(recipe);
     }
 
     /**

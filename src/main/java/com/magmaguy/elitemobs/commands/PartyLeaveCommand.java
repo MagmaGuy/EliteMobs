@@ -14,7 +14,6 @@ public class PartyLeaveCommand extends AdvancedCommand {
         addLiteral("leave");
         setUsage("/em party leave");
         setDescription(PartyConfig.getCommandLeaveDescription());
-        setPermission("elitemobs.party");
         setSenderType(SenderType.PLAYER);
     }
 

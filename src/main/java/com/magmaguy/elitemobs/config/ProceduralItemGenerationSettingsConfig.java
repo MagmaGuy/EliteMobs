@@ -29,8 +29,7 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
 
     private void addMaterial(Material material) {
         String key = "validMaterials." + material.name();
-        if (!fileConfiguration.contains(key))
-            fileConfiguration.set(key, true);
+        ConfigurationEngine.setBoolean(fileConfiguration, key, true);
     }
 
     public void cacheMaterials() {
@@ -125,6 +124,7 @@ public class ProceduralItemGenerationSettingsConfig extends ConfigurationFile {
             // SPEAR doesn't exist pre-1.21.11
         }
 
+        fileConfiguration.options().copyDefaults(true);
         cacheMaterials();
 
         MaterialGenerator.initializeValidProceduralMaterials();

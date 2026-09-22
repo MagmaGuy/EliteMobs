@@ -36,6 +36,7 @@ public class ValidWorldsConfig extends ConfigurationFile {
         for (World world : Bukkit.getWorlds())
             ConfigurationEngine.setBoolean(fileConfiguration, "validWorlds." + world.getName(), true);
 
+        fileConfiguration.options().copyDefaults(true);
         ConfigurationSection validWorldsSection = fileConfiguration.getConfigurationSection("validWorlds");
 
         validWorlds.clear();
