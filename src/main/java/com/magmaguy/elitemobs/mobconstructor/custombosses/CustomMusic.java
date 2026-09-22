@@ -42,31 +42,21 @@ public class CustomMusic {
     private int durationTicks2 = -1;
     private BukkitTask bossScannerTask = null;
     private World world;
+    private final boolean valid;
 
     //Format: name=rsp.name length=durations_milliseconds->name=rsp.name length=duration_milliseconds
     public CustomMusic(String rawString, CustomBossEntity customBossEntity) {
         this.customBossEntity = customBossEntity;
         contentType = ContentType.BOSS;
-        if (!rawString.contains("->")) {
-            parse(rawString, 1);
-        } else {
-            String[] rawEntries = rawString.split("->");
-            parse(rawEntries[0], 1);
-            parse(rawEntries[1], 2);
-        }
+        valid = parseTracks(rawString);
     }
 
     public CustomMusic(String rawString, ContentPackagesConfigFields contentPackagesConfigFields, World world) {
         this.world = world;
         this.contentPackagesConfigFields = contentPackagesConfigFields;
         contentType = ContentType.DUNGEON;
-        if (!rawString.contains("->")) {
-            parse(rawString, 1);
-        } else {
-            String[] rawEntries = rawString.split("->");
-            parse(rawEntries[0], 1);
-            parse(rawEntries[1], 2);
-        }
+        valid = parseTracks(rawString);
+        if (!valid) return;
         CustomMusic previousMusic = dungeonMusic.put(world.getUID(), this);
         if (previousMusic != null && previousMusic != this) previousMusic.stop();
     }
@@ -89,29 +79,56 @@ public class CustomMusic {
         playerSongSingleton.entrySet().removeIf(entry -> entry.getValue().equals(customMusic));
     }
 
-    private void parse(String rawString, int entryNumber) {
-        String[] strings = rawString.split(" ");
-        for (String string : strings) {
-            String[] parsed = string.split("=");
-            switch (parsed[0]) {
-                case "name":
-                    if (entryNumber == 1) name = parsed[1];
-                    else name2 = parsed[1];
-                    break;
-                case "length":
-                    if (entryNumber == 1) {
-                        durationTicks = (int) (Integer.parseInt(parsed[1]) / 1000D * 20D);
-                    } else {
-                        durationTicks2 = (int) (Integer.parseInt(parsed[1]) / 1000D * 20D);
-                    }
-                    break;
-                default:
-                    Logger.warn("Failed to get value for boss music!");
+    private boolean parseTracks(String rawString) {
+        try {
+            String[] entries = rawString.split("->", -1);
+            if (entries.length < 1 || entries.length > 2)
+                throw new IllegalArgumentException("Expected one or two tracks");
+            Track first = parse(entries[0]);
+            Track second = entries.length == 2 ? parse(entries[1]) : null;
+            name = first.name();
+            durationTicks = first.ticks();
+            if (second != null) {
+                name2 = second.name();
+                durationTicks2 = second.ticks();
             }
+            return true;
+        } catch (IllegalArgumentException exception) {
+            String owner = contentType == ContentType.BOSS
+                    ? customBossEntity.getCustomBossesConfigFields().getFilename()
+                    : contentPackagesConfigFields.getFilename();
+            Logger.warn("Disabled invalid music in " + owner + ": " + exception.getMessage());
+            return false;
         }
     }
 
+    private static Track parse(String rawString) {
+        String name = null;
+        Long milliseconds = null;
+        for (String field : rawString.trim().split("\\s+")) {
+            String[] parsed = field.split("=", 2);
+            if (parsed.length != 2) throw new IllegalArgumentException("Expected name and length fields");
+            switch (parsed[0]) {
+                case "name" -> {
+                    if (name != null || parsed[1].isBlank()) throw new IllegalArgumentException("Invalid track name");
+                    name = parsed[1];
+                }
+                case "length" -> {
+                    if (milliseconds != null) throw new IllegalArgumentException("Duplicate track length");
+                    milliseconds = Long.parseLong(parsed[1]);
+                }
+                default -> throw new IllegalArgumentException("Unknown music field: " + parsed[0]);
+            }
+        }
+        if (name == null || milliseconds == null || milliseconds < 50 || milliseconds / 50 > Integer.MAX_VALUE)
+            throw new IllegalArgumentException("Each track needs a name and a length of at least 50 milliseconds");
+        return new Track(name, (int) (milliseconds / 50));
+    }
+
+    private record Track(String name, int ticks) {}
+
     public void start(CustomBossEntity customBossEntity) {
+        if (!valid) return;
         if (bossScannerTask != null) bossScannerTask.cancel();
         activeMusic.add(this);
         bossScannerTask = new BukkitRunnable() {
@@ -152,14 +169,14 @@ public class CustomMusic {
     }
 
     private void beginPlayback(Player player) {
-        if (!isPlaybackEligible(player)) return;
+        if (!valid || !isPlaybackEligible(player)) return;
         UUID playerId = player.getUniqueId();
         CustomMusic currentMusic = playerSongSingleton.get(playerId);
         if (currentMusic != null && currentMusic != this) {
-            //Dungeon ambience never interrupts an active boss track.
-            if (contentType == ContentType.DUNGEON && currentMusic.contentType == ContentType.BOSS &&
-                    currentMusic.playerTasks.contains(playerId, PlayerTaskRegistry.Role.PLAYBACK_LOOP))
-                return;
+            // Retain an eligible owner at equal priority; boss tracks can still displace dungeon ambience.
+            if (currentMusic.isPlaybackEligible(player)
+                    && currentMusic.playerTasks.contains(playerId, PlayerTaskRegistry.Role.PLAYBACK_LOOP)
+                    && (contentType == currentMusic.contentType || contentType == ContentType.DUNGEON)) return;
             currentMusic.stopPlayer(playerId, true);
         }
         if (playerTasks.contains(playerId, PlayerTaskRegistry.Role.PLAYBACK_LOOP)) return;
@@ -171,8 +188,8 @@ public class CustomMusic {
 
     private void startLoopingTask(UUID playerId) {
         String loopingTrack = name2 == null ? name : name2;
-        long initialDelay = Math.max(1, durationTicks);
-        long period = Math.max(1, name2 == null ? durationTicks : durationTicks2);
+        long initialDelay = durationTicks;
+        long period = name2 == null ? durationTicks : durationTicks2;
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {

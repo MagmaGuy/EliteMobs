@@ -120,10 +120,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                 () -> trackableCustomBosses.add(this),
                 () -> trackableCustomBosses.remove(this),
                 () -> new BossTrackingBar(this));
-        if (customBossesConfigFields.getSong() != null)
-            bossMusic = new CustomMusic(customBossesConfigFields.getSong(), this);
         //This stores everything that will need to be initialized for the EliteMobEntity
         setCustomBossesConfigFields(customBossesConfigFields);
+        if (customBossesConfigFields.getSong() != null)
+            bossMusic = new CustomMusic(customBossesConfigFields.getSong(), this);
         super.setPersistent(customBossesConfigFields.isPersistent());
         //Phases are final
         if (customBossesConfigFields.getPhases() != null)

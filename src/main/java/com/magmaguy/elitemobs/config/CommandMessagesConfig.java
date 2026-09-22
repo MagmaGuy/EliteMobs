@@ -281,6 +281,10 @@ public class CommandMessagesConfig extends ConfigurationFile {
     @Getter
     private static String transitiveBlockCorner2Message;
     @Getter
+    private static String transitiveBlockMissingCornersMessage;
+    @Getter
+    private static String transitiveBlockWorldMismatchMessage;
+    @Getter
     private static String transitiveBlockSelectionCountMessage;
     @Getter
     private static String transitiveBlockRegisteredMessage;
@@ -926,6 +930,12 @@ public class CommandMessagesConfig extends ConfigurationFile {
         transitiveBlockCorner2Message = ConfigurationEngine.setString(
                 List.of("Sets the message sent when corner 2 is set"),
                 file, fileConfiguration, "transitiveBlockCorner2Message", "Set corner 2!", true);
+        transitiveBlockMissingCornersMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a block area is missing a corner"),
+                file, fileConfiguration, "transitiveBlockMissingCornersMessage", "Select both corners before saving. Your selection is still active.", true);
+        transitiveBlockWorldMismatchMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when selected blocks are outside the regional boss world"),
+                file, fileConfiguration, "transitiveBlockWorldMismatchMessage", "Select blocks in the regional boss's world. Your selection is still active.", true);
         transitiveBlockSelectionCountMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent showing block selection count", "$count - the number of blocks selected", "$limit - the recommended block limit"),
                 file, fileConfiguration, "transitiveBlockSelectionCountMessage", "[EliteMobs] Current selection has $count blocks selected. For performance reasons, it is recommended you don't go over $limit blocks!", true);

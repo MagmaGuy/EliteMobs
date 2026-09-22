@@ -45,6 +45,7 @@ public class TransitiveBlockCommand {
                             String message = "Could not find valid custom boss config fields for phase boss! This is probably a configuration issue. Check why your phase boss isn't valid on console logs on /em reload and make sure to test the phases in-game!";
                             Logger.warn(message);
                             player.sendMessage(message);
+                            continue;
                         }
                         if (bossPhase.customBossesConfigFields.equals(customBossesConfigFields)) {
                             this.regionalBossEntity = iteratedRegionalBossEntity;
@@ -141,16 +142,17 @@ public class TransitiveBlockCommand {
     }
 
     public void setCorner(boolean leftClick, Location location) {
+        if (!matchesAnchorWorld(location)) return;
         if (leftClick) {
-            corner1 = location;
+            corner1 = location.clone();
             player.sendMessage(CommandMessagesConfig.getTransitiveBlockCorner1Message());
         } else {
-            corner2 = location;
+            corner2 = location.clone();
             player.sendMessage(CommandMessagesConfig.getTransitiveBlockCorner2Message());
         }
 
         if (corner1 != null && corner2 != null && corner1.getWorld() == corner2.getWorld()) {
-            int blockCount = (int) ((Math.abs(corner1.getX() - corner2.getX()) + 1) * (Math.abs(corner1.getY() - corner2.getY()) + 1) * (Math.abs(corner1.getZ() - corner2.getZ()) + 1));
+            long blockCount = selectionVolume();
             if (blockCount > DefaultConfig.getDefaultTransitiveBlockLimiter())
                 player.sendMessage(CommandMessagesConfig.getTransitiveBlockSelectionCountMessage()
                         .replace("$count", String.valueOf(blockCount))
@@ -165,13 +167,34 @@ public class TransitiveBlockCommand {
                 location.getZ() - regionalBossEntity.getSpawnLocation().getZ());
     }
 
+    private boolean matchesAnchorWorld(Location location) {
+        Location anchor = regionalBossEntity.getSpawnLocation();
+        if (location != null && anchor != null && anchor.getWorld() != null
+                && anchor.getWorld().equals(location.getWorld())) return true;
+        player.sendMessage(CommandMessagesConfig.getTransitiveBlockWorldMismatchMessage());
+        return false;
+    }
+
+    private long selectionVolume() {
+        long x = Math.abs((long) corner1.getBlockX() - corner2.getBlockX()) + 1;
+        long y = Math.abs((long) corner1.getBlockY() - corner2.getBlockY()) + 1;
+        long z = Math.abs((long) corner1.getBlockZ() - corner2.getBlockZ()) + 1;
+        try {
+            return Math.multiplyExact(Math.multiplyExact(x, y), z);
+        } catch (ArithmeticException overflow) {
+            return Long.MAX_VALUE;
+        }
+    }
+
     public void registerBlock(Block block) {
+        if (!matchesAnchorWorld(block.getLocation())) return;
         if (doubleEntryCheck(block, false)) return;
         transitiveBlockList.add(new TransitiveBlock(block.getBlockData(), getRelativeCoordinate(block.getLocation())));
         player.sendMessage(CommandMessagesConfig.getTransitiveBlockRegisteredMessage().replace("$type", block.getType().toString()));
     }
 
     public void registerAir(Block block) {
+        if (!matchesAnchorWorld(block.getLocation())) return;
         if (doubleEntryCheck(block, true)) return;
         transitiveBlockList.add(new TransitiveBlock(Material.AIR.createBlockData(), getRelativeCoordinate(block.getLocation())));
         player.sendMessage(CommandMessagesConfig.getTransitiveBlockRegisteredAirMessage());
@@ -192,35 +215,44 @@ public class TransitiveBlockCommand {
     }
 
     public void commitLocations() {
-        activePlayers.remove(player.getUniqueId());
+        if (activePlayers.get(player.getUniqueId()) != this) return;
+        if (regionalSelection) {
+            if (corner1 == null || corner2 == null) {
+                player.sendMessage(CommandMessagesConfig.getTransitiveBlockMissingCornersMessage());
+                return;
+            }
+            if (!matchesAnchorWorld(corner1) || !matchesAnchorWorld(corner2)
+                    || !matchesAnchorWorld(player.getLocation())) return;
+        }
         player.sendMessage(CommandMessagesConfig.getTransitiveBlockNowSavingMessage().replace("$type", transitiveBlockType.toString()));
         List<String> deserializedData = new ArrayList<>();
+        List<TransitiveBlock> capturedBlocks = new ArrayList<>(transitiveBlockList);
 
         if (regionalSelection) {
-            int blockCount = (int) ((Math.abs(corner1.getX() - corner2.getX()) + 1) * (Math.abs(corner1.getY() - corner2.getY()) + 1) * (Math.abs(corner1.getZ() - corner2.getZ()) + 1));
+            long blockCount = selectionVolume();
             if (blockCount > DefaultConfig.getDefaultTransitiveBlockLimiter()) {
                 player.sendMessage(CommandMessagesConfig.getTransitiveBlockTooManyMessage().replace("$limit", String.valueOf(DefaultConfig.getDefaultTransitiveBlockLimiter())));
             }
             int lowestX, highestX, lowestY, highestY, lowestZ, highestZ;
-            lowestX = (int) Math.min(corner1.getX(), corner2.getX());
-            highestX = (int) Math.max(corner1.getX(), corner2.getX());
-            lowestY = (int) Math.min(corner1.getY(), corner2.getY());
-            highestY = (int) Math.max(corner1.getY(), corner2.getY());
-            lowestZ = (int) Math.min(corner1.getZ(), corner2.getZ());
-            highestZ = (int) Math.max(corner1.getZ(), corner2.getZ());
+            lowestX = Math.min(corner1.getBlockX(), corner2.getBlockX());
+            highestX = Math.max(corner1.getBlockX(), corner2.getBlockX());
+            lowestY = Math.min(corner1.getBlockY(), corner2.getBlockY());
+            highestY = Math.max(corner1.getBlockY(), corner2.getBlockY());
+            lowestZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
+            highestZ = Math.max(corner1.getBlockZ(), corner2.getBlockZ());
 
             for (int x = lowestX; x < highestX + 1; x++)
                 for (int y = lowestY; y < highestY + 1; y++)
                     for (int z = lowestZ; z < highestZ + 1; z++) {
-                        Location blockLocation = new Location(player.getWorld(), x, y, z);
-                        transitiveBlockList.add(new TransitiveBlock(blockLocation.getBlock().getBlockData(), getRelativeCoordinate(blockLocation)));
+                        Location blockLocation = new Location(corner1.getWorld(), x, y, z);
+                        capturedBlocks.add(new TransitiveBlock(blockLocation.getBlock().getBlockData(), getRelativeCoordinate(blockLocation)));
                     }
 
-            player.sendMessage(CommandMessagesConfig.getTransitiveBlockRegisteredCornerMessage().replace("$count", String.valueOf(transitiveBlockList.size())));
+            player.sendMessage(CommandMessagesConfig.getTransitiveBlockRegisteredCornerMessage().replace("$count", String.valueOf(capturedBlocks.size())));
 
         }
 
-        for (TransitiveBlock transitiveBlock : transitiveBlockList) {
+        for (TransitiveBlock transitiveBlock : capturedBlocks) {
             String deserializedString = transitiveBlock.getRelativeLocation().getX() + ","
                     + transitiveBlock.getRelativeLocation().getY() + ","
                     + transitiveBlock.getRelativeLocation().getZ() + "/"
@@ -244,6 +276,7 @@ public class TransitiveBlockCommand {
             default:
                 player.sendMessage(CommandMessagesConfig.getTransitiveBlockLocationsFailedMessage());
         }
+        activePlayers.remove(player.getUniqueId(), this);
     }
 
     public enum TransitiveBlockType {

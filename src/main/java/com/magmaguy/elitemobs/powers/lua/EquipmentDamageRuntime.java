@@ -50,12 +50,15 @@ final class EquipmentDamageRuntime {
         }
 
         boolean permitted = true;
+        ItemStack originalState = item.clone();
         if (target instanceof Player player) {
             PlayerItemDamageEvent event = new PlayerItemDamageEvent(player, item, eventDamage);
             Bukkit.getPluginManager().callEvent(event);
             permitted = !event.isCancelled();
             eventDamage = event.getDamage();
         }
+        // Bukkit may return different wrappers for one slot. Compare complete value state after listeners.
+        if (!originalState.equals(item) || !originalState.equals(equipment.getItem(slot))) return 0;
         EquipmentDamagePolicy.Result result = EquipmentDamagePolicy.applyEventDamage(
                 target.isValid() && !target.isDead(),
                 permitted,
@@ -67,15 +70,15 @@ final class EquipmentDamageRuntime {
         }
 
         if (result.broke()) {
-            ItemStack brokenItem = item.clone();
+            ItemStack brokenItem = originalState;
             equipment.setItem(slot, new ItemStack(Material.AIR), false);
             if (target instanceof Player player) {
                 Bukkit.getPluginManager().callEvent(new PlayerItemBreakEvent(player, brokenItem));
             }
         } else {
             damageable.setDamage(result.resultingDamage());
-            item.setItemMeta(damageable);
-            equipment.setItem(slot, item, false);
+            originalState.setItemMeta(damageable);
+            equipment.setItem(slot, originalState, false);
         }
         return result.actualDamage();
     }

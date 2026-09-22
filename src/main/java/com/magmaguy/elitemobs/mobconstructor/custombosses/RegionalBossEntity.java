@@ -63,8 +63,6 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         this.rawLocationString = rawString.split(":")[0];
         this.respawnCoolDownInMinutes = customBossesConfigFields.getSpawnCooldown();
         this.leashRadius = customBossesConfigFields.getLeashRadius();
-        this.onSpawnTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
-        this.onRemoveTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
 
         regionalBossesFromConfigFields.put(customBossesConfigFields, this);
 
@@ -83,10 +81,6 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
     public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, boolean permanent, boolean persistent) {
         super(customBossesConfigFields);
-        this.onSpawnTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
-        this.onRemoveTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
-        this.onSpawnTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
-        this.onRemoveTransitiveBlocks = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
         super.setPersistent(persistent);
         super.spawnLocation = location;
         this.leashRadius = customBossesConfigFields.getLeashRadius();
