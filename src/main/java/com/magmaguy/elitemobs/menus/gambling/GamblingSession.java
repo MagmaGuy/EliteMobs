@@ -9,6 +9,7 @@ import java.util.UUID;
 public abstract class GamblingSession {
     public final UUID playerUUID;
     public int betAmount;
+    org.bukkit.inventory.Inventory inventory;
 
     protected GamblingSession(UUID playerUUID, int betAmount) {
         this.playerUUID = playerUUID;

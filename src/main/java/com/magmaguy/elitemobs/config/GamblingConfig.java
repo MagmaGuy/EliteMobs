@@ -409,6 +409,16 @@ public class GamblingConfig extends ConfigurationFile {
         super("GamblingSettings.yml");
     }
 
+    private boolean hasScalarCoinFlipSettings() {
+        return fileConfiguration.contains("payouts.coinFlip")
+                && !fileConfiguration.isConfigurationSection("payouts.coinFlip");
+    }
+
+    @Override
+    public void saveDefaults() {
+        if (!hasScalarCoinFlipSettings()) super.saveDefaults();
+    }
+
     @Override
     public void initializeValues() {
         // General settings
@@ -462,26 +472,37 @@ public class GamblingConfig extends ConfigurationFile {
         blackjackPayoutBlackjack = requireNonNegativeFinite(
                 "payouts.blackjack.blackjack", blackjackPayoutBlackjack, 2.5);
 
-        coinFlipPayout = ConfigurationEngine.setDouble(
-                List.of("Payout multiplier for winning a coin flip.",
-                        "Set below 2.0 for house edge (1.9 = 5% house edge)."),
-                fileConfiguration, "payouts.coinFlip", 1.9);
-        coinFlipPayout = requireNonNegativeFinite("payouts.coinFlip", coinFlipPayout, 1.9);
+        if (hasScalarCoinFlipSettings()) {
+            gamblingEnabled = false;
+            coinFlipPayout = 1.9;
+            coinFlipEdgeChance = 0.01;
+            coinFlipEdgePayout = 5.0;
+            Logger.warn("GamblingSettings.yml: replace the scalar payouts.coinFlip with a section containing normal: "
+                    + fileConfiguration.get("payouts.coinFlip")
+                    + ", edgeChance: 0.01 and edgePayout: 5.0. Gambling is disabled until corrected; the file was not changed.");
+        } else {
+            coinFlipPayout = ConfigurationEngine.setDouble(
+                    List.of("Payout multiplier for winning a coin flip.",
+                            "Set below 2.0 for house edge (1.9 = 5% house edge)."),
+                    fileConfiguration, "payouts.coinFlip.normal", 1.9);
+            coinFlipPayout = requireNonNegativeFinite("payouts.coinFlip.normal", coinFlipPayout, 1.9);
 
-        coinFlipEdgeChance = ConfigurationEngine.setDouble(
-                List.of("Chance (0.0 to 1.0) for the coin to land on its edge (bonus win).",
-                        "Default 0.01 = 1% chance. Set to 0.0 to disable the edge mechanic."),
-                fileConfiguration, "payouts.coinFlip.edgeChance", 0.01);
-        coinFlipEdgeChance = requireProbability(
-                "payouts.coinFlip.edgeChance", coinFlipEdgeChance, 0.01);
+            coinFlipEdgeChance = ConfigurationEngine.setDouble(
+                    List.of("Chance (0.0 to 1.0) for the coin to land on its edge (bonus win).",
+                            "Default 0.01 = 1% chance. Set to 0.0 to disable the edge mechanic."),
+                    fileConfiguration, "payouts.coinFlip.edgeChance", 0.01);
+            coinFlipEdgeChance = requireProbability(
+                    "payouts.coinFlip.edgeChance", coinFlipEdgeChance, 0.01);
 
-        coinFlipEdgePayout = ConfigurationEngine.setDouble(
-                List.of("Payout multiplier when the coin lands on its edge.",
-                        "Combined with the edge chance and normal payout, this determines the overall house edge.",
-                        "With 1% edge chance and 1.9x normal payout: 5.0x edge = ~1% house edge, 10.0x edge = ~4% player edge."),
-                fileConfiguration, "payouts.coinFlip.edgePayout", 5.0);
-        coinFlipEdgePayout = requireNonNegativeFinite(
-                "payouts.coinFlip.edgePayout", coinFlipEdgePayout, 5.0);
+            coinFlipEdgePayout = ConfigurationEngine.setDouble(
+                    List.of("Payout multiplier when the coin lands on its edge.",
+                            "Combined with the edge chance and normal payout, this determines the overall house edge.",
+                            "With 1% edge chance and 1.9x normal payout: 5.0x edge = ~1% house edge, 10.0x edge = ~4% player edge."),
+                    fileConfiguration, "payouts.coinFlip.edgePayout", 5.0);
+            coinFlipEdgePayout = requireNonNegativeFinite(
+                    "payouts.coinFlip.edgePayout", coinFlipEdgePayout, 5.0);
+
+        }
 
         higherLowerMultiplier = ConfigurationEngine.setDouble(
                 List.of("Multiplier applied to the bet for each correct guess in Higher/Lower.",

@@ -166,16 +166,10 @@ public class CustomShopMenu {
             if (!inventoryHasFreeSlots) {
                 player.sendMessage(CustomShopMenuConfig.messageFullInventory);
                 player.closeInventory();
-            } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
-                EconomyHandler.subtractCurrency(player.getUniqueId(), itemValue);
-                new EliteItemLore(itemStack, false);
-                player.getInventory().addItem(itemStack);
+            } else if (SharedShopElements.purchase(player, itemStack, itemValue)) {
                 populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
 
                 SharedShopElements.buyMessage(player, itemDisplayName, itemValue);
-            } else {
-                player.closeInventory();
-                SharedShopElements.insufficientFundsMessage(player, itemValue);
             }
 
         }

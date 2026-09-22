@@ -70,16 +70,35 @@ public class HigherLowerGame {
      */
     public static void startGame(Player player, int betAmount) {
         HigherLowerSession session = new HigherLowerSession(player.getUniqueId(), betAmount);
-        // Draw initial card
-        session.currentCard = drawCard();
-        activeSessions.put(player.getUniqueId(), session);
+        try {
+            // Draw initial card
+            session.currentCard = drawCard();
 
-        String title = GamblingConfig.getHigherLowerMenuTitle();
-        Inventory inventory = Bukkit.createInventory(player, 27, title);
+            String title = GamblingConfig.getHigherLowerMenuTitle();
+            Inventory inventory = Bukkit.createInventory(player, 27, title);
+            session.inventory = inventory;
+            activeSessions.put(player.getUniqueId(), session);
 
-        updateDisplay(inventory, session);
-        player.openInventory(inventory);
-        HigherLowerMenuEvents.menus.add(inventory);
+            updateDisplay(inventory, session);
+            HigherLowerMenuEvents.menus.add(inventory);
+            try {
+                player.openInventory(inventory);
+            } finally {
+                if (player.getOpenInventory().getTopInventory() != inventory)
+                    throw new IllegalStateException("Gambling inventory opening was cancelled");
+            }
+        } catch (RuntimeException failure) {
+            activeSessions.remove(session.playerUUID, session);
+            HigherLowerMenuEvents.menus.remove(session.inventory);
+            try {
+                // Setup never reached a playable game. Preserve an already selected outcome if one exists.
+                GamblingEconomyHandler.resolveOutcome(session.playerUUID, session.betAmount);
+            } catch (RuntimeException settlementFailure) {
+                failure.addSuppressed(settlementFailure);
+            }
+            com.magmaguy.magmacore.util.Logger.warn("Could not open gambling game for " + session.playerUUID + ": " + failure);
+            player.sendMessage(com.magmaguy.elitemobs.config.EconomySettingsConfig.getShopTransactionFailedMessage());
+        }
     }
 
     /**
@@ -421,8 +440,31 @@ public class HigherLowerGame {
     }
 
     public static void shutdown() {
-        activeSessions.clear();
-        HigherLowerMenuEvents.menus.clear();
+        for (HigherLowerSession session : List.copyOf(activeSessions.values())) {
+            closeSession(session);
+            Player player = Bukkit.getPlayer(session.playerUUID);
+            if (player != null && player.getOpenInventory().getTopInventory() == session.inventory)
+                player.closeInventory();
+        }
+    }
+
+    private static void closeSession(HigherLowerSession session) {
+        if (!activeSessions.remove(session.playerUUID, session)) return;
+        HigherLowerMenuEvents.menus.remove(session.inventory);
+        double payout = 0;
+        if (session.streak > 0 && !session.gameOver)
+            payout = GamblingEconomyHandler.calculatePayout(session.betAmount, session.multiplier);
+        try {
+            // An already-selected payout is retained by the economy owner, including rejected credits.
+            double awarded = GamblingEconomyHandler.resolveOutcome(session.playerUUID, payout);
+            Player player = Bukkit.getPlayer(session.playerUUID);
+            if (awarded > 0 && player != null && player.isOnline())
+                player.sendMessage(GamblingConfig.getHigherLowerAutoCashOutChat()
+                        .replace("%amount%", String.format("%.2f", awarded))
+                        .replace("%streak%", String.valueOf(session.streak)));
+        } catch (RuntimeException failure) {
+            com.magmaguy.magmacore.util.Logger.warn("Gambling close could not settle " + session.playerUUID + ": " + failure);
+        }
     }
 
     /**
@@ -471,24 +513,9 @@ public class HigherLowerGame {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            if (!menus.remove(event.getInventory())) return;
-            HigherLowerSession session = activeSessions.remove(event.getPlayer().getUniqueId());
-            if (session == null) return;
-
-            // Auto-cash-out if player has a winning streak and hasn't been paid yet
-            if (session.streak > 0 && !session.gameOver) {
-                double payout = session.betAmount * session.multiplier;
-                double awarded = GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), payout);
-                if (awarded > 0 && event.getPlayer() instanceof Player player) {
-                    player.sendMessage(
-                            GamblingConfig.getHigherLowerAutoCashOutChat()
-                                    .replace("%amount%", String.format("%.2f", awarded))
-                                    .replace("%streak%", String.valueOf(session.streak)));
-                }
-            } else if (!session.gameOver) {
-                // No streak, player closed without playing — forfeit
-                GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), 0);
-            }
+            if (!menus.contains(event.getInventory())) return;
+            HigherLowerSession session = activeSessions.get(event.getPlayer().getUniqueId());
+            if (session != null && session.inventory == event.getInventory()) closeSession(session);
         }
     }
 }

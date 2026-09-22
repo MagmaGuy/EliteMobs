@@ -66,14 +66,33 @@ public class SlotMachineGame {
      */
     public static void startGame(Player player, int betAmount) {
         SlotSession session = new SlotSession(player.getUniqueId(), betAmount);
-        activeSessions.put(player.getUniqueId(), session);
+        try {
 
-        String title = GamblingConfig.getSlotsMenuTitle();
-        Inventory inventory = Bukkit.createInventory(player, 36, title);
+            String title = GamblingConfig.getSlotsMenuTitle();
+            Inventory inventory = Bukkit.createInventory(player, 36, title);
+            session.inventory = inventory;
+            activeSessions.put(player.getUniqueId(), session);
 
-        setupInitialDisplay(inventory, session);
-        player.openInventory(inventory);
-        SlotMachineMenuEvents.menus.add(inventory);
+            setupInitialDisplay(inventory, session);
+            SlotMachineMenuEvents.menus.add(inventory);
+            try {
+                player.openInventory(inventory);
+            } finally {
+                if (player.getOpenInventory().getTopInventory() != inventory)
+                    throw new IllegalStateException("Gambling inventory opening was cancelled");
+            }
+        } catch (RuntimeException failure) {
+            activeSessions.remove(session.playerUUID, session);
+            SlotMachineMenuEvents.menus.remove(session.inventory);
+            try {
+                // Setup never reached a playable game. Preserve an already selected outcome if one exists.
+                GamblingEconomyHandler.resolveOutcome(session.playerUUID, session.betAmount);
+            } catch (RuntimeException settlementFailure) {
+                failure.addSuppressed(settlementFailure);
+            }
+            com.magmaguy.magmacore.util.Logger.warn("Could not open gambling game for " + session.playerUUID + ": " + failure);
+            player.sendMessage(com.magmaguy.elitemobs.config.EconomySettingsConfig.getShopTransactionFailedMessage());
+        }
     }
 
     /**
@@ -226,7 +245,7 @@ public class SlotMachineGame {
         disableSpinButton(inventory);
 
         // STEP 5: NOW play the animation (safe to disconnect at any point)
-        playSpinAnimation(player, session, inventory, results, payout);
+        playSpinAnimation(player, session, inventory, results, session.winAmount);
     }
 
     /**
@@ -433,8 +452,24 @@ public class SlotMachineGame {
     }
 
     public static void shutdown() {
-        activeSessions.clear();
-        SlotMachineMenuEvents.menus.clear();
+        for (SlotSession session : List.copyOf(activeSessions.values())) {
+            closeSession(session);
+            Player player = Bukkit.getPlayer(session.playerUUID);
+            if (player != null && player.getOpenInventory().getTopInventory() == session.inventory)
+                player.closeInventory();
+        }
+    }
+
+    private static void closeSession(SlotSession session) {
+        if (!activeSessions.remove(session.playerUUID, session)) return;
+        SlotMachineMenuEvents.menus.remove(session.inventory);
+        double payout = 0;
+        try {
+            // An already-selected payout is retained by the economy owner, including rejected credits.
+            GamblingEconomyHandler.resolveOutcome(session.playerUUID, payout);
+        } catch (RuntimeException failure) {
+            com.magmaguy.magmacore.util.Logger.warn("Gambling close could not settle " + session.playerUUID + ": " + failure);
+        }
     }
 
     /**
@@ -511,7 +546,7 @@ public class SlotMachineGame {
             if (player == null) return;
 
             SlotSession session = activeSessions.get(player.getUniqueId());
-            if (session == null || session.isSpinning) return;
+            if (session == null || session.inventory != event.getInventory() || session.isSpinning) return;
 
             if (event.getSlot() == SPIN_BUTTON_SLOT && !session.gameOver) {
                 processSpin(player, session, event.getInventory());
@@ -535,13 +570,9 @@ public class SlotMachineGame {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            if (!menus.remove(event.getInventory())) return;
-            SlotSession session = activeSessions.remove(event.getPlayer().getUniqueId());
-            if (session == null) return;
-            // If player closed without spinning, forfeit the bet
-            if (!session.isSpinning && !session.gameOver) {
-                GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), 0);
-            }
+            if (!menus.contains(event.getInventory())) return;
+            SlotSession session = activeSessions.get(event.getPlayer().getUniqueId());
+            if (session != null && session.inventory == event.getInventory()) closeSession(session);
         }
     }
 }

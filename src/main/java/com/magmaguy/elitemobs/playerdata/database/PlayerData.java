@@ -317,6 +317,19 @@ public class PlayerData {
             playerDataHashMap.get(uuid).currencyCents = cents;
     }
 
+    /** One native economy snapshot keeps accepted proceeds and collected debt in the same SQL update. */
+    public static void setCurrencyAndGamblingDebt(UUID uuid, double currency, double debt) {
+        long currencyValue = Math.round(currency * 100.0);
+        long debtValue = Math.round(Math.max(0, Math.min(500, debt)) * 100.0);
+        setDatabaseValues(uuid, Map.of("CurrencyCents", currencyValue, "CurrencyV2", currencyValue / 100.0,
+                "GamblingDebtCents", debtValue, "GamblingDebt", debtValue / 100.0));
+        PlayerData loaded = playerDataHashMap.get(uuid);
+        if (loaded != null) {
+            loaded.currencyCents = currencyValue;
+            loaded.gamblingDebtCents = debtValue;
+        }
+    }
+
     public static List<Quest> getQuests(UUID uuid) {
         try {
             if (!isInMemory(uuid))

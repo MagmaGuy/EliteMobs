@@ -53,14 +53,23 @@ public class BettingMenu {
 
         int defaultBet = Math.max(GamblingConfig.getMinBet(), 10);
         BetSession session = new BetSession(player.getUniqueId(), gameType, defaultBet);
-        activeSessions.put(player.getUniqueId(), session);
 
         String title = GamblingConfig.getBettingMenuTitle().replace("%game%", gameType.getDisplayName());
         Inventory inventory = Bukkit.createInventory(player, 27, title);
 
         updateBettingDisplay(inventory, player, session);
-        player.openInventory(inventory);
+        player.closeInventory();
+        session.inventory = inventory;
+        activeSessions.put(player.getUniqueId(), session);
         BettingMenuEvents.menus.add(inventory);
+        try {
+            player.openInventory(inventory);
+        } finally {
+            if (player.getOpenInventory().getTopInventory() != inventory) {
+                BettingMenuEvents.menus.remove(inventory);
+                activeSessions.remove(player.getUniqueId(), session);
+            }
+        }
     }
 
     /**
@@ -86,12 +95,14 @@ public class BettingMenu {
         // Balance display
         double balance = GamblingEconomyHandler.getBalance(uuid);
         double debt = GamblingEconomyHandler.getDebt(uuid);
+        double credit = Math.max(0, GamblingEconomyHandler.MAX_DEBT - debt);
+        double maxAvailable = Double.isFinite(balance + credit) ? Math.max(0, balance + credit) : 0;
         List<String> balanceLore = new ArrayList<>();
         balanceLore.add("");
         balanceLore.add(GamblingConfig.getBettingBalanceLabel() + String.format("%.2f", balance));
         if (debt > 0) {
             balanceLore.add(GamblingConfig.getBettingDebtLabel() + String.format("%.2f", debt));
-            balanceLore.add(GamblingConfig.getBettingAvailableCreditLabel() + String.format("%.2f", GamblingEconomyHandler.getAvailableCredit(uuid)));
+            balanceLore.add(GamblingConfig.getBettingAvailableCreditLabel() + String.format("%.2f", credit));
         }
         ItemStack balanceItem = ItemStackGenerator.generateItemStack(
                 Material.GOLD_INGOT,
@@ -102,7 +113,8 @@ public class BettingMenu {
         inventory.setItem(BALANCE_SLOT, balanceItem);
 
         // Current bet display
-        boolean canAfford = GamblingEconomyHandler.canAffordBet(uuid, session.betAmount);
+        boolean canAfford = com.magmaguy.elitemobs.economy.EconomyHandler.isReady(uuid)
+                && session.betAmount > 0 && session.betAmount <= maxAvailable;
         ItemStack betDisplay = ItemStackGenerator.generateItemStack(
                 canAfford ? Material.EMERALD : Material.REDSTONE,
                 ChatColorConverter.convert((canAfford ? GamblingConfig.getBettingAffordableColor() : GamblingConfig.getBettingUnaffordableColor()) + GamblingConfig.getBettingCurrentBetPrefix() + session.betAmount),
@@ -115,7 +127,9 @@ public class BettingMenu {
         inventory.setItem(BET_DISPLAY_SLOT, betDisplay);
 
         // Calculate increments based on player wealth
-        int[] increments = calculateIncrements(uuid);
+        int[] increments = calculateIncrements(balance, debt);
+        session.increments = increments;
+        session.maximumDisplayedBet = (int) maxAvailable;
         int smallIncrement = increments[0];
         int mediumIncrement = increments[1];
         int largeIncrement = increments[2];
@@ -131,7 +145,6 @@ public class BettingMenu {
         inventory.setItem(MINUS_100_SLOT, createModifierButton("-" + largeIncrement, Material.RED_STAINED_GLASS_PANE, largeIncrement));
 
         // All In button (under +100)
-        double maxAvailable = GamblingEconomyHandler.getMaxBet(uuid);
         ItemStack allInButton = ItemStackGenerator.generateItemStack(
                 Material.DIAMOND,
                 GamblingConfig.getBettingAllInButtonText(),
@@ -199,10 +212,7 @@ public class BettingMenu {
      *
      * @return array of 3 increments [small, medium, large]
      */
-    private static int[] calculateIncrements(UUID uuid) {
-        double balance = GamblingEconomyHandler.getBalance(uuid);
-        double debt = GamblingEconomyHandler.getDebt(uuid);
-
+    private static int[] calculateIncrements(double balance, double debt) {
         // Fall back to fixed amounts if player has less than 100 coins or is in debt
         if (balance < 100 || debt > 0) {
             return new int[]{10, 50, 100};
@@ -252,8 +262,13 @@ public class BettingMenu {
     }
 
     public static void shutdown() {
-        activeSessions.clear();
-        BettingMenuEvents.menus.clear();
+        for (BetSession session : List.copyOf(activeSessions.values())) {
+            activeSessions.remove(session.playerUUID, session);
+            BettingMenuEvents.menus.remove(session.inventory);
+            Player player = Bukkit.getPlayer(session.playerUUID);
+            if (player != null && player.getOpenInventory().getTopInventory() == session.inventory)
+                player.closeInventory();
+        }
     }
 
     /**
@@ -291,6 +306,9 @@ public class BettingMenu {
         final UUID playerUUID;
         final GameType gameType;
         int betAmount;
+        Inventory inventory;
+        int[] increments;
+        int maximumDisplayedBet;
 
         BetSession(UUID playerUUID, GameType gameType, int betAmount) {
             this.playerUUID = playerUUID;
@@ -311,7 +329,7 @@ public class BettingMenu {
             if (player == null) return;
 
             BetSession session = activeSessions.get(player.getUniqueId());
-            if (session == null) {
+            if (session == null || session.inventory != event.getInventory()) {
                 player.closeInventory();
                 return;
             }
@@ -320,28 +338,26 @@ public class BettingMenu {
             int minBet = GamblingConfig.getMinBet();
 
             // Calculate increments based on player wealth
-            int[] increments = calculateIncrements(player.getUniqueId());
+            int[] increments = session.increments;
             int smallIncrement = increments[0];
             int mediumIncrement = increments[1];
             int largeIncrement = increments[2];
 
             switch (slot) {
-                case PLUS_10_SLOT -> session.betAmount = session.betAmount + smallIncrement;
-                case PLUS_50_SLOT -> session.betAmount = session.betAmount + mediumIncrement;
-                case PLUS_100_SLOT -> session.betAmount = session.betAmount + largeIncrement;
+                case PLUS_10_SLOT -> session.betAmount = (int) Math.min(Integer.MAX_VALUE, (long) session.betAmount + smallIncrement);
+                case PLUS_50_SLOT -> session.betAmount = (int) Math.min(Integer.MAX_VALUE, (long) session.betAmount + mediumIncrement);
+                case PLUS_100_SLOT -> session.betAmount = (int) Math.min(Integer.MAX_VALUE, (long) session.betAmount + largeIncrement);
                 case MINUS_10_SLOT -> session.betAmount = Math.max(minBet, session.betAmount - smallIncrement);
                 case MINUS_50_SLOT -> session.betAmount = Math.max(minBet, session.betAmount - mediumIncrement);
                 case MINUS_100_SLOT -> session.betAmount = Math.max(minBet, session.betAmount - largeIncrement);
-                case ALL_IN_SLOT -> session.betAmount = (int) GamblingEconomyHandler.getMaxBet(player.getUniqueId());
+                case ALL_IN_SLOT -> session.betAmount = session.maximumDisplayedBet;
                 case ZERO_SLOT -> session.betAmount = minBet;
                 case CANCEL_SLOT -> {
                     player.closeInventory();
                     return;
                 }
                 case PLAY_SLOT -> {
-                    if (GamblingEconomyHandler.canAffordBet(player.getUniqueId(), session.betAmount)) {
-                        startGame(player, session);
-                    }
+                    startGame(player, session);
                     return;
                 }
                 default -> {
@@ -355,8 +371,10 @@ public class BettingMenu {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            menus.remove(event.getInventory());
-            activeSessions.remove(event.getPlayer().getUniqueId());
+            if (!menus.remove(event.getInventory())) return;
+            BetSession session = activeSessions.get(event.getPlayer().getUniqueId());
+            if (session != null && session.inventory == event.getInventory())
+                activeSessions.remove(session.playerUUID, session);
         }
     }
 }

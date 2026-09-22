@@ -78,6 +78,8 @@ public class EconomySettingsConfig extends ConfigurationFile {
     private static String shopItemPrice;
     @Getter
     private static String shopBatchSellMessage;
+    @Getter
+    private static String shopTransactionFailedMessage;
 
 
     public EconomySettingsConfig() {
@@ -96,6 +98,9 @@ public class EconomySettingsConfig extends ConfigurationFile {
 
     @Override
     public void initializeValues() {
+        shopTransactionFailedMessage = ConfigurationEngine.setString(
+                List.of("Shown when a shop transaction could not be confirmed"), file, fileConfiguration,
+                "shopTransactionFailedMessage", "&cThe transaction could not be confirmed. Contact an administrator before trying again.", true);
         thisConfiguration = fileConfiguration;
         double netheriteLevel = CombatSystem.NETHERITE_TIER_LEVEL + 10D;
         double tridentLevel = CombatSystem.DIAMOND_TIER_LEVEL + 10D;

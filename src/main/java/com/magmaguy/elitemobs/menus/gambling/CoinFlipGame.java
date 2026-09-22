@@ -45,14 +45,33 @@ public class CoinFlipGame {
      */
     public static void startGame(Player player, int betAmount) {
         CoinFlipSession session = new CoinFlipSession(player.getUniqueId(), betAmount);
-        activeSessions.put(player.getUniqueId(), session);
+        try {
 
-        String title = GamblingConfig.getCoinFlipMenuTitle();
-        Inventory inventory = Bukkit.createInventory(player, 27, title);
+            String title = GamblingConfig.getCoinFlipMenuTitle();
+            Inventory inventory = Bukkit.createInventory(player, 27, title);
+            session.inventory = inventory;
+            activeSessions.put(player.getUniqueId(), session);
 
-        setupInitialDisplay(inventory, session);
-        player.openInventory(inventory);
-        CoinFlipMenuEvents.menus.add(inventory);
+            setupInitialDisplay(inventory, session);
+            CoinFlipMenuEvents.menus.add(inventory);
+            try {
+                player.openInventory(inventory);
+            } finally {
+                if (player.getOpenInventory().getTopInventory() != inventory)
+                    throw new IllegalStateException("Gambling inventory opening was cancelled");
+            }
+        } catch (RuntimeException failure) {
+            activeSessions.remove(session.playerUUID, session);
+            CoinFlipMenuEvents.menus.remove(session.inventory);
+            try {
+                // Setup never reached a playable game. Preserve an already selected outcome if one exists.
+                GamblingEconomyHandler.resolveOutcome(session.playerUUID, session.betAmount);
+            } catch (RuntimeException settlementFailure) {
+                failure.addSuppressed(settlementFailure);
+            }
+            com.magmaguy.magmacore.util.Logger.warn("Could not open gambling game for " + session.playerUUID + ": " + failure);
+            player.sendMessage(com.magmaguy.elitemobs.config.EconomySettingsConfig.getShopTransactionFailedMessage());
+        }
     }
 
     /**
@@ -320,8 +339,24 @@ public class CoinFlipGame {
     }
 
     public static void shutdown() {
-        activeSessions.clear();
-        CoinFlipMenuEvents.menus.clear();
+        for (CoinFlipSession session : List.copyOf(activeSessions.values())) {
+            closeSession(session);
+            Player player = Bukkit.getPlayer(session.playerUUID);
+            if (player != null && player.getOpenInventory().getTopInventory() == session.inventory)
+                player.closeInventory();
+        }
+    }
+
+    private static void closeSession(CoinFlipSession session) {
+        if (!activeSessions.remove(session.playerUUID, session)) return;
+        CoinFlipMenuEvents.menus.remove(session.inventory);
+        double payout = 0;
+        try {
+            // An already-selected payout is retained by the economy owner, including rejected credits.
+            GamblingEconomyHandler.resolveOutcome(session.playerUUID, payout);
+        } catch (RuntimeException failure) {
+            com.magmaguy.magmacore.util.Logger.warn("Gambling close could not settle " + session.playerUUID + ": " + failure);
+        }
     }
 
     /**
@@ -352,7 +387,7 @@ public class CoinFlipGame {
             if (player == null) return;
 
             CoinFlipSession session = activeSessions.get(player.getUniqueId());
-            if (session == null || session.hasChosen) return;
+            if (session == null || session.inventory != event.getInventory() || session.hasChosen) return;
 
             int slot = event.getSlot();
 
@@ -365,13 +400,9 @@ public class CoinFlipGame {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            if (!menus.remove(event.getInventory())) return;
-            CoinFlipSession session = activeSessions.remove(event.getPlayer().getUniqueId());
-            if (session == null) return;
-            // If player closed without choosing, forfeit the bet
-            if (!session.hasChosen) {
-                GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), 0);
-            }
+            if (!menus.contains(event.getInventory())) return;
+            CoinFlipSession session = activeSessions.get(event.getPlayer().getUniqueId());
+            if (session != null && session.inventory == event.getInventory()) closeSession(session);
         }
     }
 }

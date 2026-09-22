@@ -170,16 +170,6 @@ public class ArrowShopMenu {
             ArrowItem arrowItem = slotToArrow.get(event.getSlot());
             if (arrowItem == null) return;
 
-            // Check if player has enough money
-            double playerBalance = EconomyHandler.checkCurrency(player.getUniqueId());
-            if (playerBalance < arrowItem.price) {
-                player.sendMessage(
-                        ArrowShopMenuConfig.getInsufficientFundsMessage()
-                                .replace("%price%", String.valueOf(arrowItem.price))
-                );
-                return;
-            }
-
             // Check if player has inventory space
             if (player.getInventory().firstEmpty() == -1) {
                 player.sendMessage(ArrowShopMenuConfig.getInventoryFullMessage());
@@ -187,8 +177,7 @@ public class ArrowShopMenu {
             }
 
             // Process purchase
-            EconomyHandler.subtractCurrency(player.getUniqueId(), arrowItem.price);
-            player.getInventory().addItem(createArrowItem(arrowItem));
+            if (!SharedShopElements.purchase(player, createArrowItem(arrowItem), arrowItem.price)) return;
 
             player.sendMessage(
                     ArrowShopMenuConfig.getPurchaseSuccessMessage()

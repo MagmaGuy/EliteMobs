@@ -54,29 +54,48 @@ public class BlackjackGame {
      */
     public static void startGame(Player player, int betAmount) {
         BlackjackSession session = new BlackjackSession(player.getUniqueId(), betAmount);
+        try {
 
-        // Deal initial cards
-        session.playerHand.add(drawCard(session));
-        session.dealerHand.add(drawCard(session));
-        session.playerHand.add(drawCard(session));
-        session.dealerHand.add(drawCard(session));
+            // Deal initial cards
+            session.playerHand.add(drawCard(session));
+            session.dealerHand.add(drawCard(session));
+            session.playerHand.add(drawCard(session));
+            session.dealerHand.add(drawCard(session));
 
-        activeSessions.put(player.getUniqueId(), session);
 
-        String title = GamblingConfig.getBlackjackMenuTitle();
-        Inventory inventory = Bukkit.createInventory(player, 54, title);
+            String title = GamblingConfig.getBlackjackMenuTitle();
+            Inventory inventory = Bukkit.createInventory(player, 54, title);
+            session.inventory = inventory;
+            activeSessions.put(player.getUniqueId(), session);
 
-        updateDisplay(inventory, session, false);
+            updateDisplay(inventory, session, false);
 
-        // Check for natural blackjack
-        if (calculateHandValue(session.playerHand) == 21) {
-            // Player got blackjack on first deal
-            session.gameState = GameState.PLAYER_BLACKJACK;
-            processEndGame(player, session, inventory);
+            // Check for natural blackjack
+            if (calculateHandValue(session.playerHand) == 21) {
+                // Player got blackjack on first deal
+                session.gameState = GameState.PLAYER_BLACKJACK;
+                processEndGame(player, session, inventory);
+            }
+
+            BlackjackMenuEvents.menus.add(inventory);
+            try {
+                player.openInventory(inventory);
+            } finally {
+                if (player.getOpenInventory().getTopInventory() != inventory)
+                    throw new IllegalStateException("Gambling inventory opening was cancelled");
+            }
+        } catch (RuntimeException failure) {
+            activeSessions.remove(session.playerUUID, session);
+            BlackjackMenuEvents.menus.remove(session.inventory);
+            try {
+                // Setup never reached a playable game. Preserve an already selected outcome if one exists.
+                GamblingEconomyHandler.resolveOutcome(session.playerUUID, session.betAmount);
+            } catch (RuntimeException settlementFailure) {
+                failure.addSuppressed(settlementFailure);
+            }
+            com.magmaguy.magmacore.util.Logger.warn("Could not open gambling game for " + session.playerUUID + ": " + failure);
+            player.sendMessage(com.magmaguy.elitemobs.config.EconomySettingsConfig.getShopTransactionFailedMessage());
         }
-
-        player.openInventory(inventory);
-        BlackjackMenuEvents.menus.add(inventory);
     }
 
     /**
@@ -296,13 +315,18 @@ public class BlackjackGame {
         if (session.gameState != GameState.PLAYING || !session.canDoubleDown) return;
         if (session.playerHand.size() != 2) return;
 
-        // SAFETY-FIRST: Process the additional bet
+        long doubledBet = (long) session.betAmount * 2;
+        if (doubledBet > Integer.MAX_VALUE) {
+            player.sendMessage(GamblingConfig.getInsufficientFundsMessage());
+            return;
+        }
+        // Validate representation before charging the additional stake.
         if (!GamblingEconomyHandler.placeBet(player.getUniqueId(), session.betAmount)) {
             player.sendMessage(GamblingConfig.getInsufficientFundsMessage());
             return;
         }
 
-        session.betAmount *= 2;
+        session.betAmount = (int) doubledBet;
         session.canDoubleDown = false;
 
         // Draw exactly one card
@@ -450,8 +474,35 @@ public class BlackjackGame {
     }
 
     public static void shutdown() {
-        activeSessions.clear();
-        BlackjackMenuEvents.menus.clear();
+        for (BlackjackSession session : List.copyOf(activeSessions.values())) {
+            closeSession(session);
+            Player player = Bukkit.getPlayer(session.playerUUID);
+            if (player != null && player.getOpenInventory().getTopInventory() == session.inventory)
+                player.closeInventory();
+        }
+    }
+
+    private static void closeSession(BlackjackSession session) {
+        if (!activeSessions.remove(session.playerUUID, session)) return;
+        BlackjackMenuEvents.menus.remove(session.inventory);
+        double payout = 0;
+        if (session.gameState == GameState.DEALER_TURN) {
+            while (calculateHandValue(session.dealerHand) < 17) session.dealerHand.add(drawCard(session));
+            int dealer = calculateHandValue(session.dealerHand);
+            int player = calculateHandValue(session.playerHand);
+            if (dealer > 21 || player > dealer)
+                payout = GamblingEconomyHandler.calculatePayout(session.betAmount, GamblingConfig.getBlackjackPayoutNormal());
+            else if (player == dealer) payout = session.betAmount;
+        }
+        try {
+            // An already-selected payout is retained by the economy owner, including rejected credits.
+            double awarded = GamblingEconomyHandler.resolveOutcome(session.playerUUID, payout);
+            Player player = Bukkit.getPlayer(session.playerUUID);
+            if (awarded > 0 && player != null && player.isOnline())
+                GamblingDisplay.sendWinMessage(player, awarded - session.betAmount, GamblingConfig.getBettingBlackjackName());
+        } catch (RuntimeException failure) {
+            com.magmaguy.magmacore.util.Logger.warn("Gambling close could not settle " + session.playerUUID + ": " + failure);
+        }
     }
 
     /**
@@ -523,7 +574,7 @@ public class BlackjackGame {
             if (player == null) return;
 
             BlackjackSession session = activeSessions.get(player.getUniqueId());
-            if (session == null || session.gameState != GameState.PLAYING) return;
+            if (session == null || session.inventory != event.getInventory() || session.gameState != GameState.PLAYING) return;
 
             int slot = event.getSlot();
 
@@ -538,34 +589,9 @@ public class BlackjackGame {
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            if (!menus.remove(event.getInventory())) return;
-            BlackjackSession session = activeSessions.remove(event.getPlayer().getUniqueId());
-            if (session == null) return;
-
-            // If closed during dealer's turn, resolve the hand
-            if (session.gameState == GameState.DEALER_TURN) {
-                // Play out dealer's hand
-                while (calculateHandValue(session.dealerHand) < 17) {
-                    session.dealerHand.add(drawCard(session));
-                }
-                int dealerTotal = calculateHandValue(session.dealerHand);
-                int playerTotal = calculateHandValue(session.playerHand);
-
-                double payout = 0;
-                if (dealerTotal > 21 || playerTotal > dealerTotal) {
-                    payout = session.betAmount * GamblingConfig.getBlackjackPayoutNormal();
-                } else if (playerTotal == dealerTotal) {
-                    payout = session.betAmount; // Push - return bet
-                }
-
-                double awarded = GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), payout);
-                if (awarded > 0 && event.getPlayer() instanceof Player player) {
-                    GamblingDisplay.sendWinMessage(player, awarded - session.betAmount, GamblingConfig.getBettingBlackjackName());
-                }
-            } else if (session.gameState == GameState.PLAYING) {
-                // Player closed mid-game without standing — forfeit
-                GamblingEconomyHandler.resolveOutcome(event.getPlayer().getUniqueId(), 0);
-            }
+            if (!menus.contains(event.getInventory())) return;
+            BlackjackSession session = activeSessions.get(event.getPlayer().getUniqueId());
+            if (session != null && session.inventory == event.getInventory()) closeSession(session);
         }
     }
 }

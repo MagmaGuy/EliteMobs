@@ -31,15 +31,25 @@ public class GamblingEconomyHandler {
      * Positive = house profit, Negative = house loss (players winning more than losing).
      */
     @Getter
-    private static double houseEarnings = 0;
+    private static volatile double houseEarnings = 0;
 
     /**
      * Tracks players with active, unresolved gambling sessions.
      * Added by {@link #placeBet}, removed by {@link #resolveOutcome}.
-     * Guarantees that every game session is financially resolved exactly once.
+     * A marker is removed only after a known outcome settles. External provider exceptions
+     * remain manual reconciliation cases, with no automatic replay.
      */
     private static final Set<UUID> unresolvedGames = ConcurrentHashMap.newKeySet();
+    private static final java.util.Map<UUID, Double> pendingPayouts = new java.util.HashMap<>();
+    private static final Set<UUID> uncertainTransactions = new java.util.HashSet<>();
+    private static final Set<UUID> transactionsInProgress = new java.util.HashSet<>();
 
+    private static final Object houseStateLock = new Object();
+    private static final Object houseWriteLock = new Object();
+    private static long houseRevision;
+    private static long savedHouseRevision;
+    private static volatile long saveGeneration;
+    private static org.bukkit.scheduler.BukkitTask saveTask;
     private static File houseDataFile;
     private static FileConfiguration houseDataConfig;
 
@@ -48,56 +58,73 @@ public class GamblingEconomyHandler {
      * Loads saved earnings from disk.
      */
     public static void initialize() {
-        unresolvedGames.clear();
-        if (!GamblingConfig.isGamblingEnabled()) return;
-
-        houseDataFile = new File(MetadataHandler.PLUGIN.getDataFolder(), "house_earnings.yml");
-        if (!houseDataFile.exists()) {
+        if (saveTask != null) saveTask.cancel();
+        saveTask = null;
+        synchronized (houseWriteLock) {
+            ++saveGeneration;
+            if (!GamblingConfig.isGamblingEnabled()) return;
+            houseDataFile = new File(MetadataHandler.PLUGIN.getDataFolder(), "house_earnings.yml");
+            YamlConfiguration loaded = new YamlConfiguration();
             try {
-                if (!houseDataFile.createNewFile()) {
-                    Logger.warn("Could not create house_earnings.yml; gambling totals will not persist.");
+                loaded.load(houseDataFile);
+            } catch (java.io.FileNotFoundException missing) {
+                // A new installation starts at zero and creates its file on the first change.
+            } catch (IOException | org.bukkit.configuration.InvalidConfigurationException failure) {
+                houseDataConfig = null;
+                Logger.warn("Cannot load house_earnings.yml; preserving the file and unsaved totals: " + failure);
+                return;
+            }
+            houseDataConfig = loaded;
+            synchronized (houseStateLock) {
+                if (houseRevision == savedHouseRevision) houseEarnings = loaded.getDouble("houseEarnings", 0);
+            }
+            long generation = saveGeneration;
+            saveTask = org.bukkit.Bukkit.getScheduler().runTaskTimerAsynchronously(MetadataHandler.PLUGIN,
+                    () -> saveHouseEarnings(generation), 100L, 100L);
+        }
+    }
+
+    public static void saveHouseEarnings() {
+        saveHouseEarnings(saveGeneration);
+    }
+
+    private static void saveHouseEarnings(long generation) {
+        synchronized (houseWriteLock) {
+            if (generation != saveGeneration || houseDataConfig == null) return;
+            final double value;
+            final long revision;
+            synchronized (houseStateLock) {
+                if (houseRevision == savedHouseRevision) return;
+                value = houseEarnings;
+                revision = houseRevision;
+            }
+            houseDataConfig.set("houseEarnings", value);
+            try {
+                com.magmaguy.magmacore.config.ConfigurationEngine.fileSaverSerialized(
+                        houseDataConfig.saveToString(), houseDataFile);
+                synchronized (houseStateLock) {
+                    savedHouseRevision = revision;
                 }
-            } catch (IOException e) {
-                Logger.warn("Could not create house_earnings.yml: " + e.getMessage());
+            } catch (RuntimeException failure) {
+                Logger.warn("Could not save house_earnings.yml; total retained for retry: " + value + "; " + failure);
             }
         }
-        houseDataConfig = YamlConfiguration.loadConfiguration(houseDataFile);
-        houseEarnings = houseDataConfig.getDouble("houseEarnings", 0);
     }
 
-    /**
-     * Saves the house earnings to disk.
-     */
-    public static void saveHouseEarnings() {
-        if (houseDataConfig == null) return;
-        houseDataConfig.set("houseEarnings", houseEarnings);
-        try {
-            houseDataConfig.save(houseDataFile);
-        } catch (IOException e) {
-            Logger.warn("Could not save house_earnings.yml: " + e.getMessage());
+    public static void recordHouseWin(double amount) {
+        if (!isPositiveAmount(amount)) return;
+        synchronized (houseStateLock) {
+            houseEarnings += amount;
+            ++houseRevision;
         }
     }
 
-    /**
-     * Records earnings for the house (when a player loses).
-     *
-     * @param amount The amount the house won
-     */
-    public static void recordHouseWin(double amount) {
-        if (!isPositiveAmount(amount)) return;
-        houseEarnings += amount;
-        saveHouseEarnings();
-    }
-
-    /**
-     * Records a loss for the house (when a player wins).
-     *
-     * @param amount The amount the house lost
-     */
     public static void recordHouseLoss(double amount) {
         if (!isPositiveAmount(amount)) return;
-        houseEarnings -= amount;
-        saveHouseEarnings();
+        synchronized (houseStateLock) {
+            houseEarnings -= amount;
+            ++houseRevision;
+        }
     }
 
     /**
@@ -117,8 +144,15 @@ public class GamblingEconomyHandler {
      * Shuts down the handler and saves data.
      */
     public static void shutdown() {
-        saveHouseEarnings();
-        unresolvedGames.clear();
+        if (saveTask != null) saveTask.cancel();
+        saveTask = null;
+        synchronized (houseWriteLock) {
+            ++saveGeneration;
+            saveHouseEarnings(saveGeneration);
+        }
+        if (!pendingPayouts.isEmpty() || !uncertainTransactions.isEmpty())
+            Logger.warn("Unsettled gambling payments retained in memory: payouts=" + pendingPayouts
+                    + "; uncertain players=" + uncertainTransactions + ". Reconcile before restarting the server.");
     }
 
     /**
@@ -129,7 +163,7 @@ public class GamblingEconomyHandler {
      * @return true if they can afford it (including credit)
      */
     public static boolean canAffordBet(UUID uuid, double betAmount) {
-        if (!GamblingConfig.isGamblingEnabled() || uuid == null) return false;
+        if (!GamblingConfig.isGamblingEnabled() || !EconomyHandler.isReady(uuid)) return false;
         betAmount = Round.twoDecimalPlaces(betAmount);
         if (!isPositiveAmount(betAmount)) return false;
         double balance = EconomyHandler.checkCurrency(uuid);
@@ -176,37 +210,45 @@ public class GamblingEconomyHandler {
      * @return true if the bet was successfully placed, false if they can't afford it
      */
     public static boolean placeBet(UUID uuid, double betAmount) {
-        betAmount = Round.twoDecimalPlaces(betAmount);
-        if (!canAffordBet(uuid, betAmount)) {
+        if (!org.bukkit.Bukkit.isPrimaryThread()) throw new IllegalStateException("Gambling mutation off server thread");
+        if (!GamblingConfig.isGamblingEnabled() || !EconomyHandler.isReady(uuid)) return false;
+        if (uncertainTransactions.contains(uuid)) {
+            transactionFailure(uuid, "An earlier gambling provider result needs manual reconciliation");
             return false;
         }
-
-        double balance = EconomyHandler.checkCurrency(uuid);
-
-        if (balance >= betAmount) {
-            // Player has enough balance - deduct from balance
-            EconomyHandler.subtractCurrency(uuid, betAmount);
-        } else {
-            // Player needs to go into debt
-            double fromBalance = balance;
-            double fromDebt = betAmount - balance;
-
-            // Take all remaining balance (subtractCurrency is Vault-aware; setCurrency is a no-op under Vault)
-            if (fromBalance > 0) {
-                EconomyHandler.subtractCurrency(uuid, fromBalance);
-            }
-
-            // Add the rest to debt
-            PlayerData.addGamblingDebt(uuid, fromDebt);
+        if (pendingPayouts.containsKey(uuid)) {
+            // Only an explicit rejected credit can reach this retry; ambiguous calls stay blocked.
+            try { resolveOutcome(uuid, pendingPayouts.get(uuid)); }
+            catch (IllegalStateException rejected) { return false; }
         }
-
-        // House takes the bet
-        recordHouseWin(betAmount);
-
-        // Mark this player as having an unresolved game
-        unresolvedGames.add(uuid);
-
-        return true;
+        betAmount = Round.twoDecimalPlaces(betAmount);
+        if (!isPositiveAmount(betAmount) || !transactionsInProgress.add(uuid)) return false;
+        try {
+            double balance = EconomyHandler.checkCurrency(uuid);
+            double debt = PlayerData.getGamblingDebt(uuid);
+            if (!Double.isFinite(balance) || !Double.isFinite(debt) || balance + MAX_DEBT - debt < betAmount)
+                return false;
+            double fromBalance = Math.min(Math.max(0, balance), betAmount);
+            double fromDebt = Round.twoDecimalPlaces(betAmount - fromBalance);
+            try {
+                if (VaultCompatibility.VAULT_ENABLED) {
+                    if (fromBalance > 0 && !EconomyHandler.tryWithdraw(uuid, fromBalance)) return false;
+                    if (fromDebt > 0) PlayerData.setGamblingDebt(uuid, debt + fromDebt);
+                } else {
+                    PlayerData.setCurrencyAndGamblingDebt(uuid, balance - fromBalance, debt + fromDebt);
+                }
+            } catch (RuntimeException failure) {
+                uncertainTransactions.add(uuid);
+                transactionFailure(uuid, "Unconfirmed gambling stake " + betAmount + "; balance debit="
+                        + fromBalance + "; debt addition=" + fromDebt + "; " + failure);
+                return false;
+            }
+            unresolvedGames.add(uuid);
+            recordHouseWin(betAmount);
+            return true;
+        } finally {
+            transactionsInProgress.remove(uuid);
+        }
     }
 
     /**
@@ -220,44 +262,54 @@ public class GamblingEconomyHandler {
      * @return The actual amount awarded (0 if already resolved or loss)
      */
     public static double resolveOutcome(UUID uuid, double payoutAmount) {
-        if (uuid == null) return 0;
-        if (!unresolvedGames.remove(uuid)) return 0; // Already resolved or no active game
-        payoutAmount = Round.twoDecimalPlaces(payoutAmount);
-        if (isPositiveAmount(payoutAmount)) {
-            awardWinnings(uuid, payoutAmount);
-            return payoutAmount;
+        if (!org.bukkit.Bukkit.isPrimaryThread()) throw new IllegalStateException("Gambling mutation off server thread");
+        if (uuid == null || !unresolvedGames.contains(uuid)) return 0;
+        if (uncertainTransactions.contains(uuid))
+            throw new IllegalStateException("An earlier gambling provider result needs manual reconciliation for " + uuid);
+        if (!Double.isFinite(payoutAmount) || payoutAmount < 0)
+            throw new IllegalArgumentException("Invalid gambling payout");
+        if (!transactionsInProgress.add(uuid)) throw new IllegalStateException("Gambling transaction already in progress");
+        try {
+            double owed = pendingPayouts.computeIfAbsent(uuid, ignored -> Round.twoDecimalPlaces(payoutAmount));
+            if (owed > 0 && !EconomyHandler.isReady(uuid))
+                throw new IllegalStateException("Player data unavailable; gambling payout retained for " + uuid);
+            if (owed > 0) {
+                boolean accepted;
+                try {
+                    accepted = EconomyHandler.tryCredit(uuid, owed);
+                } catch (RuntimeException failure) {
+                    uncertainTransactions.add(uuid);
+                    transactionFailure(uuid, "Unconfirmed gambling payout " + owed + "; " + failure);
+                    throw failure;
+                }
+                if (!accepted) {
+                    transactionFailure(uuid, "Provider rejected gambling payout " + owed + "; payout retained");
+                    throw new IllegalStateException("Gambling payout rejected for " + uuid);
+                }
+                recordHouseLoss(owed);
+            }
+            pendingPayouts.remove(uuid);
+            unresolvedGames.remove(uuid);
+            return owed;
+        } finally {
+            transactionsInProgress.remove(uuid);
         }
-        return 0;
     }
 
-    /**
-     * Awards winnings to a player. Winnings are first applied to pay off debt.
-     * Internal — games should use {@link #resolveOutcome} instead.
-     *
-     * @param uuid   The player's UUID
-     * @param amount The amount won (including original bet if applicable)
-     */
+    /** Direct callers receive a failure instead of a false successful payout. */
     public static void awardWinnings(UUID uuid, double amount) {
-        if (uuid == null) return;
+        if (uuid == null || !isPositiveAmount(amount)) return;
         amount = Round.twoDecimalPlaces(amount);
-        if (!isPositiveAmount(amount)) return;
-
-        // House pays out the winnings
+        if (!EconomyHandler.tryCredit(uuid, amount))
+            throw new IllegalStateException("Provider rejected gambling payout for " + uuid);
         recordHouseLoss(amount);
+    }
 
-        double currentDebt = PlayerData.getGamblingDebt(uuid);
-
-        if (currentDebt > 0) {
-            // Pay off debt first
-            double debtPayment = Math.min(currentDebt, amount);
-            PlayerData.reduceGamblingDebt(uuid, debtPayment);
-            amount -= debtPayment;
-        }
-
-        // Add remaining amount to balance
-        if (amount > 0) {
-            EconomyHandler.addCurrency(uuid, amount);
-        }
+    private static void transactionFailure(UUID uuid, String reason) {
+        Logger.warn(reason + "; player=" + uuid);
+        var player = org.bukkit.Bukkit.getPlayer(uuid);
+        if (player != null && player.isOnline())
+            player.sendMessage(com.magmaguy.elitemobs.config.EconomySettingsConfig.getShopTransactionFailedMessage());
     }
 
     /**

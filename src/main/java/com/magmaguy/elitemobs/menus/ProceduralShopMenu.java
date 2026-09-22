@@ -205,7 +205,7 @@ public class ProceduralShopMenu {
                     player.sendMessage(ProceduralShopMenuConfig.messageFullInventory);
                     player.closeInventory();
 
-                } else if (EconomyHandler.checkCurrency(player.getUniqueId()) >= itemValue) {
+                } else {
                     // Check gear restriction before allowing purchase
                     if (!GearRestrictionHandler.canEquip(player, itemStack)) {
                         GearRestrictionHandler.sendRestrictionMessage(player, itemStack);
@@ -213,17 +213,9 @@ public class ProceduralShopMenu {
                     }
 
                     // Player has enough money and meets skill requirements
-                    EconomyHandler.subtractCurrency(player.getUniqueId(), itemValue);
-                    new EliteItemLore(itemStack, false);
-                    player.getInventory().addItem(itemStack);
+                    if (!SharedShopElements.purchase(player, itemStack, itemValue)) return;
                     populateShop(event.getInventory(), Bukkit.getPlayer(event.getWhoClicked().getUniqueId()));
                     SharedShopElements.buyMessage(player, itemDisplayName, itemValue);
-
-                } else {
-
-                    player.closeInventory();
-                    menus.remove(player);
-                    SharedShopElements.insufficientFundsMessage(player, itemValue);
 
                 }
 

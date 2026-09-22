@@ -27,17 +27,38 @@ import java.util.Set;
 
 public class SellMenu extends EliteMenu implements Listener {
 
-    private static final List<Integer> validSlots = SellMenuConfig.storeSlots;
+    private static final java.util.Map<Inventory, List<Integer>> inputSlots = new java.util.IdentityHashMap<>();
 
     public static Set<Inventory> inventories = new HashSet<>();
+    private static final Set<Inventory> selling = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+    // Ambiguous external credits keep their stock out of automatic return/retry paths.
+    private static final java.util.Map<java.util.UUID, List<HeldSale>> uncertainSales = new java.util.HashMap<>();
+    private record HeldSale(ItemStack item, double proceeds) {}
 
     public static void shutdown() {
-        inventories.clear();
+        for (Inventory inventory : List.copyOf(inventories)) {
+            if (!(inventory.getHolder() instanceof Player player)) continue;
+            close(player, inventory);
+            if (player.getOpenInventory().getTopInventory() == inventory) player.closeInventory();
+        }
+        if (!uncertainSales.isEmpty())
+            com.magmaguy.magmacore.util.Logger.warn("Unconfirmed sale stock retained for manual reconciliation before restart: " + uncertainSales);
+    }
+
+    private static List<Integer> slotsFor(Inventory inventory) {
+        return inputSlots.getOrDefault(inventory, List.of());
+    }
+
+    private static void close(Player player, Inventory inventory) {
+        if (!inventories.remove(inventory)) return;
+        List<Integer> slots = inputSlots.remove(inventory);
+        if (slots == null) return;
+        EliteMenu.cancel(player, inventory, player.getInventory(), slots);
     }
 
     private static double calculateShopValue(Inventory shopInventory, Player player) {
         double itemWorth = 0;
-        for (Integer validSlot : validSlots) {
+        for (Integer validSlot : slotsFor(shopInventory)) {
             ItemStack itemStack = shopInventory.getItem(validSlot);
             if (itemStack == null) continue;
             itemWorth += (ItemWorthCalculator.determineResaleWorth(itemStack, player) * itemStack.getAmount());
@@ -67,6 +88,7 @@ public class SellMenu extends EliteMenu implements Listener {
      */
     public void constructSellMenu(Player player) {
 
+        List<Integer> validSlots = List.copyOf(SellMenuConfig.storeSlots);
         String menuName = SellMenuConfig.shopName;
         if (DefaultConfig.useResourcePackModels())
             menuName = ChatColor.WHITE + "\uDB83\uDEF1\uDB83\uDE05\uDB83\uDEF5          " + menuName;
@@ -111,8 +133,13 @@ public class SellMenu extends EliteMenu implements Listener {
 
         }
 
-        player.openInventory(sellInventory);
+        inputSlots.put(sellInventory, validSlots);
         createEliteMenu(sellInventory, inventories);
+        try {
+            player.openInventory(sellInventory);
+        } finally {
+            if (player.getOpenInventory().getTopInventory() != sellInventory) close(player, sellInventory);
+        }
 
     }
 
@@ -146,7 +173,7 @@ public class SellMenu extends EliteMenu implements Listener {
 
             //If the shop is full, don't let the player put stuff in it
             int firstEmptySlot = -1;
-            for (int i : validSlots)
+            for (int i : slotsFor(shopInventory))
                 if (shopInventory.getItem(i) == null) {
                     firstEmptySlot = i;
                     break;
@@ -170,37 +197,61 @@ public class SellMenu extends EliteMenu implements Listener {
             //sell items in shop
             if (event.getSlot() == SellMenuConfig.confirmSlot) {
 
-                int amount = (int) validSlots.stream().filter(validSlot -> shopInventory.getItem(validSlot) != null).count();
-                double totalItemValue = 0;
-
-                for (Integer validSlot : validSlots) {
-                    ItemStack itemStack = shopInventory.getItem(validSlot);
-                    if (itemStack == null)
-                        continue;
-                    double itemValue = ItemWorthCalculator.determineResaleWorth(itemStack, player) * itemStack.getAmount();
-                    EconomyHandler.addCurrency(player.getUniqueId(), itemValue);
-                    totalItemValue += itemValue;
-
-                    if (amount < 4)
-                        player.sendMessage(
-                                EconomySettingsConfig.getShopSellMessage()
-                                        .replace("$item_name", itemStack.getItemMeta().getDisplayName())
-                                        .replace("$currency_amount", EconomyHandler.formatCurrency(itemValue))
-                                        .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
-                    shopInventory.clear(validSlot);
+                if (!EconomyHandler.isReady(player.getUniqueId())) {
+                    player.sendMessage(EconomySettingsConfig.getShopTransactionFailedMessage());
+                    return;
                 }
-
-                if (amount >= 3)
-                    player.sendMessage(
-                            EconomySettingsConfig.getShopBatchSellMessage()
-                                    .replace("$currency_amount", EconomyHandler.formatCurrency(totalItemValue))
-                                    .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
-
-                player.sendMessage(
-                        EconomySettingsConfig.getShopCurrentBalance()
-                                .replace("$currency_amount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId())))
-                                .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
-                updateConfirmButton(0);
+                if (!selling.add(shopInventory)) return;
+                double totalItemValue = 0;
+                int sold = 0;
+                try {
+                    for (Integer validSlot : slotsFor(shopInventory)) {
+                        ItemStack itemStack = shopInventory.getItem(validSlot);
+                        if (itemStack == null) continue;
+                        ItemStack held = itemStack.clone();
+                        double itemValue = ItemWorthCalculator.determineResaleWorth(held, player) * held.getAmount();
+                        if (!Double.isFinite(itemValue) || itemValue < 0) {
+                            player.sendMessage(EconomySettingsConfig.getShopTransactionFailedMessage());
+                            break;
+                        }
+                        // Own the stock before entering a provider which may reenter menu callbacks.
+                        shopInventory.clear(validSlot);
+                        boolean accepted;
+                        try {
+                            accepted = EconomyHandler.tryCredit(player.getUniqueId(), itemValue);
+                        } catch (RuntimeException failure) {
+                            uncertainSales.computeIfAbsent(player.getUniqueId(), ignored -> new ArrayList<>())
+                                    .add(new HeldSale(held, itemValue));
+                            com.magmaguy.magmacore.util.Logger.warn("Unconfirmed sale credit; retained stock for "
+                                    + player.getUniqueId() + "; proceeds=" + itemValue + "; item=" + held + "; " + failure);
+                            player.sendMessage(EconomySettingsConfig.getShopTransactionFailedMessage());
+                            break;
+                        }
+                        if (!accepted) {
+                            if (inventories.contains(shopInventory) && player.getOpenInventory().getTopInventory() == shopInventory
+                                    && shopInventory.getItem(validSlot) == null) shopInventory.setItem(validSlot, held);
+                            else returnUnsold(player, held);
+                            player.sendMessage(EconomySettingsConfig.getShopTransactionFailedMessage());
+                            break;
+                        }
+                        ++sold;
+                        totalItemValue += itemValue;
+                        // A provider callback may have closed the menu and returned all other stock.
+                        if (!inventories.contains(shopInventory)) break;
+                    }
+                } finally {
+                    selling.remove(shopInventory);
+                }
+                if (sold > 0) {
+                    player.sendMessage(EconomySettingsConfig.getShopBatchSellMessage()
+                            .replace("$currency_amount", EconomyHandler.formatCurrency(totalItemValue))
+                            .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
+                    player.sendMessage(EconomySettingsConfig.getShopCurrentBalance()
+                            .replace("$currency_amount", EconomyHandler.formatCurrency(EconomyHandler.checkCurrency(player.getUniqueId())))
+                            .replace("$currency_name", EconomySettingsConfig.getCurrencyName()));
+                }
+                if (inventories.contains(shopInventory))
+                    shopInventory.setItem(SellMenuConfig.confirmSlot, updateConfirmButton(calculateShopValue(shopInventory, player)));
                 return;
             }
 
@@ -211,7 +262,7 @@ public class SellMenu extends EliteMenu implements Listener {
             }
 
             //If player clicks on a border glass pane, do nothing
-            if (!validSlots.contains(event.getSlot())) return;
+            if (!slotsFor(shopInventory).contains(event.getSlot())) return;
 
 
             //If player clicks on one of the items already in the shop, return to their inventory
@@ -223,12 +274,16 @@ public class SellMenu extends EliteMenu implements Listener {
     }
 
 
+    private static void returnUnsold(Player player, ItemStack item) {
+        for (ItemStack overflow : player.getInventory().addItem(item).values()) {
+            var dropped = player.getWorld().dropItem(player.getLocation(), overflow);
+            dropped.setOwner(player.getUniqueId());
+        }
+    }
+
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (inventories.contains(event.getInventory())) {
-            inventories.remove(event.getInventory());
-            EliteMenu.cancel(event.getPlayer(), event.getView().getTopInventory(), event.getView().getBottomInventory(), SellMenuConfig.storeSlots);
-        }
+        if (event.getPlayer() instanceof Player player) close(player, event.getInventory());
     }
 
 }

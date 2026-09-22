@@ -14,6 +14,8 @@ import java.util.UUID;
  */
 public class EconomyHandler {
 
+    private static final java.util.Set<UUID> activeMutations = new java.util.HashSet<>();
+
     public static boolean isReady(UUID user) {
         return user != null && PlayerData.isDataLoaded(user);
     }
@@ -24,65 +26,94 @@ public class EconomyHandler {
     }
 
     public static void addCurrency(UUID user, double amount) {
-        requireReady(user);
-        double debt = PlayerData.getGamblingDebt(user);
-        if (debt > 0) {
-            double debtPayment = Math.min(debt, amount);
-            PlayerData.reduceGamblingDebt(user, debtPayment);
-            amount -= debtPayment;
-            double remainingDebt = debt - debtPayment;
-            Player player = Bukkit.getPlayer(user);
-            if (player != null && player.isOnline()) {
-                if (remainingDebt > 0)
-                    player.sendMessage(ChatColorConverter.convert(
-                            GamblingConfig.getDebtAutoCollectedMessage()
-                                    .replace("$amount", String.format("%.0f", debtPayment))
-                                    .replace("$remaining", String.format("%.0f", remainingDebt))));
-                else
-                    player.sendMessage(ChatColorConverter.convert(
-                            GamblingConfig.getDebtAutoClearedMessage()));
-            }
-            if (amount <= 0) return;
-        }
-        if (VaultCompatibility.VAULT_ENABLED) {
-            VaultCompatibility.addVaultCurrency(user, amount);
-            return;
-        }
-        // Storage layer is now cent-precise (PlayerData stores long cents); Round.twoDecimalPlaces is belt-and-suspenders.
-        PlayerData.setCurrency(user, Round.twoDecimalPlaces(checkCurrency(user) + amount));
+        if (!tryCredit(user, amount)) throw new IllegalStateException("Economy provider rejected credit for " + user);
     }
 
+    /** Checked ordinary proceeds, including debt collection. False commits neither proceeds nor debt. */
+    public static boolean tryCredit(UUID user, double amount) {
+        requireReady(user);
+        if (!Double.isFinite(amount) || amount < 0) throw new IllegalArgumentException("Invalid credit");
+        amount = Round.twoDecimalPlaces(amount);
+        if (amount == 0) return true;
+        if (!activeMutations.add(user)) return false;
+        try {
+            double debt = PlayerData.getGamblingDebt(user);
+            double collection = Math.min(debt, amount);
+            double proceeds = Round.twoDecimalPlaces(amount - collection);
+            double remainingDebt = Round.twoDecimalPlaces(debt - collection);
+            if (VaultCompatibility.VAULT_ENABLED) {
+                if (proceeds > 0) {
+                    var economy = VaultCompatibility.getEconomy();
+                    if (economy == null || !economy.depositPlayer(Bukkit.getOfflinePlayer(user), proceeds).transactionSuccess())
+                        return false;
+                }
+                // Commit local debt only after the external provider accepts the remaining proceeds.
+                if (collection > 0) PlayerData.setGamblingDebt(user, remainingDebt);
+            } else {
+                PlayerData.setCurrencyAndGamblingDebt(user,
+                        Round.twoDecimalPlaces(checkCurrency(user) + proceeds), remainingDebt);
+            }
+            if (collection > 0) notifyDebtCollection(user, collection, remainingDebt);
+            return true;
+        } finally {
+            activeMutations.remove(user);
+        }
+    }
+
+    private static void notifyDebtCollection(UUID user, double amount, double remainingDebt) {
+        try {
+            Player player = Bukkit.getPlayer(user);
+            if (player == null || !player.isOnline()) return;
+            player.sendMessage(ChatColorConverter.convert(remainingDebt > 0
+                    ? GamblingConfig.getDebtAutoCollectedMessage().replace("$amount", String.format("%.0f", amount))
+                            .replace("$remaining", String.format("%.0f", remainingDebt))
+                    : GamblingConfig.getDebtAutoClearedMessage()));
+        } catch (RuntimeException failure) {
+            com.magmaguy.magmacore.util.Logger.warn("Could not display accepted debt collection for " + user + ": " + failure);
+        }
+    }
 
     /** Checked purchase path. Call on the server thread with loaded player data. */
     public static boolean tryWithdraw(UUID user, double amount) {
         requireReady(user);
         if (!Double.isFinite(amount) || amount < 0) throw new IllegalArgumentException("Invalid purchase price");
-        if (VaultCompatibility.VAULT_ENABLED) {
-            var economy = VaultCompatibility.getEconomy();
-            return economy != null && economy.withdrawPlayer(Bukkit.getOfflinePlayer(user), amount).transactionSuccess();
+        if (!activeMutations.add(user)) return false;
+        try {
+            if (VaultCompatibility.VAULT_ENABLED) {
+                var economy = VaultCompatibility.getEconomy();
+                return economy != null && economy.withdrawPlayer(Bukkit.getOfflinePlayer(user), amount).transactionSuccess();
+            }
+            double balance = checkCurrency(user);
+            if (balance < amount) return false;
+            PlayerData.setCurrency(user, Round.twoDecimalPlaces(balance - amount));
+            return true;
+        } finally {
+            activeMutations.remove(user);
         }
-        double balance = checkCurrency(user);
-        if (balance < amount) return false;
-        PlayerData.setCurrency(user, Round.twoDecimalPlaces(balance - amount));
-        return true;
     }
 
     /** Returns an aborted purchase without diverting the refund into gambling debt. */
     public static boolean refundPayment(UUID user, double amount) {
         requireReady(user);
         if (!Double.isFinite(amount) || amount < 0) throw new IllegalArgumentException("Invalid refund");
-        if (VaultCompatibility.VAULT_ENABLED) {
-            var economy = VaultCompatibility.getEconomy();
-            return economy != null && economy.depositPlayer(Bukkit.getOfflinePlayer(user), amount).transactionSuccess();
+        if (!activeMutations.add(user)) return false;
+        try {
+            if (VaultCompatibility.VAULT_ENABLED) {
+                var economy = VaultCompatibility.getEconomy();
+                return economy != null && economy.depositPlayer(Bukkit.getOfflinePlayer(user), amount).transactionSuccess();
+            }
+            PlayerData.setCurrency(user, Round.twoDecimalPlaces(checkCurrency(user) + amount));
+            return true;
+        } finally {
+            activeMutations.remove(user);
         }
-        PlayerData.setCurrency(user, Round.twoDecimalPlaces(checkCurrency(user) + amount));
-        return true;
     }
 
     public static void subtractCurrency(UUID user, double amount) {
         requireReady(user);
+        if (activeMutations.contains(user)) throw new IllegalStateException("Economy mutation already in progress");
         if (VaultCompatibility.VAULT_ENABLED) {
-            VaultCompatibility.subtractCurrency(user, amount);
+            if (!tryWithdraw(user, amount)) throw new IllegalStateException("Economy provider rejected withdrawal for " + user);
             return;
         }
         // Storage layer is now cent-precise (PlayerData stores long cents); Round.twoDecimalPlaces is belt-and-suspenders.
@@ -91,6 +122,7 @@ public class EconomyHandler {
 
     public static void setCurrency(UUID user, double amount) {
         requireReady(user);
+        if (activeMutations.contains(user)) throw new IllegalStateException("Economy mutation already in progress");
 
         if (VaultCompatibility.VAULT_ENABLED) {
             VaultCompatibility.setCurrency(user, amount);

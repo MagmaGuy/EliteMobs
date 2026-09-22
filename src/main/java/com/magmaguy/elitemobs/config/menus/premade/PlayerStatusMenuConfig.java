@@ -640,10 +640,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
 
         migrateExactString("statsChestMenuName", "&2EliteMobs Stats", "&6Adventure Record");
         migrateExactString("dialog.titleStats", "Stats", "&6Adventure Record");
-        migrateExactInt("statsEliteKillsSlot", 12, 14);
-        migrateExactInt("statsMaxEliteLevelKilledSlot", 13, 15);
-        migrateExactInt("statsQuestsCompletedSlot", 15, 16);
-        migrateExactInt("statsScoreSlot", 16, 11);
+        migrateLegacyStatsSlots();
 
         migrateExactItem("statsEliteKillsItem", Material.DIAMOND_SWORD,
                 "&4Elite Kills: &c$kills", List.of("&fAmount of EliteMobs killed."),
@@ -675,9 +672,22 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                         "&7Elite deaths reduce it."));
     }
 
-    private void migrateExactInt(String path, int legacyValue, int replacement) {
-        if (fileConfiguration.isSet(path) && fileConfiguration.getInt(path) == legacyValue)
-            fileConfiguration.set(path, replacement);
+    private void migrateLegacyStatsSlots() {
+        var legacy = java.util.Map.of("statsEliteKillsSlot", 12, "statsMaxEliteLevelKilledSlot", 13,
+                "statsQuestsCompletedSlot", 15, "statsScoreSlot", 16);
+        for (var entry : legacy.entrySet())
+            if (!fileConfiguration.isInt(entry.getKey()) || fileConfiguration.getInt(entry.getKey()) != entry.getValue())
+                return;
+        var proposed = java.util.Map.of("statsEliteKillsSlot", 14, "statsMaxEliteLevelKilledSlot", 15,
+                "statsQuestsCompletedSlot", 16, "statsScoreSlot", 11);
+        var occupied = new java.util.HashSet<Integer>(proposed.values());
+        var unchanged = java.util.Map.of("statsRankSlot", 10, "statsDungeonsCompletedSlot", 12, "statsCombatLevelSlot", 13);
+        for (var entry : unchanged.entrySet()) {
+            if (fileConfiguration.isSet(entry.getKey()) && !fileConfiguration.isInt(entry.getKey())) return;
+            int slot = fileConfiguration.getInt(entry.getKey(), entry.getValue());
+            if (slot < 0 || slot >= 27 || !occupied.add(slot)) return;
+        }
+        proposed.forEach(fileConfiguration::set);
     }
 
     private void migrateExactItem(String path,
