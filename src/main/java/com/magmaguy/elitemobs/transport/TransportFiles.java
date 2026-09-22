@@ -43,6 +43,10 @@ final class TransportFiles {
             yaml.setComments("transportEntity", List.of("Enabled file in custombosses/. Configure its appearance and powers in that file."));
         atomic(target, yaml);
         reload();
+        TransportRoute published = get(route.id());
+        if (published == null || !published.points().equals(route.points())
+                || Float.compare(published.arrivalYaw(), route.arrivalYaw()) != 0)
+            throw new IOException("Route file was written but could not be loaded as saved. Your draft is retained: " + target);
     }
     static void atomic(Path path, YamlConfiguration yaml) throws IOException {
         Path temp = Files.createTempFile(path.getParent(), ".transport-", ".tmp");
