@@ -30,6 +30,7 @@ import com.magmaguy.elitemobs.tagger.PersistentTagger;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.elitemobs.utils.EntitySearch;
+import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -146,9 +147,8 @@ public class EliteEntity {
     @Setter
     protected double damageMultiplier = 1.0;
     protected double defaultMaxHealth;
-    @Getter
-    @Setter
     protected boolean inCooldown = false;
+    private long globalPowerCooldownExpiresAt;
     @Getter
     protected boolean triggeredAntiExploit = false;
     protected int antiExploitPoints = 0;
@@ -1219,23 +1219,21 @@ public class EliteEntity {
     }
 
     public void doCooldown() {
-        setInCooldown(true);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                setInCooldown(false);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 20 * 15);
+        doGlobalPowerCooldown(20 * 15);
     }
 
     public void doGlobalPowerCooldown(int ticks) {
-        setInCooldown(true);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                setInCooldown(false);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, ticks);
+        if (ticks > 0) globalPowerCooldownExpiresAt = Math.max(globalPowerCooldownExpiresAt,
+                GameClock.getCurrentTick() + ticks);
+    }
+
+    public boolean isInCooldown() {
+        return inCooldown || GameClock.getCurrentTick() < globalPowerCooldownExpiresAt;
+    }
+
+    public void setInCooldown(boolean inCooldown) {
+        this.inCooldown = inCooldown;
+        if (!inCooldown) globalPowerCooldownExpiresAt = 0;
     }
 
     public void setTriggeredAntiExploit(boolean triggeredAntiExploit) {

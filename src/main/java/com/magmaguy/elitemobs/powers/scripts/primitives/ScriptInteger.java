@@ -7,6 +7,9 @@ public class ScriptInteger {
     private Integer lowestRange = null;
     private Integer highestRange = null;
     public ScriptInteger(int lowestRange, int highestRange) {
+        if (lowestRange > highestRange)
+            throw new IllegalArgumentException("Reversed script range: " + lowestRange + "~" + highestRange);
+        if (lowestRange == highestRange) this.value = lowestRange;
         this.lowestRange = lowestRange;
         this.highestRange = highestRange;
     }
@@ -20,6 +23,6 @@ public class ScriptInteger {
 
     public Integer getValue() {
         if (value != null) return value;
-        return ThreadLocalRandom.current().nextInt(lowestRange, highestRange+1);
+        return (int) ThreadLocalRandom.current().nextLong(lowestRange, (long) highestRange + 1);
     }
 }

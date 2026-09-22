@@ -72,17 +72,16 @@ public class MapListInterpreter {
                 return new ScriptInteger(intValue);
             else if (value instanceof String stringValue) {
                 if (stringValue.contains("~")) {
-                    String[] strings = stringValue.split("~");
+                    String[] strings = stringValue.split("~", -1);
+                    if (strings.length != 2) throw new IllegalArgumentException("Expected two range endpoints");
                     return new ScriptInteger(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]));
                 }
                 return new ScriptInteger(Integer.parseInt(stringValue));
             } else {
-                Logger.warn("Failed to get integer value from " + value + " in script " + scriptName);
-                return null;
+                throw new IllegalArgumentException("Expected an integer or integer range");
             }
         } catch (Exception ex) {
-            parsingErrorMessage(key, value, scriptName);
-            return null;
+            throw new IllegalArgumentException("Invalid " + key + " value " + value + " in script " + scriptName, ex);
         }
     }
 
@@ -128,17 +127,16 @@ public class MapListInterpreter {
                 return new ScriptFloat(flt);
             else if (value instanceof String string) {
                 if (((String) value).contains("~")) {
-                    String[] strings = ((String) value).split("~");
+                    String[] strings = string.split("~", -1);
+                    if (strings.length != 2) throw new IllegalArgumentException("Expected two range endpoints");
                     return new ScriptFloat(Float.parseFloat(strings[0]), Float.parseFloat(strings[1]));
                 }
                 return new ScriptFloat(Float.parseFloat(string));
             }
         } catch (Exception ex) {
-            parsingErrorMessage(key, value, scriptName);
-            return null;
+            throw new IllegalArgumentException("Invalid " + key + " value " + value + " in script " + scriptName, ex);
         }
-        Logger.warn("Failed to parse " + value + " as double in " + scriptName + " for key " + key);
-        return null;
+        throw new IllegalArgumentException("Invalid " + key + " value " + value + " in script " + scriptName);
     }
 
     public static <T extends Enum<T>> T parseEnum(String key, Object value, Class<T> enumClass, String scriptName) {

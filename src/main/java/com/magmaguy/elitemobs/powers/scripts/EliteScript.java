@@ -70,7 +70,7 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
         //If the script uses the cooldown system then it should respect if the boss is in a global or local cooldown state
         //If the script does not define a local or global cooldown then it is considered to ignore cooldowns. This is an
         //important bypass for a lot of behavior like teleporting at specific triggers regardless of state
-        if (getPowerCooldownTime() > 0 && getGlobalCooldownTime() > 0 &&
+        if ((getPowerCooldownTime() > 0 || getGlobalCooldownTime() > 0) &&
                 scriptCooldowns != null && super.isInCooldown(eliteEntity)) return;
         //Check if the event is relevant to the script
         if (!scriptEvents.isTargetEvent(event.getClass())) return;
@@ -94,7 +94,7 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
         //If the script uses the cooldown system then it should respect if the boss is in a global or local cooldown state
         //If the script does not define a local or global cooldown then it is considered to ignore cooldowns. This is an
         //important bypass for a lot of behavior like teleporting at specific triggers regardless of state
-        if (getPowerCooldownTime() > 0 && getGlobalCooldownTime() > 0 &&
+        if ((getPowerCooldownTime() > 0 || getGlobalCooldownTime() > 0) &&
                 scriptCooldowns != null && super.isInCooldown(eliteEntity)) return;
         //Check if the event is relevant to the script
         if (!scriptEvents.isTargetEvent(event.getClass())) return;

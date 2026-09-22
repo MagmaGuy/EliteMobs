@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.lua.LuaElitePower;
 import com.magmaguy.elitemobs.powers.scripts.EliteScript;
+import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,8 +52,7 @@ public class ElitePower {
     @Getter
     @Setter
     private boolean inGlobalCooldown = false;
-    @Getter
-    private boolean powerCooldownActive = false;
+    private long powerCooldownExpiresAt;
     @Getter
     @Setter
     private boolean isFiring = false;
@@ -230,7 +230,11 @@ public class ElitePower {
     }
 
     public boolean isInCooldown(EliteEntity eliteEntity) {
-        return this.powerCooldownActive || eliteEntity.isInCooldown();
+        return isPowerCooldownActive() || eliteEntity.isInCooldown();
+    }
+
+    public boolean isPowerCooldownActive() {
+        return GameClock.getCurrentTick() < powerCooldownExpiresAt;
     }
 
     public void setInCooldown(EliteEntity eliteEntity, boolean inCooldown) {
@@ -239,32 +243,19 @@ public class ElitePower {
     }
 
     public void doCooldown(EliteEntity eliteEntity) {
-        this.powerCooldownActive = true;
-        if (globalCooldownTime < 1) return;
-
-        eliteEntity.doGlobalPowerCooldown(globalCooldownTime * 20);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                powerCooldownActive = false;
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, powerCooldownTime * 20L);
-
+        applyCooldowns(eliteEntity, 20);
     }
 
     public void doCooldownTicks(EliteEntity eliteEntity) {
-        this.powerCooldownActive = true;
-        if (globalCooldownTime > 0)
-            eliteEntity.doGlobalPowerCooldown(globalCooldownTime);
-        if (powerCooldownTime > 0)
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    powerCooldownActive = false;
-                }
-            }.runTaskLater(MetadataHandler.PLUGIN, powerCooldownTime);
+        applyCooldowns(eliteEntity, 1);
+    }
 
+    private void applyCooldowns(EliteEntity eliteEntity, int ticksPerUnit) {
+        if (globalCooldownTime > 0)
+            eliteEntity.doGlobalPowerCooldown(Math.multiplyExact(globalCooldownTime, ticksPerUnit));
+        if (powerCooldownTime > 0)
+            powerCooldownExpiresAt = Math.max(powerCooldownExpiresAt,
+                    GameClock.getCurrentTick() + (long) powerCooldownTime * ticksPerUnit);
     }
 
     protected void doGlobalCooldown(int ticks, EliteEntity eliteEntity) {

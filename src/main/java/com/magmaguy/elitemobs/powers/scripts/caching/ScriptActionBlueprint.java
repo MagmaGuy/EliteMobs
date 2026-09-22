@@ -122,7 +122,8 @@ public class ScriptActionBlueprint {
         this.scriptName = scriptName;
         this.scriptFilename = scriptFilename;
         processMapList(entry);
-        conditionsBlueprint = new ScriptConditionsBlueprint((Map<String, Object>) entry.get("Conditions"), scriptName, scriptFilename);
+        if (conditionsBlueprint == null)
+            conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) null, scriptName, scriptFilename);
         if (scriptTargets == null) scriptTargets = new ScriptTargetsBlueprint(entry, scriptName, scriptFilename);
         if (actionType == ActionType.SPAWN_PARTICLE &&
                 scriptTargets.isZoneTarget() &&
@@ -153,8 +154,11 @@ public class ScriptActionBlueprint {
             }
             case "scripts" -> scripts = parseStringList(key, value, scriptName);
             case "landingscripts" -> landingScripts = parseStringList(key, value, scriptName);
-            case "conditions" ->
-                    conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) value, scriptName, scriptFilename);
+            case "conditions" -> {
+                if (conditionsBlueprint != null)
+                    throw new IllegalArgumentException("Duplicate conditions section in script " + scriptName + " in " + scriptFilename);
+                conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) value, scriptName, scriptFilename);
+            }
             case "times" -> times = parseScriptInteger(key, value, scriptName);
             case "repeatevery" -> repeatEvery = parseScriptInteger(key, value, scriptName);
             case "particles" ->
