@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.utils;
 
+import com.magmaguy.elitemobs.config.QuestsConfig;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -121,10 +123,10 @@ public class DialogMaker {
         addBodySection(builder, questText.getBody());
 
         // Add objectives (text only, no items)
-        addBodySectionWithHeader(builder, questText.getFixedSummary(), questText.getSummary(), quest, false);
+        addBodySectionWithHeader(builder, questText.getFixedSummary(), questText.getSummary());
 
         // Add rewards (with items if available)
-        addBodySectionWithHeader(builder, questText.getFixedRewards(), questText.getRewards(), quest, true);
+        addQuestRewardSection(builder, quest, questText);
     }
 
     private static void addBodySection(DialogManager.MultiActionDialogBuilder builder,
@@ -145,68 +147,46 @@ public class DialogMaker {
     }
 
     private static void addBodySectionWithHeader(DialogManager.MultiActionDialogBuilder builder,
-                                                 TextComponent header, List<TextComponent> items,
-                                                 Quest quest, boolean showItemsIfAvailable) {
-        // Add header as text if present
-        if (header != null && componentText(header) != null) {
+                                                 TextComponent header, List<TextComponent> items) {
+        if (header != null && componentText(header) != null)
             builder.addBody(DialogManager.PlainMessageBody.of(processText(componentText(header))).width(questDialogWidth));
+        addBodySection(builder, items);
+    }
+
+    /** Normal quest dialogue and the quest-check command share one entry-aware reward render. */
+    public static void addQuestRewardSection(DialogManager.MultiActionDialogBuilder builder,
+                                             Quest quest, QuestMenu.QuestText questText) {
+        TextComponent header = questText.getFixedRewards();
+        if (header != null && componentText(header) != null)
+            builder.addBody(DialogManager.PlainMessageBody.of(processText(componentText(header))).width(questDialogWidth));
+        List<com.magmaguy.elitemobs.quests.rewards.QuestReward.PreviewEntry> previews;
+        try {
+            previews = quest.getQuestObjectives().getQuestReward().previewRewardEntries();
+            if (previews.isEmpty()) {
+                addBodySection(builder, questText.getRewards());
+                return;
+            }
+        } catch (RuntimeException failure) {
+            com.magmaguy.magmacore.util.Logger.warn("Could not preview quest rewards for " + quest.getQuestID()
+                    + ": " + failure.getMessage());
+            builder.addBody(DialogManager.PlainMessageBody.of(QuestsConfig.getRewardPreviewUnavailable()).width(questDialogWidth));
+            return;
         }
-
-        // Check if we should and can display items
-        boolean hasPreviewItems = showItemsIfAvailable
-                && quest != null
-                && quest.getQuestObjectives().getQuestReward().previewRewards() != null
-                && !quest.getQuestObjectives().getQuestReward().previewRewards().isEmpty();
-
-        if (hasPreviewItems) {
-            // Display rewards as actual item icons
-            List<ItemStack> previewRewards = quest.getQuestObjectives().getQuestReward().previewRewards();
-
-            for (int i = 0; i < previewRewards.size() && items != null && i < items.size(); i++) {
-                ItemStack itemStack = previewRewards.get(i);
-                if (itemStack != null) {
-                    String itemId = itemStack.getType().getKey().toString();
-
-                    // Get the description from the corresponding TextComponent
-                    String description = "";
-                    if (i < items.size() && componentText(items.get(i)) != null) {
-                        description = processText(componentText(items.get(i)));
-                    }
-
-                    // Create and add the ItemBody
-                    DialogManager.ItemBody itemBody = DialogManager.ItemBody.of(itemId, itemStack.getAmount())
-                            .showTooltip(true)
-                            .showDecoration(true);
-
-                    // Add custom item components (lore, enchantments, etc.)
-                    JsonObject components = DialogManager.serializeItemComponents(itemStack);
-                    if (components != null && !components.entrySet().isEmpty()) {
-                        fixCustomModelDataFormat(components);
-                        itemBody.components(components);
-                    }
-
-                    if (!description.isEmpty()) {
-                        itemBody.description(description);
-                    }
-
-                    builder.addBody(itemBody);
-                }
+        for (var preview : previews) {
+            String description = processText(componentText(QuestMenu.describeRewardPreview(quest, preview)));
+            ItemStack item = preview.item();
+            if (item == null) {
+                builder.addBody(DialogManager.PlainMessageBody.of(description).width(questDialogWidth));
+                continue;
             }
-        } else {
-            // Fall back to text-based display
-            if (items != null && !items.isEmpty()) {
-                StringBuilder text = new StringBuilder();
-                for (TextComponent item : items) {
-                    String itemText = componentText(item);
-                    if (itemText != null) {
-                        text.append("  ").append(processText(itemText)).append("\n");
-                    }
-                }
-
-                if (!text.isEmpty()) {
-                    builder.addBody(DialogManager.PlainMessageBody.of(text.toString().trim()).width(questDialogWidth));
-                }
+            DialogManager.ItemBody body = DialogManager.ItemBody.of(item.getType().getKey().toString(), item.getAmount())
+                    .showTooltip(true).showDecoration(true).description(description);
+            JsonObject components = DialogManager.serializeItemComponents(item);
+            if (components != null && !components.entrySet().isEmpty()) {
+                fixCustomModelDataFormat(components);
+                body.components(components);
             }
+            builder.addBody(body);
         }
     }
 

@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DynamicDungeonInstance;
 import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.customloottable.CustomLootTable;
+import com.magmaguy.elitemobs.items.customloottable.CustomLootEntry;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.DynamicQuestLevel;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
@@ -18,11 +19,13 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class QuestReward implements Serializable {
+    private static final long serialVersionUID = -2611659941991762555L;
 
     @Getter
     private final int rewardLevel;
@@ -99,14 +102,25 @@ public class QuestReward implements Serializable {
     }
 
     public List<ItemStack> previewRewards() {
+        return previewRewardEntries().stream().map(PreviewEntry::item).filter(java.util.Objects::nonNull)
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+    }
+
+    /** One sampled preview, retaining entry identity after permission, difficulty and chance filtering. */
+    public List<PreviewEntry> previewRewardEntries() {
         Player player = Bukkit.getPlayer(playerUUID);
         int effectiveLevel = getEffectiveRewardLevel(player);
-        List<ItemStack> items = customLootTable.previewQuestDrop(player, effectiveLevel);
+        List<PreviewEntry> items = new ArrayList<>();
+        if (customLootTable != null)
+            for (CustomLootEntry entry : customLootTable.getEntries())
+                if (entry.willDrop(player)) items.add(new PreviewEntry(entry, entry.previewDrop(effectiveLevel, player)));
         if (generateProceduralReward) {
             ItemStack itemReward = LootTables.generateItemStack(effectiveLevel, player, null);
-            if (itemReward != null) items.add(itemReward);
+            if (itemReward != null) items.add(new PreviewEntry(null, itemReward));
         }
         return items;
     }
+
+    public record PreviewEntry(CustomLootEntry source, ItemStack item) {}
 
 }

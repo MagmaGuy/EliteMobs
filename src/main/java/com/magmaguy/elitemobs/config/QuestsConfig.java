@@ -134,6 +134,8 @@ public class QuestsConfig extends ConfigurationFile {
     @Getter
     private static String nextInventoryPage;
     @Getter
+    private static String rewardPreviewUnavailable;
+    @Getter
     private static String questLockoutSubtitle;
     @Getter
     private static String questLockoutChatMessage;
@@ -510,6 +512,9 @@ public class QuestsConfig extends ConfigurationFile {
         nextInventoryPage = ConfigurationEngine.setString(
                 List.of("Next page button in inventory quest menus"),
                 file, fileConfiguration, "nextInventoryPage", "Next page", true);
+        rewardPreviewUnavailable = ConfigurationEngine.setString(
+                List.of("Shown when a quest reward preview cannot be generated"),
+                file, fileConfiguration, "rewardPreviewUnavailable", "Reward preview unavailable.", true);
 
         questLockoutSubtitle = ConfigurationEngine.setString(
                 List.of("Sets the subtitle shown when a player tries to accept a quest they are locked out from"),

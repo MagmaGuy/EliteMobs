@@ -1,8 +1,5 @@
 package com.magmaguy.elitemobs.commands;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.QuestsConfig;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
@@ -112,7 +109,7 @@ public class QuestCheckCommand extends AdvancedCommand {
         addBodySectionWithHeader(builder, questText.getFixedSummary(), questText.getSummary());
 
         // Add rewards
-        addBodySectionWithRewards(builder, questText.getFixedRewards(), questText.getRewards(), quest);
+        com.magmaguy.elitemobs.utils.DialogMaker.addQuestRewardSection(builder, quest, questText);
 
         // Add action buttons
         addActionButtons(builder, quest, questText);
@@ -163,55 +160,6 @@ public class QuestCheckCommand extends AdvancedCommand {
         }
     }
 
-    private void addBodySectionWithRewards(DialogManager.MultiActionDialogBuilder builder,
-                                           net.md_5.bungee.api.chat.TextComponent header,
-                                           List<net.md_5.bungee.api.chat.TextComponent> items,
-                                           Quest quest) {
-        if (header != null && header.toPlainText() != null) {
-            builder.addBody(DialogManager.PlainMessageBody.of(processText(header.toPlainText())).width(QUEST_DIALOG_WIDTH));
-        }
-
-        // Try to show actual item rewards if available
-        if (quest != null &&
-                quest.getQuestObjectives().getQuestReward().previewRewards() != null &&
-                !quest.getQuestObjectives().getQuestReward().previewRewards().isEmpty()) {
-
-            List<org.bukkit.inventory.ItemStack> previewRewards =
-                    quest.getQuestObjectives().getQuestReward().previewRewards();
-
-            for (int i = 0; i < previewRewards.size(); i++) {
-                org.bukkit.inventory.ItemStack itemStack = previewRewards.get(i);
-                if (itemStack != null) {
-                    String itemId = itemStack.getType().getKey().toString();
-
-                    String description = "";
-                    if (items != null && i < items.size() && items.get(i).toPlainText() != null) {
-                        description = processText(items.get(i).toPlainText());
-                    }
-
-                    DialogManager.ItemBody itemBody = DialogManager.ItemBody.of(itemId, itemStack.getAmount())
-                            .showTooltip(true)
-                            .showDecoration(true);
-
-                    JsonObject components = DialogManager.serializeItemComponents(itemStack);
-                    if (components != null && !components.entrySet().isEmpty()) {
-                        fixCustomModelDataFormat(components);
-                        itemBody.components(components);
-                    }
-
-                    if (!description.isEmpty()) {
-                        itemBody.description(description);
-                    }
-
-                    builder.addBody(itemBody);
-                }
-            }
-        } else {
-            // Fallback to text
-            addBodySection(builder, items);
-        }
-    }
-
     private void addActionButtons(DialogManager.MultiActionDialogBuilder builder,
                                   Quest quest, QuestMenu.QuestText questText) {
         builder.columns(1);
@@ -258,23 +206,4 @@ public class QuestCheckCommand extends AdvancedCommand {
         return null;
     }
 
-    /**
-     * Fixes the custom_model_data format for Minecraft 1.21.4+
-     * Old format: "minecraft:custom_model_data": 36004
-     * New format: "minecraft:custom_model_data": {"floats": [36004.0]}
-     */
-    private void fixCustomModelDataFormat(JsonObject components) {
-        String key = "minecraft:custom_model_data";
-        if (components.has(key)) {
-            JsonElement element = components.get(key);
-            if (element.isJsonPrimitive()) {
-                double value = element.getAsDouble();
-                JsonObject newFormat = new JsonObject();
-                JsonArray floats = new JsonArray();
-                floats.add(value);
-                newFormat.add("floats", floats);
-                components.add(key, newFormat);
-            }
-        }
-    }
 }

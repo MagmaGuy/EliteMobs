@@ -51,6 +51,7 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
     private static String rewardsLine;
 
     private static String killQuestDefaultSummaryLine;
+    @Getter
     private static String rewardsDefaultSummaryLine;
 
     public DynamicQuestMenuConfig() {

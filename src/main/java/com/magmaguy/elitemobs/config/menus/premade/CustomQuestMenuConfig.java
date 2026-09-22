@@ -66,6 +66,7 @@ public class CustomQuestMenuConfig extends MenusConfigFields {
     private static String dialogQuestDefaultSummaryLine;
     private static String arenaQuestDefaultSummaryLine;
     private static String classUnlockQuestDefaultSummaryLine;
+    @Getter
     private static String rewardsDefaultSummaryLine;
     @Getter
     private static boolean useQuestTracking;

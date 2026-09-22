@@ -1,6 +1,10 @@
 package com.magmaguy.elitemobs.quests.menus;
 
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.items.customloottable.CurrencyCustomLootEntry;
+import com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry;
+import com.magmaguy.elitemobs.quests.rewards.QuestReward;
 import com.magmaguy.elitemobs.config.menus.premade.CustomQuestMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.DynamicQuestMenuConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
@@ -148,6 +152,24 @@ public class QuestMenu {
             return DynamicQuestMenuConfig.getRewardsDefaultSummaryLine(quest.getQuestObjectives().getQuestReward());
     }
 
+    public static TextComponent describeRewardPreview(Quest quest, QuestReward.PreviewEntry preview) {
+        var entry = preview.source();
+        var item = preview.item();
+        String name;
+        if (entry instanceof CurrencyCustomLootEntry currency)
+            name = currency.getCurrencyAmount() + " " + EconomySettingsConfig.getCurrencyName();
+        else if (item != null) {
+            var meta = item.getItemMeta();
+            name = meta != null && meta.hasDisplayName() ? meta.getDisplayName() : item.getType().toString().replace('_', ' ');
+        } else if (entry instanceof EliteCustomLootEntry custom) name = custom.getFilename();
+        else name = "?";
+        String template = quest instanceof CustomQuest ? CustomQuestMenuConfig.getRewardsDefaultSummaryLine()
+                : DynamicQuestMenuConfig.getRewardsDefaultSummaryLine();
+        return new TextComponent(template.replace("$amount", String.valueOf(entry == null ? item.getAmount() : entry.getAmount()))
+                .replace("$rewardName", name == null ? "?" : name)
+                .replace("$chance", String.valueOf(entry == null ? 100 : (int) (entry.getChance() * 100))));
+    }
+
     private static TextComponent generateAccept(Quest quest, NPCEntity npcEntity) {
         //Before quest was accepted
         if (!quest.isAccepted())
@@ -232,6 +254,7 @@ public class QuestMenu {
     }
 
     public static class QuestText {
+        private final Quest quest;
         @Getter
         private final TextComponent header;
         @Getter
@@ -242,24 +265,28 @@ public class QuestMenu {
         private final List<TextComponent> summary;
         @Getter
         private final TextComponent fixedRewards;
-        @Getter
-        private final List<TextComponent> rewards;
+        private List<TextComponent> rewards;
         @Getter
         private final TextComponent accept;
         @Getter
         private TextComponent track;
 
         public QuestText(Quest quest, NPCEntity npcEntity, Player player) {
+            this.quest = quest;
             header = generateHeader(quest);
             body = generateBody(quest);
             fixedSummary = generateFixedSummary(quest);
             summary = generateSummary(quest);
             fixedRewards = generateFixedRewards(quest);
-            rewards = generateRewards(quest);
             accept = generateAccept(quest, npcEntity);
             track = null;
             if (quest instanceof CustomQuest)
                 track = generateTrack(player, quest);
+        }
+
+        public List<TextComponent> getRewards() {
+            if (rewards == null) rewards = generateRewards(quest);
+            return rewards;
         }
     }
 
