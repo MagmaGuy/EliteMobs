@@ -17,7 +17,6 @@ import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.elitemobs.utils.BossBarOrderManager;
-import com.magmaguy.magmacore.scripting.zones.Shape;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -173,6 +172,16 @@ public class ScriptAction {
                 protected void runAction() {
                     counter++;
 
+                    if (blueprint.getTimes().getValue() > 0 && counter > blueprint.getTimes().getValue()) {
+                        cancel();
+                        return;
+                    }
+
+                    if (blueprint.getTimes().getValue() < 0 && !scriptActionData.getEliteEntity().isValid()) {
+                        cancel();
+                        return;
+                    }
+
                     //Cancel if the entity's world is no longer loaded (e.g. world/chunk unloaded)
                     Location entityLocation = scriptActionData.getEliteEntity().getLocation();
                     if (entityLocation == null || entityLocation.getWorld() == null) {
@@ -200,16 +209,6 @@ public class ScriptAction {
                         return;
                     }
 
-                    if (blueprint.getTimes().getValue() > 0 && counter > blueprint.getTimes().getValue()) {
-                        cancel();
-                        return;
-                    }
-
-                    if (blueprint.getTimes().getValue() < 0 && !scriptActionData.getEliteEntity().isValid()) {
-                        cancel();
-                        return;
-                    }
-
                     runActions(scriptActionData);
                 }
             }.schedule(0, blueprint.getRepeatEvery().getValue());
@@ -222,25 +221,10 @@ public class ScriptAction {
         }
     }
 
-    // Returns true if this action targets a zone whose shape origin has lost its
-    // world reference, meaning the task should cancel rather than keep ticking
-    // and spamming "World is null in filterBy*" warnings.
-    private boolean zoneOriginWorldLost(ScriptActionData scriptActionData) {
-        TargetType targetType = blueprint.getScriptTargets().getTargetType();
-        ScriptActionData dataForShapes;
-        switch (targetType) {
-            case ZONE_FULL, ZONE_BORDER -> dataForShapes = scriptActionData;
-            case INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER ->
-                    dataForShapes = scriptActionData.getInheritedScriptActionData();
-            default -> { return false; }
-        }
-        ScriptZone scriptZone = scriptActionData.getScriptZone();
-        if (scriptZone == null || !scriptZone.isValid() || dataForShapes == null) return false;
-        for (Shape shape : scriptZone.generateShapes(dataForShapes, false)) {
-            Location center = shape.getCenter();
-            if (center == null || center.getWorld() == null) return true;
-        }
-        return false;
+    private boolean zoneOriginWorldLost(ScriptActionData data) {
+        if (!blueprint.getScriptTargets().isZoneTarget()) return false;
+        ScriptActionData zoneData = scriptTargets.resolveZoneData(data);
+        return zoneData.getScriptZone().originWorldLost(zoneData);
     }
 
     /**
@@ -390,7 +374,7 @@ public class ScriptAction {
      */
     protected Collection<LivingEntity> getTargets(ScriptActionData scriptActionData) {
         Collection<LivingEntity> livingTargets = scriptConditions.validateEntities(scriptActionData, scriptTargets.getTargetEntities(scriptActionData));
-        scriptTargets.setAnonymousTargets(new ArrayList<>(livingTargets));
+        scriptTargets.setAnonymousTargets(new ArrayList<>(livingTargets), scriptActionData);
         if (blueprint.isDebug()) {
             livingTargets.forEach(livingTarget -> Logger.showLocation(livingTarget.getLocation()));
         }
@@ -405,7 +389,7 @@ public class ScriptAction {
      */
     protected Collection<Location> getLocationTargets(ScriptActionData scriptActionData) {
         Collection<Location> locationTargets = scriptConditions.validateLocations(scriptActionData, scriptTargets.getTargetLocations(scriptActionData));
-        scriptTargets.setAnonymousTargets(new ArrayList<>(locationTargets));
+        scriptTargets.setAnonymousTargets(new ArrayList<>(locationTargets), scriptActionData);
         if (blueprint.isDebug()) {
             locationTargets.forEach(Logger::showLocation);
         }
@@ -423,7 +407,7 @@ public class ScriptAction {
             return Collections.emptyList();
         }
         Collection<Location> locationTargets = scriptConditions.validateLocations(scriptActionData, finalScriptTargets.getTargetLocations(scriptActionData));
-        finalScriptTargets.setAnonymousTargets(new ArrayList<>(locationTargets));
+        finalScriptTargets.setAnonymousTargets(new ArrayList<>(locationTargets), scriptActionData);
         if (blueprint.isDebug()) {
             locationTargets.forEach(Logger::showLocation);
         }

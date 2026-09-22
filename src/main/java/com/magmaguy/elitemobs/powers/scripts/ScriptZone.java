@@ -5,7 +5,6 @@ import com.magmaguy.elitemobs.api.ScriptZoneEnterEvent;
 import com.magmaguy.elitemobs.api.ScriptZoneLeaveEvent;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptZoneBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.elitemobs.utils.EventCaller;
@@ -139,49 +138,28 @@ public class ScriptZone {
      * @param blueprintFromRequestingTarget The target blueprint requesting entities.
      * @return A collection of living entities within the zone.
      */
-    protected Collection<LivingEntity> getZoneEntities(ScriptActionData scriptActionData, ScriptTargetsBlueprint blueprintFromRequestingTarget) {
-        try {
-            switch (blueprintFromRequestingTarget.getTargetType()) {
-                case ZONE_FULL, ZONE_BORDER:
-                    return getEntitiesInArea(generateShapes(scriptActionData, false), blueprintFromRequestingTarget.getTargetType());
-                case INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
-                    return getEntitiesInArea(generateShapes(scriptActionData.getInheritedScriptActionData(), false), blueprintFromRequestingTarget.getTargetType());
-                default:
-                    Logger.warn("Couldn't parse target type '" + blueprintFromRequestingTarget.getTargetType() + "' in script zone.");
-                    return Collections.emptyList();
-            }
-        } catch (Exception e) {
-            Logger.warn("Error retrieving zone entities: " + e.getMessage());
-            return Collections.emptyList();
-        }
+    protected Collection<LivingEntity> getZoneEntities(ScriptActionData data, TargetType targetType) {
+        return getEntitiesInArea(generateShapes(data, false), targetType);
     }
 
-    /**
-     * Retrieves locations within the zone based on the provided script action data and target.
-     *
-     * @param scriptActionData The data for the current script action.
-     * @param actionTarget     The action target requesting locations.
-     * @return A collection of locations within the zone.
-     */
-    protected Collection<Location> getZoneLocations(ScriptActionData scriptActionData, ScriptTargets actionTarget) {
-        try {
-            switch (actionTarget.getTargetBlueprint().getTargetType()) {
-                case ZONE_FULL:
-                    return consolidateLists(generateShapes(scriptActionData, false).stream().map(Shape::getLocations).collect(Collectors.toSet()));
-                case ZONE_BORDER:
-                    return consolidateLists(generateShapes(scriptActionData, false).stream().map(Shape::getEdgeLocations).collect(Collectors.toSet()));
-                case INHERIT_SCRIPT_ZONE_FULL:
-                    return consolidateLists(generateShapes(scriptActionData.getInheritedScriptActionData(), false).stream().map(Shape::getLocations).collect(Collectors.toSet()));
-                case INHERIT_SCRIPT_ZONE_BORDER:
-                    return consolidateLists(generateShapes(scriptActionData.getInheritedScriptActionData(), false).stream().map(Shape::getEdgeLocations).collect(Collectors.toSet()));
-                default:
-                    Logger.warn("Couldn't parse target type '" + actionTarget.getTargetBlueprint().getTargetType() + "' in script zone.");
-                    return Collections.emptyList();
+    protected Collection<Location> getZoneLocations(ScriptActionData data, TargetType targetType) {
+        return consolidateLists(generateShapes(data, false).stream()
+                .map(shape -> targetType == TargetType.ZONE_FULL ? shape.getLocations() : shape.getEdgeLocations())
+                .collect(Collectors.toSet()));
+    }
+
+    // Inspect captured centers or source locations; checking a world must not draw rays or build shapes.
+    boolean originWorldLost(ScriptActionData data) {
+        if (data.getShapesCachedByTarget() != null) {
+            for (Shape shape : data.getShapesCachedByTarget()) {
+                Location center = shape.getCenter();
+                if (center == null || center.getWorld() == null) return true;
             }
-        } catch (Exception e) {
-            Logger.warn("Error retrieving zone locations: " + e.getMessage());
-            return Collections.emptyList();
+        } else {
+            for (Location origin : targets.getTargetLocations(data))
+                if (origin == null || origin.getWorld() == null) return true;
         }
+        return false;
     }
 
     /**

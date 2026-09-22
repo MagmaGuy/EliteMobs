@@ -172,13 +172,13 @@ public class ScriptConditions {
 
     public boolean meetsPreActionConditions(EliteEntity eliteEntity, LivingEntity directTarget) {
         if (scriptTargets == null) return true;
-        ScriptActionData data = new ScriptActionData(eliteEntity, directTarget, scriptTargets, null);
+        ScriptActionData data = new ScriptActionData(eliteEntity, directTarget, scriptTargets, runtimeOwner.getScriptZone(), null);
         Collection<LivingEntity> entities = scriptTargets.getTargetEntities(data);
         int count = entities.size();
 
         if (!targetCountLowerThan(count) || !targetCountGreaterThan(count)) return false;
         for (LivingEntity e : entities) if (!checkConditions(e)) return false;
-        for (Location loc : scriptTargets.getTargetLocations(data)) if (!checkConditions(loc)) return false;
+        for (Location loc : scriptTargets.getTargetLocations(data, entities)) if (!checkConditions(loc)) return false;
         return checkRandomizer();
     }
 
@@ -196,8 +196,7 @@ public class ScriptConditions {
         int count = entities.size();
         if (!targetCountLowerThan(count) || !targetCountGreaterThan(count)) return false;
         for (LivingEntity e : entities) if (!checkConditions(e)) return false;
-        if (scriptTargets.getTargetLocations(data) != null)
-            for (Location loc : scriptTargets.getTargetLocations(data)) if (!checkConditions(loc)) return false;
+        for (Location loc : scriptTargets.getTargetLocations(data, entities)) if (!checkConditions(loc)) return false;
         return checkRandomizer();
     }
 

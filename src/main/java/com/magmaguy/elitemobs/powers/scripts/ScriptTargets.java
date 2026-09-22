@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.powers.scripts;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptTargetsBlueprint;
+import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -26,19 +27,16 @@ public class ScriptTargets {
     private final ScriptTargetsBlueprint targetBlueprint;
     @Getter
     private final ScriptRuntimeOwner runtimeOwner;
-    //collection of targets, can be shapes, entities or locations
-    private List anonymousTargets = null;
-    @Getter
-    private ScriptRelativeVector scriptRelativeVector = null;
 
     public ScriptTargets(ScriptTargetsBlueprint targetBlueprint, ScriptRuntimeOwner runtimeOwner) {
         this.targetBlueprint = targetBlueprint;
         this.runtimeOwner = runtimeOwner;
     }
 
-    public List getAnonymousTargets(boolean locations, ScriptActionData scriptActionData) {
-        if (anonymousTargets != null) {
-            return anonymousTargets;
+    public List<?> getAnonymousTargets(boolean locations, ScriptActionData scriptActionData) {
+        List<?> inherited = scriptActionData.inheritedTargets(this);
+        if (inherited != null) {
+            return inherited;
         } else if (locations) {
             return getTargetLocations(scriptActionData).stream().toList();
         } else {
@@ -46,12 +44,13 @@ public class ScriptTargets {
         }
     }
 
-    public void setAnonymousTargets(List anonymousTargets) {
-        //Animated zones can't be cached!
-        if (getTargetBlueprint().isTrack() || getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 1)
-            return;
-        //Non-animated zones must be cached for script inheritance and such
-        this.anonymousTargets = anonymousTargets;
+    public void setAnonymousTargets(List<?> targets, ScriptActionData data) {
+        if (!targetBlueprint.isTrack() && !animatedZone(data)) data.captureInheritedTargets(this, targets);
+    }
+
+    private boolean animatedZone(ScriptActionData data) {
+        ScriptZone zone = targetBlueprint.isZoneTarget() ? resolveZoneData(data).getScriptZone() : getScriptZone();
+        return zone != null && zone.isValid() && zone.getZoneBlueprint().getAnimationDuration().getValue() > 0;
     }
 
     //Parse all string-based configuration locations
@@ -77,42 +76,20 @@ public class ScriptTargets {
                 parsedLocation.setWorld(bossWorld);
         }
 
-        addOffsets(parsedLocation, scriptActionData);
-
-        return parsedLocation;
+        return addOffsets(parsedLocation, scriptActionData);
     }
 
-    protected void cacheTargets(ScriptActionData scriptActionData) {
-        if (getTargetBlueprint().isTrack()) {
-            //Zones that animate independently can not be set to track, as this causes confusion. This is forced to make it easier on scripters.
-            if (getScriptZone().isValid() && getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 0)
-                getTargetBlueprint().setTrack(false);
-            else return;
-        }
-        //Only cache locations - caching living entities would probably be very confusing
-        //if (actionType.isRequiresLivingEntity()) return;
-        boolean animatedScriptZone = false;
-        if (getScriptZone().isValid()) {
-            scriptActionData.setShapesCachedByTarget(getScriptZone().generateShapes(scriptActionData, true));
-            if (getScriptZone().getZoneBlueprint().getAnimationDuration().getValue() > 0) animatedScriptZone = true;
-            anonymousTargets = null;
-        }
-        if (!animatedScriptZone) {
-            anonymousTargets = new ArrayList<>(getTargetLocations(scriptActionData));
-        }
-        if (!getTargetBlueprint().isTrack() && targetBlueprint.getScriptRelativeVectorBlueprint() != null) {
-            scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, null);
-            scriptRelativeVector.cacheVector(scriptActionData);
-        }
+    protected void cacheTargets(ScriptActionData data) {
+        boolean animated = animatedZone(data);
+        if (targetBlueprint.isTrack() && !animated) return;
+        ScriptZone zone = getScriptZone();
+        if (zone != null && zone.isValid() && data.getShapesCachedByTarget() == null)
+            data.setShapesCachedByTarget(zone.generateShapes(data, true));
+        if (!animated) data.captureLocations(this, getTargetLocations(data));
     }
 
     //Get living entity targets. New array lists so they are not immutable.
     public Collection<LivingEntity> getTargetEntities(ScriptActionData scriptActionData) {
-        if (getTargetBlueprint().isTrack() && anonymousTargets != null &&
-                (anonymousTargets.isEmpty() || anonymousTargets.get(0) instanceof LivingEntity)) {
-            return (List<LivingEntity>) anonymousTargets;
-        }
-
         //If a script zone exists, it overrides the check entirely to expose zone-based fields
         Location eliteEntityLocation = scriptActionData.getEliteEntity().getLocation();
 
@@ -170,28 +147,29 @@ public class ScriptTargets {
                         .map(LivingEntity.class::cast)
                         .collect(Collectors.toSet());
             case DIRECT_TARGET:
-                return new ArrayList<>(List.of(scriptActionData.getDirectTarget()));
+                return scriptActionData.getDirectTarget() == null ? new ArrayList<>()
+                        : new ArrayList<>(List.of(scriptActionData.getDirectTarget()));
             case SELF:
             case SELF_SPAWN:
                 if (selfEntity == null) return new ArrayList<>();
                 return new ArrayList<>(List.of(selfEntity));
             case ZONE_FULL, ZONE_BORDER, INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
-                return getScriptZone().getZoneEntities(scriptActionData, targetBlueprint);
+                ScriptActionData zoneData = resolveZoneData(scriptActionData);
+                return zoneData.getScriptZone().getZoneEntities(zoneData, zoneTargetType());
             case INHERIT_SCRIPT_TARGET:
-                if (scriptActionData.getInheritedScriptActionData() != null) {
-                    try {
-                        return (List<LivingEntity>) scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets(false, scriptActionData.getInheritedScriptActionData());
-                    } catch (Exception Ex) {
-                        Logger.warn("Failed to get entity from INHERIT_SCRIPT_TARGET because the script inherits a location, not an entity");
-                    }
-                } else {
-                    Logger.warn("Failed to get INHERIT_SCRIPT_TARGET because the script is not called by another script!");
-                    return new ArrayList<>();
+                ScriptActionData parent = requireParent(scriptActionData);
+                List<?> inherited = parent.getScriptTargets().getAnonymousTargets(false, parent);
+                List<LivingEntity> entities = new ArrayList<>();
+                for (Object target : inherited) {
+                    if (!(target instanceof LivingEntity entity))
+                        throw new IllegalStateException("INHERIT_SCRIPT_TARGET requires entities in " + targetBlueprint.getScriptName());
+                    entities.add(entity);
                 }
-
+                return entities;
+            case LOCATION, LOCATIONS, LANDING_LOCATION, ACTION_TARGET:
+                return new ArrayList<>();
             default:
-                Logger.warn("Could not find default target for script in " + runtimeOwner.getFileName());
-                return null;
+                throw new IllegalStateException("Invalid target type in " + targetBlueprint.getScriptName());
         }
     }
 
@@ -202,15 +180,19 @@ public class ScriptTargets {
      * @return Validated location for the script behavior
      */
     public Collection<Location> getTargetLocations(ScriptActionData scriptActionData) {
-        if (anonymousTargets != null && !anonymousTargets.isEmpty() && anonymousTargets.get(0) instanceof Location location) {
-            return (List<Location>) anonymousTargets;
-        }
+        return getTargetLocations(scriptActionData, null);
+    }
 
-        Collection<Location> newLocations = null;
+    // A condition evaluation can reuse the entities it already resolved without freezing later actions.
+    Collection<Location> getTargetLocations(ScriptActionData scriptActionData, Collection<LivingEntity> entities) {
+        List<Location> frozen = scriptActionData.locationSnapshot(this);
+        if (frozen != null) return frozen;
+        Collection<Location> newLocations;
 
         switch (this.getTargetBlueprint().getTargetType()) {
             case ALL_PLAYERS, WORLD_PLAYERS, NEARBY_PLAYERS, DIRECT_TARGET, SELF, NEARBY_MOBS, NEARBY_ELITES:
-                return getTargetEntities(scriptActionData).stream().map(targetEntity -> addOffsets(targetEntity.getLocation(), scriptActionData)).collect(Collectors.toSet());
+                return (entities == null ? getTargetEntities(scriptActionData) : entities).stream()
+                        .map(targetEntity -> addOffsets(targetEntity.getLocation(), scriptActionData)).collect(Collectors.toSet());
             case SELF_SPAWN:
                 return new ArrayList<>(List.of(addOffsets(scriptActionData.getEliteEntity().getSpawnLocation(), scriptActionData)));
             case LOCATION:
@@ -219,20 +201,24 @@ public class ScriptTargets {
                 return getLocations(scriptActionData.getEliteEntity(), scriptActionData);
             case LANDING_LOCATION:
                 return new ArrayList<>(List.of(scriptActionData.getLandingLocation().clone()));
-            case ZONE_FULL, ZONE_BORDER:
+            case ZONE_FULL, ZONE_BORDER, INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
                 newLocations = getLocationFromZone(scriptActionData);
                 break;
-            case INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER:
-                newLocations = getLocationFromZone(scriptActionData.getInheritedScriptActionData());
-                break;
             case INHERIT_SCRIPT_TARGET:
-                return scriptActionData.getInheritedScriptActionData().getScriptTargets().getAnonymousTargets(
-                        true, scriptActionData.getInheritedScriptActionData());
+                ScriptActionData parent = requireParent(scriptActionData);
+                List<?> inherited = parent.getScriptTargets().getAnonymousTargets(true, parent);
+                List<Location> locations = new ArrayList<>();
+                for (Object target : inherited) {
+                    if (target instanceof Location location) locations.add(location.clone());
+                    else if (target instanceof LivingEntity entity) locations.add(entity.getLocation());
+                    else throw new IllegalStateException("Invalid inherited target in " + targetBlueprint.getScriptName());
+                }
+                return locations;
             case ACTION_TARGET:
                 //This is an edge case of action target, if there were no nearby targets it can't assume a value so it passes action target as a fallback. That just means there aren't valid targets.
                 return new ArrayList<>();
             default: {
-                Logger.warn("Failed to get target type in script " + getTargetBlueprint().getScriptName() + " ! Type was: " + getTargetBlueprint().getTargetType());
+                throw new IllegalStateException("Invalid target type in " + targetBlueprint.getScriptName());
             }
         }
 
@@ -242,12 +228,35 @@ public class ScriptTargets {
         return newLocations;
     }
 
-    private Collection<Location> getLocationFromZone(ScriptActionData scriptActionData) {
-        if (scriptActionData.getScriptZone() == null) {
-            Logger.warn("Your script " + targetBlueprint.getScriptName() + " uses " + targetBlueprint.getTargetType().toString() + " but does not have a valid Zone defined!");
-            return new ArrayList<>();
-        }
-        return addOffsets(getScriptZone().getZoneLocations(scriptActionData, this), scriptActionData);
+    private Collection<Location> getLocationFromZone(ScriptActionData data) {
+        ScriptActionData zoneData = resolveZoneData(data);
+        return addOffsets(zoneData.getScriptZone().getZoneLocations(zoneData, zoneTargetType()), data);
+    }
+
+    ScriptActionData resolveZoneData(ScriptActionData data) {
+        ScriptActionData resolved = switch (targetBlueprint.getTargetType()) {
+            case INHERIT_SCRIPT_ZONE_FULL, INHERIT_SCRIPT_ZONE_BORDER -> requireParent(data);
+            default -> data;
+        };
+        if (resolved.getScriptZone() == null || !resolved.getScriptZone().isValid())
+            throw new IllegalStateException("No valid zone for " + targetBlueprint.getTargetType()
+                    + " in script " + targetBlueprint.getScriptName());
+        return resolved;
+    }
+
+    private ScriptActionData requireParent(ScriptActionData data) {
+        ScriptActionData parent = data.getInheritedScriptActionData();
+        if (parent == null) throw new IllegalStateException("No parent invocation for "
+                + targetBlueprint.getTargetType() + " in script " + targetBlueprint.getScriptName());
+        return parent;
+    }
+
+    private TargetType zoneTargetType() {
+        return switch (targetBlueprint.getTargetType()) {
+            case ZONE_FULL, INHERIT_SCRIPT_ZONE_FULL -> TargetType.ZONE_FULL;
+            case ZONE_BORDER, INHERIT_SCRIPT_ZONE_BORDER -> TargetType.ZONE_BORDER;
+            default -> throw new IllegalStateException("Not a zone target");
+        };
     }
 
     private ScriptZone getScriptZone() {
@@ -270,18 +279,14 @@ public class ScriptTargets {
     private Location addOffsets(Location originalLocation, ScriptActionData scriptActionData) {
         Location location = originalLocation.clone().add(targetBlueprint.getOffset().getValue());
         if (targetBlueprint.getScriptRelativeVectorBlueprint() != null)
-            scriptRelativeVector = new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, location);
-        else
-            return location;
-
-        location.add(scriptRelativeVector.getVector(scriptActionData));
+            location.add(new ScriptRelativeVector(targetBlueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, location)
+                    .getVector(scriptActionData));
 
         return location;
     }
 
     private Collection<Location> addOffsets(Collection<Location> locations, ScriptActionData scriptActionData) {
-        if (targetBlueprint.getOffset().getValue().length() == 0 && scriptRelativeVector == null) return locations;
-        locations.forEach(entry -> addOffsets(entry, scriptActionData));
-        return locations;
+        return locations.stream().map(location -> addOffsets(location, scriptActionData))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }

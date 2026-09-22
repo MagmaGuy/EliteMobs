@@ -12,8 +12,38 @@ import org.bukkit.event.Event;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.IdentityHashMap;
 
 public class ScriptActionData {
+    // Targets are reusable definitions. Waits, repeats and their snapshots belong to this invocation.
+    private final Map<ScriptTargets, List<Location>> locationSnapshots = new IdentityHashMap<>();
+    private final Map<ScriptTargets, List<?>> inheritedTargets = new IdentityHashMap<>();
+
+    List<Location> locationSnapshot(ScriptTargets targets) {
+        List<Location> snapshot = locationSnapshots.get(targets);
+        return snapshot == null ? null : snapshot.stream().map(Location::clone)
+                .collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+    }
+
+    void captureLocations(ScriptTargets targets, Collection<Location> locations) {
+        locationSnapshots.putIfAbsent(targets, locations.stream().map(Location::clone).toList());
+    }
+
+    List<?> inheritedTargets(ScriptTargets targets) {
+        List<?> snapshot = inheritedTargets.get(targets);
+        return snapshot == null ? null : copyTargets(snapshot);
+    }
+
+    void captureInheritedTargets(ScriptTargets targets, List<?> values) {
+        inheritedTargets.put(targets, copyTargets(values));
+    }
+
+    private static List<?> copyTargets(List<?> targets) {
+        return targets.stream().map(target -> target instanceof Location location ? location.clone() : target)
+                .collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+    }
+
     @Getter
     private final TargetType targetType;
     @Getter
