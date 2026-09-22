@@ -27,13 +27,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class QuestInventoryMenu {
     private static final int trackEntry = 8;
     private static final int acceptEntry = 26;
     private static final int directoryBackEntry = 26;
     private static final int questBackEntry = 0;
+    private static final int directoryPreviousEntry = 18, directoryNextEntry = 22;
+    private static final int detailPreviousEntry = 2, detailNextEntry = 6;
+    private static final List<Integer> questSlots = List.of(13, 11, 15, 9, 17, 10, 16, 12, 14, 8);
     private static final HashMap<Inventory, QuestDirectory> questDirectories = new HashMap<>();
     private static final HashMap<Inventory, QuestInventory> questInventories = new HashMap<>();
 
@@ -74,30 +76,35 @@ public class QuestInventoryMenu {
                                                        boolean returnToPlayerStatus) {
         String menuTitle = "Quests";
         Inventory questInventory = Bukkit.createInventory(player, 27, menuTitle);
-        List<Integer> questSlots = new ArrayList<>(new ArrayList<>(List.of(13, 11, 15, 9, 17, 10, 16, 12, 14, 8)));
-        Material acceptMaterial = Material.GREEN_STAINED_GLASS_PANE;
-        Material inProgressMaterial = Material.RED_STAINED_GLASS_PANE;
-        Material completeMaterial = Material.ORANGE_STAINED_GLASS_PANE;
-        HashMap<Integer, Quest> questMap = new HashMap<>();
-        for (int i = 0; i < quests.size(); i++) {
-            if (i >= questSlots.size()) break;
-            questMap.put(questSlots.get(i), quests.get(i));
-            QuestMenu.QuestText questText = new QuestMenu.QuestText(quests.get(i), npcEntity, player);
-            if (!quests.get(i).isAccepted())
-                questInventory.setItem(questSlots.get(i), ItemStackGenerator.generateItemStack(acceptMaterial, questText.getHeader().toPlainText()));
-            else if (!quests.get(i).getQuestObjectives().isOver())
-                questInventory.setItem(questSlots.get(i), ItemStackGenerator.generateItemStack(inProgressMaterial, questText.getHeader().toPlainText()));
-            else
-                questInventory.setItem(questSlots.get(i), ItemStackGenerator.generateItemStack(completeMaterial, questText.getHeader().toPlainText()));
-        }
-
-        if (returnToPlayerStatus)
-            questInventory.setItem(directoryBackEntry, PlayerStatusMenuConfig.getBackItem());
-
-        QuestDirectory questDirectory = new QuestDirectory(
-                player, questMap, questInventory, npcEntity, returnToPlayerStatus);
+        QuestDirectory questDirectory = new QuestDirectory(player, List.copyOf(quests), questInventory,
+                npcEntity, returnToPlayerStatus);
+        renderDirectory(questDirectory);
         if (player.openInventory(questInventory) != null)
             questDirectories.put(questInventory, questDirectory);
+    }
+
+    private static void renderDirectory(QuestDirectory menu) {
+        menu.inventory.clear();
+        menu.questMap.clear();
+        int first = menu.page * questSlots.size();
+        for (int index = first; index < Math.min(first + questSlots.size(), menu.quests.size()); index++) {
+            Quest quest = menu.quests.get(index);
+            int slot = questSlots.get(index - first);
+            menu.questMap.put(slot, quest);
+            Material material = !quest.isAccepted() ? Material.GREEN_STAINED_GLASS_PANE
+                    : !quest.getQuestObjectives().isOver() ? Material.RED_STAINED_GLASS_PANE : Material.ORANGE_STAINED_GLASS_PANE;
+            menu.inventory.setItem(slot, ItemStackGenerator.generateItemStack(material, QuestMenu.generateHeader(quest).toPlainText()));
+        }
+        if (menu.returnToPlayerStatus) menu.inventory.setItem(directoryBackEntry, PlayerStatusMenuConfig.getBackItem());
+        renderNavigation(menu.inventory, menu.page, menu.pageCount(), directoryPreviousEntry, directoryNextEntry);
+    }
+
+    private static void renderNavigation(Inventory inventory, int page, int pageCount, int previousSlot, int nextSlot) {
+        List<String> indicator = List.of((page + 1) + " / " + pageCount);
+        inventory.setItem(previousSlot, page > 0
+                ? ItemStackGenerator.generateItemStack(Material.ARROW, QuestsConfig.getPreviousInventoryPage(), indicator) : null);
+        inventory.setItem(nextSlot, page + 1 < pageCount
+                ? ItemStackGenerator.generateItemStack(Material.ARROW, QuestsConfig.getNextInventoryPage(), indicator) : null);
     }
 
     public static void generateInventoryQuestEntry(Quest quest, Player player, NPCEntity npcEntity) {
@@ -127,27 +134,34 @@ public class QuestInventoryMenu {
         if (quest instanceof CustomQuest && quest.isAccepted())
             questInventory.setItem(trackEntry, generateItemStackEntry(questText.getTrack(), new TextComponent(), trackingMaterial).get(0));
         questInventory.setItem(acceptEntry, generateItemStackEntry(questText.getAccept(), new TextComponent(), acceptMaterial).get(0));
+        List<CardSection> sections = new ArrayList<>();
         if (quest instanceof CustomQuest)
-            fillItemSlotLists(questInventory, loreEntries, new TextComponent(" "), questText.getBody(), loreMaterial);
-        fillItemSlotLists(questInventory, objectivesEntries, questText.getFixedSummary(), questText.getSummary(), objectivesMaterial);
-        fillItemSlotLists(questInventory, rewardEntries, questText.getFixedRewards(), questText.getRewards(), rewardsMaterial);
+            sections.add(new CardSection(loreEntries, generateItemStackEntry(new TextComponent(" "), questText.getBody(), loreMaterial)));
+        sections.add(new CardSection(objectivesEntries, generateItemStackEntry(questText.getFixedSummary(), questText.getSummary(), objectivesMaterial)));
+        sections.add(new CardSection(rewardEntries, generateItemStackEntry(questText.getFixedRewards(), questText.getRewards(), rewardsMaterial)));
         if (returnToPlayerStatus)
             questInventory.setItem(questBackEntry, PlayerStatusMenuConfig.getBackItem());
 
         QuestInventory questMenu = new QuestInventory(
-                player, quest, questInventory, npcEntity, returnToPlayerStatus);
+                player, quest, questInventory, npcEntity, returnToPlayerStatus, sections);
+        renderDetail(questMenu);
         if (player.openInventory(questInventory) != null)
             questInventories.put(questInventory, questMenu);
     }
 
-    public static void fillItemSlotLists(Inventory inventory, List<Integer> entries, TextComponent title, List<TextComponent> textComponents, Material material) {
-        List<ItemStack> loreItems = generateItemStackEntry(title, textComponents, material);
-        List<Integer> exactEntriesAmount = new ArrayList<>(entries);
-        exactEntriesAmount = exactEntriesAmount.subList(0, loreItems.size());
-        Collections.sort(exactEntriesAmount);
-        for (int i = 0; i < exactEntriesAmount.size(); i++)
-            inventory.setItem(exactEntriesAmount.get(i), loreItems.get(i));
+    private static void renderDetail(QuestInventory menu) {
+        for (CardSection section : menu.sections) {
+            for (int slot : section.slots()) menu.inventory.setItem(slot, null);
+            int first = menu.page * section.slots().size();
+            int count = Math.min(section.slots().size(), Math.max(0, section.cards().size() - first));
+            List<Integer> slots = new ArrayList<>(section.slots().subList(0, count));
+            Collections.sort(slots);
+            for (int i = 0; i < count; i++) menu.inventory.setItem(slots.get(i), section.cards().get(first + i));
+        }
+        renderNavigation(menu.inventory, menu.page, menu.pageCount(), detailPreviousEntry, detailNextEntry);
     }
+
+    private record CardSection(List<Integer> slots, List<ItemStack> cards) {}
 
     public static List<ItemStack> generateItemStackEntry(TextComponent title, List<TextComponent> textComponents, Material material) {
         List<String> list = new ArrayList<>();
@@ -162,79 +176,78 @@ public class QuestInventoryMenu {
 
     public static List<ItemStack> generateParsedItemStackEntry(String title, List<String> rawLore, Material material) {
         title = title.replace(ChatColor.BLACK.toString(), ChatColor.WHITE.toString());
-        List<String> lore = new ArrayList<>();
-        rawLore.forEach(raw -> lore.add(ChatColor.WHITE + raw.replace(ChatColor.BLACK.toString(), ChatColor.WHITE.toString())));
-        int characterLimit = QuestsConfig.getItemEntryCharacterLimitBedrockMenu();
-        List<ItemStack> itemStacks = new ArrayList<>();
-        AtomicInteger counter = new AtomicInteger();
-        lore.forEach(entry -> counter.addAndGet(entry.length()));
-        if (counter.get() < characterLimit) {
-            itemStacks.add(ItemStackGenerator.generateItemStack(material, title, lore));
-            return itemStacks;
-        }
-
-        int maxCharactersPerLine = QuestsConfig.getHorizontalCharacterLimitBedrockMenu();
-        List<String> currentList = new ArrayList<>();
-        int currentCharacterCount = 0;
-        for (String entry : lore) {
-            entry = entry.replace(ChatColor.BLACK.toString(), ChatColor.WHITE.toString());
-            if (!currentList.isEmpty() && entry.length() + currentCharacterCount > characterLimit) {
-                itemStacks.add(ItemStackGenerator.generateItemStack(material, title, currentList));
-                currentList.clear();
-                currentCharacterCount = 0;
-            }
-            if (entry.length() > maxCharactersPerLine) {
-                int size = maxCharactersPerLine;
-                //for languages that have no spaces
-                if (!entry.contains(" ")) {
-                    List<String> substrings = new ArrayList<>((entry.length() + size - 1) / size);
-                    for (int start = 0; start < entry.length(); start += size)
-                        substrings.add(ChatColor.WHITE + entry.substring(start, Math.min(entry.length(), start + size)));
-                    currentList.addAll(substrings);
-                    //for other languages
-                } else {
-                    String[] splitBySpaces = entry.split(" ");
-                    List<String> substrings = new ArrayList<>();
-                    StringBuilder currentString = new StringBuilder();
-                    currentString.append(ChatColor.WHITE);
-                    for (String string : splitBySpaces) {
-                        string += " ";
-                        if (currentString.length() + string.length() > size) {
-                            substrings.add(currentString.toString());
-                            currentString = new StringBuilder();
-                            currentString.append(ChatColor.WHITE);
-                        }
-                        currentString.append(string);
-                    }
-                    substrings.add(currentString.toString());
-                    currentList.addAll(substrings);
+        int characterLimit = Math.max(1, QuestsConfig.getItemEntryCharacterLimitBedrockMenu());
+        int lineLimit = Math.max(1, Math.min(characterLimit, QuestsConfig.getHorizontalCharacterLimitBedrockMenu()));
+        List<ItemStack> items = new ArrayList<>();
+        List<String> card = new ArrayList<>();
+        int used = 0;
+        for (String raw : rawLore) {
+            for (String line : wrapLore(raw.replace(ChatColor.BLACK.toString(), ChatColor.WHITE.toString()), lineLimit)) {
+                String plain = ChatColor.stripColor(line);
+                int size = plain.codePointCount(0, plain.length());
+                if (!card.isEmpty() && used + size > characterLimit) {
+                    items.add(ItemStackGenerator.generateItemStack(material, title, card));
+                    card = new ArrayList<>();
+                    used = 0;
                 }
-            } else
-                currentList.add(entry);
-            currentCharacterCount += entry.length();
+                card.add(line);
+                used += size;
+            }
         }
-        itemStacks.add(ItemStackGenerator.generateItemStack(material, title, currentList));
-        return itemStacks;
+        if (!card.isEmpty() || items.isEmpty()) items.add(ItemStackGenerator.generateItemStack(material, title, card));
+        return items;
+    }
+
+    private static List<String> wrapLore(String text, int limit) {
+        List<String> lines = new ArrayList<>();
+        String color = ChatColor.WHITE.toString();
+        for (String paragraph : text.split("\\R", -1)) {
+            if (paragraph.isEmpty()) lines.add(color);
+            for (int start = 0; start < paragraph.length();) {
+                int end = start, visible = 0, space = -1;
+                while (end < paragraph.length() && visible < limit) {
+                    char character = paragraph.charAt(end);
+                    if (character == ChatColor.COLOR_CHAR && end + 1 < paragraph.length()) {
+                        end += 2;
+                        continue;
+                    }
+                    if (character == ' ') space = end;
+                    end += Character.charCount(paragraph.codePointAt(end));
+                    visible++;
+                }
+                if (end < paragraph.length() && space > start) end = space + 1;
+                String line = color + paragraph.substring(start, end);
+                lines.add(line);
+                color = ChatColor.getLastColors(line);
+                start = end;
+            }
+        }
+        return lines;
     }
 
     private static class QuestDirectory {
-        HashMap<Integer, Quest> questMap;
+        final HashMap<Integer, Quest> questMap = new HashMap<>();
+        final List<? extends Quest> quests;
+        int page;
         Inventory inventory;
         NPCEntity npcEntity;
         Player player;
         boolean returnToPlayerStatus;
 
-        private QuestDirectory(Player player, HashMap<Integer, Quest> questMap, Inventory inventory, NPCEntity npcEntity,
+        private QuestDirectory(Player player, List<? extends Quest> quests, Inventory inventory, NPCEntity npcEntity,
                                boolean returnToPlayerStatus) {
-            this.questMap = questMap;
+            this.quests = quests;
             this.inventory = inventory;
             this.npcEntity = npcEntity;
             this.player = player;
             this.returnToPlayerStatus = returnToPlayerStatus;
         }
+        private int pageCount() { return Math.max(1, (quests.size() + questSlots.size() - 1) / questSlots.size()); }
     }
 
     private static class QuestInventory {
+        final List<CardSection> sections;
+        int page;
         Quest quest;
         Inventory inventory;
         NPCEntity npcEntity;
@@ -242,12 +255,17 @@ public class QuestInventoryMenu {
         boolean returnToPlayerStatus;
 
         private QuestInventory(Player player, Quest quest, Inventory inventory, NPCEntity npcEntity,
-                               boolean returnToPlayerStatus) {
+                               boolean returnToPlayerStatus, List<CardSection> sections) {
+            this.sections = sections;
             this.quest = quest;
             this.inventory = inventory;
             this.npcEntity = npcEntity;
             this.player = player;
             this.returnToPlayerStatus = returnToPlayerStatus;
+        }
+        private int pageCount() {
+            return sections.stream().mapToInt(section -> (section.cards().size() + section.slots().size() - 1)
+                    / section.slots().size()).max().orElse(1);
         }
     }
 
@@ -259,6 +277,16 @@ public class QuestInventoryMenu {
                 event.setCancelled(true);
                 if (event.getClickedInventory() != event.getView().getTopInventory()) return;
                 QuestDirectory questDirectory = questDirectories.get(event.getInventory());
+                if (event.getSlot() == directoryPreviousEntry && questDirectory.page > 0) {
+                    questDirectory.page--;
+                    renderDirectory(questDirectory);
+                    return;
+                }
+                if (event.getSlot() == directoryNextEntry && questDirectory.page + 1 < questDirectory.pageCount()) {
+                    questDirectory.page++;
+                    renderDirectory(questDirectory);
+                    return;
+                }
                 if (questDirectory.returnToPlayerStatus && event.getSlot() == directoryBackEntry) {
                     player.closeInventory();
                     CoverPage.coverPage(player);
@@ -272,6 +300,16 @@ public class QuestInventoryMenu {
                 event.setCancelled(true);
                 if (event.getClickedInventory() != event.getView().getTopInventory()) return;
                 QuestInventory questInventory = questInventories.get(event.getInventory());
+                if (event.getSlot() == detailPreviousEntry && questInventory.page > 0) {
+                    questInventory.page--;
+                    renderDetail(questInventory);
+                    return;
+                }
+                if (event.getSlot() == detailNextEntry && questInventory.page + 1 < questInventory.pageCount()) {
+                    questInventory.page++;
+                    renderDetail(questInventory);
+                    return;
+                }
                 if (questInventory.returnToPlayerStatus && event.getSlot() == questBackEntry) {
                     player.closeInventory();
                     CoverPage.coverPage(player);

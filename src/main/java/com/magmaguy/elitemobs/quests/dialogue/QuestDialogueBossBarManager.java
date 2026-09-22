@@ -149,8 +149,7 @@ public class QuestDialogueBossBarManager {
                 }
             }
         } else if (quest instanceof DynamicQuest && !quest.isAccepted()) {
-            QuestMenu.QuestText questText = new QuestMenu.QuestText(quest, npcEntity, player);
-            for (TextComponent textComponent : questText.getBody()) {
+            for (TextComponent textComponent : QuestMenu.generateBody(quest)) {
                 lines.add(textComponent.toPlainText());
             }
         }

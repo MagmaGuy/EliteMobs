@@ -130,6 +130,10 @@ public class QuestsConfig extends ConfigurationFile {
     @Getter
     private static int itemEntryCharacterLimitBedrockMenu;
     @Getter
+    private static String previousInventoryPage;
+    @Getter
+    private static String nextInventoryPage;
+    @Getter
     private static String questLockoutSubtitle;
     @Getter
     private static String questLockoutChatMessage;
@@ -499,6 +503,13 @@ public class QuestsConfig extends ConfigurationFile {
         itemEntryCharacterLimitBedrockMenu = ConfigurationEngine.setInt(
                 List.of("Sets the maximum amount of characters per item entry in inventory-based menus for quests before creating another item to continue the entry."),
                 fileConfiguration, "itemEntryCharacterLimitBedrockMenu", 300);
+
+        previousInventoryPage = ConfigurationEngine.setString(
+                List.of("Previous page button in inventory quest menus"),
+                file, fileConfiguration, "previousInventoryPage", "Previous page", true);
+        nextInventoryPage = ConfigurationEngine.setString(
+                List.of("Next page button in inventory quest menus"),
+                file, fileConfiguration, "nextInventoryPage", "Next page", true);
 
         questLockoutSubtitle = ConfigurationEngine.setString(
                 List.of("Sets the subtitle shown when a player tries to accept a quest they are locked out from"),

@@ -352,12 +352,13 @@ public final class PartyManager implements Listener {
 
     public static List<Player> expandSharedCreditParticipants(Collection<Player> contributors, Location creditLocation) {
         LinkedHashMap<UUID, Player> eligible = new LinkedHashMap<>();
+        Map<Party, List<Player>> nearbyByParty = new java.util.IdentityHashMap<>();
         for (Player contributor : contributors) {
             if (contributor == null || contributor.hasMetadata("NPC")) continue;
             eligible.put(contributor.getUniqueId(), contributor);
             Party party = getParty(contributor.getUniqueId());
             if (party == null) continue;
-            for (Player partyMember : getNearbyMembers(party, creditLocation))
+            for (Player partyMember : nearbyByParty.computeIfAbsent(party, current -> getNearbyMembers(current, creditLocation)))
                 eligible.put(partyMember.getUniqueId(), partyMember);
         }
         return List.copyOf(eligible.values());

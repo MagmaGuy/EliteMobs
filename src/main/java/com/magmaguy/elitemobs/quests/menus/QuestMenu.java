@@ -89,14 +89,14 @@ public class QuestMenu {
     }
 
 
-    private static TextComponent generateHeader(Quest quest) {
+    static TextComponent generateHeader(Quest quest) {
         if (quest instanceof CustomQuest)
             return SpigotMessage.simpleMessage(CustomQuestMenuConfig.getHeaderTextLines().replace("$questName", quest.getQuestName()));
         else
             return SpigotMessage.simpleMessage(DynamicQuestMenuConfig.getHeaderTextLines().replace("$questName", quest.getQuestName()));
     }
 
-    private static List<TextComponent> generateBody(Quest quest) {
+    public static List<TextComponent> generateBody(Quest quest) {
         List<TextComponent> body = new ArrayList<>();
         if (quest instanceof CustomQuest)
             for (String splitString : ((CustomQuest) quest).getCustomQuestsConfigFields().getQuestLore())
