@@ -52,6 +52,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -62,6 +63,7 @@ import java.util.UUID;
 /** Live, player-scoped patrol authoring. Runtime patrols remain owned by {@link PatrolService}. */
 public final class PatrolEditor implements Listener {
     private static final Map<UUID, Session> SESSIONS = new HashMap<>();
+    private static final Map<Object, UUID> EDITORS = new IdentityHashMap<>();
     private static PatrolEditor listener;
     private static BukkitTask previewTask;
     private static int previewTicks;
@@ -80,6 +82,7 @@ public final class PatrolEditor implements Listener {
     public static void shutdown() {
         for (Session session : new ArrayList<>(SESSIONS.values())) session.close(true);
         SESSIONS.clear();
+        EDITORS.clear();
         if (previewTask != null) previewTask.cancel();
         previewTask = null;
         if (listener != null) HandlerList.unregisterAll(listener);
@@ -87,7 +90,7 @@ public final class PatrolEditor implements Listener {
     }
 
     public static boolean isEditing(NPCEntity npc) {
-        return SESSIONS.values().stream().anyMatch(session -> session.owner == npc);
+        return EDITORS.containsKey(npc);
     }
 
     public static void edit(Player player) {
@@ -98,15 +101,22 @@ public final class PatrolEditor implements Listener {
             return;
         }
 
-        Session session;
-        try {
-            session = Session.create(player, owner);
-        } catch (IllegalArgumentException exception) {
-            message(player, exception.getMessage());
+        if (EDITORS.putIfAbsent(owner, player.getUniqueId()) != null) {
+            message(player, "Another administrator is already editing that actor.");
             return;
         }
-        SESSIONS.put(player.getUniqueId(), session);
-        PatrolService.pause(owner);
+        Session session = null;
+        try {
+            session = Session.create(player, owner);
+            PatrolService.pause(owner);
+            SESSIONS.put(player.getUniqueId(), session);
+        } catch (RuntimeException | Error exception) {
+            EDITORS.remove(owner, player.getUniqueId());
+            if (session != null) session.close(true);
+            if (exception instanceof Error error) throw error;
+            message(player, rootMessage(exception));
+            return;
+        }
         message(player, "Editing " + session.filename() + " with " + session.nodes.size()
                 + " node(s), mode " + session.mode + ". Use /em patrol add at each waypoint.");
     }
@@ -312,6 +322,10 @@ public final class PatrolEditor implements Listener {
         private final Object owner;
         private final Location origin;
         private final double speedModifier;
+        private final Double virtualSpeed;
+        private final boolean originalAi;
+        private final boolean originalAware;
+        private boolean closed;
         private final boolean hadPatrol;
         private final UUID bodyId;
         private final PathfindingHandle driver;
@@ -326,11 +340,16 @@ public final class PatrolEditor implements Listener {
                         Location origin,
                         PatrolRoute existing,
                         UUID bodyId,
-                        PathfindingHandle driver) {
+                        PathfindingHandle driver,
+                        boolean originalAi,
+                        boolean originalAware) {
             this.playerId = player.getUniqueId();
             this.owner = owner;
             this.origin = origin.clone();
             this.speedModifier = existing == null ? 1D : existing.speedModifier();
+            this.virtualSpeed = existing == null ? null : existing.virtualSpeed();
+            this.originalAi = originalAi;
+            this.originalAware = originalAware;
             this.hadPatrol = existing != null;
             this.bodyId = bodyId;
             this.driver = driver;
@@ -352,12 +371,6 @@ public final class PatrolEditor implements Listener {
                     throw new IllegalArgumentException("Runtime-only NPCs cannot be used as persistent route templates.");
                 if (body != null && body.isInsideVehicle())
                     throw new IllegalArgumentException("A passenger cannot own a patrol; route its mount instead.");
-                if (body instanceof Mob mob) {
-                    mob.setAI(true);
-                    mob.setAware(true);
-                    if (NMSManager.getAdapter() == null || !NMSManager.getAdapter().removeFreeWill(body))
-                        throw new IllegalArgumentException("This NPC body cannot be prepared for native pathfinding.");
-                }
             } else if (owner instanceof CustomBossEntity boss) {
                 body = boss.getLivingEntity();
                 origin = boss.getSpawnLocation();
@@ -378,7 +391,23 @@ public final class PatrolEditor implements Listener {
                 throw new IllegalArgumentException("No MagmaCore NMS adapter is active on this server version.");
             PathfindingHandle driver = NMSManager.getAdapter().createPathfindingHandle(body)
                     .orElseThrow(() -> new IllegalArgumentException("The targeted body has no native pathfinding handle."));
-            return new Session(player, owner, origin, route, body.getUniqueId(), driver);
+            boolean originalAi = body.hasAI();
+            boolean originalAware = !(body instanceof Mob mob) || mob.isAware();
+            try {
+                if (owner instanceof NPCEntity && body instanceof Mob mob) {
+                    mob.setAI(true);
+                    mob.setAware(true);
+                    if (!NMSManager.getAdapter().removeFreeWill(body))
+                        throw new IllegalArgumentException("This NPC body cannot be prepared for native pathfinding.");
+                }
+                return new Session(player, owner, origin, route, body.getUniqueId(), driver,
+                        originalAi, originalAware);
+            } catch (RuntimeException | Error failure) {
+                driver.close();
+                body.setAI(originalAi);
+                if (body instanceof Mob mob) mob.setAware(originalAware);
+                throw failure;
+            }
         }
 
         private LivingEntity body() {
@@ -403,7 +432,9 @@ public final class PatrolEditor implements Listener {
             validation.set("patrol.enabled", true);
             validation.set("patrol.mode", mode.name());
             validation.set("patrol.speed", speedModifier);
-            validation.set("patrol.nodes", nodes.stream().map(PatrolEditor::vector).toList());
+            validation.set("patrol.virtualSpeed", virtualSpeed);
+            validation.set("patrol.nodes", nodes.stream().map(node ->
+                    Double.toString(node.getX()) + "," + node.getY() + "," + node.getZ()).toList());
             return Objects.requireNonNull(PatrolRoute.parse(validation));
         }
 
@@ -496,33 +527,82 @@ public final class PatrolEditor implements Listener {
 
         private void render(Player player) {
             restoreBedrockPreview(player);
-            if (player.getWorld() != origin.getWorld()) return;
-            List<Location> points = nodes.stream().map(node -> origin.clone().add(node)).toList();
-            if (points.isEmpty()) return;
-            int segments = mode == PatrolMode.LOOP && points.size() > 2 ? points.size() : points.size() - 1;
-            for (Location point : points) showPoint(player, point);
-            for (int start = 0; start < segments; start++) {
-                Location from = points.get(start);
-                Location to = points.get((start + 1) % points.size());
-                Vector delta = to.toVector().subtract(from.toVector());
-                double length = delta.length();
-                if (length <= 1.0E-6D) continue;
-                Vector step = delta.normalize().multiply(0.75D);
-                for (double distance = 0.75D; distance < length; distance += 0.75D)
-                    showPoint(player, from.clone().add(step.clone().multiply(distance / 0.75D)));
+            if (player.getWorld() != origin.getWorld() || nodes.isEmpty()) return;
+            Preview preview = new Preview(player);
+            for (Vector node : nodes) {
+                if (preview.full()) return;
+                preview.point(origin.clone().add(node));
             }
-            for (Location resolvedPoint : driver.routePreview()) showPoint(player, resolvedPoint);
+            int segments = mode == PatrolMode.LOOP && nodes.size() > 2 ? nodes.size() : nodes.size() - 1;
+            for (int start = 0; start < segments && !preview.full(); start++)
+                preview.segment(origin.clone().add(nodes.get(start)),
+                        origin.clone().add(nodes.get((start + 1) % nodes.size())));
+            if (preview.full()) return;
+            for (Location resolvedPoint : driver.routePreview()) {
+                if (preview.full()) return;
+                preview.point(resolvedPoint);
+            }
         }
 
-        private void showPoint(Player player, Location location) {
-            if (BedrockChecker.isBedrock(player)) {
-                Location block = location.getBlock().getLocation();
-                if (!block.getWorld().isChunkLoaded(block.getBlockX() >> 4, block.getBlockZ() >> 4)) return;
-                if (bedrockPreview.size() >= 256 || bedrockPreview.containsKey(block)) return;
-                bedrockPreview.put(block, block.getBlock().getBlockData());
-                player.sendBlockChange(block, Material.GLASS.createBlockData());
-            } else {
-                player.spawnParticle(Particle.BLOCK_MARKER, location, 1, Material.BARRIER.createBlockData());
+        /** Clip before sampling: authored route length does not determine preview work. */
+        private final class Preview {
+            private static final double RADIUS = 48D;
+            private final Player player;
+            private final Location viewer;
+            private final boolean bedrock;
+            private final BlockData marker;
+            private int remaining = 256;
+
+            private Preview(Player player) {
+                this.player = player;
+                viewer = player.getLocation();
+                bedrock = BedrockChecker.isBedrock(player);
+                marker = (bedrock ? Material.GLASS : Material.BARRIER).createBlockData();
+            }
+
+            private boolean full() { return remaining == 0; }
+
+            private void segment(Location from, Location to) {
+                Vector delta = to.toVector().subtract(from.toVector());
+                double length = delta.length();
+                if (length <= 1.0E-6D) return;
+                double[] offset = {from.getX() - viewer.getX(), from.getY() - viewer.getY(),
+                        from.getZ() - viewer.getZ()};
+                double[] direction = {delta.getX(), delta.getY(), delta.getZ()};
+                double first = 0D, last = 1D;
+                for (int axis = 0; axis < 3; axis++) {
+                    if (direction[axis] == 0D) {
+                        if (Math.abs(offset[axis]) > RADIUS) return;
+                    } else {
+                        double a = (-RADIUS - offset[axis]) / direction[axis];
+                        double b = (RADIUS - offset[axis]) / direction[axis];
+                        first = Math.max(first, Math.min(a, b));
+                        last = Math.min(last, Math.max(a, b));
+                        if (first > last) return;
+                    }
+                }
+                double step = 0.75D / length;
+                int samples = 0;
+                for (double fraction = Math.max(step, Math.ceil(first / step) * step);
+                     fraction < 1D && fraction <= last && !full() && samples++ < 256; fraction += step)
+                    point(from.clone().add(delta.clone().multiply(fraction)));
+            }
+
+            private void point(Location location) {
+                if (full() || location.getWorld() != viewer.getWorld()
+                        || Math.abs(location.getX() - viewer.getX()) > RADIUS
+                        || Math.abs(location.getY() - viewer.getY()) > RADIUS
+                        || Math.abs(location.getZ() - viewer.getZ()) > RADIUS) return;
+                --remaining;
+                if (bedrock) {
+                    if (!location.getWorld().isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4)) return;
+                    Location block = location.getBlock().getLocation();
+                    if (bedrockPreview.containsKey(block)) return;
+                    bedrockPreview.put(block, block.getBlock().getBlockData());
+                    player.sendBlockChange(block, marker);
+                } else {
+                    player.spawnParticle(Particle.BLOCK_MARKER, location, 1, marker);
+                }
             }
         }
 
@@ -534,13 +614,20 @@ public final class PatrolEditor implements Listener {
         }
 
         private void close(boolean cancelled) {
+            if (closed) return;
+            closed = true;
+            EDITORS.remove(owner, playerId);
+            SESSIONS.remove(playerId, this);
             Player player = Bukkit.getPlayer(playerId);
             if (player != null) restoreBedrockPreview(player);
             driver.close();
             if (cancelled) {
                 if (hadPatrol) PatrolService.refresh(owner);
-                else if (owner instanceof NPCEntity npc && npc.getVillager() != null)
-                    npc.getVillager().setAI(false);
+                else if (owner instanceof NPCEntity && body() instanceof Mob mob
+                        && mob.getUniqueId().equals(bodyId)) {
+                    mob.setAI(originalAi);
+                    mob.setAware(originalAware);
+                }
             }
         }
 

@@ -241,8 +241,7 @@ public final class PatrolRoute {
     }
 
     private static String format(double value) {
-        if (Math.rint(value) == value) return Long.toString((long) value);
-        return String.format(java.util.Locale.ROOT, "%.3f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
+        return Double.toString(value);
     }
 
     public record Step(int targetNode, int direction) {
