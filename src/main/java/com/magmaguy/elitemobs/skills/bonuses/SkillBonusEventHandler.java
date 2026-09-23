@@ -53,6 +53,13 @@ public class SkillBonusEventHandler implements Listener {
         event.applySkillBonuses();
     }
 
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDeath(org.bukkit.event.entity.PlayerDeathEvent event) {
+        SkillBonus skill = SkillBonusRegistry.getSkillById("armor_second_wind");
+        if (skill instanceof com.magmaguy.elitemobs.skills.bonuses.skills.armor.SecondWindSkill secondWind)
+            secondWind.cancelPending(event.getEntity());
+    }
+
     /**
      * Loads player skill selections on join.
      */

@@ -12,28 +12,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
-import java.util.HashMap;
+import java.util.WeakHashMap;
+import java.lang.ref.WeakReference;
+import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerDeathMessageByEliteMob implements Listener {
 
-    private static final HashMap<UUID, String> deadPlayerList = new HashMap<>();
+    private static final WeakHashMap<EntityDamageEvent, WeakReference<EliteEntity>> eliteHits = new WeakHashMap<>();
 
-    public static void shutdown() {
-        deadPlayerList.clear();
-    }
+    public static void shutdown() { eliteHits.clear(); }
 
-    public static void addDeadPlayer(Player player, String deathMessage) {
-        deadPlayerList.put(player.getUniqueId(), deathMessage);
-    }
-
-    private static boolean isDeadPlayer(Player player) {
-        return deadPlayerList.containsKey(player.getUniqueId());
-    }
-
-    private static void removeDeadPlayer(Player player) {
-        deadPlayerList.remove(player.getUniqueId());
+    /** Associate the real native hit, without predicting whether its victim will die. */
+    public static void recordHit(EntityDamageEvent hit, EliteEntity source) {
+        eliteHits.put(hit, new WeakReference<>(source));
     }
 
     public static String initializeDeathMessage(Player player, EliteEntity eliteEntity) {
@@ -78,11 +71,13 @@ public class PlayerDeathMessageByEliteMob implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
 
-        if (isDeadPlayer(event.getEntity())) {
-            event.setDeathMessage(deadPlayerList.get(event.getEntity().getUniqueId()));
-            PlayerStatsTracker.registerPlayerDeath(event.getEntity());
-            removeDeadPlayer(event.getEntity());
-        }
+        EntityDamageEvent cause = event.getEntity().getLastDamageCause();
+        WeakReference<EliteEntity> reference = eliteHits.remove(cause);
+        EliteEntity source = reference == null ? null : reference.get();
+        if (source == null || cause == null || cause.isCancelled() || source.getLivingEntity() == null) return;
+        String message = initializeDeathMessage(event.getEntity(), source);
+        if (message != null && !message.isBlank()) event.setDeathMessage(message);
+        PlayerStatsTracker.registerPlayerDeath(event.getEntity());
 
     }
 

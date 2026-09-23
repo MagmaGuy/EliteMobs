@@ -650,6 +650,7 @@ public class EliteMobs extends JavaPlugin {
         EliteLuaPowerServiceModule.shutdown();
         AutoclickerThrottle.shutdown();
         SpiritWalkSupport.shutdown();
+        com.magmaguy.elitemobs.combatsystem.combattag.CombatTag.shutdown();
         ZombieNecronomiconSupport.shutdown();
         if (MetadataHandler.pluginState == PluginState.INITIALIZING) {
             Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);

@@ -269,8 +269,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
 
             // SecondWind - heal when health drops below threshold
             if (skill instanceof SecondWindSkill secondWind) {
-                double newHealthPercent = (player.getHealth() - getDamage()) / player.getMaxHealth();
-                secondWind.checkTrigger(player, newHealthPercent);
+                secondWind.afterHit(player, entityDamageByEntityEvent);
                 continue;
             }
 
@@ -709,9 +708,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 event.setDamage(EntityDamageEvent.DamageModifier.ABSORPTION,
                         -Math.min(player.getAbsorptionAmount(), Math.max(0D, newDamage)));
 
-            //Deal with the player getting killed todo: this is a bit busted, fix
-            if (player.getHealth() - event.getDamage() <= 0)
-                PlayerDeathMessageByEliteMob.addDeadPlayer(player, PlayerDeathMessageByEliteMob.initializeDeathMessage(player, eliteEntity));
+            PlayerDeathMessageByEliteMob.recordHit(event, eliteEntity);
 
         }
 

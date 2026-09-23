@@ -194,6 +194,8 @@ public class QuestDialogueBossBarManager {
         private final Set<KeyedBossBar> hiddenKeyedBossBars = new LinkedHashSet<>();
         private final BossBar[] bars = new BossBar[TOTAL_BARS];
         private final PotionEffect previousSlowness;
+        private long movementLockTick;
+        private boolean movementLockApplied;
         private BossBarOrderManager.Suspension bossBarSuspension;
         private BukkitTask task;
         private int pageIndex = 0;
@@ -253,12 +255,10 @@ public class QuestDialogueBossBarManager {
         }
 
         private void applyMovementLock() {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,
-                    DIALOGUE_SLOWNESS_DURATION_TICKS,
-                    DIALOGUE_SLOWNESS_AMPLIFIER,
-                    false,
-                    false,
-                    false), true);
+            com.magmaguy.elitemobs.utils.GameClock.initialize();
+            movementLockTick = com.magmaguy.elitemobs.utils.GameClock.getCurrentTick();
+            movementLockApplied = player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,
+                    DIALOGUE_SLOWNESS_DURATION_TICKS, DIALOGUE_SLOWNESS_AMPLIFIER, false, false, false));
         }
 
         private void createBars() {
@@ -351,14 +351,21 @@ public class QuestDialogueBossBarManager {
         }
 
         private void clearMovementLock() {
-            if (!player.isOnline()) return;
-            PotionEffect currentSlowness = player.getPotionEffect(PotionEffectType.SLOWNESS);
-            if (currentSlowness != null &&
-                    (currentSlowness.getAmplifier() != DIALOGUE_SLOWNESS_AMPLIFIER ||
-                            currentSlowness.getDuration() > DIALOGUE_SLOWNESS_DURATION_TICKS))
-                return;
-            if (currentSlowness != null) player.removePotionEffect(PotionEffectType.SLOWNESS);
-            if (previousSlowness != null) player.addPotionEffect(previousSlowness, true);
+            if (!movementLockApplied || !player.isOnline()) return;
+            long elapsed = Math.max(0L, com.magmaguy.elitemobs.utils.GameClock.getCurrentTick() - movementLockTick);
+            int expected = (int) Math.max(0L, DIALOGUE_SLOWNESS_DURATION_TICKS - elapsed);
+            PotionEffect current = player.getPotionEffect(PotionEffectType.SLOWNESS);
+            if (current == null || expected == 0 || current.getAmplifier() != DIALOGUE_SLOWNESS_AMPLIFIER
+                    || current.isAmbient() || current.hasParticles() || current.hasIcon()
+                    || Math.abs((long) current.getDuration() - expected) > 1) return;
+            player.removePotionEffect(PotionEffectType.SLOWNESS);
+            if (player.hasPotionEffect(PotionEffectType.SLOWNESS) || previousSlowness == null) return;
+            int remaining = previousSlowness.isInfinite() ? -1
+                    : (int) Math.max(0L, previousSlowness.getDuration() - elapsed);
+            if (remaining == 0) return;
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, remaining,
+                    previousSlowness.getAmplifier(), previousSlowness.isAmbient(),
+                    previousSlowness.hasParticles(), previousSlowness.hasIcon()));
         }
 
         private void restoreBossBars() {

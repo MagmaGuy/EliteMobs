@@ -8,6 +8,11 @@ import com.magmaguy.elitemobs.skills.bonuses.interfaces.CooldownSkill;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.scheduler.BukkitTask;
+import com.magmaguy.elitemobs.MetadataHandler;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import java.util.List;
 import java.util.Map;
@@ -34,6 +39,7 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
 
     private static final Set<UUID> activePlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
+    private final Map<UUID, PendingHit> pendingHits = new HashMap<>();
     private static final double HEALTH_THRESHOLD = 0.25; // 25% health
 
     public SecondWindSkill() {
@@ -65,6 +71,7 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void onDeactivate(Player player) {
+        cancelPending(player);
         activePlayers.remove(player.getUniqueId());
         cooldownMap.remove(player.getUniqueId());
     }
@@ -95,6 +102,8 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void shutdown() {
+        pendingHits.values().forEach(pending -> pending.task.cancel());
+        pendingHits.clear();
         activePlayers.clear();
         cooldownMap.clear();
     }
@@ -145,38 +154,59 @@ public class SecondWindSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void onActivate(Player player, Object event) {
-        int skillLevel = getPlayerSkillLevel(player);
-
-        // Heal the player
-        double healAmount = player.getMaxHealth() * getHealPercent(skillLevel);
-        double newHealth = Math.min(player.getHealth() + healAmount, player.getMaxHealth());
-        player.setHealth(newHealth);
-
-        // Visual and sound effects
-        player.getWorld().spawnParticle(Particle.HEART,
-            player.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0);
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
-
-        // Start cooldown
-        startCooldown(player, skillLevel);
+        if (event instanceof EntityDamageEvent hit) afterHit(player, hit);
     }
 
-    /**
-     * Checks if the skill should trigger based on health threshold.
-     * Called from damage event handler.
-     *
-     * @param player The player taking damage
-     * @param newHealthPercent The player's new health percentage (0.0 to 1.0)
-     */
-    public void checkTrigger(Player player, double newHealthPercent) {
-        if (!isActive(player) || isOnCooldown(player)) {
+    /** Second Wind heals surviving players after accepted native damage has changed health. */
+    public void afterHit(Player player, EntityDamageEvent event) {
+        if (!isActive(player) || isOnCooldown(player)) return;
+        PendingHit existing = pendingHits.get(player.getUniqueId());
+        if (existing != null) {
+            existing.hits.add(new Hit(event, player.getHealth()));
             return;
         }
+        PendingHit pending = new PendingHit(player, event);
+        pendingHits.put(player.getUniqueId(), pending);
+        try {
+            pending.task = player.getServer().getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                if (!pendingHits.remove(player.getUniqueId(), pending)) return;
+                if (!player.isOnline() || player.isDead() || !isActive(player) || isOnCooldown(player)
+                        || !player.getWorld().getUID().equals(pending.worldId)) return;
+                double health = player.getHealth();
+                if (health <= 0 || health / player.getMaxHealth() > HEALTH_THRESHOLD) return;
+                boolean accepted = pending.hits.stream().anyMatch(hit -> !hit.event.isCancelled()
+                        && hit.event.getFinalDamage() > 0 && health < hit.healthBefore);
+                if (!accepted) return;
+                int skillLevel = getPlayerSkillLevel(player);
+                double healed = Math.min(player.getMaxHealth(), health + player.getMaxHealth() * getHealPercent(skillLevel));
+                if (healed <= health) return;
+                player.setHealth(healed);
+                startCooldown(player, skillLevel);
+                incrementProcCount(player);
+                SkillBonus.sendSkillActionBar(player, this);
+                player.getWorld().spawnParticle(Particle.HEART,
+                        player.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0);
+                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
+            });
+        } catch (RuntimeException failure) {
+            pendingHits.remove(player.getUniqueId(), pending);
+            throw failure;
+        }
+    }
 
-        if (newHealthPercent <= HEALTH_THRESHOLD) {
-            onActivate(player, null);
-            incrementProcCount(player);
-            SkillBonus.sendSkillActionBar(player, this);
+    public void cancelPending(Player player) {
+        PendingHit pending = pendingHits.remove(player.getUniqueId());
+        if (pending != null && pending.task != null) pending.task.cancel();
+    }
+
+    private record Hit(EntityDamageEvent event, double healthBefore) {}
+    private static final class PendingHit {
+        final UUID worldId;
+        final List<Hit> hits = new ArrayList<>();
+        BukkitTask task;
+        PendingHit(Player player, EntityDamageEvent event) {
+            worldId = player.getWorld().getUID();
+            hits.add(new Hit(event, player.getHealth()));
         }
     }
 
