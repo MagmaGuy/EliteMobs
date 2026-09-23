@@ -159,6 +159,10 @@ public class ChannelHealingLuaConfig extends InlineLuaPowerConfig {
                     start_scan_task(context)
                   end,
                   on_exit_combat = function(context)
+                    if context.state.channel_healing_task ~= nil then
+                      context.scheduler:cancel_task(context.state.channel_healing_task)
+                      finish_channel(context, context.state.channel_healing_target)
+                    end
                     if context.state.channel_healing_scan_task ~= nil then
                       context.scheduler:cancel_task(context.state.channel_healing_scan_task)
                       context.state.channel_healing_scan_task = nil

@@ -79,41 +79,41 @@ public class ZombieParentsLuaConfig extends LuaPowersConfigFields {
                 end
 
                 local function start_dialog(context, reinforcement_mom, reinforcement_dad)
-                  context.scheduler:run_after(20, function(context)
-                    local task_id
-                    local function do_dialog()
-                      if not context.boss:is_alive() then
-                        if reinforcement_dad ~= nil and reinforcement_dad:is_alive() then
-                          say_random_line(context, reinforcement_dad, death_message)
+                  local families = context.state.zombie_parent_families
+                  if families == nil then
+                    families = {}
+                    context.state.zombie_parent_families = families
+                  end
+                  families[#families + 1] = { mom = reinforcement_mom, dad = reinforcement_dad }
+                  if context.state.zombie_parents_dialog_task ~= nil then
+                    return
+                  end
+
+                  context.state.zombie_parents_dialog_task = context.scheduler:run_repeating(20, 20 * 8, function(context)
+                    local boss_alive = context.boss:is_alive()
+                    for index = #families, 1, -1 do
+                      local family = families[index]
+                      local mom_alive = family.mom ~= nil and family.mom:is_alive()
+                      local dad_alive = family.dad ~= nil and family.dad:is_alive()
+                      if not mom_alive and not dad_alive then
+                        table.remove(families, index)
+                      else
+                        if dad_alive and (not boss_alive or math.random() < 0.5) then
+                          say_random_line(context, family.dad, boss_alive and zombie_dad or death_message)
                         end
-                        if reinforcement_mom ~= nil and reinforcement_mom:is_alive() then
-                          say_random_line(context, reinforcement_mom, death_message)
+                        if mom_alive and (not boss_alive or math.random() < 0.5) then
+                          say_random_line(context, family.mom, boss_alive and zombie_mom or death_message)
                         end
-                        if task_id ~= nil then
-                          context.scheduler:cancel_task(task_id)
-                        end
-                        return false
                       end
-
-                      if math.random() < 0.5 then
-                        say_random_line(context, context.boss, boss_entity_dialog)
-                      end
-
-                      if reinforcement_dad ~= nil and reinforcement_dad:is_alive() and math.random() < 0.5 then
-                        say_random_line(context, reinforcement_dad, zombie_dad)
-                      end
-
-                      if reinforcement_mom ~= nil and reinforcement_mom:is_alive() and math.random() < 0.5 then
-                        say_random_line(context, reinforcement_mom, zombie_mom)
-                      end
-
-                      return true
                     end
-
-                    if do_dialog() then
-                      task_id = context.scheduler:run_every(20 * 8, function(context)
-                        do_dialog()
-                      end)
+                    if not boss_alive or #families == 0 then
+                      context.scheduler:cancel_task(context.state.zombie_parents_dialog_task)
+                      context.state.zombie_parents_dialog_task = nil
+                      context.state.zombie_parent_families = nil
+                      return
+                    end
+                    if math.random() < 0.5 then
+                      say_random_line(context, context.boss, boss_entity_dialog)
                     end
                   end)
                 end
@@ -124,8 +124,6 @@ public class ZombieParentsLuaConfig extends LuaPowersConfigFields {
                     if math.random() > 0.01 then
                       return
                     end
-
-                    context.state.zombie_parents_firing = false
 
                     local boss_location = context.boss:get_location()
                     local reinforcement_mom = context.world:spawn_custom_boss_at_location(
@@ -143,6 +141,7 @@ public class ZombieParentsLuaConfig extends LuaPowersConfigFields {
                       { level = context.boss.level, silent = false }
                     )
                     if reinforcement_dad == nil then
+                      reinforcement_mom:remove_elite()
                       return
                     end
 

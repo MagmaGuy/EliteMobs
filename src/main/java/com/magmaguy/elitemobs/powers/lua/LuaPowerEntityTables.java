@@ -51,6 +51,10 @@ import com.magmaguy.shaded.luaj.vm2.Varargs;
 import com.magmaguy.shaded.luaj.vm2.lib.VarArgFunction;
 
 import java.util.Objects;
+import java.util.IdentityHashMap;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Creates Lua tables for entities (boss, player, living entity, generic entity)
@@ -67,6 +71,8 @@ final class LuaPowerEntityTables {
     private final LuaPowerScriptApi.OwnedTaskController taskController;
     private final LuaPowerScriptApi.CallbackInvoker callbackInvoker;
     private final LuaBossTableBuilder bossTableBuilder;
+    private static final Map<EliteEntity, LuaPowerEntityTables> healingOwners = new IdentityHashMap<>();
+    private final Set<EliteEntity> healingTargets = Collections.newSetFromMap(new IdentityHashMap<>());
 
     LuaPowerEntityTables(ScriptDefinition definition,
                          EliteEntity eliteEntity,
@@ -79,6 +85,12 @@ final class LuaPowerEntityTables {
         this.taskController = taskController;
         this.callbackInvoker = callbackInvoker;
         this.bossTableBuilder = new LuaBossTableBuilder(definition, eliteEntity, support, this, taskController, callbackInvoker);
+        taskController.ownCleanup(() -> {
+            for (EliteEntity target : healingTargets) {
+                if (healingOwners.remove(target, this)) target.setHealing(false);
+            }
+            healingTargets.clear();
+        });
     }
 
     // ── Boss table (delegated to LuaBossTableBuilder) ──────────────────
@@ -519,7 +531,15 @@ final class LuaPowerEntityTables {
         entity.set("set_healing", method(entity, args -> {
             EliteEntity entityRef = EntityTracker.getEliteMobEntity(livingEntity);
             if (entityRef != null) {
-                entityRef.setHealing(args.checkboolean(1));
+                boolean healing = args.checkboolean(1);
+                if (healing && !entityRef.isHealing()) {
+                    healingOwners.put(entityRef, this);
+                    healingTargets.add(entityRef);
+                    entityRef.setHealing(true);
+                } else if (!healing && healingOwners.remove(entityRef, this)) {
+                    healingTargets.remove(entityRef);
+                    entityRef.setHealing(false);
+                }
             }
             return LuaValue.NIL;
         }));

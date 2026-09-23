@@ -99,7 +99,9 @@ public abstract class EnderDragonBombardmentLuaConfig extends InlineLuaPowerConf
 
                   local phase = context.boss:get_ender_dragon_phase()
                   if phase ~= nil and not is_flying_phase(phase) then
-                    deactivate(context)
+                    cancel_state_task(context, "firing_task")
+                    context.state.firing = false
+                    context.state.firing_timer = 0
                     return true
                   end
 

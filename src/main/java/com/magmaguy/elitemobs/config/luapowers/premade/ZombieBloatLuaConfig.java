@@ -54,7 +54,7 @@ public class ZombieBloatLuaConfig extends InlineLuaPowerConfig {
                 end
 
                 local function bloat_effect(context, event_zombie)
-                  local giant = context.world.spawn_entity_at_location("GIANT", event_zombie:get_location())
+                  local giant = context.world.spawn_entity_at_location("GIANT", event_zombie:get_location(), { duration = 10 })
                   if giant ~= nil then
                     giant:set_ai_enabled(false)
                   end

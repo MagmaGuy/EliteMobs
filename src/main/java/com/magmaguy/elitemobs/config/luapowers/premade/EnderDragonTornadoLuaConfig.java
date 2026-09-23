@@ -116,7 +116,7 @@ public class EnderDragonTornadoLuaConfig extends InlineLuaPowerConfig {
 
                 local function do_entity_displacement(context)
                   local source_entity = context.boss
-                  local nearby_entities = context.entities.get_nearby_entities(21, "living")
+                  local nearby_entities = context.entities.get_entities_in_box(context.state.tornado_eye, 7, 21, 7, "living")
                   for index = 1, #nearby_entities do
                     local entity = nearby_entities[index]
                     if entity.uuid ~= source_entity.uuid then
