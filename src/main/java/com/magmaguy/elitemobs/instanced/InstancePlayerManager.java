@@ -200,13 +200,15 @@ public class InstancePlayerManager {
                     return;
 
                 //Teleport the player to the correct location
-                MatchInstance.MatchInstanceEvents.teleportBypass = true;
                 Location destination = (matchInstance.state.equals(MatchInstance.InstancedRegionState.WAITING) && matchInstance.lobbyLocation != null)
                         ? matchInstance.lobbyLocation
                         : matchInstance.startLocation;
 
                 // Use PlayerTeleportEvent to trigger dungeon music and other listeners
-                PlayerTeleportEvent.teleportPlayer(player, destination);
+                if (!InstancePlayerMovement.teleportForMatch(player, destination, matchInstance, true)) {
+                    matchInstance.removeAnyKind(player);
+                    return;
+                }
 
                 //With spectator revives disabled, the active run itself is the player's only life.
                 //Otherwise preserve the established three-life dungeon behavior.
@@ -235,8 +237,7 @@ public class InstancePlayerManager {
 
         // A successful explicit exit already moved the player to their chosen destination.
         if (player.isOnline() && matchInstance.isInRegion(player.getLocation())) {
-            MatchInstance.MatchInstanceEvents.teleportBypass = true;
-            player.teleport(matchInstance.participantExitLocation(player));
+            InstancePlayerMovement.teleportForMatch(player, matchInstance.participantExitLocation(player), matchInstance, false);
         }
 
         //End the match if there are no players left because they all died
@@ -262,11 +263,10 @@ public class InstancePlayerManager {
         matchInstance.players.remove(player);
         if (matchInstance.players.isEmpty()) {
             matchInstance.defeat();
-            MatchInstance.MatchInstanceEvents.teleportBypass = true;
             if (matchInstance.previousPlayerLocations.get(player) != null)
-                player.teleport(matchInstance.previousPlayerLocations.get(player));
+                InstancePlayerMovement.teleportForMatch(player, matchInstance.previousPlayerLocations.get(player), matchInstance, false);
             else if (matchInstance.exitLocation != null)
-                player.teleport(matchInstance.exitLocation);
+                InstancePlayerMovement.teleportForMatch(player, matchInstance.exitLocation, matchInstance, false);
             PlayerData.setMatchInstance(player, null);
             matchInstance.participants.remove(player);
             fireLeaveEvents(matchInstance, player);
@@ -279,11 +279,10 @@ public class InstancePlayerManager {
         // life, and a dead player is removed from the instance instead of becoming a spectator
         // at a death banner.
         if (!DungeonsConfig.isAllowSpectatorsInInstancedContent()) {
-            MatchInstance.MatchInstanceEvents.teleportBypass = true;
             if (matchInstance.previousPlayerLocations.get(player) != null)
-                player.teleport(matchInstance.previousPlayerLocations.get(player));
+                InstancePlayerMovement.teleportForMatch(player, matchInstance.previousPlayerLocations.get(player), matchInstance, false);
             else if (matchInstance.exitLocation != null)
-                player.teleport(matchInstance.exitLocation);
+                InstancePlayerMovement.teleportForMatch(player, matchInstance.exitLocation, matchInstance, false);
             PlayerData.setMatchInstance(player, null);
             matchInstance.participants.remove(player);
             matchInstance.playerLives.remove(player);
@@ -301,29 +300,48 @@ public class InstancePlayerManager {
         player.setGameMode(GameMode.SURVIVAL);
         matchInstance.spectators.remove(player);
         player.setHealth(player.getMaxHealth());
-        MatchInstance.MatchInstanceEvents.teleportBypass = true;
-        player.teleport(deathLocation.getRespawnLocation());
         PlayerData.setMatchInstance(player, matchInstance);
+        InstancePlayerMovement.teleportForMatch(player, deathLocation.getRespawnLocation(), matchInstance, false);
     }
 
     public static void addSpectator(MatchInstance matchInstance, Player player, boolean wasPlayer) {
-        if (!matchInstance.isAcceptingSpectator(player, wasPlayer)) return;
+        if (!canAdmitSpectator(matchInstance, player, wasPlayer)) return;
         if (!wasPlayer && !fireJoinEvent(matchInstance, player)) return;
-        if (!matchInstance.isAcceptingSpectator(player, wasPlayer)
+        if (!canAdmitSpectator(matchInstance, player, wasPlayer)
                 || !matchInstance.reserveAdmission()) return;
 
+        GameMode previousMode = player.getGameMode();
         if (!wasPlayer) matchInstance.previousPlayerLocations.put(player, player.getLocation());
         matchInstance.participants.add(player);
+        matchInstance.spectators.add(player);
+        PlayerData.setMatchInstance(player, matchInstance);
+        boolean admitted = false;
+        try {
+            player.setGameMode(GameMode.SPECTATOR);
+            admitted = wasPlayer || InstancePlayerMovement.teleportForMatch(player, matchInstance.startLocation, matchInstance, false);
+        } finally {
+            if (!admitted && !wasPlayer) {
+                matchInstance.spectators.remove(player);
+                rollbackRegistrations(List.of(player), matchInstance);
+                matchInstance.abortAdmission();
+                player.setGameMode(previousMode);
+            }
+        }
+        if (!admitted) return;
         player.sendMessage(ArenasConfig.getArenaJoinSpectatorMessage());
         player.sendTitle(ArenasConfig.getJoinSpectatorTitle(), ArenasConfig.getJoinSpectatorSubtitle(), 60, 60 * 3, 60);
-        matchInstance.spectators.add(player);
-        player.setGameMode(GameMode.SPECTATOR);
-        if (!wasPlayer) {
-            MatchInstance.MatchInstanceEvents.teleportBypass = true;
-            player.teleport(matchInstance.startLocation);
-        }
-        PlayerData.setMatchInstance(player, matchInstance);
         if (!wasPlayer) fireTypedJoinEvent(matchInstance, player);
+    }
+
+    private static boolean canAdmitSpectator(MatchInstance match, Player player, boolean wasPlayer) {
+        if (player == null || !player.isOnline() || !player.isValid() || match.isDefunct()
+                || match.isDestroyingMatch() || match.spectators.contains(player)
+                || !match.isAcceptingSpectator(player, wasPlayer)) return false;
+        MatchInstance indexed = PlayerData.getMatchInstance(player);
+        MatchInstance registered = MatchInstance.getAnyPlayerInstance(player);
+        if (wasPlayer) return indexed == match && match.participants.contains(player)
+                && (registered == null || registered == match);
+        return indexed == null && registered == null;
     }
 
     public static void removeSpectator(MatchInstance matchInstance, Player player) {
@@ -338,8 +356,7 @@ public class InstancePlayerManager {
             fireLeaveEvents(matchInstance, player);
         player.setGameMode(GameMode.SURVIVAL);
         if (matchInstance.isInRegion(player.getLocation())) {
-            MatchInstance.MatchInstanceEvents.teleportBypass = true;
-            player.teleport(matchInstance.participantExitLocation(player));
+            InstancePlayerMovement.teleportForMatch(player, matchInstance.participantExitLocation(player), matchInstance, false);
         }
         PlayerData.setMatchInstance(player, null);
         matchInstance.playerLives.remove(player);

@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EnchantmentDungeonInstance extends DungeonInstance {
     @Getter
@@ -57,21 +58,39 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         if (!launchEvent(contentPackagesConfigFields, instancedWordName, player)) return false;
 
         boolean[] accepted = {false};
+        boolean[] instanceOwnsWorld = {false};
+        AtomicBoolean copied = new AtomicBoolean();
         WorldOperationQueue.queueOperation(
                 player,
-                () -> cloneWorldFiles(contentPackagesConfigFields, instancedWordName) != null,
+                () -> {
+                    boolean created = cloneWorldFiles(contentPackagesConfigFields, instancedWordName) != null;
+                    copied.set(created);
+                    return created;
+                },
                 () -> {
                     if (!player.isOnline() || MetadataHandler.shutdownRequested || !acquisition.isOwned()) return;
                     acquisition.validateProviders();
                     DungeonInstance instance = initializeInstancedWorld(contentPackagesConfigFields, instancedWordName,
                             player, (String) contentPackagesConfigFields.getDifficulties().get(0).get("name"));
+                    instanceOwnsWorld[0] = instance != null;
                     if (instance instanceof EnchantmentDungeonInstance challenge && !challenge.isDefunct()) {
                         challenge.accept(acquisition);
                         accepted[0] = true;
                     } else if (instance != null) instance.removeInstance();
                 },
                 contentPackagesConfigFields.getName(),
-                () -> { if (!accepted[0]) acquisition.abort("challenge startup failed or was cancelled"); });
+                () -> {
+                    if (accepted[0]) return;
+                    try {
+                        if (copied.get() && !instanceOwnsWorld[0]) {
+                            World loaded = Bukkit.getWorld(instancedWordName);
+                            if (loaded == null) cleanupUnloadedWorldFolder(instancedWordName);
+                            else cleanupLoadedWorld(loaded);
+                        }
+                    } finally {
+                        acquisition.abort("challenge startup failed or was cancelled");
+                    }
+                });
         return true;
     }
 

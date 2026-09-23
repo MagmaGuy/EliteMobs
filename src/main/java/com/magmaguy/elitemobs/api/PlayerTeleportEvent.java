@@ -29,6 +29,7 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
     private final boolean deferredExecution;
     private final Purpose purpose;
     private boolean isCancelled = false;
+    private boolean teleportSucceeded;
 
     /**
      * Event fired when players teleport due to EliteMobs. This is used for teleporting to the Adventurer's Guild and to
@@ -53,12 +54,15 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
         this.purpose = java.util.Objects.requireNonNull(purpose, "purpose");
     }
 
-    public static void teleportPlayer(Player player, Location destination) {
-        new EventCaller(new PlayerTeleportEvent(player, destination));
+    public static boolean teleportPlayer(Player player, Location destination) {
+        return teleportPlayer(player, destination, Purpose.NORMAL);
     }
 
-    public static void teleportPlayer(Player player, Location destination, Purpose purpose) {
-        new EventCaller(new PlayerTeleportEvent(player, destination, purpose));
+    public static boolean teleportPlayer(Player player, Location destination, Purpose purpose) {
+        if (destination == null || destination.getWorld() == null) return false;
+        PlayerTeleportEvent event = new PlayerTeleportEvent(player, destination, purpose);
+        new EventCaller(event);
+        return !event.isCancelled && event.teleportSucceeded;
     }
 
     /**
@@ -66,7 +70,7 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
      * A cancellation therefore rejects the whole initial group instead of moving only its first
      * members. Bukkit-level teleport cancellation can still prevent an individual final move.
      *
-     * @return true when every EliteMobs event passed preflight and execution was attempted
+     * @return true when every EliteMobs event passed preflight and every native teleport succeeded
      */
     public static boolean teleportPlayers(Collection<Player> players, Location destination) {
         if (destination == null || destination.getWorld() == null) return false;
@@ -84,8 +88,12 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
             events.add(event);
         }
         if (events.stream().anyMatch(event -> !event.player.isOnline() || !event.player.isValid())) return false;
-        events.forEach(PlayerTeleportEvent::executeTeleport);
-        return true;
+        boolean moved = true;
+        for (PlayerTeleportEvent event : events) {
+            event.executeTeleport();
+            moved &= event.teleportSucceeded;
+        }
+        return moved;
     }
 
     public static HandlerList getHandlerList() {
@@ -112,14 +120,16 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
     }
 
     public void executeTeleport() {
-        if (!EliteMobsWorld.isEliteMobsWorld(player.getLocation().getWorld().getUID()))
-            PlayerData.setBackTeleportLocation(player, originalLocation);
-        WormholeManager.getInstance(false).addPlayerToCooldown(player, destination);
+        if (isCancelled || destination == null || destination.getWorld() == null) return;
         if (!player.getPassengers().isEmpty()) player.getPassengers().forEach(player::removePassenger);
         if (purpose == Purpose.LEAVE_INSTANCE)
-            com.magmaguy.elitemobs.instanced.InstancePlayerMovement.teleportLeavingInstance(
+            teleportSucceeded = com.magmaguy.elitemobs.instanced.InstancePlayerMovement.teleportLeavingInstance(
                     player, destination, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.PLUGIN);
-        else player.teleport(destination);
+        else teleportSucceeded = player.teleport(destination);
+        if (!teleportSucceeded) return;
+        if (!EliteMobsWorld.isEliteMobsWorld(originalLocation.getWorld().getUID()))
+            PlayerData.setBackTeleportLocation(player, originalLocation);
+        WormholeManager.getInstance(false).addPlayerToCooldown(player, destination);
     }
 
     public static class PlayerTeleportEventExecutor implements Listener {

@@ -44,7 +44,6 @@ import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.WorldOperationQueue;
 import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
-import com.magmaguy.elitemobs.instanced.dungeons.DungeonKillPercentageObjective;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonKillTargetObjective;
 import com.magmaguy.elitemobs.items.ItemLootShower;
 import com.magmaguy.elitemobs.items.LootTables;
@@ -776,8 +775,6 @@ public class EliteMobs extends JavaPlugin {
         CrashFix.shutdown();
         com.magmaguy.elitemobs.commands.admin.RemoveCommand.shutdown();
         com.magmaguy.magmacore.instance.InstanceProtector.shutdown();
-        DungeonKillPercentageObjective.shutdown();
-        DungeonKillTargetObjective.shutdown();
         ConfigurationLocation.shutdown();
         // Fourth pass memory leak fixes
         ElitePlayerInventory.shutdown();

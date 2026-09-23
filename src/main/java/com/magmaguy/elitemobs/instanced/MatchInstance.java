@@ -319,11 +319,10 @@ public abstract class MatchInstance {
                     + destination.getBlockY() + "," + destination.getBlockZ() + ".");
 
         if (destination == null) return;
-        MatchInstanceEvents.teleportBypass = true;
         // Without this the fall distance accumulated before the rescue is applied on
         // landing and the "rescue" kills the player with fall damage.
         player.setFallDistance(0);
-        player.teleport(destination);
+        InstancePlayerMovement.teleportForMatch(player, destination, this, false);
     }
 
     private void spectatorWatchdog() {
@@ -358,18 +357,17 @@ public abstract class MatchInstance {
     }
 
     private void intruderWatchdog() {
-        if (state != InstancedRegionState.ONGOING) return;
-        for (Player player : Bukkit.getOnlinePlayers())
+        if (state != InstancedRegionState.ONGOING || world == null) return;
+        for (Player player : world.getPlayers())
             if (!players.contains(player) &&
                     !spectators.contains(player) &&
                     !player.hasPermission("elitemobs.*") &&
                     isInRegion(player.getLocation())) {
-                MatchInstanceEvents.teleportBypass = true;
-                if (exitLocation != null) player.teleport(exitLocation);
+                if (exitLocation != null) InstancePlayerMovement.teleportForMatch(player, exitLocation, this, false);
                 else if (PlayerData.getBackTeleportLocation(player) != null)
-                    player.teleport(PlayerData.getBackTeleportLocation(player));
+                    InstancePlayerMovement.teleportForMatch(player, PlayerData.getBackTeleportLocation(player), this, false);
                 else if (DefaultConfig.getDefaultSpawnLocation() != null && DefaultConfig.getDefaultSpawnLocation().getWorld() != null)
-                    player.teleport(DefaultConfig.getDefaultSpawnLocation());
+                    InstancePlayerMovement.teleportForMatch(player, DefaultConfig.getDefaultSpawnLocation(), this, false);
             }
     }
 
@@ -455,8 +453,7 @@ public abstract class MatchInstance {
         matchDestroyEventFired = false;
         state = InstancedRegionState.ONGOING;
         players.forEach(player -> {
-            MatchInstanceEvents.teleportBypass = true;
-            player.teleport(startLocation);
+                InstancePlayerMovement.teleportForMatch(player, startLocation, this, false);
         });
         participants = (HashSet<Player>) players.clone();
         startingParticipantIds.clear();
@@ -535,7 +532,6 @@ public abstract class MatchInstance {
     }
 
     public static class MatchInstanceEvents implements Listener {
-        public static boolean teleportBypass = false;
         // Remember only events accepted by the permission exception, for final validation.
         private final Map<PlayerTeleportEvent, MatchInstance> permissionTeleports = new IdentityHashMap<>();
 
@@ -618,10 +614,6 @@ public abstract class MatchInstance {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
         public void onPlayerTeleport(PlayerTeleportEvent event) {
             if (InstancePlayerMovement.authorizes(event)) return;
-            if (teleportBypass) {
-                teleportBypass = false;
-                return;
-            }
 
             MatchInstance currentInstance = MatchInstance.getAnyPlayerInstance(event.getPlayer());
             if (InstancePlayerMovement.permitsWithinInstance(event, currentInstance)) {

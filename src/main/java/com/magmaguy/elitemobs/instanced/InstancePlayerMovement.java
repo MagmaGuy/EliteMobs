@@ -11,6 +11,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
 
 /**
  * Performs narrowly scoped player movement which instance escape protection may
@@ -101,6 +102,36 @@ public final class InstancePlayerMovement {
     private static boolean teleportAuthorized(Player player, Location destination,
                                                PlayerTeleportEvent.TeleportCause cause,
                                                MatchInstance instance, boolean leavingInstance) {
+        return teleportAuthorized(player, destination, cause, instance, leavingInstance, null,
+                () -> player.teleport(destination, cause));
+    }
+
+    /** The existing match owner admits, rescues, spectates or evacuates one player synchronously. */
+    public static boolean teleportForMatch(Player player, Location destination, MatchInstance match,
+                                            boolean notifyEliteMobs) {
+        if (!Bukkit.isPrimaryThread() || match == null || destination == null || destination.getWorld() == null
+                || !player.isOnline() || !player.isValid()) return false;
+        MatchInstance current = PlayerData.getMatchInstance(player);
+        if (!permitsLifecycleMovement(player, destination, match, current)) return false;
+        return teleportAuthorized(player, destination, PlayerTeleportEvent.TeleportCause.PLUGIN,
+                current, false, match, () -> notifyEliteMobs
+                        ? com.magmaguy.elitemobs.api.PlayerTeleportEvent.teleportPlayer(player, destination)
+                        : player.teleport(destination, PlayerTeleportEvent.TeleportCause.PLUGIN));
+    }
+
+    private static boolean permitsLifecycleMovement(Player player, Location destination,
+                                                      MatchInstance match, MatchInstance current) {
+        if (current != null && current != match) return false;
+        if (match.isInRegion(destination))
+            return !match.isDefunct() && current == match
+                    && (match.players.contains(player) || match.spectators.contains(player));
+        return match.isInRegion(player.getLocation());
+    }
+
+    private static boolean teleportAuthorized(Player player, Location destination,
+                                               PlayerTeleportEvent.TeleportCause cause,
+                                               MatchInstance instance, boolean leavingInstance,
+                                               MatchInstance lifecycleOwner, BooleanSupplier teleport) {
         Authorization authorization = new Authorization(
                 player.getUniqueId(),
                 player.getWorld().getUID(),
@@ -108,7 +139,7 @@ public final class InstancePlayerMovement {
                 destination.clone(),
                 cause,
                 instance,
-                leavingInstance);
+                leavingInstance, lifecycleOwner);
         Deque<Authorization> stack = AUTHORIZATIONS.get();
         if (stack == null) {
             stack = new ArrayDeque<>();
@@ -116,7 +147,7 @@ public final class InstancePlayerMovement {
         }
         stack.push(authorization);
         try {
-            return player.teleport(destination, cause);
+            return teleport.getAsBoolean();
         } finally {
             Authorization removed = stack.pop();
             if (removed != authorization)
@@ -139,6 +170,8 @@ public final class InstancePlayerMovement {
 
             MatchInstance current = PlayerData.getMatchInstance(event.getPlayer());
             if (current != authorization.instance()) return false;
+            if (authorization.lifecycleOwner() != null)
+                return permitsLifecycleMovement(event.getPlayer(), destination, authorization.lifecycleOwner(), current);
             if (current == null) return true;
             if (authorization.leavingInstance())
                 return !current.isInRegion(destination)
@@ -170,6 +203,7 @@ public final class InstancePlayerMovement {
             Location destination,
             PlayerTeleportEvent.TeleportCause cause,
             MatchInstance instance,
-            boolean leavingInstance) {
+            boolean leavingInstance,
+            MatchInstance lifecycleOwner) {
     }
 }

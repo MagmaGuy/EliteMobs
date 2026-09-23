@@ -201,8 +201,7 @@ public class DynamicDungeonInstance extends DungeonInstance {
             if (dynamicDungeonConfigFields.getSong() != null)
                 new CustomMusic(dynamicDungeonConfigFields.getSong(), dynamicDungeonConfigFields, world);
 
-            Location startLocation = ConfigurationLocation.serialize(dynamicDungeonConfigFields.getStartLocationString());
-            startLocation.setWorld(world);
+            Location startLocation = dynamicDungeonConfigFields.instanceStartLocation(world);
             Location lobbyLocation = ConfigurationLocation.serialize(dynamicDungeonConfigFields.getTeleportLocationString());
             if (lobbyLocation != null) lobbyLocation.setWorld(world);
             else lobbyLocation = startLocation;

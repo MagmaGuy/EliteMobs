@@ -62,6 +62,8 @@ public class DungeonInstance extends MatchInstance {
     }
 
     private final List<DungeonObjective> dungeonObjectives = new ArrayList<>();
+
+    List<DungeonObjective> objectiveSnapshot() { return List.copyOf(dungeonObjectives); }
     private boolean instanceRemovalScheduled = false;
     private boolean removalEventCalled = false;
     @Getter
@@ -134,19 +136,8 @@ public class DungeonInstance extends MatchInstance {
         try {
             super.lobbyLocation = lobbyLocation;
             this.contentPackagesConfigFields = contentPackagesConfigFields;
-            List<String> rawDungeonObjectives = contentPackagesConfigFields.getRawDungeonObjectives();
-            if (rawDungeonObjectives != null) {
-                for (String rawObjective : rawDungeonObjectives) {
-                    DungeonObjective objective = DungeonObjective.registerObjective(this, rawObjective);
-                    if (objective == null) {
-                        Logger.warn("Could not register dungeon objective '" + rawObjective + "' for "
-                                + contentPackagesConfigFields.getFilename()
-                                + " — entries must be of the form 'filename=<bossfile.yml>' or 'clearpercentage=<value>'.");
-                        continue;
-                    }
-                    this.dungeonObjectives.add(objective);
-                }
-            }
+            for (DungeonObjective.TargetDefinition objective : contentPackagesConfigFields.instanceObjectives())
+                dungeonObjectives.add(new DungeonKillTargetObjective(this, objective));
             this.world = world;
             super.world = world;
             this.instancedWorldName = world.getName();
@@ -261,6 +252,12 @@ public class DungeonInstance extends MatchInstance {
     }
 
     protected static boolean launchEvent(ContentPackagesConfigFields instancedDungeonsConfigFields, String instancedWordName, Player player) {
+        try { instancedDungeonsConfigFields.prepareInstanceDefinition(); }
+        catch (IllegalArgumentException failure) {
+            Logger.warn("Cannot launch dungeon: " + failure.getMessage());
+            player.sendMessage(DungeonsConfig.getDungeonCancelledEventMessage());
+            return false;
+        }
         WorldInstanceEvent worldInstanceEvent = new WorldInstanceEvent(
                 instancedDungeonsConfigFields.getWorldName(),
                 instancedWordName,
@@ -274,6 +271,7 @@ public class DungeonInstance extends MatchInstance {
     }
 
     protected static File cloneWorldFiles(ContentPackagesConfigFields instancedDungeonsConfigFields, String instancedWordName) {
+        instancedDungeonsConfigFields.prepareInstanceDefinition();
         return WorldInstantiator.cloneWorld(instancedDungeonsConfigFields.getWorldName(), instancedWordName, instancedDungeonsConfigFields.getDungeonConfigFolderName(), instancedDungeonsConfigFields.getEnvironment());
     }
 
@@ -324,8 +322,7 @@ public class DungeonInstance extends MatchInstance {
                 new CustomMusic(instancedDungeonsConfigFields.getSong(), instancedDungeonsConfigFields, world);
 
             //Location where players are teleported to start completing the dungeon
-            Location startLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getStartLocationString());
-            startLocation.setWorld(world);
+            Location startLocation = instancedDungeonsConfigFields.instanceStartLocation(world);
             //Lobby location is optional, if null it should be the same as the start location
             Location lobbyLocation = ConfigurationLocation.serialize(instancedDungeonsConfigFields.getTeleportLocationString());
             if (lobbyLocation != null) lobbyLocation.setWorld(world);
@@ -883,8 +880,7 @@ public class DungeonInstance extends MatchInstance {
                     }
                     if (player.getGameMode() == org.bukkit.GameMode.SPECTATOR)
                         player.setSpectatorTarget(null);
-                    MatchInstance.MatchInstanceEvents.teleportBypass = true;
-                    player.teleport(destination);
+                    com.magmaguy.elitemobs.instanced.InstancePlayerMovement.teleportForMatch(player, destination, dungeonInstance, false);
                 } catch (Exception exception) {
                     Logger.warn("Failed to evacuate " + player.getName() + " from "
                             + worldToDelete.getName() + ": " + exception.getMessage());

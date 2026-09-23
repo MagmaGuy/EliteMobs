@@ -11,12 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DungeonKillTargetObjective extends DungeonObjective {
-    private static final List<DungeonKillTargetObjective> dungeonKillTargetObjectiveList = new ArrayList<>();
-
-    public static void shutdown() {
-        dungeonKillTargetObjectiveList.clear();
-    }
-
     @Getter
     private String bossFilename;
     @Getter
@@ -26,32 +20,17 @@ public class DungeonKillTargetObjective extends DungeonObjective {
 
 
     public DungeonKillTargetObjective(DungeonInstance dungeonInstance, String objectiveString) {
-        super(dungeonInstance, objectiveString);
-        String[] strings = objectiveString.split(":");
-        for (String seperatedByColon : strings) {
-            String[] separatedByEquals = seperatedByColon.split("=");
-            if (separatedByEquals[0].equalsIgnoreCase("filename")) {
-                this.bossFilename = separatedByEquals[1];
-            } else if (separatedByEquals[0].equalsIgnoreCase("amount")) {
-                try {
-                    this.targetAmount = Integer.parseInt(separatedByEquals[1]);
-                } catch (Exception ex) {
-                    Logger.warn("Value " + separatedByEquals[1] + " is not a valid integer amount!");
-                }
-            } else {
-                Logger.warn("Invalid entry for objective string! " + objectiveString + " could not be parsed correctly.");
-            }
-        }
-        initializeObjective(dungeonInstance);
+        this(dungeonInstance, DungeonObjective.parse(objectiveString));
     }
 
-    @Override
-    protected void initializeObjective(DungeonInstance dungeonInstance) {
-        super.initializeObjective(dungeonInstance);
-        dungeonKillTargetObjectiveList.add(this);
+    DungeonKillTargetObjective(DungeonInstance dungeonInstance, TargetDefinition definition) {
+        super(dungeonInstance, null);
+        bossFilename = definition.filename();
+        targetAmount = definition.amount();
     }
 
     public void incrementKills() {
+        if (completed || dungeonInstance.isDefunct()) return;
         currentAmount++;
         if (currentAmount >= targetAmount) {
             super.completed = true;
@@ -60,18 +39,14 @@ public class DungeonKillTargetObjective extends DungeonObjective {
         }
     }
 
-    @Override
-    public void unregister() {
-        dungeonKillTargetObjectiveList.remove(this);
-    }
-
     public static class DungeonKillTargetObjectiveListener implements Listener {
         @EventHandler
         public void onEliteDeath(EliteMobDeathEvent event) {
             if (!(event.getEliteEntity() instanceof InstancedBossEntity instancedBossEntity)) return;
             if (instancedBossEntity.getDungeonInstance() == null) return;
-            List<DungeonKillTargetObjective> cloneList = new ArrayList<>(dungeonKillTargetObjectiveList);
-            for (DungeonKillTargetObjective dungeonKillTargetObjective : cloneList) {
+            List<DungeonObjective> cloneList = instancedBossEntity.getDungeonInstance().objectiveSnapshot();
+            for (DungeonObjective objective : cloneList) {
+                if (!(objective instanceof DungeonKillTargetObjective dungeonKillTargetObjective)) continue;
                 if (dungeonKillTargetObjective.isCompleted()) continue;
                 if (dungeonKillTargetObjective.getDungeonInstance() != instancedBossEntity.getDungeonInstance()) continue;
                 if (instancedBossEntity.getCustomBossesConfigFields().getFilename().equals(dungeonKillTargetObjective.getBossFilename()) ||

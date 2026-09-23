@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.instanced.dungeons.DifficultyResolver;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonObjective;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -95,10 +96,49 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     @Setter
     private int maxPlayerCount = 5;
     @Getter
-    @Setter
     private List<String> rawDungeonObjectives = null;
     @Getter
     private String startLocationString = null;
+    private InstanceDefinition instanceDefinition;
+
+    private record InstanceDefinition(Location start, List<DungeonObjective.TargetDefinition> objectives) {}
+
+    public void setRawDungeonObjectives(List<String> objectives) {
+        rawDungeonObjectives = objectives == null ? null : List.copyOf(objectives);
+        instanceDefinition = null;
+    }
+
+    /** One definition admission, before any expensive world copy or load. */
+    public synchronized void prepareInstanceDefinition() {
+        if (instanceDefinition != null) return;
+        Location start = ConfigurationLocation.serialize(startLocationString, true);
+        if (start == null || !Double.isFinite(start.getX()) || !Double.isFinite(start.getY())
+                || !Double.isFinite(start.getZ()) || !Float.isFinite(start.getYaw()) || !Float.isFinite(start.getPitch()))
+            throw new IllegalArgumentException(filename + " requires finite startLocation coordinates");
+        start.setWorld(null);
+        List<DungeonObjective.TargetDefinition> objectives = new ArrayList<>();
+        if (rawDungeonObjectives != null) {
+            for (String raw : rawDungeonObjectives) {
+                try { objectives.add(DungeonObjective.parse(raw)); }
+                catch (IllegalArgumentException failure) {
+                    throw new IllegalArgumentException(filename + ": " + failure.getMessage(), failure);
+                }
+            }
+        }
+        instanceDefinition = new InstanceDefinition(start, List.copyOf(objectives));
+    }
+
+    public synchronized Location instanceStartLocation(World world) {
+        prepareInstanceDefinition();
+        Location start = instanceDefinition.start.clone();
+        start.setWorld(world);
+        return start;
+    }
+
+    public synchronized List<DungeonObjective.TargetDefinition> instanceObjectives() {
+        prepareInstanceDefinition();
+        return instanceDefinition.objectives;
+    }
     @Getter
     private String dungeonConfigFolderName;
     @Getter
@@ -316,6 +356,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
 
     @Override
     public void processConfigFields() {
+        instanceDefinition = null;
         this.isEnabled = processBoolean("isEnabled", isEnabled, false, true);
         this.name = translatable(filename, "name", processString("name", name, null, true));
         this.downloadLink = processString("downloadLink" , downloadLink, downloadLink, false);
@@ -390,6 +431,8 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         this.setupMenuDescription = processStringList("setupMenuDescription", setupMenuDescription, new ArrayList<>(), false);
         this.dungeonLockoutMinutes = processInt("dungeonLockoutMinutes", dungeonLockoutMinutes, 4320, true);
         processAdditionalFields();
+        if (contentType == ContentType.INSTANCED_DUNGEON || contentType == ContentType.DYNAMIC_DUNGEON)
+            prepareInstanceDefinition();
     }
 
     public void processAdditionalFields() {

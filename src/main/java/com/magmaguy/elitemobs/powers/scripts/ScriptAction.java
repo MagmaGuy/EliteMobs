@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
+import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteDamageEvent;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
@@ -440,12 +442,12 @@ public class ScriptAction {
 
         targets.forEach(target -> {
             try {
-                MatchInstance.MatchInstanceEvents.teleportBypass = true;
-                target.teleport(destination);
+                if (target instanceof Player player && PlayerData.getMatchInstance(player) != null)
+                    com.magmaguy.elitemobs.instanced.InstancePlayerMovement.teleportWithinWorld(
+                            player, destination, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.PLUGIN);
+                else target.teleport(destination);
             } catch (Exception e) {
                 Logger.warn("Failed to teleport entity '" + target.getName() + "' in script '" + blueprint.getScriptName() + "': " + e.getMessage());
-            } finally {
-                MatchInstance.MatchInstanceEvents.teleportBypass = false;
             }
         });
     }
