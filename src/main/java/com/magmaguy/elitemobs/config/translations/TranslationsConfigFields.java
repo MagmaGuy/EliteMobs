@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,6 +94,11 @@ public class TranslationsConfigFields {
      * Bumped by every reconciliation that changed something, so a pending flush can tell whether boot has settled.
      */
     private int changeGeneration = 0;
+    private final Object writeLock = new Object();
+    private volatile boolean stopped;
+    private BukkitTask pendingFlush;
+    private int writeFailures;
+    private int shapeConflictCount;
 
     public TranslationsConfigFields() {
         // Parse language name from config (e.g., "french" or "french.yml" -> "french")
@@ -121,6 +127,12 @@ public class TranslationsConfigFields {
                                            Object shippedDefault,
                                            String languageCode) {
         Object liveEnglish = live.get(key, ENGLISH_COLUMN);
+        for (String language : live.getLanguages()) {
+            Object translated = live.get(key, language);
+            if (!ENGLISH_COLUMN.equals(language) && translated != null
+                    && (translated instanceof List) != (shippedDefault instanceof List))
+                return ReconciliationOutcome.SHAPE_CONFLICT;
+        }
 
         if (liveEnglish == null) {
             //Brand new key. The shipped default is both the English and the starting point for the translator.
@@ -144,11 +156,12 @@ public class TranslationsConfigFields {
             recordTranslationBaseline(live, baseline, key, languageCode);
         }
 
-        if (Objects.equals(shippedDefault, baselineEnglish))
+        int paddingWidth = Math.max(otherLanguageWidth(live, key), otherLanguageWidth(baseline, key));
+        if (csvValuesEqual(shippedDefault, baselineEnglish, paddingWidth))
             //The overwhelming majority of keys on every boot after the first.
             return adopting ? ReconciliationOutcome.BASELINE_ADOPTED : ReconciliationOutcome.UNCHANGED;
 
-        if (!Objects.equals(liveEnglish, baselineEnglish))
+        if (!csvValuesEqual(liveEnglish, baselineEnglish, paddingWidth))
             //Someone edited the en cell after it was last reconciled. Refreshing would overwrite that edit, so the
             //whole row is left alone and reported instead. The baseline is deliberately not advanced, so the key keeps
             //being reported until a human resolves it.
@@ -159,6 +172,27 @@ public class TranslationsConfigFields {
         live.set(key, ENGLISH_COLUMN, shippedDefault);
         baseline.set(key, ENGLISH_COLUMN, shippedDefault);
         return ReconciliationOutcome.ENGLISH_REFRESHED;
+    }
+
+    private static int otherLanguageWidth(TranslationCsvParser.TranslationData data, String key) {
+        int width = 0;
+        for (String language : data.getLanguages()) {
+            if (ENGLISH_COLUMN.equals(language)) continue;
+            List<String> values = data.getList(key, language);
+            if (values != null) width = Math.max(width, values.size());
+        }
+        return width;
+    }
+
+    /** The existing rectangular CSV pads a shorter column; compare in that same representation. */
+    private static boolean csvValuesEqual(Object first, Object second, int paddingWidth) {
+        if (Objects.equals(first, second)) return true;
+        if (!(first instanceof List<?> a) || !(second instanceof List<?> b)) return false;
+        int length = Math.max(a.size(), b.size());
+        if (length > paddingWidth) return false;
+        for (int i = 0; i < length; i++)
+            if (!Objects.equals(i < a.size() ? a.get(i) : "", i < b.size() ? b.get(i) : "")) return false;
+        return true;
     }
 
     /**
@@ -301,8 +335,8 @@ public class TranslationsConfigFields {
      * Registers a translation key with the English default the plugin currently ships, reconciling it against the
      * recorded baseline. See the class javadoc for what each outcome means.
      */
-    public void add(String filename, String key, Object value) {
-        if (value == null) return;
+    public synchronized void add(String filename, String key, Object value) {
+        if (value == null || stopped) return;
 
         String filteredFilename = filename.replace(".yml", "");
         String realKey = filteredFilename + "." + key;
@@ -347,6 +381,7 @@ public class TranslationsConfigFields {
                 customizedEnglishCount++;
                 recordSample(customizedSample, realKey);
             }
+            case SHAPE_CONFLICT -> shapeConflictCount++;
         }
 
         changeGeneration++;
@@ -386,7 +421,7 @@ public class TranslationsConfigFields {
      * Gets the translated value for a key.
      * Returns target language value if available, otherwise falls back to English.
      */
-    public Object get(String filename, String key) {
+    public synchronized Object get(String filename, String key) {
         String filteredFilename = filename.replace(".yml", "");
         String realKey = filteredFilename + "." + key;
 
@@ -432,22 +467,25 @@ public class TranslationsConfigFields {
      * corrections and call it the total.
      */
     private void scheduleSave() {
-        if (saving) return;
+        if (saving || stopped) return;
         saving = true;
         scheduleFlush(0);
     }
 
     private void scheduleFlush(int attempt) {
         int generation = changeGeneration;
-        Bukkit.getScheduler().scheduleSyncDelayedTask(MetadataHandler.PLUGIN, () -> {
+        pendingFlush = Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
+          synchronized (this) {
+            if (stopped) return;
+            pendingFlush = null;
             //Still registering keys, so the counters are not final yet. Bounded so a pathological caller cannot keep
             //the pending write in memory forever.
             if (changeGeneration != generation && attempt < MAX_FLUSH_DEFERRALS) {
                 scheduleFlush(attempt + 1);
                 return;
             }
-            flush();
-            saving = false;
+            startFlush();
+          }
         }, 100L);
     }
 
@@ -455,17 +493,56 @@ public class TranslationsConfigFields {
      * Writes whatever changed and reports the reconciliation once. Configuration files register their keys across the
      * whole of boot, so the report can only be accurate after that has settled.
      */
-    private void flush() {
-        if (dirty) {
-            save();
-            dirty = false;
+    private void startFlush() {
+        if (!writable || (!dirty && !baselineDirty)) {
+            saving = false;
+            report();
+            return;
         }
-        if (baselineDirty) {
-            saveBaseline();
-            baselineDirty = false;
+        SaveSnapshot snapshot = snapshot();
+        Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
+            boolean success;
+            synchronized (writeLock) {
+                if (stopped) return;
+                success = persist(snapshot);
+            }
+            synchronized (this) {
+                if (stopped) return;
+                acknowledge(snapshot, success);
+                saving = false;
+                if ((dirty || baselineDirty) && (success || ++writeFailures < 2)) scheduleSave();
+            }
+        });
+    }
+
+    private SaveSnapshot snapshot() {
+        return new SaveSnapshot(changeGeneration, dirty ? translationData.snapshot() : null,
+                baselineDirty ? baselineData.snapshot() : null);
+    }
+
+    private boolean persist(SaveSnapshot snapshot) {
+        try {
+            // Baselines never advance when publishing the corresponding live CSV failed.
+            if (snapshot.live != null) TranslationCsvParser.write(snapshot.live, translationsPath);
+            if (snapshot.baseline != null) TranslationCsvParser.write(snapshot.baseline, baselinePath);
+            return true;
+        } catch (IOException | RuntimeException failure) {
+            Logger.warn("Could not save translations/" + languageName
+                    + ".csv and its baselines; unsaved changes are retained: " + failure.getMessage());
+            return false;
         }
+    }
+
+    private void acknowledge(SaveSnapshot snapshot, boolean success) {
+        if (!success || snapshot.generation != changeGeneration) return;
+        if (snapshot.live != null) dirty = false;
+        if (snapshot.baseline != null) baselineDirty = false;
+        writeFailures = 0;
         report();
     }
+
+    private record SaveSnapshot(int generation, TranslationCsvParser.TranslationData live,
+                                TranslationCsvParser.TranslationData baseline) {}
 
     /**
      * One console line for what changed, plus a warning only when something needs a human. Never one line per key:
@@ -476,6 +553,9 @@ public class TranslationsConfigFields {
         //describing the empty in-memory copy.
         if (reported || !writable) return;
         reported = true;
+        if (shapeConflictCount > 0)
+            Logger.warn(shapeConflictCount + " translation keys in " + languageName
+                    + ".csv changed between text and lists. Their existing rows were preserved; update their shapes manually.");
 
         if (adoptedKeyCount > 0 && refreshedKeyCount == 0 && customizedEnglishCount == 0 && addedKeyCount == 0) {
             Logger.info("Recorded translation baselines for " + adoptedKeyCount + " keys in "
@@ -510,26 +590,6 @@ public class TranslationsConfigFields {
                     + String.join(", ", customizedSample) + "). Clear those cells to let EliteMobs manage them again.");
     }
 
-    private void save() {
-        //An unreadable CSV holds no translations in memory, so writing would replace the file with English defaults.
-        if (!writable) return;
-        try {
-            TranslationCsvParser.write(translationData, translationsPath);
-        } catch (IOException e) {
-            Logger.warn("Failed to save translations: " + e.getMessage());
-        }
-    }
-
-    private void saveBaseline() {
-        //Baselines derived from a CSV that could not be read would describe nothing that exists.
-        if (!writable) return;
-        try {
-            TranslationCsvParser.write(baselineData, baselinePath);
-        } catch (IOException e) {
-            Logger.warn("Failed to save translation baselines: " + e.getMessage());
-        }
-    }
-
     private String fixConfigColors(String value) {
         if (value == null) return null;
         return value.replace("§", "&");
@@ -550,7 +610,18 @@ public class TranslationsConfigFields {
     }
 
     public void shutdown() {
-        flush();
+        SaveSnapshot snapshot;
+        synchronized (this) {
+            if (stopped) return;
+            stopped = true;
+            if (pendingFlush != null) pendingFlush.cancel();
+            pendingFlush = null;
+            if (!writable) return;
+            snapshot = snapshot();
+        }
+        boolean success;
+        synchronized (writeLock) { success = persist(snapshot); }
+        synchronized (this) { acknowledge(snapshot, success); }
     }
 
     /**
@@ -577,6 +648,7 @@ public class TranslationsConfigFields {
         /**
          * The shipped default changed but the {@code en} cell had been edited by hand, so the row was left alone.
          */
-        ENGLISH_CUSTOMIZED
+        ENGLISH_CUSTOMIZED,
+        SHAPE_CONFLICT
     }
 }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,6 +20,9 @@ import java.util.regex.Pattern;
 public class TranslationCsvParser {
 
     private static final Pattern LIST_INDEX_PATTERN = Pattern.compile("^(.+)\\[(\\d+)]$");
+    // Bound sparse-to-dense amplification before allocating the list backing arrays.
+    private static final int MAX_LIST_ENTRIES = 16_384;
+    private static final long MAX_EXPANDED_CELLS = 1_000_000;
 
     /**
      * Parses a CSV translation file.
@@ -130,7 +134,17 @@ public class TranslationCsvParser {
             if (matcher.matches()) {
                 // This is an indexed list entry
                 String baseKey = matcher.group(1);
-                int index = Integer.parseInt(matcher.group(2));
+                if (data.hasKey(baseKey))
+                    throw new IOException("CSV row " + (rowIndex + 1) + " mixes scalar and list entries for " + baseKey);
+                int index;
+                try {
+                    index = Integer.parseInt(matcher.group(2));
+                } catch (NumberFormatException failure) {
+                    throw new IOException("CSV row " + (rowIndex + 1) + " has an invalid list index: " + rawKey, failure);
+                }
+                if (index >= MAX_LIST_ENTRIES)
+                    throw new IOException("CSV row " + (rowIndex + 1) + " exceeds " + MAX_LIST_ENTRIES
+                            + " entries per translation list: " + rawKey);
 
                 for (int langIdx = 0; langIdx < languages.size() && (langIdx + 1) < row.length; langIdx++) {
                     String language = languages.get(langIdx);
@@ -143,6 +157,8 @@ public class TranslationCsvParser {
                 }
             } else {
                 // Regular string entry
+                if (indexedEntries.containsKey(rawKey))
+                    throw new IOException("CSV row " + (rowIndex + 1) + " mixes scalar and list entries for " + rawKey);
                 for (int langIdx = 0; langIdx < languages.size() && (langIdx + 1) < row.length; langIdx++) {
                     String language = languages.get(langIdx);
                     String value = row[langIdx + 1];
@@ -152,15 +168,19 @@ public class TranslationCsvParser {
         }
 
         // Convert indexed entries to lists
+        long expandedCells = 0;
         for (Map.Entry<String, Map<String, TreeMap<Integer, String>>> keyEntry : indexedEntries.entrySet()) {
             String baseKey = keyEntry.getKey();
             for (Map.Entry<String, TreeMap<Integer, String>> langEntry : keyEntry.getValue().entrySet()) {
                 String language = langEntry.getKey();
                 TreeMap<Integer, String> indexMap = langEntry.getValue();
+                expandedCells += (long) indexMap.lastKey() + 1;
+                if (expandedCells > MAX_EXPANDED_CELLS)
+                    throw new IOException("CSV indexed translations exceed " + MAX_EXPANDED_CELLS
+                            + " expanded cells at " + baseKey + " / " + language);
 
                 // Build list from indexed entries
                 List<String> list = new ArrayList<>();
-                int expectedIndex = 0;
                 for (Map.Entry<Integer, String> indexEntry : indexMap.entrySet()) {
                     int index = indexEntry.getKey();
                     // Fill gaps with empty strings if indices are not contiguous
@@ -168,7 +188,6 @@ public class TranslationCsvParser {
                         list.add("");
                     }
                     list.add(indexEntry.getValue());
-                    expectedIndex = index + 1;
                 }
 
                 data.set(baseKey, language, list);
@@ -240,8 +259,18 @@ public class TranslationCsvParser {
      * @throws IOException if file cannot be written
      */
     public static void write(TranslationData data, Path path) throws IOException {
-        Files.createDirectories(path.getParent());
+        Path destination = path.toAbsolutePath();
+        Files.createDirectories(destination.getParent());
+        Path staged = Files.createTempFile(destination.getParent(), destination.getFileName().toString(), ".tmp");
+        try {
+            writeSnapshot(data, staged);
+            Files.move(staged, destination, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            Files.deleteIfExists(staged);
+        }
+    }
 
+    private static void writeSnapshot(TranslationData data, Path path) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             // Write UTF-8 BOM for Excel/editor compatibility
             writer.write('\uFEFF');
@@ -258,12 +287,18 @@ public class TranslationCsvParser {
             // Collect and sort all keys, expanding lists to indexed keys
             List<String> sortedKeys = new ArrayList<>(data.getKeys());
             Collections.sort(sortedKeys);
+            long expandedCells = 0;
 
             for (String key : sortedKeys) {
                 Object firstValue = null;
                 for (String lang : languages) {
                     firstValue = data.get(key, lang);
                     if (firstValue != null) break;
+                }
+                for (String lang : languages) {
+                    Object value = data.get(key, lang);
+                    if (value != null && (value instanceof List) != (firstValue instanceof List))
+                        throw new IOException("Translation '" + key + "' mixes scalar and list values; existing CSV was preserved.");
                 }
 
                 if (firstValue instanceof List) {
@@ -274,6 +309,9 @@ public class TranslationCsvParser {
                         List<String> list = data.getList(key, lang);
                         if (list != null) maxSize = Math.max(maxSize, list.size());
                     }
+                    expandedCells += (long) maxSize * languages.size();
+                    if (maxSize > MAX_LIST_ENTRIES || expandedCells > MAX_EXPANDED_CELLS)
+                        throw new IOException("Translation lists exceed the CSV resource limit at " + key);
 
                     for (int i = 0; i < maxSize; i++) {
                         writer.write(escapeCSV(key + "[" + i + "]"));
@@ -355,6 +393,13 @@ public class TranslationCsvParser {
 
         public List<String> getLanguages() {
             return Collections.unmodifiableList(languages);
+        }
+
+        TranslationData snapshot() {
+            TranslationData copy = new TranslationData(languages);
+            translations.forEach((key, values) -> values.forEach((language, value) ->
+                    copy.set(key, language, value instanceof List<?> list ? new ArrayList<>(list) : value)));
+            return copy;
         }
 
         /**
