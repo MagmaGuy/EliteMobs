@@ -595,7 +595,7 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             boolean blocking = false;
 
             //Blocking reduces melee damage and nullifies most ranged damage at the cost of shield durability
-            if (player.isBlocking() || (com.magmaguy.elitemobs.testing.CombatSimulator.isTestingActive() && com.magmaguy.elitemobs.testing.CombatSimulator.isBlockingOverride())) {
+            if (player.isBlocking() || (CombatSimulator.isBlockingOverride(event))) {
                 blocking = true;
                 damageBlockingShield(player);
 
@@ -612,9 +612,9 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             double newDamage = eliteToPlayerDamageFormula(player, eliteEntity, event, specialMultiplier);
             double damageAfterFormula = newDamage;
             // Test damage override: bypass defense formula during automated testing
-            boolean testOverrideHit = CombatSimulator.isTestingActive() && CombatSimulator.getTestDamageOverride() >= 0;
+            boolean testOverrideHit = CombatSimulator.getTestDamageOverride(event) >= 0;
             if (testOverrideHit) {
-                newDamage = CombatSimulator.getTestDamageOverride();
+                newDamage = CombatSimulator.getTestDamageOverride(event);
             }
             double damageAfterTestOverride = newDamage;
             //Blocking reduces damage by 80%

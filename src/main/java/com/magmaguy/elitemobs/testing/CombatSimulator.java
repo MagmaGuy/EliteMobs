@@ -67,11 +67,8 @@ public class CombatSimulator {
      * Uses damageMultiplier=1.0 (works for both offensive and defensive tests).
      */
     private static final String DAMAGE_TEST_DUMMY_CONFIG = "damage_test_dummy.yml";
-    @Getter
-    private static boolean testingActive = false;
-    @Getter
-    @Setter
-    private static boolean blockingOverride = false;
+    private static java.util.UUID testingPlayer;
+    private boolean blockingOverride = false;
 
     @Getter
     private final Player player;
@@ -97,9 +94,45 @@ public class CombatSimulator {
      * and uses this fixed damage value instead. Set to -1 to disable (default).
      * Used by special test simulation methods to ensure meaningful damage at all armor levels.
      */
-    @Getter
-    @Setter
-    private static double testDamageOverride = -1;
+    private double testDamageOverride = -1;
+    private static DamageOperation damageOperation;
+    private static final class DamageOperation {
+        private final Player player;
+        private final LivingEntity attacker;
+        private final double damage;
+        private final boolean blocking;
+        private org.bukkit.event.entity.EntityDamageByEntityEvent event;
+        private DamageOperation(Player player, LivingEntity attacker, double damage, boolean blocking) {
+            this.player = player; this.attacker = attacker; this.damage = damage; this.blocking = blocking;
+        }
+    }
+
+    public static boolean isTestingActive(Player player) {
+        return player != null && player.getUniqueId().equals(testingPlayer);
+    }
+
+    public static boolean ownsIncomingDamage(org.bukkit.event.entity.EntityDamageByEntityEvent event) {
+        DamageOperation operation = damageOperation;
+        if (operation == null || operation.player != event.getEntity() || operation.attacker != event.getDamager()) return false;
+        if (operation.event == null) operation.event = event;
+        return operation.event == event;
+    }
+
+    public static boolean isBlockingOverride(org.bukkit.event.entity.EntityDamageByEntityEvent event) {
+        return ownsIncomingDamage(event) && damageOperation.blocking;
+    }
+
+    public static double getTestDamageOverride(org.bukkit.event.entity.EntityDamageByEntityEvent event) {
+        return ownsIncomingDamage(event) ? damageOperation.damage : -1;
+    }
+
+    private void damagePlayer(double amount, LivingEntity attacker) {
+        DamageOperation previous = damageOperation;
+        damageOperation = new DamageOperation(player, attacker, testDamageOverride, blockingOverride);
+        try { player.damage(amount, attacker); }
+        finally { damageOperation = previous; }
+    }
+
     // Saved block data for water placement restoration
     private Location waterBlockLocation = null;
 
@@ -230,8 +263,9 @@ public class CombatSimulator {
         }
     }
 
-    public static void setTestingActive(boolean active) {
-        testingActive = active;
+    static void setTestingActive(Player player, boolean active) {
+        if (active) testingPlayer = player.getUniqueId();
+        else if (isTestingActive(player)) testingPlayer = null;
     }
 
     /**
@@ -537,7 +571,7 @@ public class CombatSimulator {
         double absorptionBefore = player.getAbsorptionAmount();
         double totalBefore = healthBefore + absorptionBefore;
 
-        player.damage(amount, attacker);
+        damagePlayer(amount, attacker);
 
         double healthAfter = player.getHealth();
         double absorptionAfter = player.getAbsorptionAmount();
@@ -700,7 +734,7 @@ public class CombatSimulator {
         // Override defense formula to ensure the exact damage amount reaches skills
         testDamageOverride = amount;
         try {
-            player.damage(amount, attacker);
+            damagePlayer(amount, attacker);
         } finally {
             testDamageOverride = -1;
         }
@@ -738,7 +772,7 @@ public class CombatSimulator {
 
         testDamageOverride = amount;
         try {
-            player.damage(amount, attacker);
+            damagePlayer(amount, attacker);
         } finally {
             testDamageOverride = -1;
         }
@@ -771,9 +805,13 @@ public class CombatSimulator {
         LivingEntity entity = getDummyEntity(skillId);
         if (entity == null) return;
         Location loc = entity.getLocation().getBlock().getLocation();
+        if (loc.equals(waterBlockLocation)) return;
+        restoreWaterBlock();
+        if (!loc.getBlock().getType().isAir())
+            throw new IllegalStateException("Diagnostic water requires an empty block");
         savedBlockData = loc.getBlock().getBlockData().clone();
         waterBlockLocation = loc;
-        loc.getBlock().setType(Material.WATER);
+        loc.getBlock().setType(Material.WATER, false);
     }
 
     /**
@@ -781,7 +819,9 @@ public class CombatSimulator {
      */
     public void restoreWaterBlock() {
         if (waterBlockLocation != null && savedBlockData != null) {
-            waterBlockLocation.getBlock().setBlockData(savedBlockData, false);
+            // Preserve later external edits; only this owner's source-water value may be restored.
+            if (waterBlockLocation.getBlock().getBlockData().equals(Material.WATER.createBlockData()))
+                waterBlockLocation.getBlock().setBlockData(savedBlockData, false);
             waterBlockLocation = null;
             savedBlockData = null;
         }
@@ -838,7 +878,7 @@ public class CombatSimulator {
         double healthBefore = player.getHealth();
         testDamageOverride = fatalDamage;
         try {
-            player.damage(fatalDamage, attacker);
+            damagePlayer(fatalDamage, attacker);
         } finally {
             testDamageOverride = -1;
         }
@@ -916,7 +956,7 @@ public class CombatSimulator {
      */
     public double simulateBlockingIncomingDamage(String skillId, double amount) {
         // Equip a sword so Parry's material check passes
-        player.getInventory().setItemInMainHand(new ItemStack(Material.NETHERITE_SWORD));
+        equipment.equipWeapon(SkillType.SWORDS);
 
         blockingOverride = true;
         testDamageOverride = amount;

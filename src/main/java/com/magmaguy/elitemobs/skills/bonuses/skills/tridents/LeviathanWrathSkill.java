@@ -100,7 +100,7 @@ public class LeviathanWrathSkill extends SkillBonus implements CooldownSkill {
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1.0f, 0.5f);
 
         // Strike lightning at multiple points (suppress during testing to avoid entity spam)
-        if (!CombatSimulator.isTestingActive()) {
+        if (!CombatSimulator.isTestingActive(player)) {
             for (int i = 0; i < 3; i++) {
                 target.getWorld().strikeLightningEffect(target.getLocation().add(
                         (Math.random() - 0.5) * AOE_RADIUS,

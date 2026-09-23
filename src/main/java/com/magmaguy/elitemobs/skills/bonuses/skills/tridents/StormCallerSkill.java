@@ -53,7 +53,7 @@ public class StormCallerSkill extends SkillBonus implements ProcSkill {
         int skillLevel = getPlayerSkillLevel(player);
 
         // Strike lightning effect at target (suppress during testing to avoid entity spam)
-        if (!CombatSimulator.isTestingActive()) {
+        if (!CombatSimulator.isTestingActive(player)) {
             target.getWorld().strikeLightningEffect(target.getLocation());
         }
 

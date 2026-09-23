@@ -43,7 +43,7 @@ public class PackHunterSkill extends SkillBonus implements ConditionalSkill {
 
     @Override
     public boolean conditionMet(Player player, Object context) {
-        if (testOverrideNearbyPlayers) return true;
+        if (testOverrideNearbyPlayers && com.magmaguy.elitemobs.testing.CombatSimulator.isTestingActive(player)) return true;
         return player.getNearbyEntities(ALLY_RANGE, ALLY_RANGE, ALLY_RANGE).stream()
                 .anyMatch(e -> e instanceof Player && !e.equals(player));
     }

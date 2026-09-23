@@ -76,7 +76,7 @@ public class ArrowRainSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void onActivate(Player player, Object event) {
-        if (CombatSimulator.isTestingActive()) return;
+        if (CombatSimulator.isTestingActive(player)) return;
         if (!isActive(player) || isOnCooldown(player)) return;
         if (!(event instanceof EliteMobDamagedByPlayerEvent damageEvent)) return;
         if (damageEvent.getEliteMobEntity().getLivingEntity() == null) return;

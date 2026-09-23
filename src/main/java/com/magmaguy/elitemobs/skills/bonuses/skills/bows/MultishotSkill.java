@@ -43,7 +43,7 @@ public class MultishotSkill extends SkillBonus implements ProcSkill {
 
     @Override
     public void onProc(Player player, Object context) {
-        if (CombatSimulator.isTestingActive()) return;
+        if (CombatSimulator.isTestingActive(player)) return;
         if (!(context instanceof EliteMobDamagedByPlayerEvent event)) return;
         if (event.getEntityDamageByEntityEvent() == null
                 || !(event.getEntityDamageByEntityEvent().getDamager() instanceof org.bukkit.entity.Projectile origin)) return;

@@ -40,6 +40,24 @@ public class TestReport {
             ActiveAbilityBalanceAnalyzer.analyzeBuiltIns();
 
     // Summary stats
+    private final Map<String, SkillTestResult> unobserved = new LinkedHashMap<>();
+
+    void expect(com.magmaguy.elitemobs.skills.bonuses.SkillBonus skill) {
+        unobserved.putIfAbsent(skill.getSkillId(), new SkillTestResult(
+                skill.getSkillId(), skill.getBonusName(), skill.getSkillType(), skill.getRequiredLevel()));
+    }
+
+    void finishCoverage(String reason) {
+        for (SkillTestResult result : List.copyOf(unobserved.values())) {
+            result.addIssue("Not fully observed across requested levels: " + reason);
+            addResult(result);
+        }
+    }
+
+    private boolean allPassed() {
+        return unobserved.isEmpty() && passedTests > 0 && failedTests == 0;
+    }
+
     private int totalTests = 0;
     private int passedTests = 0;
     private int failedTests = 0;
@@ -71,6 +89,7 @@ public class TestReport {
     }
 
     public void addResult(SkillTestResult result) {
+        unobserved.remove(result.getSkillId());
         results.add(result);
         resultsByType.computeIfAbsent(result.getSkillType(), k -> new ArrayList<>()).add(result);
 
@@ -88,6 +107,7 @@ public class TestReport {
      * Adds a skipped skill result.
      */
     public void addSkippedResult(SkillTestResult result) {
+        unobserved.remove(result.getSkillId());
         skippedResults.add(result);
         totalTests++;
         skippedTests++;
@@ -218,8 +238,10 @@ public class TestReport {
         lines.add("");
 
         // Overall status
-        if (failedTests == 0) {
+        if (allPassed()) {
             lines.add("&a&lALL TESTS PASSED!" + (skippedTests > 0 ? " &7(" + skippedTests + " skipped)" : ""));
+        } else if (failedTests == 0) {
+            lines.add("&c&lINCOMPLETE: no complete passing observations");
         } else {
             lines.add(String.format("&c&l%d TEST(S) FAILED &7- Use /em debug combat results for details", failedTests));
         }
@@ -417,10 +439,10 @@ public class TestReport {
         cover.append("\u00A7aPassed: ").append(passedTests).append("\n");
         cover.append("\u00A7cFailed: ").append(failedTests).append("\n");
         cover.append("\u00A77Skipped: ").append(skippedTests).append("\n\n");
-        if (failedTests == 0) {
+        if (allPassed()) {
             cover.append("\u00A7a\u00A7lALL PASSED");
         } else {
-            cover.append("\u00A7c\u00A7l").append(failedTests).append(" FAILED");
+            cover.append("\u00A7c\u00A7l").append(failedTests > 0 ? failedTests + " FAILED" : "INCOMPLETE");
         }
         bookMeta.addPage(cover.toString());
 

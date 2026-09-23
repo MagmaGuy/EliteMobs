@@ -14,34 +14,68 @@ import org.bukkit.inventory.meta.ItemMeta;
 /** Owns temporary diagnostic equipment and restores the exact original contents. */
 final class CombatTestEquipment {
 
-    private final PlayerInventory inventory;
-    private ItemStack mainHand;
-    private ItemStack offHand;
-    private ItemStack[] armor;
+    private PlayerInventory inventory;
+    private final java.util.UUID playerId;
+    private final java.util.Map<Integer, ItemStack> originals = new java.util.LinkedHashMap<>();
+    private final java.util.Set<Integer> borrowed = new java.util.LinkedHashSet<>();
+    private final String owner = java.util.UUID.randomUUID().toString();
+    private static final org.bukkit.NamespacedKey OWNER = new org.bukkit.NamespacedKey("elitemobs", "diagnostic_equipment");
+    private int heldSlot;
     private boolean captured;
 
     CombatTestEquipment(Player player) {
         inventory = player.getInventory();
+        playerId = player.getUniqueId();
     }
 
     void capture() {
         if (captured) return;
-        mainHand = cloneItem(inventory.getItemInMainHand());
-        offHand = cloneItem(inventory.getItemInOffHand());
-        ItemStack[] currentArmor = inventory.getArmorContents();
-        armor = new ItemStack[currentArmor.length];
-        for (int index = 0; index < currentArmor.length; index++) armor[index] = cloneItem(currentArmor[index]);
+        heldSlot = inventory.getHeldItemSlot();
+        originals.put(heldSlot, cloneItem(inventory.getItem(heldSlot)));
+        for (int slot = 36; slot <= 40; slot++) originals.put(slot, cloneItem(inventory.getItem(slot)));
         captured = true;
+        // Borrow copies, so native durability mutations cannot touch the saved real items.
+        for (var entry : originals.entrySet()) write(entry.getKey(), cloneItem(entry.getValue()));
     }
 
     void restore() {
         if (!captured) return;
-        inventory.setItemInMainHand(cloneItem(mainHand));
-        inventory.setItemInOffHand(cloneItem(offHand));
-        ItemStack[] restoredArmor = new ItemStack[armor.length];
-        for (int index = 0; index < armor.length; index++) restoredArmor[index] = cloneItem(armor[index]);
-        inventory.setArmorContents(restoredArmor);
+        Player currentPlayer = org.bukkit.Bukkit.getPlayer(playerId);
+        if (currentPlayer != null) inventory = currentPlayer.getInventory();
+        RuntimeException failure = null;
+        for (int slot : java.util.List.copyOf(borrowed)) {
+            try {
+                ItemStack current = inventory.getItem(slot);
+                ItemStack original = originals.get(slot);
+                if (!owned(current) && !java.util.Objects.equals(current, original))
+                    throw new IllegalStateException("Diagnostic slot " + slot + " changed externally; original item retained");
+                inventory.setItem(slot, cloneItem(original));
+                borrowed.remove(slot);
+            } catch (RuntimeException error) {
+                if (failure == null) failure = error; else failure.addSuppressed(error);
+            }
+        }
+        if (failure != null) throw failure;
         captured = false;
+    }
+
+    private boolean owned(ItemStack item) {
+        return item != null && item.hasItemMeta() && owner.equals(item.getItemMeta()
+                .getPersistentDataContainer().get(OWNER, org.bukkit.persistence.PersistentDataType.STRING));
+    }
+
+    private void write(int slot, ItemStack replacement) {
+        ItemStack current = inventory.getItem(slot);
+        if (!owned(current) && !java.util.Objects.equals(current, originals.get(slot)))
+            throw new IllegalStateException("Diagnostic slot " + slot + " changed externally");
+        if (replacement != null && !replacement.getType().isAir()) {
+            ItemMeta meta = replacement.getItemMeta();
+            meta.getPersistentDataContainer().set(OWNER, org.bukkit.persistence.PersistentDataType.STRING, owner);
+            meta.setUnbreakable(true);
+            replacement.setItemMeta(meta);
+        }
+        borrowed.add(slot);
+        inventory.setItem(slot, replacement);
     }
 
     void equipWeapon(SkillType skillType) {
@@ -70,7 +104,10 @@ final class CombatTestEquipment {
             }
             case ARMOR -> null;
         };
-        if (weapon != null) inventory.setItemInMainHand(weapon);
+        if (weapon != null) {
+            inventory.setHeldItemSlot(heldSlot);
+            write(heldSlot, weapon);
+        }
     }
 
     private static ItemStack explicitlyIdentified(ItemStack itemStack, SkillType skillType) {
@@ -83,10 +120,10 @@ final class CombatTestEquipment {
     }
 
     void equipArmorSet(int level) {
-        inventory.setHelmet(createEliteArmor(Material.IRON_HELMET, level));
-        inventory.setChestplate(createEliteArmor(Material.IRON_CHESTPLATE, level));
-        inventory.setLeggings(createEliteArmor(Material.IRON_LEGGINGS, level));
-        inventory.setBoots(createEliteArmor(Material.IRON_BOOTS, level));
+        write(39, createEliteArmor(Material.IRON_HELMET, level));
+        write(38, createEliteArmor(Material.IRON_CHESTPLATE, level));
+        write(37, createEliteArmor(Material.IRON_LEGGINGS, level));
+        write(36, createEliteArmor(Material.IRON_BOOTS, level));
     }
 
     private ItemStack createEliteArmor(Material material, int level) {

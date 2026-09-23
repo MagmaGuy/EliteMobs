@@ -71,7 +71,7 @@ public class OverdrawSkill extends SkillBonus implements ConditionalSkill {
                 && event.getEntityDamageByEntityEvent() != null
                 && event.getEntityDamageByEntityEvent().getDamager() instanceof Projectile projectile)
             return ItemTagger.getArrowDrawMillis(projectile) >= FULL_DRAW_TIME;
-        return CombatSimulator.isTestingActive() && getDrawTime(player.getUniqueId()) >= FULL_DRAW_TIME;
+        return CombatSimulator.isTestingActive(player) && getDrawTime(player.getUniqueId()) >= FULL_DRAW_TIME;
     }
 
     @Override

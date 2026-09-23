@@ -56,6 +56,7 @@ import java.util.*;
 public class SkillSystemTest implements Listener {
 
     private static final Map<UUID, SkillSystemTest> activeSessions = new HashMap<>();
+    private final Set<String> restored = new HashSet<>();
 
     // Test configuration
     static final int[] TEST_LEVELS = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
@@ -163,6 +164,7 @@ public class SkillSystemTest implements Listener {
 
     private boolean cancelled = false;
     private boolean cleaned;
+    private boolean cleaning;
     private boolean stormStateCaptured;
     private World savedStormWorld;
     private boolean packHunterOverrideActive;
@@ -230,8 +232,7 @@ public class SkillSystemTest implements Listener {
 
     public static void shutdown() {
         for (SkillSystemTest session : new ArrayList<>(activeSessions.values())) session.cancel();
-        activeSessions.clear();
-        CombatSimulator.setTestingActive(false);
+        if (!activeSessions.isEmpty()) Logger.warn("Combat diagnostic recovery remains unfinished for " + activeSessions.keySet());
     }
 
     /**
@@ -245,6 +246,7 @@ public class SkillSystemTest implements Listener {
     }
 
     public void start() {
+        if (!player.isOnline() || player.isDead()) return;
         if (!PlayerData.isDataLoaded(playerUUID)) {
             log("§cPlayer data is still loading; retry the combat diagnostic in a moment.");
             return;
@@ -261,6 +263,7 @@ public class SkillSystemTest implements Listener {
         for (SkillType type : SkillType.values()) {
             // Apply filter if selective testing
             if (filterType != null && type != filterType) continue;
+            for (SkillBonus skill : SkillBonusRegistry.getEnabledBonuses(type)) report.expect(skill);
 
             // Skip SPEARS if the server doesn't have spear materials
             if (type == SkillType.SPEARS && !spearsAvailable) {
@@ -289,8 +292,9 @@ public class SkillSystemTest implements Listener {
         }
 
         activeSessions.put(playerUUID, this);
+        try {
         Bukkit.getPluginManager().registerEvents(this, MetadataHandler.PLUGIN);
-        CombatSimulator.setTestingActive(true);
+        CombatSimulator.setTestingActive(player, true);
 
         totalTypes = typeQueue.size();
         int totalSkills = skillsByType.values().stream().mapToInt(List::size).sum();
@@ -320,6 +324,9 @@ public class SkillSystemTest implements Listener {
 
         // Start testing
         testNextType();
+        } catch (RuntimeException failure) {
+            abort(failure);
+        }
     }
 
     private void testNextType() {
@@ -383,6 +390,13 @@ public class SkillSystemTest implements Listener {
             SkillBonus firstSkill = testableSkills.get(0);
             if (!combatSimulator.spawnSingleDummy(firstSkill)) {
                 log("§cFailed to spawn dummy for " + currentType.getDisplayName());
+                for (SkillBonus skill : testableSkills) {
+                    SkillTestResult result = new SkillTestResult(skill.getSkillId(), skill.getBonusName(),
+                            skill.getSkillType(), skill.getRequiredLevel());
+                    result.addIssue("Dummy admission failed; requested levels were not run");
+                    report.addResult(result);
+                }
+                completedTypes++;
                 testNextType();
                 return;
             }
@@ -841,10 +855,24 @@ public class SkillSystemTest implements Listener {
     public void cancel() {
         if (cleaned) return;
         cancelled = true;
-        log("§c§lTest cancelled!");
-        File logFile = testLog.saveToFile();
-        if (logFile != null) log("§7Partial log: §e" + logFile.getName());
-        cleanup();
+        try {
+            report.finishCoverage("diagnostic cancelled");
+            report.store();
+            log("§c§lTest cancelled!");
+            File logFile = testLog.saveToFile();
+            if (logFile != null) log("§7Partial log: §e" + logFile.getName());
+        } finally {
+            cleanup();
+        }
+    }
+
+    private void abort(RuntimeException failure) {
+        Logger.warn("Combat diagnostic aborted for " + playerUUID + ": " + failure);
+        try { cancel(); }
+        catch (RuntimeException cleanupFailure) {
+            failure.addSuppressed(cleanupFailure);
+            Logger.warn("Combat diagnostic recovery retained for " + playerUUID + ": " + failure);
+        }
     }
 
     private void completeTest() {
@@ -854,6 +882,7 @@ public class SkillSystemTest implements Listener {
 
         testLog.logSection("TEST COMPLETE");
 
+        report.finishCoverage("requested skill never produced a complete result");
         // Store report for later review
         report.store();
 
@@ -882,6 +911,11 @@ public class SkillSystemTest implements Listener {
         }
         log("§7Use §e/em debug combat results §7to review this report.");
 
+        cleanup();
+        if (!cleaned) {
+            log("§cDiagnostic recovery is unfinished. Run cancel again after correcting the logged failure.");
+            return;
+        }
         // Give the player a written book with the full report
         try {
             org.bukkit.inventory.ItemStack book = report.generateBook();
@@ -901,7 +935,8 @@ public class SkillSystemTest implements Listener {
     }
 
     private void log(String message) {
-        player.sendMessage(message);
+        Player current = Bukkit.getPlayer(playerUUID);
+        if (current != null) current.sendMessage(message);
     }
 
     private void updateProgressBar(String action, int current, int max, BarColor color) {
@@ -912,44 +947,111 @@ public class SkillSystemTest implements Listener {
     }
 
     private void cleanup() {
-        if (cleaned) return;
-        cleaned = true;
-        CombatSimulator.setTestingActive(false);
-        CombatSimulator.setBlockingOverride(false);
-        CombatSimulator.setTestDamageOverride(-1);
-        HandlerList.unregisterAll(this);
-        for (BukkitTask task : new ArrayList<>(scheduledTasks)) task.cancel();
-        scheduledTasks.clear();
-        if (progressBar != null) {
-            BossBarOrderManager.hide(player, progressBar);
-            progressBar.removeAll();
-            progressBar = null;
+        if (cleaned || cleaning) return;
+        cleaning = true;
+        try {
+        boolean complete = true;
+        cancelled = true;
+        CombatSimulator.setTestingActive(player, false);
+        complete &= cleanupSafely("scheduled callbacks", () -> {
+            for (BukkitTask task : new ArrayList<>(scheduledTasks)) task.cancel();
+            scheduledTasks.clear();
+        });
+        complete &= cleanupSafely("progress bar", () -> {
+            if (progressBar != null) {
+                BossBarOrderManager.hide(player, progressBar);
+                progressBar.removeAll();
+                progressBar = null;
+            }
+        });
+        complete &= cleanupSafely("water block", combatSimulator::restoreWaterBlock);
+        complete &= cleanupSafely("weather", () -> {
+            if (stormStateCaptured && savedStormWorld != null) savedStormWorld.setStorm(savedStormState);
+        });
+        complete &= cleanupSafely("Pack Hunter override", () -> {
+            if (packHunterOverrideActive) PackHunterSkill.setTestOverrideNearbyPlayers(false);
+        });
+        complete &= cleanupSafely("test dummies", combatSimulator::removeAllDummies);
+        complete &= cleanupSafely("test projectiles", combatSimulator::cleanupTestEntities);
+        complete &= cleanupSafely("player state", playerState::restore);
+        complete &= cleanupSafely("proc counts", () -> {
+            for (SkillBonus skill : SkillBonusRegistry.getAllBonuses()) skill.resetProcCount(player);
+        });
+        cleaned = complete;
+        if (cleaned) {
+            HandlerList.unregisterAll(this);
+            activeSessions.remove(playerUUID, this);
         }
-        cleanupSafely("water block", combatSimulator::restoreWaterBlock);
-        if (stormStateCaptured && savedStormWorld != null)
-            cleanupSafely("weather", () -> savedStormWorld.setStorm(savedStormState));
-        if (packHunterOverrideActive)
-            cleanupSafely("Pack Hunter override", () -> PackHunterSkill.setTestOverrideNearbyPlayers(false));
-        cleanupSafely("test dummies", combatSimulator::removeAllDummies);
-        cleanupSafely("test projectiles", combatSimulator::cleanupTestEntities);
-        cleanupSafely("player state", playerState::restore);
-        activeSessions.remove(playerUUID);
-        for (SkillBonus skill : SkillBonusRegistry.getAllBonuses()) skill.resetProcCount(player);
+        } finally { cleaning = false; }
     }
 
-    private void cleanupSafely(String state, Runnable cleanupAction) {
+    private boolean cleanupSafely(String state, Runnable cleanupAction) {
+        if (restored.contains(state)) return true;
         try {
             cleanupAction.run();
+            restored.add(state);
+            return true;
         } catch (RuntimeException exception) {
-            Logger.warn("Failed to restore combat diagnostic " + state + ": " + exception.getMessage());
+            Logger.warn("Failed to restore combat diagnostic " + state + "; recovery retained: " + exception);
+            return false;
         }
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onHeldSlot(org.bukkit.event.player.PlayerItemHeldEvent event) {
+        if (event.getPlayer().getUniqueId().equals(playerUUID)) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onInventoryClick(org.bukkit.event.inventory.InventoryClickEvent event) {
+        if (event.getWhoClicked().getUniqueId().equals(playerUUID)) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onInventoryDrag(org.bukkit.event.inventory.InventoryDragEvent event) {
+        if (event.getWhoClicked().getUniqueId().equals(playerUUID)) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onSwap(org.bukkit.event.player.PlayerSwapHandItemsEvent event) {
+        if (event.getPlayer().getUniqueId().equals(playerUUID)) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDrop(org.bukkit.event.player.PlayerDropItemEvent event) {
+        if (event.getPlayer().getUniqueId().equals(playerUUID)) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPickup(org.bukkit.event.entity.EntityPickupItemEvent event) {
+        if (event.getEntity().getUniqueId().equals(playerUUID)) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onInteract(org.bukkit.event.player.PlayerInteractEvent event) {
+        if (event.getPlayer().getUniqueId().equals(playerUUID)) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.LOWEST, ignoreCancelled = true)
+    public void onIncomingDamage(org.bukkit.event.entity.EntityDamageEvent event) {
+        if (event.getEntity().getUniqueId().equals(playerUUID)
+                && (!(event instanceof org.bukkit.event.entity.EntityDamageByEntityEvent hit)
+                || !CombatSimulator.ownsIncomingDamage(hit))) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onNaturalHealing(org.bukkit.event.entity.EntityRegainHealthEvent event) {
+        if (event.getEntity().getUniqueId().equals(playerUUID)) event.setCancelled(true);
     }
 
     private void schedule(Runnable runnable, long delayTicks) {
         BukkitTask[] taskReference = new BukkitTask[1];
         taskReference[0] = Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
             scheduledTasks.remove(taskReference[0]);
-            if (!cleaned && !cancelled) runnable.run();
+            if (!cleaned && !cancelled) {
+                try { runnable.run(); }
+                catch (RuntimeException failure) { abort(failure); }
+            }
         }, delayTicks);
         scheduledTasks.add(taskReference[0]);
     }
