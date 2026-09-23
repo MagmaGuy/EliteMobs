@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class EventsPackage extends EMPackage {
     private final List<CustomEventsConfigFields> customEvents = new ArrayList<>();
@@ -67,13 +66,9 @@ public class EventsPackage extends EMPackage {
                 : DungeonsConfig.getEventsUninstallingMessage().replace("$count", String.valueOf(customEvents.size()));
         notify(player, actionMessage);
 
-        List<CompletableFuture<Void>> futures = customEvents.stream()
-                .map(customItem -> customItem.setEnabledAndSave(enable))
-                .toList();
-
         notify(player, DungeonsConfig.getEventsSavingMessage().replace("$count", String.valueOf(customEvents.size())));
 
-        submitBulkMemberSaves(player, futures, DungeonsConfig.getEventsReloadingMessage(), "event");
+        submitBulkMemberSaves(player, customEvents, enable, DungeonsConfig.getEventsReloadingMessage());
     }
 
     /**

@@ -404,12 +404,6 @@ public class EliteMobs extends JavaPlugin {
     }
 
     private void syncInitialization(PluginInitializationContext initializationContext) {
-        //Refresh dungeon versions from disk after importer extracts new content packages.
-        //The importer may overwrite YAML files with updated dungeonVersion values, but the
-        //in-memory configs were loaded before the importer ran, so they need to be refreshed.
-        initializationContext.step("Dungeon Versions");
-        ContentPackagesConfig.refreshDungeonVersions();
-
         //Initializes custom models
         initializationContext.step("Custom Models");
         CustomModel.initialize();

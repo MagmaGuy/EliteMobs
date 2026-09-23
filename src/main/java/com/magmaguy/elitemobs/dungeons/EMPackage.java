@@ -74,115 +74,131 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
     }
 
     public static void shutdown() {
+        BulkToggle batch = bulkToggle;
+        bulkToggle = null; // Invalidates callbacks from this generation before waiting for disk settlement.
+        if (batch != null) {
+            if (batch.flushTask != null) batch.flushTask.cancel();
+            if (batch.worker != null) reportSaveFailures(batch.worker.join());
+        }
         content.clear();
         emPackages.clear();
-        // Statics survive /em reload; without this a batch interrupted by an
-        // unrelated reload would leave the toggle gate stuck closed.
-        synchronized (BULK_TOGGLE_LOCK) {
-            collectingBulkSaves = null;
-            bulkToggleInitiator = null;
-            bulkReloadingMessage = null;
-            bulkContentType = null;
-            bulkSavesInFlight = false;
+    }
+
+    // Server-thread admission owns intent; one worker receives only sealed file/string snapshots.
+    private static BulkToggle bulkToggle;
+
+    private static final class BulkToggle {
+        private final Map<java.nio.file.Path, MemberIntent> intents = new LinkedHashMap<>();
+        private final Player player;
+        private final String reloadingMessage;
+        private org.bukkit.scheduler.BukkitTask flushTask;
+        private CompletableFuture<List<MemberResult>> worker;
+        private BulkToggle(Player player, String reloadingMessage) {
+            this.player = player;
+            this.reloadingMessage = reloadingMessage;
         }
     }
 
-    // ---- Bulk member-toggle coalescing ----
-    // Items/events packages persist one file per member (100+ for the default items
-    // package) and finish with a full plugin reload. Batches launched in the same
-    // tick — a MetaPackage installs its children in one synchronous sweep — are
-    // coalesced into ONE save-set and ONE reload, and new toggles are refused while
-    // a batch is still saving. Overlapping batches used to interleave their per-file
-    // writes and could strand a package half enabled, which is how servers ended up
-    // with a "partially installed" default items package nobody asked for. All
-    // submissions happen on the main thread; the lock covers the async completion.
-    private static final Object BULK_TOGGLE_LOCK = new Object();
-    private static List<CompletableFuture<Void>> collectingBulkSaves = null;
-    private static boolean bulkSavesInFlight = false;
-    private static Player bulkToggleInitiator = null;
-    private static String bulkReloadingMessage = null;
-    private static String bulkContentType = null;
+    private record MemberIntent(com.magmaguy.magmacore.config.CustomConfigFields fields, boolean enabled) { }
+    private record MemberSave(MemberIntent intent, File file, String contents) { }
+    private record MemberResult(MemberSave save, RuntimeException failure) { }
 
-    /**
-     * @return true when a previous batch is still saving. Callers must not write
-     * any member configuration while this holds — half of a toggle applied over
-     * half of another is exactly the corruption this gate exists to prevent.
-     */
     protected static boolean bulkMemberTogglesLocked() {
-        synchronized (BULK_TOGGLE_LOCK) {
-            return bulkSavesInFlight;
-        }
+        return bulkToggle != null && bulkToggle.worker != null;
     }
 
-    /**
-     * Queues a batch of member-configuration saves for the shared end-of-tick flush.
-     * The first submission of a tick schedules the flush; later same-tick submissions
-     * (meta children) join it. The flush completes every save without blocking the
-     * server thread, then hands feedback and the single plugin reload back to the
-     * main thread. Tolerates a null player (console/automation).
-     */
     protected static void submitBulkMemberSaves(Player player,
-                                                Collection<? extends CompletableFuture<Void>> saves,
-                                                String reloadingMessage,
-                                                String contentType) {
-        synchronized (BULK_TOGGLE_LOCK) {
-            if (collectingBulkSaves == null) {
-                collectingBulkSaves = new ArrayList<>(saves);
-                bulkToggleInitiator = player;
-                bulkReloadingMessage = reloadingMessage;
-                bulkContentType = contentType;
-                Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, EMPackage::flushBulkMemberSaves);
-            } else {
-                collectingBulkSaves.addAll(saves);
-                if (bulkToggleInitiator == null) bulkToggleInitiator = player;
+            Collection<? extends com.magmaguy.magmacore.config.CustomConfigFields> members,
+            boolean enabled, String reloadingMessage) {
+        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Content toggles require the server thread");
+        if (bulkMemberTogglesLocked()) throw new IllegalStateException("Content toggle already saving");
+        Map<java.nio.file.Path, MemberIntent> incoming = new LinkedHashMap<>();
+        for (var fields : members) {
+            try {
+                incoming.put(fields.getFile().getCanonicalFile().toPath(), new MemberIntent(fields, enabled));
+            } catch (java.io.IOException failure) {
+                throw new java.io.UncheckedIOException("Cannot identify content file " + fields.getFile(), failure);
             }
         }
+        if (bulkToggle == null) {
+            BulkToggle batch = new BulkToggle(player, reloadingMessage);
+            bulkToggle = batch;
+            try {
+                batch.flushTask = Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> flushBulkMemberSaves(batch));
+            } catch (RuntimeException failure) {
+                bulkToggle = null;
+                throw failure;
+            }
+        }
+        // Last same-tick intent wins, including opposing toggles and shared meta-package members.
+        bulkToggle.intents.putAll(incoming);
     }
 
-    private static void flushBulkMemberSaves() {
-        final List<CompletableFuture<Void>> saves;
-        final Player player;
-        final String reloadingMessage;
-        final String contentType;
-        synchronized (BULK_TOGGLE_LOCK) {
-            if (collectingBulkSaves == null) return;
-            saves = collectingBulkSaves;
-            player = bulkToggleInitiator;
-            reloadingMessage = bulkReloadingMessage;
-            contentType = bulkContentType;
-            collectingBulkSaves = null;
-            bulkToggleInitiator = null;
-            bulkReloadingMessage = null;
-            bulkContentType = null;
-            bulkSavesInFlight = true;
-        }
-        CompletableFuture.allOf(saves.toArray(CompletableFuture[]::new)).whenComplete((ignored, failure) -> {
-            if (MetadataHandler.shutdownRequested) {
-                synchronized (BULK_TOGGLE_LOCK) {
-                    bulkSavesInFlight = false;
-                }
-                return;
+    private static void flushBulkMemberSaves(BulkToggle batch) {
+        if (bulkToggle != batch || MetadataHandler.shutdownRequested) return;
+        List<MemberSave> saves = new ArrayList<>();
+        try {
+            for (var entry : batch.intents.entrySet()) {
+                MemberIntent intent = entry.getValue();
+                if (intent.fields().isEnabled() == intent.enabled()) continue;
+                var snapshot = new org.bukkit.configuration.file.YamlConfiguration();
+                snapshot.loadFromString(intent.fields().getWritableFileConfiguration().saveToString());
+                snapshot.set("isEnabled", intent.enabled());
+                saves.add(new MemberSave(intent, entry.getKey().toFile(), snapshot.saveToString()));
             }
+        } catch (Exception failure) {
+            bulkToggle = null;
+            Logger.warn("Content toggle could not be prepared; no member was saved: " + failure);
+            if (batch.player != null && batch.player.isOnline())
+                Logger.sendMessage(batch.player, DungeonsConfig.getContentConfigurationSaveFailedMessage());
+            return;
+        }
+        if (saves.isEmpty()) { bulkToggle = null; return; }
+        batch.worker = CompletableFuture.supplyAsync(() -> {
+            List<MemberResult> results = new ArrayList<>();
+            for (MemberSave save : saves) {
+                try {
+                    com.magmaguy.magmacore.config.ConfigurationEngine.fileSaverSerialized(save.contents(), save.file());
+                    results.add(new MemberResult(save, null));
+                } catch (RuntimeException failure) {
+                    results.add(new MemberResult(save, failure));
+                }
+            }
+            return List.copyOf(results);
+        });
+        batch.worker.thenAccept(results -> {
+            if (MetadataHandler.shutdownRequested) return;
             Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
-                // The reload below runs synchronously on this same thread, so clearing
-                // first cannot admit a competing toggle mid-reload.
-                synchronized (BULK_TOGGLE_LOCK) {
-                    bulkSavesInFlight = false;
+                if (bulkToggle != batch || MetadataHandler.shutdownRequested) return;
+                bulkToggle = null;
+                boolean failed = reportSaveFailures(results);
+                boolean changed = false;
+                for (MemberResult result : results) {
+                    if (result.failure() != null) continue;
+                    MemberIntent intent = result.save().intent();
+                    intent.fields().setEnabled(intent.enabled());
+                    intent.fields().getWritableFileConfiguration().set("isEnabled", intent.enabled());
+                    changed = true;
                 }
-                if (MetadataHandler.shutdownRequested) return;
-                if (failure != null) {
-                    Throwable cause = failure.getCause() == null ? failure : failure.getCause();
-                    Logger.warn("Failed to save " + contentType + " content configuration: " + cause.getMessage());
-                    cause.printStackTrace();
-                    if (player != null && player.isOnline())
-                        Logger.sendMessage(player, DungeonsConfig.getContentConfigurationSaveFailedMessage());
-                    return;
-                }
-
-                if (player != null && player.isOnline()) Logger.sendMessage(player, reloadingMessage);
-                ReloadCommand.reload(player != null && player.isOnline() ? player : Bukkit.getConsoleSender());
+                if (batch.player != null && batch.player.isOnline())
+                    Logger.sendMessage(batch.player, failed ? DungeonsConfig.getContentConfigurationSaveFailedMessage()
+                            : batch.reloadingMessage);
+                // Successful members are durable even if another file failed; reload once to expose that exact state.
+                if (changed) ReloadCommand.reload(batch.player != null && batch.player.isOnline()
+                        ? batch.player : Bukkit.getConsoleSender());
             });
         });
+    }
+
+    private static boolean reportSaveFailures(List<MemberResult> results) {
+        boolean failed = false;
+        for (MemberResult result : results) {
+            if (result.failure() == null) continue;
+            failed = true;
+            Logger.warn("Content member was not changed: " + result.save().file() + ": " + result.failure());
+        }
+        if (failed) Logger.warn("Content toggle partially failed; successful members remain saved. Failed files are listed above.");
+        return failed;
     }
 
     /**

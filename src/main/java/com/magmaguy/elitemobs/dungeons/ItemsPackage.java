@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class ItemsPackage extends EMPackage {
     private final List<CustomItemsConfigFields> customItems = new ArrayList<>();
@@ -64,13 +63,9 @@ public class ItemsPackage extends EMPackage {
                 : DungeonsConfig.getItemsUninstallingMessage().replace("$count", String.valueOf(customItems.size()));
         notify(player, actionMessage);
 
-        List<CompletableFuture<Void>> futures = customItems.stream()
-                .map(customItem -> customItem.setEnabledAndSave(enable))
-                .toList();
-
         notify(player, DungeonsConfig.getItemsSavingMessage().replace("$count", String.valueOf(customItems.size())));
 
-        submitBulkMemberSaves(player, futures, DungeonsConfig.getItemsReloadingMessage(), "item");
+        submitBulkMemberSaves(player, customItems, enable, DungeonsConfig.getItemsReloadingMessage());
     }
 
     /**

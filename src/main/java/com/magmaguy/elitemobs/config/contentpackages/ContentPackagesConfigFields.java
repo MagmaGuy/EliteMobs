@@ -439,20 +439,6 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     }
 
     /**
-     * Re-reads the dungeonVersion from the YAML file on disk.
-     * This is needed after the importer extracts new content packages,
-     * since the in-memory fileConfiguration was loaded before the importer ran.
-     */
-    public void refreshDungeonVersionFromDisk() {
-        if (file == null || !file.exists()) return;
-        YamlConfiguration freshConfig = YamlConfiguration.loadConfiguration(file);
-        int freshVersion = freshConfig.getInt("dungeonVersion", 0);
-        if (freshVersion > this.dungeonVersion) {
-            this.dungeonVersion = freshVersion;
-        }
-    }
-
-    /**
      * This just sets the installed status to true, doesn't really do anything else
      */
     public void simpleInstall() {
