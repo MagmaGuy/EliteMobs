@@ -1,27 +1,14 @@
 package com.magmaguy.elitemobs.utils;
 
 import org.bukkit.Chunk;
-
-import java.util.Objects;
 import java.util.UUID;
-import java.util.Vector;
 
-public class ChunkVectorizer {
-
-    public static int hash(Chunk chunk) {
-        return Objects.hash(chunk.getX(), chunk.getZ(), chunk.getWorld().getUID());
+/** Full chunk identity without retaining or loading a Chunk/World object. */
+public final class ChunkVectorizer {
+    private ChunkVectorizer() {}
+    public record Key(UUID worldId, int x, int z) {}
+    public static Key key(Chunk chunk) {
+        return key(chunk.getX(), chunk.getZ(), chunk.getWorld().getUID());
     }
-
-    //pseudo-chunks - prevent it form having to load the chunk
-    public static int hash(int x, int z, UUID worldUUID) {
-        return Objects.hash(x, z, worldUUID);
-    }
-
-    public static Vector hash(double x, double z) {
-        Vector vector = new Vector(2);
-        vector.addElement(x);
-        vector.addElement(z);
-        return vector;
-    }
-
+    public static Key key(int x, int z, UUID worldId) { return new Key(worldId, x, z); }
 }

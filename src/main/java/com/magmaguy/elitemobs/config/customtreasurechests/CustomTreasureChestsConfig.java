@@ -41,13 +41,13 @@ public class CustomTreasureChestsConfig extends CustomConfig {
         return customTreasureChestConfigFields.addTreasureChest(location, 0);
     }
 
-    public static void removeTreasureChestEntry(Location location, String customChestFileName) {
+    public static boolean removeTreasureChestEntry(Location location, String customChestFileName) {
         CustomTreasureChestConfigFields customTreasureChestConfigFields = getCustomTreasureChestConfigFields().get(customChestFileName);
         if (location == null || customTreasureChestConfigFields == null) {
             Logger.warn("Failed to remove a location for a treasure chest!");
-            return;
+            return false;
         }
-        customTreasureChestConfigFields.purgeLocations();
+        return customTreasureChestConfigFields.removeLocation(location);
     }
 
 }

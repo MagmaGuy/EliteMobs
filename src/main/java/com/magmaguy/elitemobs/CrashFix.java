@@ -16,10 +16,10 @@ import java.util.HashSet;
 
 public class CrashFix implements Listener {
 
-    private static final HashSet<Integer> temporarilyCachedChunks = new HashSet<>();
+    private static final HashSet<ChunkVectorizer.Key> temporarilyCachedChunks = new HashSet<>();
     public static String key = "EliteMobsCullable";
     public static String fallingBlocksKey = "VisualFallingBlocks";
-    public static HashSet<Integer> knownSessionChunks = new HashSet<>();
+    public static HashSet<ChunkVectorizer.Key> knownSessionChunks = new HashSet<>();
 
     public static void persistentTracker(Entity entity) {
         PersistentVanillaData.write(entity, key, "delete_me");
@@ -46,7 +46,7 @@ public class CrashFix implements Listener {
         for (World world : Bukkit.getWorlds())
             for (Chunk chunk : world.getLoadedChunks()) {
                 chunkCheck(chunk);
-                knownSessionChunks.add(ChunkVectorizer.hash(chunk));
+                knownSessionChunks.add(ChunkVectorizer.key(chunk));
             }
     }
 
@@ -66,7 +66,7 @@ public class CrashFix implements Listener {
      *
      * @param chunk
      */
-    private static void delayedChunkCheck(Chunk chunk, int hashedChunk) {
+    private static void delayedChunkCheck(Chunk chunk, ChunkVectorizer.Key hashedChunk) {
         Entity[] entities = chunk.getEntities().clone();
         new BukkitRunnable() {
             @Override
@@ -81,11 +81,9 @@ public class CrashFix implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChunkLoad(ChunkLoadEvent event) {
-        int hashedChunk = ChunkVectorizer.hash(event.getChunk());
+        ChunkVectorizer.Key hashedChunk = ChunkVectorizer.key(event.getChunk());
         //For some reason there is double chunk loading going on, and entities aren't getting detected correctly
-        if (temporarilyCachedChunks.contains(hashedChunk)) return;
-        temporarilyCachedChunks.add(hashedChunk);
-        if (knownSessionChunks.contains(hashedChunk)) return;
+        if (knownSessionChunks.contains(hashedChunk) || !temporarilyCachedChunks.add(hashedChunk)) return;
         knownSessionChunks.add(hashedChunk);
         delayedChunkCheck(event.getChunk(), hashedChunk);
     }

@@ -11,6 +11,8 @@ import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.InvalidConfigurationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,27 +140,24 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
      * @param unixTimeStamp
      * @return
      */
-    public TreasureChest addTreasureChest(Location chestInstanceLocation, long unixTimeStamp) {
-        int index = -1;
-        String deserializedLocation = ConfigurationLocation.deserialize(chestInstanceLocation.getBlock().getLocation());
-        for (String string : locationsString)
-            if (string.split(":")[0].equals(deserializedLocation)) {
-                index = locationsString.indexOf(string);
-                break;
-            }
-        String serializedUpdatedLocation = deserializedLocation + ":" + unixTimeStamp;
-        TreasureChest treasureChest = null;
-        if (index != -1) {
-            //case for existing treasure chest getting a cooldown
-            locationsString.set(index, serializedUpdatedLocation);
-        } else {
-            //case for a new treasure chest
-            locationsString.add(serializedUpdatedLocation);
-            treasureChest = new TreasureChest(this, ConfigurationLocation.deserialize(chestInstanceLocation), unixTimeStamp);
+    public synchronized TreasureChest addTreasureChest(Location chestInstanceLocation, long unixTimeStamp) {
+        Location block = chestInstanceLocation.getBlock().getLocation();
+        String coordinates = ConfigurationLocation.deserialize(block);
+        List<String> updated = new ArrayList<>(locationsString == null ? List.of() : locationsString);
+        boolean existing = false;
+        for (int i = 0; i < updated.size(); i++) {
+            if (!sameBlock(updated.get(i), block)) continue;
+            updated.set(i, coordinates + ":" + unixTimeStamp);
+            existing = true;
+            break;
         }
-        fileConfiguration.set("locations", locationsString);
-        ConfigurationEngine.fileSaverCustomValues(fileConfiguration, file);
-        return treasureChest;
+        if (!existing) updated.add(coordinates + ":" + unixTimeStamp);
+        YamlConfiguration snapshot = configurationSnapshot();
+        snapshot.set("locations", updated);
+        ConfigurationEngine.fileSaverSerialized(snapshot.saveToString(), file);
+        locationsString = updated;
+        fileConfiguration = snapshot;
+        return existing ? null : new TreasureChest(this, coordinates, unixTimeStamp);
     }
 
     public void setRestockTime(Location location, long newRestockTime) {
@@ -177,11 +176,34 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         }
     }
 
-    public void purgeLocations() {
-        this.locationsString = new ArrayList<>();
-        ConfigurationEngine.writeValue(null, file, fileConfiguration, "locations");
-        this.locationString = null;
-        ConfigurationEngine.writeValue(null, file, fileConfiguration, "location");
+    public synchronized boolean removeLocation(Location selected) {
+        List<String> retained = new ArrayList<>(locationsString == null ? List.of() : locationsString);
+        boolean changed = retained.removeIf(entry -> sameBlock(entry, selected));
+        boolean clearLegacy = sameBlock(locationString, selected);
+        if (!changed && !clearLegacy) return false;
+        YamlConfiguration snapshot = configurationSnapshot();
+        snapshot.set("locations", retained);
+        if (clearLegacy) snapshot.set("location", null);
+        ConfigurationEngine.fileSaverSerialized(snapshot.saveToString(), file);
+        locationsString = retained;
+        if (clearLegacy) locationString = null;
+        fileConfiguration = snapshot;
+        return true;
+    }
+
+    private YamlConfiguration configurationSnapshot() {
+        YamlConfiguration snapshot = new YamlConfiguration();
+        try { snapshot.loadFromString(fileConfiguration.saveToString()); }
+        catch (InvalidConfigurationException failure) { throw new IllegalStateException("Invalid chest configuration snapshot", failure); }
+        return snapshot;
+    }
+
+    private static boolean sameBlock(String entry, Location selected) {
+        if (entry == null || selected == null || selected.getWorld() == null) return false;
+        Location parsed = ConfigurationLocation.serialize(entry, true);
+        return parsed != null && selected.getWorld().equals(parsed.getWorld())
+                && parsed.getBlockX() == selected.getBlockX() && parsed.getBlockY() == selected.getBlockY()
+                && parsed.getBlockZ() == selected.getBlockZ();
     }
 
 }

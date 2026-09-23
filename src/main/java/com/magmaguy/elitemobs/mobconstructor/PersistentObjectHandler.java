@@ -33,28 +33,26 @@ import java.util.UUID;
 public class PersistentObjectHandler {
 
     /*
-    This ListMultimap keeps two types of string keys: The first type is a world name and the second type is a chunk vector converted to a string
+    This ListMultimap distinguishes world-name buckets from full world UUID and chunk-coordinate buckets.
     Handlers are created from the async content-package initialization thread as well as from the main thread (chunk
     and world events, boss spawns), so the backing multimap has to be synchronized. Guava only guards single
     operations; every iteration over a collection view below additionally locks on the multimap itself, which is the
     lock Multimaps#synchronizedListMultimap uses internally.
      */
-    private static final ListMultimap<String, PersistentObjectHandler> persistentObjects =
+    private static final ListMultimap<Bucket, PersistentObjectHandler> persistentObjects =
             Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
     // Accessed on the server thread. Keys retain no Chunk or World references while waiting.
-    private static final Map<PendingChunk, BukkitTask> pendingChunkLoads = new HashMap<>();
+    private static final Map<ChunkVectorizer.Key, BukkitTask> pendingChunkLoads = new HashMap<>();
 
-    private record PendingChunk(UUID worldId, int x, int z) {
-        static PendingChunk of(Chunk chunk) {
-            return new PendingChunk(chunk.getWorld().getUID(), chunk.getX(), chunk.getZ());
-        }
-    }
+    private sealed interface Bucket permits WorldBucket, ChunkBucket {}
+    private record WorldBucket(String name) implements Bucket {}
+    private record ChunkBucket(ChunkVectorizer.Key key) implements Bucket {}
 
     private final PersistentObject persistentObject;
     private final String worldName;
     @Getter
     private Location persistentLocation;
-    private String chunk;
+    private ChunkBucket chunk;
 
     /**
      * Used to store the locations of custom bosses that have gone into unloaded chunks.
@@ -63,8 +61,10 @@ public class PersistentObjectHandler {
      */
     public PersistentObjectHandler(PersistentObject persistentObject) {
         this.persistentObject = persistentObject;
-        this.persistentLocation = persistentObject.getPersistentLocation();
-        this.worldName = persistentObject.getWorldName();
+        Location initial = persistentObject.getPersistentLocation();
+        this.persistentLocation = initial == null ? null : initial.clone();
+        this.worldName = initial != null && initial.getWorld() != null
+                ? initial.getWorld().getName() : persistentObject.getWorldName();
         if (persistentLocation != null &&
                 persistentLocation.getWorld() != null &&
                 Bukkit.getWorld(persistentLocation.getWorld().getUID()) != null)
@@ -97,12 +97,12 @@ public class PersistentObjectHandler {
             addWorldKey(simplePersistentEntity);
             return;
         }
-        this.chunk = ChunkVectorizer.hash(persistentLocation.getBlockX() >> 4, persistentLocation.getBlockZ() >> 4, persistentLocation.getWorld().getUID()) + "";
+        this.chunk = new ChunkBucket(ChunkVectorizer.key(persistentLocation.getBlockX() >> 4, persistentLocation.getBlockZ() >> 4, persistentLocation.getWorld().getUID()));
         persistentObjects.put(simplePersistentEntity.chunk, simplePersistentEntity);
     }
 
     private void addWorldKey(PersistentObjectHandler persistentObjectHandler) {
-        persistentObjects.put(persistentObjectHandler.worldName, persistentObjectHandler);
+        persistentObjects.put(new WorldBucket(persistentObjectHandler.worldName), persistentObjectHandler);
     }
 
     public void worldLoad(World world) {
@@ -114,8 +114,10 @@ public class PersistentObjectHandler {
         //Assign world to the location. The handler can be constructed before the persistent object knows where it
         //lives (regional bosses parsed while their world is still unloaded), so the location may only materialize
         //once the implementation above has run - ask for it again rather than dereferencing a null field.
-        if (this.persistentLocation == null)
-            this.persistentLocation = persistentObject.getPersistentLocation();
+        if (this.persistentLocation == null) {
+            Location restored = persistentObject.getPersistentLocation();
+            this.persistentLocation = restored == null ? null : restored.clone();
+        }
         if (this.persistentLocation != null)
             this.persistentLocation.setWorld(world);
         //Assign key
@@ -138,18 +140,18 @@ public class PersistentObjectHandler {
 
     public void updatePersistentLocation(Location location) {
         remove();
-        this.persistentLocation = location;
+        this.persistentLocation = location == null ? null : location.clone();
         addChunkKey(this);
     }
 
     public void remove() {
         persistentObjects.remove(this.chunk, this);
-        persistentObjects.remove(this.worldName, this);
+        persistentObjects.remove(new WorldBucket(this.worldName), this);
     }
 
     /**
      * Removes every handler whose stored location lives in the given world. Instanced dungeon chests
-     * (and any other persistent object inside an instanced world) get keyed by chunk hash while the
+     * (and any other persistent object inside an instanced world) get keyed by chunk identity while the
      * world is loaded, so neither the instanced-world-name removal nor the WorldUnloadEvent sweep
      * (which both key off the base blueprint world name) can reach them. Without this, the handler
      * keeps its persistentLocation -> instanced World -> ServerLevel alive after the dungeon closes.
@@ -159,9 +161,9 @@ public class PersistentObjectHandler {
         List<PersistentObjectHandler> copy = snapshotAll();
         for (PersistentObjectHandler handler : copy) {
             Location handlerLocation = handler.persistentLocation;
-            if (handlerLocation != null &&
-                    handlerLocation.getWorld() != null &&
-                    handlerLocation.getWorld().getUID().equals(worldUUID))
+            if ((handler.chunk != null && handler.chunk.key.worldId().equals(worldUUID))
+                    || (handlerLocation != null && handlerLocation.getWorld() != null
+                    && handlerLocation.getWorld().getUID().equals(worldUUID)))
                 handler.remove();
         }
     }
@@ -170,7 +172,7 @@ public class PersistentObjectHandler {
      * Guava's synchronized multimap only locks individual operations - copying a collection view still iterates it, so
      * the copy has to happen while holding the multimap's own lock.
      */
-    private static List<PersistentObjectHandler> snapshot(String key) {
+    private static List<PersistentObjectHandler> snapshot(Bucket key) {
         synchronized (persistentObjects) {
             return new ArrayList<>(persistentObjects.get(key));
         }
@@ -189,13 +191,13 @@ public class PersistentObjectHandler {
      * that ever drained that key was {@link WorldLoadEvent}. That is not enough: worlds loaded by
      * {@code TemporaryWorldManager} short-circuit and return the existing {@link World} when it is already loaded,
      * which fires no event at all. Calling this directly from the dungeon world-load path makes the drain independent
-     * of the event. It is safe to call more than once for the same world - a drained handler is re-keyed by chunk hash,
+     * of the event. It is safe to call more than once for the same world - a drained handler is re-keyed by chunk identity,
      * so a second pass finds an empty bucket - and a handler that failed to acquire a chunk key stays under the world
      * key precisely so the next pass can retry it.
      */
     public static void loadWorld(World world) {
         if (world == null) return;
-        for (PersistentObjectHandler persistentObjectHandler : snapshot(world.getName()))
+        for (PersistentObjectHandler persistentObjectHandler : snapshot(new WorldBucket(world.getName())))
             try {
                 persistentObjectHandler.worldLoad(world);
             } catch (Exception exception) {
@@ -207,8 +209,8 @@ public class PersistentObjectHandler {
 
     public static class PersistentObjectHandlerEvents implements Listener {
 
-        private static int chunkLocation(Chunk chunk) {
-            return ChunkVectorizer.hash(chunk);
+        private static ChunkBucket chunkLocation(Chunk chunk) {
+            return new ChunkBucket(ChunkVectorizer.key(chunk));
         }
 
 
@@ -238,8 +240,8 @@ public class PersistentObjectHandler {
         //Store world names and serialized locations
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
         public void chunkLoadEvent(ChunkLoadEvent event) {
-            PendingChunk key = PendingChunk.of(event.getChunk());
-            String bucket = chunkLocation(event.getChunk()) + "";
+            ChunkVectorizer.Key key = ChunkVectorizer.key(event.getChunk());
+            ChunkBucket bucket = chunkLocation(event.getChunk());
             if (snapshot(bucket).isEmpty() || pendingChunkLoads.containsKey(key)) return;
             BukkitTask task = new BukkitRunnable() {
                 @Override
@@ -277,16 +279,16 @@ public class PersistentObjectHandler {
             PersistentObjectHandler.loadWorld(event.getWorld());
         }
 
-        @EventHandler (priority = EventPriority.LOWEST)
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void chunkUnloadEvent(ChunkUnloadEvent event) {
-            int chunkLocation = chunkLocation(event.getChunk());
-            List<PersistentObjectHandler> simplePersistentEntityList = snapshot(chunkLocation + "");
+            ChunkBucket chunkLocation = chunkLocation(event.getChunk());
+            List<PersistentObjectHandler> simplePersistentEntityList = snapshot(chunkLocation);
             unloadChunk(simplePersistentEntityList);
         }
 
         @EventHandler
         public void onInstanceRemove(InstancedDungeonRemoveEvent event) {
-            persistentObjects.removeAll(event.getDungeonInstance().getInstancedWorldName());
+            persistentObjects.removeAll(new WorldBucket(event.getDungeonInstance().getInstancedWorldName()));
         }
 
     }

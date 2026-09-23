@@ -93,10 +93,10 @@ public class RemoveCommand {
             if (event.getClickedBlock() == null) return;
             TreasureChest treasureChest = TreasureChest.getTreasureChest(event.getClickedBlock().getLocation());
             if (treasureChest == null) return;
-            treasureChest.removeTreasureChest();
-            event.getPlayer().sendMessage(CommandMessagesConfig.getRemovedTreasureChestMessage());
             event.setCancelled(true);
-            event.getClickedBlock().setType(Material.AIR);
+            if (treasureChest.removeTreasureChest())
+                event.getPlayer().sendMessage(CommandMessagesConfig.getRemovedTreasureChestMessage());
+            else event.getPlayer().sendMessage("Could not remove this chest's saved location. The chest was kept; check the server log.");
         }
     }
 

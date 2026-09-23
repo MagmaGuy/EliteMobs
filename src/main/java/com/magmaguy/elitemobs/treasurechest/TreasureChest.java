@@ -64,7 +64,7 @@ public class TreasureChest implements PersistentObject {
         this.customTreasureChestConfigFields = customTreasureChestConfigFields;
         this.locationString = locationString;
         this.worldName = ConfigurationLocation.worldName(locationString);
-        this.location = ConfigurationLocation.serialize(locationString);
+        this.location = blockLocation(ConfigurationLocation.serialize(locationString));
         this.restockTime = restockTime;
         this.emPackage = EMPackage.getContent(customTreasureChestConfigFields.getFilename());
 
@@ -91,7 +91,7 @@ public class TreasureChest implements PersistentObject {
         this.customTreasureChestConfigFields = blueprint.customTreasureChestConfigFields;
         this.locationString = blueprint.locationString;
         this.worldName = blueprint.worldName;
-        this.location = ConfigurationLocation.serializeWithInstance(instancedWorld, locationString);
+        this.location = blockLocation(ConfigurationLocation.serializeWithInstance(instancedWorld, locationString));
         this.restockTime = 0;
         this.emPackage = blueprint.emPackage;
 
@@ -146,7 +146,11 @@ public class TreasureChest implements PersistentObject {
     }
 
     public static TreasureChest getTreasureChest(Location location) {
-        return getTreasureChestHashMap().get(location);
+        return getTreasureChestHashMap().get(blockLocation(location));
+    }
+
+    private static Location blockLocation(Location location) {
+        return location == null ? null : new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     private static boolean isLocationInWorld(Location location, UUID worldUUID) {
@@ -469,13 +473,19 @@ public class TreasureChest implements PersistentObject {
         }
     }
 
-    public void removeTreasureChest() {
+    public boolean removeTreasureChest() {
+        try {
+            if (!CustomTreasureChestsConfig.removeTreasureChestEntry(location, customTreasureChestConfigFields.getFilename())) return false;
+        } catch (RuntimeException failure) {
+            Logger.warn("Could not save removal of chest " + customTreasureChestConfigFields.getFilename() + ": " + failure.getMessage());
+            return false;
+        }
         cancelRestock();
         unregisterPersistentHandler();
-        CustomTreasureChestsConfig.removeTreasureChestEntry(location, customTreasureChestConfigFields.getFilename());
         if (location != null && location.getWorld() != null)
             location.getBlock().setBlockData(Material.AIR.createBlockData());
         treasureChestHashMap.remove(location, this);
+        return true;
     }
 
     @Override
@@ -491,7 +501,7 @@ public class TreasureChest implements PersistentObject {
 
     @Override
     public void worldLoad(World world) {
-        this.location = ConfigurationLocation.serialize(locationString);
+        this.location = blockLocation(ConfigurationLocation.serializeWithInstance(world, locationString));
         if (!registerChest()) return;
         scheduleRestock();
     }
@@ -530,11 +540,7 @@ public class TreasureChest implements PersistentObject {
 
         @EventHandler(ignoreCancelled = true)
         public void onBreak(BlockBreakEvent event) {
-            for (TreasureChest treasureChest : treasureChestHashMap.values())
-                if (treasureChest.getLocation() != null &&
-                        treasureChest.getLocation().getWorld() != null &&
-                        event.getBlock().getLocation().equals(treasureChest.location.getBlock().getLocation()))
-                    event.setCancelled(true);
+            if (getTreasureChest(event.getBlock().getLocation()) != null) event.setCancelled(true);
         }
     }
 
