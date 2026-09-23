@@ -32,10 +32,7 @@ public class GetLootMenu extends EliteMenu implements Listener {
         lootNavigationConstructor(fakeChestInventory);
         lootConstructor(fakeChestInventory);
 
-        player.openInventory(fakeChestInventory);
-        inventory = fakeChestInventory;
-
-        inventories.put(player.getUniqueId(), this);
+        open(player, fakeChestInventory);
     }
     private final String shopName = GetLootMenuConfig.menuName;
     public int currentHeaderPage = 1;
@@ -58,10 +55,14 @@ public class GetLootMenu extends EliteMenu implements Listener {
         lootNavigationConstructor(fakeChestInventory);
         lootConstructor(fakeChestInventory);
 
-        player.openInventory(fakeChestInventory);
-        inventory = fakeChestInventory;
+        open(player, fakeChestInventory);
+    }
 
-        inventories.put(player.getUniqueId(), this);
+    private void open(Player player, Inventory inventory) {
+        this.inventory = inventory;
+        player.openInventory(inventory);
+        if (player.getOpenInventory().getTopInventory() == inventory)
+            inventories.put(player.getUniqueId(), this);
     }
 
     public static void shutdown() {
