@@ -10,6 +10,8 @@ import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.arguments.ListStringCommandArgument;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.command.CommandSender;
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,6 +42,7 @@ public class LanguageCommand extends AdvancedCommand {
     );
 
     private final List<String> suggestions;
+    private static Request activeRequest;
 
     public LanguageCommand() {
         super(List.of("language"));
@@ -101,6 +104,8 @@ public class LanguageCommand extends AdvancedCommand {
             return;
         }
 
+        // A newer selection or reload owns activation, including choices needing no download.
+        shutdown();
         // Handle special cases
         if (language.equals("english")) {
             // English uses plugin defaults directly, no CSV
@@ -142,13 +147,16 @@ public class LanguageCommand extends AdvancedCommand {
 
         if (!Files.exists(target)) {
             Logger.sendMessage(sender, CommandMessagesConfig.getLanguageDownloadingMessage().replace("$language", language));
-            if (!downloadRemoteLanguage(language, target)) {
+            Request request = new Request(language, target, sender);
+            activeRequest = request;
+            try {
+                request.worker = Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> prepare(request));
+            } catch (RuntimeException failure) {
+                request.cancel();
+                activeRequest = null;
                 Logger.sendMessage(sender, CommandMessagesConfig.getLanguageDownloadFailedMessage().replace("$language", language));
-                return;
             }
-            //The recorded baselines describe the file that was just replaced, not this one.
-            TranslationsConfigFields.discardBaseline(folder, language);
-            Logger.sendMessage(sender, CommandMessagesConfig.getLanguageDownloadSuccessMessage().replace("$language", language));
+            return;
         }
 
         // Set the language and reload
@@ -175,75 +183,112 @@ public class LanguageCommand extends AdvancedCommand {
         }
     }
 
-    /**
-     * Downloads a language CSV file from the remote server.
-     */
-    private boolean downloadRemoteLanguage(String language, Path outPath) {
-        String apiUrl = "https://magmaguy.com/api/elitemobs_translations/" + language + ".csv";
-        HttpURLConnection conn = null;
-        Path temporaryPath = null;
+    private static void prepare(Request request) {
+        boolean queued = false;
         try {
-            URL url = new URL(apiUrl);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(10_000);
-            conn.setReadTimeout(30_000);
-
-            int responseCode = conn.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                Logger.warn("Download failed: HTTP " + responseCode + " for " + language + ".csv");
-                return false;
+            request.download();
+            synchronized (request) {
+                if (request.cancelled) return;
+                request.completion = Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> complete(request));
+                queued = true;
             }
-
-            Files.createDirectories(outPath.getParent());
-            temporaryPath = outPath.resolveSibling(
-                    outPath.getFileName() + "." + UUID.randomUUID() + ".download");
-            try (InputStream in = conn.getInputStream();
-                 OutputStream out = Files.newOutputStream(
-                         temporaryPath,
-                         StandardOpenOption.CREATE_NEW,
-                         StandardOpenOption.WRITE)) {
-                byte[] buf = new byte[8192];
-                int bytesRead;
-                while ((bytesRead = in.read(buf)) != -1) {
-                    out.write(buf, 0, bytesRead);
+        } catch (Exception failure) {
+            synchronized (request) {
+                if (!request.cancelled) {
+                    Logger.warn("Error downloading " + request.language + ".csv: " + failure.getMessage());
+                    try {
+                        request.completion = Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                            if (activeRequest != request || request.cancelled) return;
+                            activeRequest = null;
+                            Logger.sendMessage(request.sender, CommandMessagesConfig.getLanguageDownloadFailedMessage()
+                                    .replace("$language", request.language));
+                        });
+                    } catch (RuntimeException ignored) { /* Shutdown owns cancellation. */ }
                 }
             }
-
-            // A successful HTTP status is not enough: never install HTML, a partial response, or
-            // malformed CSV as the active language file.
-            TranslationCsvParser.parse(temporaryPath);
-            try {
-                Files.move(
-                        temporaryPath,
-                        outPath,
-                        StandardCopyOption.ATOMIC_MOVE,
-                        StandardCopyOption.REPLACE_EXISTING);
-            } catch (AtomicMoveNotSupportedException ignored) {
-                Files.move(
-                        temporaryPath,
-                        outPath,
-                        StandardCopyOption.REPLACE_EXISTING);
-            }
-            temporaryPath = null;
-            return true;
-
-        } catch (Exception ex) {
-            Logger.warn("Error downloading " + language + ".csv: " + ex.getMessage());
-            return false;
         } finally {
-            if (conn != null) {
-                conn.disconnect();
+            if (!queued) request.removeTemporary();
+        }
+    }
+
+    private static void complete(Request request) {
+        try {
+            if (activeRequest != request || request.cancelled) return;
+            // A local file supplied while downloading wins over the obsolete prepared copy.
+            if (!Files.exists(request.target)) {
+                Files.move(request.temporary, request.target, StandardCopyOption.ATOMIC_MOVE);
+                TranslationsConfigFields.discardBaseline(request.target.getParent(), request.language);
             }
-            if (temporaryPath != null) {
-                try {
-                    Files.deleteIfExists(temporaryPath);
-                } catch (Exception cleanupFailure) {
-                    Logger.warn(
-                            "Could not remove incomplete translation download " +
-                                    temporaryPath.getFileName() + ": " +
-                                    cleanupFailure.getMessage());
+            activeRequest = null;
+            Logger.sendMessage(request.sender, CommandMessagesConfig.getLanguageDownloadSuccessMessage()
+                    .replace("$language", request.language));
+            DefaultConfig.setLanguage(request.sender, request.language);
+            Logger.sendMessage(request.sender, CommandMessagesConfig.getLanguageSetMessage().replace("$language", request.language));
+        } catch (Exception failure) {
+            Logger.warn("Could not activate language " + request.language + ": " + failure.getMessage());
+            Logger.sendMessage(request.sender, CommandMessagesConfig.getLanguageDownloadFailedMessage().replace("$language", request.language));
+        } finally {
+            if (activeRequest == request) activeRequest = null;
+            request.removeTemporary();
+        }
+    }
+
+    public static void shutdown() {
+        Request previous = activeRequest;
+        activeRequest = null;
+        if (previous != null) previous.cancel();
+    }
+
+    private static final class Request {
+        final String language;
+        final Path target;
+        final Path temporary;
+        final CommandSender sender;
+        volatile boolean cancelled;
+        BukkitTask worker;
+        BukkitTask completion;
+
+        Request(String language, Path target, CommandSender sender) {
+            this.language = language;
+            this.target = target;
+            this.sender = sender;
+            temporary = target.resolveSibling(target.getFileName() + "." + UUID.randomUUID() + ".download");
+        }
+
+        void download() throws Exception {
+            HttpURLConnection current = (HttpURLConnection) new URL(
+                    "https://magmaguy.com/api/elitemobs_translations/" + language + ".csv").openConnection();
+            if (cancelled) { current.disconnect(); return; }
+            try {
+                current.setRequestMethod("GET");
+                current.setConnectTimeout(10_000);
+                current.setReadTimeout(30_000);
+                int status = current.getResponseCode();
+                if (status != HttpURLConnection.HTTP_OK) throw new java.io.IOException("HTTP " + status);
+                Files.createDirectories(target.getParent());
+                try (InputStream in = current.getInputStream();
+                     OutputStream out = Files.newOutputStream(temporary, StandardOpenOption.CREATE_NEW)) {
+                    byte[] buffer = new byte[8192];
+                    int count;
+                    while (!cancelled && (count = in.read(buffer)) != -1) out.write(buffer, 0, count);
                 }
+                if (!cancelled) TranslationCsvParser.parse(temporary);
+            } finally {
+                current.disconnect();
+            }
+        }
+
+        synchronized void cancel() {
+            cancelled = true;
+            if (worker != null) worker.cancel();
+            if (completion != null) completion.cancel();
+            removeTemporary(); // An active worker repeats cleanup after closing its stream.
+        }
+
+        void removeTemporary() {
+            try { Files.deleteIfExists(temporary); }
+            catch (java.io.IOException failure) {
+                if (!cancelled) Logger.warn("Could not remove translation download " + temporary.getFileName() + ": " + failure.getMessage());
             }
         }
     }

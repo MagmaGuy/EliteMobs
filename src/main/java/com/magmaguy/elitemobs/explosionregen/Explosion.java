@@ -12,6 +12,11 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.EntityFinder;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.scheduler.BukkitTask;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
+import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -23,10 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -35,21 +37,19 @@ import java.util.*;
 public class Explosion {
 
     private static final HashSet<Explosion> explosions = new HashSet<>();
-    public final List<BlockState> detonatedBlocks = new ArrayList<>();
+    private final Deque<BlockState> detonatedBlocks = new ArrayDeque<>();
+    private BukkitTask task;
+    private World world;
     private final int delayBeforeRegen = 1;
     private UUID worldUUID;
 
     public Explosion(List<BlockState> detonatedBlocks) {
         if (detonatedBlocks == null || detonatedBlocks.isEmpty()) return;
-        //sort blocks bottom to top
-        HashMap<BlockState, Integer> unsortedBlocks = new HashMap<>();
-        for (BlockState blockState : detonatedBlocks)
-            unsortedBlocks.put(blockState, blockState.getY());
-
-        unsortedBlocks.entrySet().stream().sorted(Map.Entry.comparingByValue())
-                .forEachOrdered(x -> this.detonatedBlocks.add(x.getKey()));
-
-        worldUUID = detonatedBlocks.get(0).getWorld().getUID();
+        Map<BlockPosition, BlockState> unique = new LinkedHashMap<>();
+        for (BlockState block : detonatedBlocks) unique.putIfAbsent(BlockPosition.of(block), block);
+        unique.values().stream().sorted(java.util.Comparator.comparingInt(BlockState::getY)).forEach(this.detonatedBlocks::addLast);
+        world = this.detonatedBlocks.getFirst().getWorld();
+        worldUUID = world.getUID();
 
         explosions.add(this);
         regenerate();
@@ -57,11 +57,10 @@ public class Explosion {
 
     public static void shutdown() {
         regenerateAllPendingBlocks();
-        explosions.clear();
     }
 
     public static void regenerateAllPendingBlocks() {
-        for (Explosion explosion : explosions)
+        for (Explosion explosion : List.copyOf(explosions))
             explosion.resetAllBlocks();
     }
 
@@ -74,26 +73,31 @@ public class Explosion {
     }
 
     private static void generateExplosion(EntityExplodeEvent event) {
-        generateExplosion(event.blockList(), event.getEntity(), null, event.getEntity().getLocation());
+        Generation result = generateExplosion(event.blockList(), event.getEntity(), null, event.getEntity().getLocation());
+        if (result == Generation.CANCELLED) event.setCancelled(true);
+        else if (result == Generation.APPLIED) event.blockList().clear();
     }
 
-    private static void generateExplosion(List<Block> blockList, Entity entity, PowersConfigFields powersConfigFields, Location explosionSource) {
-        if (!DefaultConfig.isDoExplosionRegen()) return;
+    private enum Generation { BYPASS, CANCELLED, APPLIED }
+
+    private static Generation generateExplosion(List<Block> blockList, Entity entity, PowersConfigFields powersConfigFields, Location explosionSource) {
+        if (!DefaultConfig.isDoExplosionRegen()) return Generation.BYPASS;
         if (EliteMobs.worldGuardIsEnabled &&
                 explosionSource != null &&
                 !WorldGuardFlagChecker.doExplosionRegenFlag(explosionSource))
-            return;
+            return Generation.BYPASS;
 
-        ArrayList<BlockState> blockStates = new ArrayList<>();
-
+        Map<BlockPosition, BlockState> captured = new LinkedHashMap<>();
+        Set<BlockPosition> visited = new HashSet<>();
         for (Block block : blockList) {
             if (block.getType().isAir() ||
                     block.getType().equals(Material.FIRE) ||
                     block.isLiquid() ||
                     EntityTracker.isTemporaryBlock(block))
                 continue;
-            nearbyBlockScan(blockStates, block.getState());
+            nearbyBlockScan(captured, visited, block.getState());
         }
+        ArrayList<BlockState> blockStates = new ArrayList<>(captured.values());
 
         Entity shooter = EntityFinder.filterRangedDamagers(entity);
         EliteEntity eliteEntity = null;
@@ -116,20 +120,30 @@ public class Explosion {
                     entity.getLocation(),
                     blockStates);
         }
-        if (eliteExplosionEvent.isCancelled()) return;
-
-        if (explosionSource != null)
-            eliteExplosionEvent.setExplosionSourceLocation(explosionSource);
-
+        if (explosionSource != null) eliteExplosionEvent.setExplosionSourceLocation(explosionSource);
+        Bukkit.getPluginManager().callEvent(eliteExplosionEvent);
+        if (eliteExplosionEvent.isCancelled()) return Generation.CANCELLED;
+        // Honor listener edits while retaining each position's first authoritative snapshot.
+        Map<BlockPosition, BlockState> approved = new LinkedHashMap<>();
+        for (BlockState state : blockStates) {
+            if (state == null || !state.getWorld().equals(entity.getWorld())) continue;
+            if (EntityTracker.isTemporaryBlock(state.getBlock())) continue;
+            if (!DefaultConfig.isDoRegenerateContainers() && state instanceof Container) continue;
+            approved.putIfAbsent(BlockPosition.of(state), state);
+        }
+        blockStates.clear();
+        blockStates.addAll(approved.values());
         eliteExplosionEvent.visualExplosionEffect(powersConfigFields);
-
         for (BlockState blockState : blockStates) {
+            BlockState live = blockState.getBlock().getState();
+            if (live instanceof Chest chest) chest.getBlockInventory().clear();
+            else if (live instanceof Container container) container.getInventory().clear();
             blockState.getBlock().setType(Material.AIR);
             blockState.getBlock().getState().update(true);
         }
 
         new Explosion(blockStates);
-
+        return Generation.APPLIED;
     }
 
     /**
@@ -138,17 +152,32 @@ public class Explosion {
      *
      * @param blockState
      */
-    private static void nearbyBlockScan(ArrayList<BlockState> blockStates, BlockState blockState) {
-        queueBlock(blockStates, blockState);
-        for (int x = -1; x < 2; x++)
-            for (int y = -1; y < 2; y++)
-                for (int z = -1; z < 2; z++) {
-                    Location blockLocation = blockState.getLocation().clone().add(new Vector(x, y, z));
-                    BlockState iteratedBlockState = blockLocation.getBlock().getState();
-                    if (blockStates.contains(iteratedBlockState)) continue;
-                    if (!isCodependentBlock(iteratedBlockState, y)) continue;
-                    nearbyBlockScan(blockStates, iteratedBlockState);
-                }
+    private record BlockPosition(UUID world, int x, int y, int z) {
+        static BlockPosition of(BlockState state) {
+            return new BlockPosition(state.getWorld().getUID(), state.getX(), state.getY(), state.getZ());
+        }
+    }
+
+    private static void nearbyBlockScan(Map<BlockPosition, BlockState> states, Set<BlockPosition> visited, BlockState start) {
+        Deque<BlockState> pending = new ArrayDeque<>();
+        pending.add(start);
+        while (!pending.isEmpty()) {
+            BlockState state = pending.removeFirst();
+            BlockPosition key = BlockPosition.of(state);
+            if (!visited.add(key)) continue;
+            if (EntityTracker.isTemporaryBlock(state.getBlock())) continue;
+            if (!DefaultConfig.isDoRegenerateContainers() && state instanceof Container) continue;
+            states.putIfAbsent(key, state);
+            for (int x = -1; x <= 1; x++)
+                for (int y = -1; y <= 1; y++)
+                    for (int z = -1; z <= 1; z++) {
+                        if (x == 0 && y == 0 && z == 0) continue;
+                        BlockPosition neighbor = new BlockPosition(key.world, key.x + x, key.y + y, key.z + z);
+                        if (visited.contains(neighbor)) continue;
+                        BlockState adjacent = state.getBlock().getRelative(x, y, z).getState();
+                        if (isCodependentBlock(adjacent, y)) pending.addLast(adjacent);
+                    }
+        }
     }
 
     private static boolean isCodependentBlock(BlockState blockState, int y) {
@@ -246,83 +275,70 @@ public class Explosion {
         }
     }
 
-    private static void queueBlock(ArrayList<BlockState> blockStates, BlockState blockState) {
-        if (!DefaultConfig.isDoRegenerateContainers() && blockState instanceof Container)
-            return;
-        blockStates.add(blockState.getBlock().getState());
-        if (blockState instanceof Container)
-            if (blockState instanceof Chest)
-                ((Chest) blockState).getBlockInventory().setContents(new ItemStack[0]);
-            else
-                ((Container) blockState).getInventory().setContents(new ItemStack[0]);
-    }
-
     public void resetAllBlocks() {
-        for (BlockState blockState : detonatedBlocks)
-            fullBlockRestore(blockState, true);
-        detonatedBlocks.clear();
+        while (!detonatedBlocks.isEmpty()) {
+            if (!fullBlockRestore(detonatedBlocks.getFirst())) return;
+            detonatedBlocks.removeFirst();
+        }
+        discard();
     }
 
     public void regenerate() {
-
-        Explosion explosion = this;
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (detonatedBlocks.isEmpty()) {
-                    explosions.remove(explosion);
-                    cancel();
-                    return;
-                }
-
-                BlockState firstBlock = detonatedBlocks.get(0);
-                fullBlockRestore(firstBlock, false);
-
+        if (task != null || detonatedBlocks.isEmpty()) return;
+        task = Bukkit.getScheduler().runTaskTimer(MetadataHandler.PLUGIN, () -> {
+            if (Bukkit.getWorld(worldUUID) != world) {
+                task.cancel();
+                task = null;
+                Logger.warn("Explosion recovery suspended: original world " + worldUUID + " is unavailable.");
+                return;
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 20 * 60 * delayBeforeRegen, 1);
-
+            if (detonatedBlocks.isEmpty()) { discard(); return; }
+            if (fullBlockRestore(detonatedBlocks.getFirst())) detonatedBlocks.removeFirst();
+            if (detonatedBlocks.isEmpty()) discard();
+        }, 20L * 60 * delayBeforeRegen, 1L);
     }
 
-    private void fullBlockRestore(BlockState blockState, boolean isShutdown) {
-
-        //Things like instanced dungeons can unload in the meanwhile
-        if (Bukkit.getWorld(worldUUID) == null) return;
-
-        for (Entity entity : blockState.getWorld().getNearbyEntities(new BoundingBox(blockState.getX(), blockState.getY(), blockState.getZ(),
-                blockState.getX() + 1, blockState.getY() + 1, blockState.getZ() + 1)))
+    private boolean fullBlockRestore(BlockState state) {
+        if (Bukkit.getWorld(worldUUID) != world) return false;
+        for (Entity entity : world.getNearbyEntities(new BoundingBox(state.getX(), state.getY(), state.getZ(),
+                state.getX() + 1, state.getY() + 1, state.getZ() + 1)))
             entity.teleport(entity.getLocation().clone().add(new Vector(0, 1, 0)));
+        // Tile snapshots carry their saved inventory. Never substitute the live empty inventory.
+        return state.update(true, false);
+    }
 
-        blockState.setBlockData(blockState.getBlockData());
+    private void discard() {
+        if (task != null) task.cancel();
+        task = null;
+        detonatedBlocks.clear();
+        explosions.remove(this);
+        world = null;
+    }
 
-        if (blockState instanceof Container) {
-
-            Inventory container = null;
-
-            switch (blockState.getType()) {
-
-                case LECTERN:
-                    container = ((Lectern) blockState).getInventory();
-                    break;
-
-                case JUKEBOX:
-                    //((Jukebox) blockState).setRecord(this.items.get(0));
-                    blockState.update(true, false);
-                    break;
-
-                default:
-                    container = ((Container) blockState).getInventory();
-            }
-
-            if (container != null) container.setContents(((Container) blockState).getInventory().getContents());
-        }
-
-        blockState.update(true);
-        if (!isShutdown)
-            detonatedBlocks.remove(blockState);
+    /** Only the instance retirement owner calls this after a disposable world actually unloads. */
+    public static void discardForWorld(UUID worldId) {
+        for (Explosion explosion : List.copyOf(explosions))
+            if (worldId.equals(explosion.worldUUID)) explosion.discard();
     }
 
     public static class ExplosionEvent implements Listener {
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+        public void onWorldUnload(WorldUnloadEvent event) {
+            UUID worldId = event.getWorld().getUID();
+            if (DungeonInstance.isWorldRetiring(worldId)) return;
+            for (Explosion explosion : List.copyOf(explosions)) {
+                if (!worldId.equals(explosion.worldUUID)) continue;
+                try { explosion.resetAllBlocks(); }
+                catch (RuntimeException failure) {
+                    Logger.warn("Could not finish explosion recovery before world unload: " + failure.getMessage());
+                }
+                if (!explosion.detonatedBlocks.isEmpty()) {
+                    event.setCancelled(true);
+                    Logger.warn("World unload postponed until pending explosion blocks can be restored.");
+                }
+            }
+        }
+
         @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
         public void entityExplodeEvent(EntityExplodeEvent event) {
             Entity entity = event.getEntity();

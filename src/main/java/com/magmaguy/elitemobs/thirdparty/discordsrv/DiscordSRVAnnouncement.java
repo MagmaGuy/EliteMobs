@@ -10,9 +10,6 @@ import org.bukkit.ChatColor;
 
 public class DiscordSRVAnnouncement {
 
-    private static TextChannel textChannel = null;
-    private static boolean isInitialized = false;
-
     public DiscordSRVAnnouncement(String announcement) {
 
         if (Bukkit.getPluginManager().getPlugin("DiscordSRV") == null) return;
@@ -21,24 +18,21 @@ public class DiscordSRVAnnouncement {
             return;
 
         try {
-            //Initialize which room will be used regardless of whether it's using config name, id or discord room name
-            if (!isInitialized) {
-                if (textChannel == null)
-                    textChannel = DiscordUtil.getTextChannelById(DiscordSRVConfig.getAnnouncementRoomName());
-
-                if (textChannel == null)
-                    textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName(DiscordSRVConfig.getAnnouncementRoomName());
-
-                if (textChannel == null && !DiscordUtil.getJda().getTextChannelsByName(DiscordSRVConfig.getAnnouncementRoomName(), true).isEmpty())
-                    textChannel = DiscordUtil.getJda().getTextChannelsByName(DiscordSRVConfig.getAnnouncementRoomName(), true).get(0);
-
-                isInitialized = true;
+            // These are JDA's in-memory lookups. Resolve against current configuration and
+            // provider state for each announcement rather than retaining a stale destination.
+            String room = DiscordSRVConfig.getAnnouncementRoomName();
+            TextChannel channel = room.matches("[0-9]+") ? DiscordUtil.getTextChannelById(room) : null;
+            if (channel == null) channel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName(room);
+            if (channel == null) {
+                var matches = DiscordUtil.getJda().getTextChannelsByName(room, true);
+                if (!matches.isEmpty()) channel = matches.get(0);
             }
-
-            if (textChannel != null)
-                textChannel.sendMessage(ChatColor.stripColor(announcement)).queue();
-            else
-                Logger.warn("Channel room " + DiscordSRVConfig.getAnnouncementRoomName() + " is not valid!");
+            if (channel == null) {
+                Logger.warn("Channel room " + room + " is not valid!");
+                return;
+            }
+            channel.sendMessage(ChatColor.stripColor(announcement)).queue(ignored -> {},
+                    failure -> Logger.warn("DiscordSRV announcement failed for " + room + ": " + failure.getMessage()));
 
         } catch (Exception ex) {
             Logger.warn("Failed to send announcement via DiscordsSRV! Is it configured correctly?");

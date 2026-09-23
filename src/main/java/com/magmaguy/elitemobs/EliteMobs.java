@@ -638,6 +638,7 @@ public class EliteMobs extends JavaPlugin {
         MetadataHandler.shutdownRequested = true;
         if (enchantmentAnvil != null) { enchantmentAnvil.close(); enchantmentAnvil = null; }
         CustomItem.shutdownCacheRegeneration();
+        com.magmaguy.elitemobs.commands.LanguageCommand.shutdown();
         ClassSelectionMenu.shutdown();
         MagmaCore.requestInitializationShutdown(this);
         PatrolEditor.shutdown();

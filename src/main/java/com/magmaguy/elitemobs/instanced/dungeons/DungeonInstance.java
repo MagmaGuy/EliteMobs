@@ -642,6 +642,7 @@ public class DungeonInstance extends MatchInstance {
     }
 
     private static void cleanupWorldScopedState(World worldToDelete) {
+        com.magmaguy.elitemobs.explosionregen.Explosion.discardForWorld(worldToDelete.getUID());
         UUID worldUUID = worldToDelete.getUID();
         EliteMobsWorld.destroy(worldUUID);
         com.magmaguy.magmacore.instance.InstanceProtector.removeProtectedWorld(worldToDelete);
