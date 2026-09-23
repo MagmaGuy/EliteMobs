@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.skills.bonuses;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusConfigFields;
 import com.magmaguy.elitemobs.config.skillbonuses.SkillBonusesConfig;
@@ -200,7 +202,10 @@ public class PlayerSkillSelection {
         }
 
         try {
-            Map<String, List<String>> parsed = GSON.fromJson(json, SELECTION_TYPE);
+            JsonElement selection = JsonParser.parseString(json);
+            if (!selection.isJsonObject())
+                throw new IllegalArgumentException("Skill selections must be a JSON object");
+            Map<String, List<String>> parsed = GSON.fromJson(selection, SELECTION_TYPE);
             Map<SkillType, List<String>> converted = new EnumMap<>(SkillType.class);
 
             if (parsed != null) {
