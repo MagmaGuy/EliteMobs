@@ -153,6 +153,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         dynamicLevelUpdater = new BukkitRunnable() {
             @Override
             public void run() {
+                DynamicLevelPass pass = new DynamicLevelPass();
                 Iterator<CustomBossEntity> iterator = dynamicLevelBossEntities.iterator();
                 while (iterator.hasNext()) {
                     CustomBossEntity customBossEntity = iterator.next();
@@ -161,7 +162,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                         continue; // Skip to the next iteration
                     }
                     int currentLevel = customBossEntity.getLevel();
-                    customBossEntity.getDynamicLevel(customBossEntity.getLocation());
+                    customBossEntity.getDynamicLevel(customBossEntity.getLocation(), pass);
                     int newLevel = customBossEntity.getLevel();
 
                     if (currentLevel == newLevel) {
@@ -489,20 +490,46 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     public void getDynamicLevel(Location bossLocation) {
-        int bossLevel = 1;
-        if (bossLocation.getWorld() != null) {
-            List<Player> players = bossLocation.getWorld().getPlayers();
-            for (Player player : players)
-                if (player.getLocation().distanceSquared(bossLocation) <= Math.pow(16L * (Bukkit.getViewDistance() + 2D), 2)) {
-                    ElitePlayerInventory playerInventory = ElitePlayerInventory.getPlayer(player);
-                    if (playerInventory == null) continue;
-                    int level = playerInventory.getNaturalMobSpawnLevel(false);
-                    if (level < bossLevel) continue;
-                    bossLevel = level;
-                }
-        }
+        getDynamicLevel(bossLocation, new DynamicLevelPass());
+    }
+
+    private void getDynamicLevel(Location location, DynamicLevelPass pass) {
         startUpdatingDynamicLevel();
-        super.setLevel(bossLevel);
+        super.setLevel(pass.highestLevel(location));
+    }
+
+    /** One synchronous update pass, never a cache spanning XP changes or reconnects. */
+    private static final class DynamicLevelPass {
+        private final double radiusSquared = Math.pow(16D * (Bukkit.getViewDistance() + 2D), 2);
+        private final Map<World, List<PlayerLevel>> playersByWorld = new HashMap<>();
+
+        private int highestLevel(Location location) {
+            if (location == null || location.getWorld() == null) return 1;
+            List<PlayerLevel> players = playersByWorld.computeIfAbsent(location.getWorld(), world ->
+                    world.getPlayers().stream().map(PlayerLevel::new).toList());
+            int level = 1;
+            for (PlayerLevel player : players)
+                if (player.location.distanceSquared(location) <= radiusSquared)
+                    level = Math.max(level, player.level());
+            return level;
+        }
+    }
+
+    private static final class PlayerLevel {
+        private final Player player;
+        private final Location location;
+        private Integer level;
+        private PlayerLevel(Player player) {
+            this.player = player;
+            this.location = player.getLocation();
+        }
+        private int level() {
+            if (level == null) {
+                ElitePlayerInventory inventory = ElitePlayerInventory.getPlayer(player);
+                level = inventory == null ? 0 : inventory.getNaturalMobSpawnLevel(false);
+            }
+            return level;
+        }
     }
 
     /**

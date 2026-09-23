@@ -72,10 +72,10 @@ public class TransitiveBlockCommand {
         if (edit)
             switch (transitiveBlockType) {
                 case ON_SPAWN:
-                    transitiveBlockList = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnSpawnBlockStates(), customBossesConfigFields.getFilename());
+                    loadSelection(customBossesConfigFields.getOnSpawnBlockStates());
                     break;
                 case ON_REMOVE:
-                    transitiveBlockList = TransitiveBlock.serializeTransitiveBlocks(customBossesConfigFields.getOnRemoveBlockStates(), customBossesConfigFields.getFilename());
+                    loadSelection(customBossesConfigFields.getOnRemoveBlockStates());
             }
 
         activePlayers.put(player.getUniqueId(), this);
@@ -86,7 +86,17 @@ public class TransitiveBlockCommand {
     private final Player player;
     private final CustomBossesConfigFields customBossesConfigFields;
     private final TransitiveBlockType transitiveBlockType;
-    private List<TransitiveBlock> transitiveBlockList = new ArrayList<>();
+    private final java.util.Map<RelativePosition, TransitiveBlock> selection = new java.util.LinkedHashMap<>();
+    private record RelativePosition(double x, double y, double z) {
+        private static RelativePosition of(Vector vector) {
+            return new RelativePosition(vector.getX(), vector.getY(), vector.getZ());
+        }
+    }
+
+    private void loadSelection(List<String> raw) {
+        for (TransitiveBlock block : TransitiveBlock.serializeTransitiveBlocks(raw, customBossesConfigFields.getFilename()))
+            selection.put(RelativePosition.of(block.getRelativeLocation()), block);
+    }
     private RegionalBossEntity regionalBossEntity;
     @Getter
     @Setter
@@ -187,31 +197,27 @@ public class TransitiveBlockCommand {
     }
 
     public void registerBlock(Block block) {
-        if (!matchesAnchorWorld(block.getLocation())) return;
-        if (doubleEntryCheck(block, false)) return;
-        transitiveBlockList.add(new TransitiveBlock(block.getBlockData(), getRelativeCoordinate(block.getLocation())));
-        player.sendMessage(CommandMessagesConfig.getTransitiveBlockRegisteredMessage().replace("$type", block.getType().toString()));
+        register(block, block.getBlockData());
     }
 
     public void registerAir(Block block) {
-        if (!matchesAnchorWorld(block.getLocation())) return;
-        if (doubleEntryCheck(block, true)) return;
-        transitiveBlockList.add(new TransitiveBlock(Material.AIR.createBlockData(), getRelativeCoordinate(block.getLocation())));
-        player.sendMessage(CommandMessagesConfig.getTransitiveBlockRegisteredAirMessage());
+        register(block, Material.AIR.createBlockData());
     }
 
-    private boolean doubleEntryCheck(Block block, boolean isAir) {
-        TransitiveBlock transitiveBlock = null;
-        for (TransitiveBlock element : transitiveBlockList)
-            if (element.getRelativeLocation().equals(getRelativeCoordinate(block.getLocation())))
-                if (element.isAir() && !isAir || !element.isAir() && isAir) {
-                    transitiveBlock = element;
-                    break;
-                }
-        if (transitiveBlock == null) return false;
-        transitiveBlockList.remove(transitiveBlock);
-        player.sendMessage(CommandMessagesConfig.getTransitiveBlockUnregisteredMessage());
-        return true;
+    private void register(Block block, org.bukkit.block.data.BlockData data) {
+        Location location = block.getLocation();
+        if (!matchesAnchorWorld(location)) return;
+        Vector relative = getRelativeCoordinate(location);
+        RelativePosition key = RelativePosition.of(relative);
+        TransitiveBlock previous = selection.get(key);
+        if (previous != null && previous.isAir() != data.getMaterial().isAir()) {
+            selection.remove(key);
+            player.sendMessage(CommandMessagesConfig.getTransitiveBlockUnregisteredMessage());
+            return;
+        }
+        selection.put(key, new TransitiveBlock(data, relative));
+        player.sendMessage(data.getMaterial().isAir() ? CommandMessagesConfig.getTransitiveBlockRegisteredAirMessage()
+                : CommandMessagesConfig.getTransitiveBlockRegisteredMessage().replace("$type", data.getMaterial().toString()));
     }
 
     public void commitLocations() {
@@ -226,7 +232,7 @@ public class TransitiveBlockCommand {
         }
         player.sendMessage(CommandMessagesConfig.getTransitiveBlockNowSavingMessage().replace("$type", transitiveBlockType.toString()));
         List<String> deserializedData = new ArrayList<>();
-        List<TransitiveBlock> capturedBlocks = new ArrayList<>(transitiveBlockList);
+        var capturedBlocks = new java.util.LinkedHashMap<>(selection);
 
         if (regionalSelection) {
             long blockCount = selectionVolume();
@@ -245,14 +251,15 @@ public class TransitiveBlockCommand {
                 for (int y = lowestY; y < highestY + 1; y++)
                     for (int z = lowestZ; z < highestZ + 1; z++) {
                         Location blockLocation = new Location(corner1.getWorld(), x, y, z);
-                        capturedBlocks.add(new TransitiveBlock(blockLocation.getBlock().getBlockData(), getRelativeCoordinate(blockLocation)));
+                        Vector relative = getRelativeCoordinate(blockLocation);
+                        capturedBlocks.put(RelativePosition.of(relative), new TransitiveBlock(blockLocation.getBlock().getBlockData(), relative));
                     }
 
             player.sendMessage(CommandMessagesConfig.getTransitiveBlockRegisteredCornerMessage().replace("$count", String.valueOf(capturedBlocks.size())));
 
         }
 
-        for (TransitiveBlock transitiveBlock : capturedBlocks) {
+        for (TransitiveBlock transitiveBlock : capturedBlocks.values()) {
             String deserializedString = transitiveBlock.getRelativeLocation().getX() + ","
                     + transitiveBlock.getRelativeLocation().getY() + ","
                     + transitiveBlock.getRelativeLocation().getZ() + "/"

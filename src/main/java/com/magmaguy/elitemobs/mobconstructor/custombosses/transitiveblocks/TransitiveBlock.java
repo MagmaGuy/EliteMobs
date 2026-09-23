@@ -3,7 +3,6 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks;
 import com.magmaguy.elitemobs.config.LegacyValueConverter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.util.Vector;
@@ -18,9 +17,9 @@ public class TransitiveBlock {
     private final BlockData blockData;
     @Getter
     private final Vector relativeLocation;
-    @Getter
-    @Setter
-    private boolean isAir;
+    public boolean isAir() {
+        return blockData.getMaterial().isAir();
+    }
 
     public TransitiveBlock(BlockData blockData, Vector relativeLocation) {
         this.blockData = blockData;
