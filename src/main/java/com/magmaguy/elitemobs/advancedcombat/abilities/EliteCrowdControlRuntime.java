@@ -128,8 +128,7 @@ final class EliteCrowdControlRuntime implements Listener, AutoCloseable {
             EliteEntity elite,
             EliteControlEffectPlan plan) {
         if (closed || caster == null || elite == null || plan == null
-                || plan.durationTicks() <= 0
-                || plan.additionalMovementSpeedAdjustment() >= 0D) return;
+                || plan.durationTicks() <= 0) return;
         LivingEntity target = elite.getLivingEntity();
         if (!validPlayer(caster) || !valid(target)) return;
         slowPotencyLeases.computeIfAbsent(target.getUniqueId(), ignored -> new HashMap<>())
@@ -138,6 +137,27 @@ final class EliteCrowdControlRuntime implements Listener, AutoCloseable {
                         plan.potionAmplifier(),
                         plan.additionalMovementSpeedAdjustment()));
         refreshSlowPotency(target);
+    }
+
+    int ownedSlowRemainingTicks(Player caster, LivingEntity target, int amplifier) {
+        Map<UUID, SlowPotencyLease> leases = slowPotencyLeases.get(target.getUniqueId());
+        if (closed || leases == null) return 0;
+        SlowPotencyLease lease = leases.get(caster.getUniqueId());
+        PotionEffect actual = target.getPotionEffect(PotionEffectType.SLOWNESS);
+        if (lease == null || actual == null || lease.potionAmplifier() != amplifier
+                || actual.getAmplifier() != amplifier) return 0;
+        return (int) Math.max(0L, Math.min(actual.getDuration(), lease.expiresAtTick() - currentTick));
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.MONITOR, ignoreCancelled = true)
+    public void onSlowChanged(org.bukkit.event.entity.EntityPotionEffectEvent event) {
+        if (event.getModifiedType() != PotionEffectType.SLOWNESS
+                || !slowPotencyLeases.containsKey(event.getEntity().getUniqueId())) return;
+        // A confirmed application installs its lease after native dispatch. Any accepted
+        // replacement first revokes the previous source, even when its visible values match.
+        if (event.getNewEffect() == null || event.getOldEffect() == null || event.isOverride())
+            clearSlowPotency(event.getEntity().getUniqueId(),
+                    event.getEntity() instanceof LivingEntity living ? living : null);
     }
 
     @EventHandler(ignoreCancelled = true)

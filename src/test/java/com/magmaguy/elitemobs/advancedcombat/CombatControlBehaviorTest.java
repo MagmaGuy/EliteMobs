@@ -263,9 +263,10 @@ class CombatControlBehaviorTest extends CombatBehaviorFixture {
     }
 
     @ParameterizedTest
-    @CsvSource({"false,135,1", "true,154,.9302909090909091"})
-    void trapperExtendsExistingSlowAndItsPassiveStrengthensControl(
-            boolean passives, int addedDuration, double movementMultiplier) {
+    @CsvSource({"false,135,1,false", "true,154,.9302909090909091,false",
+            "false,135,1,true", "true,154,.9302909090909091,true"})
+    void trapperExtendsOnlyItsOwnSlowAndItsPassiveStrengthensControl(
+            boolean passives, int addedDuration, double movementMultiplier, boolean externalReplacement) {
         fullCombatActive = passives;
         assertTrue(module.setClassLevelForAdministration(player, "trapper", 91).applied());
         var enemy = target().getLivingEntity();
@@ -276,16 +277,21 @@ class CombatControlBehaviorTest extends CombatBehaviorFixture {
         outsider.teleport(player.getLocation().add(1, 0, 0));
 
         assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
-        assertEquals(80 + addedDuration, enemy.getPotionEffect(PotionEffectType.SLOWNESS).getDuration());
+        assertEquals(addedDuration, enemy.getPotionEffect(PotionEffectType.SLOWNESS).getDuration(),
+                "An unrelated slow must not donate its remaining duration");
         assertEquals(2, enemy.getPotionEffect(PotionEffectType.SLOWNESS).getAmplifier());
         assertEquals(before * movementMultiplier, movement.getValue(), .000001);
         assertTrue(enemy.hasPotionEffect(PotionEffectType.GLOWING));
         assertFalse(outsider.hasPotionEffect(PotionEffectType.SLOWNESS));
         assertFalse(outsider.hasPotionEffect(PotionEffectType.GLOWING));
+        if (externalReplacement)
+            enemy.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, addedDuration * 3, 2));
         assertTrue(module.useAbility(player, AbilitySlot.UTILITY).successful());
-        assertEquals(80 + addedDuration * 2, enemy.getPotionEffect(PotionEffectType.SLOWNESS).getDuration());
-        assertEquals(before * movementMultiplier, movement.getValue(), .000001,
-                "Recasting must extend the slow without stacking its passive strength");
+        assertEquals(addedDuration * (externalReplacement ? 3 : 2),
+                enemy.getPotionEffect(PotionEffectType.SLOWNESS).getDuration(),
+                "Recasting extends only the owned slow; an external replacement revokes that ownership");
+        assertEquals(before * (externalReplacement ? 1D : movementMultiplier), movement.getValue(), .000001,
+                "Recasting must not stack passive strength or apply it to an external replacement");
         module.close();
         assertEquals(before, movement.getValue(), .000001,
                 "Closing combat must release the extra movement modifier");

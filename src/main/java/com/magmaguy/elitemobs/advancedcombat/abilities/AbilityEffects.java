@@ -247,14 +247,21 @@ final class AbilityEffects {
                         .contains(AbilityMechanic.EXTEND_CONTROL_DURATION);
                 // Native stacking keeps a weaker, longer slow behind a short root. Combining
                 // the existing amplifier with this duration would create an unowned long root.
-                int duration = Math.max(20, slowPlan.durationTicks());
                 int amplifier = slowPlan.potionAmplifier();
+                int ownedRemaining = extend ? crowdControl.ownedSlowRemainingTicks(caster, enemy, amplifier) : 0;
+                int duration = Math.max(20, slowPlan.durationTicks());
+                if (ownedRemaining > 0) duration = Math.min(600, ownedRemaining + duration);
                 EliteEntity elite = EntityTracker.getEliteMobEntity(enemy);
                 observedPotionControl |= applyPotion(caster, enemy, spec, AbilityEffect.SLOW,
                         AbilityRuntimeObservation.Kind.CONTROL,
                         new PotionEffect(PotionEffectType.SLOWNESS, duration, amplifier, false, true, true),
-                        ignored -> {
-                            if (elite != null) crowdControl.applySlowPotency(caster, elite, slowPlan);
+                        actual -> {
+                            if (elite != null) crowdControl.applySlowPotency(caster, elite,
+                                    new EliteControlEffectPlan(actual.getDuration(), actual.getAmplifier(),
+                                            slowPlan.additionalMovementSpeedAdjustment()));
+                            if (ownedRemaining > 0) observeMechanicTriggered(caster, enemy, spec,
+                                    AbilityMechanic.EXTEND_CONTROL_DURATION, AbilityEffect.SLOW,
+                                    1D, actual.getDuration());
                         });
                 if (extend) {
                     if (crowdControl.extendRoot(caster, elite, Math.max(20, controlDuration)))
