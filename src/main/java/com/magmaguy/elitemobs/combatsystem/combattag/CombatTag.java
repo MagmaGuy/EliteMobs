@@ -34,7 +34,7 @@ public class CombatTag implements Listener {
         clearFlightSafetyEffect(player);
         GameClock.initialize();
         FlightSafety flight = new FlightSafety(player);
-        if (!player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, SAFETY_TICKS, 0))) return;
+        if (!player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, SAFETY_TICKS, 0, true, true, true))) return;
         flights.put(player.getUniqueId(), flight);
         try {
             flight.task = player.getServer().getScheduler().runTaskTimer(MetadataHandler.PLUGIN, () -> {
@@ -81,7 +81,7 @@ public class CombatTag implements Listener {
             long elapsed = Math.max(0, GameClock.getCurrentTick() - started);
             long expected = Math.max(0, SAFETY_TICKS - elapsed);
             PotionEffect current = player.getPotionEffect(PotionEffectType.SLOW_FALLING);
-            if (expected == 0 || current == null || current.getAmplifier() != 0 || current.isAmbient()
+            if (expected == 0 || current == null || current.getAmplifier() != 0 || !current.isAmbient()
                     || !current.hasParticles() || !current.hasIcon()
                     || Math.abs(current.getDuration() - expected) > 1) return;
             player.removePotionEffect(PotionEffectType.SLOW_FALLING);
