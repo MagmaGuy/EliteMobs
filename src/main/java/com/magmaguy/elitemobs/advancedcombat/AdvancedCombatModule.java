@@ -907,27 +907,31 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
-        abilityEvidence.discard(playerId);
-        endLobbyPractice(player);
-        skillTutorial.discard(playerId);
-        hudPresentation.discard(playerId);
-        boolean retainRunState = progression.lockedRunId(playerId).isPresent();
-        abilityEngine.deactivate(player);
-        if (retainRunState) resources.suspend(player);
-        else resources.discard(player);
-        passiveRuntime.discard(player);
-        participation.discard(playerId);
-        observedRunIds.remove(playerId);
-        lastCapWarning.remove(playerId);
-        progressionFailureWarnings.remove(playerId);
-        String playerName = player.getName();
-        java.util.concurrent.CompletableFuture<Void> flush = progression.flush(playerId);
-        progression.unload(playerId);
-        flush.whenComplete((ignored, failure) -> {
-            if (failure != null)
-                Logger.warn("Could not flush [Alpha] Advanced Combat System class progression for "
-                        + playerName + ": " + rootCause(failure).getMessage());
-        });
+        try {
+            endLobbyPractice(player);
+            skillTutorial.discard(playerId);
+            hudPresentation.discard(playerId);
+            boolean retainRunState = progression.lockedRunId(playerId).isPresent();
+            abilityEngine.deactivate(player);
+            if (retainRunState) resources.suspend(player);
+            else resources.discard(player);
+            passiveRuntime.discard(player);
+            participation.discard(playerId);
+            observedRunIds.remove(playerId);
+            lastCapWarning.remove(playerId);
+            progressionFailureWarnings.remove(playerId);
+            String playerName = player.getName();
+            java.util.concurrent.CompletableFuture<Void> flush = progression.flush(playerId);
+            progression.unload(playerId);
+            flush.whenComplete((ignored, failure) -> {
+                if (failure != null)
+                    Logger.warn("Could not flush [Alpha] Advanced Combat System class progression for "
+                            + playerName + ": " + rootCause(failure).getMessage());
+            });
+        } finally {
+            // Deactivation emits lifecycle evidence, so discard after its last observation.
+            abilityEvidence.discard(playerId);
+        }
     }
 
     @Override
