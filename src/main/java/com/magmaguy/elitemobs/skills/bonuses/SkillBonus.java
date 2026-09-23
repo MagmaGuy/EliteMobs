@@ -342,7 +342,7 @@ public abstract class SkillBonus {
      * @return true if the skill is unlockable
      */
     public boolean canUnlock(int skillLevel) {
-        return skillLevel >= getLevelForTier(unlockTier);
+        return meetsLevelRequirement(skillLevel);
     }
 
     /**
