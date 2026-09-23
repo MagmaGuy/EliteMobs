@@ -171,7 +171,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         snapshot.set("locations", updated);
         ConfigurationEngine.fileSaverSerialized(snapshot.saveToString(), file);
         locationsString = updated;
-        fileConfiguration = snapshot;
+        setFileConfiguration(snapshot);
         return existing ? null : new TreasureChest(this, coordinates, unixTimeStamp);
     }
 
@@ -208,7 +208,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         cooldowns.clear();
         cooldowns.putAll(updated);
         restockTimers = serialized;
-        fileConfiguration = snapshot;
+        setFileConfiguration(snapshot);
     }
 
     public synchronized boolean removeLocation(Location selected) {
@@ -222,7 +222,7 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         ConfigurationEngine.fileSaverSerialized(snapshot.saveToString(), file);
         locationsString = retained;
         if (clearLegacy) locationString = null;
-        fileConfiguration = snapshot;
+        setFileConfiguration(snapshot);
         return true;
     }
 
