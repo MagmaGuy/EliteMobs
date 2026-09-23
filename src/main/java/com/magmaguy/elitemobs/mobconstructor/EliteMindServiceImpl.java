@@ -361,11 +361,11 @@ final class EliteMindServiceImpl implements EliteMindService, Listener {
                     "Natural-spawn claim owner does not own its Mind request");
         }
         if (!requested.bodyProfile().carrierType().equals(
-                event.getEntityType().getKeyOrThrow())) {
+                event.getEntityType().getKey())) {
             throw new IllegalArgumentException(
                     "Natural-spawn replacement carrier "
                             + requested.bodyProfile().carrierType()
-                            + " does not match source " + event.getEntityType().getKeyOrThrow());
+                            + " does not match source " + event.getEntityType().getKey());
         }
         EliteMindSpawnRequest atSource = new EliteMindSpawnRequest(
                 requested.owner(),

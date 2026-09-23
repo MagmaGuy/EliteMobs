@@ -148,7 +148,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
             } catch (RuntimeException | Error failure) {
                 event.setCancelled(true);
                 Logger.warn("Environment-owned Mind replacement failed closed for "
-                        + event.getEntityType().getKeyOrThrow() + ": " + failure.getMessage());
+                        + event.getEntityType().getKey() + ": " + failure.getMessage());
                 return;
             }
         }
