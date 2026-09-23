@@ -40,11 +40,14 @@ class OverheadDisplayLifecycleTest {
         viewer.teleport(new Location(world, 0, 65, 0));
         settings = mockStatic(MobCombatSettingsConfig.class);
         settings.when(MobCombatSettingsConfig::isDisplayVisualHealthBars).thenReturn(true);
+        settings.when(MobCombatSettingsConfig::getCombatDisplayTimeoutSeconds).thenReturn(30);
         visuals = mockStatic(VisualDisplay.class);
         visuals.when(() -> VisualDisplay.createStyledFakeText(
                 any(Location.class), anyString(), any(Color.class), anyBoolean(), anyFloat()))
                 .thenAnswer(ignored -> {
                     FakeText label = mock(FakeText.class);
+                    Location location = ignored.getArgument(0);
+                    when(label.getLocation()).thenAnswer(call -> location.clone());
                     emittedLabels.add(label);
                     return label;
                 });
@@ -61,6 +64,7 @@ class OverheadDisplayLifecycleTest {
         hit = mock(EliteMobDamagedByPlayerEvent.class);
         when(hit.getEliteMobEntity()).thenReturn(boss);
         when(hit.getPlayer()).thenReturn(viewer);
+        BossHealthDisplay.startMasterUpdateTask();
     }
 
     @AfterEach void close() {
@@ -79,7 +83,7 @@ class OverheadDisplayLifecycleTest {
         server.getScheduler().performOneTick();
 
         assertEquals(1, emittedLabels.size(), "Only the current phase's display may emit labels");
-        verify(emittedLabels.getFirst()).displayTo(hit.getPlayer());
+        verify(emittedLabels.getFirst()).displayTo(hit.getPlayer().getUniqueId());
         BossHealthDisplay.removeDisplay(boss);
         verify(emittedLabels.getFirst()).remove();
         server.getScheduler().performOneTick();
@@ -91,5 +95,20 @@ class OverheadDisplayLifecycleTest {
         BossHealthDisplay.shutdown();
         server.getScheduler().performOneTick();
         assertEquals(0, emittedLabels.size());
+    }
+
+    @Test void viewersEnteringAndLeavingRangeReconcileWithoutAnotherHealthChange() {
+        new BossHealthDisplay().onDamage(hit);
+        server.getScheduler().performOneTick();
+        FakeText label = emittedLabels.getFirst();
+        var player = hit.getPlayer();
+        var near = player.getLocation();
+        player.teleport(near.clone().add(100, 0, 0));
+        server.getScheduler().performOneTick();
+        verify(label).hideFrom(player.getUniqueId());
+        player.teleport(near);
+        server.getScheduler().performOneTick();
+        verify(label, times(2)).displayTo(player.getUniqueId());
+        assertEquals(1, emittedLabels.size(), "Audience changes must reuse the existing display");
     }
 }

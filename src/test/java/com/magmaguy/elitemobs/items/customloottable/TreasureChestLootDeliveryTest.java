@@ -72,7 +72,7 @@ class TreasureChestLootDeliveryTest {
         }
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
     @CsvSource({"false,0", "false,1", "false,2", "true,0", "true,1", "true,2"})
     void missingItemReportsAnEmptyChestInsteadOfClaimingDelivery(boolean direct, int mode) throws Exception {
         config(ItemSettingsConfig.class, "putLootDirectlyIntoPlayerInventory", direct);
@@ -82,7 +82,7 @@ class TreasureChestLootDeliveryTest {
         assertEquals(0, awarded(Material.DIAMOND));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
     @CsvSource({"false,0", "false,1", "false,2", "true,0", "true,1", "true,2"})
     void mixedMissingAndValidEntriesStillAwardTheValidItem(boolean direct, int mode) throws Exception {
         config(ItemSettingsConfig.class, "putLootDirectlyIntoPlayerInventory", direct);
@@ -94,7 +94,7 @@ class TreasureChestLootDeliveryTest {
         assertNoEmptyMessage();
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
     @CsvSource({"false,0", "false,1", "false,2", "true,0", "true,1", "true,2"})
     void onlyTheSelectedDungeonDifficultyCanAwardItsChestItem(boolean direct, int mode) throws Exception {
         config(ItemSettingsConfig.class, "putLootDirectlyIntoPlayerInventory", direct);
@@ -148,7 +148,7 @@ class TreasureChestLootDeliveryTest {
         assertNoEmptyMessage();
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
     @CsvSource({"false", "true"})
     void guaranteedCommandEntryDispatchesExactlyTheAuthoredAmount(boolean direct) throws Exception {
         config(ItemSettingsConfig.class, "putLootDirectlyIntoPlayerInventory", direct);
@@ -167,7 +167,7 @@ class TreasureChestLootDeliveryTest {
         assertNoEmptyMessage();
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
     @CsvSource({"false,vanilla", "true,vanilla", "false,serialized", "true,serialized"})
     void genericBossOverloadsDeliverSupportedItemEntries(boolean direct, String kind) {
         CustomLootEntry entry;
@@ -186,7 +186,7 @@ class TreasureChestLootDeliveryTest {
         assertEquals(2, awarded(Material.DIAMOND));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
     @CsvSource({"false", "true"})
     void zeroCurrencyIsNotReportedAsAnAward(boolean direct) throws Exception {
         config(ItemSettingsConfig.class, "putLootDirectlyIntoPlayerInventory", direct);
@@ -199,7 +199,7 @@ class TreasureChestLootDeliveryTest {
         }
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
     @CsvSource({"false", "true"})
     void bossEquipmentReportsDeliveryOnlyWhenItEntersTheSharedPool(boolean direct) {
         var other = server.addPlayer();

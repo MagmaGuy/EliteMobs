@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CorpseOpportunityLedgerTest {
 
@@ -35,7 +36,10 @@ class CorpseOpportunityLedgerTest {
         assertTrue(ledger.availableTo(corpse, player, 599L));
         assertFalse(ledger.availableTo(corpse, player, 600L));
         assertFalse(ledger.consume(corpse, player, 600L));
+        assertTrue(ledger.contains(corpse), "The display owner still needs this identity for cleanup");
+        assertEquals(Set.of(corpse), ledger.expire(600L));
         assertFalse(ledger.contains(corpse));
+        assertTrue(ledger.expire(600L).isEmpty(), "Display retirement must be handed off once");
     }
 
     @Test

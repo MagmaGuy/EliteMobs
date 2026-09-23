@@ -46,14 +46,15 @@ class ClassProgressionModuleTest {
         assertEquals(10, rootCap.currentEffectiveLevel());
 
         foundation.setAllLevels(30);
+        foundation.setLevel(SkillType.SPEARS, 29);
         AwardResult completedRoot = progression.award(
                 playerId, SkillXPCalculator.totalXPForLevel(30));
         assertEquals(30, completedRoot.currentEffectiveLevel());
         assertEquals(SelectionResult.Status.LOCKED_FORM,
                 progression.selectForm(playerId, "guardian").status());
 
-        foundation.setLevel(SkillType.ARMOR, 31);
-        foundation.setLevel(SkillType.SPEARS, 31);
+        foundation.setLevel(SkillType.ARMOR, 30);
+        foundation.setLevel(SkillType.SPEARS, 30);
         SelectionResult guardian = progression.selectForm(playerId, "guardian");
         assertEquals(SelectionResult.Status.APPLIED, guardian.status());
         assertEquals(31, guardian.snapshot().activeLineage().activeEffectiveLevel());
@@ -196,7 +197,7 @@ class ClassProgressionModuleTest {
     @Test
     void administrativeFixturePreservesFoundationAndRunLockInvariants() {
         UUID playerId = UUID.randomUUID();
-        MutableFoundationLevels foundation = new MutableFoundationLevels(playerId, 60);
+        MutableFoundationLevels foundation = new MutableFoundationLevels(playerId, 59);
         InMemoryStore store = InMemoryStore.empty(playerId);
         ClassProgressionModule progression = module(foundation, store);
         progression.load(playerId).join();
@@ -204,9 +205,9 @@ class ClassProgressionModuleTest {
         ClassProgressionSetResult capped = progression.setLineageForAdministration(
                 playerId, "aegis", 61);
         assertEquals(ClassProgressionSetResult.Status.FOUNDATION_SKILL_CAP, capped.status());
-        assertEquals("aegis", capped.blockingFormId());
-        assertEquals(60, capped.effectiveCap());
-        assertNull(store.progress("paladin"));
+        assertEquals("guardian", capped.blockingFormId());
+        assertEquals(59, capped.effectiveCap());
+        assertEquals(0L, store.progress("paladin").xp());
 
         ClassProgressionSetResult root = progression.setLineageForAdministration(
                 playerId, "paladin", 30);
@@ -291,7 +292,14 @@ class ClassProgressionModuleTest {
 
         private InMemoryStore(StoredClassProfile profile, StoredClassProgress... initialProgress) {
             this.profile = profile;
-            for (StoredClassProgress row : initialProgress) progress.put(row.formId(), row);
+            // These cases exercise XP/skill caps after trials have been completed.
+            // Production admission and trial tests cover acquiring this prerequisite.
+            for (var form : BuiltInClassContent.catalog().forms())
+                progress.put(form.id(), new StoredClassProgress(profile.playerId(), form.id(),
+                        form.id().equals("adventurer") ? SkillXPCalculator.totalXPForLevel(10) : 0L,
+                        BuiltInClassContent.PERSISTENCE_VERSION, true));
+            for (StoredClassProgress row : initialProgress) progress.put(row.formId(),
+                    new StoredClassProgress(row.playerId(), row.formId(), row.xp(), row.catalogVersion(), true));
         }
 
 

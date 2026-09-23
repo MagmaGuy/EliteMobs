@@ -16,9 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class QuestDialogueBossBarManagerTest {
 
+    @org.junit.jupiter.api.BeforeEach
+    void openServer() { org.mockbukkit.mockbukkit.MockBukkit.mock(); }
+
     @AfterEach
     void clearPendingQuests() {
-        Quest.shutdown();
+        try { Quest.shutdown(); }
+        finally { org.mockbukkit.mockbukkit.MockBukkit.unmock(); }
     }
 
     @Test

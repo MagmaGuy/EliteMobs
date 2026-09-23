@@ -15,12 +15,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DungeonFoodRegenerationTest {
 
+    @org.junit.jupiter.api.BeforeEach
+    void openServer() { org.mockbukkit.mockbukkit.MockBukkit.mock(); }
+
     private static final UUID PLAYER_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private static final UUID WORLD_ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
     @AfterEach
     void clearProtectedWorlds() {
-        InstanceProtector.shutdown();
+        try { InstanceProtector.shutdown(); }
+        finally { org.mockbukkit.mockbukkit.MockBukkit.unmock(); }
     }
 
     @Test

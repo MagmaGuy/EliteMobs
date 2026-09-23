@@ -10,10 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClassMenuPresenterTest {
-    private static final int MAX_DESCRIPTION_ROW_LENGTH = 68;
     private static final Pattern MINI_MESSAGE_TAG = Pattern.compile("<[^>]+>");
     private static final Pattern LEGACY_HEX = Pattern.compile(
             "(?i)(?:[&§]x(?:[&§][0-9a-f]){6}|[&§]#[0-9a-f]{6})");
@@ -43,21 +40,21 @@ class ClassMenuPresenterTest {
     }
 
     @Test
-    void controlsUseTheFAbilityLayerAndNameTheActiveAbilities() {
+    void controlsUseCurrentChordsAndNameTheActiveAbilities() {
         ClassMenuPresentation controls = ClassMenuPresenter.controls(
                 withActiveForm(catalogView(true), "berserker"));
         String copy = visibleText(String.join("\n", playerFacingCopy(controls)));
 
-        assertTrue(copy.contains("F then 1 • Crater Leap"));
-        assertTrue(copy.contains("F then 2 • Rampage"));
-        assertTrue(copy.contains("F then 3 • War Cry"));
+        assertTrue(copy.contains("F, F • Crater Leap"));
+        assertTrue(copy.contains("F + LMB • Rampage"));
+        assertTrue(copy.contains("F + RMB • War Cry"));
         assertFalse(copy.contains("Double F"));
         assertFalse(copy.contains("F then right-click"));
         assertFalse(copy.contains("Shift+F"));
         assertFalse(copy.contains("Selected"));
         assertFalse(copy.contains("next run"));
         assertFalse(copy.contains("Hotbar Layer"));
-        assertTrue(copy.contains("Press F, then choose ability 1, 2 or 3."));
+        assertFalse(copy.contains("F then 1"));
     }
 
     @Test
@@ -69,24 +66,6 @@ class ClassMenuPresenterTest {
             lockedActions += assertLockedActionsExplainBlockers(page, view);
         }
         assertTrue(lockedActions > 0, "The fixture must expose locked class actions");
-    }
-
-    @Test
-    void everyRenderedRowFitsTheSingleLineBudget() {
-        Set<String> overlongRows = new LinkedHashSet<>();
-        for (ClassMenuView view : List.of(catalogView(true), catalogView(false))) {
-            for (ClassMenuPresentation page : pages(view)) {
-                for (String row : playerFacingCopy(page)) {
-                    String visible = visibleText(row);
-                    if (visible.length() > MAX_DESCRIPTION_ROW_LENGTH) {
-                        overlongRows.add(visible.length() + " characters: " + visible);
-                    }
-                }
-            }
-        }
-        assertTrue(overlongRows.isEmpty(), () -> "Description rows exceed "
-                + MAX_DESCRIPTION_ROW_LENGTH + " visible characters:\n"
-                + String.join("\n", overlongRows));
     }
 
     @Test

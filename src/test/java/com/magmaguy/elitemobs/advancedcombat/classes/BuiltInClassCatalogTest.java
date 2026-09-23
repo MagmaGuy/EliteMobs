@@ -57,7 +57,7 @@ class BuiltInClassCatalogTest {
     void aFormsOwnPairDeterminesItsEffectiveSkillCap() {
         ClassFormDefinition sniper = catalog.require("sniper");
 
-        assertEquals(31, sniper.requiredFoundationSkillLevel());
+        assertEquals(30, sniper.requiredFoundationSkillLevel());
         assertEquals(List.of(SkillType.BOWS, SkillType.CROSSBOWS), sniper.foundationSkills().asList());
         assertEquals(37, sniper.effectiveSkillCap(skill -> switch (skill) {
             case BOWS -> 42;

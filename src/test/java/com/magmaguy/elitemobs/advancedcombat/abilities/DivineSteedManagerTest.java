@@ -35,6 +35,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DivineSteedManagerTest {
 
+    @org.junit.jupiter.api.BeforeEach
+    void initializeItemRegistry() { org.mockbukkit.mockbukkit.MockBukkit.mock(); }
+
+    @org.junit.jupiter.api.AfterEach
+    void closeItemRegistry() { org.mockbukkit.mockbukkit.MockBukkit.unmock(); }
+
     @Test
     void summonsALiteralArmoredHorseAndMountsItsOwner() {
         SteedFixture fixture = new SteedFixture();

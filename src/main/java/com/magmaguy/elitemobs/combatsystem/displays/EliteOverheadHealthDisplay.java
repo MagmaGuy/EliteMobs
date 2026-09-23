@@ -30,6 +30,8 @@ final class EliteOverheadHealthDisplay {
     private static final String COLOR_FULL_CRITICAL = "&4";
     private static final String COLOR_EMPTY = "&8";
     private static final int BARS_PER_ROW = 10;
+    private static final double VIEW_DISTANCE = 30;
+    private static final double ROW_HEIGHT = 0.22;
 
     private final EliteEntity eliteEntity;
     private final List<FakeText> healthBarDisplays = new ArrayList<>();
@@ -38,7 +40,6 @@ final class EliteOverheadHealthDisplay {
     private FakeText numericDisplay;
     private long lastCombatTime;
     private boolean dirty = true;
-    private boolean audienceDirty = true;
 
     EliteOverheadHealthDisplay(EliteEntity eliteEntity) {
         this.eliteEntity = eliteEntity;
@@ -81,7 +82,6 @@ final class EliteOverheadHealthDisplay {
             removeText(numericDisplay);
             numericDisplay = null;
         }
-        audienceDirty = true;
     }
 
     void updatePositions() {
@@ -90,16 +90,13 @@ final class EliteOverheadHealthDisplay {
         if (baseLocation == null) return;
         for (int index = 0; index < healthBarDisplays.size(); index++) {
             FakeText display = healthBarDisplays.get(index);
-            if (display != null) display.teleport(baseLocation.clone().add(0, index * 0.22, 0));
+            if (display != null) display.teleport(baseLocation.clone().add(0, index * ROW_HEIGHT, 0));
         }
         if (numericDisplay != null) {
             int rows = MobCombatSettingsConfig.isDisplayVisualHealthBars() ? calculateBarLayout().rows() : 0;
-            numericDisplay.teleport(baseLocation.clone().add(0, rows * 0.22, 0));
+            numericDisplay.teleport(baseLocation.clone().add(0, rows * ROW_HEIGHT, 0));
         }
-        if (audienceDirty) {
-            reconcileViewers();
-            audienceDirty = false;
-        }
+        reconcileViewers(baseLocation);
     }
 
     void cleanup() {
@@ -129,7 +126,7 @@ final class EliteOverheadHealthDisplay {
             if (row < healthBarDisplays.size()) {
                 setTextIfChanged(healthBarDisplays.get(row), rendered);
             } else {
-                FakeText display = createFakeText(baseLocation.clone().add(0, row * 0.22, 0), rendered);
+                FakeText display = createFakeText(baseLocation.clone().add(0, row * ROW_HEIGHT, 0), rendered);
                 if (display != null) healthBarDisplays.add(display);
             }
             barsRemaining -= filledInRow;
@@ -151,7 +148,7 @@ final class EliteOverheadHealthDisplay {
         int rows = MobCombatSettingsConfig.isDisplayVisualHealthBars() ? calculateBarLayout().rows() : 0;
         String rendered = ChatColorConverter.convert(text);
         if (numericDisplay == null)
-            numericDisplay = createFakeText(baseLocation.clone().add(0, rows * 0.22, 0), rendered);
+            numericDisplay = createFakeText(baseLocation.clone().add(0, rows * ROW_HEIGHT, 0), rendered);
         else setTextIfChanged(numericDisplay, rendered);
     }
 
@@ -201,16 +198,21 @@ final class EliteOverheadHealthDisplay {
         if (!text.equals(display.getText())) display.setText(text);
     }
 
-    private void reconcileViewers() {
-        Location base = getBaseLocation();
-        if (base == null || base.getWorld() == null) return;
+    private void reconcileViewers(Location base) {
+        if (base.getWorld() == null || audiences.isEmpty()) return;
         Map<UUID, Location> playerLocations = new HashMap<>();
-        for (Player player : base.getWorld().getPlayers())
+        // Health can stay unchanged while viewers move. Query once for all rows,
+        // then use each label's exact range before changing its audience.
+        for (var entity : base.getWorld().getNearbyEntities(base,
+                VIEW_DISTANCE, VIEW_DISTANCE + healthBarDisplays.size() * ROW_HEIGHT,
+                VIEW_DISTANCE, entity -> entity instanceof Player)) {
+            Player player = (Player) entity;
             playerLocations.put(player.getUniqueId(), player.getLocation());
+        }
         audiences.forEach((display, viewers) -> {
             Location location = display.getLocation();
             playerLocations.forEach((playerId, playerLocation) -> {
-                if (playerLocation.distanceSquared(location) <= 900) {
+                if (playerLocation.distanceSquared(location) <= VIEW_DISTANCE * VIEW_DISTANCE) {
                     if (viewers.add(playerId)) display.displayTo(playerId);
                 } else if (viewers.remove(playerId)) display.hideFrom(playerId);
             });
