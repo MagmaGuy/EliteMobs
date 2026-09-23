@@ -505,7 +505,7 @@ final class LuaPowerEntityTables {
             int duration = args.optint(2, 0);
             AttributeInstance attribute = AttributeManager.getAttributeInstance(livingEntity, "generic_scale");
             if (attribute != null) {
-                TimedScriptStateManager.applyOwned(this, livingEntity.getUniqueId(), "scale", scale, duration,
+                TimedScriptStateManager.applyOwned(this, livingEntity.getUniqueId(), "generic_scale", scale, duration,
                         attribute::getBaseValue, attribute::setBaseValue);
             }
             return LuaValue.NIL;
