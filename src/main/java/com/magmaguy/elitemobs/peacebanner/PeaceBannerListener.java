@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 
 public class PeaceBannerListener implements Listener {
 
@@ -37,4 +38,9 @@ public class PeaceBannerListener implements Listener {
         if (!PeaceBannerConfig.isEnabled()) return;
         PeaceBannerManager.validateChunk(event.getChunk());
     }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldLoad(WorldLoadEvent event) {
+        if (PeaceBannerConfig.isEnabled()) PeaceBannerManager.activateWorld(event.getWorld());
+    }
+
 }

@@ -668,6 +668,7 @@ public class EliteMobs extends JavaPlugin {
         }
         Logger.info("Starting EliteMobs shutdown sequence...");
         Explosion.shutdown();
+        PeaceBannerManager.shutdown();
         com.magmaguy.elitemobs.parties.PartyManager.shutdown();
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
         Wormhole.shutdown();
@@ -678,7 +679,6 @@ public class EliteMobs extends JavaPlugin {
         EntityTracker.wipeShutdown();
         TimedEvent.shutdown();
         ActionEvent.shutdown();
-        PeaceBannerManager.shutdown();
         PeaceBannerItem.unregisterRecipe();
         validWorldList.clear();
         CustomBossesConfigFields.getRegionalElites().clear();
