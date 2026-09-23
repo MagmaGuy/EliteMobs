@@ -319,10 +319,17 @@ public class WormholeEntry implements PersistentObject {
     }
 
     public void updateLocation(Player player) {
-        locationString = ConfigurationLocation.deserialize(player.getLocation());
-        location = player.getLocation().add(new Vector(0, 1 * wormhole.getWormholeConfigFields().getSizeMultiplier(), 0));
-        wormhole.getWormholeConfigFields().setWormholeEntryLocation(location, wormholeNumber);
+        Location replacement = player.getLocation().add(0,
+                wormhole.getWormholeConfigFields().getSizeMultiplier(), 0);
+        wormhole.getWormholeConfigFields().setWormholeEntryLocation(replacement, wormholeNumber);
+        remove();
         if (persistentObjectHandler != null) persistentObjectHandler.remove();
+        location = replacement;
+        locationString = ConfigurationLocation.deserialize(replacement);
+        worldName = replacement.getWorld().getName();
+        portalMissingMessage = null;
+        opMessage = null;
+        showDownloadHint = false;
         persistentObjectHandler = new PersistentObjectHandler(this);
     }
 
@@ -534,13 +541,12 @@ public class WormholeEntry implements PersistentObject {
             List<DrawLine.LineData> oldLines = new ArrayList<>(lineDataList);
             lineDataList.clear();
             linesInitialized = false;
-            cachedEdges = null;
 
             // Get concrete color that matches the wormhole's particle color (only once)
             concreteColor = getConcreteColorForWormhole();
 
             // Get edges from shape (connect points based on shape type) - cache this
-            cachedEdges = getEdgesForShape(currentFrame);
+            if (cachedEdges == null) cachedEdges = getEdgesForShape(wormhole.getCachedRotations().getFirst());
 
             // Create lines for each edge
             try {
@@ -875,7 +881,6 @@ public class WormholeEntry implements PersistentObject {
         }
         lineDataList.clear();
         linesInitialized = false;
-        cachedEdges = null;
         playersViewingLines.clear(); // Clear player tracking to force fresh state
         lastLinesClearTime = System.currentTimeMillis();
     }

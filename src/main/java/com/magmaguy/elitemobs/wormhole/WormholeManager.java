@@ -25,7 +25,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 
 public class WormholeManager {
-    // Static cooldown time in seconds (20 seconds)
+    // Minimum cooldown time in seconds
     private static final long COOLDOWN_DURATION_SECONDS = 5;
     // Distance for player-specific particle rendering
     private static final double PARTICLE_RENDER_DISTANCE = 30.0;
@@ -39,6 +39,10 @@ public class WormholeManager {
     // Concurrent map: mutated from listeners while the per-tick task copies its values; the plain
     // HashMap shared the same mid-copy ArrayIndexOutOfBoundsException risk as wormholeEntries.
     private final Map<UUID, PlayerWormholeData> playerTeleportData = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Set<UUID> activeTravel = new HashSet<>();
+    // Retain uncertain economy outcomes across an EM reload; never replay an ambiguous mutation.
+    private static final Map<UUID, TravelRecovery> unresolvedTravel = new HashMap<>();
+    private record TravelRecovery(double amount, String status, String wormhole) { }
     private BukkitTask wormholeTask;
     private static final int TELEPORT_CHECK_INTERVAL = 5; // Check teleports every 5 ticks
     private int tickCounter = 0;
@@ -82,7 +86,10 @@ public class WormholeManager {
 
         double maxDistanceSquared = PARTICLE_RENDER_DISTANCE * PARTICLE_RENDER_DISTANCE;
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (org.bukkit.entity.Entity entity : wormholeLocation.getWorld().getNearbyEntities(
+                wormholeLocation, PARTICLE_RENDER_DISTANCE, PARTICLE_RENDER_DISTANCE,
+                PARTICLE_RENDER_DISTANCE, candidate -> candidate instanceof Player)) {
+            Player player = (Player) entity;
             if (player.getWorld().equals(wormholeLocation.getWorld()) &&
                     player.getLocation().distanceSquared(wormholeLocation) <= maxDistanceSquared) {
                 nearbyPlayers.add(player);
@@ -98,7 +105,8 @@ public class WormholeManager {
     private void checkForTeleports(WormholeEntry wormholeEntry, List<Player> nearbyPlayers) {
         double teleportDistanceSquared = Math.pow(TELEPORT_DISTANCE_MULTIPLIER * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier(), 2);
         for (Player player : nearbyPlayers) {
-            if (player.getLocation().distanceSquared(wormholeEntry.getLocation()) > teleportDistanceSquared)
+            if (player.getWorld() != wormholeEntry.getLocation().getWorld()
+                    || player.getLocation().distanceSquared(wormholeEntry.getLocation()) > teleportDistanceSquared)
                 continue;
             if (!canPlayerTeleport(wormholeEntry, player)) continue;
             teleportPlayer(wormholeEntry, player);
@@ -109,6 +117,10 @@ public class WormholeManager {
      * Checks if a player can teleport through a wormhole
      */
     private boolean canPlayerTeleport(WormholeEntry wormholeEntry, Player player) {
+        UUID playerId = player.getUniqueId();
+        if (activeTravel.contains(playerId) || unresolvedTravel.containsKey(playerId)) return false;
+        PlayerWormholeData cooldown = playerTeleportData.get(playerId);
+        if (cooldown != null && !cooldown.canTeleport()) return false;
         // Check permissions
         if (!PlayerQuestCooldowns.getBypassedPlayers().contains(player) &&
                 wormholeEntry.getWormhole().getWormholeConfigFields().getPermission() != null &&
@@ -117,21 +129,7 @@ public class WormholeManager {
             return false;
         }
 
-        // Check currency
-        if (wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost() > 0) {
-            double coinCost = wormholeEntry.getWormhole().getWormholeConfigFields().getCoinCost();
-
-            if (EconomyHandler.checkCurrency(player.getUniqueId()) < coinCost) {
-                player.sendMessage(WormholesConfig.getInsufficientCurrencyForWormholeMessage()
-                        .replace("$amount", EconomyHandler.formatCurrency(coinCost)));
-                return false;
-            }
-
-            EconomyHandler.subtractCurrency(player.getUniqueId(), coinCost);
-        }
-
-        PlayerWormholeData playerWormholeData = playerTeleportData.get(player.getUniqueId());
-        return playerWormholeData == null || playerWormholeData.canTeleport();
+        return true;
     }
 
     /**
@@ -183,22 +181,75 @@ public class WormholeManager {
             return;
         }
 
-        // Add player to cooldown and track destination BEFORE teleport
-        // to prevent double teleports
-        addPlayerToCooldown(player, destinationEntry);
-
-        // Clone location to ensure we have a stable copy
-        final Location finalDestination = destination.clone();
-
-        // Perform teleport on the main thread
-        if (sourceEntry.getWormhole().getWormholeConfigFields().isBlindPlayer()) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 2, 0));
+        UUID playerId = player.getUniqueId();
+        if (!activeTravel.add(playerId)) return;
+        double price = sourceEntry.getWormhole().getWormholeConfigFields().getCoinCost();
+        if (!Double.isFinite(price) || price < 0) {
+            activeTravel.remove(playerId);
+            Logger.warn("Invalid wormhole price in " + sourceEntry.getWormhole().getWormholeConfigFields().getFilename());
+            return;
         }
-
-        // Use PlayerTeleportEvent to trigger dungeon music and other listeners
-        PlayerTeleportEvent.teleportPlayer(player, finalDestination);
+        Location target = destination.clone();
+        boolean paid = false;
+        boolean arrived = false;
+        try {
+            if (price > 0) {
+                try {
+                    paid = EconomyHandler.tryWithdraw(playerId, price);
+                } catch (RuntimeException uncertain) {
+                    retainRecovery(playerId, price, "withdrawal-unknown", sourceEntry, uncertain);
+                    return;
+                }
+                if (!paid) {
+                    player.sendMessage(WormholesConfig.getInsufficientCurrencyForWormholeMessage()
+                            .replace("$amount", EconomyHandler.formatCurrency(price)));
+                    return;
+                }
+            }
+            boolean accepted = PlayerTeleportEvent.teleportPlayer(player, target);
+            arrived = accepted && atDestination(player, target);
+        } catch (RuntimeException failure) {
+            // A post-teleport listener can fail after movement committed.
+            arrived = atDestination(player, target);
+            Logger.warn("Wormhole travel failed for " + playerId + ": " + failure);
+        } finally {
+            if (paid && !arrived) {
+                try {
+                    if (!EconomyHandler.refundPayment(playerId, price))
+                        retainRecovery(playerId, price, "refund-rejected", sourceEntry, null);
+                } catch (RuntimeException uncertain) {
+                    retainRecovery(playerId, price, "refund-unknown", sourceEntry, uncertain);
+                }
+            }
+            try {
+                if (arrived) addPlayerToCooldown(player, destinationEntry);
+            } finally {
+                activeTravel.remove(playerId);
+            }
+        }
+        if (!arrived) return;
+        if (sourceEntry.getWormhole().getWormholeConfigFields().isBlindPlayer())
+            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 2, 0));
         player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1f, 1f);
         player.setFlying(false);
+    }
+
+    private static boolean atDestination(Player player, Location destination) {
+        Location actual = player.getLocation();
+        return actual.getWorld() == destination.getWorld() && actual.distanceSquared(destination) < 1.0e-6;
+    }
+
+    private static void retainRecovery(UUID playerId, double amount, String status,
+                                       WormholeEntry source, RuntimeException failure) {
+        String filename = source.getWormhole().getWormholeConfigFields().getFilename();
+        unresolvedTravel.put(playerId, new TravelRecovery(amount, status, filename));
+        Player player = Bukkit.getPlayer(playerId);
+        if (player != null) Logger.sendMessage(player,
+                "&cWormhole payment could not be settled. Contact an administrator before trying again.");
+        Logger.warn("Wormhole payment requires manual reconciliation: player=" + playerId
+                + ", amount=" + amount + ", status=" + status + ", wormhole=" + filename
+                + (failure == null ? "" : ", failure=" + failure)
+                + ". Further wormhole travel is blocked for this player; no automatic payment retry.");
     }
 
     private void sendDownloadHint(Player player) {
@@ -224,6 +275,7 @@ public class WormholeManager {
     }
 
     public void addPlayerToCooldown(Player player, Location destination) {
+        if (activeTravel.contains(player.getUniqueId())) return;
         WormholeEntry destinationEntry = null;
         for (WormholeEntry wormholeEntry : WormholeEntry.getWormholeEntries()) {
             try {
@@ -264,6 +316,8 @@ public class WormholeManager {
 
         // Reset singleton to allow clean restart
         instance = null;
+        unresolvedTravel.forEach((playerId, recovery) -> Logger.warn(
+                "Unresolved wormhole payment at shutdown: " + playerId + " " + recovery));
     }
 
     /**
@@ -331,7 +385,7 @@ public class WormholeManager {
 
         public PlayerWormholeData(Player player, WormholeEntry destinationWormhole, long timeStamp) {
             this.player = player;
-            this.destination = destinationWormhole.getLocation();
+            this.destination = destinationWormhole.getLocation().clone();
             this.timeStamp = timeStamp;
             this.wormholeEntry = destinationWormhole;
         }
@@ -343,7 +397,7 @@ public class WormholeManager {
 
         //Has to run on the tick to see the distance. Should be efficient.
         public void tick() {
-            if (isHasLeftTeleportRadius() && enoughTimeHasPassed()) playerTeleportData.remove(player.getUniqueId());
+            if (isHasLeftTeleportRadius() && enoughTimeHasPassed()) playerTeleportData.remove(player.getUniqueId(), this);
         }
 
         private boolean enoughTimeHasPassed() {
@@ -353,9 +407,9 @@ public class WormholeManager {
         private boolean isHasLeftTeleportRadius() {
             if (hasLeftTeleportRadius) return true;
             try {
-                if (!player.getWorld().equals(destination.getWorld())) return false;
+                if (!player.getWorld().equals(destination.getWorld())) return hasLeftTeleportRadius = true;
             } catch (IllegalArgumentException e) {
-                return false;
+                return hasLeftTeleportRadius = true;
             }
             if (destination.distanceSquared(player.getLocation()) > Math.pow(TELEPORT_DISTANCE_MULTIPLIER * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier() + SAFE_DISTANCE, 2))
                 return hasLeftTeleportRadius = true;
