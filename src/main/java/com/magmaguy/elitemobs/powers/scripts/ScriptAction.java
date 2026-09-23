@@ -588,10 +588,6 @@ public class ScriptAction {
      */
     public static void shutdown() {
         TimedScriptStateManager.shutdown();
-        invulnerablePlayers.forEach(uuid -> {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) player.setInvulnerable(false);
-        });
         invulnerablePlayers.clear();
         scriptDamageDepth.remove();
     }

@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.powers.lua;
 
+import com.magmaguy.elitemobs.powers.scripts.TimedScriptStateManager;
+
 import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.api.EliteDamageEvent;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByEliteMobEvent;
@@ -86,6 +88,7 @@ final class LuaPowerEntityTables {
         this.callbackInvoker = callbackInvoker;
         this.bossTableBuilder = new LuaBossTableBuilder(definition, eliteEntity, support, this, taskController, callbackInvoker);
         taskController.ownCleanup(() -> {
+            TimedScriptStateManager.releaseOwner(this);
             for (EliteEntity target : healingTargets) {
                 if (healingOwners.remove(target, this)) target.setHealing(false);
             }
@@ -463,15 +466,11 @@ final class LuaPowerEntityTables {
         entity.set("set_awareness_enabled", method(entity, args -> {
             if (livingEntity instanceof Mob mob) {
                 boolean aware = args.checkboolean(1);
-                setAwarenessState(mob, aware);
                 int duration = args.optint(2, 0);
-                if (duration > 0) {
-                    GameClock.scheduleLater(duration, () -> {
-                        if (mob.isValid()) {
-                            setAwarenessState(mob, !aware);
-                        }
-                    });
-                }
+                if (!aware || !TimedScriptStateManager.releaseProperty(this, mob.getUniqueId(), "mob_aware"))
+                    TimedScriptStateManager.applyOwned(this, mob.getUniqueId(), "mob_aware", aware, duration,
+                            () -> { EliteEntity owner = resolveAiOwner(mob); return owner == null ? mob.isAware() : owner.isAware(); },
+                            value -> setAwarenessState(mob, value));
             }
             return LuaValue.NIL;
         }));
@@ -506,15 +505,13 @@ final class LuaPowerEntityTables {
             int duration = args.optint(2, 0);
             AttributeInstance attribute = AttributeManager.getAttributeInstance(livingEntity, "generic_scale");
             if (attribute != null) {
-                attribute.setBaseValue(scale);
-                if (duration > 0) {
-                    GameClock.scheduleLater(duration, () -> attribute.setBaseValue(1.0));
-                }
+                TimedScriptStateManager.applyOwned(this, livingEntity.getUniqueId(), "scale", scale, duration,
+                        attribute::getBaseValue, attribute::setBaseValue);
             }
             return LuaValue.NIL;
         }));
         entity.set("set_invulnerable", method(entity, args -> {
-            support.applyInvulnerable(livingEntity, args.checkboolean(1), args.optint(2, 0));
+            TimedScriptStateManager.applyInvulnerability(this, livingEntity, args.checkboolean(1), args.optint(2, 0));
             return LuaValue.NIL;
         }));
         entity.set("remove_elite", method(entity, args -> {
@@ -636,17 +633,11 @@ final class LuaPowerEntityTables {
     }
 
     void applyAiState(LivingEntity livingEntity, boolean targetValue, int duration) {
-        if (livingEntity == null) {
-            return;
-        }
-        setAiState(livingEntity, targetValue);
-        if (duration > 0) {
-            GameClock.scheduleLater(duration, () -> {
-                if (livingEntity.isValid()) {
-                    setAiState(livingEntity, !targetValue);
-                }
-            });
-        }
+        if (livingEntity == null) return;
+        if (targetValue && TimedScriptStateManager.releaseProperty(this, livingEntity.getUniqueId(), "mob_ai")) return;
+        TimedScriptStateManager.applyOwned(this, livingEntity.getUniqueId(), "mob_ai", targetValue, duration,
+                () -> { EliteEntity owner = resolveAiOwner(livingEntity); return owner == null ? livingEntity.hasAI() : owner.isAIEnabled(); },
+                value -> setAiState(livingEntity, value));
     }
 
     private void setAiState(LivingEntity livingEntity, boolean enabled) {

@@ -336,32 +336,7 @@ final class LuaPowerSupport {
         }
     }
 
-    void applyInvulnerable(LivingEntity livingEntity, boolean invulnerable, int duration) {
-        livingEntity.setInvulnerable(invulnerable);
-        if (livingEntity instanceof Player player) {
-            if (invulnerable) {
-                ScriptAction.getInvulnerablePlayers().add(player.getUniqueId());
-            } else {
-                ScriptAction.getInvulnerablePlayers().remove(player.getUniqueId());
-            }
-        }
-        if (duration > 0) {
-            UUID uuid = livingEntity.getUniqueId();
-            GameClock.scheduleLater(duration, () -> {
-                if (!livingEntity.isValid()) {
-                    return;
-                }
-                livingEntity.setInvulnerable(!invulnerable);
-                if (livingEntity instanceof Player) {
-                    if (invulnerable) {
-                        ScriptAction.getInvulnerablePlayers().remove(uuid);
-                    } else {
-                        ScriptAction.getInvulnerablePlayers().add(uuid);
-                    }
-                }
-            });
-        }
-    }
+
 
     void applyTag(LivingEntity livingEntity, String tag, boolean add) {
         EliteEntity targetElite = EntityTracker.getEliteMobEntity(livingEntity);

@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.maces;
 
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.powers.scripts.TimedScriptStateManager;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
@@ -120,12 +121,7 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
         player.setHealth(Math.min(player.getMaxHealth(), 4.0)); // 2 hearts
 
         // Make temporarily invulnerable
-        player.setInvulnerable(true);
-        player.getServer().getScheduler().runTaskLater(
-            com.magmaguy.elitemobs.MetadataHandler.PLUGIN,
-            () -> player.setInvulnerable(false),
-            INVULN_DURATION_TICKS
-        );
+        TimedScriptStateManager.applyInvulnerability(this, player, true, INVULN_DURATION_TICKS);
 
         // Visual and sound effects - divine/holy theme
         player.getWorld().spawnParticle(Particle.END_ROD,
@@ -152,6 +148,7 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void removeBonus(Player player) {
+        TimedScriptStateManager.releaseProperty(this, player.getUniqueId(), "invulnerable");
         activePlayers.remove(player.getUniqueId());
         cooldowns.remove(player.getUniqueId());
     }
@@ -202,6 +199,7 @@ public class DivineShieldSkill extends SkillBonus implements CooldownSkill {
 
     @Override
     public void shutdown() {
+        TimedScriptStateManager.releaseOwner(this);
         activePlayers.clear();
         cooldowns.clear();
     }

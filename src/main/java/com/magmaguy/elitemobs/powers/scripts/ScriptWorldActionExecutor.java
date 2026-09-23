@@ -80,9 +80,12 @@ final class ScriptWorldActionExecutor {
         boolean aiEnabled = action.getBlueprint().getBValue();
         int duration = action.getBlueprint().getDuration().getValue();
 
-        action.getTargets(scriptActionData).forEach(target -> TimedScriptStateManager.apply(
-                target.getUniqueId(), "mob_ai", aiEnabled, duration,
-                target::hasAI, target::setAI));
+        action.getTargets(scriptActionData).forEach(target -> {
+            var elite = com.magmaguy.elitemobs.entitytracker.EntityTracker.getEliteMobEntity(target);
+            TimedScriptStateManager.apply(target.getUniqueId(), "mob_ai", aiEnabled, duration,
+                    () -> elite == null ? target.hasAI() : elite.isAIEnabled(),
+                    value -> { if (elite == null) target.setAI(value); else elite.setAIEnabled(value); });
+        });
     }
 
     /**
@@ -96,9 +99,10 @@ final class ScriptWorldActionExecutor {
 
         action.getTargets(scriptActionData).forEach(target -> {
             if (target instanceof Mob mob) {
-                TimedScriptStateManager.apply(
-                        mob.getUniqueId(), "mob_aware", aware, duration,
-                        mob::isAware, mob::setAware);
+                var elite = com.magmaguy.elitemobs.entitytracker.EntityTracker.getEliteMobEntity(mob);
+                TimedScriptStateManager.apply(mob.getUniqueId(), "mob_aware", aware, duration,
+                        () -> elite == null ? mob.isAware() : elite.isAware(),
+                        value -> { if (elite == null) mob.setAware(value); else elite.setAware(value); });
             } else {
                 Logger.warn("SET_MOB_AWARE action must target mobs! Problematic script: '" + action.getBlueprint().getScriptName() + "' in file '" + action.getBlueprint().getScriptFilename() + "'");
             }
@@ -247,26 +251,8 @@ final class ScriptWorldActionExecutor {
         boolean invulnerable = action.getBlueprint().isInvulnerable();
         int duration = action.getBlueprint().getDuration().getValue();
 
-        action.getTargets(scriptActionData).forEach(target -> {
-            if (target instanceof Player player) {
-                UUID playerId = player.getUniqueId();
-                TimedScriptStateManager.apply(
-                        playerId, "invulnerable", new PlayerInvulnerability(
-                                invulnerable, invulnerable), duration,
-                        () -> new PlayerInvulnerability(
-                                player.isInvulnerable(),
-                                ScriptAction.getInvulnerablePlayers().contains(playerId)),
-                        state -> {
-                            player.setInvulnerable(state.invulnerable());
-                            if (state.scriptOwned()) ScriptAction.getInvulnerablePlayers().add(playerId);
-                            else ScriptAction.getInvulnerablePlayers().remove(playerId);
-                        });
-            } else {
-                TimedScriptStateManager.apply(
-                        target.getUniqueId(), "invulnerable", invulnerable, duration,
-                        target::isInvulnerable, target::setInvulnerable);
-            }
-        });
+        action.getTargets(scriptActionData).forEach(target ->
+                TimedScriptStateManager.applyInvulnerability(action, target, invulnerable, duration));
     }
 
     /**
@@ -411,7 +397,5 @@ final class ScriptWorldActionExecutor {
         else inventory.removeTags(List.of(tag));
     }
 
-    private record PlayerInvulnerability(boolean invulnerable, boolean scriptOwned) {
-    }
 
 }
