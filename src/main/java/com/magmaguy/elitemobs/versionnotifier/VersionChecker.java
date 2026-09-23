@@ -48,6 +48,7 @@ public class VersionChecker {
             tokenChangeListener;
     private static BukkitTask scheduledCheckTask;
     private static volatile long lifecycleGeneration;
+    private static volatile long contentRefreshSequence;
     private record DlcCatalog(Map<String, Integer> versions, Set<String> slugs, Set<String> unpublishedSlugs) {}
 
     private static volatile DlcCatalog dlcCatalog = new DlcCatalog(Map.of(), Set.of(), Set.of());
@@ -73,6 +74,16 @@ public class VersionChecker {
         } catch (org.bukkit.plugin.IllegalPluginAccessException disabled) {
             if (isCurrent(generation)) throw disabled;
         }
+    }
+
+    private static boolean isCurrentContent(long generation, long refresh) {
+        return isCurrent(generation) && refresh == contentRefreshSequence;
+    }
+
+    private static void publishContent(long generation, long refresh, Runnable publication) {
+        publish(generation, () -> {
+            if (isCurrentContent(generation, refresh)) publication.run();
+        });
     }
 
     /**
@@ -227,22 +238,23 @@ public class VersionChecker {
     private static void checkContentVersion(Runnable onComplete) {
         long generation = lifecycleGeneration;
         publish(generation, () -> {
+            long refresh = ++contentRefreshSequence;
             List<EMPackage> packageSnapshot = new ArrayList<>(EMPackage.getEmPackages().values());
             Bukkit.getScheduler().runTaskAsynchronously(MetadataHandler.PLUGIN, () -> {
                 try {
-                    if (!isCurrent(generation)) return;
+                    if (!isCurrentContent(generation, refresh)) return;
                     DlcCatalog parsedCatalog = parseNightbreakDlcResponse(fetchFromNightbreak("https://nightbreak.io/api/dlc"));
-                    publish(generation, () -> {
+                    publishContent(generation, refresh, () -> {
                         dlcCatalog = parsedCatalog;
                         connectionFailed = false;
                         connectionRetryCount = 0;
                         Logger.info("Parsed " + parsedCatalog.versions().size() + " content versions from Nightbreak API");
                         processContentVersionData(parsedCatalog.versions(), true);
                     });
-                    if (!isCurrent(generation)) return;
-                    prefetchAccessInfoInternal(packageSnapshot, parsedCatalog, generation);
+                    if (!isCurrentContent(generation, refresh)) return;
+                    prefetchAccessInfoInternal(packageSnapshot, parsedCatalog, generation, refresh);
                 } catch (IOException failure) {
-                    publish(generation, () -> {
+                    publishContent(generation, refresh, () -> {
                         lastRefreshTimestamp = 0;
                         handleConnectionError("content version check", failure);
                         if (connectionRetryCount >= MAX_RETRY_ATTEMPTS ||
@@ -250,7 +262,7 @@ public class VersionChecker {
                             Logger.info("Using local data for content version checks as remote server is unavailable.");
                     });
                 } finally {
-                    if (onComplete != null) publish(generation, onComplete);
+                    if (onComplete != null) publishContent(generation, refresh, onComplete);
                 }
             });
         });
@@ -349,10 +361,10 @@ public class VersionChecker {
 
                 // Schedule a retry after delay
                 long generation = lifecycleGeneration;
+                long refresh = contentRefreshSequence;
                 Bukkit.getScheduler().runTaskLaterAsynchronously(MetadataHandler.PLUGIN,
-                        () -> {
-                            if (isCurrent(generation)) checkContentVersion();
-                        }, 20L * RETRY_DELAY_SECONDS);
+                        () -> publishContent(generation, refresh, VersionChecker::checkContentVersion),
+                        20L * RETRY_DELAY_SECONDS);
             } else {
                 Logger.warn("Failed to connect for " + checkType + " after " + MAX_RETRY_ATTEMPTS +
                         " attempts. Will continue without version checking. Error: " + e.getMessage());
@@ -447,6 +459,7 @@ public class VersionChecker {
         }
         tokenChangeListener = NightbreakAccount.registerTokenChangeListener(
                 () -> publish(generation, () -> {
+                    contentRefreshSequence++;
                     invalidateRefreshCooldown();
                     if (NightbreakAccount.hasToken()) {
                         Logger.info("Account token changed; refreshing content access info.");
@@ -562,8 +575,11 @@ public class VersionChecker {
      * Prefetches access info for all content packages with Nightbreak slugs.
      * Called internally after version checks complete.
      */
-    private static void prefetchAccessInfoInternal(List<EMPackage> packageSnapshot, DlcCatalog catalog, long generation) {
-        if (!isCurrent(generation) || !NightbreakAccount.hasToken()) return;
+    private static void prefetchAccessInfoInternal(List<EMPackage> packageSnapshot, DlcCatalog catalog,
+                                                 long generation, long refresh) {
+        if (!isCurrentContent(generation, refresh) || !NightbreakAccount.hasToken()) return;
+        NightbreakAccount account = NightbreakAccount.getInstance();
+        if (account == null) return;
 
         // Deduplicate by slug — many packages share the same slug, no need to hit the API repeatedly
         Map<String, NightbreakAccount.AccessInfo> slugCache = new HashMap<>();
@@ -571,7 +587,7 @@ public class VersionChecker {
         List<String> failedSlugs = new ArrayList<>();
         boolean authFailed = NightbreakAccount.hasAuthFailure();
         if (authFailed) {
-            publish(generation, VersionChecker::logNightbreakTokenRejected);
+            publishContent(generation, refresh, VersionChecker::logNightbreakTokenRejected);
             return;
         }
 
@@ -580,7 +596,7 @@ public class VersionChecker {
             // checkAccess can take up to 10s on its HTTP timeout, and Bukkit
             // nags ("not properly shutting down its async tasks") if this
             // task is still alive when onDisable returns.
-            if (!isCurrent(generation)) return;
+            if (!isCurrentContent(generation, refresh)) return;
 
             String slug = pkg.getContentPackagesConfigFields().getNightbreakSlug();
             if (slug == null || slug.isEmpty()) continue;
@@ -590,8 +606,9 @@ public class VersionChecker {
             if (slugCache.containsKey(slug)) {
                 info = slugCache.get(slug);
             } else {
-                info = NightbreakAccount.getInstance().checkAccess(slug);
-                if (!isCurrent(generation)) return;
+                if (NightbreakAccount.getInstance() != account) return;
+                info = account.checkAccess(slug);
+                if (!isCurrentContent(generation, refresh) || NightbreakAccount.getInstance() != account) return;
                 if (NightbreakAccount.hasAuthFailure()) {
                     authFailed = true;
                     break;
@@ -607,7 +624,8 @@ public class VersionChecker {
             }
         }
         boolean rejectedToken = authFailed;
-        publish(generation, () -> {
+        publishContent(generation, refresh, () -> {
+            if (NightbreakAccount.getInstance() != account) return;
             resolvedAccess.forEach(EMPackage::setCachedAccessInfo);
             if (!resolvedAccess.isEmpty())
                 Logger.info("Prefetched Nightbreak access info for " + resolvedAccess.size() + " content packages");
