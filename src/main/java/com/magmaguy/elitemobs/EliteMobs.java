@@ -425,6 +425,7 @@ public class EliteMobs extends JavaPlugin {
         //Hook up all listeners, some depend on config
         initializationContext.step("Event Listeners");
         EventsRegistrer.registerEvents();
+        com.magmaguy.elitemobs.testing.SkillSystemTest.registerRecoveryListeners();
         EliteLuaPowerServiceModule.initialize();
         EliteMindServiceModule.initialize();
         PatrolService.initialize();

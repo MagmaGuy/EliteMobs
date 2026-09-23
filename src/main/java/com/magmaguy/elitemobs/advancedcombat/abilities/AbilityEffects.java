@@ -245,8 +245,8 @@ final class AbilityEffects {
                     && authorized(caster, enemy, spec, AbilityEffect.SLOW)) {
                 boolean extend = spec.executionTraits().mechanics()
                         .contains(AbilityMechanic.EXTEND_CONTROL_DURATION);
-                // Native stacking keeps a weaker, longer slow behind a short root. Combining
-                // the existing amplifier with this duration would create an unowned long root.
+                // Preserve authored strength whether native stacking hides or rejects this slow.
+                // Borrowing the current amplifier would create an unowned, longer root.
                 int amplifier = slowPlan.potionAmplifier();
                 int ownedRemaining = extend ? crowdControl.ownedSlowRemainingTicks(caster, enemy, amplifier) : 0;
                 int duration = Math.max(20, slowPlan.durationTicks());

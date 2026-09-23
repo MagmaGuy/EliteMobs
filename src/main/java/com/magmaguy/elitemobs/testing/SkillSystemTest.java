@@ -235,6 +235,19 @@ public class SkillSystemTest implements Listener {
         if (!activeSessions.isEmpty()) Logger.warn("Combat diagnostic recovery remains unfinished for " + activeSessions.keySet());
     }
 
+    /** Soft reload unregisters plugin listeners even when a failed restoration retains its owner. */
+    public static void registerRecoveryListeners() {
+        for (SkillSystemTest session : activeSessions.values()) {
+            HandlerList.unregisterAll(session);
+            Bukkit.getPluginManager().registerEvents(session, MetadataHandler.PLUGIN);
+        }
+    }
+
+    @EventHandler(priority = org.bukkit.event.EventPriority.MONITOR)
+    public void onPlayerDataLoaded(com.magmaguy.elitemobs.api.PlayerDataLoadedEvent event) {
+        if (cancelled && event.getPlayer().getUniqueId().equals(playerUUID)) cleanup();
+    }
+
     /**
      * Handles player disconnect during testing - restores state and cleans up.
      */
