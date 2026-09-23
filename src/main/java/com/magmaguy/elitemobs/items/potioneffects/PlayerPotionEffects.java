@@ -28,6 +28,70 @@ import java.util.*;
  * Created by MagmaGuy on 14/03/2017.
  */
 public class PlayerPotionEffects implements Listener {
+    private static PlayerPotionEffects active;
+    private PotionMutation mutation;
+
+    private static final class PotionMutation {
+        private final UUID player;
+        private final PotionEffectType type;
+        private int events;
+        private PotionMutation(Player player, PotionEffectType type) {
+            this.player = player.getUniqueId();
+            this.type = type;
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPotionChanged(org.bukkit.event.entity.EntityPotionEffectEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (event.getAction() == org.bukkit.event.entity.EntityPotionEffectEvent.Action.CHANGED && !event.isOverride()) return;
+        PotionEffectType type = event.getModifiedType();
+        if (mutation != null && mutation.player.equals(player.getUniqueId()) && mutation.type.equals(type)) {
+            if (++mutation.events == 1) return;
+            // A nested provider change during our own call makes ownership ambiguous.
+        }
+        Map<PotionEffectType, AppliedContinuousEffect> effects = appliedContinuousEffects.get(player.getUniqueId());
+        if (effects != null) {
+            AppliedContinuousEffect owned = effects.get(type);
+            if (owned != null) owned.externallyChanged = true;
+        }
+    }
+
+    private boolean removeOwnedEffect(Player player, PotionEffectType type) {
+        PotionMutation previous = mutation;
+        mutation = new PotionMutation(player, type);
+        try {
+            player.removePotionEffect(type);
+            return player.getPotionEffect(type) == null;
+        } finally {
+            mutation = previous;
+        }
+    }
+
+    private AppliedContinuousEffect installEffect(Player player, PotionEffect effect) {
+        PotionMutation previous = mutation;
+        PotionMutation attempt = new PotionMutation(player, effect.getType());
+        mutation = attempt;
+        try {
+            player.addPotionEffect(effect);
+            PotionEffect actual = player.getPotionEffect(effect.getType());
+            // Native addPotionEffect's boolean does not establish acceptance on every server version.
+            return attempt.events == 1 && effect.equals(actual) ? new AppliedContinuousEffect(actual) : null;
+        } finally {
+            mutation = previous;
+        }
+    }
+
+    public static void shutdown() {
+        if (active == null) return;
+        for (UUID playerId : new ArrayList<>(active.appliedContinuousEffects.keySet())) {
+            Player player = Bukkit.getPlayer(playerId);
+            if (player != null) active.removeOwnedContinuousEffects(player);
+        }
+        active.appliedContinuousEffects.clear();
+        active = null;
+    }
+
 
     private static final int STANDARD_REFRESH_THRESHOLD_TICKS = 20;
     private static final int NIGHT_VISION_REFRESH_THRESHOLD_TICKS = 12 * 20;
@@ -35,6 +99,7 @@ public class PlayerPotionEffects implements Listener {
     private final Set<UUID> failedEquipmentQueries = new HashSet<>();
 
     public PlayerPotionEffects() {
+        active = this;
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -74,6 +139,7 @@ public class PlayerPotionEffects implements Listener {
         Map<PotionEffectType, ElitePotionEffect> desiredPotionEffects = new HashMap<>();
 
         for (ElitePotionEffect elitePotionEffect : elitePotionEffects) {
+            if (!elitePotionEffect.isEnabled()) continue;
             PotionEffect potionEffect = elitePotionEffect.getPotionEffect();
             if (potionEffect == null) continue;
 
@@ -125,8 +191,8 @@ public class PlayerPotionEffects implements Listener {
             PotionEffect currentEffect = player.getPotionEffect(potionEffectType);
 
             if (desiredEffect == null) {
-                if (appliedEffect.matchesCurrentLease(currentEffect))
-                    player.removePotionEffect(potionEffectType);
+                if (appliedEffect.matchesCurrentLease(currentEffect) && !removeOwnedEffect(player, potionEffectType))
+                    continue;
                 iterator.remove();
                 continue;
             }
@@ -140,7 +206,7 @@ public class PlayerPotionEffects implements Listener {
             // The strongest equipped source changed. Remove only the lease EliteMobs owns, then
             // let the desired-effect pass below install the replacement.
             if (!appliedEffect.hasSameDefinition(desiredEffect.getPotionEffect())) {
-                player.removePotionEffect(potionEffectType);
+                if (!removeOwnedEffect(player, potionEffectType)) continue;
                 iterator.remove();
             }
         }
@@ -154,7 +220,7 @@ public class PlayerPotionEffects implements Listener {
             if (appliedEffect != null && appliedEffect.matchesCurrentLease(currentEffect)) {
                 if (currentEffect.getDuration() > refreshThreshold(potionEffectType, desiredEffect))
                     continue;
-                player.removePotionEffect(potionEffectType);
+                if (!removeOwnedEffect(player, potionEffectType)) continue;
                 currentEffect = null;
                 appliedEffects.remove(potionEffectType);
             }
@@ -163,8 +229,8 @@ public class PlayerPotionEffects implements Listener {
             // effect source, so only an effect previously leased by this instance is replaceable.
             if (currentEffect != null) continue;
 
-            if (player.addPotionEffect(desiredEffect))
-                appliedEffects.put(potionEffectType, new AppliedContinuousEffect(desiredEffect));
+            AppliedContinuousEffect installed = installEffect(player, desiredEffect);
+            if (installed != null) appliedEffects.put(potionEffectType, installed);
         }
 
         if (appliedEffects.isEmpty())
@@ -198,10 +264,18 @@ public class PlayerPotionEffects implements Listener {
 
         for (Map.Entry<PotionEffectType, AppliedContinuousEffect> entry : appliedEffects.entrySet())
             if (entry.getValue().matchesCurrentLease(player.getPotionEffect(entry.getKey())))
-                player.removePotionEffect(entry.getKey());
+                if (!removeOwnedEffect(player, entry.getKey()))
+                    MetadataHandler.PLUGIN.getLogger().warning("Equipment effect removal was refused for "
+                            + player.getUniqueId() + ": " + entry.getKey().getKey());
     }
 
-    private record AppliedContinuousEffect(PotionEffect appliedEffect) {
+    private static final class AppliedContinuousEffect {
+        private final PotionEffect appliedEffect;
+        private boolean externallyChanged;
+
+        private AppliedContinuousEffect(PotionEffect appliedEffect) {
+            this.appliedEffect = appliedEffect;
+        }
 
         private boolean hasSameDefinition(PotionEffect potionEffect) {
             return potionEffect != null &&
@@ -214,7 +288,7 @@ public class PlayerPotionEffects implements Listener {
         }
 
         private boolean matchesCurrentLease(PotionEffect potionEffect) {
-            return potionEffect != null &&
+            return !externallyChanged && potionEffect != null &&
                     appliedEffect.getType().equals(potionEffect.getType()) &&
                     appliedEffect.getAmplifier() == potionEffect.getAmplifier() &&
                     potionEffect.getDuration() > 0 &&
@@ -248,6 +322,7 @@ public class PlayerPotionEffects implements Listener {
     }
 
     private void doOnHitPotionEffect(ElitePotionEffect elitePotionEffect, Player player, LivingEntity damagee) {
+        if (!elitePotionEffect.isEnabled()) return;
         //This one doesn't work
         if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.ABSORPTION)) return;
         if (elitePotionEffect.getPotionEffect().getType().equals(PotionEffectType.HEALTH_BOOST)) return;

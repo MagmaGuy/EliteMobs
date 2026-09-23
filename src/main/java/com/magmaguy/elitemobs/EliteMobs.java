@@ -692,6 +692,7 @@ public class EliteMobs extends JavaPlugin {
         EMPackage.shutdown();
         RegionalBossEntity.regionalBossesShutdown();
         if (this.placeholders != null) ((Placeholders) placeholders).unregister();
+        com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects.shutdown();
         HandlerList.unregisterAll(MetadataHandler.PLUGIN);
         TreasureChest.shutdown();
         WorldOperationQueue.shutdown();

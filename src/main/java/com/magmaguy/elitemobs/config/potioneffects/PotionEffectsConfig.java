@@ -12,6 +12,10 @@ import java.util.Locale;
 
 public class PotionEffectsConfig {
 
+    private static long revision;
+
+    public static long revision() { return revision; }
+
     private static final HashMap<String, PotionEffectsConfigFields> potionEffects = new HashMap();
     private static final List<PotionEffectsConfigFields> potionEffectsConfigFields = new ArrayList<>(new ArrayList<>(List.of(
             new AbsorptionConfig(),
@@ -59,12 +63,14 @@ public class PotionEffectsConfig {
 
     public static PotionEffectsConfigFields getPotionEffect(String fileName) {
         fileName = fileName.toLowerCase(Locale.ROOT);
-        if (!fileName.contains(".yml"))
+        if (!fileName.endsWith(".yml"))
             fileName += ".yml";
         return potionEffects.get(fileName);
     }
 
     public static void initializeConfigs() {
+        ++revision;
+        potionEffects.clear();
         for (PotionEffectsConfigFields powersConfigFields : potionEffectsConfigFields)
             initializeConfiguration(powersConfigFields);
     }

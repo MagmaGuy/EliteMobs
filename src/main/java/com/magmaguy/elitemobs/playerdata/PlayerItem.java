@@ -285,7 +285,7 @@ public class PlayerItem {
 
     private record ItemRuntimeContext(GearRestrictionHandler.RestrictionContext restrictionContext,
                                       boolean soulbindEnabled,
-                                      int dungeonLevelSync, long enchantmentRevision) {
+                                      int dungeonLevelSync, long enchantmentRevision, long potionRevision) {
 
         private static ItemRuntimeContext capture(Player player, ItemStack itemStack) {
             int dungeonLevelSync = PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeonInstance
@@ -294,7 +294,8 @@ public class PlayerItem {
             return new ItemRuntimeContext(
                     GearRestrictionHandler.getRestrictionContext(player, itemStack),
                     EnchantmentsConfig.getEnchantment(SoulbindEnchantment.key + ".yml").isEnabled(),
-                    dungeonLevelSync, com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.revision());
+                    dungeonLevelSync, com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.revision(),
+                    com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig.revision());
         }
     }
 

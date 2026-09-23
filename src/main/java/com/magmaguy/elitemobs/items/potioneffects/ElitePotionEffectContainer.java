@@ -18,13 +18,17 @@ public class ElitePotionEffectContainer {
      */
     public ElitePotionEffectContainer(ItemMeta itemMeta, List<String> potionEffects) {
 
+        itemMeta.getPersistentDataContainer().remove(ItemTagger.onHitPotionEffectKey);
+        itemMeta.getPersistentDataContainer().remove(ItemTagger.continuousPotionEffectKey);
         if (potionEffects.isEmpty()) return;
 
         StringBuilder onHit = new StringBuilder();
         StringBuilder continuous = new StringBuilder();
 
         for (String substring : potionEffects) {
-            ElitePotionEffect elitePotionEffect = new ElitePotionEffect(substring);
+            ElitePotionEffect elitePotionEffect = parse(substring);
+            if (elitePotionEffect == null) continue;
+            // Preserve authored tags while disabled so a later configuration change can re-enable them.
             switch (elitePotionEffect.getApplicationMethod()) {
                 case ONHIT:
                     onHit.append(substring).append(":");
@@ -48,11 +52,22 @@ public class ElitePotionEffectContainer {
         if (!itemMeta.getPersistentDataContainer().has(namespacedKey, PersistentDataType.STRING))
             return new ArrayList<>();
         ArrayList<ElitePotionEffect> elitePotionEffects = new ArrayList<>();
-        for (String string : itemMeta.getPersistentDataContainer().get(namespacedKey, PersistentDataType.STRING).split(":"))
-            if (string.length() > 0)
-                elitePotionEffects.add(new ElitePotionEffect(string));
+        for (String string : itemMeta.getPersistentDataContainer().get(namespacedKey, PersistentDataType.STRING).split(":")) {
+            if (string.isEmpty()) continue;
+            ElitePotionEffect effect = parse(string);
+            if (effect != null && effect.isEnabled()) elitePotionEffects.add(effect);
+        }
 
         return elitePotionEffects;
+    }
+
+    private static ElitePotionEffect parse(String definition) {
+        try {
+            return new ElitePotionEffect(definition);
+        } catch (IllegalArgumentException | ArithmeticException failure) {
+            com.magmaguy.magmacore.util.Logger.warn("Invalid equipment potion entry '" + definition + "': " + failure.getMessage());
+            return null;
+        }
     }
 
 }

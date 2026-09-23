@@ -2,7 +2,6 @@ package com.magmaguy.elitemobs.items.potioneffects;
 
 import com.magmaguy.elitemobs.config.LegacyValueConverter;
 import com.magmaguy.elitemobs.config.potioneffects.PotionEffectsConfig;
-import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.potion.PotionEffect;
@@ -12,48 +11,40 @@ import java.util.Locale;
 
 public class ElitePotionEffect {
 
-    private PotionEffect potionEffect;
-    private Target target;
-    private ApplicationMethod applicationMethod;
-    private double value;
+    private final PotionEffect potionEffect;
+    private final Target target;
+    private final ApplicationMethod applicationMethod;
+    private final double value;
 
-    public ElitePotionEffect(String string) {
-        try {
-            String[] stringObject = string.split(",");
-            int duration = 2 * 20;
-            PotionEffectType potionEffectType = Registry.EFFECT.get(new NamespacedKey("minecraft", LegacyValueConverter.parsePotionEffect(stringObject[0]).toLowerCase(Locale.ROOT)));
-            if (potionEffectType == null) {
-                Logger.warn("Failed to get valid potion effect for " + stringObject[0].toLowerCase(Locale.ROOT));
-                return;
-            }
-            if (potionEffectType.equals(PotionEffectType.NIGHT_VISION))
-                duration = 15 * 20;
-            this.potionEffect = new PotionEffect(potionEffectType, duration, Integer.parseInt(stringObject[1]));
-            this.value = PotionEffectsConfig.getPotionEffect(potionEffectType.getKey().getKey()).getValue();
-            if (stringObject.length < 3) {
-                this.target = Target.SELF;
-                this.applicationMethod = ApplicationMethod.CONTINUOUS;
-                return;
-            }
+    public ElitePotionEffect(String definition) {
+        if (definition == null) throw new IllegalArgumentException("Missing potion definition");
+        String[] fields = definition.split(",", -1);
+        if (fields.length < 2 || fields.length > 4)
+            throw new IllegalArgumentException("Expected effect,amplifier[,target[,applicationMethod]]: " + definition);
+        String nativeName = LegacyValueConverter.parsePotionEffect(fields[0].trim()).toLowerCase(Locale.ROOT);
+        PotionEffectType type = Registry.EFFECT.get(new NamespacedKey("minecraft", nativeName));
+        if (type == null) throw new IllegalArgumentException("Unknown native potion effect: " + nativeName);
+        var config = PotionEffectsConfig.getPotionEffect(type.getKey().getKey());
+        if (config == null)
+            throw new IllegalArgumentException("Native effect " + nativeName + " has no EliteMobs equipment-effect configuration");
+        int amplifier = Integer.parseInt(fields[1].trim());
+        if (amplifier < 0 || amplifier > 255) throw new IllegalArgumentException("Potion amplifier must be 0..255");
+        Target target = fields.length >= 3 ? Target.valueOf(fields[2].trim().toUpperCase(Locale.ROOT)) : Target.SELF;
+        ApplicationMethod method = fields.length >= 4
+                ? ApplicationMethod.valueOf(fields[3].trim().toUpperCase(Locale.ROOT)) : ApplicationMethod.CONTINUOUS;
+        int duration = type.equals(PotionEffectType.NIGHT_VISION) ? 15 * 20 : 2 * 20;
+        if (method == ApplicationMethod.ONHIT) duration = Math.multiplyExact(config.getOnHitDuration(), 20);
+        if (duration <= 0 || !Double.isFinite(config.getValue()) || config.getValue() < 0)
+            throw new IllegalArgumentException("Invalid potion duration or value for " + nativeName);
+        this.potionEffect = new PotionEffect(type, duration, amplifier);
+        this.target = target;
+        this.applicationMethod = method;
+        this.value = config.getValue();
+    }
 
-            this.target = Target.valueOf(stringObject[2].toUpperCase(Locale.ROOT));
-
-            if (stringObject.length < 4) {
-                applicationMethod = ApplicationMethod.CONTINUOUS;
-                return;
-            }
-
-            this.applicationMethod = ApplicationMethod.valueOf(stringObject[3].toUpperCase(Locale.ROOT));
-
-            if (this.applicationMethod.equals(ApplicationMethod.ONHIT))
-                this.potionEffect = new PotionEffect(potionEffectType,
-                        PotionEffectsConfig.getPotionEffect(potionEffect.getType().getKey().getKey()).getOnHitDuration() * 20,
-                        Integer.parseInt(stringObject[1]));
-
-        } catch (Exception ex) {
-            Logger.warn("Detected invalid potion effect entry: " + string);
-            ex.printStackTrace();
-        }
+    public boolean isEnabled() {
+        var config = PotionEffectsConfig.getPotionEffect(potionEffect.getType().getKey().getKey());
+        return config != null && config.isEnabled();
     }
 
     public PotionEffect getPotionEffect() {
