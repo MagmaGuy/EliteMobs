@@ -120,14 +120,15 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                 () -> trackableCustomBosses.add(this),
                 () -> trackableCustomBosses.remove(this),
                 () -> new BossTrackingBar(this));
+        // Reject unusable phase definitions before binding powers or scheduling regional work.
+        this.customBossesConfigFields = Objects.requireNonNull(customBossesConfigFields);
+        if (customBossesConfigFields.getPhases() != null)
+            this.phaseBossEntity = new PhaseBossEntity(this);
         //This stores everything that will need to be initialized for the EliteMobEntity
         setCustomBossesConfigFields(customBossesConfigFields);
         if (customBossesConfigFields.getSong() != null)
             bossMusic = new CustomMusic(customBossesConfigFields.getSong(), this);
         super.setPersistent(customBossesConfigFields.isPersistent());
-        //Phases are final
-        if (customBossesConfigFields.getPhases() != null)
-            this.phaseBossEntity = new PhaseBossEntity(this);
         if (this instanceof RegionalBossEntity)
             super.bypassesProtections = true;
         this.emPackage = EMPackage.getContent(customBossesConfigFields.getFilename());
@@ -340,6 +341,8 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
             return;
         }
 
+        onBodyMaterialized();
+
         //It isn't worth initializing things that will notify players or spawn additional entities until we are certain that the boss has actually spawned
         if (livingEntity != null) {
             if (bossMusic != null)
@@ -366,6 +369,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                     }));
 
         CommandRunner.runCommandFromList(customBossesConfigFields.getOnSpawnCommands(), new ArrayList<>());
+    }
+
+    protected void onBodyMaterialized() {
+        if (phaseBossEntity != null) phaseBossEntity.onBodyMaterialized();
     }
 
     private Location resolveSpawnLocation() {

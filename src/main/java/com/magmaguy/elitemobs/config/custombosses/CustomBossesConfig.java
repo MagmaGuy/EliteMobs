@@ -43,8 +43,14 @@ public class CustomBossesConfig extends CustomConfig {
                 if (!customBossesConfigFields.isReinforcement()) {
                     //Initialize the regional bosses in the world
                     List<String> locations = customBossesConfigFields.processStringList("spawnLocations", customBossesConfigFields.getSpawnLocations(), customBossesConfigFields.getSpawnLocations(), false);
-                    for (String string : locations)
-                        new RegionalBossEntity(customBossesConfigFields, string).initialize();
+                    for (String string : locations) {
+                        try {
+                            new RegionalBossEntity(customBossesConfigFields, string).initialize();
+                        } catch (IllegalArgumentException failure) {
+                            com.magmaguy.magmacore.util.Logger.warn("Rejected regional boss "
+                                    + customBossesConfigFields.getFilename() + " at " + string + ": " + failure.getMessage());
+                        }
+                    }
                 }
             }
         }

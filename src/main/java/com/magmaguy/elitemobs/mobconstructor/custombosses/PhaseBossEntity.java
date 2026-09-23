@@ -22,29 +22,34 @@ public class PhaseBossEntity {
 
     private final CustomBossEntity customBossEntity;
     @Getter
-    private List<BossPhase> bossPhases = new ArrayList();
+    private final List<BossPhase> bossPhases;
     private BossPhase currentPhase = null;
     private Location originalSpawnLocation;
+    private Double pendingHealthFraction;
+    private final java.util.Set<BossPhase> reportedInvalidLocations = new java.util.HashSet<>();
 
     public PhaseBossEntity(CustomBossEntity customBossEntity) {
         this.customBossEntity = customBossEntity;
-        try {
-            ArrayList<BossPhase> unsortedBossPhases = new ArrayList<>();
-            unsortedBossPhases.add(new BossPhase(customBossEntity.getCustomBossesConfigFields(), 1));
-            for (String phaseConfigFile : customBossEntity.getCustomBossesConfigFields().getPhases()) {
-                CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(phaseConfigFile.split(":")[0]);
-                if (customBossesConfigFields == null) {
-                    Logger.warn("Phase boss " + customBossEntity.getCustomBossesConfigFields() + " has an invalid config entry for phase " + phaseConfigFile.split(":")[0] + " - this file could not be found. The boss will not be able to do this phase until it is fixed!");
-                }
-                double healthPercentage = Double.parseDouble(phaseConfigFile.split(":")[1]);
-                unsortedBossPhases.add(new BossPhase(customBossesConfigFields, healthPercentage));
+        ArrayList<BossPhase> parsed = new ArrayList<>();
+        parsed.add(new BossPhase(customBossEntity.getCustomBossesConfigFields(), 1));
+        for (String entry : customBossEntity.getCustomBossesConfigFields().getPhases()) {
+            try {
+                String[] parts = entry.split(":", -1);
+                if (parts.length != 2) throw new IllegalArgumentException("Expected filename:healthFraction");
+                CustomBossesConfigFields fields = CustomBossesConfig.getCustomBoss(parts[0].trim());
+                if (fields == null) throw new IllegalArgumentException("Missing phase boss " + parts[0]);
+                double fraction = Double.parseDouble(parts[1].trim());
+                if (!Double.isFinite(fraction) || fraction < 0 || fraction >= 1)
+                    throw new IllegalArgumentException("Phase health fraction must be between 0 inclusive and 1 exclusive");
+                parsed.add(new BossPhase(fields, fraction));
+            } catch (RuntimeException failure) {
+                throw new IllegalArgumentException("Invalid phase '" + entry + "' in "
+                        + customBossEntity.getCustomBossesConfigFields().getFilename() + ": " + failure.getMessage(), failure);
             }
-            unsortedBossPhases.sort((o1, o2) -> Double.compare(o2.healthPercentage, o1.healthPercentage));
-            this.bossPhases = unsortedBossPhases;
-            currentPhase = bossPhases.get(0);
-        } catch (Exception ex) {
-            Logger.warn("Your phase boss " + customBossEntity.customBossesConfigFields.getFilename() + " does not have a valid phases setup. Its phases will not work.");
         }
+        parsed.sort((first, second) -> Double.compare(second.healthPercentage, first.healthPercentage));
+        bossPhases = List.copyOf(parsed);
+        currentPhase = bossPhases.get(0);
     }
 
     public boolean isInFirstPhase() {
@@ -52,45 +57,46 @@ public class PhaseBossEntity {
     }
 
     private void switchPhase(BossPhase bossPhase, RemovalReason removalReason, double healthPercentage) {
-        if (isInFirstPhase()) originalSpawnLocation = customBossEntity.getSpawnLocation().clone();
         if (bossPhase.equals(currentPhase)) {
             Logger.warn("Attempted to change the boss phase to what it already was.", true);
             return;
         }
-        if (bossPhase.customBossesConfigFields == null) {
-            Logger.warn("A phase for phase boss " + bossPhases.get(0).customBossesConfigFields.getFilename() + " was not valid! The boss will not be able to switch phases until it is fixed.");
+        Location origin = customBossEntity.getLocation();
+        Location destination;
+        boolean reset = removalReason == RemovalReason.PHASE_BOSS_RESET;
+        String authored = bossPhase.customBossesConfigFields.getPhaseSpawnLocation();
+        if (reset) destination = originalSpawnLocation == null ? customBossEntity.getSpawnLocation() : originalSpawnLocation;
+        else if (authored == null) destination = origin;
+        else {
+            destination = ConfigurationLocation.serialize(authored, true);
+            if (destination != null && origin != null && authored.split(",", 2)[0].equalsIgnoreCase("same_as_boss"))
+                destination.setWorld(origin.getWorld());
+        }
+        try {
+            if (destination == null || destination.getWorld() == null)
+                throw new IllegalArgumentException("Phase destination has no loaded world");
+            destination.checkFinite();
+            destination = destination.clone();
+        } catch (IllegalArgumentException failure) {
+            if (reportedInvalidLocations.add(bossPhase))
+                Logger.warn("Refused phase transition from " + currentPhase.customBossesConfigFields.getFilename()
+                        + " to " + bossPhase.customBossesConfigFields.getFilename() + ": " + failure.getMessage()
+                        + ". The current phase was retained; correct phaseSpawnLocation.");
             return;
         }
+        if (isInFirstPhase()) originalSpawnLocation = customBossEntity.getSpawnLocation().clone();
         if (removalReason == RemovalReason.PHASE_BOSS_PHASE_END
                 && customBossEntity instanceof RegionalBossEntity regional)
             com.magmaguy.elitemobs.mobconstructor.custombosses.transitiveblocks.TransitiveBossBlock.clearPhaseBlocks(regional);
         customBossEntity.remove(removalReason);
         if (customBossEntity.getCustomModel() != null) customBossEntity.getCustomModel().switchPhase();
         customBossEntity.setCustomBossesConfigFields(bossPhase.customBossesConfigFields);
-        if (removalReason.equals(RemovalReason.PHASE_BOSS_RESET)) {
+        if (reset) {
             if (bossPhase.customBossesConfigFields.getSong() != null)
                 customBossEntity.setBossMusic(new CustomMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
-            //Necessary to reset phase bosses which move their spawn point via teleportation
-            customBossEntity.setSpawnLocation(originalSpawnLocation);
-            customBossEntity.setRespawnOverrideLocation(originalSpawnLocation);
-            customBossEntity.spawn(true);
+            customBossEntity.setSpawnLocation(destination.clone());
         } else {
-            if (bossPhase.customBossesConfigFields.getPhaseSpawnLocation() != null) {
-                Location location = ConfigurationLocation.serialize(bossPhase.customBossesConfigFields.getPhaseSpawnLocation(), true);
-                if (bossPhase.customBossesConfigFields.getPhaseSpawnLocation() != null &&
-                        bossPhase.customBossesConfigFields.getPhaseSpawnLocation().split(",")[0].equalsIgnoreCase("same_as_boss"))
-                    location.setWorld(customBossEntity.getLocation().getWorld());
-                if (location != null) {
-                    customBossEntity.setSpawnLocation(location);
-                    customBossEntity.setRespawnOverrideLocation(location);
-                    customBossEntity.setPersistentLocation(location);
-                } else {
-                    customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
-                    customBossEntity.setPersistentLocation(customBossEntity.getLocation());
-                }
-            } else {
-                customBossEntity.setRespawnOverrideLocation(customBossEntity.getLocation());
-            }
+            if (authored != null) customBossEntity.setSpawnLocation(destination.clone());
             //Handle music, soundtrack shouldn't change if the new one is the same
             if (bossPhase.customBossesConfigFields.getSong() != null) {
                 if (currentPhase.customBossesConfigFields.getSong() == null) {
@@ -102,14 +108,23 @@ public class PhaseBossEntity {
                     customBossEntity.setBossMusic(new CustomMusic(bossPhase.customBossesConfigFields.getSong(), customBossEntity));
                 }
             }
-            //Spawn policy decides whether the effective location is ready; phase changes never force-load terrain.
-            customBossEntity.spawn(true);
         }
+        customBossEntity.setRespawnOverrideLocation(destination.clone());
+        customBossEntity.setPersistentLocation(destination);
         currentPhase = bossPhase;
-        ElitePhaseSwitchEvent elitePhaseSwitchEvent = new ElitePhaseSwitchEvent(customBossEntity, this);
-        new EventCaller(elitePhaseSwitchEvent);
-        customBossEntity.setHealth(customBossEntity.getMaxHealth() * healthPercentage);
+        pendingHealthFraction = healthPercentage;
+        // Logical transition owns the intent even if materialization waits for a loaded chunk.
+        customBossEntity.spawn(true);
+    }
+
+    void onBodyMaterialized() {
+        if (pendingHealthFraction == null || !customBossEntity.isValid()) return;
+        double fraction = pendingHealthFraction;
+        customBossEntity.setHealth(customBossEntity.getMaxHealth() * fraction);
+        pendingHealthFraction = null;
+        if (!customBossEntity.isValid()) return;
         customBossEntity.setCombatGracePeriod(20);
+        new EventCaller(new ElitePhaseSwitchEvent(customBossEntity, this));
     }
 
     public void resetToFirstPhase() {
@@ -117,6 +132,7 @@ public class PhaseBossEntity {
     }
 
     public void silentReset() {
+        pendingHealthFraction = null;
         currentPhase = bossPhases.get(0);
         customBossEntity.setCustomBossesConfigFields(currentPhase.customBossesConfigFields);
     }
@@ -159,8 +175,8 @@ public class PhaseBossEntity {
     }
 
     public class BossPhase {
-        public CustomBossesConfigFields customBossesConfigFields;
-        public double healthPercentage;
+        public final CustomBossesConfigFields customBossesConfigFields;
+        public final double healthPercentage;
 
         public BossPhase(CustomBossesConfigFields customBossesConfigFields, double healthPercentage) {
             this.customBossesConfigFields = customBossesConfigFields;

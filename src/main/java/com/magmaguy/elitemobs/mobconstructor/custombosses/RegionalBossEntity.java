@@ -53,6 +53,8 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     @Getter
     private boolean removed = false;
     private BukkitTask respawnTask = null;
+    private long respawnGeneration;
+    private boolean freshEncounterPending;
 
     public RegionalBossEntity(CustomBossesConfigFields customBossesConfigFields, String rawString) {
         super(customBossesConfigFields);
@@ -213,21 +215,29 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         queueSpawn(SpawnLifecycle.fromSilentFlag(silent));
     }
 
+    private void cancelQueuedRespawn() {
+        ++respawnGeneration;
+        if (respawnTask != null) respawnTask.cancel();
+        respawnTask = null;
+    }
+
     private void queueSpawn(SpawnLifecycle.Context spawnContext) {
-        RegionalBossEntity regionalBossEntity = this;
+        cancelQueuedRespawn();
+        long generation = respawnGeneration;
         this.isRespawning = true;
         respawnTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (phaseBossEntity != null) phaseBossEntity.silentReset();
+                if (generation != respawnGeneration || removed) return;
+                respawnTask = null;
                 ticksBeforeRespawn = 0;
                 clearPersistedRespawnTime();
-                // A new encounter must not inherit the previous actor's cached death health.
-                // Chunk/world restoration uses spawn directly and retains its saved health.
-                health = null;
-                //Reminder: this might not spawn a living entity as it gets queued for when the chunk loads
-                regionalBossEntity.spawn(spawnContext);
-                regionalBossEntity.clearDamagers();
+                if (livingEntity != null && livingEntity.isValid()) {
+                    isRespawning = false;
+                    return;
+                }
+                freshEncounterPending = true;
+                spawn(spawnContext);
             }
         }.runTaskLater(MetadataHandler.PLUGIN, ticksBeforeRespawn);
     }
@@ -244,12 +254,15 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
     public void forceRespawn() {
         if (respawnTask == null) return;
-        respawnTask.cancel();
+        cancelQueuedRespawn();
         ticksBeforeRespawn = 0;
         clearPersistedRespawnTime();
-        health = null;
+        if (livingEntity != null && livingEntity.isValid()) {
+            isRespawning = false;
+            return;
+        }
+        freshEncounterPending = true;
         spawn(false);
-        clearDamagers();
     }
 
     public void respawn() {
@@ -303,7 +316,19 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
     @Override
     protected void spawn(SpawnLifecycle.Context spawnContext) {
+        // Persistence restoration resumes this encounter and retires its obsolete respawn timer.
+        if (respawnTask != null) {
+            cancelQueuedRespawn();
+            ticksBeforeRespawn = 0;
+            clearPersistedRespawnTime();
+        }
+        if (livingEntity != null && livingEntity.isValid()) return;
+        if (freshEncounterPending) {
+            if (phaseBossEntity != null) phaseBossEntity.silentReset();
+            health = null;
+        }
         super.spawn(spawnContext);
+        if (livingEntity == null || !livingEntity.isValid()) return;
         this.isRespawning = false;
         if (!ItemSettingsConfig.isRegionalBossesDropVanillaLoot())
             super.vanillaLoot = false;
@@ -314,6 +339,15 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
             }
         } else if (livingEntity != null)
             checkLeash();
+    }
+
+    @Override
+    protected void onBodyMaterialized() {
+        if (freshEncounterPending) {
+            clearDamagers();
+            freshEncounterPending = false;
+        }
+        super.onBodyMaterialized();
     }
 
     @Override
@@ -382,10 +416,8 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         // Keep the terminal phase until the deferred removal event has applied its block cleanup.
         EntityTracker.getEliteMobEntities().remove(super.eliteUUID);
         removed = true;
-        if (respawnTask != null) {
-            respawnTask.cancel();
-            respawnTask = null;
-        }
+        cancelQueuedRespawn();
+        freshEncounterPending = false;
         //Temporary regionals were never written to the configuration, so there is nothing to sync.
         if (!isTemporary()) {
             var persistedConfig = phaseBossEntity == null ? getCustomBossesConfigFields() : phaseBossEntity.getPhase1Config();
