@@ -16,6 +16,9 @@ import org.bukkit.configuration.InvalidConfigurationException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class CustomTreasureChestConfigFields extends CustomConfigFields {
 
@@ -35,8 +38,8 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
     private double mimicChance = 0;
     @Getter
     private List<String> mimicCustomBossesList = null;
-    @Getter
     private List<String> restockTimers = null;
+    private final Map<UUID, Long> cooldowns = new HashMap<>();
     @Getter
     private List<String> effects = null;
     @Getter
@@ -111,6 +114,18 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         this.restockTime = processLong("restockTime", restockTime, 0, false);
         this.restockTimers = processStringList("restockTimers", restockTimers, new ArrayList<>(), false);
         if (this.restockTimers == null) this.restockTimers = new ArrayList<>();
+        cooldowns.clear();
+        for (String entry : restockTimers) {
+            try {
+                String[] parts = entry.split(":", -1);
+                if (parts.length != 2) throw new IllegalArgumentException("Expected UUID:expiry");
+                UUID player = UUID.fromString(parts[0]);
+                long expiry = Long.parseLong(parts[1]);
+                cooldowns.merge(player, expiry, Math::max);
+            } catch (IllegalArgumentException failure) {
+                Logger.warn("Invalid restock timer in " + filename + ": " + entry);
+            }
+        }
         this.effects = processStringList("effects", effects, new ArrayList<>(), false);
         this.locationsString = processStringList("locations", locationsString, new ArrayList<>(), false);
         this.locationString = processString("location", locationString, null, false);
@@ -174,6 +189,26 @@ public class CustomTreasureChestConfigFields extends CustomConfigFields {
         } catch (Exception ex) {
             Logger.warn("Attempted to update restock time for a custom treasure chest and failed, did you delete it during runtime?");
         }
+    }
+
+    public synchronized long cooldownExpiry(UUID playerId) {
+        return cooldowns.getOrDefault(playerId, 0L);
+    }
+
+    /** Publish the reservation before loot is delivered. Failed publication changes no live state. */
+    public synchronized void reserveCooldown(UUID playerId, long expiry, long now) {
+        Map<UUID, Long> updated = new HashMap<>(cooldowns);
+        updated.values().removeIf(value -> value <= now);
+        updated.put(playerId, expiry);
+        List<String> serialized = updated.entrySet().stream()
+                .map(entry -> entry.getKey() + ":" + entry.getValue()).toList();
+        YamlConfiguration snapshot = configurationSnapshot();
+        snapshot.set("restockTimers", serialized);
+        ConfigurationEngine.fileSaverSerialized(snapshot.saveToString(), file);
+        cooldowns.clear();
+        cooldowns.putAll(updated);
+        restockTimers = serialized;
+        fileConfiguration = snapshot;
     }
 
     public synchronized boolean removeLocation(Location selected) {

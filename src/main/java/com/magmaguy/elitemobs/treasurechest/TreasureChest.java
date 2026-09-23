@@ -242,43 +242,25 @@ public class TreasureChest implements PersistentObject {
 
     public void doInteraction(Player player) {
 
-        if (customTreasureChestConfigFields.getDropStyle().equals(DropStyle.GROUP))
-            if (playerIsInCooldown(player)) {
-                if (!customTreasureChestConfigFields.isInstanced())
-                    groupTimerCooldownMessage(player, getPlayerCooldown(player));
-                return;
-            } else if (restockTime > Instant.now().getEpochSecond())
-                return;
-
-        // Add player to cooldown BEFORE giving loot to prevent spam clicking exploits
+        long now = Instant.now().getEpochSecond();
         if (customTreasureChestConfigFields.getDropStyle().equals(DropStyle.GROUP)) {
             if (customTreasureChestConfigFields.isInstanced()) {
-                blacklistedPlayersInstance.add(player.getUniqueId());
-            } else if (customTreasureChestConfigFields.getRestockTimers() != null) {
-                customTreasureChestConfigFields.getRestockTimers().add(cooldownStringConstructor(player));
-
-                // Save the updated restockTimers to the config file
-                customTreasureChestConfigFields.getFileConfiguration().set("restockTimers", customTreasureChestConfigFields.getRestockTimers());
-                try {
-                    customTreasureChestConfigFields.getFileConfiguration().save(customTreasureChestConfigFields.getFile());
-                } catch (Exception ex) {
-                    Logger.warn("Failed to save restock timers for treasure chest " + customTreasureChestConfigFields.getFilename());
+                if (!blacklistedPlayersInstance.add(player.getUniqueId())) return;
+            } else {
+                long expiry = customTreasureChestConfigFields.cooldownExpiry(player.getUniqueId());
+                if (expiry > now) {
+                    groupTimerCooldownMessage(player, expiry);
+                    return;
                 }
-
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        customTreasureChestConfigFields.getRestockTimers().removeIf(restockTime -> restockTime.split(":")[0].equals(player.getUniqueId().toString()));
-
-                        // Save the updated restockTimers to the config file after removal
-                        customTreasureChestConfigFields.getFileConfiguration().set("restockTimers", customTreasureChestConfigFields.getRestockTimers());
-                        try {
-                            customTreasureChestConfigFields.getFileConfiguration().save(customTreasureChestConfigFields.getFile());
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to save restock timers for treasure chest " + customTreasureChestConfigFields.getFilename());
-                        }
-                    }
-                }.runTaskLater(MetadataHandler.PLUGIN, 20L * 60 * customTreasureChestConfigFields.getRestockTimer());
+                if (restockTime > now) return;
+                try {
+                    customTreasureChestConfigFields.reserveCooldown(player.getUniqueId(), cooldownTime(), now);
+                } catch (RuntimeException failure) {
+                    Logger.warn("Could not reserve treasure chest " + customTreasureChestConfigFields.getFilename()
+                            + ": " + failure.getMessage());
+                    player.sendMessage("This chest could not save your claim. Please try again later.");
+                    return;
+                }
             }
         }
 
@@ -396,57 +378,6 @@ public class TreasureChest implements PersistentObject {
         player.sendMessage(DefaultConfig.getChestCooldownMessage().replace("$time", timeConverter(targetTime - Instant.now().getEpochSecond())));
     }
 
-    private boolean playerIsInCooldown(Player player) {
-        if (customTreasureChestConfigFields.isInstanced())
-            return blacklistedPlayersInstance.contains(player.getUniqueId());
-        if (customTreasureChestConfigFields.getRestockTimers() == null) return false;
-        long now = Instant.now().getEpochSecond();
-        boolean saveNeeded = false;
-        for (Iterator<String> iterator = customTreasureChestConfigFields.getRestockTimers().iterator(); iterator.hasNext(); ) {
-            String string = iterator.next();
-            String[] split = string.split(":");
-            if (split.length < 2) continue;
-            long targetTime;
-            try {
-                targetTime = Long.parseLong(split[1]);
-            } catch (Exception ex) {
-                iterator.remove();
-                saveNeeded = true;
-                continue;
-            }
-            if (targetTime <= now) {
-                iterator.remove();
-                saveNeeded = true;
-                continue;
-            }
-            if (split[0].equals(player.getUniqueId().toString())) {
-                if (saveNeeded) saveRestockTimers();
-                return true;
-            }
-        }
-        if (saveNeeded) saveRestockTimers();
-        return false;
-    }
-
-    private long getPlayerCooldown(Player player) {
-        if (customTreasureChestConfigFields.getRestockTimers() == null) return Instant.now().getEpochSecond();
-        for (String string : customTreasureChestConfigFields.getRestockTimers()) {
-            String[] split = string.split(":");
-            if (split.length < 2) continue;
-            if (!split[0].equals(player.getUniqueId().toString())) continue;
-            try {
-                return Long.parseLong(split[1]);
-            } catch (Exception ex) {
-                return Instant.now().getEpochSecond();
-            }
-        }
-        return Instant.now().getEpochSecond();
-    }
-
-    private String cooldownStringConstructor(Player player) {
-        return player.getUniqueId() + ":" + cooldownTime();
-    }
-
     private long cooldownTime() {
         return Instant.now().getEpochSecond() + 60L * this.customTreasureChestConfigFields.getRestockTimer();
     }
@@ -461,16 +392,6 @@ public class TreasureChest implements PersistentObject {
             return Round.twoDecimalPlaces(seconds / 60D / 60) + "hours";
         else
             return Round.twoDecimalPlaces(seconds / 60D / 60 / 24) + "days";
-    }
-
-    private void saveRestockTimers() {
-        if (customTreasureChestConfigFields.getRestockTimers() == null) return;
-        customTreasureChestConfigFields.getFileConfiguration().set("restockTimers", customTreasureChestConfigFields.getRestockTimers());
-        try {
-            customTreasureChestConfigFields.getFileConfiguration().save(customTreasureChestConfigFields.getFile());
-        } catch (Exception ex) {
-            Logger.warn("Failed to save restock timers for treasure chest " + customTreasureChestConfigFields.getFilename());
-        }
     }
 
     public boolean removeTreasureChest() {
