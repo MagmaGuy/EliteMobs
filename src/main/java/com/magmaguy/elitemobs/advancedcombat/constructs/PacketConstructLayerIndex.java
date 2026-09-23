@@ -24,13 +24,14 @@ final class PacketConstructLayerIndex<K, V> {
     List<VisibilityChange<K, V>> replace(UUID constructId, Map<K, V> values) {
         Objects.requireNonNull(constructId, "constructId");
         Objects.requireNonNull(values, "values");
+        Layer<K, V> previous = layers.get(constructId);
+        if (previous != null && previous.values().equals(values)) return List.of();
         LinkedHashMap<K, V> replacement = new LinkedHashMap<>();
         values.forEach((key, value) -> replacement.put(
                 Objects.requireNonNull(key, "construct key"),
                 Objects.requireNonNull(value, "construct value")));
         if (replacement.isEmpty()) return remove(constructId);
 
-        Layer<K, V> previous = layers.get(constructId);
         Set<K> affected = new LinkedHashSet<>();
         if (previous != null) affected.addAll(previous.values().keySet());
         affected.addAll(replacement.keySet());

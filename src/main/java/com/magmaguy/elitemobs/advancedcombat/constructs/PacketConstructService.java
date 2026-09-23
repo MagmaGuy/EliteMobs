@@ -104,7 +104,7 @@ public final class PacketConstructService implements Listener, AutoCloseable {
         UUID id = UUID.randomUUID();
         Session session = new Session(
                 id, owner.getUniqueId(), definition, anchor, initial.getWorld().getUID(),
-                expiresAt, onRemoved);
+                expiresAt, onRemoved, new Layout());
         sessions.put(id, session);
         reconcile();
         return Optional.of(new HandleImpl(id));
@@ -140,7 +140,7 @@ public final class PacketConstructService implements Listener, AutoCloseable {
         clearViewer(event.getPlayer(), false);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent event) {
         UUID worldId = event.getWorld().getUID();
         sessions.values().stream()
@@ -156,6 +156,7 @@ public final class PacketConstructService implements Listener, AutoCloseable {
     }
 
     private void reconcile() {
+        if (sessions.isEmpty() && viewers.isEmpty()) return;
         long now = MonotonicTickClock.currentTick();
         Map<UUID, Frame> frames = new LinkedHashMap<>();
         for (Session session : List.copyOf(sessions.values())) {
@@ -168,7 +169,8 @@ public final class PacketConstructService implements Listener, AutoCloseable {
                 remove(session.id());
                 continue;
             }
-            frames.put(session.id(), new Frame(session, anchor, blocks(session.definition(), anchor)));
+            frames.put(session.id(), new Frame(session, anchor,
+                    session.layout().blocks(session.definition(), anchor)));
         }
 
         Set<UUID> online = new LinkedHashSet<>();
@@ -251,21 +253,51 @@ public final class PacketConstructService implements Listener, AutoCloseable {
         }
     }
 
-    private static Map<BlockCoordinate, String> blocks(
-            PacketConstructDefinition definition,
-            Location anchor) {
-        World world = anchor.getWorld();
-        if (world == null) return Map.of();
-        Map<BlockCoordinate, String> blocks = new LinkedHashMap<>();
-        for (PacketConstructDefinition.BlockVisual visual : definition.blocks()) {
-            int x = anchor.getBlockX() + visual.relativeX();
-            int y = anchor.getBlockY() + visual.relativeY();
-            int z = anchor.getBlockZ() + visual.relativeZ();
-            if (!world.isChunkLoaded(x >> 4, z >> 4)) continue;
-            blocks.put(new BlockCoordinate(world.getUID(), x, y, z), visual.serializedBlockData());
+    /** Per-session layout; only movement or changed chunk admission rebuilds the visible map. */
+    private static final class Layout {
+        private World world;
+        private int x, y, z;
+        private Map<ChunkCoordinate, Map<BlockCoordinate, String>> chunks = Map.of();
+        private final Set<ChunkCoordinate> loaded = new LinkedHashSet<>();
+        private Map<BlockCoordinate, String> visible = Map.of();
+
+        private Map<BlockCoordinate, String> blocks(PacketConstructDefinition definition, Location anchor) {
+            World currentWorld = anchor.getWorld();
+            if (currentWorld == null) return Map.of();
+            boolean changed = world != currentWorld || x != anchor.getBlockX()
+                    || y != anchor.getBlockY() || z != anchor.getBlockZ();
+            if (changed) {
+                world = currentWorld;
+                x = anchor.getBlockX();
+                y = anchor.getBlockY();
+                z = anchor.getBlockZ();
+                Map<ChunkCoordinate, Map<BlockCoordinate, String>> replacement = new LinkedHashMap<>();
+                for (PacketConstructDefinition.BlockVisual visual : definition.blocks()) {
+                    int blockX = x + visual.relativeX();
+                    int blockY = y + visual.relativeY();
+                    int blockZ = z + visual.relativeZ();
+                    replacement.computeIfAbsent(new ChunkCoordinate(blockX >> 4, blockZ >> 4),
+                                    ignored -> new LinkedHashMap<>())
+                            .put(new BlockCoordinate(world.getUID(), blockX, blockY, blockZ),
+                                    visual.serializedBlockData());
+                }
+                chunks = replacement;
+                loaded.clear();
+            }
+            for (ChunkCoordinate chunk : chunks.keySet()) {
+                changed |= world.isChunkLoaded(chunk.x(), chunk.z())
+                        ? loaded.add(chunk) : loaded.remove(chunk);
+            }
+            if (changed) {
+                Map<BlockCoordinate, String> replacement = new LinkedHashMap<>();
+                for (ChunkCoordinate chunk : loaded) replacement.putAll(chunks.get(chunk));
+                visible = Map.copyOf(replacement);
+            }
+            return visible;
         }
-        return Map.copyOf(blocks);
     }
+
+    private record ChunkCoordinate(int x, int z) { }
 
     private static boolean canSee(Player player, Frame frame) {
         if (!player.isOnline() || !player.isValid()
@@ -336,7 +368,8 @@ public final class PacketConstructService implements Listener, AutoCloseable {
             Supplier<Location> anchor,
             UUID worldId,
             long expiresAtTick,
-            Consumer<UUID> onRemoved) {
+            Consumer<UUID> onRemoved,
+            Layout layout) {
     }
 
     private record Frame(
