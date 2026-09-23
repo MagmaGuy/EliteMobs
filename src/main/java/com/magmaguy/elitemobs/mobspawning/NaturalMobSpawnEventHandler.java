@@ -112,6 +112,11 @@ public class NaturalMobSpawnEventHandler implements Listener {
         if (event.getEntity().getCustomName() != null && DefaultConfig.isPreventEliteMobConversionOfNamedMobs())
             return;
 
+        boolean providerEligible = EliteNaturalSpawnReasonPolicy.isProviderEligible(event.getSpawnReason())
+                && EliteMindServiceModule.hasNaturalSpawnProviders();
+        // Only derive a level when a conversion owner can consume it. Providers retain their
+        // independent admission rules; generic-only events can stop before scanning players.
+        if (!providerEligible && !genericEligible(event)) return;
         LivingEntity livingEntity = event.getEntity();
         List<Player> nearbyPlayers = PlayerScanner.getNearbyPlayers(livingEntity.getLocation());
         int eliteMobLevel = getNaturalMobLevel(
@@ -131,7 +136,7 @@ public class NaturalMobSpawnEventHandler implements Listener {
         // conversion gates. This keeps exact mode ownership independent of EliteMobs' generic
         // spawn percentage and strict-spawning settings. Explicit external spawns never enter the
         // provider seam, and native Mind bodies were excluded above to prevent recursion.
-        if (EliteNaturalSpawnReasonPolicy.isProviderEligible(event.getSpawnReason())) {
+        if (providerEligible) {
             try {
                 int providerLevel = Math.max(0, Math.min(
                         eliteMobLevel,
@@ -153,31 +158,10 @@ public class NaturalMobSpawnEventHandler implements Listener {
         if (eliteMobLevel < 0) return;
         if (eliteMobLevel > MobCombatSettingsConfig.getNaturalEliteMobLevelCap())
             eliteMobLevel = MobCombatSettingsConfig.getNaturalEliteMobLevelCap();
-        if (event.getSpawnReason().equals(DROWNED) || event.getSpawnReason().equals(BREEDING)) return;
-        if (EliteMobs.worldGuardIsEnabled)
-            if (!WorldGuardFlagChecker.checkFlag(event.getLocation(), WorldGuardCompatibility.getELITEMOBS_SPAWN_FLAG()))
-                return;
-        if (!MobCombatSettingsConfig.isDoNaturalMobSpawning()) return;
-        if (!ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean(
-                "validWorlds." + event.getEntity().getWorld().getName())) return;
-        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) &&
-                !MobCombatSettingsConfig.isDoSpawnersSpawnEliteMobs() ||
-                event.getSpawnReason() != NATURAL && DefaultConfig.isDoStrictSpawningRules()) return;
-        if (PeaceBannerManager.isProtected(event.getLocation())) return;
-
-        boolean genericTypeEnabled = !event.getEntity().getType().equals(EntityType.BEE)
-                && !event.getEntity().getType().equals(EntityType.VEX)
-                && MobPropertiesConfig.getMobProperties().get(event.getEntityType()) != null
-                && MobPropertiesConfig.getMobProperties().get(event.getEntityType()).isEnabled()
-                && EliteMobProperties.isValidEliteMobType(event.getEntityType());
-        boolean genericSelected = false;
-        if (genericTypeEnabled) {
-            double validChance = MobCombatSettingsConfig.getAggressiveMobConversionPercentage()
-                    + EliteEnchantmentCatalog.huntingGearBonus(nearbyPlayers);
-            genericSelected = ThreadLocalRandom.current().nextDouble() < validChance;
-        }
-
-        if (!genericTypeEnabled || !genericSelected) return;
+        if (providerEligible && !genericEligible(event)) return;
+        double validChance = MobCombatSettingsConfig.getAggressiveMobConversionPercentage()
+                + EliteEnchantmentCatalog.huntingGearBonus(nearbyPlayers);
+        if (ThreadLocalRandom.current().nextDouble() >= validChance) return;
 
         EliteEntity eliteEntity;
         if (EliteMobProperties.getPluginData(event.getEntityType()).getBehavior() != null) {
@@ -199,6 +183,26 @@ public class NaturalMobSpawnEventHandler implements Listener {
         if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER))
             eliteEntity.setEliteLoot(false);
 
+    }
+
+    private static boolean genericEligible(CreatureSpawnEvent event) {
+        if (event.getSpawnReason().equals(DROWNED) || event.getSpawnReason().equals(BREEDING)) return false;
+        if (EliteMobs.worldGuardIsEnabled)
+            if (!WorldGuardFlagChecker.checkFlag(event.getLocation(), WorldGuardCompatibility.getELITEMOBS_SPAWN_FLAG()))
+                return false;
+        if (!MobCombatSettingsConfig.isDoNaturalMobSpawning()) return false;
+        if (!ValidWorldsConfig.getInstance().getFileConfiguration().getBoolean(
+                "validWorlds." + event.getEntity().getWorld().getName())) return false;
+        if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) &&
+                !MobCombatSettingsConfig.isDoSpawnersSpawnEliteMobs() ||
+                event.getSpawnReason() != NATURAL && DefaultConfig.isDoStrictSpawningRules()) return false;
+        if (PeaceBannerManager.isProtected(event.getLocation())) return false;
+
+        return !event.getEntity().getType().equals(EntityType.BEE)
+                && !event.getEntity().getType().equals(EntityType.VEX)
+                && MobPropertiesConfig.getMobProperties().get(event.getEntityType()) != null
+                && MobPropertiesConfig.getMobProperties().get(event.getEntityType()).isEnabled()
+                && EliteMobProperties.isValidEliteMobType(event.getEntityType());
     }
 
 }

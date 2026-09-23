@@ -63,7 +63,12 @@ public final class ClassAbilityInputRouter implements Listener {
     /** Whether this player may currently issue class-ability input. */
     public boolean controlsEnabled(Player player) {
         Objects.requireNonNull(player, "player");
-        return input.hasActiveClass(player) && controlModeEnabled(player);
+        return controlsEnabled(player, input.hasActiveClass(player));
+    }
+
+    /** Reuses the caller's active-class snapshot within one server-thread operation. */
+    public boolean controlsEnabled(Player player, boolean hasActiveClass) {
+        return hasActiveClass && controlModeEnabled(Objects.requireNonNull(player, "player"));
     }
 
     /** Cancels pending gesture timeouts and releases all retained player state. */

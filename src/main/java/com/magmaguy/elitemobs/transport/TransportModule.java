@@ -156,15 +156,28 @@ public final class TransportModule implements Listener, AutoCloseable {
         if (!journeys.remove(j.player.getUniqueId(), j)) return;
         try {
             if (j.actor != null) {
-                if (j.player.getVehicle() == j.actor.getLivingEntity()) j.player.leaveVehicle();
-                EliteMindServiceModule.clearInternal(j.actor);
+                try {
+                    if (j.player.getVehicle() == j.actor.getLivingEntity()) j.player.leaveVehicle();
+                } finally {
+                    EliteMindServiceModule.clearInternal(j.actor);
+                }
             }
             if (arrived && j.player.isOnline() && !j.player.isDead()) {
-                InstancePlayerMovement.teleportWithinWorld(j.player, j.destination, PlayerTeleportEvent.TeleportCause.PLUGIN);
-                j.player.setFallDistance(0);
+                boolean accepted = InstancePlayerMovement.teleportWithinWorld(j.player, j.destination,
+                        PlayerTeleportEvent.TeleportCause.PLUGIN);
+                Location actual = j.player.getLocation();
+                boolean placed = accepted && actual.getWorld().equals(j.destination.getWorld())
+                        && actual.distanceSquared(j.destination) < 0.000001D;
+                if (placed) j.player.setFallDistance(0);
+                else reason = "Travel interrupted. The final destination could not be reached.";
+            } else if (arrived) {
+                reason = "Travel interrupted.";
             }
             if (reason != null && j.player.isOnline()) message(j.player, reason);
-        } catch (Exception error) { plugin.getLogger().warning("Transport cleanup: " + error); }
+        } catch (Exception error) {
+            plugin.getLogger().warning("Transport cleanup: " + error);
+            if (j.player.isOnline()) message(j.player, "Travel interrupted.");
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

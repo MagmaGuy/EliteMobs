@@ -335,6 +335,10 @@ final class EliteMindServiceImpl implements EliteMindService, Listener {
         naturalSpawnProviders.register(owner, provider);
     }
 
+    boolean hasNaturalSpawnProviders() {
+        return !closed && !naturalSpawnProviders.isEmpty();
+    }
+
     /** Returns true when an owner claimed and terminally handled this vanilla carrier. */
     boolean replaceNaturalSpawn(CreatureSpawnEvent event, int suggestedLevel) {
         requireAvailable();

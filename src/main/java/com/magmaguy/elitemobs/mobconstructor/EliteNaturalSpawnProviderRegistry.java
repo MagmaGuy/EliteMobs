@@ -14,6 +14,8 @@ import java.util.Optional;
 final class EliteNaturalSpawnProviderRegistry {
     private final List<Registration> registrations = new ArrayList<>();
 
+    boolean isEmpty() { return registrations.isEmpty(); }
+
     void register(Plugin owner, EliteNaturalSpawnProvider provider) {
         Objects.requireNonNull(owner, "owner");
         Objects.requireNonNull(provider, "provider");

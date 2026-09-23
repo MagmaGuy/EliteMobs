@@ -50,6 +50,7 @@ import com.magmaguy.elitemobs.advancedcombat.progression.ClassProgressionForgetR
 import com.magmaguy.elitemobs.advancedcombat.progression.InputProfile;
 import com.magmaguy.elitemobs.advancedcombat.progression.FoundationLevelSnapshot;
 import com.magmaguy.elitemobs.advancedcombat.progression.ProfileSnapshot;
+import com.magmaguy.elitemobs.advancedcombat.progression.ClassProgressionModule.ActiveProfileSnapshot;
 import com.magmaguy.elitemobs.advancedcombat.progression.FormProgressSnapshot;
 import com.magmaguy.elitemobs.advancedcombat.progression.ProgressionReadiness;
 import com.magmaguy.elitemobs.advancedcombat.progression.ProgressionCapReason;
@@ -269,8 +270,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
 
     /** Active form, including the selection locked for an instance run. */
     public static Optional<FormProgressSnapshot> classProgressSnapshot(UUID playerId) {
-        return instance == null ? Optional.empty() : instance.profile(playerId)
-                .flatMap(profile -> profile.activeFormId().map(profile.forms()::get));
+        return instance == null ? Optional.empty() : instance.progression.activeSnapshot(playerId).map(ActiveProfileSnapshot::activeForm);
     }
 
     public static void shutdownIfInitialized() {
@@ -283,8 +283,8 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
 
     /** The same effective lineage used for activation, including an instance's locked class. */
     public static Optional<ClassLineage> activeClassLineageSnapshot(UUID playerId) {
-        return instance == null ? Optional.empty() : instance.progression.snapshot(playerId)
-                .flatMap(ProfileSnapshot::optionalActiveLineage)
+        return instance == null ? Optional.empty() : instance.progression.activeSnapshot(playerId)
+                .flatMap(ActiveProfileSnapshot::optionalActiveLineage)
                 .map(active -> instance.catalog.lineageOf(active.activeFormId()));
     }
 
@@ -314,8 +314,8 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
 
     @Override
     public boolean hasActiveClass(Player player) {
-        return progression.snapshot(player.getUniqueId())
-                .flatMap(ProfileSnapshot::optionalActiveLineage)
+        return progression.activeSnapshot(player.getUniqueId())
+                .flatMap(ActiveProfileSnapshot::optionalActiveLineage)
                 .isPresent();
     }
 
@@ -326,8 +326,8 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
 
     /** Weapon affinities of the active form; empty without an active class. */
     public Set<SkillType> activeClassWeaponAffinities(Player player) {
-        return progression.snapshot(player.getUniqueId())
-                .flatMap(ProfileSnapshot::optionalActiveLineage)
+        return progression.activeSnapshot(player.getUniqueId())
+                .flatMap(ActiveProfileSnapshot::optionalActiveLineage)
                 .map(active -> Set.copyOf(
                         catalog.require(active.activeFormId()).weaponAffinities()))
                 .orElse(Set.of());
@@ -354,15 +354,15 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
     }
 
     public InputProfile activeInputProfile(Player player) {
-        return progression.snapshot(player.getUniqueId())
-                .map(ProfileSnapshot::activeInputProfile)
+        return progression.activeSnapshot(player.getUniqueId())
+                .map(ActiveProfileSnapshot::activeInputProfile)
                 .orElse(InputProfile.DEFAULT);
     }
 
     @Override
     public String abilityName(Player player, AbilitySlot slot) {
-        return progression.snapshot(player.getUniqueId())
-                .flatMap(ProfileSnapshot::optionalActiveLineage)
+        return progression.activeSnapshot(player.getUniqueId())
+                .flatMap(ActiveProfileSnapshot::optionalActiveLineage)
                 .map(active -> abilityName(catalog.lineageOf(active.activeFormId()), slot))
                 .orElseGet(() -> switch (slot) {
                     case MOBILITY -> "Mobility";
@@ -430,13 +430,14 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
             sendFeedback(player, "&eClass skills are unavailable during transport.");
             return AbilityResult.failure("transport." + slot.name().toLowerCase(Locale.ROOT), AbilityFailureReason.INVALID_PLAYER);
         }
-        Optional<ProfileSnapshot> optionalProfile = progression.snapshot(player.getUniqueId());
-        if (!mechanicsActive(player) || optionalProfile.isEmpty()) {
+        Optional<ActiveProfileSnapshot> optionalProfile = progression.activeSnapshot(player.getUniqueId());
+        if (optionalProfile.isEmpty()
+                || !inputRouter.controlsEnabled(player, optionalProfile.get().activeLineage() != null)) {
             sendFeedback(player, "&cClass controls are not active here.");
             return AbilityResult.failure("unavailable." + slot.name().toLowerCase(Locale.ROOT),
                     AbilityFailureReason.INVALID_PLAYER);
         }
-        ProfileSnapshot profile = optionalProfile.get();
+        ActiveProfileSnapshot profile = optionalProfile.get();
         ActiveLineageSnapshot active = profile.activeLineage();
         if (active == null) {
             sendFeedback(player, "&eSelect an unlocked class with &f/em class&e first.");
@@ -446,8 +447,8 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
 
         ClassLineage lineage = catalog.lineageOf(active.activeFormId());
         FixedAbilitySpec abilitySpec = abilityRegistry.require(abilityId(lineage, slot));
-        double abilityCost = abilityCost(player, abilitySpec);
-        reconcilePlayer(player);
+        double abilityCost = abilityCost(player, abilitySpec, active);
+        reconcilePlayer(player, optionalProfile);
         boolean practicing = isWaitingForMatch(player);
         if (!resources.canAfford(player, abilityCost)) {
             observeFailedCast(player, abilitySpec);
@@ -503,8 +504,15 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
 
     /** Passive cost efficiency replaces the removed cooldown system as the only cast pacing. */
     private double abilityCost(Player player, FixedAbilitySpec spec) {
+        return abilityCost(player, spec, progression.activeSnapshot(player.getUniqueId())
+                .map(ActiveProfileSnapshot::activeLineage).orElse(null));
+    }
+
+    private double abilityCost(Player player, FixedAbilitySpec spec, ActiveLineageSnapshot active) {
         double multiplier = passiveRuntime.mechanics(player).abilityCostMultiplier();
-        double reduction = passivesFor(player.getUniqueId()).abilityCostReductionFraction();
+        double reduction = (active == null ? PassiveAggregate.NEUTRAL
+                : PassiveAggregate.resolve(catalog.lineageOf(active.activeFormId()), active, passiveRegistry))
+                .abilityCostReductionFraction();
         return Math.max(1D, spec.resourceCost() * multiplier * (1D - reduction));
     }
 
@@ -596,9 +604,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
         if (PlayerData.getMatchInstance(player) instanceof
                 com.magmaguy.elitemobs.advancedcombat.challenges.ClassChallengeInstance trial)
             runId = trial.runId();
-        UUID lockedRunId = progression.snapshot(playerId)
-                .map(ProfileSnapshot::lockedRunId)
-                .orElse(null);
+        UUID lockedRunId = progression.lockedRunId(playerId).orElse(null);
         UUID previousRunId = runId == null
                 ? observedRunIds.remove(playerId)
                 : observedRunIds.put(playerId, runId);
@@ -621,9 +627,12 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
     }
 
     private void reconcilePlayer(Player player) {
-        Optional<ProfileSnapshot> optional = progression.snapshot(player.getUniqueId());
-        ActiveLineageSnapshot active = optional.map(ProfileSnapshot::activeLineage).orElse(null);
-        boolean controlsActive = active != null && inputRouter.controlsEnabled(player);
+        reconcilePlayer(player, progression.activeSnapshot(player.getUniqueId()));
+    }
+
+    private void reconcilePlayer(Player player, Optional<ActiveProfileSnapshot> optional) {
+        ActiveLineageSnapshot active = optional.map(ActiveProfileSnapshot::activeLineage).orElse(null);
+        boolean controlsActive = inputRouter.controlsEnabled(player, active != null);
         if (!controlsActive) {
             endLobbyPractice(player);
             // Reconciliation ends an existing class session, not a classless ally's lifecycle.
@@ -692,7 +701,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
     }
 
     private Optional<String> classLabel(UUID playerId) {
-        return progression.snapshot(playerId).flatMap(snapshot -> {
+        return progression.activeSnapshot(playerId).flatMap(snapshot -> {
             ActiveLineageSnapshot active = snapshot.activeLineage();
             if (active == null) return Optional.empty();
             ClassFormDefinition form = catalog.require(active.activeFormId());
@@ -707,14 +716,14 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
         double maximumHealth = maxHealth == null ? health : maxHealth.getValue();
         String healthDisplay = "&cHP " + CombatHealthFormatter.format(health)
                 + "/" + CombatHealthFormatter.format(maximumHealth);
-        Optional<ProfileSnapshot> optional = progression.snapshot(player.getUniqueId());
+        Optional<ActiveProfileSnapshot> optional = progression.activeSnapshot(player.getUniqueId());
         if (optional.isEmpty() || optional.get().activeLineage() == null)
             return hudPresentation.render(player.getUniqueId(),
                     new ClassHudPresentation.Vitals(health, maximumHealth,
                             player.getAbsorptionAmount(), 0D, 0D, null),
                     healthDisplay, "&7No active class &8| &e/em class", System.nanoTime());
 
-        ProfileSnapshot profile = optional.get();
+        ActiveProfileSnapshot profile = optional.get();
         ActiveLineageSnapshot active = profile.activeLineage();
         ClassLineage lineage = catalog.lineageOf(active.activeFormId());
         ClassResourceController.Snapshot resource = resources.snapshot(player.getUniqueId()).orElse(null);
@@ -735,7 +744,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
     }
 
     private PassiveAggregate passivesFor(UUID playerId) {
-        Optional<ProfileSnapshot> optional = progression.snapshot(playerId);
+        Optional<ActiveProfileSnapshot> optional = progression.activeSnapshot(playerId);
         if (optional.isEmpty() || optional.get().activeLineage() == null) return PassiveAggregate.NEUTRAL;
         ActiveLineageSnapshot active = optional.get().activeLineage();
         return PassiveAggregate.resolve(
@@ -756,7 +765,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
     }
 
     private List<String> activeFormIds(Player player) {
-        Optional<ProfileSnapshot> optional = progression.snapshot(player.getUniqueId());
+        Optional<ActiveProfileSnapshot> optional = progression.activeSnapshot(player.getUniqueId());
         if (optional.isEmpty() || optional.get().activeLineage() == null) return List.of();
         return List.copyOf(catalog.lineageOf(
                 optional.get().activeLineage().activeFormId()).formIds());
@@ -764,8 +773,8 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
 
     private Optional<ClassMinionManager.OwnerProfile> activeMinionProfile(Player player) {
         if (player == null || !ClassAbilityEligibility.isEligible(player)) return Optional.empty();
-        return progression.snapshot(player.getUniqueId())
-                .flatMap(ProfileSnapshot::optionalActiveLineage)
+        return progression.activeSnapshot(player.getUniqueId())
+                .flatMap(ActiveProfileSnapshot::optionalActiveLineage)
                 .map(active -> new ClassMinionManager.OwnerProfile(
                         active.activeFormId(), active.activeEffectiveLevel()));
     }
@@ -902,9 +911,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
         endLobbyPractice(player);
         skillTutorial.discard(playerId);
         hudPresentation.discard(playerId);
-        boolean retainRunState = progression.snapshot(playerId)
-                .map(ProfileSnapshot::lockedRunId)
-                .isPresent();
+        boolean retainRunState = progression.lockedRunId(playerId).isPresent();
         abilityEngine.deactivate(player);
         if (retainRunState) resources.suspend(player);
         else resources.discard(player);

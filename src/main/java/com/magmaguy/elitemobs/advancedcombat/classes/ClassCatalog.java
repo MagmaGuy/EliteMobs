@@ -21,6 +21,8 @@ public final class ClassCatalog {
     private final Map<String, ClassFormDefinition> formsById;
     private final Map<String, List<ClassFormDefinition>> childrenById;
     private final List<ClassFormDefinition> roots;
+    private final Map<String, List<ClassFormDefinition>> progressionPaths;
+    private final Map<String, ClassLineage> lineages;
 
     private ClassCatalog(int persistenceVersion,
                          Set<String> retiredFormIds,
@@ -32,6 +34,25 @@ public final class ClassCatalog {
         this.formsById = formsById;
         this.childrenById = childrenById;
         this.roots = roots;
+        Map<String, List<ClassFormDefinition>> paths = new LinkedHashMap<>();
+        Map<String, ClassLineage> kits = new LinkedHashMap<>();
+        for (ClassFormDefinition form : formsById.values()) {
+            List<ClassFormDefinition> reversed = new ArrayList<>();
+            for (ClassFormDefinition current = form; current != null;
+                    current = current.parentId() == null ? null : formsById.get(current.parentId()))
+                reversed.add(current);
+            List<ClassFormDefinition> path = List.copyOf(reversed.reversed());
+            paths.put(form.id(), path);
+            for (int index = path.size() - 1; index >= 0; index--) {
+                if (path.get(index).rootKit() == null) continue;
+                kits.put(form.id(), new ClassLineage(path.subList(index, path.size())));
+                break;
+            }
+            if (!kits.containsKey(form.id()))
+                throw new IllegalStateException("Class has no combat kit: " + form.id());
+        }
+        progressionPaths = Map.copyOf(paths);
+        lineages = Map.copyOf(kits);
     }
 
     public static ClassCatalog create(
@@ -129,25 +150,16 @@ public final class ClassCatalog {
     }
 
     public ClassLineage lineageOf(String formId) {
-        List<ClassFormDefinition> path = progressionPathOf(formId);
-        // A new root replaces the starter kit rather than inheriting its resource or passives.
-        for (int index = path.size() - 1; index >= 0; index--)
-            if (path.get(index).rootKit() != null)
-                return new ClassLineage(path.subList(index, path.size()));
-        throw new IllegalStateException("Class has no combat kit: " + formId);
+        ClassLineage lineage = lineages.get(formId);
+        if (lineage == null) throw new IllegalArgumentException("Unknown class form: " + formId);
+        return lineage;
     }
 
     /** Full prerequisite path, including the starter before a resource-owning root class. */
     public List<ClassFormDefinition> progressionPathOf(String formId) {
-        ClassFormDefinition current = require(formId);
-        List<ClassFormDefinition> reversed = new ArrayList<>();
-        Set<String> visited = new HashSet<>();
-        while (current != null) {
-            if (!visited.add(current.id())) throw new IllegalStateException("Cycle in class lineage at " + current.id());
-            reversed.add(current);
-            current = current.parentId() == null ? null : require(current.parentId());
-        }
-        return List.copyOf(reversed.reversed());
+        List<ClassFormDefinition> path = progressionPaths.get(formId);
+        if (path == null) throw new IllegalArgumentException("Unknown class form: " + formId);
+        return path;
     }
 
     public ClassFormDefinition rootOf(String formId) {

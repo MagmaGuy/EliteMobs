@@ -185,6 +185,12 @@ public final class EliteMindServiceModule {
         return current != null && current.suspendForChunkUnload(eliteEntity, removedBody);
     }
 
+    /** Internal admission check; no provider callbacks or level derivation. */
+    public static boolean hasNaturalSpawnProviders() {
+        EliteMindServiceImpl current = implementation;
+        return current != null && current.hasNaturalSpawnProviders();
+    }
+
     /** Internal natural-spawn hook used before historical probabilistic conversion. */
     public static boolean replaceNaturalSpawn(
             CreatureSpawnEvent event,

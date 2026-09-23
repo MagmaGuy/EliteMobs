@@ -183,6 +183,49 @@ public final class ClassProgressionModule {
         return state == null ? Optional.empty() : Optional.ofNullable(state.failure);
     }
 
+    /** Runtime projection of only the selected form and its prerequisites, read atomically.
+     * Player-derived results are not retained between operations: foundation levels and content
+     * availability can change independently of this module's profile writes.
+     */
+    public Optional<ActiveProfileSnapshot> activeSnapshot(UUID playerId) {
+        Objects.requireNonNull(playerId, "playerId");
+        CachedPlayer state = players.get(playerId);
+        if (closed.get() || state == null) return Optional.empty();
+        synchronized (state.monitor) {
+            if (state.readiness != ProgressionReadiness.READY || players.get(playerId) != state)
+                return Optional.empty();
+            return foundationLevels.snapshot(playerId).map(foundation -> {
+                if (!playerId.equals(foundation.playerId()))
+                    throw new IllegalStateException("Foundation adapter returned another player's levels");
+                LockedRun run = runSelections.get(playerId);
+                String formId = run == null ? state.profile.selectedFormId() : run.selection().formId();
+                FormProgressSnapshot form = formId == null ? null
+                        : formSnapshot(catalog.require(formId), state, foundation.levels(), new HashMap<>());
+                return new ActiveProfileSnapshot(run == null ? null : run.runId(),
+                        run == null ? selectedInputProfile(state.profile) : run.selection().inputProfile(),
+                        form, activeLineage(form));
+            });
+        }
+    }
+
+    public Optional<UUID> lockedRunId(UUID playerId) {
+        CachedPlayer state = players.get(Objects.requireNonNull(playerId, "playerId"));
+        if (closed.get() || state == null) return Optional.empty();
+        synchronized (state.monitor) {
+            if (state.readiness != ProgressionReadiness.READY || players.get(playerId) != state)
+                return Optional.empty();
+            LockedRun run = runSelections.get(playerId);
+            return run == null ? Optional.empty() : Optional.of(run.runId());
+        }
+    }
+
+    public record ActiveProfileSnapshot(UUID lockedRunId, InputProfile activeInputProfile,
+            FormProgressSnapshot activeForm, ActiveLineageSnapshot activeLineage) {
+        public Optional<ActiveLineageSnapshot> optionalActiveLineage() {
+            return Optional.ofNullable(activeLineage);
+        }
+    }
+
     /** Returns an immutable current view only after successful hydration. */
     public Optional<ProfileSnapshot> snapshot(UUID playerId) {
         Objects.requireNonNull(playerId, "playerId");
@@ -793,42 +836,17 @@ public final class ClassProgressionModule {
     private ProfileSnapshot snapshotLocked(
             UUID playerId,
             CachedPlayer state,
-        Map<SkillType, Integer> levels) {
+            Map<SkillType, Integer> levels) {
         Map<String, FormProgressSnapshot> forms = new LinkedHashMap<>();
         Map<String, List<UnlockBlocker>> unlocks = new HashMap<>();
         for (ClassFormDefinition form : catalog.forms()) {
-            List<UnlockBlocker> unlockBlockers = unlockBlockers(
-                    form, state.progressXp, state.challenges, levels, unlocks);
-            boolean unlocked = unlockBlockers.isEmpty();
-            int localCap = unlocked ? form.localProgressionCap(levels::get) : 0;
-            int effectiveCap = unlocked ? form.effectiveProgressionCap(levels::get) : 0;
-            long xpAtCap = unlocked ? xpAtLocalCap(form, localCap) : 0L;
-            long xp = unlocked
-                    ? Math.min(state.progressXp.getOrDefault(form.id(), 0L), xpAtCap)
-                    : 0L;
-            int localLevel = unlocked ? localLevelFromXp(form, xp) : 0;
-            int effectiveLevel = unlocked ? form.band().toEffectiveLevel(localLevel) : 0;
-            ProgressionCapReason capReason = unlocked
-                    ? capReason(form, levels)
-                    : ProgressionCapReason.NOT_APPLICABLE;
-            forms.put(form.id(), new FormProgressSnapshot(
-                    form.id(),
-                    unlocked,
-                    unlockBlockers,
-                    xp,
-                    localLevel,
-                    effectiveLevel,
-                    localCap,
-                    effectiveCap,
-                    xpAtCap,
-                    capReason,
-                    unlocked ? limitingSkills(form, levels, capReason) : List.of()));
+            forms.put(form.id(), formSnapshot(form, state, levels, unlocks));
         }
 
         LockedRun lockedRun = runSelections.get(playerId);
         RunSelection runSelection = lockedRun == null ? null : lockedRun.selection();
         String activeFormId = runSelection == null ? state.profile.selectedFormId() : runSelection.formId();
-        ActiveLineageSnapshot activeLineage = activeLineage(activeFormId, forms);
+        ActiveLineageSnapshot activeLineage = activeLineage(forms.get(activeFormId));
         return new ProfileSnapshot(
                 playerId,
                 state.profile.selectedFormId(),
@@ -840,12 +858,39 @@ public final class ClassProgressionModule {
                 forms);
     }
 
-    private ActiveLineageSnapshot activeLineage(
-            String activeFormId,
-            Map<String, FormProgressSnapshot> forms) {
-        if (activeFormId == null) return null;
-        FormProgressSnapshot active = forms.get(activeFormId);
+    private FormProgressSnapshot formSnapshot(ClassFormDefinition form, CachedPlayer state,
+            Map<SkillType, Integer> levels, Map<String, List<UnlockBlocker>> unlocks) {
+        List<UnlockBlocker> unlockBlockers = unlockBlockers(
+                form, state.progressXp, state.challenges, levels, unlocks);
+        boolean unlocked = unlockBlockers.isEmpty();
+        int localCap = unlocked ? form.localProgressionCap(levels::get) : 0;
+        int effectiveCap = unlocked ? form.effectiveProgressionCap(levels::get) : 0;
+        long xpAtCap = unlocked ? xpAtLocalCap(form, localCap) : 0L;
+        long xp = unlocked
+                ? Math.min(state.progressXp.getOrDefault(form.id(), 0L), xpAtCap)
+                : 0L;
+        int localLevel = unlocked ? localLevelFromXp(form, xp) : 0;
+        int effectiveLevel = unlocked ? form.band().toEffectiveLevel(localLevel) : 0;
+        ProgressionCapReason capReason = unlocked
+                ? capReason(form, levels)
+                : ProgressionCapReason.NOT_APPLICABLE;
+        return new FormProgressSnapshot(
+                form.id(),
+                unlocked,
+                unlockBlockers,
+                xp,
+                localLevel,
+                effectiveLevel,
+                localCap,
+                effectiveCap,
+                xpAtCap,
+                capReason,
+                unlocked ? limitingSkills(form, levels, capReason) : List.of());
+    }
+
+    private ActiveLineageSnapshot activeLineage(FormProgressSnapshot active) {
         if (active == null || !active.unlocked()) return null;
+        String activeFormId = active.formId();
         ClassLineage lineage = catalog.lineageOf(activeFormId);
         return new ActiveLineageSnapshot(
                 activeFormId,
