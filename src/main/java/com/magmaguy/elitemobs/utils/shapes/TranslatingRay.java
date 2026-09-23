@@ -7,39 +7,39 @@ import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class TranslatingRay extends Ray {
-    private final Location finalCenterLocation;
-
-    public TranslatingRay(boolean ignoresSolidBlocks,
-                          double pointRadius,
-                          Location target,
-                          Location finalTarget,
-                          Location target2,
-                          Location finalTarget2,
-                          int animationDuration) {
-        super(ignoresSolidBlocks, pointRadius, target, finalTarget);
-        this.finalCenterLocation = finalTarget == null ? target : finalTarget;
-        locations = drawLine(target, target2);
-        startAnimation(target.clone(), finalCenterLocation.clone(), target2.clone(), finalTarget2.clone(), animationDuration);
+    public TranslatingRay(boolean ignoresSolidBlocks, double pointRadius, Location target, Location finalTarget,
+                          Location target2, Location finalTarget2, int animationDuration) {
+        super(ignoresSolidBlocks, pointRadius, target, target2);
+        RotatingRay.validateEndpoints(target, target2, pointRadius, animationDuration);
+        Location firstEnd = finalTarget == null ? target : finalTarget;
+        Location secondEnd = finalTarget2 == null ? target2 : finalTarget2;
+        RotatingRay.validateEndpoints(target, firstEnd, pointRadius, animationDuration);
+        RotatingRay.validateEndpoints(target, secondEnd, pointRadius, animationDuration);
+        RotatingRay.validateEndpoints(firstEnd, secondEnd, pointRadius, animationDuration);
+        centerLocation = target.clone();
+        locations = drawLine(centerLocation, target2.clone());
+        // Zero duration is a static initial ray, matching the factories' optional-animation default.
+        if (animationDuration > 0)
+            startAnimation(target.clone(), firstEnd.clone(), target2.clone(), secondEnd.clone(), animationDuration);
     }
 
-    private void startAnimation(Location startLocation1,
-                                Location endLocation1,
-                                Location startLocation2,
-                                Location endLocation2,
-                                int animationDuration) {
+    private void startAnimation(Location firstStart, Location firstEnd, Location secondStart, Location secondEnd,
+                                int duration) {
         new BukkitRunnable() {
-            int counter = 0;
-
+            private int frame;
             @Override
             public void run() {
-                if (counter > animationDuration) {
+                try {
+                    double progress = ++frame / (double) duration;
+                    Location source = Lerp.lerpLocation(firstStart, firstEnd, progress);
+                    Location target = Lerp.lerpLocation(secondStart, secondEnd, progress);
+                    locations = drawLine(source, target);
+                    centerLocation = source;
+                    if (frame == duration) cancel();
+                } catch (RuntimeException failure) {
                     cancel();
-                    return;
+                    com.magmaguy.magmacore.util.Logger.warn("Stopped translating ray after geometry failure: " + failure);
                 }
-                counter++;
-                locations = drawLine(
-                        Lerp.lerpLocation(startLocation1, endLocation1, counter / (double) animationDuration),
-                        Lerp.lerpLocation(startLocation2, endLocation2, counter / (double) animationDuration));
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 1L, 1L);
     }

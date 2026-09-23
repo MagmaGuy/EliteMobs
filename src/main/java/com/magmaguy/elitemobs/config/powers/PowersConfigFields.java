@@ -17,7 +17,6 @@ import java.util.Map;
 public class PowersConfigFields extends CustomConfigFields {
 
     @Getter
-    @Setter
     private String effect;
     @Getter
     @Setter
@@ -113,10 +112,36 @@ public class PowersConfigFields extends CustomConfigFields {
         return defaults;
     }
 
+    public void setEffect(String configured) {
+        if (configured == null || configured.isEmpty()) {
+            effect = null;
+            return;
+        }
+        org.bukkit.Material material = null;
+        try {
+            material = org.bukkit.Material.valueOf(configured);
+        } catch (IllegalArgumentException notMaterial) {
+            // Particle names are the other supported representation.
+        }
+        if (material != null && material.isItem()) {
+            effect = configured;
+            return;
+        }
+        try {
+            org.bukkit.Particle particle = org.bukkit.Particle.valueOf(configured);
+            if (particle.getDataType() != Void.class)
+                throw new IllegalArgumentException("particle requires " + particle.getDataType().getSimpleName() + " data");
+            effect = configured;
+        } catch (IllegalArgumentException invalid) {
+            effect = null;
+            Logger.warn("Disabled invalid power trail '" + configured + "' in " + getFilename() + ": " + invalid.getMessage());
+        }
+    }
+
     @Override
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.effect = processString("effect", effect, null, false);
+        setEffect(processString("effect", effect, null, false));
         this.powerCooldown = processInt("powerCooldown", powerCooldown, 0, false);
         this.globalCooldown = processInt("globalCooldown", globalCooldown, 0, false);
         this.rawScripts = processMap("eliteScript", rawScripts);

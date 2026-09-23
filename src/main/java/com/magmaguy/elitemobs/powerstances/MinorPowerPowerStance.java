@@ -105,17 +105,14 @@ public class MinorPowerPowerStance implements Listener, AutoCloseable {
     }
 
     private Object effectParser(String powerString) {
+        Material material = null;
         try {
-            Material material = Material.valueOf(powerString);
-            return addEffect(material);
-        } catch (Exception ex) {
+            material = Material.valueOf(powerString);
+        } catch (IllegalArgumentException notMaterial) {
+            // The definition loader has already validated the alternate particle representation.
         }
-        try {
-            Particle particle = Particle.valueOf(powerString);
-            return addEffect(particle);
-        } catch (Exception ex) {
-        }
-        return null;
+        if (material != null) return addEffect(material);
+        return addEffect(Particle.valueOf(powerString));
     }
 
     private Object addEffect(Material material) {

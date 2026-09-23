@@ -53,53 +53,60 @@ public class VisualItemProcessor implements AutoCloseable {
 
             @Override
             public void run() {
+                try {
 
-                if (!eliteEntity.isValid() || !hasValidEffect) {
-                    VisualItemRemover.removeItems(multiDimensionalTrailTracker);
-                    cancel();
-                    return;
-                }
 
-                for (int i = 0; i < multiDimensionalTrailTracker.length; i++) {
-                    int sectionCounter = 0;
-                    for (int j = 0; j < multiDimensionalTrailTracker[i].length; j++) {
+                    if (!eliteEntity.isValid() || !hasValidEffect) {
+                        VisualItemRemover.removeItems(multiDimensionalTrailTracker);
+                        cancel();
+                        return;
+                    }
 
-                        int adjustedEffectPositionInRotation = adjustTrackPosition(
-                                pointsPerRotation,
-                                multiDimensionalTrailTracker[i].length,
-                                sectionCounter,
-                                counter);
+                    for (int i = 0; i < multiDimensionalTrailTracker.length; i++) {
+                        int sectionCounter = 0;
+                        for (int j = 0; j < multiDimensionalTrailTracker[i].length; j++) {
 
-                        Vector vector = cachedVectorPositions[i][adjustedEffectPositionInRotation];
+                            int adjustedEffectPositionInRotation = adjustTrackPosition(
+                                    pointsPerRotation,
+                                    multiDimensionalTrailTracker[i].length,
+                                    sectionCounter,
+                                    counter);
 
-                        if (multiDimensionalTrailTracker[i][j] instanceof Item)
-                            rotateItem(multiDimensionalTrailTracker[i][j], vector, eliteEntity);
+                            Vector vector = cachedVectorPositions[i][adjustedEffectPositionInRotation];
 
-                        if (multiDimensionalTrailTracker[i][j] instanceof Particle)
-                            rotateParticle(multiDimensionalTrailTracker[i][j], vector, eliteEntity);
+                            if (multiDimensionalTrailTracker[i][j] instanceof Item)
+                                rotateItem(multiDimensionalTrailTracker[i][j], vector, eliteEntity);
 
-                        sectionCounter++;
-                        if (sectionCounter >= pointsPerRotation)
-                            sectionCounter = 0;
+                            if (multiDimensionalTrailTracker[i][j] instanceof Particle)
+                                rotateParticle(multiDimensionalTrailTracker[i][j], vector, eliteEntity);
+
+                            sectionCounter++;
+                            if (sectionCounter >= pointsPerRotation)
+                                sectionCounter = 0;
+
+                        }
+
 
                     }
 
+                    counter++;
+                    if (counter >= pointsPerRotation)
+                        counter = 0;
 
-                }
-
-                counter++;
-                if (counter >= pointsPerRotation)
-                    counter = 0;
-
-                /*
-                Check if the effect has ceased being obfuscated
-                 */
-                if (isObfuscated != eliteEntity.isVisualEffectObfuscated()) {
-                    VisualItemRemover.removeItems(multiDimensionalTrailTracker);
+                    /*
+                    Check if the effect has ceased being obfuscated
+                     */
+                    if (isObfuscated != eliteEntity.isVisualEffectObfuscated()) {
+                        VisualItemRemover.removeItems(multiDimensionalTrailTracker);
+                        cancel();
+                        eliteEntity.requestPowerStanceRefreshAfterObfuscation();
+                    }
+                } catch (RuntimeException failure) {
                     cancel();
-                    eliteEntity.requestPowerStanceRefreshAfterObfuscation();
+                    com.magmaguy.magmacore.util.Logger.warn("Stopped failed power stance for "
+                            + eliteEntity.getEliteUUID() + ": " + failure);
+                    VisualItemProcessor.this.close();
                 }
-
             }
 
         }.runTaskTimer(MetadataHandler.PLUGIN, 0, 5);
