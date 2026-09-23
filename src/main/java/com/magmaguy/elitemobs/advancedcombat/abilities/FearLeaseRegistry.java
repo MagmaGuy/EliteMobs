@@ -91,6 +91,12 @@ final class FearLeaseRegistry<K, S> implements AutoCloseable {
         return entries.size();
     }
 
+    int remainingTicks(K target, UUID source, long currentTick) {
+        Entry<S> entry = entries.get(target);
+        if (entry == null || !entry.source.equals(source)) return 0;
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(0L, entry.expiresAtTick - currentTick));
+    }
+
     boolean ownedBy(K target, UUID source) {
         Entry<S> entry = entries.get(target);
         return entry != null && entry.source.equals(source) && isActive(entry.handle);

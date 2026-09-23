@@ -61,6 +61,12 @@ final class SourceSuppressionLeaseRegistry<K, S> implements AutoCloseable {
         return Set.copyOf(new LinkedHashSet<>(entries.keySet()));
     }
 
+    int remainingTicks(K target, S source, long currentTick) {
+        Entry<S> entry = entries.get(target);
+        long expiry = entry == null ? currentTick : entry.expiryBySource.getOrDefault(source, currentTick);
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(0L, expiry - currentTick));
+    }
+
     boolean ownedBy(K target, S source) {
         Entry<S> entry = entries.get(target);
         return entry != null && entry.expiryBySource.containsKey(source);

@@ -106,6 +106,15 @@ final class EliteCrowdControlRuntime implements Listener, AutoCloseable {
                 target.getUniqueId(), caster.getUniqueId(), additionalTicks, currentTick);
     }
 
+    int remainingTicks(Player caster, LivingEntity target, AbilityEffect effect) {
+        return switch (effect) {
+            case ROOT -> rootLeases.remainingTicks(target.getUniqueId(), caster.getUniqueId(), currentTick);
+            case INTERRUPT -> interruptLeases.remainingTicks(target.getUniqueId(), caster.getUniqueId(), currentTick);
+            case FEAR -> fearLeases.remainingTicks(target.getUniqueId(), caster.getUniqueId(), currentTick);
+            default -> throw new IllegalArgumentException("Not a leased control: " + effect);
+        };
+    }
+
     boolean controlledBy(Player caster, LivingEntity target) {
         if (closed || caster == null || target == null) return false;
         UUID targetId = target.getUniqueId();

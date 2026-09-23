@@ -39,6 +39,9 @@ final class AbilityEffects {
     private final TimedCombatModifiers modifiers;
     private final AbilityStateRuntime states;
     private final EliteCrowdControlRuntime crowdControl;
+    private final ObservedPotionApplications potions;
+    private record AppliedControl(double amount, int ticks) { }
+
 
     AbilityEffects(
             AbilitySemantics semantics,
@@ -49,6 +52,7 @@ final class AbilityEffects {
         this.modifiers = modifiers;
         this.states = states;
         this.crowdControl = new EliteCrowdControlRuntime(MetadataHandler.PLUGIN);
+        this.potions = new ObservedPotionApplications(MetadataHandler.PLUGIN);
     }
 
     AbilityContribution apply(Player caster, FixedAbilitySpec spec,
@@ -79,8 +83,9 @@ final class AbilityEffects {
         double potency = mechanicModifiers.controlPotencyMultiplier();
         if (spec.effects().contains(AbilityEffect.SLOW)
                 && authorized(caster, target, spec, AbilityEffect.SLOW)) {
-            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, duration,
-                    scaledAmplifier(1, potency), false, true, true), true);
+            applyPotion(caster, target, spec, AbilityEffect.SLOW, AbilityRuntimeObservation.Kind.CONTROL,
+                    new PotionEffect(PotionEffectType.SLOWNESS, duration, scaledAmplifier(1, potency), false, true, true),
+                    ignored -> { });
         }
         if (spec.effects().contains(AbilityEffect.WEAKEN)
                 && authorized(caster, target, spec, AbilityEffect.WEAKEN)) {
@@ -95,11 +100,15 @@ final class AbilityEffects {
         if (elite == null) return;
         if (spec.effects().contains(AbilityEffect.INTERRUPT)
                 && authorized(caster, target, spec, AbilityEffect.INTERRUPT)) {
-            crowdControl.interrupt(caster, elite, Math.min(40, duration));
+            if (crowdControl.interrupt(caster, elite, Math.min(40, duration)))
+                observeApplied(caster, target, spec, AbilityRuntimeObservation.Kind.CONTROL,
+                        AbilityEffect.INTERRUPT, 1, crowdControl.remainingTicks(caster, target, AbilityEffect.INTERRUPT));
         }
         if (spec.effects().contains(AbilityEffect.FEAR)
                 && authorized(caster, target, spec, AbilityEffect.FEAR)) {
-            crowdControl.fear(caster, elite, Math.min(60, duration));
+            if (crowdControl.fear(caster, elite, Math.min(60, duration)))
+                observeApplied(caster, target, spec, AbilityRuntimeObservation.Kind.CONTROL,
+                        AbilityEffect.FEAR, 1, crowdControl.remainingTicks(caster, target, AbilityEffect.FEAR));
         }
     }
 
@@ -187,7 +196,8 @@ final class AbilityEffects {
 
         for (LivingEntity enemy : enemies) {
             if (!valid(enemy) || !semantics.canTargetEnemy(caster, enemy, spec)) continue;
-            EnumSet<AbilityEffect> appliedControls = EnumSet.noneOf(AbilityEffect.class);
+            Map<AbilityEffect, AppliedControl> appliedControls = new java.util.EnumMap<>(AbilityEffect.class);
+            boolean observedPotionControl = false;
 
             if (effects.contains(AbilityEffect.DAMAGE)
                     && tuning.damageMultiplier() > 0D
@@ -217,19 +227,19 @@ final class AbilityEffects {
 
             if (effects.contains(AbilityEffect.KNOCKBACK)
                     && authorized(caster, enemy, spec, AbilityEffect.KNOCKBACK)) {
-                displaceAway(caster, enemy, displacement * controlPotency, .25D);
-                appliedControls.add(AbilityEffect.KNOCKBACK);
+                double changed = displaceAway(caster, enemy, displacement * controlPotency, .25D);
+                if (changed > 0) appliedControls.put(AbilityEffect.KNOCKBACK, new AppliedControl(changed, 0));
             }
             if (effects.contains(AbilityEffect.PULL)
                     && authorized(caster, enemy, spec, AbilityEffect.PULL)) {
-                displaceToward(caster, enemy, displacement * controlPotency);
-                appliedControls.add(AbilityEffect.PULL);
+                double changed = displaceToward(caster, enemy, displacement * controlPotency);
+                if (changed > 0) appliedControls.put(AbilityEffect.PULL, new AppliedControl(changed, 0));
             }
             if (effects.contains(AbilityEffect.LAUNCH)
                     && authorized(caster, enemy, spec, AbilityEffect.LAUNCH)) {
-                displaceAway(caster, enemy, displacement * .45D * controlPotency,
+                double changed = displaceAway(caster, enemy, displacement * .45D * controlPotency,
                         Math.max(.55D, displacement * controlPotency));
-                appliedControls.add(AbilityEffect.LAUNCH);
+                if (changed > 0) appliedControls.put(AbilityEffect.LAUNCH, new AppliedControl(changed, 0));
             }
             if (effects.contains(AbilityEffect.SLOW)
                     && authorized(caster, enemy, spec, AbilityEffect.SLOW)) {
@@ -239,12 +249,13 @@ final class AbilityEffects {
                 // the existing amplifier with this duration would create an unowned long root.
                 int duration = Math.max(20, slowPlan.durationTicks());
                 int amplifier = slowPlan.potionAmplifier();
-                enemy.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,
-                        duration, amplifier, false, true, true), true);
                 EliteEntity elite = EntityTracker.getEliteMobEntity(enemy);
-                if (elite != null)
-                    crowdControl.applySlowPotency(caster, elite, slowPlan);
-                appliedControls.add(AbilityEffect.SLOW);
+                observedPotionControl |= applyPotion(caster, enemy, spec, AbilityEffect.SLOW,
+                        AbilityRuntimeObservation.Kind.CONTROL,
+                        new PotionEffect(PotionEffectType.SLOWNESS, duration, amplifier, false, true, true),
+                        ignored -> {
+                            if (elite != null) crowdControl.applySlowPotency(caster, elite, slowPlan);
+                        });
                 if (extend) {
                     if (crowdControl.extendRoot(caster, elite, Math.max(20, controlDuration)))
                         observeMechanicTriggered(caster, enemy, spec,
@@ -256,7 +267,7 @@ final class AbilityEffects {
                     && authorized(caster, enemy, spec, AbilityEffect.ROOT)) {
                 EliteEntity elite = EntityTracker.getEliteMobEntity(enemy);
                 if (crowdControl.root(caster, elite, Math.max(20, controlDuration)))
-                    appliedControls.add(AbilityEffect.ROOT);
+                    appliedControls.put(AbilityEffect.ROOT, new AppliedControl(1, crowdControl.remainingTicks(caster, enemy, AbilityEffect.ROOT)));
             }
             if (effects.contains(AbilityEffect.WEAKEN)
                     && authorized(caster, enemy, spec, AbilityEffect.WEAKEN)) {
@@ -267,32 +278,34 @@ final class AbilityEffects {
                 observeApplied(caster, enemy, spec,
                         AbilityRuntimeObservation.Kind.MODIFIER_APPLIED,
                         AbilityEffect.WEAKEN, multiplier, duration);
-                appliedControls.add(AbilityEffect.WEAKEN);
+                appliedControls.put(AbilityEffect.WEAKEN, new AppliedControl(multiplier, duration));
             }
             if (effects.contains(AbilityEffect.INTERRUPT)
                     && authorized(caster, enemy, spec, AbilityEffect.INTERRUPT)) {
                 EliteEntity elite = EntityTracker.getEliteMobEntity(enemy);
                 if (crowdControl.interrupt(
                         caster, elite, Math.max(10, Math.min(60, controlDuration))))
-                    appliedControls.add(AbilityEffect.INTERRUPT);
+                    appliedControls.put(AbilityEffect.INTERRUPT, new AppliedControl(1, crowdControl.remainingTicks(caster, enemy, AbilityEffect.INTERRUPT)));
             }
             if (effects.contains(AbilityEffect.FEAR)
                     && authorized(caster, enemy, spec, AbilityEffect.FEAR)) {
                 EliteEntity elite = EntityTracker.getEliteMobEntity(enemy);
                 if (crowdControl.fear(caster, elite, Math.max(30, controlDuration)))
-                    appliedControls.add(AbilityEffect.FEAR);
+                    appliedControls.put(AbilityEffect.FEAR, new AppliedControl(1, crowdControl.remainingTicks(caster, enemy, AbilityEffect.FEAR)));
             }
             if (effects.contains(AbilityEffect.GLOW)
                     && authorized(caster, enemy, spec, AbilityEffect.GLOW)) {
-                enemy.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING,
-                        Math.max(20, levelDuration), 0, false, true, true));
-                appliedControls.add(AbilityEffect.GLOW);
+                observedPotionControl |= applyPotion(caster, enemy, spec, AbilityEffect.GLOW,
+                        AbilityRuntimeObservation.Kind.CONTROL,
+                        new PotionEffect(PotionEffectType.GLOWING, Math.max(20, levelDuration), 0, false, true, true),
+                        ignored -> { });
             }
             if (effects.contains(AbilityEffect.BURN)
                     && authorized(caster, enemy, spec, AbilityEffect.BURN)) {
-                enemy.setFireTicks(Math.max(enemy.getFireTicks(),
-                        Math.max(20, Math.min(200, levelDuration))));
-                appliedControls.add(AbilityEffect.BURN);
+                int before = enemy.getFireTicks();
+                enemy.setFireTicks(Math.max(before, Math.max(20, Math.min(200, levelDuration))));
+                int actual = enemy.getFireTicks();
+                if (actual > before) appliedControls.put(AbilityEffect.BURN, new AppliedControl(1, actual));
             }
             if (effects.contains(AbilityEffect.PARTY_DAMAGE_MARK)
                     && authorized(caster, enemy, spec, AbilityEffect.PARTY_DAMAGE_MARK)) {
@@ -314,13 +327,12 @@ final class AbilityEffects {
                 tauntedEnemies.add(enemy);
                 affectedEnemies.add(enemy);
             }
-            if (!appliedControls.isEmpty()) {
+            if (!appliedControls.isEmpty() || observedPotionControl) {
                 controlledEnemies++;
                 affectedEnemies.add(enemy);
-                AbilityControlEvidence.applied(
-                                caster.getUniqueId(), enemy.getUniqueId(), spec,
-                                appliedControls, controlPotency, controlDuration)
-                        .forEach(semantics::observe);
+                appliedControls.forEach((effect, actual) -> AbilityControlEvidence.applied(
+                        caster.getUniqueId(), enemy.getUniqueId(), spec,
+                        Set.of(effect), actual.amount(), actual.ticks()).forEach(semantics::observe));
             }
         }
 
@@ -375,12 +387,17 @@ final class AbilityEffects {
                     && !states.suppressesImmediate(spec, AbilityEffect.SHIELD)) {
                 double shieldAmount = maximumHealth(ally) * tuning.shieldFraction()
                         * classRankScale * mechanicModifiers.shieldStrengthMultiplier();
-                applyAbsorption(ally, shieldAmount, effectDuration);
-                semantics.observe(AbilityRuntimeObservation.effect(
-                        AbilityRuntimeObservation.Kind.SHIELD,
-                        caster.getUniqueId(), ally.getUniqueId(), spec.id(),
-                        shieldAmount, effectDuration, AbilityEffect.SHIELD));
-                supported = true;
+                if (shieldAmount > 0 && Double.isFinite(shieldAmount)) {
+                    int amplifier = Math.max(0, Math.min(255, (int) Math.ceil(shieldAmount / 4D) - 1));
+                    double before = ally.getAbsorptionAmount();
+                    supported |= potions.apply(caster.getUniqueId(), ally,
+                            new PotionEffect(PotionEffectType.ABSORPTION, Math.max(20, effectDuration),
+                                    amplifier, false, true, true),
+                            actual -> observeApplied(caster, ally, spec, AbilityRuntimeObservation.Kind.SHIELD,
+                                    AbilityEffect.SHIELD, Math.max(0, ally.getAbsorptionAmount() - before), actual.getDuration()),
+                            () -> observeApplied(caster, ally, spec, AbilityRuntimeObservation.Kind.STATUS_BLOCKED,
+                                    AbilityEffect.SHIELD, 0, 0));
+                }
             }
             if (effects.contains(AbilityEffect.CLEANSE)) {
                 cleanse(ally);
@@ -390,24 +407,19 @@ final class AbilityEffects {
                 supported = true;
             }
             if (effects.contains(AbilityEffect.SPEED) && !missingHealthScaling) {
-                ally.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,
-                        Math.max(20, effectDuration), 1, false, true, true));
-                observeApplied(caster, ally, spec,
+                supported |= applyPotion(caster, ally, spec, AbilityEffect.SPEED,
                         AbilityRuntimeObservation.Kind.MODIFIER_APPLIED,
-                        AbilityEffect.SPEED, 2D, effectDuration);
-                supported = true;
+                        new PotionEffect(PotionEffectType.SPEED, Math.max(20, effectDuration), 1, false, true, true),
+                        ignored -> { });
             }
             for (AbilityEffect effect : List.of(AbilityEffect.HASTE, AbilityEffect.RESISTANCE)) {
                 if (!effects.contains(effect)) continue;
                 PotionEffectType type = effect == AbilityEffect.HASTE
                         ? PotionEffectType.HASTE : PotionEffectType.RESISTANCE;
                 int duration = Math.max(20, effectDuration);
-                if (ally.addPotionEffect(new PotionEffect(type, duration, 0, false, true, true))) {
-                    observeApplied(caster, ally, spec,
-                            AbilityRuntimeObservation.Kind.MODIFIER_APPLIED,
-                            effect, 1D, duration);
-                    supported = true;
-                }
+                supported |= applyPotion(caster, ally, spec, effect,
+                        AbilityRuntimeObservation.Kind.MODIFIER_APPLIED,
+                        new PotionEffect(type, duration, 0, false, true, true), ignored -> { });
             }
             if (effects.contains(AbilityEffect.STRENGTH) && !missingHealthScaling) {
                 double multiplier = tuning.modifierMultiplier() > 1D
@@ -537,10 +549,12 @@ final class AbilityEffects {
     }
 
     void clearSource(UUID sourceId) {
+        potions.clearSource(sourceId);
         crowdControl.clearSource(sourceId);
     }
 
     void close() {
+        potions.close();
         crowdControl.close();
     }
 
@@ -613,11 +627,14 @@ final class AbilityEffects {
         return Math.max(0D, target.getHealth() - before);
     }
 
-    private static void applyAbsorption(Player target, double amount, int durationTicks) {
-        if (amount <= 0D || !Double.isFinite(amount)) return;
-        int amplifier = Math.max(0, Math.min(255, (int) Math.ceil(amount / 4D) - 1));
-        target.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION,
-                Math.max(20, durationTicks), amplifier, false, true, true), true);
+    private boolean applyPotion(Player caster, LivingEntity target, FixedAbilitySpec spec,
+                                AbilityEffect effect, AbilityRuntimeObservation.Kind kind,
+                                PotionEffect requested, java.util.function.Consumer<PotionEffect> onApplied) {
+        return potions.apply(caster.getUniqueId(), target, requested, actual -> {
+            onApplied.accept(actual);
+            observeApplied(caster, target, spec, kind, effect, actual.getAmplifier() + 1D, actual.getDuration());
+        }, () -> observeApplied(caster, target, spec,
+                AbilityRuntimeObservation.Kind.STATUS_BLOCKED, effect, 0, 0));
     }
 
     private void observeApplied(
@@ -662,7 +679,7 @@ final class AbilityEffects {
             target.removePotionEffect(type);
     }
 
-    private static void displaceAway(Player caster, LivingEntity target, double horizontal, double vertical) {
+    private static double displaceAway(Player caster, LivingEntity target, double horizontal, double vertical) {
         Vector direction = target.getLocation().toVector().subtract(caster.getLocation().toVector());
         direction.setY(0);
         if (direction.lengthSquared() < 1.0E-6) {
@@ -670,14 +687,18 @@ final class AbilityEffects {
             direction = new Vector(-Math.sin(yaw), 0, Math.cos(yaw));
         }
         direction.normalize().multiply(Math.max(.1D, horizontal)).setY(vertical);
-        target.setVelocity(target.getVelocity().add(direction));
+        Vector before = target.getVelocity();
+        target.setVelocity(before.clone().add(direction));
+        return target.getVelocity().subtract(before).length();
     }
 
-    private static void displaceToward(Player caster, LivingEntity target, double strength) {
+    private static double displaceToward(Player caster, LivingEntity target, double strength) {
         Vector direction = caster.getLocation().toVector().subtract(target.getLocation().toVector());
-        if (direction.lengthSquared() < 1.0E-6) return;
+        if (direction.lengthSquared() < 1.0E-6) return 0;
         direction.normalize().multiply(Math.max(.1D, strength)).setY(.15D);
-        target.setVelocity(target.getVelocity().add(direction));
+        Vector before = target.getVelocity();
+        target.setVelocity(before.clone().add(direction));
+        return target.getVelocity().subtract(before).length();
     }
 
     private static int scaledDuration(int authoredTicks, double multiplier) {
