@@ -58,6 +58,10 @@ public class WorldOperationQueue {
         WorldOperation operation = new WorldOperation(
                 player, asyncOperation, syncOperation, operationName, terminalCallback,
                 operationGeneration.get(), new AtomicBoolean(false));
+        if (MetadataHandler.shutdownRequested || !player.isOnline()) {
+            runTerminalCallback(operation);
+            return;
+        }
         operationQueue.add(operation);
 
         int queuePosition = operationQueue.size() + (isProcessing.get() ? 1 : 0);
@@ -75,7 +79,12 @@ public class WorldOperationQueue {
             return; // Another operation is already processing
         }
 
-        WorldOperation operation = operationQueue.poll();
+        WorldOperation next = operationQueue.poll();
+        while (next != null && (!next.player.isOnline() || MetadataHandler.shutdownRequested)) {
+            runTerminalCallback(next);
+            next = operationQueue.poll();
+        }
+        WorldOperation operation = next;
         if (operation == null) {
             isProcessing.set(false);
             return;

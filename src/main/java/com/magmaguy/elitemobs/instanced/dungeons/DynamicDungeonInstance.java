@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
@@ -128,27 +127,23 @@ public class DynamicDungeonInstance extends DungeonInstance {
         if (!launchEvent(dynamicDungeonConfigFields, instancedWorldName, player)) return false;
         if (!reservation.isValid()) return false;
 
-        AtomicBoolean worldFilesCreated = new AtomicBoolean(false);
+        PendingWorldCopy copy = new PendingWorldCopy();
         WorldOperationQueue.queueOperation(
                 player,
                 () -> {
                     if (!reservation.isValid()) return true;
-                    boolean created = cloneWorldFiles(dynamicDungeonConfigFields, instancedWorldName) != null;
-                    worldFilesCreated.set(created);
-                    return created;
+                    return copy.copy(() -> cloneWorldFiles(dynamicDungeonConfigFields, instancedWorldName));
                 },
                 () -> {
-                    // Cancellation before copying owns no files, even if another launch chose this name.
-                    if (!worldFilesCreated.get()) return;
-                    if (!reservation.isValid()) {
-                        cleanupUnloadedWorldFolder(instancedWorldName);
-                        return;
-                    }
+                    if (!reservation.isValid() || !copy.transferToInitializer()) return;
                     initializeDynamicWorld(dynamicDungeonConfigFields, instancedWorldName, player,
                             entryMemberIds, difficultyName, selectedLevel, reservation);
                 },
                 dynamicDungeonConfigFields.getName(),
-                reservation::release
+                () -> {
+                    try { copy.cancel(); }
+                    finally { reservation.release(); }
+                }
         );
         return true;
     }
@@ -214,7 +209,9 @@ public class DynamicDungeonInstance extends DungeonInstance {
                     reservation == null ? () -> true : reservation::isValid);
         } catch (Exception exception) {
             com.magmaguy.magmacore.util.Logger.warn("Failed to initialize dynamic dungeon world " + instancedWorldName + ": " + exception.getMessage());
-            cleanupLoadedWorld(world != null ? world : Bukkit.getWorld(instancedWorldName));
+            World loaded = world != null ? world : Bukkit.getWorld(instancedWorldName);
+            if (loaded == null) cleanupUnloadedWorldFolder(instancedWorldName);
+            else cleanupLoadedWorld(loaded);
             throw new RuntimeException(exception);
         }
     }

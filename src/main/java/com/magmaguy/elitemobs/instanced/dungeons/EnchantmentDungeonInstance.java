@@ -20,7 +20,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EnchantmentDungeonInstance extends DungeonInstance {
     @Getter
@@ -59,21 +58,17 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
             throw new IllegalStateException("Enchantment challenge launch was rejected");
 
         boolean[] accepted = {false};
-        boolean[] instanceOwnsWorld = {false};
-        AtomicBoolean copied = new AtomicBoolean();
+        PendingWorldCopy copy = new PendingWorldCopy();
         WorldOperationQueue.queueOperation(
                 player,
-                () -> {
-                    boolean created = cloneWorldFiles(contentPackagesConfigFields, instancedWordName) != null;
-                    copied.set(created);
-                    return created;
-                },
+                () -> copy.copy(() -> cloneWorldFiles(contentPackagesConfigFields, instancedWordName)),
                 () -> {
                     if (!player.isOnline() || MetadataHandler.shutdownRequested || !acquisition.isOwned()) return;
                     acquisition.validateProviders();
+                    String difficulty = (String) contentPackagesConfigFields.getDifficulties().get(0).get("name");
+                    if (!copy.transferToInitializer()) return;
                     DungeonInstance instance = initializeInstancedWorld(contentPackagesConfigFields, instancedWordName,
-                            player, (String) contentPackagesConfigFields.getDifficulties().get(0).get("name"));
-                    instanceOwnsWorld[0] = instance != null;
+                            player, difficulty);
                     if (instance instanceof EnchantmentDungeonInstance challenge && !challenge.isDefunct()) {
                         challenge.accept(acquisition);
                         accepted[0] = true;
@@ -83,11 +78,7 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
                 () -> {
                     if (accepted[0]) return;
                     try {
-                        if (copied.get() && !instanceOwnsWorld[0]) {
-                            World loaded = Bukkit.getWorld(instancedWordName);
-                            if (loaded == null) cleanupUnloadedWorldFolder(instancedWordName);
-                            else cleanupLoadedWorld(loaded);
-                        }
+                        copy.cancel();
                     } finally {
                         acquisition.abort("challenge startup failed or was cancelled");
                     }

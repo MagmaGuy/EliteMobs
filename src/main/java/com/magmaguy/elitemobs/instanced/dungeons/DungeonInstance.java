@@ -43,7 +43,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 
 public class DungeonInstance extends MatchInstance {
@@ -236,27 +235,23 @@ public class DungeonInstance extends MatchInstance {
         if (!launchEvent(instancedDungeonsConfigFields, instancedWorldName, player)) return false;
         if (!reservation.isValid()) return false;
 
-        AtomicBoolean worldFilesCreated = new AtomicBoolean(false);
+        PendingWorldCopy copy = new PendingWorldCopy();
         WorldOperationQueue.queueOperation(
                 player,
                 () -> {
                     if (!reservation.isValid()) return true;
-                    boolean created = cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName) != null;
-                    worldFilesCreated.set(created);
-                    return created;
+                    return copy.copy(() -> cloneWorldFiles(instancedDungeonsConfigFields, instancedWorldName));
                 },
                 () -> {
-                    // Cancellation before copying owns no files, even if another launch chose this name.
-                    if (!worldFilesCreated.get()) return;
-                    if (!reservation.isValid()) {
-                        cleanupUnloadedWorldFolder(instancedWorldName);
-                        return;
-                    }
+                    if (!reservation.isValid() || !copy.transferToInitializer()) return;
                     initializeInstancedWorld(instancedDungeonsConfigFields, instancedWorldName, player,
                             entryMemberIds, difficultyName, reservation);
                 },
                 instancedDungeonsConfigFields.getName(),
-                reservation::release
+                () -> {
+                    try { copy.cancel(); }
+                    finally { reservation.release(); }
+                }
         );
         return true;
     }
@@ -351,7 +346,9 @@ public class DungeonInstance extends MatchInstance {
                         world, entryPlayers.get(0), difficultyName);
         } catch (Exception exception) {
             Logger.warn("Failed to initialize instanced dungeon world " + instancedWordName + ": " + exception.getMessage());
-            cleanupLoadedWorld(world != null ? world : Bukkit.getWorld(instancedWordName));
+            World loaded = world != null ? world : Bukkit.getWorld(instancedWordName);
+            if (loaded == null) cleanupUnloadedWorldFolder(instancedWordName);
+            else cleanupLoadedWorld(loaded);
             throw new RuntimeException(exception);
         }
     }
