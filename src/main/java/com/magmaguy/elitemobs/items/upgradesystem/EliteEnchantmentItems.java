@@ -59,8 +59,10 @@ public final class EliteEnchantmentItems {
         ITEMS.previewCustom(item, result);
         for (var entry : nativeLevels(item).entrySet()) {
             var config = EnchantmentsConfig.getEnchantment(entry.getKey());
-            if (config == null || !config.isEnabled() || entry.getValue() > config.getMaxEnchantmentLevel())
+            if (config == null || !config.isEnabled())
                 throw new IllegalArgumentException("Native book enchantment is outside EM's configured policy");
+            if (entry.getValue() > config.getMaxEnchantmentLevel())
+                throw new EnchantmentItems.LimitExceededException("Native book enchantment exceeds EM's configured limit");
             result.put(entry.getKey().getKey().toString(), entry.getValue());
         }
         if (result.isEmpty()) throw new IllegalArgumentException("Book has no transferable enchantments");

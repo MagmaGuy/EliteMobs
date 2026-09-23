@@ -55,7 +55,8 @@ public class EnchantmentDungeonInstance extends DungeonInstance {
         ContentPackagesConfigFields contentPackagesConfigFields = contentPackagesConfigFieldsList.get(ThreadLocalRandom.current().nextInt(0, contentPackagesConfigFieldsList.size()));
         String instancedWordName = WorldInstantiator.getNewWorldName(contentPackagesConfigFields.getWorldName());
 
-        if (!launchEvent(contentPackagesConfigFields, instancedWordName, player)) return false;
+        if (!launchEvent(contentPackagesConfigFields, instancedWordName, player))
+            throw new IllegalStateException("Enchantment challenge launch was rejected");
 
         boolean[] accepted = {false};
         boolean[] instanceOwnsWorld = {false};

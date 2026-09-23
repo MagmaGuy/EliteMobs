@@ -28,13 +28,15 @@ public final class UpgradeSystem {
                 if (WeaponIdentityResolver.isMagicWeapon(source)
                         && !EnchantmentGenerator.supportedMagicEnchantments().contains(enchantment))
                     throw new IllegalArgumentException("Native enchantment is incompatible with this magic weapon");
-                natives.merge(enchantment, entry.getValue(), Math::addExact);
-            } else custom.merge(entry.getKey(), entry.getValue(), Math::addExact);
+                natives.merge(enchantment, entry.getValue(), UpgradeSystem::addLevels);
+            } else custom.merge(entry.getKey(), entry.getValue(), UpgradeSystem::addLevels);
         }
         for (var entry : natives.entrySet()) {
             var config = EnchantmentsConfig.getEnchantment(entry.getKey());
-            if (config == null || !config.isEnabled() || entry.getValue() > config.getMaxEnchantmentLevel())
-                throw new IllegalArgumentException("Native upgrade exceeds EM's configured limit");
+            if (config == null || !config.isEnabled())
+                throw new IllegalArgumentException("Native upgrade is disabled or unavailable");
+            if (entry.getValue() > config.getMaxEnchantmentLevel())
+                throw new EnchantmentItems.LimitExceededException("Native upgrade exceeds EM's configured limit");
         }
         ItemStack nativeDraft = source.clone();
         nativeDraft.setAmount(1);
@@ -50,13 +52,11 @@ public final class UpgradeSystem {
 
     public static ItemStack upgrade(ItemStack source, ItemStack book) { return preview(source, book).apply(source, book); }
 
-    public static boolean isValidUpgrade(ItemStack source, ItemStack book) {
-        try { preview(source, book); return true; }
-        catch (RuntimeException invalid) { return false; }
-    }
-
-    public static boolean isCompatibleBook(ItemStack source, ItemStack book) {
-        return isValidUpgrade(source, book);
+    private static int addLevels(int first, int second) {
+        try { return Math.addExact(first, second); }
+        catch (ArithmeticException overflow) {
+            throw new EnchantmentItems.LimitExceededException("Enchantment level exceeds the supported integer range");
+        }
     }
 
     public static final class Preview {

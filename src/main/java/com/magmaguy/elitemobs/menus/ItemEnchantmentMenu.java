@@ -1,5 +1,7 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.magmacore.util.Logger;
+
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
@@ -154,6 +156,9 @@ public class ItemEnchantmentMenu extends EliteMenu {
             event.setCancelled(true);
             if (processing.contains(event.getView().getTopInventory())) return;
             if (!SharedShopElements.itemNullPointerPrevention(event)) return;
+            Inventory inventory = event.getView().getTopInventory();
+            ItemStack previousInput = inventory.getItem(ITEM_SLOT);
+            ItemStack previousBook = inventory.getItem(ENCHANTED_BOOK_SLOT);
 
             if (isTopMenu(event)) {
                 handleTopInventory(event);
@@ -161,14 +166,18 @@ public class ItemEnchantmentMenu extends EliteMenu {
                 handleBottomInventory(event);
             }
 
-            if (event.getInventory().getItem(ENCHANTED_BOOK_SLOT) != null &&
-                    event.getInventory().getItem(ITEM_SLOT) != null &&
-                    !UpgradeSystem.isValidUpgrade(event.getView().getTopInventory().getItem(ITEM_SLOT),
-                            event.getView().getTopInventory().getItem(ENCHANTED_BOOK_SLOT))) {
-                event.getWhoClicked().sendMessage(UpgradeSystem.isCompatibleBook(
-                        event.getInventory().getItem(ITEM_SLOT), event.getInventory().getItem(ENCHANTED_BOOK_SLOT))
-                        ? ItemEnchantmentMenuConfig.getEnchantmentLimitMessage()
-                        : ItemEnchantmentMenuConfig.getIncompatibleEnchantmentMessage());
+            if (!menus.contains(inventory) || event.getWhoClicked().getOpenInventory().getTopInventory() != inventory) return;
+            ItemStack input = inventory.getItem(ITEM_SLOT), book = inventory.getItem(ENCHANTED_BOOK_SLOT);
+            if (input == null || book == null
+                    || (Objects.equals(previousInput, input) && Objects.equals(previousBook, book))) return;
+            try {
+                UpgradeSystem.preview(input, book);
+            } catch (com.magmaguy.magmacore.enchantments.EnchantmentItems.LimitExceededException limit) {
+                event.getWhoClicked().sendMessage(ItemEnchantmentMenuConfig.getEnchantmentLimitMessage());
+                event.getWhoClicked().closeInventory();
+            } catch (RuntimeException invalid) {
+                Logger.warn("Rejected enchantment preview: " + invalid.getMessage());
+                event.getWhoClicked().sendMessage(ItemEnchantmentMenuConfig.getIncompatibleEnchantmentMessage());
                 event.getWhoClicked().closeInventory();
             }
         }
@@ -265,6 +274,9 @@ public class ItemEnchantmentMenu extends EliteMenu {
                         }
                     }
                 }
+            } catch (com.magmaguy.magmacore.enchantments.EnchantmentItems.LimitExceededException limit) {
+                if (attempt != null) attempt.abort("enchantment limit changed: " + limit.getMessage());
+                player.sendMessage(ItemEnchantmentMenuConfig.getEnchantmentLimitMessage());
             } catch (RuntimeException invalid) {
                 if (attempt != null) attempt.abort("enchantment operation failed: " + invalid);
                 player.sendMessage(ChatColor.RED + "The enchantment attempt could not be completed.");
