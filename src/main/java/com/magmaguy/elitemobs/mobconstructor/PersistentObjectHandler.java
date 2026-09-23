@@ -267,7 +267,7 @@ public class PersistentObjectHandler {
             pendingChunkLoads.put(key, task);
         }
 
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void worldUnloadEvent(WorldUnloadEvent event) {
             unloadWorld(event.getWorld());
         }

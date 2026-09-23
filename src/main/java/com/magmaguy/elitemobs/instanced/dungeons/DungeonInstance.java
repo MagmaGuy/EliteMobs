@@ -54,11 +54,17 @@ public class DungeonInstance extends MatchInstance {
 
     @Getter
     private static final Set<DungeonInstance> dungeonInstances = new HashSet<>();
+    private static final Map<UUID, DungeonInstance> worldInstances = new HashMap<>();
+    private static final Map<UUID, WorldRetirement> worldRetirements = new HashMap<>();
+
+    public static DungeonInstance forWorld(UUID worldId) { return worldInstances.get(worldId); }
+    public static boolean isWorldRetiring(UUID worldId) { return worldRetirements.containsKey(worldId); }
 
     public static void shutdown() {
         HashSet<DungeonInstance> copy = new HashSet<>(dungeonInstances);
+        copy.addAll(worldInstances.values());
         copy.forEach(DungeonInstance::removeInstance);
-        dungeonInstances.clear();
+        for (WorldRetirement retirement : new ArrayList<>(worldRetirements.values())) retirement.runNow(true);
     }
 
     private final List<DungeonObjective> dungeonObjectives = new ArrayList<>();
@@ -82,7 +88,6 @@ public class DungeonInstance extends MatchInstance {
     private String difficultyID = null;
     private BukkitTask initializeEntitiesTask = null;
     private BukkitTask destroyMatchTask = null;
-    private BukkitTask removeInstanceTask = null;
 
     /** Creates a one-life encounter mob owned and cleaned up by this dungeon. */
     public InstancedBossEntity createEncounterBoss(CustomBossesConfigFields fields, Location location) {
@@ -136,6 +141,11 @@ public class DungeonInstance extends MatchInstance {
         try {
             super.lobbyLocation = lobbyLocation;
             this.contentPackagesConfigFields = contentPackagesConfigFields;
+            this.world = world;
+            super.world = world;
+            DungeonInstance previous = worldInstances.putIfAbsent(world.getUID(), this);
+            if (previous != null && previous != this)
+                throw new IllegalStateException("Dungeon world already has an owner: " + world.getName());
             for (DungeonObjective.TargetDefinition objective : contentPackagesConfigFields.instanceObjectives())
                 dungeonObjectives.add(new DungeonKillTargetObjective(this, objective));
             this.world = world;
@@ -302,14 +312,16 @@ public class DungeonInstance extends MatchInstance {
             cleanupUnloadedWorldFolder(instancedWordName);
             return null;
         }
-        World world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment(), instancedDungeonsConfigFields);
-        if (world == null) {
-            player.sendMessage(DungeonsConfig.getDungeonWorldLoadFailedMessage());
-            cleanupUnloadedWorldFolder(instancedWordName);
-            return null;
-        }
-
+        World world = null;
         try {
+            instancedDungeonsConfigFields.prepareInstanceDefinition();
+            world = DungeonUtils.loadWorld(instancedWordName, instancedDungeonsConfigFields.getEnvironment(), instancedDungeonsConfigFields);
+            if (world == null) {
+                player.sendMessage(DungeonsConfig.getDungeonWorldLoadFailedMessage());
+                cleanupUnloadedWorldFolder(instancedWordName);
+                return null;
+            }
+
             List<Player> entryPlayers = resolveDungeonEntryRoster(
                     player, entryMemberIds, instancedDungeonsConfigFields, null);
             if (entryPlayers.isEmpty() || (reservation != null && !reservation.isValid())) {
@@ -339,7 +351,7 @@ public class DungeonInstance extends MatchInstance {
                         world, entryPlayers.get(0), difficultyName);
         } catch (Exception exception) {
             Logger.warn("Failed to initialize instanced dungeon world " + instancedWordName + ": " + exception.getMessage());
-            cleanupLoadedWorld(world);
+            cleanupLoadedWorld(world != null ? world : Bukkit.getWorld(instancedWordName));
             throw new RuntimeException(exception);
         }
     }
@@ -566,11 +578,10 @@ public class DungeonInstance extends MatchInstance {
         }
 
         world.getEntities().forEach(entity -> EntityTracker.unregister(entity, RemovalReason.WORLD_UNLOAD));
-        if (immediateRemoval) {
-            new RemoveInstanceTask(dungeonInstance, true).run();
-        } else {
-            removeInstanceTask = new RemoveInstanceTask(dungeonInstance, false).runTaskLater(MetadataHandler.PLUGIN, 20 * 30L);
-        }
+        WorldRetirement retirement = worldRetirements.computeIfAbsent(world.getUID(),
+                ignored -> new WorldRetirement(world, dungeonInstance));
+        if (immediateRemoval) retirement.runNow(true);
+        else retirement.schedule(20L * 30L);
     }
 
     private void cancelInitializeEntitiesTask() {
@@ -586,9 +597,8 @@ public class DungeonInstance extends MatchInstance {
     }
 
     private void cancelRemoveInstanceTask() {
-        if (removeInstanceTask == null) return;
-        removeInstanceTask.cancel();
-        removeInstanceTask = null;
+        WorldRetirement retirement = world == null ? null : worldRetirements.get(world.getUID());
+        if (retirement != null) retirement.cancelPending();
     }
 
     private void removeInstancedBossEntities(RemovalReason removalReason) {
@@ -626,19 +636,15 @@ public class DungeonInstance extends MatchInstance {
 
     protected static void cleanupLoadedWorld(World world) {
         if (world == null) return;
-        UUID worldUUID = world.getUID();
-        CustomMusic.removeDungeonMusic(worldUUID);
-        TreasureChest.removeInstancedTreasureChests(world);
-        PersistentObjectHandler.removeForWorld(worldUUID);
-        EliteMobsWorld.destroy(worldUUID);
-        if (!TemporaryWorldManager.tryPermanentlyDeleteWorld(world))
-            Logger.warn("Failed to clean up cancelled instanced dungeon world " + world.getName());
+        WorldRetirement retirement = worldRetirements.computeIfAbsent(world.getUID(),
+                ignored -> new WorldRetirement(world, worldInstances.get(world.getUID())));
+        retirement.runNow(MetadataHandler.shutdownRequested);
     }
 
-    private void cleanupWorldScopedState(World worldToDelete) {
-        if (worldToDelete == null) return;
+    private static void cleanupWorldScopedState(World worldToDelete) {
         UUID worldUUID = worldToDelete.getUID();
         EliteMobsWorld.destroy(worldUUID);
+        com.magmaguy.magmacore.instance.InstanceProtector.removeProtectedWorld(worldToDelete);
         CustomMusic.removeDungeonMusic(worldUUID);
         TreasureChest.removeInstancedTreasureChests(worldToDelete);
         PersistentObjectHandler.removeForWorld(worldUUID);
@@ -791,144 +797,115 @@ public class DungeonInstance extends MatchInstance {
         }
     }
 
-    private class RemoveInstanceTask extends BukkitRunnable {
-        private static final int MAX_DELETE_ATTEMPTS = 12;
-        private static final long DELETE_RETRY_DELAY_TICKS = 20L * 5L;
+    /** The same retirement owner handles both complete instances and failed construction. */
+    private static final class WorldRetirement implements Runnable {
+        private final World world;
+        private final DungeonInstance owner;
+        private BukkitTask pending;
+        private int attempts;
+        private boolean immediate;
+        private boolean running;
 
-        private final DungeonInstance dungeonInstance;
-        private final int attempt;
-        private final boolean immediateRemoval;
-
-        private RemoveInstanceTask(DungeonInstance dungeonInstance, boolean immediateRemoval) {
-            this(dungeonInstance, 1, immediateRemoval);
+        private WorldRetirement(World world, DungeonInstance owner) {
+            this.world = world;
+            this.owner = owner;
         }
 
-        private RemoveInstanceTask(DungeonInstance dungeonInstance, int attempt, boolean immediateRemoval) {
-            this.dungeonInstance = dungeonInstance;
-            this.attempt = attempt;
-            this.immediateRemoval = immediateRemoval;
+        private void cancelPending() {
+            if (pending != null) { pending.cancel(); pending = null; }
+        }
+
+        private void schedule(long delay) {
+            if (pending == null)
+                pending = Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, this, delay);
+        }
+
+        private void runNow(boolean immediate) {
+            cancelPending();
+            this.immediate |= immediate;
+            run();
         }
 
         @Override
         public void run() {
-            // Check if world was already removed
-            if (world == null) {
-                Logger.warn("RemoveInstanceTask: World already null, skipping deletion");
-                cleanupInstanceReferences();
-                return;
-            }
-
-            World worldToDelete = world;
-            String worldName = worldToDelete.getName();
-
-            // Log diagnostic info before attempting deletion
-            int entityCount = worldToDelete.getEntities().size();
-            int playerCount = worldToDelete.getPlayers().size();
-            int loadedChunks = worldToDelete.getLoadedChunks().length;
-
-            if (playerCount > 0) {
-                Logger.warn("Delaying deletion of world " + worldName + " because " + playerCount + " players are still in it.");
-                evacuatePlayers(worldToDelete);
-                callRemovalEvent();
-                cleanupWorldScopedState(worldToDelete);
-                if (!immediateRemoval) {
-                    retryDeletion(worldName);
-                    return;
-                }
-            }
-
-            callRemovalEvent();
-            cleanupWorldScopedState(worldToDelete);
-
+            pending = null;
+            if (running || worldRetirements.get(world.getUID()) != this) return;
+            running = true;
+            attempts++;
             try {
-                Logger.info("Deleting instanced dungeon world " + worldName + " with " + entityCount + " entities and " + loadedChunks + " loaded chunks.");
-                boolean deleted = immediateRemoval
-                        ? TemporaryWorldManager.trySyncPermanentlyDeleteWorld(worldToDelete)
-                        : TemporaryWorldManager.tryPermanentlyDeleteWorld(worldToDelete);
-                if (!deleted) {
-                    retryDeletion(worldName);
-                    return;
-                }
-                new EventCaller(new WorldUninstanceEvent(contentPackagesConfigFields, worldName));
-                cleanupInstanceReferences();
-            } catch (Exception e) {
-                Logger.warn("Exception while deleting world " + worldName + ": " + e.getMessage());
-                e.printStackTrace();
-                retryDeletion(worldName);
-            }
-        }
-
-        private void callRemovalEvent() {
-            if (removalEventCalled) return;
-            new EventCaller(new InstancedDungeonRemoveEvent(dungeonInstance));
-            removalEventCalled = true;
-        }
-
-        private void evacuatePlayers(World worldToDelete) {
-            Location fallbackLocation = getFallbackLocation(worldToDelete);
-            for (Player player : new HashSet<>(worldToDelete.getPlayers())) {
-                Logger.warn(" - Player still in world: " + player.getName());
-                // Per-player isolation: this loop runs BEFORE the deletion try-block,
-                // so an escaping exception used to abort the remaining evacuations AND
-                // the retry chain — the world was then never deleted and its ghost
-                // browser entry outlived the grace window until a restart.
-                try {
-                    Location destination = getSafeExitLocation(player, worldToDelete, fallbackLocation);
-                    if (destination == null) {
-                        Logger.warn("Could not find a safe destination for " + player.getName() + " while deleting " + worldToDelete.getName() + ".");
-                        continue;
+                if (Bukkit.getWorld(world.getUID()) != null) {
+                    evacuatePlayers();
+                    if (!world.getPlayers().isEmpty()) { retry(); return; }
+                    var protection = com.magmaguy.magmacore.instance.InstanceProtector.getRules(world);
+                    boolean unloaded = immediate
+                            ? TemporaryWorldManager.trySyncPermanentlyDeleteWorld(world)
+                            : TemporaryWorldManager.tryPermanentlyDeleteWorld(world);
+                    if (!unloaded) {
+                        if (protection != null)
+                            com.magmaguy.magmacore.instance.InstanceProtector.addProtectedWorld(world, protection);
+                        PersistentObjectHandler.loadWorld(world);
+                        retry();
+                        return;
                     }
-                    if (player.getGameMode() == org.bukkit.GameMode.SPECTATOR)
-                        player.setSpectatorTarget(null);
-                    com.magmaguy.elitemobs.instanced.InstancePlayerMovement.teleportForMatch(player, destination, dungeonInstance, false);
-                } catch (Exception exception) {
-                    Logger.warn("Failed to evacuate " + player.getName() + " from "
-                            + worldToDelete.getName() + ": " + exception.getMessage());
-                    exception.printStackTrace();
+                }
+                // The protection/index remains authoritative until native unload actually succeeds.
+                cleanupWorldScopedState(world);
+                if (owner != null) {
+                    if (!owner.removalEventCalled) {
+                        owner.removalEventCalled = true;
+                        new EventCaller(new InstancedDungeonRemoveEvent(owner));
+                    }
+                    if (owner.contentPackagesConfigFields != null)
+                        new EventCaller(new WorldUninstanceEvent(owner.contentPackagesConfigFields, world.getName()));
+                    owner.cleanupInstanceReferences();
+                }
+                worldRetirements.remove(world.getUID(), this);
+            } catch (RuntimeException failure) {
+                Logger.warn("Could not retire dungeon world " + world.getName() + ": " + failure.getMessage());
+                retry();
+            } finally {
+                running = false;
+            }
+        }
+
+        private void retry() {
+            if (immediate || MetadataHandler.shutdownRequested || !MetadataHandler.PLUGIN.isEnabled()) {
+                Logger.warn("Dungeon world " + world.getName()
+                        + " could not be unloaded during shutdown. Its ownership was retained; no files were deleted.");
+                return;
+            }
+            if (attempts == 1 || attempts == 12)
+                Logger.warn("Dungeon world " + world.getName()
+                        + " is still loaded. Protection and cleanup ownership were retained; cleanup will retry.");
+            schedule(attempts < 12 ? 20L * 5L : 20L * 60L);
+        }
+
+        private void evacuatePlayers() {
+            Location fallback = null;
+            for (World other : Bukkit.getWorlds())
+                if (!other.equals(world) && !isWorldRetiring(other.getUID())) {
+                    fallback = other.getSpawnLocation();
+                    break;
+                }
+            for (Player player : new ArrayList<>(world.getPlayers())) {
+                Location destination = owner == null ? null : owner.previousPlayerLocations.get(player);
+                if (!safeExit(destination)) destination = owner == null ? null : owner.exitLocation;
+                if (!safeExit(destination)) destination = fallback;
+                if (destination == null) continue;
+                try {
+                    if (player.getGameMode() == org.bukkit.GameMode.SPECTATOR) player.setSpectatorTarget(null);
+                    if (owner == null) player.teleport(destination);
+                    else com.magmaguy.elitemobs.instanced.InstancePlayerMovement.teleportForMatch(player, destination, owner, false);
+                } catch (RuntimeException failure) {
+                    Logger.warn("Could not evacuate " + player.getName() + " from " + world.getName() + ": " + failure.getMessage());
                 }
             }
         }
 
-        private Location getFallbackLocation(World worldToDelete) {
-            for (World fallbackWorld : Bukkit.getWorlds())
-                if (!fallbackWorld.equals(worldToDelete))
-                    return fallbackWorld.getSpawnLocation();
-            return null;
-        }
-
-        private Location getSafeExitLocation(Player player, World worldToDelete, Location fallbackLocation) {
-            Location previousLocation = previousPlayerLocations.get(player);
-            if (isSafeExitLocation(previousLocation, worldToDelete)) return previousLocation;
-            if (isSafeExitLocation(exitLocation, worldToDelete)) return exitLocation;
-            return fallbackLocation;
-        }
-
-        private boolean isSafeExitLocation(Location location, World worldToDelete) {
-            if (location == null || location.getWorld() == null) return false;
-            if (location.getWorld().equals(worldToDelete)) return false;
-            return Bukkit.getWorld(location.getWorld().getUID()) != null;
-        }
-
-        private void retryDeletion(String worldName) {
-            if (attempt >= MAX_DELETE_ATTEMPTS) {
-                String worldState = world == null ? "world reference already null" :
-                        world.getPlayers().size() + " players, " + world.getEntities().size() + " entities, "
-                                + world.getLoadedChunks().length + " loaded chunks still present";
-                Logger.warn("Could not safely delete instanced dungeon world " + worldName + " after " + attempt
-                        + " attempts (" + worldState + "). Leaving it loaded to avoid save errors - it will occupy"
-                        + " memory until the next restart.");
-                callRemovalEvent();
-                cleanupWorldScopedState(world);
-                cleanupInstanceReferences();
-                return;
-            }
-            if (immediateRemoval || MetadataHandler.shutdownRequested) {
-                Logger.warn("Skipping retry scheduling for " + worldName + " because EliteMobs is shutting down.");
-                cleanupWorldScopedState(world);
-                cleanupInstanceReferences();
-                return;
-            }
-            removeInstanceTask = new RemoveInstanceTask(dungeonInstance, attempt + 1, false).runTaskLater(MetadataHandler.PLUGIN, DELETE_RETRY_DELAY_TICKS);
+        private boolean safeExit(Location location) {
+            return location != null && location.getWorld() != null && !world.equals(location.getWorld())
+                    && Bukkit.getWorld(location.getWorld().getUID()) != null
+                    && !isWorldRetiring(location.getWorld().getUID());
         }
     }
 
@@ -940,6 +917,7 @@ public class DungeonInstance extends MatchInstance {
         cancelRemoveInstanceTask();
         instances.remove(this);
         dungeonInstances.remove(this);
+        if (world != null) worldInstances.remove(world.getUID(), this);
         players.clear();
         spectators.clear();
         participants.clear();

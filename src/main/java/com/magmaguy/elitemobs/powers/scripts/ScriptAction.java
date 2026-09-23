@@ -442,10 +442,11 @@ public class ScriptAction {
 
         targets.forEach(target -> {
             try {
-                if (target instanceof Player player && PlayerData.getMatchInstance(player) != null)
-                    com.magmaguy.elitemobs.instanced.InstancePlayerMovement.teleportWithinWorld(
-                            player, destination, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.PLUGIN);
-                else target.teleport(destination);
+                if (target instanceof Player player && PlayerData.getMatchInstance(player) != null) {
+                    if (com.magmaguy.elitemobs.instanced.InstanceEffectPolicy.canAffect(scriptActionData.getEliteEntity(), player))
+                        com.magmaguy.elitemobs.instanced.InstancePlayerMovement.teleportForMatch(
+                                player, destination, PlayerData.getMatchInstance(player), false);
+                } else target.teleport(destination);
             } catch (Exception e) {
                 Logger.warn("Failed to teleport entity '" + target.getName() + "' in script '" + blueprint.getScriptName() + "': " + e.getMessage());
             }

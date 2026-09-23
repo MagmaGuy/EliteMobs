@@ -1,79 +1,60 @@
 package com.magmaguy.elitemobs.instanced.arena;
 
-import com.magmaguy.magmacore.util.Logger;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
+/** Parsed once before registering an arena run or its scheduled work. */
 public class ArenaWaves {
+    private final Map<Integer, List<ArenaEntity>> arenaEntities;
 
-    private final HashMap<Integer, List<ArenaEntity>> arenaEntities = new HashMap();
-
-    //wave=X:spawnPoint=Y:boss=Z.yml:mythicmob=false
     public ArenaWaves(List<String> rawBosses) {
-        for (String iteratedBoss : rawBosses) {
-            String[] subString = iteratedBoss.split(":");
-            String waveString = "";
-            String spawnpointString = "";
-            String boss = "";
-            String mythicMobString = "";
-            String levelString = "";
-            for (String iteratedString : subString) {
-                String[] valuesString = iteratedString.split("=");
-                switch (valuesString[0].toLowerCase(Locale.ROOT)) {
-                    case "wave":
-                        waveString = valuesString[1];
-                        break;
-                    case "spawnpoint":
-                        spawnpointString = valuesString[1];
-                        break;
-                    case "boss":
-                        boss = valuesString[1];
-                        break;
-                    case "mythicmob":
-                        mythicMobString = valuesString[1];
-                        break;
-                    case "level":
-                        levelString = valuesString[1];
-                        break;
-                }
+        Map<Integer, List<ArenaEntity>> waves = new HashMap<>();
+        if (rawBosses == null) throw new IllegalArgumentException("Arena bossList is missing");
+        for (String entry : rawBosses) {
+            if (entry == null) throw new IllegalArgumentException("Arena bossList contains a null entry");
+            Map<String, String> fields = new HashMap<>();
+            for (String field : entry.split(":", -1)) {
+                String[] pair = field.split("=", 2);
+                if (pair.length != 2 || pair[1].isBlank()) throw new IllegalArgumentException("Invalid arena wave: " + entry);
+                String key = pair[0].trim().toLowerCase(Locale.ROOT);
+                if (!List.of("wave", "spawnpoint", "boss", "mythicmob", "level").contains(key)
+                        || fields.putIfAbsent(key, pair[1].trim()) != null)
+                    throw new IllegalArgumentException("Unknown or duplicate arena wave field: " + entry);
             }
-            int wave;
-            try {
-                wave = Integer.valueOf(waveString);
-            } catch (Exception exception) {
-                Logger.warn("Invalid value for wave in arena wave: " + waveString);
-                continue;
-            }
-            boolean mythicMob;
-            if (mythicMobString.isEmpty()) mythicMob = false;
-            else
-                try {
-                    mythicMob = Boolean.valueOf(mythicMobString);
-                } catch (Exception exception) {
-                    Logger.warn("Invalid value for mythic mob in arena wave: " + waveString);
-                    continue;
-                }
-            int level = -1;
-            if (!levelString.isEmpty()) try {
-                level = Integer.valueOf(levelString);
-            } catch (Exception exception) {
-                Logger.warn("Invalid value for level in: " + levelString);
-                continue;
-            }
-            ArenaEntity arenaEntity = new ArenaEntity(spawnpointString, wave, boss);
-            if (mythicMob) arenaEntity.setMythicMob(true);
-            if (level != -1) arenaEntity.setLevel(level);
-            if (arenaEntities.get(wave) == null)
-                arenaEntities.put(wave, new ArrayList<>(List.of(arenaEntity)));
-            else
-                arenaEntities.get(wave).add(arenaEntity);
+            int wave = integer(fields.get("wave"), entry);
+            int level = fields.containsKey("level") ? integer(fields.get("level"), entry) : -1;
+            String spawn = fields.get("spawnpoint"), boss = fields.get("boss");
+            String mythic = fields.getOrDefault("mythicmob", "false");
+            if (wave < 1 || (level != -1 && level < 1) || spawn == null || boss == null
+                    || !(mythic.equalsIgnoreCase("true") || mythic.equalsIgnoreCase("false")))
+                throw new IllegalArgumentException("Invalid arena wave: " + entry);
+            ArenaEntity entity = new ArenaEntity(spawn, wave, boss);
+            entity.setMythicMob(Boolean.parseBoolean(mythic));
+            entity.setLevel(level);
+            waves.computeIfAbsent(wave, ignored -> new ArrayList<>()).add(entity);
+        }
+        waves.replaceAll((wave, entries) -> List.copyOf(entries));
+        arenaEntities = Map.copyOf(waves);
+    }
+
+    private static int integer(String value, String entry) {
+        try { return Integer.parseInt(value); }
+        catch (NumberFormatException failure) { throw new IllegalArgumentException("Invalid arena wave number: " + entry, failure); }
+    }
+
+    void validate(int waveCount, ArenaContainer container) {
+        if (waveCount < 1 || arenaEntities.size() != waveCount)
+            throw new IllegalArgumentException("Arena requires at least one boss in every configured wave");
+        for (var wave : arenaEntities.entrySet()) {
+            if (wave.getKey() > waveCount) throw new IllegalArgumentException("Arena wave exceeds waveCount: " + wave.getKey());
+            for (ArenaEntity entity : wave.getValue())
+                if (container.spawnPoint(entity.getSpawnPointName()) == null)
+                    throw new IllegalArgumentException("Unknown arena spawn point: " + entity.getSpawnPointName());
         }
     }
 
-    public List<ArenaEntity> getWaveEntities(int wave) {
-        return arenaEntities.get(wave);
-    }
+    public List<ArenaEntity> getWaveEntities(int wave) { return arenaEntities.get(wave); }
 }

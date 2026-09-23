@@ -15,6 +15,7 @@ import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.WorldInstantiator;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -182,14 +183,16 @@ public class DynamicDungeonInstance extends DungeonInstance {
             cleanupUnloadedWorldFolder(instancedWorldName);
             return null;
         }
-        World world = DungeonUtils.loadWorld(instancedWorldName, dynamicDungeonConfigFields.getEnvironment(), dynamicDungeonConfigFields);
-        if (world == null) {
-            player.sendMessage(DungeonsConfig.getDynamicDungeonWorldLoadFailedMessage());
-            cleanupUnloadedWorldFolder(instancedWorldName);
-            return null;
-        }
-
+        World world = null;
         try {
+            dynamicDungeonConfigFields.prepareInstanceDefinition();
+            world = DungeonUtils.loadWorld(instancedWorldName, dynamicDungeonConfigFields.getEnvironment(), dynamicDungeonConfigFields);
+            if (world == null) {
+                player.sendMessage(DungeonsConfig.getDynamicDungeonWorldLoadFailedMessage());
+                cleanupUnloadedWorldFolder(instancedWorldName);
+                return null;
+            }
+
             List<Player> entryPlayers = resolveDungeonEntryRoster(
                     player, entryMemberIds, dynamicDungeonConfigFields, null);
             if (entryPlayers.isEmpty() || (reservation != null && !reservation.isValid())) {
@@ -211,7 +214,7 @@ public class DynamicDungeonInstance extends DungeonInstance {
                     reservation == null ? () -> true : reservation::isValid);
         } catch (Exception exception) {
             com.magmaguy.magmacore.util.Logger.warn("Failed to initialize dynamic dungeon world " + instancedWorldName + ": " + exception.getMessage());
-            cleanupLoadedWorld(world);
+            cleanupLoadedWorld(world != null ? world : Bukkit.getWorld(instancedWorldName));
             throw new RuntimeException(exception);
         }
     }

@@ -18,12 +18,12 @@ public final class InstanceEffectPolicy {
         Location origin = source == null ? null : source.getLocation();
         if (!player.isOnline() || player.isDead() || origin == null
                 || !player.getWorld().equals(origin.getWorld())) return false;
+        if (DungeonInstance.isWorldRetiring(player.getWorld().getUID())) return false;
         if (source instanceof InstancedBossEntity boss && boss.getDungeonInstance() != null)
             return isParticipant(boss.getDungeonInstance(), player);
         // Reinforcements and later boss phases may use ordinary CustomBossEntity instances.
-        for (DungeonInstance dungeon : DungeonInstance.getDungeonInstances())
-            if (player.getWorld().equals(dungeon.getWorld())) return isParticipant(dungeon, player);
-        return true;
+        DungeonInstance dungeon = DungeonInstance.forWorld(player.getWorld().getUID());
+        return dungeon == null || isParticipant(dungeon, player);
     }
 
     private static boolean isParticipant(DungeonInstance dungeon, Player player) {

@@ -81,6 +81,16 @@ public class ArenaInstance extends MatchInstance {
     }
 
     public ArenaInstance(CustomArenasConfigFields customArenasConfigFields, ArenaContainer container) {
+        this(customArenasConfigFields, container, prepareWaves(customArenasConfigFields, container));
+    }
+
+    private static ArenaWaves prepareWaves(CustomArenasConfigFields fields, ArenaContainer container) {
+        ArenaWaves waves = new ArenaWaves(fields.getBossList());
+        waves.validate(fields.getWaveCount(), container);
+        return waves;
+    }
+
+    private ArenaInstance(CustomArenasConfigFields customArenasConfigFields, ArenaContainer container, ArenaWaves waves) {
         super(container.start(), container.exit(), customArenasConfigFields.getMinimumPlayerCount(), customArenasConfigFields.getMaximumPlayerCount());
         this.container = container;
         if (cancelled) return;
@@ -89,7 +99,7 @@ public class ArenaInstance extends MatchInstance {
         this.state = InstancedRegionState.WAITING;
 
         this.customArenasConfigFields = customArenasConfigFields;
-        this.arenaWaves = new ArenaWaves(customArenasConfigFields.getBossList());
+        this.arenaWaves = waves;
 
 
         arenaInstances.put(customArenasConfigFields.getFilename(), this);
@@ -166,9 +176,13 @@ public class ArenaInstance extends MatchInstance {
             }
             return;
         }
-        ArenaContainer container = containers.computeIfAbsent(geometry.getFilename(), ignored ->
-                new ArenaContainer(geometry, corner1, corner2, startLocation, exitLocation));
-        new ArenaInstance(customArenasConfigFields, container);
+        try {
+            ArenaContainer container = containers.computeIfAbsent(geometry.getFilename(), ignored ->
+                    new ArenaContainer(geometry, corner1, corner2, startLocation, exitLocation));
+            new ArenaInstance(customArenasConfigFields, container);
+        } catch (IllegalArgumentException failure) {
+            Logger.warn("Cannot initialize arena " + customArenasConfigFields.getFilename() + ": " + failure.getMessage());
+        }
     }
 
     private static CustomArenasConfigFields geometryDefinition(CustomArenasConfigFields definition) {
@@ -265,7 +279,19 @@ public class ArenaInstance extends MatchInstance {
             String finalSubtitle = subtitle;
             players.forEach(player -> player.sendTitle(finalTitle.replace("$wave", currentWave + ""), finalSubtitle.replace("$wave", currentWave + ""), 0, 20, 0));
             spectators.forEach(player -> player.sendTitle(finalTitle.replace("$wave", currentWave + ""), finalSubtitle.replace("$wave", currentWave + ""), 0, 20, 0));
-            spawnBosses();
+            try {
+                if (!spawnBosses()) {
+                    Logger.warn("Arena " + customArenasConfigFields.getFilename() + " wave " + currentWave
+                            + " could not spawn its required mobs. Ending this run without completing the wave.");
+                    if (scheduledRun == runGeneration && arenaState != ArenaState.IDLE) defeat();
+                    return;
+                }
+            } catch (RuntimeException failure) {
+                Logger.warn("Arena wave admission failed: " + failure.getMessage());
+                if (scheduledRun == runGeneration && arenaState != ArenaState.IDLE) defeat();
+                return;
+            }
+            if (scheduledRun != runGeneration || arenaState == ArenaState.IDLE) return;
             arenaState = ArenaState.ACTIVE;
             roundDamage.clear();
         }, 20L * delayBetweenWaves);
@@ -287,48 +313,60 @@ public class ArenaInstance extends MatchInstance {
 
     public void removeBoss(CustomBossEntity customBossEntity) {
         customBosses.remove(customBossEntity);
-        if (customBosses.isEmpty() && nonEliteMobsEntities.isEmpty()) nextWave();
+        if (arenaState == ArenaState.ACTIVE && customBosses.isEmpty() && nonEliteMobsEntities.isEmpty()) nextWave();
     }
 
     public void removeBoss(Entity nonEliteEntity) {
         nonEliteMobsEntities.remove(nonEliteEntity);
-        if (customBosses.isEmpty() && nonEliteMobsEntities.isEmpty()) nextWave();
+        if (arenaState == ArenaState.ACTIVE && customBosses.isEmpty() && nonEliteMobsEntities.isEmpty()) nextWave();
     }
 
-    private void spawnBosses() {
-        if (arenaWaves.getWaveEntities(currentWave) == null) return;
+    private boolean spawnBosses() {
+        if (arenaWaves.getWaveEntities(currentWave) == null) return false;
+        long generation = runGeneration;
         highestArenaMobLevel = -1;
         for (ArenaEntity arenaEntity : arenaWaves.getWaveEntities(currentWave)) {
             if (!arenaEntity.isMythicMob()) {
                 CustomBossEntity customBossEntity = CustomBossEntity.createCustomBossEntity(arenaEntity.getBossfile());
                 if (customBossEntity == null) {
                     Logger.warn("Failed to generate custom boss " + arenaEntity.getBossfile() + " because the filename was not valid!");
-                    continue;
+                    return false;
                 }
                 customBossEntity.setNormalizedCombat();
                 customBossEntity.setEliteLoot(false);
                 customBossEntity.setVanillaLoot(false);
                 customBossEntity.setRandomLoot(false);
                 customBossEntity.spawn(container.spawnPoint(arenaEntity.getSpawnPointName()), true);
+                if (generation != runGeneration || arenaState == ArenaState.IDLE) {
+                    customBossEntity.remove(RemovalReason.OTHER);
+                    return false;
+                }
                 if (customBossEntity.getLevel() > highestArenaMobLevel)
                     highestArenaMobLevel = customBossEntity.getLevel();
                 if (!customBossEntity.exists()) {
                     Logger.warn("Arena " + getCustomArenasConfigFields().getArenaName() + " failed to spawn boss " + customBossEntity.getCustomBossesConfigFields().getFilename());
-                    continue;
+                    customBossEntity.remove(RemovalReason.OTHER);
+                    return false;
                 } else customBosses.add(customBossEntity);
 
             } else {
                 //MythicMobs integration
                 try {
                     Entity mythicMob = MythicMobsInterface.spawn(container.spawnPoint(arenaEntity.getSpawnPointName()), arenaEntity.getBossfile(), arenaEntity.getLevel());
-                    if (mythicMob != null) nonEliteMobsEntities.add(mythicMob);
-                    else
+                    if (mythicMob != null && generation == runGeneration && arenaState != ArenaState.IDLE)
+                        nonEliteMobsEntities.add(mythicMob);
+                    else {
+                        if (mythicMob != null) mythicMob.remove();
                         Logger.warn("Failed to spawn MythicMobs entity '" + arenaEntity.getBossfile() + "' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " because MythicMobs did not recognize the name of the entity!");
+                        return false;
+                    }
                 } catch (Exception e) {
                     Logger.warn("Failed to spawn MythicMobs entity '" + arenaEntity.getBossfile() + "' at spawn point " + arenaEntity.getSpawnPointName() + " with level " + arenaEntity.getLevel() + " due to a MythicMobs error - there is a high chance mob spawning is being prevented in this area!");
+                    return false;
                 }
             }
         }
+        return !customBosses.isEmpty() || !nonEliteMobsEntities.isEmpty();
     }
 
     private void doRewards() {
