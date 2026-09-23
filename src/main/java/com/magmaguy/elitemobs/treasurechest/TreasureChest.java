@@ -45,6 +45,23 @@ public class TreasureChest implements PersistentObject {
 
     @Getter
     private static final HashMap<Location, TreasureChest> treasureChestHashMap = new HashMap<>();
+    private static final Map<String, Set<TreasureChest>> itemSources = new HashMap<>();
+    private final Set<String> indexedItems = new HashSet<>();
+
+    public static Collection<TreasureChest> chestsDropping(String itemFilename) {
+        return List.copyOf(itemSources.getOrDefault(itemFilename, Set.of()));
+    }
+
+    private void removeItemSources() {
+        for (String item : indexedItems) {
+            Set<TreasureChest> sources = itemSources.get(item);
+            if (sources == null) continue;
+            sources.remove(this);
+            if (sources.isEmpty()) itemSources.remove(item);
+        }
+        indexedItems.clear();
+    }
+
     private static final ArrayListMultimap<String, TreasureChest> instancedTreasureChests = ArrayListMultimap.create();
     @Getter
     private final CustomTreasureChestConfigFields customTreasureChestConfigFields;
@@ -114,6 +131,7 @@ public class TreasureChest implements PersistentObject {
             treasureChest.unregisterPersistentHandler();
         });
         treasureChestHashMap.clear();
+        itemSources.clear();
     }
 
     public static void removeInstancedTreasureChests(World world) {
@@ -124,7 +142,10 @@ public class TreasureChest implements PersistentObject {
             Location keyLocation = entry.getKey();
             Location chestLocation = entry.getValue().location;
             boolean remove = isLocationInWorld(keyLocation, worldUUID) || isLocationInWorld(chestLocation, worldUUID);
-            if (remove) removedChests.add(entry.getValue());
+            if (remove) {
+                entry.getValue().removeItemSources();
+                removedChests.add(entry.getValue());
+            }
             return remove;
         });
         instancedTreasureChests.values().forEach(treasureChest -> {
@@ -142,6 +163,7 @@ public class TreasureChest implements PersistentObject {
             treasureChest.unregisterPersistentHandler();
         });
         treasureChestHashMap.clear();
+        itemSources.clear();
         instancedTreasureChests.clear();
     }
 
@@ -170,7 +192,14 @@ public class TreasureChest implements PersistentObject {
 
     private boolean registerChest() {
         if (!hasValidConfiguration() || !hasLoadedWorld()) return false;
-        treasureChestHashMap.put(location, this);
+        TreasureChest previous = treasureChestHashMap.put(location, this);
+        if (previous != null) previous.removeItemSources();
+        var table = customTreasureChestConfigFields.getCustomLootTable();
+        if (table != null) for (var entry : table.getEntries()) {
+            if (!(entry instanceof com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry item)) continue;
+            indexedItems.add(item.getFilename());
+            itemSources.computeIfAbsent(item.getFilename(), ignored -> new HashSet<>()).add(this);
+        }
         return true;
     }
 
@@ -203,6 +232,7 @@ public class TreasureChest implements PersistentObject {
         unregisterPersistentHandler();
         if (!isLocationInWorld(location, worldUUID)) return;
         treasureChestHashMap.remove(location, this);
+        removeItemSources();
         location = null;
     }
 
@@ -406,6 +436,7 @@ public class TreasureChest implements PersistentObject {
         if (location != null && location.getWorld() != null)
             location.getBlock().setBlockData(Material.AIR.createBlockData());
         treasureChestHashMap.remove(location, this);
+        removeItemSources();
         return true;
     }
 
@@ -431,6 +462,7 @@ public class TreasureChest implements PersistentObject {
     public void worldUnload() {
         cancelRestock();
         treasureChestHashMap.remove(location, this);
+        removeItemSources();
     }
 
     @Override

@@ -13,6 +13,24 @@ public class CustomBossesConfig extends CustomConfig {
 
     private static HashMap<String, CustomBossesConfigFields> customBosses = new HashMap<>();
     private static CustomBossesConfig instance;
+    private static java.util.Map<String, java.util.Set<String>> itemSources = java.util.Map.of();
+
+    public static java.util.Set<String> bossesDropping(String itemFilename) {
+        return itemSources.getOrDefault(itemFilename, java.util.Set.of());
+    }
+
+    private static void rebuildItemSources() {
+        var index = new java.util.HashMap<String, java.util.Set<String>>();
+        for (var boss : customBosses.values()) {
+            if (boss.getCustomLootTable() == null) continue;
+            for (var entry : boss.getCustomLootTable().getEntries())
+                if (entry instanceof com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry item)
+                    index.computeIfAbsent(item.getFilename(), ignored -> new java.util.HashSet<>()).add(boss.getFilename());
+        }
+        index.replaceAll((item, sources) -> java.util.Set.copyOf(sources));
+        itemSources = java.util.Map.copyOf(index);
+    }
+
 
     public CustomBossesConfig() {
         super("custombosses", "com.magmaguy.elitemobs.config.custombosses.premade",
@@ -24,6 +42,7 @@ public class CustomBossesConfig extends CustomConfig {
                 CustomBossesConfigFields customBossesConfigFields = (CustomBossesConfigFields) super.getCustomConfigFieldsHashMap().get(key);
                 customBosses.put(key, customBossesConfigFields);
             }
+        rebuildItemSources();
     }
 
     public static void initializeBosses() {
@@ -72,6 +91,7 @@ public class CustomBossesConfig extends CustomConfig {
         }
         CustomBossesConfigFields fields = (CustomBossesConfigFields) instance.registerFile(file);
         if (fields != null && fields.isEnabled()) customBosses.put(fields.getFilename(), fields);
+        rebuildItemSources();
         return fields;
     }
 
@@ -79,6 +99,7 @@ public class CustomBossesConfig extends CustomConfig {
         if (instance == null) return;
         instance.getCustomConfigFieldsHashMap().entrySet().removeIf(entry -> sameFile(entry.getValue().getFile(), file));
         customBosses.entrySet().removeIf(entry -> sameFile(entry.getValue().getFile(), file));
+        rebuildItemSources();
     }
 
     private static boolean sameFile(File left, File right) {

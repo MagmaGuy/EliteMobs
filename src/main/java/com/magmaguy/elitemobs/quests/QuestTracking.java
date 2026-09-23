@@ -11,8 +11,6 @@ import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
-import com.magmaguy.elitemobs.items.customloottable.CustomLootEntry;
-import com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
@@ -145,19 +143,20 @@ public class QuestTracking {
 
     public void updateLocations(Quest quest) {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
+        DestinationLookup lookup = new DestinationLookup();
         if (!quest.getQuestObjectives().isOver()) {
             questIsDone = false;
             turnInNPCs.clear();
             for (Objective objective : quest.getQuestObjectives().getObjectives())
                 if (objective != null && !objective.isObjectiveCompleted())
                     if (objective instanceof CustomKillObjective)
-                        destinations.addAll(getKillLocations((CustomKillObjective) objective));
+                        destinations.addAll(getKillLocations((CustomKillObjective) objective, lookup));
                     else if (objective instanceof DialogObjective)
                         destinations.addAll(getDialogLocations((DialogObjective) objective));
                     else if (objective instanceof ClassUnlockObjective unlock && unlock.getNpcFilename() != null)
                         destinations.add(new ObjectiveDestinations(unlock, getNPCLocations(unlock.getNpcFilename())));
                     else if (objective instanceof CustomFetchObjective)
-                        destinations.addAll(getFetchLocations((CustomFetchObjective) objective));
+                        destinations.addAll(getFetchLocations((CustomFetchObjective) objective, lookup));
             objectiveDestinations = destinations;
         } else {
             questIsDone = true;
@@ -165,9 +164,9 @@ public class QuestTracking {
         }
     }
 
-    private List<ObjectiveDestinations> getKillLocations(CustomKillObjective customKillObjective) {
+    private List<ObjectiveDestinations> getKillLocations(CustomKillObjective customKillObjective, DestinationLookup lookup) {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
-        List<Location> locations = getCustomBossLocations(customKillObjective.getCustomBossFilename());
+        List<Location> locations = getCustomBossLocations(customKillObjective.getCustomBossFilename(), lookup);
         destinations.add(new ObjectiveDestinations(customKillObjective, locations));
         return destinations;
     }
@@ -178,21 +177,13 @@ public class QuestTracking {
         return destinations;
     }
 
-    private List<ObjectiveDestinations> getFetchLocations(CustomFetchObjective customFetchObjective) {
-        List<ObjectiveDestinations> destinations = new ArrayList<>();
+    private List<ObjectiveDestinations> getFetchLocations(CustomFetchObjective objective, DestinationLookup lookup) {
         List<Location> locations = new ArrayList<>();
-        CustomBossesConfig.getCustomBosses().values().forEach(customBossesConfigFields -> {
-            if (customBossesConfigFields.getCustomLootTable() == null) return;
-            if (dropsCustomItem(customBossesConfigFields.getCustomLootTable().getEntries(), customFetchObjective.getKey()))
-                getCustomBossLocations(customBossesConfigFields.getFilename()).forEach(location -> addLocation(locations, location));
-        });
-        new ArrayList<>(TreasureChest.getTreasureChestHashMap().values()).forEach((treasureChest -> {
-            if (treasureChest.getCustomTreasureChestConfigFields().getCustomLootTable() == null) return;
-            if (dropsCustomItem(treasureChest.getCustomTreasureChestConfigFields().getCustomLootTable().getEntries(), customFetchObjective.getKey()))
-                addLocation(locations, treasureChest.getLocation());
-        }));
-        destinations.add(new ObjectiveDestinations(customFetchObjective, locations));
-        return destinations;
+        for (String filename : CustomBossesConfig.bossesDropping(objective.getKey()))
+            getCustomBossLocations(filename, lookup).forEach(location -> addLocation(locations, location));
+        for (TreasureChest chest : TreasureChest.chestsDropping(objective.getKey()))
+            addLocation(locations, chest.getLocation());
+        return List.of(new ObjectiveDestinations(objective, locations));
     }
 
     private void getTurnInNPC() {
@@ -200,12 +191,23 @@ public class QuestTracking {
         turnInNPCs.addAll(getNPCLocations(quest.getQuestTaker()));
     }
 
-    private boolean dropsCustomItem(List<CustomLootEntry> customLootEntries, String itemFilename) {
-        if (customLootEntries == null || itemFilename == null) return false;
-        for (CustomLootEntry customLootEntry : customLootEntries)
-            if (customLootEntry instanceof EliteCustomLootEntry eliteCustomLootEntry && eliteCustomLootEntry.getFilename().equals(itemFilename))
-                return true;
-        return false;
+    private static final class DestinationLookup {
+        private final java.util.Map<String, List<Location>> resolved = new HashMap<>();
+        private java.util.Map<String, List<Location>> loaded;
+
+        private List<Location> loaded(String filename) {
+            if (loaded == null) {
+                loaded = new HashMap<>();
+                for (EliteEntity entity : EntityTracker.getEliteMobEntities().values()) {
+                    if (!(entity instanceof CustomBossEntity boss)) continue;
+                    String identity = boss.getPhaseBossEntity() != null
+                            ? boss.getPhaseBossEntity().getPhase1Config().getFilename()
+                            : boss.getCustomBossesConfigFields().getFilename();
+                    loaded.computeIfAbsent(identity, ignored -> new ArrayList<>()).add(entity.getLocation());
+                }
+            }
+            return loaded.getOrDefault(filename, List.of());
+        }
     }
 
     private List<Location> getNPCLocations(String npcFilename) {
@@ -241,7 +243,9 @@ public class QuestTracking {
         return locations;
     }
 
-    private List<Location> getCustomBossLocations(String customBossFilename) {
+    private List<Location> getCustomBossLocations(String customBossFilename, DestinationLookup lookup) {
+        List<Location> cached = lookup.resolved.get(customBossFilename);
+        if (cached != null) return cached;
         List<Location> locations = new ArrayList<>();
         if (customBossFilename == null) return locations;
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(customBossFilename);
@@ -252,7 +256,8 @@ public class QuestTracking {
                 addLocationStrings(locations, customBossesConfigFields.getSpawnLocations());
         }
         if (locations.isEmpty())
-            addLoadedCustomBossLocations(locations, customBossFilename);
+            lookup.loaded(customBossFilename).forEach(location -> addLocation(locations, location));
+        lookup.resolved.put(customBossFilename, locations);
         return locations;
     }
 
@@ -263,18 +268,19 @@ public class QuestTracking {
         addLocation(locations, location);
     }
 
-    private void addLoadedCustomBossLocations(List<Location> locations, String customBossFilename) {
-        new ArrayList<EliteEntity>(EntityTracker.getEliteMobEntities().values()).forEach(eliteEntity -> {
-            if (!(eliteEntity instanceof CustomBossEntity customBossEntity)) return;
-            if (customBossMatches(customBossEntity, customBossFilename))
-                addLocation(locations, eliteEntity.getLocation());
-        });
-    }
-
-    private boolean customBossMatches(CustomBossEntity customBossEntity, String customBossFilename) {
-        if (customBossEntity.getPhaseBossEntity() != null)
-            return customBossEntity.getPhaseBossEntity().getPhase1Config().getFilename().equals(customBossFilename);
-        return customBossEntity.getCustomBossesConfigFields().getFilename().equals(customBossFilename);
+    private boolean tracksSource(CustomBossEntity boss) {
+        String current = boss.getCustomBossesConfigFields().getFilename();
+        String identity = boss.getPhaseBossEntity() == null ? current
+                : boss.getPhaseBossEntity().getPhase1Config().getFilename();
+        for (Objective objective : quest.getQuestObjectives().getObjectives()) {
+            if (objective == null || objective.isObjectiveCompleted()) continue;
+            if (objective instanceof CustomKillObjective kill && identity.equals(kill.getCustomBossFilename())) return true;
+            if (objective instanceof CustomFetchObjective fetch) {
+                Set<String> sources = CustomBossesConfig.bossesDropping(fetch.getKey());
+                if (sources.contains(identity) || sources.contains(current)) return true;
+            }
+        }
+        return false;
     }
 
     private void addLocationStrings(List<Location> locations, List<String> rawLocations) {
@@ -498,9 +504,10 @@ public class QuestTracking {
     public static class QuestTrackingEvents implements Listener {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onTargetSpawn(com.magmaguy.elitemobs.api.EliteMobSpawnEvent event) {
-            if (!(event.getEliteMobEntity() instanceof CustomBossEntity)) return;
+            if (!(event.getEliteMobEntity() instanceof CustomBossEntity boss)) return;
             for (QuestTracking tracking : playerTrackingQuests.values())
-                if (tracking.player.getWorld().equals(event.getEntity().getWorld())) tracking.queueLocationRefresh();
+                if (tracking.player.getWorld().equals(event.getEntity().getWorld()) && tracking.tracksSource(boss))
+                    tracking.queueLocationRefresh();
         }
         @EventHandler
         public void onWorldChanged(PlayerChangedWorldEvent event) {
