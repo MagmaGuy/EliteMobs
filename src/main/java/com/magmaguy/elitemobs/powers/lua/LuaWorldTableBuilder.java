@@ -340,8 +340,9 @@ final class LuaWorldTableBuilder {
             support.generateFakeExplosion(blockLocations, args.narg() >= 2 ? support.toLocation(args.arg(2)) : null);
             return LuaValue.NIL;
         }));
+        ProjectileDamage.GoldNuggetBurst goldBurst = new ProjectileDamage.GoldNuggetBurst();
         world.set("spawn_fake_gold_nugget_at_location", method(world, args -> {
-            ProjectileDamage.FakeProjectile projectile = support.spawnGoldNuggetProjectile(
+            ProjectileDamage.FakeProjectile projectile = goldBurst.create(
                     support.toLocation(args.arg1()),
                     support.toVector(args.arg(2)));
             if (projectile == null) {

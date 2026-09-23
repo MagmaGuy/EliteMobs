@@ -93,14 +93,54 @@ public class ProjectileDamage {
      * Creates a gold nugget projectile at the specified location with the given velocity.
      */
     public static FakeProjectile createGoldNuggetProjectile(Location location, Vector velocity) {
-        ItemStack goldNugget = ItemStackGenerator.generateItemStack(
+        return new GoldNuggetBurst().create(location, velocity);
+    }
+
+    /** Viewer candidates belong to one Lua context and one native tick. */
+    public static final class GoldNuggetBurst {
+        private long tick = Long.MIN_VALUE;
+        private Location center;
+        private List<Player> candidates = List.of();
+
+        public FakeProjectile create(Location location, Vector velocity) {
+            if (location == null || location.getWorld() == null || velocity == null) return null;
+            long now = com.magmaguy.elitemobs.utils.GameClock.getCurrentTick();
+            if (center == null || center.getWorld() != location.getWorld() || now != tick
+                    || now == ViewerEvents.changedAtTick
+                    || Math.abs(center.getX() - location.getX()) > 4
+                    || Math.abs(center.getY() - location.getY()) > 4
+                    || Math.abs(center.getZ() - location.getZ()) > 4) {
+                center = location.clone();
+                tick = now;
+                candidates = location.getWorld().getNearbyEntities(location, 68, 68, 68,
+                                entity -> entity instanceof Player).stream()
+                        .map(Player.class::cast).toList();
+            }
+            ItemStack goldNugget = ItemStackGenerator.generateItemStack(
                 Material.GOLD_NUGGET,
                 "visual projectile",
                 List.of(ThreadLocalRandom.current().nextDouble() + ""));
 
         FakeProjectile projectile = new FakeProjectile(location, goldNugget, velocity);
-        projectile.displayToNearbyPlayers(64);
-        return projectile;
+            org.bukkit.util.BoundingBox range = org.bukkit.util.BoundingBox.of(location, 64, 64, 64);
+            for (Player player : candidates)
+                if (player.isOnline() && player.getWorld() == location.getWorld()
+                        && range.overlaps(player.getBoundingBox())) projectile.fakeItem.displayTo(player);
+            return projectile;
+        }
+    }
+
+    public static final class ViewerEvents implements org.bukkit.event.Listener {
+        private static long changedAtTick = Long.MIN_VALUE;
+        private static void changed() { changedAtTick = com.magmaguy.elitemobs.utils.GameClock.getCurrentTick(); }
+        @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR, ignoreCancelled = true)
+        public void onTeleport(org.bukkit.event.player.PlayerTeleportEvent event) { changed(); }
+        @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR)
+        public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) { changed(); }
+        @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR)
+        public void onQuit(org.bukkit.event.player.PlayerQuitEvent event) { changed(); }
+        @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR)
+        public void onRespawn(org.bukkit.event.player.PlayerRespawnEvent event) { changed(); }
     }
 
     /**

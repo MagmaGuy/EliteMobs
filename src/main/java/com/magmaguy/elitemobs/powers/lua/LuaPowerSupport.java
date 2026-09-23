@@ -477,13 +477,6 @@ final class LuaPowerSupport {
         Explosion.generateFakeExplosion(blocks, eliteEntity.getLivingEntity(), powersConfigFields, explosionSourceLocation);
     }
 
-    ProjectileDamage.FakeProjectile spawnGoldNuggetProjectile(Location location, Vector velocity) {
-        if (location == null || velocity == null) {
-            return null;
-        }
-        return ProjectileDamage.createGoldNuggetProjectile(location, velocity);
-    }
-
     void runGoldNuggetDamage(List<ProjectileDamage.FakeProjectile> projectiles) {
         if (projectiles == null || projectiles.isEmpty()) {
             return;

@@ -283,6 +283,7 @@ public class EventsRegistrer {
         if (DefaultConfig.isPreventVanillaReinforcementsForEliteEntities())
             register(new VanillaReinforcementsCanceller());
         register(new LightningSpawnBypass());
+        register(new com.magmaguy.elitemobs.powers.ProjectileDamage.ViewerEvents());
         if (ItemSettingsConfig.isEliteDurability())
             register(new AlternativeDurabilityLoss());
         register(new EnderCrystalDamageProtectionBypass());
