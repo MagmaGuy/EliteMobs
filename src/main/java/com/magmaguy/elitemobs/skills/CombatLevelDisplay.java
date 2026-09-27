@@ -274,9 +274,9 @@ public class CombatLevelDisplay implements Listener {
 
     private static boolean shouldRender(Player player) {
         if (!player.isOnline() || player.isDead() || player.isSleeping()) return false;
+        if (!SkillsConfig.isShowCombatLevelDisplay()) return false;
         if (PlayerIdentityLabelRenderer.hasClassLabel(player.getUniqueId())) return true;
         return SkillsConfig.isSkillSystemEnabled()
-                && SkillsConfig.isShowCombatLevelDisplay()
                 && !SkillsConfig.isWorldExcludedFromSkills(player);
     }
 }

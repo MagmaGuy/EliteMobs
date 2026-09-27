@@ -116,7 +116,7 @@ public class SkillsConfig extends ConfigurationFile {
                 file, fileConfiguration, "skillsMenuTitle", "&5&lYour Skills", true);
 
         showCombatLevelDisplay = ConfigurationEngine.setBoolean(
-                List.of("Whether to show a combat level display above players.",
+                List.of("Whether to show the class or combat level display above players.",
                         "Combat level is the average of the two highest weapon skills and armor.",
                         "The display follows player visibility and scoreboard team name-tag visibility exposed by Spigot.",
                         "Packet-only name-tag changes cannot be detected; disable this setting if another plugin hides names that way."),
