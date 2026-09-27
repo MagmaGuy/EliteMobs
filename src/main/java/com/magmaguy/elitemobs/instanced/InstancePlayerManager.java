@@ -145,6 +145,8 @@ public class InstancePlayerManager {
     }
 
     private static void registerPlayer(Player player, MatchInstance matchInstance, Location previousLocation) {
+        // Reused arenas may retain the previous run's counter. Readiness belongs to this entry.
+        matchInstance.playerLives.remove(player);
         matchInstance.participants.add(player);
         matchInstance.players.add(player);
         PlayerData.setMatchInstance(player, matchInstance);
