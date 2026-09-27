@@ -263,7 +263,13 @@ public abstract class MatchInstance {
 
     private void playerWatchdog() {
         ((HashSet<Player>) players.clone()).forEach(player -> {
-            if (!player.isOnline()) removePlayer(player);
+            if (!player.isOnline()) {
+                removePlayer(player);
+                return;
+            }
+            // Entry owns the initial teleport. A rescue before it can leave the player
+            // temporarily invalid while the destination chunk loads and reject admission.
+            if (!playerLives.containsKey(player)) return;
             Location location = player.getLocation();
             // The void check matters for dungeon instances, whose isInRegion() spans the
             // whole world: without it a player falling off e.g. the Binder of Worlds
