@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.mobconstructor.custombosses;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.magmaguy.elitemobs.api.internal.RemovalReason;
+import com.magmaguy.elitemobs.combatsystem.LevelScaling;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
@@ -100,31 +101,32 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
 
     public void setNormalizedMaxHealth(int playerCount) {
         super.setNormalizedMaxHealth();
-        if (dungeonInstance == null) return;
-        if (playerCount < 2) return;
-        double normalizedDungeonMaxHealth = super.getMaxHealth() * .75 * playerCount;
-        super.maxHealth = normalizedDungeonMaxHealth;
-        super.health = maxHealth;
+        if (dungeonInstance != null && playerCount >= 2) {
+            // The base normalization already clamps health. Party scaling must respect
+            // the same limit before writing either the attribute or the current health.
+            maxHealth = Math.min(maxHealth * .75 * playerCount, LevelScaling.getMinecraftMaxHealth());
+        }
         if (livingEntity != null) {
             AttributeManager.setAttribute(livingEntity, "generic_max_health", maxHealth);
             livingEntity.setHealth(maxHealth);
         }
+        health = maxHealth;
+    }
+
+    @Override
+    public void setNormalizedMaxHealth() {
+        setNormalizedMaxHealth(dungeonInstance == null ? 1 : dungeonInstance.getPlayers().size());
     }
 
     @Override
     public void setMaxHealth() {
-        super.setNormalizedMaxHealth();
-        if (dungeonInstance == null) return;
-        if (dungeonInstance.getPlayers().size() < 2) return;
-        double normalizedDungeonMaxHealth = super.getMaxHealth() * .75 * dungeonInstance.getPlayers().size();
-        super.maxHealth = normalizedDungeonMaxHealth;
-        if (health == null) {
-            if (livingEntity != null) livingEntity.setHealth(maxHealth);
-            this.health = maxHealth;
+        Double previousHealth = health;
+        setNormalizedMaxHealth();
+        // Recalculating or rematerializing an existing boss must not heal it.
+        if (previousHealth != null) {
+            health = Math.min(previousHealth, maxHealth);
+            if (livingEntity != null) livingEntity.setHealth(health);
         }
-        //This is useful for phase boss entities that spawn in unloaded chunks and shouldn't full heal between phases, like in dungeons
-        else if (livingEntity != null)
-            livingEntity.setHealth(Math.min(health, AttributeManager.getAttributeBaseValue(livingEntity, "generic_max_health")));
     }
 
     public void setEntityLevel(int level) {

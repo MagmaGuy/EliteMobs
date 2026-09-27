@@ -433,9 +433,16 @@ public abstract class MatchInstance {
             players.forEach(player -> startMessage(counter, player));
             spectators.forEach(player -> startMessage(counter, player));
             if (counter >= 3) {
-                startMatch();
                 cancel();
                 countdownTask = null;
+                try {
+                    startMatch();
+                } catch (RuntimeException failure) {
+                    // A failed start must not leave a partially started match or retry
+                    // every second with a negative countdown.
+                    destroyMatch();
+                    throw failure;
+                }
             }
         }
     }
