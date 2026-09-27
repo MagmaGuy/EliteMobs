@@ -1,4 +1,3 @@
-local offsets={{0,0,0},{0,1,0},{0,-1,0},{1,0,0},{-1,0,0},{0,0,1},{0,0,-1}}
 local function zipline(context,destination)
   if not context.player:has_clear_movement_path(destination) then context.action:stop(); return end
   if not context.action:temporary_potion(context.player.uuid,'LEVITATION',200,1) then context.action:stop(); return end
@@ -31,13 +30,11 @@ return {api_version=1,on_projectile_launch=function(context)
     if not arrow.is_valid or ticks>200 then ctx.action:stop(); return end
     if not arrow.in_block then return end
     ctx.scheduler:cancel(task)
-    local at,destination=arrow.current_location,arrow.attachment_location
-    if not destination then ctx.action:stop(); return end
-    local found=false
-    for _,offset in ipairs(offsets) do
-      if ctx.world:get_block_at(math.floor(at.x)+offset[1],math.floor(at.y)+offset[2],math.floor(at.z)+offset[3])=='target' then found=true; break end
+    local block,destination=arrow.attachment_block,arrow.attachment_location
+    if not block or not destination or block.world~=ctx.player.world
+      or ctx.world:get_block_at(math.floor(block.x),math.floor(block.y),math.floor(block.z))~='target' then
+      ctx.action:stop(); return
     end
-    if not found then ctx.action:stop(); return end
     arrow:set_pickup('DISALLOWED')
     zipline(ctx,destination)
   end)
