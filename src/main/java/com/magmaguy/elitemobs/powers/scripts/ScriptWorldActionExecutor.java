@@ -81,10 +81,15 @@ final class ScriptWorldActionExecutor {
         int duration = action.getBlueprint().getDuration().getValue();
 
         action.getTargets(scriptActionData).forEach(target -> {
-            var elite = com.magmaguy.elitemobs.entitytracker.EntityTracker.getEliteMobEntity(target);
             TimedScriptStateManager.apply(target.getUniqueId(), "mob_ai", aiEnabled, duration,
-                    () -> elite == null ? target.hasAI() : elite.isAIEnabled(),
-                    value -> { if (elite == null) target.setAI(value); else elite.setAIEnabled(value); });
+                    () -> {
+                        EliteEntity elite = resolveStateOwner(scriptActionData, target);
+                        return elite == null ? target.hasAI() : elite.isAIEnabled();
+                    },
+                    value -> {
+                        EliteEntity elite = resolveStateOwner(scriptActionData, target);
+                        if (elite == null) target.setAI(value); else elite.setAIEnabled(value);
+                    });
         });
     }
 
@@ -99,14 +104,33 @@ final class ScriptWorldActionExecutor {
 
         action.getTargets(scriptActionData).forEach(target -> {
             if (target instanceof Mob mob) {
-                var elite = com.magmaguy.elitemobs.entitytracker.EntityTracker.getEliteMobEntity(mob);
                 TimedScriptStateManager.apply(mob.getUniqueId(), "mob_aware", aware, duration,
-                        () -> elite == null ? mob.isAware() : elite.isAware(),
-                        value -> { if (elite == null) mob.setAware(value); else elite.setAware(value); });
+                        () -> {
+                            EliteEntity elite = resolveStateOwner(scriptActionData, mob);
+                            return elite == null ? mob.isAware() : elite.isAware();
+                        },
+                        value -> {
+                            EliteEntity elite = resolveStateOwner(scriptActionData, mob);
+                            if (elite == null) mob.setAware(value); else elite.setAware(value);
+                        });
             } else {
                 Logger.warn("SET_MOB_AWARE action must target mobs! Problematic script: '" + action.getBlueprint().getScriptName() + "' in file '" + action.getBlueprint().getScriptFilename() + "'");
             }
         });
+    }
+
+    private EliteEntity resolveStateOwner(ScriptActionData data, LivingEntity body) {
+        if (body.isDead()) return null;
+        // Spawn actions precede tracker publication, but already know their actor.
+        EliteEntity owner = data.getEliteEntity();
+        if (ownsBody(owner, body)) return owner;
+        owner = EntityTracker.getEliteMobEntity(body);
+        // Recheck at expiry: an old body's tag can still identify a replacement actor.
+        return ownsBody(owner, body) ? owner : null;
+    }
+
+    private boolean ownsBody(EliteEntity owner, LivingEntity body) {
+        return owner != null && (owner.getLivingEntity() == body || owner.getUnsyncedLivingEntity() == body);
     }
 
     /**
