@@ -7,6 +7,7 @@ import com.magmaguy.easyminecraftgoals.internal.AbstractWanderBackToPoint;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.EliteMobRemoveEvent;
 import com.magmaguy.elitemobs.combatsystem.displays.LeashReturnDamageIndicator;
+import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -176,9 +177,9 @@ public class Navigation implements Listener {
                 AttributeManager.setAttribute(event.getLivingEntity(), "generic_follow_range", AttributeManager.getAttributeDefaultValue(regionalBossEntity.getLivingEntity(), "generic_follow_range"));
         }
 
-        // Walking home and teleporting home are both leash resets. In either case,
-        // restore the boss just as the legacy hard-leash return did.
-        regionalBossEntity.fullHeal();
+        // Walking and teleporting home use the same regeneration policy as combat exit.
+        if (MobCombatSettingsConfig.isRegenerateCustomBossHealthOnCombatEnd())
+            regionalBossEntity.fullHeal();
     }
 
     /**
