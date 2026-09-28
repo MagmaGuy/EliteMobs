@@ -17,6 +17,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.scheduler.BukkitTask;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.EntityMovementPath;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -30,7 +31,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -299,10 +299,20 @@ public class Explosion {
     }
 
     private boolean fullBlockRestore(BlockState state) {
-        if (Bukkit.getWorld(worldUUID) != world) return false;
-        for (Entity entity : world.getNearbyEntities(new BoundingBox(state.getX(), state.getY(), state.getZ(),
-                state.getX() + 1, state.getY() + 1, state.getZ() + 1)))
-            entity.teleport(entity.getLocation().clone().add(new Vector(0, 1, 0)));
+        World restorationWorld = world;
+        if (restorationWorld == null || Bukkit.getWorld(worldUUID) != restorationWorld) return false;
+        BoundingBox restoredVolume = new BoundingBox(state.getX(), state.getY(), state.getZ(),
+                state.getX() + 1, state.getY() + 1, state.getZ() + 1);
+        for (Entity entity : restorationWorld.getNearbyEntities(restoredVolume)) {
+            // A head or large body may intersect from more than one block below.
+            // Keep the snapshot queued when the full-body escape path is obstructed.
+            Location destination = entity.getLocation().clone().add(0,
+                    restoredVolume.getMaxY() - entity.getBoundingBox().getMinY(), 0);
+            if (!EntityMovementPath.isClear(entity, destination) || !entity.teleport(destination)) return false;
+        }
+        // Teleport listeners can redirect an occupant or move another entity into the hole.
+        if (world != restorationWorld || Bukkit.getWorld(worldUUID) != restorationWorld
+                || !restorationWorld.getNearbyEntities(restoredVolume).isEmpty()) return false;
         // Tile snapshots carry their saved inventory. Never substitute the live empty inventory.
         return state.update(true, false);
     }
