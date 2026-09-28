@@ -6,6 +6,7 @@ public class EnderDragonShockwaveLuaConfig extends InlineLuaPowerConfig {
     public EnderDragonShockwaveLuaConfig() {
         super("ender_dragon_shockwave", null, PowersConfigFields.PowerType.UNIQUE, """
                 local radius = 30
+                local terrain_columns_per_tick = 64
 
                 local function clone_location(location)
                   return em.create_location(location.x, location.y, location.z, location.world, location.yaw, location.pitch)
@@ -74,11 +75,11 @@ public class EnderDragonShockwaveLuaConfig extends InlineLuaPowerConfig {
                   context.state.shockwave_pie_blocks = pie_blocks
                 end
 
-                local function generate_real_circle(context)
-                  local real_blocks = {}
-                  local boss_location = context.boss:get_location()
+                local function generate_real_circle(context, boss_location, first_index)
+                  local real_blocks = context.state.shockwave_real_blocks
                   local pie_blocks = context.state.shockwave_pie_blocks or {}
-                  for index = 1, #pie_blocks do
+                  local last_index = math.min(first_index + terrain_columns_per_tick - 1, #pie_blocks)
+                  for index = first_index, last_index do
                     local pie_block = pie_blocks[index]
                     local raw_location = offset_location(boss_location, pie_block.vector.x, pie_block.vector.y, pie_block.vector.z)
                     for y = 0, -9, -1 do
@@ -92,7 +93,10 @@ public class EnderDragonShockwaveLuaConfig extends InlineLuaPowerConfig {
                       end
                     end
                   end
-                  context.state.shockwave_real_blocks = real_blocks
+                  if last_index < #pie_blocks then
+                    return last_index + 1
+                  end
+                  return nil
                 end
 
                 local function do_warning_phase(context)
@@ -156,6 +160,8 @@ public class EnderDragonShockwaveLuaConfig extends InlineLuaPowerConfig {
 
                 local function stop_power(context)
                   cancel_state_task(context, "ender_dragon_shockwave_task")
+                  context.state.shockwave_pie_blocks = nil
+                  context.state.shockwave_real_blocks = nil
                 end
 
                 return {
@@ -182,11 +188,13 @@ public class EnderDragonShockwaveLuaConfig extends InlineLuaPowerConfig {
                       context.cooldowns:set_local(20 * 60, "ender_dragon_shockwave")
                       context.cooldowns:set_global(20 * 30)
                       set_affected_blocks(context)
-                      generate_real_circle(context)
+                      context.state.shockwave_real_blocks = {}
                       context.state.shockwave_warning_phase_counter = 0
                       context.state.shockwave_damage_phase_counter = 0
 
                       local counter = 0
+                      local next_terrain_column = 1
+                      local preparation_location = context.boss:get_location()
                       context.state.ender_dragon_shockwave_task = context.scheduler:run_every(1, function(context)
                         if not context.boss:is_alive() then
                           stop_power(context)
@@ -197,6 +205,13 @@ public class EnderDragonShockwaveLuaConfig extends InlineLuaPowerConfig {
 
                         if not is_landed_phase(context.boss:get_ender_dragon_phase()) then
                           stop_power(context)
+                          return
+                        end
+
+                        -- Keep each terrain scan under the shared callback watchdog, including
+                        -- columns whose first solid block is nine blocks below the dragon.
+                        if next_terrain_column ~= nil then
+                          next_terrain_column = generate_real_circle(context, preparation_location, next_terrain_column)
                           return
                         end
 
