@@ -602,8 +602,8 @@ public class CustomItem {
         String configured = customItemsConfigFields.getDropWeight();
         if (configured == null || configured.equalsIgnoreCase("dynamic")) return false;
         dropWeight = Double.parseDouble(configured);
-        if (!Double.isFinite(dropWeight) || dropWeight <= 0)
-            throw new IllegalArgumentException("dropWeight must be finite and positive for " + customItemsConfigFields.getFilename());
+        if (!Double.isFinite(dropWeight) || dropWeight < 0)
+            throw new IllegalArgumentException("dropWeight must be finite and nonnegative for " + customItemsConfigFields.getFilename());
         return true;
     }
 
