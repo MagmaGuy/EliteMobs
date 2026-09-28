@@ -37,8 +37,9 @@ final class MobTypeDefaults {
     }
 
     static String behavior(EntityType type) {
+        if (type == EntityType.ENDERMAN) return null;
         boolean neutral = switch (type.name()) {
-            case "BEE", "ENDERMAN", "GOAT", "IRON_GOLEM", "LLAMA", "PANDA", "PIGLIN",
+            case "BEE", "GOAT", "IRON_GOLEM", "LLAMA", "PANDA", "PIGLIN",
                  "POLAR_BEAR", "TRADER_LLAMA", "WOLF", "ZOMBIFIED_PIGLIN" -> true;
             default -> false;
         };

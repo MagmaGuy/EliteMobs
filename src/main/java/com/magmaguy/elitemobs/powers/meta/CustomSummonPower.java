@@ -495,7 +495,14 @@ public class CustomSummonPower extends ElitePower implements Listener {
                 customBossEntity.setBypassesProtections(eliteEntity.getBypassesProtections());
                 if (customBossReinforcement.inheritLevel)
                     customBossEntity.setLevel(eliteEntity.getLevel());
-                customBossEntity.spawn(false);
+                customBossEntity.setSummoningEntity(eliteEntity);
+                try {
+                    customBossEntity.spawn(false);
+                } finally {
+                    // Spawn registers materialized children with their owner. Death summons must outlive it.
+                    if (customBossReinforcement.summonType.equals(SummonType.ON_DEATH))
+                        eliteEntity.removeReinforcement(customBossEntity);
+                }
                 //Distinguishes "spawn was never attempted" from "spawn ran and silently produced nothing", which is
                 //what a protection plugin, an unloaded chunk or a rejected entity type looks like from out here.
                 if (DebugMessage.isAnyDebugEnabled())
@@ -503,10 +510,11 @@ public class CustomSummonPower extends ElitePower implements Listener {
                             + " , livingEntity=" + (customBossEntity.getLivingEntity() == null ? "null (spawn failed)" : "present"));
                 if (customBossEntity.getLivingEntity() != null)
                     customBossEntity.getLivingEntity().setVelocity(new Vector(ThreadLocalRandom.current().nextDouble(0.2), 0.2, ThreadLocalRandom.current().nextDouble(0.2)));
-                if (!customBossReinforcement.summonType.equals(SummonType.ON_DEATH))
+                // Deferred or rejected bodies still need the parent's existing cleanup ownership.
+                if (!customBossReinforcement.summonType.equals(SummonType.ON_DEATH)
+                        && (customBossEntity.getLivingEntity() == null || !customBossEntity.getLivingEntity().isValid()))
                     eliteEntity.addReinforcement(customBossEntity);
                 customBossReinforcement.isSummoned = true;
-                customBossEntity.setSummoningEntity(eliteEntity);
                 if (customBossReinforcement.inheritAggro)
                     customBossEntity.inheritAggroFrom(eliteEntity);
             }

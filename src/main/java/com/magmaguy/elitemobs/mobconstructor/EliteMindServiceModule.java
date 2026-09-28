@@ -5,7 +5,11 @@ import com.magmaguy.elitemobs.api.mind.EliteMindService;
 import com.magmaguy.elitemobs.api.power.ElitePowerActionPosition;
 import com.magmaguy.elitemobs.api.power.ElitePowerActionResult;
 import com.magmaguy.elitemobs.config.powers.PowersConfigFields;
+import com.magmaguy.elitemobs.dungeons.CombatContent;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProperties;
 import com.magmaguy.easyminecraftgoals.NMSAdapter;
 import com.magmaguy.easyminecraftgoals.NMSManager;
@@ -27,6 +31,7 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -49,14 +54,31 @@ public final class EliteMindServiceModule {
         if (!fields.isAi() || fields.isNeutral()) return null;
         String filename = fields.getBehavior();
         if (filename == null) {
-            var properties = EliteMobProperties.getPluginData(fields.getEntityType());
-            filename = properties == null ? null : properties.getBehavior();
+            if (fields.getEntityType() == EntityType.ENDERMAN && isDungeonEncounter(actor, location)) {
+                filename = "basic_melee.lua";
+            } else {
+                var properties = EliteMobProperties.getPluginData(fields.getEntityType());
+                filename = properties == null ? null : properties.getBehavior();
+            }
         }
-        if (filename == null || filename.isBlank() || filename.equalsIgnoreCase("native")) return null;
-        EliteMindServiceImpl current = requireImplementation();
+        if (filename == null) return null;
         String reference = filename.trim();
+        if (reference.isEmpty() || reference.equalsIgnoreCase("native")) return null;
+        EliteMindServiceImpl current = requireImplementation();
         current.validateBehavior(reference);
         return configure -> current.spawnBehaviorBody(actor, location, reference, configure);
+    }
+
+    private static boolean isDungeonEncounter(CustomBossEntity actor, Location location) {
+        Set<EliteEntity> visited = new HashSet<>();
+        for (EliteEntity owner = actor; owner != null && visited.add(owner); owner = owner.getSummoningEntity()) {
+            if (owner instanceof InstancedBossEntity) return true;
+            if (owner instanceof CustomBossEntity boss && boss.getEmPackage() instanceof CombatContent) return true;
+        }
+        if (location == null || location.getWorld() == null) return false;
+        var world = location.getWorld();
+        return DungeonInstance.forWorld(world.getUID()) != null
+                || EMPackage.getContent(world.getName()) instanceof CombatContent;
     }
 
     public static EliteEntity spawnBehaviorElite(Location location, EntityType type, int level,
