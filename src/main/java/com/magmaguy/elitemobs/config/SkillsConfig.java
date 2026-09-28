@@ -30,6 +30,8 @@ public class SkillsConfig extends ConfigurationFile {
     @Getter
     private static List<String> skillWorldExclusions;
     @Getter
+    private static List<String> classLabelWorldExclusions;
+    @Getter
     private static String skillBarTitleFormat;
     @Getter
     private static String skillLevelUpTitleFormat;
@@ -55,10 +57,15 @@ public class SkillsConfig extends ConfigurationFile {
     }
 
     public static boolean isWorldExcludedFromSkills(String worldName) {
-        return worldIsExcludedFromSkills(worldName, skillWorldExclusions);
+        return worldIsExcluded(worldName, skillWorldExclusions);
     }
 
-    static boolean worldIsExcludedFromSkills(String worldName, List<String> excludedWorlds) {
+    public static boolean isWorldExcludedFromClassLabels(Player player) {
+        if (player == null || player.getWorld() == null) return false;
+        return worldIsExcluded(player.getWorld().getName(), classLabelWorldExclusions);
+    }
+
+    private static boolean worldIsExcluded(String worldName, List<String> excludedWorlds) {
         if (excludedWorlds == null || excludedWorlds.isEmpty()) return false;
         if (worldName == null || worldName.isBlank()) return false;
         String normalizedWorldName = worldName.trim();
@@ -110,6 +117,14 @@ public class SkillsConfig extends ConfigurationFile {
                         "Example:",
                         "- event_world"),
                 file, fileConfiguration, "skillWorldExclusions", Collections.emptyList(), false);
+
+        classLabelWorldExclusions = ConfigurationEngine.setList(
+                List.of("Hides only the class label above players in these worlds.",
+                        "Player names, combat health displays, skills and XP are unchanged.",
+                        "Players without a selected class keep their normal combat level display.",
+                        "World names are exact and case-insensitive; surrounding spaces are ignored.",
+                        "Leave empty to show class labels in every world. showCombatLevelDisplay still controls all these displays."),
+                file, fileConfiguration, "classLabelWorldExclusions", Collections.emptyList(), false);
 
         skillsMenuTitle = ConfigurationEngine.setString(
                 List.of("Title of the skills menu."),

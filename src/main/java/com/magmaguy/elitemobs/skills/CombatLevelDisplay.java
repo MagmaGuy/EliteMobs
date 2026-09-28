@@ -86,13 +86,16 @@ public class CombatLevelDisplay implements Listener {
     }
 
     private static String renderText(Player player, boolean showHealth) {
-        String identity = PlayerIdentityLabelRenderer.render(player.getUniqueId());
+        String identity = SkillsConfig.isWorldExcludedFromClassLabels(player)
+                && PlayerIdentityLabelRenderer.hasClassLabel(player.getUniqueId())
+                ? "" : PlayerIdentityLabelRenderer.render(player.getUniqueId());
         if (!showHealth) return identity;
         AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         double current = player.getHealth();
         double maximum = maxHealth == null ? current : maxHealth.getValue();
-        return "&c❤ " + CombatHealthFormatter.format(current) + "/"
-                + CombatHealthFormatter.format(maximum) + "\n&r" + identity;
+        String health = "&c❤ " + CombatHealthFormatter.format(current) + "/"
+                + CombatHealthFormatter.format(maximum);
+        return identity.isBlank() ? health : health + "\n&r" + identity;
     }
 
     /**
@@ -113,6 +116,7 @@ public class CombatLevelDisplay implements Listener {
         // The bottom of this label sits above the native name; extra lines grow upward.
         boolean showHealth = shouldShowHealth(player);
         String text = renderText(player, showHealth);
+        if (text.isBlank()) return;
         boolean passenger = shouldUsePassenger(player);
         FakeText fakeText = NMSManager.getAdapter().fakeTextBuilder()
                 .text(ChatColorConverter.convert(text))
@@ -189,11 +193,14 @@ public class CombatLevelDisplay implements Listener {
             return;
         }
 
+        String text = renderText(player, shouldShowHealth(player));
+        if (text.isBlank()) {
+            removeDisplay(player);
+            return;
+        }
         PlayerDisplay display = playerDisplays.get(player.getUniqueId());
         if (display != null && display.isValid(player)
                 && display.isPassenger() == shouldUsePassenger(player)) {
-            boolean showHealth = shouldShowHealth(player);
-            String text = renderText(player, showHealth);
             if (!text.equals(display.text)) {
                 display.display.setText(ChatColorConverter.convert(text));
                 display.text = text;
