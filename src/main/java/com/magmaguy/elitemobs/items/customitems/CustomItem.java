@@ -498,7 +498,7 @@ public class CustomItem {
     }
 
     public Item dropPlayerLoot(Player player, int tier, Location location, EliteEntity eliteEntity) {
-        if (!permission.isEmpty() && !player.hasPermission(permission)) return null;
+        if (!permission.isEmpty() && (player == null || !player.hasPermission(permission))) return null;
         int itemTier = limitItemLevel(player, tier);
         ItemStack itemStack = switch (getScalability()) {
             case LIMITED -> ScalableItemConstructor.constructLimitedItem(itemTier, this, player, eliteEntity);
@@ -509,7 +509,7 @@ public class CustomItem {
     }
 
     public Item dropPlayerLootExact(Player player, int level, Location location, EliteEntity eliteEntity) {
-        if (!permission.isEmpty() && !player.hasPermission(permission)) return null;
+        if (!permission.isEmpty() && (player == null || !player.hasPermission(permission))) return null;
         ItemStack itemStack = generateItemStackExact(level, player, eliteEntity);
         return dropConstructedLoot(itemStack, player, location);
     }
