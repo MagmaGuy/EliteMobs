@@ -1,11 +1,14 @@
 # Files matching these retirement rules are preserved by MagmaCore
 # before configuration loading. Current defaults regenerate through their owners.
-# Regenerate Casus only when his quest list still equals the old shipped default.
-# Current defaults and custom quest lists do not match this exact list.
+# Regenerate Casus when his quest list exactly matches either older default.
+# The current four-quest default and other quest lists do not match.
 npcs:
   - files: [guide_1.yml]
     key: questFileName
     value: [ag_welcome_quest_1.yml]
+  - files: [guide_1.yml]
+    key: questFileName
+    value: [ag_welcome_quest_1.yml, ag_adventurer_training.yml]
 
 # Scotty does not spawn with scrolls disabled. Regenerate the old welcome quest
 # without his objective; its replacement no longer matches this rule.
