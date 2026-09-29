@@ -11,7 +11,6 @@ import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
-import com.magmaguy.magmacore.instance.MatchInstance;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -29,8 +28,6 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
     private static final ArrayListMultimap<String, InstancedBossContainer> instancedBossEntities = ArrayListMultimap.create();
     @Getter
     private  DungeonInstance dungeonInstance = null;
-    @Getter
-    private  MatchInstance matchInstance;
     @Getter @Setter
     private Set<Player> lockoutPlayers = new HashSet<>();
 
@@ -50,27 +47,20 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
         }
     }
 
-    public InstancedBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, MatchInstance matchInstance, int level) {
+    public InstancedBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, int level) {
         super(customBossesConfigFields, location, false, true);
         super.level = level;
-        this.matchInstance = matchInstance;
         super.setElitePowers(ElitePowerParser.parsePowers(customBossesConfigFields, this));
-//        if (level == -1) {
-//            if (matchInstance.getPlayers().isEmpty())
-//                Logger.warn("Failed to get players for new instance when assigning dynamic level! The bosses will default to level 1.");
-//            else
-//                level = ElitePlayerInventory.getPlayer(matchInstance.getPlayers().stream().findFirst().get()).getNaturalMobSpawnLevel(true);
-//        }
     }
 
-    public static CustomBossEntity createInstancedBossEntity(String filename, Location location, MatchInstance matchInstance, int level){
+    public static CustomBossEntity createInstancedBossEntity(String filename, Location location, int level){
         CustomBossesConfigFields configFields = CustomBossesConfig.getCustomBoss(filename);
         if (configFields == null){
 
             Logger.warn("Failed to spawn instanced boss entity " + filename + " via API!");
             return null;
         }
-        return new InstancedBossEntity(configFields, location, matchInstance, level);
+        return new InstancedBossEntity(configFields, location, level);
     }
 
     public static void shutdown() {
@@ -148,7 +138,6 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
                     removalReason.equals(RemovalReason.SHUTDOWN) ||
                     removalReason.equals(RemovalReason.ARENA_RESET)) {
                 dungeonInstance = null;
-                matchInstance = null;
                 lockoutPlayers.clear();
             }
         } finally {
