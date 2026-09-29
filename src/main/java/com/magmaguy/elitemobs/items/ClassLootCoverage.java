@@ -52,7 +52,7 @@ public final class ClassLootCoverage {
             Player preferenceOwner = audience.isEmpty() ? player : audience.get(ThreadLocalRandom.current().nextInt(audience.size()));
             var eligible = candidates(boss.getCustomBossesConfigFields(), difficulty, rank, preferenceOwner, boss);
             var selected = ClassLootSelection.selectEntry(eligible, preferenceOwner);
-            if (selected == null || !selected.willDrop(preferenceOwner)) continue;
+            if (selected == null || !selected.willDrop(preferenceOwner, boss)) continue;
             for (int copy = 0; copy < selected.getAmount(); copy++) {
                 ItemStack item = ClassLootItemConstructor.construct(CustomItem.getCustomItem(selected.getFilename()),
                         level, difficulty, rank, boss, dungeonPool || partyPool ? null : player);
@@ -72,9 +72,8 @@ public final class ClassLootCoverage {
         String override = boss.getCustomBossesConfigFields().getClassLootDifficulty();
         if (!"AUTO".equals(override))
             return ClassLootSettingsConfig.difficulty(override, ClassLootSettingsConfig.defaultDifficulty());
-        if (boss instanceof InstancedBossEntity instanced && instanced.getDungeonInstance() != null)
-            return ClassLootSettingsConfig.forDifficultyId(instanced.getDungeonInstance().getDifficultyID(),
-                    instanced.getDungeonInstance().getResolvedDifficultyID());
+        if (boss instanceof InstancedBossEntity instanced)
+            return ClassLootSettingsConfig.forDifficultyId(instanced.getDifficultyID(), instanced.getResolvedDifficultyID());
         return ClassLootSettingsConfig.defaultDifficulty();
     }
 
@@ -124,8 +123,8 @@ public final class ClassLootCoverage {
         if (fields.getCustomLootTable() == null) return List.of();
         var resolver = new com.magmaguy.elitemobs.instanced.dungeons.DifficultyResolver(fields.getFilename(), List.of());
         java.util.function.Predicate<List<String>> filter = ids -> resolver.matches(ids, Integer.toString(difficulty.ordinal()), fields.getFilename());
-        if (boss instanceof InstancedBossEntity instanced && instanced.getDungeonInstance() != null)
-            filter = ids -> instanced.getDungeonInstance().matchesDifficulty(ids, fields.getFilename());
+        if (boss instanceof InstancedBossEntity instanced)
+            filter = ids -> instanced.matchesDifficulty(ids, fields.getFilename());
         var difficultyFilter = filter;
         return fields.getCustomLootTable().getEntries().stream()
                 .filter(EliteCustomLootEntry.class::isInstance).map(EliteCustomLootEntry.class::cast)

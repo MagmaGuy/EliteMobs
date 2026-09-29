@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.instanced.dungeons.DifficultyResolver;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.parties.PartyManager;
 import com.magmaguy.magmacore.util.Logger;
@@ -92,11 +93,17 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
 
     @Override
     public boolean willDrop(Player player) {
-        return matchesDungeonDifficulty(player) && super.willDrop(player);
+        return willDrop(player, null);
     }
 
-    private boolean matchesDungeonDifficulty(Player player) {
+    public boolean willDrop(Player player, EliteEntity source) {
+        return matchesDifficulty(player, source) && super.willDrop(player);
+    }
+
+    private boolean matchesDifficulty(Player player, EliteEntity source) {
         if (difficultyIDs == null) return true;
+        if (source instanceof InstancedBossEntity instanced)
+            return instanced.matchesDifficulty(difficultyIDs, configFilename);
         MatchInstance instance = player == null ? null : PlayerData.getMatchInstance(player);
         return !(instance instanceof DungeonInstance dungeon)
                 || dungeon.matchesDifficulty(difficultyIDs, configFilename);
@@ -121,7 +128,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
 
     private boolean dropPhysical(int level, Player player, Location location, EliteEntity source, boolean exactLevel) {
         if (CustomItem.isUnavailableWithoutModels(filename)) return false;
-        if (!matchesDungeonDifficulty(player) || getAmount() <= 0) return false;
+        if (!matchesDifficulty(player, source) || getAmount() <= 0) return false;
         CustomItem item = generateCustomItem();
         if (item == null) {
             Logger.warn("Invalid loot entry for " + (source == null ? "treasure chest" : "boss " + source.getName())
@@ -153,7 +160,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
 
     private boolean dropDirect(int level, Player player, EliteEntity source, boolean exactLevel) {
         if (CustomItem.isUnavailableWithoutModels(filename)) return false;
-        if (!matchesDungeonDifficulty(player) || getAmount() <= 0) return false;
+        if (!matchesDifficulty(player, source) || getAmount() <= 0) return false;
         CustomItem item = generateCustomItem();
         if (item == null) {
             Logger.warn("Invalid loot entry for " + (source == null ? "direct drop" : "boss " + source.getName())
@@ -214,9 +221,9 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
 
     private GroupDelivery groupDelivery(int itemTier, Player player, EliteEntity eliteEntity) {
         if (CustomItem.isUnavailableWithoutModels(filename)) return GroupDelivery.SKIPPED;
-        if (!matchesDungeonDifficulty(player) || getAmount() <= 0) return GroupDelivery.SKIPPED;
+        if (!matchesDifficulty(player, eliteEntity) || getAmount() <= 0) return GroupDelivery.SKIPPED;
         if (difficultyIDs != null) {
-            MatchInstance matchInstance = PlayerData.getMatchInstance(player);
+            MatchInstance matchInstance = player == null ? null : PlayerData.getMatchInstance(player);
             if (matchInstance instanceof DungeonInstance) {
                 if (!isEquipment()) return GroupDelivery.PERSONAL;
                 return addGroupLoot(CustomItem.limitItemLevel(player, itemTier), eliteEntity)

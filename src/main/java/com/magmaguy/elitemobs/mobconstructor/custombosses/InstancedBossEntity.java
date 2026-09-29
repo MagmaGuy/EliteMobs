@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.combatsystem.LevelScaling;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DifficultyResolver;
 import com.magmaguy.elitemobs.instanced.dungeons.DynamicDungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.PersistentMovingEntity;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObject;
@@ -28,6 +29,8 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
     private static final ArrayListMultimap<String, InstancedBossContainer> instancedBossEntities = ArrayListMultimap.create();
     @Getter
     private  DungeonInstance dungeonInstance = null;
+    private String externalDifficultyID = "0";
+    private DifficultyResolver externalDifficultyResolver;
     @Getter @Setter
     private Set<Player> lockoutPlayers = new HashSet<>();
 
@@ -48,19 +51,49 @@ public class InstancedBossEntity extends RegionalBossEntity implements Persisten
     }
 
     public InstancedBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, int level) {
+        this(customBossesConfigFields, location, level, "0");
+    }
+
+    public InstancedBossEntity(CustomBossesConfigFields customBossesConfigFields, Location location, int level,
+                              String difficultyID) {
         super(customBossesConfigFields, location, false, true);
+        if (!DifficultyResolver.isCanonical(difficultyID))
+            throw new IllegalArgumentException("External instance difficulty must be 0, 1 or 2");
+        externalDifficultyID = difficultyID;
+        externalDifficultyResolver = new DifficultyResolver(customBossesConfigFields.getFilename(), List.of());
         super.level = level;
         super.setElitePowers(ElitePowerParser.parsePowers(customBossesConfigFields, this));
     }
 
     public static CustomBossEntity createInstancedBossEntity(String filename, Location location, int level){
+        return createInstancedBossEntity(filename, location, level, "0");
+    }
+
+    public static CustomBossEntity createInstancedBossEntity(String filename, Location location, int level,
+                                                             String difficultyID) {
         CustomBossesConfigFields configFields = CustomBossesConfig.getCustomBoss(filename);
         if (configFields == null){
 
             Logger.warn("Failed to spawn instanced boss entity " + filename + " via API!");
             return null;
         }
-        return new InstancedBossEntity(configFields, location, level);
+        return new InstancedBossEntity(configFields, location, level, difficultyID);
+    }
+
+    public String getDifficultyID() {
+        return dungeonInstance == null ? externalDifficultyID : dungeonInstance.getDifficultyID();
+    }
+
+    public String getResolvedDifficultyID() {
+        return dungeonInstance == null ? externalDifficultyID : dungeonInstance.getResolvedDifficultyID();
+    }
+
+    public boolean matchesDifficulty(List<String> filter, String source) {
+        if (dungeonInstance != null) return dungeonInstance.matchesDifficulty(filter, source);
+        // The superclass parses powers before the instance's difficulty is assigned.
+        // Both constructors parse them again once the actual context exists.
+        return externalDifficultyResolver == null
+                || externalDifficultyResolver.matches(filter, externalDifficultyID, source);
     }
 
     public static void shutdown() {

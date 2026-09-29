@@ -96,7 +96,8 @@ public class CustomLootTable implements Serializable {
             if (customLootEntry instanceof EliteCustomLootEntry custom && custom.isClassLoot()) continue;
             if (materialsOnly && (!(customLootEntry instanceof EliteCustomLootEntry custom) || custom.isEquipment()))
                 continue;
-            if (customLootEntry.willDrop(player)) {
+            if (customLootEntry instanceof EliteCustomLootEntry custom
+                    ? custom.willDrop(player, eliteEntity) : customLootEntry.willDrop(player)) {
                 if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
                     customLootEntry.directDrop(level, player, eliteEntity);
                 else {
