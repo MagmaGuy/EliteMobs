@@ -11,17 +11,16 @@ public final class StoryModeIntroductionQuestConfig extends CustomQuestsConfigFi
                 Map.of("Objective1", Map.of("objectiveType", "DIALOG",
                         "filename", "story_dungeons_quest_giver.yml", "npcName", "Manager Wallitz",
                         "location", "on the lower floor of the Adventurer's Guild",
-                        "dialog", List.of("&8[&aManager Wallitz&8]&f Casus says you have completed your class training. Good! You are ready for Story Mode.",
+                        "dialog", List.of("&8[&aManager Wallitz&8]&f Casus says you have completed your class training. Good! You are ready for the Story Mode dungeons then.",
                                 "Talk to me again to finish this introduction and see the story quests I have for you."))),
-                List.of(), 1, "&2Your Story Begins",
+                List.of(), 1, "&2Guide me to the Story Dungeons",
                 List.of("&aVisit Manager Wallitz at the Adventurer's Guild.",
                         "&aBegin your journey through the Story Mode dungeon quests."));
         setQuestAcceptPermission("elitequest.ag_adventurer_training.yml");
         setQuestLockoutPermission();
         setTurnInNPC("story_dungeons_quest_giver.yml");
-        setQuestAcceptDialog(List.of("&8[&aCasus&8]&f With your Adventurer training complete, you are ready for the Story Mode dungeons.",
-                "Speak to Manager Wallitz on the lower floor of the guild. He will guide you into the story.",
-                "You can also take my Primis introduction. The two journeys are yours to choose between."));
+        setQuestAcceptDialog(List.of("&8[&aCasus&8]&f With your Adventurer training complete, you are ready to venture into the Story Mode dungeons or the Primis beginner adventure.",
+                "Speak to Manager Wallitz on the lower floor of the guild in the main building. He will guide you into the Story Mode dungeons."));
         setQuestCompleteDialog(List.of("&8[&aManager Wallitz&8]&f Let us get you started. Speak to me again and choose your next Story Mode quest."));
     }
 }
