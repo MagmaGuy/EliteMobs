@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.npcs.premade;
 
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
+import com.magmaguy.elitemobs.pathfinding.patrol.PatrolMode;
 import org.bukkit.entity.Villager;
 
 import java.util.ArrayList;
@@ -44,6 +45,38 @@ public class CombatInstructorConfig extends NPCsConfigFields {
                 3,
                 NPCInteractions.NPCInteractionType.CHAT);
         setDisguise("custom:ag_combat_instructor");
+        setPatrolPauseNearPlayersRadius(3D);
+        setPatrolFaceNearbyPlayers(true);
         setCustomDisguiseData("player ag_back_teleporter setskin {\"id\":\"2309bbd6-da95-4c32-9de0-08cd1072d582\",\"name\":\"Unknown\",\"properties\":[{\"name\":\"textures\",\"value\":\"ewogICJ0aW1lc3RhbXAiIDogMTY3NzI3MTg3MzI1OCwKICAicHJvZmlsZUlkIiA6ICI3YmRhNDBlM2E1YjU0YzE0YWJmZGYzNGMyODY2NjQ0NiIsCiAgInByb2ZpbGVOYW1lIiA6ICJfRWdvcl9wbGF5XyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS8xYmEwM2E5MzQ2NzlmOTdlZTNmNTIyMDI2ZGQyY2FlZDNmOWUzZGUxOTIxZDdkMzUwNzRhNzA5YWVlZTY1M2Y0IgogICAgfQogIH0KfQ==\",\"signature\":\"yLnzRj53v2941K05aMvIqH/5gREtBrDJCHReHsHko3jLzsN10BidUJd9Hs40wIdrlji8G/GvVv469fmmSVda5QTInszgNhDTUk/0IpC4Ir9nGe5S9mN+gDuyaHHClux0ZRxQkf4O7A/8765y7lGG8Y3ZBNFwovyht3Q0qoxW5AP0AUVvv7GHy2MeXWv7iDtrb3o79Yzy8tm1SG3d9jnCnIEjpKD98U5cwAu9N/UL5MM1zgVtMXsB4D7ymm3bHy+SC4HYjg8oA1TLYc9JofJB1qsMcKUbQ1N3BG63p1b6yf79ADRgtZY258Q83G9x2TmznlKeAH7WgnnYL8Mf01XTr5D7hUwhkxpPVAwLL0kJ3BXmOEE+CwRoBthOWTCWvSTNfkBu7PicML8zzdT89dMFJF+OXH/ofg+FHkhlO009mmd4H7FaAkmTAXZpqr9vjfwnO3/m5pcMgNiPpDqyZushdJKEAOTIQtUR5hO6L1u6opIVUmE5pVSY4BuuZtOi7tlkkJpqnXH8+5gZoQq7ZB0yrnNr2LlhDLdfHkBCG2/nhHK4yVdzRWb+N20c2yP2FUXWbCaWvZF8+i2051zAarqkaLL1hJ24Ysmu+n1BXbLSKB/AlUJVHmrQbJZpj+LKX1Up4buqQmnFLQwem2O3hyAaEnbQ56xwVHTiszQJ+BJqqm4=\"}],\"legacy\":false}");
+    }
+
+    @Override
+    public void processConfigFields() {
+        processBoolean("patrol.enabled", true, false, true);
+        processString("patrol.mode", PatrolMode.LOOP.name(), null, true);
+        processDouble("patrol.speed", 0.5D, 0.5D, true);
+        // Offsets from the chair at 299,91,215. LOOP closes the circuit back to the chair.
+        processStringList("patrol.nodes", List.of(
+                "0,0,0",
+                "-13,0,-2",
+                "-20,0,15",
+                "-29,-4,22",
+                "-40,-4,2",
+                "-51,-4,7",
+                "-59,-4,-4",
+                "-65,-4,1",
+                "-54,-4,9",
+                "-53,-4,19",
+                "-36,-4,30",
+                "-39,-4,42",
+                "-56,1,55",
+                "-41,-4,46",
+                "-30,-4,60",
+                "-30,0,75",
+                "-15,1,75",
+                "-6,1,65",
+                "-6,0,13",
+                "-5,0,-1"), null, true);
+        super.processConfigFields();
     }
 }
