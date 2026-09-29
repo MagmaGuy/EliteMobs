@@ -117,7 +117,8 @@ public final class PatrolEditor implements Listener {
             return;
         }
         message(player, "Editing " + session.filename() + " with " + session.nodes.size()
-                + " node(s), mode " + session.mode + ". Use /em patrol add at each waypoint.");
+                + " node(s), mode " + session.mode + ", " + (session.relative ? "relative" : "absolute")
+                + " coordinates. Use /em patrol add at each waypoint.");
     }
 
     public static void add(Player player) {
@@ -133,18 +134,19 @@ public final class PatrolEditor implements Listener {
             return;
         }
 
-        Vector offset = waypoint.toVector().subtract(session.origin.toVector());
+        Vector node = waypoint.toVector();
+        if (session.relative) node.subtract(session.origin.toVector());
         Vector previous = session.nodes.getLast();
-        double length = previous.distance(offset);
+        double length = previous.distance(node);
         if (length <= 1.0E-4D) {
             message(player, "That waypoint duplicates the previous node.");
             return;
         }
 
         session.snapshot();
-        session.nodes.add(offset);
+        session.nodes.add(node);
         session.driver.moveTo(waypoint, session.speedModifier);
-        message(player, "Added node " + (session.nodes.size() - 1) + " at " + vector(offset)
+        message(player, "Added node " + (session.nodes.size() - 1) + " at " + vector(node)
                 + "; the route solver is resolving the walk asynchronously.");
     }
 
@@ -152,7 +154,7 @@ public final class PatrolEditor implements Listener {
         Session session = session(player);
         if (session == null) return;
         if (session.nodes.size() <= 1) {
-            message(player, "A route must retain its origin node.");
+            message(player, "A route must retain its first node.");
             return;
         }
         session.snapshot();
@@ -217,7 +219,8 @@ public final class PatrolEditor implements Listener {
         Session session = SESSIONS.get(player.getUniqueId());
         if (session != null) {
             message(player, session.filename() + ": editing " + session.nodes.size() + " nodes, mode "
-                    + session.mode + ", driver " + session.driver.status() + ".");
+                    + session.mode + ", " + (session.relative ? "relative" : "absolute")
+                    + " coordinates, driver " + session.driver.status() + ".");
             return;
         }
         Object owner = targetedOwner(player);
@@ -320,6 +323,7 @@ public final class PatrolEditor implements Listener {
         private final UUID playerId;
         private final Object owner;
         private final Location origin;
+        private final boolean relative;
         private final double speedModifier;
         private final Double virtualSpeed;
         private final boolean originalAi;
@@ -345,6 +349,7 @@ public final class PatrolEditor implements Listener {
             this.playerId = player.getUniqueId();
             this.owner = owner;
             this.origin = origin.clone();
+            this.relative = existing == null || existing.relative();
             this.speedModifier = existing == null ? 1D : existing.speedModifier();
             this.virtualSpeed = existing == null ? null : existing.virtualSpeed();
             this.originalAi = originalAi;
@@ -430,6 +435,7 @@ public final class PatrolEditor implements Listener {
             YamlConfiguration validation = new YamlConfiguration();
             validation.set("patrol.enabled", true);
             validation.set("patrol.mode", mode.name());
+            validation.set("patrol.relative", relative);
             validation.set("patrol.speed", speedModifier);
             validation.set("patrol.virtualSpeed", virtualSpeed);
             validation.set("patrol.nodes", nodes.stream().map(node ->
@@ -586,17 +592,21 @@ public final class PatrolEditor implements Listener {
             Preview preview = new Preview(player);
             for (Vector node : nodes) {
                 if (preview.full()) return;
-                preview.point(origin.clone().add(node));
+                preview.point(nodeLocation(node));
             }
             int segments = mode == PatrolMode.LOOP && nodes.size() > 2 ? nodes.size() : nodes.size() - 1;
             for (int start = 0; start < segments && !preview.full(); start++)
-                preview.segment(origin.clone().add(nodes.get(start)),
-                        origin.clone().add(nodes.get((start + 1) % nodes.size())));
+                preview.segment(nodeLocation(nodes.get(start)),
+                        nodeLocation(nodes.get((start + 1) % nodes.size())));
             if (preview.full()) return;
             for (Location resolvedPoint : driver.routePreview()) {
                 if (preview.full()) return;
                 preview.point(resolvedPoint);
             }
+        }
+
+        private Location nodeLocation(Vector node) {
+            return relative ? origin.clone().add(node) : node.toLocation(origin.getWorld());
         }
 
         /** Clip before sampling: authored route length does not determine preview work. */
@@ -689,6 +699,7 @@ public final class PatrolEditor implements Listener {
         private static void applyRoute(FileConfiguration configuration, PatrolRoute route) {
             configuration.set("patrol.enabled", true);
             configuration.set("patrol.mode", route.mode().name());
+            configuration.set("patrol.relative", route.relative());
             configuration.set("patrol.speed", route.speedModifier());
             configuration.set("patrol.maxLegDistance", null);
             configuration.set("patrol.virtualSpeed", route.virtualSpeed());

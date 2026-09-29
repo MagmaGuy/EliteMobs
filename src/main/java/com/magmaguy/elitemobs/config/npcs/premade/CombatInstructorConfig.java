@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.pathfinding.patrol.PatrolMode;
 import org.bukkit.entity.Villager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CombatInstructorConfig extends NPCsConfigFields {
@@ -55,28 +56,36 @@ public class CombatInstructorConfig extends NPCsConfigFields {
         processBoolean("patrol.enabled", true, false, true);
         processString("patrol.mode", PatrolMode.LOOP.name(), null, true);
         processDouble("patrol.speed", 0.5D, 0.5D, true);
-        // Offsets from the chair at 299,91,215. LOOP closes the circuit back to the chair.
-        processStringList("patrol.nodes", List.of(
-                "0,0,0",
-                "-13,0,-2",
-                "-20,0,15",
-                "-29,-4,22",
-                "-40,-4,2",
-                "-51,-4,7",
-                "-59,-4,-4",
-                "-65,-4,1",
-                "-54,-4,9",
-                "-53,-4,19",
-                "-36,-4,30",
-                "-39,-4,42",
-                "-56,1,55",
-                "-41,-4,46",
-                "-30,-4,60",
-                "-30,0,75",
-                "-15,1,75",
-                "-6,1,65",
-                "-6,0,13",
-                "-5,0,-1"), null, true);
+        // Pair the new absolute defaults with their mode without reinterpreting existing saved offsets.
+        boolean relative = true;
+        if (!configHas("patrol.nodes")) relative = processBoolean("patrol.relative", false, true, true);
+        // LOOP closes the circuit from the final waypoint back to the chair.
+        int[][] defaultNodes = {
+                {299, 91, 215},
+                {286, 91, 213},
+                {279, 91, 230},
+                {270, 87, 237},
+                {259, 87, 217},
+                {248, 87, 222},
+                {240, 87, 211},
+                {234, 87, 216},
+                {245, 87, 224},
+                {246, 87, 234},
+                {263, 87, 245},
+                {260, 87, 257},
+                {243, 92, 270},
+                {258, 87, 261},
+                {269, 87, 275},
+                {269, 91, 290},
+                {284, 92, 290},
+                {293, 92, 280},
+                {293, 91, 228},
+                {294, 91, 214}
+        };
+        int[] origin = relative ? defaultNodes[0] : new int[3];
+        processStringList("patrol.nodes", Arrays.stream(defaultNodes)
+                .map(node -> (node[0] - origin[0]) + "," + (node[1] - origin[1]) + "," + (node[2] - origin[2]))
+                .toList(), null, true);
         super.processConfigFields();
     }
 }

@@ -11,21 +11,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/** Immutable route geometry and traversal policy. Nodes are offsets from an actor's authored origin. */
+/** Immutable route geometry and traversal policy in an actor's authored world. */
 public final class PatrolRoute {
     public static final String ROOT = "patrol";
 
     private final List<Vector> nodes;
+    private final boolean relative;
     private final PatrolMode mode;
     private final double speedModifier;
     private final Double virtualSpeed;
 
     private PatrolRoute(
             List<Vector> nodes,
+            boolean relative,
             PatrolMode mode,
             double speedModifier,
             Double virtualSpeed) {
         this.nodes = Collections.unmodifiableList(nodes.stream().map(Vector::clone).toList());
+        this.relative = relative;
         this.mode = Objects.requireNonNull(mode, "mode");
         this.speedModifier = requirePositiveFinite(speedModifier, "patrol.speed");
         this.virtualSpeed = virtualSpeed == null
@@ -51,16 +54,25 @@ public final class PatrolRoute {
             nodes.removeLast();
         }
 
+        if (configuration.contains(ROOT + ".relative") && !configuration.isBoolean(ROOT + ".relative")) {
+            throw new IllegalArgumentException("patrol.relative must be true or false");
+        }
+        boolean relative = configuration.getBoolean(ROOT + ".relative", true);
         PatrolMode mode = PatrolMode.parse(configuration.getString(ROOT + ".mode", PatrolMode.LOOP.name()));
         double speed = configuration.getDouble(ROOT + ".speed", 1D);
         Double virtualSpeed = configuration.contains(ROOT + ".virtualSpeed")
                 ? configuration.getDouble(ROOT + ".virtualSpeed")
                 : null;
-        return new PatrolRoute(nodes, mode, speed, virtualSpeed);
+        return new PatrolRoute(nodes, relative, mode, speed, virtualSpeed);
     }
 
+    /** Authored coordinates: spawn offsets when relative, otherwise absolute world coordinates. */
     public List<Vector> nodes() {
         return nodes.stream().map(Vector::clone).toList();
+    }
+
+    public boolean relative() {
+        return relative;
     }
 
     public PatrolMode mode() {
@@ -81,7 +93,12 @@ public final class PatrolRoute {
 
     public Location node(PatrolOrigin origin, int index) {
         Location base = requireResolvedOrigin(origin);
-        return base.add(nodes.get(requireNode(index)));
+        Vector node = nodes.get(requireNode(index));
+        if (relative) return base.add(node);
+        base.setX(node.getX());
+        base.setY(node.getY());
+        base.setZ(node.getZ());
+        return base;
     }
 
     public Step next(int currentNode, int direction) {
