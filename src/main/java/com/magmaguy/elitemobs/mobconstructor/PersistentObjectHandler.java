@@ -128,14 +128,16 @@ public class PersistentObjectHandler {
     public void worldUnload() {
         //run implementations
         persistentObject.worldUnload();
-        //convert persistent object handler to world-based detection
-        //Start by removing old key
-        remove();
-        //Assign key
-        addWorldKey(this);
-        //worldLoad() re-attaches the world on reload; until then keep coordinates only, or every
-        //handler parked on a world key pins the unloaded ServerLevel in memory.
-        if (persistentLocation != null) persistentLocation.setWorld(null);
+        synchronized (persistentObjects) {
+            // Instance removal can unregister this handler during the callback. Do not
+            // resurrect that registration while moving persistent objects to world keys.
+            if (!persistentObjects.containsEntry(chunk, this)
+                    && !persistentObjects.containsEntry(new WorldBucket(worldName), this)) return;
+            remove();
+            addWorldKey(this);
+            //worldLoad() re-attaches the world on reload; until then keep coordinates only.
+            if (persistentLocation != null) persistentLocation.setWorld(null);
+        }
     }
 
     public void updatePersistentLocation(Location location) {
