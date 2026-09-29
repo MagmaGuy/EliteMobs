@@ -30,7 +30,7 @@ public final class ClassLootCoverage {
 
     public static void dropLoot(CustomBossEntity boss) {
         if (!enabled(boss) || boss.isTriggeredAntiExploit() || boss.getLevel() < 1) return;
-        boolean dungeonPool = boss instanceof InstancedBossEntity;
+        boolean dungeonPool = boss instanceof InstancedBossEntity instanced && instanced.getDungeonInstance() != null;
         Difficulty difficulty = difficulty(boss);
         Rank rank = rank(boss);
         double chance = ClassLootSettingsConfig.dropChance(rank);
@@ -63,7 +63,7 @@ public final class ClassLootCoverage {
                     table.addLoot(item, selected.getPermission(), audience);
                 } else if ((!partyPool || !SharedLootTable.addPartyLoot(boss, player, item, selected.getPermission(), audience))
                         && (selected.getPermission().isEmpty() || player.hasPermission(selected.getPermission())))
-                    LootTables.deliverGeneratedItem(player, boss.getLocation(), item);
+                    LootTables.deliverGeneratedItem(player, boss, item);
             }
         }
     }

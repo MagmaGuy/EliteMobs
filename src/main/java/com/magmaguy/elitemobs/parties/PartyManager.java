@@ -366,6 +366,8 @@ public final class PartyManager implements Listener {
 
     public static boolean shouldUsePartyLoot(Player player, EliteEntity eliteEntity) {
         if (!PartyConfig.isEnabled() || player == null || eliteEntity == null) return false;
+        if (eliteEntity instanceof com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity instance
+                && instance.getDungeonInstance() == null) return false;
         Party party = getParty(player.getUniqueId());
         return party != null && getNearbyMembers(party, eliteEntity.getLocation()).size() > 1;
     }

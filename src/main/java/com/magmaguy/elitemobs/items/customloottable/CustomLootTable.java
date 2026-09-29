@@ -98,7 +98,9 @@ public class CustomLootTable implements Serializable {
                 continue;
             if (customLootEntry instanceof EliteCustomLootEntry custom
                     ? custom.willDrop(player, eliteEntity) : customLootEntry.willDrop(player)) {
-                if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory())
+                if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()
+                        && !(eliteEntity instanceof com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity instance
+                        && instance.getDungeonInstance() == null))
                     customLootEntry.directDrop(level, player, eliteEntity);
                 else {
                     customLootEntry.locationDrop(level, player, dropLocation, eliteEntity);

@@ -4,16 +4,24 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ClassLootSettingsConfig.Difficulty;
 import com.magmaguy.elitemobs.config.ClassLootSettingsConfig.Rank;
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.config.ClassLootSettingsConfig;
+import com.magmaguy.elitemobs.config.PartyConfig;
+import com.magmaguy.elitemobs.config.SpecialItemSystemsConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfig;
+import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfigFields;
 import com.magmaguy.elitemobs.instanced.dungeons.DifficultyResolver;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.items.ClassLootCoverage;
 import com.magmaguy.elitemobs.items.ClassLootFamily;
+import com.magmaguy.elitemobs.items.LootTables;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.items.itemconstructor.ClassLootItemConstructor;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.InstancedBossEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.parties.PartyManager;
+import com.magmaguy.elitemobs.parties.PartyOperationResult;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -21,6 +29,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -55,16 +64,182 @@ class ExternalInstanceLootTest {
         location = player.getLocation().clone();
         playerData = mockStatic(PlayerData.class);
         config("directDropCustomLootMessage", "Received $itemName");
+        for (String field : List.of("greedListTitle", "greedListLore1", "greedListLore2", "greedListLore3",
+                "needListTitle", "needListLore1", "needListLore2", "needListLore3"))
+            config(com.magmaguy.elitemobs.config.menus.premade.LootMenuConfig.class, field, field);
     }
 
     @AfterEach void close() throws Exception {
         try {
+            SharedLootTable.shutdown();
+            com.magmaguy.elitemobs.menus.LootMenu.shutdown();
+            PartyManager.shutdown();
             CustomItem.getCustomItems().clear();
             if (playerData != null) playerData.close();
             for (var entry : previousConfig.entrySet()) entry.getKey().set(null, entry.getValue());
         } finally {
             MockBukkit.unmock();
         }
+    }
+
+    @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
+    @CsvSource({"false,false", "false,true", "true,false", "true,true"})
+    void externalClassRewardsStayInTheMatchEvenAfterContributorsLeave(boolean direct, boolean party) throws Exception {
+        config("putLootDirectlyIntoPlayerInventory", direct);
+        var other = contributor();
+        if (party) partyWith(other);
+        var boss = classBoss(other, false);
+
+        try (var construction = classConstruction()) {
+            ClassLootCoverage.dropLoot(boss);
+        }
+
+        assertTrue(SharedLootTable.getSharedLootTables().isEmpty(), "External matches must never create a delayed dungeon vote");
+        assertEquals(2, location.getWorld().getEntitiesByClass(Item.class).size(), "Every contributor's reward must remain in the source world");
+        assertTrue(player.getInventory().isEmpty());
+        assertTrue(other.getInventory().isEmpty());
+        var lobby = server.addSimpleWorld("lobby").getSpawnLocation();
+        player.teleport(lobby);
+        other.teleport(lobby);
+        // Removing the match's ground items models its world teardown; delayed jobs must not pay into the lobby.
+        location.getWorld().getEntitiesByClass(Item.class).forEach(Item::remove);
+        server.getScheduler().performTicks(20 * 61);
+        assertTrue(player.getInventory().isEmpty());
+        assertTrue(other.getInventory().isEmpty());
+        assertTrue(lobby.getWorld().getEntitiesByClass(Item.class).isEmpty());
+    }
+
+    @Test void eliteMobsDungeonClassRewardsStillEnterTheDungeonVote() throws Exception {
+        var other = contributor();
+        var boss = classBoss(other, true);
+        try (var construction = classConstruction()) {
+            ClassLootCoverage.dropLoot(boss);
+        }
+        var vote = SharedLootTable.getSharedLootTables().get(boss);
+        assertNotNull(vote);
+        assertEquals(2, vote.getLoot().size());
+        assertTrue(player.getInventory().isEmpty());
+        assertTrue(location.getWorld().getEntitiesByClass(Item.class).isEmpty());
+    }
+
+    @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
+    @ValueSource(booleans = {false, true})
+    void externalEquipmentCannotJoinARecipientsDungeonOrPartyVote(boolean direct) throws Exception {
+        config("putLootDirectlyIntoPlayerInventory", direct);
+        var other = contributor();
+        partyWith(other);
+        recipientDifficulty(0);
+        var table = new CustomLootTable();
+        item("sword.yml", Material.DIAMOND_SWORD, false);
+        new EliteCustomLootEntry(table.getEntries(), Map.of("filename", "sword.yml", "chance", 1,
+                "difficultyID", List.of("0")), "external_guard.yml");
+        var boss = spy(new InstancedBossEntity(bossFields(), location, 30, "0"));
+        doReturn(location).when(boss).getLocation();
+        boss.getDamagers().put(player, 50D);
+        boss.getDamagers().put(other, 50D);
+
+        table.bossDrop(player, 30, location, boss);
+
+        assertTrue(SharedLootTable.getSharedLootTables().isEmpty());
+        assertFalse(PartyManager.shouldUsePartyLoot(other, boss), "External rewards cannot outlive their owner's match through party voting");
+        assertTrue(player.getInventory().isEmpty());
+        assertEquals(1, location.getWorld().getEntitiesByClass(Item.class).size());
+    }
+
+    @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
+    @ValueSource(strings = {"custom", "vanilla", "special"})
+    void directInventorySettingCannotDeliverExternalItemsToAContributorWhoAlreadyLeft(String kind) throws Exception {
+        config("putLootDirectlyIntoPlayerInventory", true);
+        var source = spy(new InstancedBossEntity(bossFields(), location, 30, "0"));
+        doReturn(location).when(source).getLocation();
+        var lobby = server.addSimpleWorld("lobby").getSpawnLocation();
+        player.teleport(lobby);
+        item("reward.yml", Material.DIAMOND, false);
+        if (kind.equals("custom")) {
+            var entry = new EliteCustomLootEntry(new java.util.ArrayList<>(), Map.of("filename", "reward.yml"), "external.yml");
+            assertTrue(entry.directDrop(30, player, source));
+        } else if (kind.equals("vanilla")) {
+            var table = new CustomLootTable();
+            new VanillaCustomLootEntry(table.getEntries(), "material=DIAMOND:chance=1", "external.yml");
+            table.bossDrop(player, 30, location, source);
+        } else {
+            // Only the authored special-item registry is supplied; weighted selection and delivery run unchanged.
+            try (var specialItems = mockStatic(SpecialItemSystemsConfig.class)) {
+                specialItems.when(SpecialItemSystemsConfig::getSpecialValues)
+                        .thenReturn(new HashMap<>(Map.of(CustomItem.getCustomItem("reward.yml"), 1D)));
+                LootTables.generateSpecialLoot(player, 30, source);
+            }
+        }
+        assertTrue(player.getInventory().isEmpty());
+        assertTrue(lobby.getWorld().getEntitiesByClass(Item.class).isEmpty());
+        assertEquals(1, location.getWorld().getEntitiesByClass(Item.class).size());
+    }
+
+    @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
+    @ValueSource(booleans = {false, true})
+    void ordinarySpecialLootKeepsTheConfiguredDeliveryAtThePlayersCurrentLocation(boolean direct) throws Exception {
+        config("putLootDirectlyIntoPlayerInventory", direct);
+        var source = mock(com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity.class);
+        when(source.getLocation()).thenReturn(location);
+        var destination = server.addSimpleWorld("destination").getSpawnLocation();
+        player.teleport(destination);
+        item("reward.yml", Material.DIAMOND, false);
+        try (var specialItems = mockStatic(SpecialItemSystemsConfig.class)) {
+            specialItems.when(SpecialItemSystemsConfig::getSpecialValues)
+                    .thenReturn(new HashMap<>(Map.of(CustomItem.getCustomItem("reward.yml"), 1D)));
+            LootTables.generateSpecialLoot(player, 30, source);
+        }
+        assertEquals(direct, player.getInventory().contains(Material.DIAMOND));
+        assertEquals(direct ? 0 : 1, destination.getWorld().getEntitiesByClass(Item.class).size());
+        assertTrue(location.getWorld().getEntitiesByClass(Item.class).isEmpty());
+    }
+
+    private PlayerMock contributor() {
+        var other = server.addPlayer();
+        other.teleport(location);
+        other.openInventory(server.createInventory(other, 9));
+        playerData.when(() -> PlayerData.isInMemory(any(java.util.UUID.class))).thenReturn(true);
+        return other;
+    }
+
+    private void partyWith(PlayerMock other) throws Exception {
+        config(PartyConfig.class, "enabled", true);
+        config(PartyConfig.class, "sidebarEnabled", false);
+        config(PartyConfig.class, "sharedProgressRange", 100D);
+        config(PartyConfig.class, "inviteTimeoutSeconds", 60);
+        config(PartyConfig.class, "lootVoteMaximumLifetimeSeconds", 120);
+        player.addAttachment(MetadataHandler.PLUGIN, "elitemobs.party", true);
+        other.addAttachment(MetadataHandler.PLUGIN, "elitemobs.party", true);
+        assertEquals(PartyOperationResult.SUCCESS, PartyManager.create(player, false));
+        assertEquals(PartyOperationResult.SUCCESS, PartyManager.invite(player, other.getName(), false));
+        assertEquals(PartyOperationResult.SUCCESS, PartyManager.accept(other, false));
+    }
+
+    private InstancedBossEntity classBoss(PlayerMock other, boolean dungeon) throws Exception {
+        config(ClassLootSettingsConfig.class, "enabled", true);
+        config(ClassLootSettingsConfig.class, "chances", Map.of(Rank.TRASH, 1D));
+        config(ClassLootSettingsConfig.class, "categoryWeights", Map.of(ClassLootFamily.SWORDS.category(), 1D));
+        config(ClassLootSettingsConfig.class, "difficultyIds", Map.of("0", Difficulty.NORMAL));
+        var enchantment = mock(EnchantmentsConfigFields.class);
+        config(EnchantmentsConfig.class, "enchantments", new HashMap<>(Map.of("soulbind.yml", enchantment)));
+        var fields = spy(bossFields());
+        fields.setClassLoot(true);
+        doReturn(table(true)).when(fields).getCustomLootTable();
+        var boss = spy(new InstancedBossEntity(fields, location, 30, "0"));
+        if (dungeon) doReturn(mock(DungeonInstance.class)).when(boss).getDungeonInstance();
+        doReturn(location).when(boss).getLocation();
+        doReturn(100D).when(boss).getMaxHealth();
+        boss.getDamagers().put(player, 50D);
+        boss.getDamagers().put(other, 50D);
+        return boss;
+    }
+
+    private MockedStatic<ClassLootItemConstructor> classConstruction() {
+        var construction = mockStatic(ClassLootItemConstructor.class);
+        construction.when(() -> ClassLootItemConstructor.available(any(), any(), any())).thenReturn(true);
+        construction.when(() -> ClassLootItemConstructor.construct(any(), anyInt(), any(), any(), any(), any()))
+                .thenAnswer(ignored -> new ItemStack(Material.DIAMOND_SWORD));
+        return construction;
     }
 
     @ParameterizedTest(name = "{displayName} [{index}] {arguments}")
@@ -172,7 +347,11 @@ class ExternalInstanceLootTest {
     }
 
     private void config(String name, Object value) throws Exception {
-        var field = ItemSettingsConfig.class.getDeclaredField(name);
+        config(ItemSettingsConfig.class, name, value);
+    }
+
+    private void config(Class<?> owner, String name, Object value) throws Exception {
+        var field = owner.getDeclaredField(name);
         field.setAccessible(true);
         previousConfig.putIfAbsent(field, field.get(null));
         field.set(null, value);

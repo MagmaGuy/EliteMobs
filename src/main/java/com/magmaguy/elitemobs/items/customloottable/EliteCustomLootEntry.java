@@ -153,6 +153,8 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
 
     @Override
     public boolean directDrop(int itemTier, Player player, EliteEntity eliteEntity) {
+        if (eliteEntity instanceof InstancedBossEntity instance && instance.getDungeonInstance() == null)
+            return dropPhysical(itemTier, player, eliteEntity.getLocation(), eliteEntity, false);
         GroupDelivery group = groupDelivery(itemTier, player, eliteEntity);
         if (group != GroupDelivery.PERSONAL) return group == GroupDelivery.DELIVERED;
         return dropDirect(itemTier, player, eliteEntity, false);
@@ -222,6 +224,9 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
     private GroupDelivery groupDelivery(int itemTier, Player player, EliteEntity eliteEntity) {
         if (CustomItem.isUnavailableWithoutModels(filename)) return GroupDelivery.SKIPPED;
         if (!matchesDifficulty(player, eliteEntity) || getAmount() <= 0) return GroupDelivery.SKIPPED;
+        // An external match owns its loot until extraction; neither recipient dungeon state nor a party may defer it.
+        if (eliteEntity instanceof InstancedBossEntity instance && instance.getDungeonInstance() == null)
+            return GroupDelivery.PERSONAL;
         if (difficultyIDs != null) {
             MatchInstance matchInstance = player == null ? null : PlayerData.getMatchInstance(player);
             if (matchInstance instanceof DungeonInstance) {
