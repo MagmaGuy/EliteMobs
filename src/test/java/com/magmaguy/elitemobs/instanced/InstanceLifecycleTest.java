@@ -119,7 +119,7 @@ class InstanceLifecycleTest extends InstanceFixture {
         assertEquals(MatchInstance.InstancedRegionState.COMPLETED_VICTORY, instance.getState());
         assertTrue(instance.getPlayers().contains(alex), "ending keeps the players inside");
 
-        instance.destroy();
+        instance.destroyMatchNow();
         assertEquals(MatchInstance.InstancedRegionState.WAITING, instance.getState(),
                 "a destroyed instance reads WAITING");
         assertEquals(exit(), alex.getLocation());
@@ -132,7 +132,7 @@ class InstanceLifecycleTest extends InstanceFixture {
     void aDestroyedBaseInstanceAcceptsPlayersAgain() {
         TestInstance instance = instance(1, 4);
         instance.addNewPlayer(alex);
-        instance.destroy();
+        instance.destroyMatchNow();
         assertFalse(instance.isDefunct());
         assertTrue(instance.isAcceptingNewPlayers());
         assertTrue(instance.addNewPlayer(bea));

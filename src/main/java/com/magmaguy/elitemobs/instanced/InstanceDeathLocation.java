@@ -1,105 +1,68 @@
 package com.magmaguy.elitemobs.instanced;
 
 import com.magmaguy.easyminecraftgoals.internal.FakeText;
-import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.DungeonsConfig;
-import com.magmaguy.magmacore.util.TemporaryBlockManager;
-import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.elitemobs.utils.VisualDisplay;
+import com.magmaguy.magmacore.match.MatchPlayer;
+import com.magmaguy.magmacore.match.ReviveMarker;
 import lombok.Getter;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+/**
+ * A dead participant's revive banner. MagmaCore's match core places and guards the banner and
+ * revives on a punch; this class adds EliteMobs' floating text and keeps the public banner map.
+ */
 public class InstanceDeathLocation {
     private final MatchInstance matchInstance;
     @Getter
-    private Block bannerBlock;
+    private final Block bannerBlock;
     @Getter
-    private Player deadPlayer;
-    private Location deathLocation = null;
+    private final Player deadPlayer;
     private FakeText nameTag;
     private FakeText livesLeft;
     private FakeText instructions;
-    private TemporaryBlockManager.OwnedBlock bannerLease;
-    private BukkitTask watchdog;
-    private boolean cleared;
 
-
-    protected InstanceDeathLocation(Player player, MatchInstance matchInstance) {
+    private InstanceDeathLocation(MatchInstance matchInstance, Player deadPlayer, Block bannerBlock) {
         this.matchInstance = matchInstance;
-        if (matchInstance.playerLives.get(player) < 1)
-            return;
-        this.deadPlayer = player;
-        if (!relocate(player.getLocation())) return;
-        bannerWatchdog();
+        this.deadPlayer = deadPlayer;
+        this.bannerBlock = bannerBlock;
     }
 
-    private void createDisplays() {
+    /** The marker the spectate-and-revive death policy draws with. */
+    static ReviveMarker marker(MatchPlayer participant) {
+        MatchInstance instance = (MatchInstance) participant.getMatch();
+        return new ReviveMarker() {
+            private InstanceDeathLocation shown;
+
+            @Override
+            public void show(Block banner, MatchPlayer dead, int lives) {
+                hide();
+                shown = new InstanceDeathLocation(instance, dead.getPlayer(), banner);
+                shown.createDisplays(lives);
+                instance.deathBanners.put(banner, shown);
+            }
+
+            @Override
+            public void hide() {
+                if (shown == null) return;
+                instance.deathBanners.remove(shown.bannerBlock, shown);
+                shown.removeDisplays();
+                shown = null;
+            }
+        };
+    }
+
+    private void createDisplays(int lives) {
+        Location deathLocation = bannerBlock.getLocation();
         instructions = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 2.2, 0)), DungeonsConfig.getInstancePunchToRez(), 30);
         nameTag = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 2, 0)), deadPlayer.getDisplayName(), 30);
-        livesLeft = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 1.8, 0)), DungeonsConfig.getInstanceLivesLeft().replace("$amount", String.valueOf(matchInstance.playerLives.get(deadPlayer))), 30);
+        livesLeft = VisualDisplay.generateFakeText(deathLocation.clone().add(new Vector(0, 1.8, 0)), DungeonsConfig.getInstanceLivesLeft().replace("$amount", String.valueOf(lives)), 30);
     }
 
-    private Block findBannerLocation(Location location) {
-        // A death below the world (void) passes the isAir check immediately and would
-        // anchor the banner where nobody can punch it — anchor at the instance start instead
-        if (location.getWorld() != null && location.getY() < location.getWorld().getMinHeight() &&
-                matchInstance.startLocation != null)
-            location = matchInstance.startLocation.clone();
-        if (location.getWorld() == null) return null;
-        int x = location.getBlockX(), z = location.getBlockZ();
-        if (!location.getWorld().isChunkLoaded(x >> 4, z >> 4)) return null;
-        for (int y = Math.max(location.getBlockY(), location.getWorld().getMinHeight());
-             y < location.getWorld().getMaxHeight(); y++) {
-            Block candidate = location.getWorld().getBlockAt(x, y, z);
-            if (candidate.getType().isAir() && !matchInstance.deathBanners.containsKey(candidate)
-                    && TemporaryBlockManager.canOwn(candidate)) return candidate;
-        }
-        return null;
-    }
-
-    private boolean relocate(Location location) {
-        releasePlacement();
-        Block candidate = findBannerLocation(location.clone());
-        if (candidate == null) {
-            Logger.warn("Could not place a revive banner for " + deadPlayer.getName() + ": no free loaded block below world height.");
-            clear(false);
-            return false;
-        }
-        try {
-            bannerLease = TemporaryBlockManager.replaceOwned(candidate, Material.RED_BANNER.createBlockData(), MetadataHandler.PLUGIN);
-            if (bannerLease == null) {
-                clear(false);
-                return false;
-            }
-            bannerBlock = candidate;
-            deathLocation = candidate.getLocation();
-            matchInstance.deathBanners.put(candidate, this);
-            createDisplays();
-            return true;
-        } catch (RuntimeException failure) {
-            clear(false);
-            throw failure;
-        }
-    }
-
-    public void clear(boolean resurrect) {
-        if (cleared) return;
-        cleared = true;
-        if (watchdog != null) { watchdog.cancel(); watchdog = null; }
-        releasePlacement();
-        if (resurrect && bannerBlock != null)
-            matchInstance.revivePlayer(deadPlayer, this);
-    }
-
-    private void releasePlacement() {
-        if (bannerBlock != null) matchInstance.deathBanners.remove(bannerBlock, this);
-        if (bannerLease != null) { bannerLease.close(); bannerLease = null; }
+    private void removeDisplays() {
         if (nameTag != null) nameTag.remove();
         if (instructions != null) instructions.remove();
         if (livesLeft != null) livesLeft.remove();
@@ -108,23 +71,15 @@ public class InstanceDeathLocation {
         livesLeft = null;
     }
 
+    public void clear(boolean resurrect) {
+        matchInstance.releaseBanner(deadPlayer, resurrect);
+    }
+
     public Location getRespawnLocation() {
         return bannerBlock.getLocation().clone().add(0.5, 0, 0.5);
     }
 
-    //This is necessary because physics updates might remove the banner while it should still be on there
+    /** The match core keeps the banner in place; kept for API compatibility. */
     public void bannerWatchdog() {
-        if (cleared || watchdog != null) return;
-        watchdog = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (matchInstance.deathBanners.get(bannerBlock) != InstanceDeathLocation.this) {
-                    clear(false);
-                    return;
-                }
-                if (bannerBlock.getType().equals(Material.RED_BANNER)) return;
-                relocate(deathLocation);
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 5, 5);
     }
 }

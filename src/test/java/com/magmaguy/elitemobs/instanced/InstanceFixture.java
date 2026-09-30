@@ -220,7 +220,7 @@ abstract class InstanceFixture {
             defeat();
         }
 
-        void destroy() {
+        void destroyMatchNow() {
             destroyMatch();
         }
     }

@@ -225,6 +225,8 @@ public final class ClassChallengeInstance extends MatchInstance implements Liste
             if (feeCharged && state == InstancedRegionState.ONGOING) refund();
             if (instructor != null) instructor.remove(RemovalReason.ARENA_RESET);
             super.destroyMatch();
+            // A trial is one run; its match is destroyed for good once everyone is out.
+            retireInstance();
         } finally {
             container.release(this);
         }

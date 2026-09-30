@@ -2,64 +2,73 @@ package com.magmaguy.elitemobs.instanced;
 
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.api.PlayerJoinArenaEvent;
+import com.magmaguy.elitemobs.api.PlayerJoinDungeonEvent;
+import com.magmaguy.elitemobs.api.PlayerLeaveArenaEvent;
+import com.magmaguy.elitemobs.api.PlayerLeaveDungeonEvent;
 import com.magmaguy.elitemobs.api.instanced.MatchDestroyEvent;
 import com.magmaguy.elitemobs.api.instanced.MatchEndEvent;
 import com.magmaguy.elitemobs.api.instanced.MatchInstantiateEvent;
+import com.magmaguy.elitemobs.api.instanced.MatchJoinEvent;
+import com.magmaguy.elitemobs.api.instanced.MatchLeaveEvent;
 import com.magmaguy.elitemobs.api.instanced.MatchStartEvent;
+import com.magmaguy.elitemobs.collateralminecraftchanges.AlternativeDurabilityLoss;
 import com.magmaguy.elitemobs.config.ArenasConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
+import com.magmaguy.elitemobs.config.DungeonsConfig;
+import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
+import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.utils.EventCaller;
+import com.magmaguy.magmacore.match.DeathPolicy;
+import com.magmaguy.magmacore.match.LeaveReason;
+import com.magmaguy.magmacore.match.Match;
+import com.magmaguy.magmacore.match.MatchApi;
+import com.magmaguy.magmacore.match.MatchCore;
+import com.magmaguy.magmacore.match.MatchMessages;
+import com.magmaguy.magmacore.match.MatchOutcome;
+import com.magmaguy.magmacore.match.MatchPhase;
+import com.magmaguy.magmacore.match.MatchPlayer;
+import com.magmaguy.magmacore.match.MatchRole;
+import com.magmaguy.magmacore.match.MatchSettings;
+import com.magmaguy.magmacore.match.MatchSpace;
+import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-public abstract class MatchInstance {
+/**
+ * EliteMobs' instance API, running on MagmaCore's match core. The core owns admission,
+ * movement, rescue, death and teardown; this class keeps every member add-ons and EliteMobs'
+ * own subclasses use, mirroring the core's state into the familiar fields and firing
+ * EliteMobs' events at the moments they always fired.
+ */
+public abstract class MatchInstance extends Match {
 
     protected static final HashSet<MatchInstance> instances = new HashSet<>();
-    /** Distinguishes successive matches that reuse the same world and physical region. */
-    @Getter
-    private final java.util.UUID runtimeId = java.util.UUID.randomUUID();
     @Getter
     protected final HashMap<Block, InstanceDeathLocation> deathBanners = new HashMap<>();
     @Getter
     protected final Map<Player, Location> previousPlayerLocations = new HashMap<>();
     @Getter
     protected HashSet<Player> players = new HashSet<>();
-    // Void-rescue bookkeeping: where each player last stood safely, and how many times in a row we
-    // have had to pull them out without them reaching solid ground in between.
-    private static final int RESCUE_ATTEMPTS_BEFORE_FALLBACK = 3;
-    private static final int RESCUE_LOOP_WARNING_THRESHOLD = 10;
-    private final java.util.Map<java.util.UUID, Location> lastSafeLocation = new java.util.HashMap<>();
-    private final java.util.Map<java.util.UUID, Integer> consecutiveRescues = new java.util.HashMap<>();
-    protected HashMap<Player, Integer> playerLives = new HashMap();
+    protected HashMap<Player, Integer> playerLives = new HashMap<>();
     @Getter
     protected HashSet<Player> participants = new HashSet<>();
     @Getter
-    protected final HashSet<java.util.UUID> startingParticipantIds = new HashSet<>();
+    protected final HashSet<UUID> startingParticipantIds = new HashSet<>();
     protected HashSet<Player> spectators = new HashSet<>();
     @Getter
     protected InstancedRegionState state = InstancedRegionState.WAITING;
@@ -78,27 +87,61 @@ public abstract class MatchInstance {
     private boolean matchHasStarted = false;
     private boolean matchEndEventFired = false;
     private boolean matchDestroyEventFired = false;
-    private BukkitTask watchdogTask = null;
-    private BukkitTask instanceMessageTask = null;
-    private BukkitTask countdownTask = null;
-
 
     public MatchInstance(Location startLocation, Location exitLocation, int minPlayers, int maxPlayers) {
+        this(new InstanceSpace(), startLocation, exitLocation, minPlayers, maxPlayers);
+    }
+
+    private MatchInstance(InstanceSpace space, Location startLocation, Location exitLocation,
+                          int minPlayers, int maxPlayers) {
+        super(settings(space, minPlayers, maxPlayers));
+        space.owner = this;
         this.startLocation = startLocation;
         this.exitLocation = exitLocation;
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
-
-        MatchInstantiateEvent matchInstantiateEvent = new MatchInstantiateEvent(this);
-        new EventCaller(matchInstantiateEvent);
-        if (matchInstantiateEvent.isCancelled()) {
+        // MatchInstantiateEvent fires here, before subclass constructors run, as it always has.
+        if (!open()) {
             cancelled = true;
             return;
         }
-
-        startWatchdogs();
-        instanceMessages();
         instances.add(this);
+    }
+
+    private static MatchSettings settings(InstanceSpace space, int minPlayers, int maxPlayers) {
+        MatchCore.enable(MetadataHandler.PLUGIN);
+        int max = Math.max(1, maxPlayers);
+        return MatchSettings.builder()
+                .space(space)
+                .players(Math.max(0, Math.min(minPlayers, max)), max)
+                .countdownSeconds(3)
+                .bypassPermission("elitemobs.*")
+                .withinTeleportPermission("elitemobs.instanced.teleport.within")
+                // Instances reset between runs; dungeons and trials retire themselves when done,
+                // and every subclass schedules its own teardown after the match ends.
+                .reusable(true)
+                .destroyAfterEnd(false)
+                .death(DungeonsConfig.isAllowSpectatorsInInstancedContent()
+                        ? DeathPolicy.spectateAndRevive(3, InstanceDeathLocation::marker)
+                        : DeathPolicy.eliminate())
+                .messages(MatchMessages.builder()
+                        .notAccepting(ArenasConfig.getArenasOngoingMessage())
+                        .full(ArenasConfig.getArenaFullMessage())
+                        .noPermission(null)
+                        .alreadyInMatch(null)
+                        .joinedMessage(ArenasConfig.getArenaJoinPlayerMessage())
+                        .joinedTitle(ArenasConfig.getJoinPlayerTitle())
+                        .joinedSubtitle(ArenasConfig.getJoinPlayerSubtitle())
+                        .spectatorMessage(ArenasConfig.getArenaJoinSpectatorMessage())
+                        .spectatorTitle(ArenasConfig.getJoinSpectatorTitle())
+                        .spectatorSubtitle(ArenasConfig.getJoinSpectatorSubtitle())
+                        .notEnoughPlayers(ArenasConfig.getNotEnoughPlayersMessage())
+                        .startingTitle(ArenasConfig.getStartingTitle())
+                        .startingSubtitle(ArenasConfig.getStartingSubtitle())
+                        .waitingHint(ArenasConfig.getArenaStartHintMessage())
+                        .build())
+                .api(EliteMatchApi.INSTANCE)
+                .build();
     }
 
     public static void shutdown() {
@@ -106,8 +149,10 @@ public abstract class MatchInstance {
         cloneInstance.forEach(matchInstance -> {
             matchInstance.cancelScheduledTasks();
             matchInstance.destroyMatch();
+            matchInstance.retire();
         });
         instances.clear();
+        MatchCore.shutdown();
     }
 
     public static MatchInstance getPlayerInstance(Player player) {
@@ -135,22 +180,18 @@ public abstract class MatchInstance {
     }
 
     /**
-     * True when this match object is a corpse: cancelled at construction, or already
-     * evicted from {@link #instances}. One-shot dungeon instances leave that registry
-     * the moment teardown begins but stay referenced by the dungeon browser for
-     * another 30–90 seconds while their world awaits deletion — and
-     * {@link #destroyMatch()} resets {@link #state} to WAITING as part of teardown,
-     * so state alone cannot tell a fresh lobby from a dead instance. That ambiguity
-     * is how players ghost-joined dungeons that were being deleted and got stranded.
+     * True when this match object is a corpse: cancelled at construction, or already evicted
+     * from {@link #instances}. Dungeon instances leave that registry the moment teardown begins
+     * but stay referenced by the dungeon browser while their world awaits deletion, and a
+     * destroyed instance reads WAITING, so state alone cannot tell a fresh lobby from a dead one.
      */
     public boolean isDefunct() {
         return cancelled || !instances.contains(this);
     }
 
     /**
-     * The single admission predicate. The dungeon browsers and
-     * {@link com.magmaguy.elitemobs.instanced.InstancePlayerManager} must agree on
-     * it, or a menu can offer an entry that admission then handles differently.
+     * The single admission predicate. The dungeon browsers and the match core both consult it,
+     * so a menu never offers an entry that admission then handles differently.
      */
     public boolean isAcceptingNewPlayers() {
         return !isDefunct() && !destroyingMatch && state == InstancedRegionState.WAITING;
@@ -167,13 +208,9 @@ public abstract class MatchInstance {
                 && player.getWorld().equals(lobbyLocation == null ? world : lobbyLocation.getWorld());
     }
 
-    /** Acquired after all cancellable admission preflights, before player registration. */
-    protected boolean reserveAdmission() { return true; }
-
-    /** Releases an admission reservation if registration could not finish. */
-    protected void abortAdmission() {}
-
-    protected boolean isAcceptingSpectator(Player player, boolean wasPlayer) { return true; }
+    protected boolean isAcceptingSpectator(Player player, boolean wasPlayer) {
+        return true;
+    }
 
     /**
      * True only when both the active participant and a prospective combat target remain inside
@@ -208,9 +245,7 @@ public abstract class MatchInstance {
     }
 
     public void removePlayer(Player player) {
-        lastSafeLocation.remove(player.getUniqueId());
-        consecutiveRescues.remove(player.getUniqueId());
-        InstancePlayerManager.removePlayer(player, this);
+        leave(player, LeaveReason.QUIT);
     }
 
     /** Participant exits are independent of the boundary used to eject intruders. */
@@ -226,251 +261,58 @@ public abstract class MatchInstance {
     }
 
     public void playerDeath(Player player) {
-        InstancePlayerManager.playerDeath(this, player);
+        handleDeath(player);
     }
 
     public void revivePlayer(Player player, InstanceDeathLocation deathLocation) {
-        InstancePlayerManager.revivePlayer(this, player, deathLocation);
+        releaseReviveBanner(player, true);
     }
 
+    /** Spectating after death is the core's job; this admits outsiders who want to watch. */
     public void addSpectator(Player player, boolean wasPlayer) {
-        InstancePlayerManager.addSpectator(this, player, wasPlayer);
+        if (!wasPlayer) admitSpectator(player);
     }
 
     public void removeSpectator(Player player) {
-        InstancePlayerManager.removeSpectator(this, player);
+        leave(player, LeaveReason.QUIT);
     }
 
     public void removeAnyKind(Player player) {
-        InstancePlayerManager.removeAnyKind(this, player);
-    }
-
-    private void startWatchdogs() {
-        cancelTask(watchdogTask);
-        watchdogTask = new WatchdogTask().runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
+        leave(player, LeaveReason.QUIT);
     }
 
     public void countdownMatch() {
         if (state != InstancedRegionState.WAITING) return;
-        if (players.size() < minPlayers) {
-            announce(ArenasConfig.getNotEnoughPlayersMessage().replace("$amount", minPlayers + ""));
-            return;
-        }
-        state = InstancedRegionState.STARTING;
-        cancelTask(countdownTask);
-        countdownTask = new CountdownTask().runTaskTimer(MetadataHandler.PLUGIN, 0L, 20L);
+        start();
+        if (getPhase() == MatchPhase.STARTING) state = InstancedRegionState.STARTING;
     }
 
-    private void playerWatchdog() {
-        ((HashSet<Player>) players.clone()).forEach(player -> {
-            if (!player.isOnline()) {
-                removePlayer(player);
-                return;
-            }
-            // Entry owns the initial teleport. A rescue before it can leave the player
-            // temporarily invalid while the destination chunk loads and reject admission.
-            if (!playerLives.containsKey(player)) return;
-            Location location = player.getLocation();
-            // The void check matters for dungeon instances, whose isInRegion() spans the
-            // whole world: without it a player falling off e.g. the Binder of Worlds
-            // arena is never rescued and dies to the void.
-            if (isBelowWorld(location) || !isInRegion(location)) {
-                rescuePlayer(player);
-                return;
-            }
-            rememberSafeLocation(player, location);
-        });
-    }
-
-    private static boolean isBelowWorld(Location location) {
-        return location.getWorld() != null && location.getY() < location.getWorld().getMinHeight();
-    }
-
-    /**
-     * Records where a player last stood on solid ground inside the instance, so a rescue can put
-     * them back roughly where they fell from instead of dragging them to the entrance. The caller
-     * has already verified the location is inside the instance and above the void.
-     */
-    private void rememberSafeLocation(Player player, Location location) {
-        if (!player.isOnGround()) return;
-        java.util.UUID uuid = player.getUniqueId();
-        Location stored = lastSafeLocation.get(uuid);
-        // Only clone and store when the player actually moved to a different block
-        if (stored == null
-                || stored.getBlockX() != location.getBlockX()
-                || stored.getBlockY() != location.getBlockY()
-                || stored.getBlockZ() != location.getBlockZ()
-                || stored.getWorld() != location.getWorld())
-            lastSafeLocation.put(uuid, location.clone());
-        consecutiveRescues.remove(uuid);
-    }
-
-    /**
-     * Pulls a player out of the void. Prefers the spot they last stood on, for two reasons: being
-     * yanked back to the instance entrance mid-fight is punishing, and a FIXED rescue point loops
-     * forever if the ground beneath it is missing - rescue, fall, rescue, fall. Falling back to the
-     * start location only after the remembered spot has failed repeatedly keeps that loop bounded,
-     * and a persistent loop is reported so the broken geometry can actually be found.
-     */
-    private void rescuePlayer(Player player) {
-        int attempts = consecutiveRescues.merge(player.getUniqueId(), 1, Integer::sum);
-        Location destination = lastSafeLocation.get(player.getUniqueId());
-        if (destination == null || attempts > RESCUE_ATTEMPTS_BEFORE_FALLBACK) destination = startLocation;
-
-        if (attempts == RESCUE_LOOP_WARNING_THRESHOLD && destination != null && destination.getWorld() != null)
-            com.magmaguy.magmacore.util.Logger.warn("Player " + player.getName() + " has been rescued from the void "
-                    + attempts + " times in a row in instance world '" + destination.getWorld().getName()
-                    + "'. The ground at the rescue point is probably missing, which would otherwise loop forever. "
-                    + "Check the dungeon's geometry around " + destination.getBlockX() + ","
-                    + destination.getBlockY() + "," + destination.getBlockZ() + ".");
-
-        if (destination == null) return;
-        // Without this the fall distance accumulated before the rescue is applied on
-        // landing and the "rescue" kills the player with fall damage.
-        player.setFallDistance(0);
-        InstancePlayerMovement.teleportForMatch(player, destination, this, false);
-    }
-
-    private void spectatorWatchdog() {
-        ((HashSet<Player>) spectators.clone()).forEach(player -> {
-            if (!player.isOnline()) {
-                removeSpectator(player);
-                return;
-            }
-
-            // The vanilla "spectate entity" action attaches the spectator's camera to a
-            // target entity via setCamera. It does NOT fire a cancellable PlayerTeleportEvent,
-            // so it slips past onPlayerTeleport entirely, and the server's per-tick spectator
-            // override then drags the player's body to wherever that entity is - anywhere on
-            // the server, across worlds. We catch the camera attachment directly here
-            // (getSpectatorTarget is core Bukkit API, so this works on Spigot and Paper alike)
-            // and break it whenever the target isn't a fellow participant of this instance.
-            // The camera MUST be cleared before the teleport below: teleporting a player who is
-            // still spectating an entity desyncs the client on Paper <=1.21.10 (PaperMC#13473).
-            Entity spectatorTarget = player.getSpectatorTarget();
-            if (spectatorTarget != null && !spectatorTarget.equals(player)) {
-                boolean targetIsInThisInstance = spectatorTarget instanceof Player targetPlayer
-                        && (players.contains(targetPlayer) || spectators.contains(targetPlayer));
-                // Gamemode guard: setSpectatorTarget throws for non-spectators, and a
-                // watchdog tick must never die on one player's inconsistent state.
-                if (!targetIsInThisInstance && player.getGameMode() == GameMode.SPECTATOR)
-                    player.setSpectatorTarget(null);
-            }
-
-            if (!isInRegion(player.getLocation()))
-                rescuePlayer(player);
-        });
-    }
-
-    private void intruderWatchdog() {
-        if (state != InstancedRegionState.ONGOING || world == null) return;
-        for (Player player : world.getPlayers())
-            if (!players.contains(player) &&
-                    !spectators.contains(player) &&
-                    !player.hasPermission("elitemobs.*") &&
-                    isInRegion(player.getLocation())) {
-                if (exitLocation != null) InstancePlayerMovement.teleportForMatch(player, exitLocation, this, false);
-                else if (PlayerData.getBackTeleportLocation(player) != null)
-                    InstancePlayerMovement.teleportForMatch(player, PlayerData.getBackTeleportLocation(player), this, false);
-                else if (DefaultConfig.getDefaultSpawnLocation() != null && DefaultConfig.getDefaultSpawnLocation().getWorld() != null)
-                    InstancePlayerMovement.teleportForMatch(player, DefaultConfig.getDefaultSpawnLocation(), this, false);
-            }
-    }
-
-    private void instanceMessages() {
-        cancelTask(instanceMessageTask);
-        instanceMessageTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!instances.contains(MatchInstance.this)) {
-                    cancel();
-                    instanceMessageTask = null;
-                    return;
-                }
-                if (state == InstancedRegionState.WAITING)
-                    announce(ArenasConfig.getArenaStartHintMessage().replace("$count", minPlayers + ""));
-            }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0, 20*60L);
-    }
-
+    /** Subclasses cancel their own tasks here; the match core owns the watchdog and countdown. */
     protected void cancelScheduledTasks() {
-        cancelTask(watchdogTask);
-        watchdogTask = null;
-        cancelTask(instanceMessageTask);
-        instanceMessageTask = null;
-        cancelTask(countdownTask);
-        countdownTask = null;
-    }
-
-    private void cancelTask(BukkitTask task) {
-        if (task != null) task.cancel();
     }
 
     protected void announce(String message) {
         participants.forEach(player -> player.sendMessage(ChatColorConverter.convert(message)));
     }
 
-    private class WatchdogTask extends BukkitRunnable {
-        @Override
-        public void run() {
-            if (!instances.contains(MatchInstance.this)) {
-                cancel();
-                watchdogTask = null;
-                return;
-            }
-            playerWatchdog();
-            spectatorWatchdog();
-            intruderWatchdog();
-        }
-    }
-
-    private class CountdownTask extends BukkitRunnable {
-        int counter = 0;
-
-        @Override
-        public void run() {
-            if (players.size() < minPlayers) {
-                cancel();
-                countdownTask = null;
-                endMatch();
-                return;
-            }
-            counter++;
-            players.forEach(player -> startMessage(counter, player));
-            spectators.forEach(player -> startMessage(counter, player));
-            if (counter >= 3) {
-                cancel();
-                countdownTask = null;
-                try {
-                    startMatch();
-                } catch (RuntimeException failure) {
-                    // A failed start must not leave a partially started match or retry
-                    // every second with a negative countdown.
-                    destroyMatch();
-                    throw failure;
-                }
-            }
-        }
-    }
-
-    private void startMessage(int counter, Player player) {
-        player.sendTitle(ArenasConfig.getStartingTitle(), ArenasConfig.getStartingSubtitle()
-                .replace("$count", (3 - counter) + ""), 0, 20, 0);
-    }
-
     protected abstract boolean isInRegion(Location location);
+
+    /**
+     * Whether non-participants are kept from teleporting into this instance during the phase.
+     * Arenas and trials share their world, so only a running match closes its door; dungeons
+     * own their world and override this.
+     */
+    protected boolean guardsEntryDuring(MatchPhase phase) {
+        return phase == MatchPhase.STARTING || phase == MatchPhase.ONGOING;
+    }
 
     protected void startMatch() {
         matchHasStarted = true;
         matchEndEventFired = false;
         matchDestroyEventFired = false;
         state = InstancedRegionState.ONGOING;
-        players.forEach(player -> {
-                InstancePlayerMovement.teleportForMatch(player, startLocation, this, false);
-        });
-        participants = (HashSet<Player>) players.clone();
         startingParticipantIds.clear();
-        players.forEach(player -> startingParticipantIds.add(player.getUniqueId()));
+        startingParticipantIds.addAll(getStartingRoster());
         new EventCaller(new MatchStartEvent(this));
     }
 
@@ -478,59 +320,51 @@ public abstract class MatchInstance {
     This is useful for extending behavior down the line like the enchanted dungeon loot
      */
     protected void victory() {
-        state = InstancedRegionState.COMPLETED_VICTORY;
-        endMatch();
+        endWith(MatchOutcome.VICTORY, InstancedRegionState.COMPLETED_VICTORY);
     }
 
     protected void defeat() {
-        state = InstancedRegionState.COMPLETED_DEFEAT;
+        endWith(MatchOutcome.DEFEAT, InstancedRegionState.COMPLETED_DEFEAT);
+    }
+
+    private void endWith(MatchOutcome outcome, InstancedRegionState endState) {
+        if (getPhase() == MatchPhase.ENDED || isDestroyed()) return;
+        state = endState;
+        end(outcome);
         endMatch();
     }
 
     protected void endMatch() {
-        if (state != InstancedRegionState.COMPLETED_VICTORY &&
-                state != InstancedRegionState.COMPLETED_DEFEAT)
-            state = InstancedRegionState.COMPLETED;
-        restoreParticipantsHealth();
+        if (getPhase() != MatchPhase.ENDED && !isDestroyed()) {
+            if (state != InstancedRegionState.COMPLETED_VICTORY && state != InstancedRegionState.COMPLETED_DEFEAT)
+                state = InstancedRegionState.COMPLETED;
+            end(MatchOutcome.NEUTRAL);
+        }
         if (matchHasStarted && !matchEndEventFired) {
             matchEndEventFired = true;
             new EventCaller(new MatchEndEvent(this));
         }
     }
 
+    /** Removes everyone and returns the instance to WAITING. Dungeons and trials then retire it. */
     protected void destroyMatch() {
         if (destroyingMatch) return;
         destroyingMatch = true;
         try {
-            boolean matchWasCompleted = state == InstancedRegionState.COMPLETED ||
-                    state == InstancedRegionState.COMPLETED_VICTORY ||
-                    state == InstancedRegionState.COMPLETED_DEFEAT;
-            if (matchWasCompleted) restoreParticipantsHealth();
-            HashSet<Player> copy = new HashSet<>(participants);
-            copy.forEach(this::removeAnyKind);
-            players.clear();
-            spectators.clear();
-            new ArrayList<>(deathBanners.values()).forEach(deathLocation -> deathLocation.clear(false));
-            deathBanners.clear();
-            state = InstancedRegionState.WAITING;
-            if (!matchDestroyEventFired) {
-                matchDestroyEventFired = true;
-                new EventCaller(new MatchDestroyEvent(this));
-            }
-            startingParticipantIds.clear();
-            matchHasStarted = false;
+            destroy();
         } finally {
             destroyingMatch = false;
         }
     }
 
-    protected boolean hasMatchDestroyEventFired() {
-        return matchDestroyEventFired;
+    /** Takes the instance out of EliteMobs' registry and destroys its match for good. */
+    protected final void retireInstance() {
+        instances.remove(this);
+        retire();
     }
 
-    private void restoreParticipantsHealth() {
-        HashSet<Player> copy = new HashSet<>(participants);
-        copy.forEach(InstancePlayerManager::restoreFullHealth);
+    protected boolean hasMatchDestroyEventFired() {
+        return matchDestroyEventFired;
     }
 
     protected InstanceDeathLocation getDeathLocationByPlayer(Player player) {
@@ -540,144 +374,232 @@ public abstract class MatchInstance {
         return null;
     }
 
+    boolean releaseBanner(Player dead, boolean revive) {
+        return releaseReviveBanner(dead, revive);
+    }
+
+    // Match core hooks.
+
+    @Override
+    protected MatchPlayer createPlayer(Player player) {
+        EliteMatchPlayer participant = new EliteMatchPlayer(player, this);
+        // Registered before any join feedback, as EliteMobs always has: a whole party is visible
+        // in the instance before the first member's join event.
+        participants.add(player);
+        players.add(player);
+        previousPlayerLocations.put(player, participant.getPreviousLocation());
+        PlayerData.setMatchInstance(player, this);
+        return participant;
+    }
+
+    @Override
+    protected void onAdmissionRolledBack(MatchPlayer participant) {
+        Player player = participant.getPlayer();
+        forget(player);
+        previousPlayerLocations.remove(player);
+    }
+
+    @Override
+    protected boolean acceptsPlayers() {
+        return isAcceptingNewPlayers();
+    }
+
+    @Override
+    protected boolean acceptsSpectator(Player player) {
+        return !isDefunct() && !destroyingMatch && isAcceptingSpectator(player, false);
+    }
+
+    @Override
+    protected String requiredPermission() {
+        return permission;
+    }
+
+    @Override
+    protected Location entryDestination(MatchPlayer participant) {
+        return state == InstancedRegionState.WAITING && lobbyLocation != null ? lobbyLocation : startLocation;
+    }
+
+    @Override
+    protected Location startDestination() {
+        return startLocation;
+    }
+
+    @Override
+    protected Location exitDestination(MatchPlayer participant) {
+        Player player = participant.getPlayer();
+        // A death has always sent the player back where they came from, before the exit.
+        if (participant.getLeaveReason() == LeaveReason.DIED) {
+            Location previous = previousPlayerLocations.get(player);
+            if (previous != null && previous.getWorld() != null
+                    && Bukkit.getWorld(previous.getWorld().getUID()) == previous.getWorld()) return previous.clone();
+            return exitLocation;
+        }
+        return participantExitLocation(player);
+    }
+
+    @Override
+    protected Location intruderDestination(Player player) {
+        if (exitLocation != null) return exitLocation;
+        Location back = PlayerData.getBackTeleportLocation(player);
+        if (back != null) return back;
+        Location spawn = DefaultConfig.getDefaultSpawnLocation();
+        return spawn != null && spawn.getWorld() != null ? spawn : null;
+    }
+
+    @Override
+    protected void onStart() {
+        state = InstancedRegionState.ONGOING;
+        startMatch();
+    }
+
+    /** Automatic endings go through the overridable methods EliteMobs subclasses intercept. */
+    @Override
+    protected void requestEnd(MatchOutcome outcome) {
+        switch (outcome) {
+            case VICTORY -> victory();
+            case DEFEAT -> defeat();
+            case NEUTRAL -> endMatch();
+        }
+    }
+
+    @Override
+    protected void onDeath(MatchPlayer participant) {
+        Player player = participant.getPlayer();
+        AlternativeDurabilityLoss.doDurabilityLoss(player);
+        AttributeManager.setAttribute(player, "generic_max_health",
+                AttributeManager.getAttributeBaseValue(player, "generic_max_health"));
+    }
+
+    @Override
+    protected void onSpectating(MatchPlayer participant) {
+        players.remove(participant.getPlayer());
+        spectators.add(participant.getPlayer());
+    }
+
+    @Override
+    protected void onRevive(MatchPlayer participant) {
+        Player player = participant.getPlayer();
+        spectators.remove(player);
+        players.add(player);
+        playerLives.put(player, participant.getLives());
+    }
+
+    @Override
+    protected void onReset() {
+        state = InstancedRegionState.WAITING;
+        startingParticipantIds.clear();
+        matchHasStarted = false;
+    }
+
+    private void forget(Player player) {
+        participants.remove(player);
+        players.remove(player);
+        spectators.remove(player);
+        playerLives.remove(player);
+        if (PlayerData.getMatchInstance(player) == this) PlayerData.setMatchInstance(player, null);
+    }
+
+    private void fireTypedJoinEvent(Player player) {
+        if (this instanceof ArenaInstance arenaInstance)
+            new EventCaller(new PlayerJoinArenaEvent(arenaInstance, player));
+        else if (this instanceof DungeonInstance dungeonInstance)
+            new EventCaller(new PlayerJoinDungeonEvent(dungeonInstance, player));
+    }
+
+    private void fireLeaveEvents(Player player) {
+        new EventCaller(new MatchLeaveEvent(this, player));
+        if (this instanceof ArenaInstance arenaInstance)
+            new EventCaller(new PlayerLeaveArenaEvent(arenaInstance, player));
+        else if (this instanceof DungeonInstance dungeonInstance)
+            new EventCaller(new PlayerLeaveDungeonEvent(dungeonInstance, player));
+    }
+
     public enum InstancedRegionState {
         WAITING, STARTING, ONGOING, COMPLETED, COMPLETED_VICTORY, COMPLETED_DEFEAT
     }
 
+    /**
+     * Kept so existing registrations compile. Quits, lethal damage, revive banners and the
+     * teleport guard are now handled by MagmaCore's match core for every instance.
+     */
     public static class MatchInstanceEvents implements Listener {
-        // Remember only events accepted by the permission exception, for final validation.
-        private final Map<PlayerTeleportEvent, MatchInstance> permissionTeleports = new IdentityHashMap<>();
+    }
 
-        @EventHandler
-        public void onPlayerLeave(PlayerQuitEvent event) {
-            HashSet<MatchInstance> copy = new HashSet<>(instances);
-            copy.forEach(instance -> instance.removeAnyKind(event.getPlayer()));
+    /** The instance's region as the match core sees it. EliteMobs retires its own worlds. */
+    private static final class InstanceSpace implements MatchSpace {
+        private MatchInstance owner;
+
+        @Override
+        public boolean contains(Location location) {
+            if (owner == null || location == null || location.getWorld() == null || owner.world == null) return false;
+            try {
+                return owner.isInRegion(location);
+            } catch (RuntimeException cleanedUp) {
+                // Dungeon cleanup clears the start location isInRegion reads.
+                return false;
+            }
         }
 
-        @EventHandler
-        public void onPlayerBreakBlockEvent(BlockBreakEvent event) {
-            for (MatchInstance matchInstance : instances)
-                if (matchInstance.state.equals(InstancedRegionState.ONGOING))
-                    if (matchInstance.getDeathBanners().get(event.getBlock()) != null)
-                        matchInstance.getDeathBanners().get(event.getBlock()).clear(true);
+        @Override
+        public Collection<World> worlds() {
+            return owner == null || owner.world == null ? List.of() : List.of(owner.world);
         }
 
-        @EventHandler
-        public void onPlayerHitFlagEvent(BlockDamageEvent event) {
-            for (MatchInstance matchInstance : instances)
-                if (matchInstance.state.equals(InstancedRegionState.ONGOING))
-                    if (matchInstance.getDeathBanners().get(event.getBlock()) != null)
-                        matchInstance.getDeathBanners().get(event.getBlock()).clear(true);
+        @Override
+        public boolean guardsEntryDuring(MatchPhase phase) {
+            return owner != null && owner.guardsEntryDuring(phase);
         }
 
-        /**
-         * This event scans for damage that would kill the player and cancels it with custom behavior it if would
-         *
-         * @param event Damage event
-         */
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-        public void onPlayerDamage(EntityDamageEvent event) {
-            if (!event.getEntityType().equals(EntityType.PLAYER)) return;
-            Player player = (Player) event.getEntity();
-
-            // Loud admin warning: a player taking WORLD_BORDER damage inside an EM
-            // instance almost always means the dungeon's blueprint world shipped
-            // without its world-border data, or the border data didn't carry over
-            // when the world was cloned. On Paper 1.21.6+ the border is stored in
-            // its own file inside the dimension data folder, so a stale clone is
-            // easy to miss. Without this warning the symptom looks like "dungeon
-            // closes the moment players walk in", because the border tick deals
-            // lethal damage which cascades into removePlayer → defeat → removeInstance.
-            if (event.getCause() == EntityDamageEvent.DamageCause.WORLD_BORDER) {
-                MatchInstance matchInstanceForWarn = PlayerData.getMatchInstance(player);
-                if (matchInstanceForWarn != null) {
-                    org.bukkit.Location loc = player.getLocation();
-                    com.magmaguy.magmacore.util.Logger.warn(
-                            "Player " + player.getName() + " took WORLD_BORDER damage inside dungeon instance '"
-                                    + (loc.getWorld() != null ? loc.getWorld().getName() : "?")
-                                    + "' at " + loc.getX() + "," + loc.getY() + "," + loc.getZ()
-                                    + ". This usually means the blueprint world is missing its world-border config "
-                                    + "(on Paper 1.21.6+ border data lives in its own file inside the dimension data folder, "
-                                    + "and a stale blueprint clone may not include it). The instance will be torn down by "
-                                    + "the lethal-damage path. Fix the blueprint world's border so players spawn inside it.");
-                }
-            }
-
-            // Falling into the void must never kill an instance participant — rescue them
-            // instead. Backup for the per-tick watchdog rescue, which can miss the window
-            // between the world's min height and void-damage depth after a lag spike.
-            if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-                MatchInstance voidMatchInstance = PlayerData.getMatchInstance(player);
-                if (voidMatchInstance != null && voidMatchInstance.players.contains(player) &&
-                        voidMatchInstance.startLocation != null) {
-                    event.setCancelled(true);
-                    voidMatchInstance.rescuePlayer(player);
-                    return;
-                }
-            }
-
-            if (event.getFinalDamage() < player.getHealth()) return;
-            MatchInstance matchInstance = PlayerData.getMatchInstance(player);
-            if (matchInstance == null) return;
-            if (matchInstance.state != InstancedRegionState.ONGOING) matchInstance.removePlayer(player);
-            event.setCancelled(true);
-            matchInstance.playerDeath(player);
-        }
-
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
-        public void onPlayerTeleport(PlayerTeleportEvent event) {
-            if (InstancePlayerMovement.authorizes(event)) return;
-
-            MatchInstance currentInstance = MatchInstance.getAnyPlayerInstance(event.getPlayer());
-            if (InstancePlayerMovement.permitsWithinInstance(event, currentInstance)) {
-                permissionTeleports.put(event, currentInstance);
-                return;
-            }
-
-            for (MatchInstance instance : instances) {
-                if (instance.world == null) continue;
-                // Only block if the player is actually in this instance
-                if (!instance.players.contains(event.getPlayer()) && !instance.spectators.contains(event.getPlayer()))
-                    continue;
-                if (instance.world.equals(event.getFrom().getWorld()) ||
-                    (event.getTo() != null && instance.world.equals(event.getTo().getWorld()))) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            MatchInstance matchInstance = PlayerData.getMatchInstance(event.getPlayer());
-            if (matchInstance == null) return;
-
-            // Prevent spectators from teleporting using the vanilla spectator menu
-            if (event.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
-                if (matchInstance.spectators.contains(event.getPlayer())) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            if (matchInstance.state == InstancedRegionState.WAITING) {
-                matchInstance.removeAnyKind(event.getPlayer());
-                return;
-            }
-
-            event.setCancelled(true);
-        }
-
-        @EventHandler(priority = EventPriority.HIGHEST)
-        public void validateAuthorizedPlayerMovement(PlayerTeleportEvent event) {
-            MatchInstance permittedInstance = permissionTeleports.remove(event);
-            if (event.isCancelled()) return;
-            if (permittedInstance != null
-                    && !InstancePlayerMovement.permitsWithinInstance(event, permittedInstance)) {
-                event.setCancelled(true);
-                return;
-            }
-            if (InstancePlayerMovement.hasAuthorization(event.getPlayer())
-                    && !InstancePlayerMovement.authorizes(event))
-                event.setCancelled(true);
+        @Override
+        public void teardown() {
         }
     }
 
+    /** Fires EliteMobs' API events from the match core's callbacks. */
+    private static final class EliteMatchApi implements MatchApi {
+        private static final EliteMatchApi INSTANCE = new EliteMatchApi();
+
+        @Override
+        public boolean instantiateAttempt(Match match) {
+            MatchInstantiateEvent event = new MatchInstantiateEvent((MatchInstance) match);
+            new EventCaller(event);
+            return !event.isCancelled();
+        }
+
+        @Override
+        public boolean joinAttempt(Match match, Player player) {
+            if (!PlayerData.isInMemory(player.getUniqueId())) return false;
+            MatchJoinEvent event = new MatchJoinEvent((MatchInstance) match, player);
+            new EventCaller(event);
+            return !event.isCancelled();
+        }
+
+        @Override
+        public void joined(Match match, MatchPlayer participant) {
+            MatchInstance instance = (MatchInstance) match;
+            Player player = participant.getPlayer();
+            if (participant.getRole() == MatchRole.SPECTATOR) {
+                instance.players.remove(player);
+                instance.spectators.add(player);
+            }
+            instance.fireTypedJoinEvent(player);
+        }
+
+        @Override
+        public void left(Match match, MatchPlayer participant, LeaveReason reason) {
+            MatchInstance instance = (MatchInstance) match;
+            Player player = participant.getPlayer();
+            boolean wasParticipant = instance.participants.contains(player);
+            instance.forget(player);
+            if (wasParticipant) instance.fireLeaveEvents(player);
+        }
+
+        @Override
+        public void destroyed(Match match) {
+            MatchInstance instance = (MatchInstance) match;
+            if (instance.matchDestroyEventFired) return;
+            instance.matchDestroyEventFired = true;
+            new EventCaller(new MatchDestroyEvent(instance));
+        }
+    }
 }

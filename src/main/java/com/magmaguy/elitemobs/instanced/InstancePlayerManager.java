@@ -1,35 +1,17 @@
 package com.magmaguy.elitemobs.instanced;
 
-import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.api.PlayerJoinArenaEvent;
-import com.magmaguy.elitemobs.api.PlayerJoinDungeonEvent;
-import com.magmaguy.elitemobs.api.PlayerLeaveArenaEvent;
-import com.magmaguy.elitemobs.api.PlayerLeaveDungeonEvent;
-import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
-import com.magmaguy.elitemobs.api.instanced.MatchJoinEvent;
-import com.magmaguy.elitemobs.api.instanced.MatchLeaveEvent;
-import com.magmaguy.elitemobs.collateralminecraftchanges.AlternativeDurabilityLoss;
-import com.magmaguy.elitemobs.config.ArenasConfig;
-import com.magmaguy.elitemobs.config.DungeonsConfig;
-import com.magmaguy.elitemobs.instanced.arena.ArenaInstance;
-import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
-import com.magmaguy.elitemobs.playerdata.database.PlayerData;
-import com.magmaguy.elitemobs.utils.EventCaller;
-import com.magmaguy.magmacore.util.AttributeManager;
-import com.magmaguy.magmacore.util.Logger;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import com.magmaguy.magmacore.match.AdmissionResult;
+import com.magmaguy.magmacore.match.LeaveReason;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.BooleanSupplier;
 
+/**
+ * EliteMobs' player lifecycle entry points, kept for existing callers. Admission, leaving,
+ * death and spectating run in MagmaCore's match core through {@link MatchInstance}.
+ */
 public class InstancePlayerManager {
 
     static void restoreFullHealth(Player player) {
@@ -37,24 +19,14 @@ public class InstancePlayerManager {
         player.setHealth(player.getMaxHealth());
     }
 
-    private static void restoreFullHealthIfMatchFinished(Player player, MatchInstance matchInstance) {
-        if (matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED &&
-                matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_DEFEAT &&
-                matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_VICTORY)
-            return;
-        restoreFullHealth(player);
-    }
-
     public static boolean addNewPlayer(Player player, MatchInstance matchInstance) {
         return addNewPlayers(List.of(player), matchInstance);
     }
 
     /**
-     * Atomically admits a set of players. All ordinary constraints and every cancellable join
-     * event are checked before any match/player state is mutated, so a party is never split by a
-     * full instance, missing permission, another active match, or an API veto. A listener may see
-     * an uncancelled preflight event for an earlier member before a later member vetoes the batch;
-     * those events describe admission attempts and no player state has changed at that point.
+     * Atomically admits a set of players. Every check and every cancellable join event runs for
+     * the whole group before any state changes, so a party is never split by a full instance,
+     * missing permission, another active match, or an API veto.
      */
     public static boolean addNewPlayers(Collection<Player> requestedPlayers, MatchInstance matchInstance) {
         return addNewPlayers(requestedPlayers, matchInstance, () -> true);
@@ -62,336 +34,41 @@ public class InstancePlayerManager {
 
     /**
      * Atomically admits players while an external authorization remains valid. The predicate is
-     * rechecked after cancellable API preflights so those callbacks cannot revive a cancelled
-     * party launch by changing and then restoring unrelated match state.
+     * rechecked after the cancellable join events so they cannot revive a cancelled party launch.
      */
     public static boolean addNewPlayers(Collection<Player> requestedPlayers,
                                         MatchInstance matchInstance,
                                         BooleanSupplier authorization) {
-        if (authorization == null || !authorization.getAsBoolean()) return false;
-        LinkedHashMap<UUID, Player> uniquePlayers = new LinkedHashMap<>();
-        for (Player player : requestedPlayers)
-            if (player != null) uniquePlayers.putIfAbsent(player.getUniqueId(), player);
-        List<Player> playersToAdd = uniquePlayers.values().stream()
-                .filter(player -> !matchInstance.players.contains(player))
-                .toList();
-        if (playersToAdd.isEmpty()) return false;
-
-        if (!canAdmitPlayers(playersToAdd, matchInstance, true)) return false;
-        for (Player player : playersToAdd) {
-            if (!fireJoinEvent(matchInstance, player)) return false;
-            if (!authorization.getAsBoolean()) return false;
-        }
-        // Join listeners execute synchronously and can change match/player state. Fail closed if
-        // anything changed during the batch preflight instead of admitting only part of a party.
-        if (!authorization.getAsBoolean()
-                || !canAdmitPlayers(playersToAdd, matchInstance, true)) return false;
-        if (!matchInstance.reserveAdmission()) return false;
-
-        LinkedHashMap<UUID, Location> previousLocations = new LinkedHashMap<>();
-        for (Player player : playersToAdd)
-            previousLocations.put(player.getUniqueId(), player.getLocation());
-
-        // Keep the mutation phase deliberately small and non-callback-based. Once this loop has
-        // completed, every member is visible in the match before post-join API events are fired.
-        playersToAdd.forEach(player -> registerPlayer(
-                player,
-                matchInstance,
-                previousLocations.get(player.getUniqueId())));
-
-        List<BukkitTask> entryTasks = new ArrayList<>();
-        try {
-            for (Player player : playersToAdd)
-                entryTasks.add(scheduleEntry(player, matchInstance));
-        } catch (RuntimeException exception) {
-            entryTasks.forEach(BukkitTask::cancel);
-            rollbackRegistrations(playersToAdd, matchInstance);
-            matchInstance.abortAdmission();
-            Logger.warn("Failed to schedule an instance-entry batch: " + exception.getMessage());
-            return false;
-        }
-
-        playersToAdd.forEach(player -> notifyAdmission(player, matchInstance));
-        return true;
+        if (authorization == null) return false;
+        return matchInstance.admit(requestedPlayers, authorization) == AdmissionResult.ADMITTED;
     }
 
-    private static boolean canAdmitPlayers(List<Player> playersToAdd,
-                                           MatchInstance matchInstance,
-                                           boolean sendFeedback) {
-        //New players can only join instances still accepting them: WAITING *and* alive.
-        //destroyMatch() resets dead dungeon instances to WAITING while their world
-        //awaits deletion, so the bare state check used to admit players into worlds
-        //already scheduled for removal. Ongoing instances are also refused here.
-        if (!matchInstance.isAcceptingNewPlayers()) {
-            if (sendFeedback) playersToAdd.get(0).sendMessage(ArenasConfig.getArenasOngoingMessage());
-            return false;
-        }
-        //Check if match is full
-        if (matchInstance.players.size() + playersToAdd.size() > matchInstance.maxPlayers) {
-            if (sendFeedback) playersToAdd.get(0).sendMessage(ArenasConfig.getArenaFullMessage());
-            return false;
-        }
-        for (Player player : playersToAdd) {
-            if (!player.isOnline() || !player.isValid() || !PlayerData.isInMemory(player.getUniqueId())
-                    || matchInstance.players.contains(player)) return false;
-            // Both indexes are checked. A disagreement between them is treated as occupied instead
-            // of allowing one player to become a member of two instances.
-            if (PlayerData.getMatchInstance(player) != null || MatchInstance.getAnyPlayerInstance(player) != null)
-                return false;
-            if (matchInstance.getPermission() != null && !player.hasPermission(matchInstance.getPermission()))
-                return false;
-        }
-        return true;
-    }
-
-    private static void registerPlayer(Player player, MatchInstance matchInstance, Location previousLocation) {
-        // Reused arenas may retain the previous run's counter. Readiness belongs to this entry.
-        matchInstance.playerLives.remove(player);
-        matchInstance.participants.add(player);
-        matchInstance.players.add(player);
-        PlayerData.setMatchInstance(player, matchInstance);
-        matchInstance.getPreviousPlayerLocations().put(player, previousLocation);
-    }
-
-    private static void rollbackRegistrations(List<Player> players, MatchInstance matchInstance) {
-        for (Player player : players) {
-            matchInstance.players.remove(player);
-            matchInstance.participants.remove(player);
-            matchInstance.getPreviousPlayerLocations().remove(player);
-            if (PlayerData.getMatchInstance(player) == matchInstance)
-                PlayerData.setMatchInstance(player, null);
-        }
-    }
-
-    /** Clears a completed admission and balances its public join notifications without teleporting. */
+    /** Clears a completed admission and balances its public join notifications. */
     public static void rollbackAdmissions(Collection<Player> admittedPlayers, MatchInstance matchInstance) {
-        for (Player player : admittedPlayers) {
-            boolean wasParticipant = matchInstance.participants.remove(player);
-            matchInstance.players.remove(player);
-            matchInstance.spectators.remove(player);
-            matchInstance.playerLives.remove(player);
-            matchInstance.getPreviousPlayerLocations().remove(player);
-            if (PlayerData.getMatchInstance(player) == matchInstance)
-                PlayerData.setMatchInstance(player, null);
-            if (wasParticipant) fireLeaveEvents(matchInstance, player);
-        }
-    }
-
-    private static void notifyAdmission(Player player, MatchInstance matchInstance) {
-        try {
-            player.sendMessage(ArenasConfig.getArenaJoinPlayerMessage().replace("$count", matchInstance.minPlayers + ""));
-            player.sendTitle(ArenasConfig.getJoinPlayerTitle(), ArenasConfig.getJoinPlayerSubtitle(), 60, 60 * 3, 60);
-        } catch (RuntimeException exception) {
-            Logger.warn("Failed to show instance join feedback to " + player.getName() + ": " + exception.getMessage());
-        }
-
-        try {
-            fireTypedJoinEvent(matchInstance, player);
-        } catch (RuntimeException exception) {
-            Logger.warn("A post-join API callback failed for " + player.getName() + ": " + exception.getMessage());
-        }
-    }
-
-    private static BukkitTask scheduleEntry(Player player, MatchInstance matchInstance) {
-        return new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!player.isOnline()
-                        || !matchInstance.players.contains(player)
-                        || PlayerData.getMatchInstance(player) != matchInstance)
-                    return;
-
-                //Teleport the player to the correct location
-                Location destination = (matchInstance.state.equals(MatchInstance.InstancedRegionState.WAITING) && matchInstance.lobbyLocation != null)
-                        ? matchInstance.lobbyLocation
-                        : matchInstance.startLocation;
-
-                // Use PlayerTeleportEvent to trigger dungeon music and other listeners
-                if (!InstancePlayerMovement.teleportForMatch(player, destination, matchInstance, true)) {
-                    matchInstance.removeAnyKind(player);
-                    return;
-                }
-
-                //With spectator revives disabled, the active run itself is the player's only life.
-                //Otherwise preserve the established three-life dungeon behavior.
-                matchInstance.playerLives.put(player,
-                        DungeonsConfig.isAllowSpectatorsInInstancedContent() ? 3 : 1);
-            }
-        }.runTaskLater(MetadataHandler.PLUGIN, 1);
+        for (Player player : admittedPlayers) matchInstance.leave(player, LeaveReason.QUIT);
     }
 
     public static void removePlayer(Player player, MatchInstance matchInstance) {
-        boolean wasParticipant = matchInstance.participants.contains(player);
-        restoreFullHealthIfMatchFinished(player, matchInstance);
-
-        //Remove match instance where needed
-        PlayerData.setMatchInstance(player, null);
-        matchInstance.players.remove(player);
-        if (!matchInstance.spectators.contains(player)) {
-            matchInstance.participants.remove(player);
-            PlayerData.setMatchInstance(player, null);
-        }
-        if (wasParticipant && !matchInstance.participants.contains(player))
-            fireLeaveEvents(matchInstance, player);
-
-        if (matchInstance.players.isEmpty() && matchInstance.getDeathLocationByPlayer(player) != null)
-            matchInstance.getDeathLocationByPlayer(player).clear(false);
-
-        // A successful explicit exit already moved the player to their chosen destination.
-        if (player.isOnline() && matchInstance.isInRegion(player.getLocation())) {
-            InstancePlayerMovement.teleportForMatch(player, matchInstance.participantExitLocation(player), matchInstance, false);
-        }
-
-        //End the match if there are no players left because they all died
-        if (matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED &&
-                matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_DEFEAT &&
-                matchInstance.state != MatchInstance.InstancedRegionState.COMPLETED_VICTORY &&
-                matchInstance.players.isEmpty() && !matchInstance.isDestroyingMatch()) {
-            matchInstance.defeat();
-        } else
-            //Remove lives
-            matchInstance.playerLives.remove(player);
+        matchInstance.leave(player, LeaveReason.QUIT);
     }
 
     public static void playerDeath(MatchInstance matchInstance, Player player) {
-        if (!matchInstance.players.contains(player)) return;
-        // Lethal damage is cancelled, so Bukkit's normal death effect cleanup never runs.
-        for (var effect : player.getActivePotionEffects()) player.removePotionEffect(effect.getType());
-        player.setFireTicks(0);
-        player.setFreezeTicks(0);
-        player.setFallDistance(0);
-        AlternativeDurabilityLoss.doDurabilityLoss(player);
-        AttributeManager.setAttribute(player, "generic_max_health", AttributeManager.getAttributeBaseValue(player, "generic_max_health"));
-        matchInstance.players.remove(player);
-        if (matchInstance.players.isEmpty()) {
-            matchInstance.defeat();
-            if (matchInstance.previousPlayerLocations.get(player) != null)
-                InstancePlayerMovement.teleportForMatch(player, matchInstance.previousPlayerLocations.get(player), matchInstance, false);
-            else if (matchInstance.exitLocation != null)
-                InstancePlayerMovement.teleportForMatch(player, matchInstance.exitLocation, matchInstance, false);
-            PlayerData.setMatchInstance(player, null);
-            matchInstance.participants.remove(player);
-            fireLeaveEvents(matchInstance, player);
-            return;
-        }
-        // When spectating is disabled the server wants vanilla spectator mode to never be
-        // applied inside instanced content (it's the whole point of the toggle, and it closes
-        // the spectator-teleport exploit surface entirely). Waiting for a revive *is* spectator
-        // mode, so that state can no longer exist: each participant effectively gets a single
-        // life, and a dead player is removed from the instance instead of becoming a spectator
-        // at a death banner.
-        if (!DungeonsConfig.isAllowSpectatorsInInstancedContent()) {
-            if (matchInstance.previousPlayerLocations.get(player) != null)
-                InstancePlayerMovement.teleportForMatch(player, matchInstance.previousPlayerLocations.get(player), matchInstance, false);
-            else if (matchInstance.exitLocation != null)
-                InstancePlayerMovement.teleportForMatch(player, matchInstance.exitLocation, matchInstance, false);
-            PlayerData.setMatchInstance(player, null);
-            matchInstance.participants.remove(player);
-            matchInstance.playerLives.remove(player);
-            fireLeaveEvents(matchInstance, player);
-            return;
-        }
-
-        new InstanceDeathLocation(player, matchInstance);
-        matchInstance.addSpectator(player, true);
+        matchInstance.playerDeath(player);
     }
 
     public static void revivePlayer(MatchInstance matchInstance, Player player, InstanceDeathLocation deathLocation) {
-        matchInstance.playerLives.put(player, matchInstance.playerLives.get(player) - 1);
-        matchInstance.players.add(player);
-        player.setGameMode(GameMode.SURVIVAL);
-        matchInstance.spectators.remove(player);
-        player.setHealth(player.getMaxHealth());
-        PlayerData.setMatchInstance(player, matchInstance);
-        InstancePlayerMovement.teleportForMatch(player, deathLocation.getRespawnLocation(), matchInstance, false);
+        matchInstance.revivePlayer(player, deathLocation);
     }
 
     public static void addSpectator(MatchInstance matchInstance, Player player, boolean wasPlayer) {
-        if (!canAdmitSpectator(matchInstance, player, wasPlayer)) return;
-        if (!wasPlayer && !fireJoinEvent(matchInstance, player)) return;
-        if (!canAdmitSpectator(matchInstance, player, wasPlayer)
-                || !matchInstance.reserveAdmission()) return;
-
-        GameMode previousMode = player.getGameMode();
-        if (!wasPlayer) matchInstance.previousPlayerLocations.put(player, player.getLocation());
-        matchInstance.participants.add(player);
-        matchInstance.spectators.add(player);
-        PlayerData.setMatchInstance(player, matchInstance);
-        boolean admitted = false;
-        try {
-            player.setGameMode(GameMode.SPECTATOR);
-            admitted = wasPlayer || InstancePlayerMovement.teleportForMatch(player, matchInstance.startLocation, matchInstance, false);
-        } finally {
-            if (!admitted && !wasPlayer) {
-                matchInstance.spectators.remove(player);
-                rollbackRegistrations(List.of(player), matchInstance);
-                matchInstance.abortAdmission();
-                player.setGameMode(previousMode);
-            }
-        }
-        if (!admitted) return;
-        player.sendMessage(ArenasConfig.getArenaJoinSpectatorMessage());
-        player.sendTitle(ArenasConfig.getJoinSpectatorTitle(), ArenasConfig.getJoinSpectatorSubtitle(), 60, 60 * 3, 60);
-        if (!wasPlayer) fireTypedJoinEvent(matchInstance, player);
-    }
-
-    private static boolean canAdmitSpectator(MatchInstance match, Player player, boolean wasPlayer) {
-        if (player == null || !player.isOnline() || !player.isValid() || match.isDefunct()
-                || match.isDestroyingMatch() || match.spectators.contains(player)
-                || !match.isAcceptingSpectator(player, wasPlayer)) return false;
-        MatchInstance indexed = PlayerData.getMatchInstance(player);
-        MatchInstance registered = MatchInstance.getAnyPlayerInstance(player);
-        if (wasPlayer) return indexed == match && match.participants.contains(player)
-                && (registered == null || registered == match);
-        return indexed == null && registered == null;
+        matchInstance.addSpectator(player, wasPlayer);
     }
 
     public static void removeSpectator(MatchInstance matchInstance, Player player) {
-        boolean wasParticipant = matchInstance.participants.contains(player);
-        restoreFullHealthIfMatchFinished(player, matchInstance);
-        matchInstance.spectators.remove(player);
-        if (!matchInstance.players.contains(player)) {
-            PlayerData.setMatchInstance(player, null);
-            matchInstance.participants.remove(player);
-        }
-        if (wasParticipant && !matchInstance.participants.contains(player))
-            fireLeaveEvents(matchInstance, player);
-        player.setGameMode(GameMode.SURVIVAL);
-        if (matchInstance.isInRegion(player.getLocation())) {
-            InstancePlayerMovement.teleportForMatch(player, matchInstance.participantExitLocation(player), matchInstance, false);
-        }
-        PlayerData.setMatchInstance(player, null);
-        matchInstance.playerLives.remove(player);
-        if (matchInstance.getDeathLocationByPlayer(player) != null)
-            matchInstance.getDeathLocationByPlayer(player).clear(false);
+        matchInstance.leave(player, LeaveReason.QUIT);
     }
 
     public static void removeAnyKind(MatchInstance matchInstance, Player player) {
-        if (matchInstance.players.contains(player)) matchInstance.removePlayer(player);
-        if (matchInstance.spectators.contains(player)) matchInstance.removeSpectator(player);
-        if (matchInstance.participants.remove(player)) fireLeaveEvents(matchInstance, player);
-        PlayerData.setMatchInstance(player, null);
+        matchInstance.leave(player, LeaveReason.QUIT);
     }
-
-    private static boolean fireJoinEvent(MatchInstance matchInstance, Player player) {
-        MatchJoinEvent event = new MatchJoinEvent(matchInstance, player);
-        new EventCaller(event);
-        return !event.isCancelled();
-    }
-
-    private static void fireTypedJoinEvent(MatchInstance matchInstance, Player player) {
-        if (matchInstance instanceof ArenaInstance arenaInstance)
-            new EventCaller(new PlayerJoinArenaEvent(arenaInstance, player));
-        else if (matchInstance instanceof DungeonInstance dungeonInstance)
-            new EventCaller(new PlayerJoinDungeonEvent(dungeonInstance, player));
-    }
-
-    private static void fireLeaveEvents(MatchInstance matchInstance, Player player) {
-        new EventCaller(new MatchLeaveEvent(matchInstance, player));
-        if (matchInstance instanceof ArenaInstance arenaInstance)
-            new EventCaller(new PlayerLeaveArenaEvent(arenaInstance, player));
-        else if (matchInstance instanceof DungeonInstance dungeonInstance)
-            new EventCaller(new PlayerLeaveDungeonEvent(dungeonInstance, player));
-    }
-
 }

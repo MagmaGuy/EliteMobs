@@ -188,7 +188,7 @@ public class DungeonInstance extends MatchInstance {
         previousPlayerLocations.clear();
         for (DungeonObjective dungeonObjective : dungeonObjectives)
             if (dungeonObjective != null) dungeonObjective.unregister();
-        instances.remove(this);
+        retireInstance();
         dungeonInstances.remove(this);
     }
 
@@ -563,7 +563,7 @@ public class DungeonInstance extends MatchInstance {
             participants.forEach(player -> player.sendMessage(DungeonsConfig.getInstancedDungeonClosingInstanceMessage()));
             HashSet<Player> participants = new HashSet<>(this.participants);
             participants.forEach(this::removeAnyKind);
-            instances.remove(this);
+            retireInstance();
         }
 
         DungeonInstance dungeonInstance = this;
@@ -765,6 +765,12 @@ public class DungeonInstance extends MatchInstance {
         return location.getWorld().equals(startLocation.getWorld());
     }
 
+    /** A dungeon owns its whole world, so nobody but its participants teleports in, in any phase. */
+    @Override
+    protected boolean guardsEntryDuring(com.magmaguy.magmacore.match.MatchPhase phase) {
+        return phase != com.magmaguy.magmacore.match.MatchPhase.DESTROYED;
+    }
+
     private class InitializeEntitiesTask extends BukkitRunnable {
         private final DungeonInstance dungeonInstance;
         private final ContentPackagesConfigFields contentPackagesConfigFields;
@@ -913,7 +919,7 @@ public class DungeonInstance extends MatchInstance {
         cancelInitializeEntitiesTask();
         cancelDestroyMatchTask();
         cancelRemoveInstanceTask();
-        instances.remove(this);
+        retireInstance();
         dungeonInstances.remove(this);
         if (world != null) worldInstances.remove(world.getUID(), this);
         players.clear();
