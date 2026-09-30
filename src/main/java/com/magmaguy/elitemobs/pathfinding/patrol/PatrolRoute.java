@@ -20,13 +20,15 @@ public final class PatrolRoute {
     private final PatrolMode mode;
     private final double speedModifier;
     private final Double virtualSpeed;
+    private final double startNodeWaitSeconds;
 
     private PatrolRoute(
             List<Vector> nodes,
             boolean relative,
             PatrolMode mode,
             double speedModifier,
-            Double virtualSpeed) {
+            Double virtualSpeed,
+            double startNodeWaitSeconds) {
         this.nodes = Collections.unmodifiableList(nodes.stream().map(Vector::clone).toList());
         this.relative = relative;
         this.mode = Objects.requireNonNull(mode, "mode");
@@ -34,6 +36,10 @@ public final class PatrolRoute {
         this.virtualSpeed = virtualSpeed == null
                 ? null
                 : requirePositiveFinite(virtualSpeed, "patrol.virtualSpeed");
+        if (!Double.isFinite(startNodeWaitSeconds) || startNodeWaitSeconds < 0D) {
+            throw new IllegalArgumentException("patrol.startNodeWaitSeconds must be finite and not negative");
+        }
+        this.startNodeWaitSeconds = startNodeWaitSeconds;
         validateGeometry();
     }
 
@@ -41,7 +47,7 @@ public final class PatrolRoute {
     public static PatrolRoute parse(FileConfiguration configuration) {
         Objects.requireNonNull(configuration, "configuration");
         if (!configuration.contains(ROOT + ".nodes")) return null;
-        if (!configuration.getBoolean(ROOT + ".enabled", true)) return null;
+        if (Boolean.FALSE.equals(setting(configuration, "enabled"))) return null;
 
         List<?> rawNodes = configuration.getList(ROOT + ".nodes");
         if (rawNodes == null) throw new IllegalArgumentException("patrol.nodes must be a list");
@@ -57,13 +63,15 @@ public final class PatrolRoute {
         if (configuration.contains(ROOT + ".relative") && !configuration.isBoolean(ROOT + ".relative")) {
             throw new IllegalArgumentException("patrol.relative must be true or false");
         }
-        boolean relative = configuration.getBoolean(ROOT + ".relative", true);
-        PatrolMode mode = PatrolMode.parse(configuration.getString(ROOT + ".mode", PatrolMode.LOOP.name()));
-        double speed = configuration.getDouble(ROOT + ".speed", 1D);
+        boolean relative = !Boolean.FALSE.equals(setting(configuration, "relative"));
+        Object rawMode = setting(configuration, "mode");
+        PatrolMode mode = PatrolMode.parse(rawMode == null ? PatrolMode.LOOP.name() : rawMode.toString());
+        double speed = numberSetting(setting(configuration, "speed"), 1D);
         Double virtualSpeed = configuration.contains(ROOT + ".virtualSpeed")
                 ? configuration.getDouble(ROOT + ".virtualSpeed")
                 : null;
-        return new PatrolRoute(nodes, relative, mode, speed, virtualSpeed);
+        double startNodeWaitSeconds = numberSetting(setting(configuration, "startNodeWaitSeconds"), 0D);
+        return new PatrolRoute(nodes, relative, mode, speed, virtualSpeed, startNodeWaitSeconds);
     }
 
     /** Authored coordinates: spawn offsets when relative, otherwise absolute world coordinates. */
@@ -85,6 +93,15 @@ public final class PatrolRoute {
 
     public Double virtualSpeed() {
         return virtualSpeed;
+    }
+
+    /** How long the actor rests at the first node each time it gets back there, once per lap. */
+    public double startNodeWaitSeconds() {
+        return startNodeWaitSeconds;
+    }
+
+    public int startNodeWaitTicks() {
+        return (int) Math.min(Integer.MAX_VALUE, Math.round(startNodeWaitSeconds * 20D));
     }
 
     public int size() {
@@ -166,6 +183,11 @@ public final class PatrolRoute {
         return start.add(delta.multiply(Math.max(0D, Math.min(1D, fraction))));
     }
 
+    /** Identifies the geometry that saved progress was recorded against. */
+    public String geometryKey() {
+        return Integer.toHexString((relative + "|" + String.join(";", serializeNodes())).hashCode());
+    }
+
     public List<String> serializeNodes() {
         return nodes.stream()
                 .map(node -> format(node.getX()) + ',' + format(node.getY()) + ',' + format(node.getZ()))
@@ -218,6 +240,19 @@ public final class PatrolRoute {
             return new Vector(number(map.get("x"), index), number(map.get("y"), index), number(map.get("z"), index));
         }
         throw new IllegalArgumentException("patrol.nodes[" + index + "] must be x,y,z or an x/y/z map");
+    }
+
+    /**
+     * Premade files register patrol keys as configuration defaults before their first save. Bukkit's
+     * getX(path, fallback) ignores those defaults and read an absolute premade route as relative, so read
+     * through get(path), which falls back to them.
+     */
+    private static Object setting(FileConfiguration configuration, String key) {
+        return configuration.get(ROOT + "." + key);
+    }
+
+    private static double numberSetting(Object value, double fallback) {
+        return value instanceof Number number ? number.doubleValue() : fallback;
     }
 
     private static double number(Object value, int index) {

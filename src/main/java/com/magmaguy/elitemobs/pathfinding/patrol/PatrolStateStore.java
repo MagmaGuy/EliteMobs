@@ -29,8 +29,10 @@ final class PatrolStateStore {
         load();
     }
 
-    Optional<StoredState> get(String canonicalIdentity) {
-        return Optional.ofNullable(states.get(PatrolIdentity.storageKey(canonicalIdentity)));
+    /** Progress recorded against other geometry, such as an edited or misread route, would restore a wrong position. */
+    Optional<StoredState> get(String canonicalIdentity, PatrolRoute route) {
+        return Optional.ofNullable(states.get(PatrolIdentity.storageKey(canonicalIdentity)))
+                .filter(state -> state.routeKey().equals(route.geometryKey()));
     }
 
     void put(String canonicalIdentity, StoredState state) {
@@ -95,6 +97,7 @@ final class PatrolStateStore {
             configuration.set(root + ".direction", state.direction());
             configuration.set(root + ".fraction", state.fraction());
             configuration.set(root + ".virtualSpeed", state.virtualSpeed());
+            configuration.set(root + ".routeKey", state.routeKey());
             if (state.safeLocation() != null) {
                 configuration.set(root + ".safe.world", state.safeLocation().worldName());
                 configuration.set(root + ".safe.x", state.safeLocation().x());
@@ -114,11 +117,12 @@ final class PatrolStateStore {
             int direction,
             double fraction,
             double virtualSpeed,
-            StoredLocation safeLocation) {
+            StoredLocation safeLocation,
+            String routeKey) {
 
         StoredState withIdentity(String canonicalIdentity) {
             return new StoredState(canonicalIdentity, currentNode, targetNode, direction,
-                    fraction, virtualSpeed, safeLocation);
+                    fraction, virtualSpeed, safeLocation, routeKey);
         }
 
         static StoredState read(ConfigurationSection section) {
@@ -137,7 +141,8 @@ final class PatrolStateStore {
                     section.getInt("direction", 1) < 0 ? -1 : 1,
                     Math.max(0D, Math.min(1D, fraction)),
                     virtualSpeed,
-                    safeLocation);
+                    safeLocation,
+                    section.getString("routeKey", ""));
         }
     }
 

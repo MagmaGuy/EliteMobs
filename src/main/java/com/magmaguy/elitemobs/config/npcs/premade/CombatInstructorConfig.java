@@ -56,6 +56,8 @@ public class CombatInstructorConfig extends NPCsConfigFields {
         processBoolean("patrol.enabled", true, false, true);
         processString("patrol.mode", PatrolMode.LOOP.name(), null, true);
         processDouble("patrol.speed", 0.5D, 0.5D, true);
+        // Rest at the chair between laps so players can still find him at his table.
+        processDouble("patrol.startNodeWaitSeconds", 60D, 0D, true);
         // Pair the new absolute defaults with their mode without reinterpreting existing saved offsets.
         boolean relative = true;
         if (!configHas("patrol.nodes")) relative = processBoolean("patrol.relative", false, true, true);

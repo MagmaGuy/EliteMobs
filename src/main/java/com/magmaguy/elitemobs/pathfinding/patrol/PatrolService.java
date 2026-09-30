@@ -81,7 +81,7 @@ public final class PatrolService implements Listener {
             PatrolActor actor = actor(owner);
             if (actor == null || actor.route() == null) return Optional.empty();
             PatrolStateStore.StoredState restored = instance.stateStore
-                    .get(actor.canonicalIdentity()).orElse(null);
+                    .get(actor.canonicalIdentity(), actor.route()).orElse(null);
             if (restored == null) return Optional.empty();
             Location safe = restored.safeLocation() == null ? null : restored.safeLocation().resolve();
             if (safe != null && safe.getWorld() != null

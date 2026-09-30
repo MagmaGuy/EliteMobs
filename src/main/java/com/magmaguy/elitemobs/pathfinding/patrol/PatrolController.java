@@ -50,6 +50,8 @@ final class PatrolController {
     private boolean holdAfterManualMove;
     private boolean terrainHeld;
     private boolean retired;
+    private int startWaitTicks;
+    private boolean startWaitServed;
     private List<Location> latestResolvedPath = List.of();
     private final Deque<Location> detachedPath = new ArrayDeque<>();
     private int persistentChunkX = Integer.MIN_VALUE;
@@ -61,7 +63,7 @@ final class PatrolController {
         this.stateStore = stateStore;
 
         PatrolStateStore.StoredState restored = actor.persistsWhileDetached()
-                ? stateStore.get(actor.canonicalIdentity()).orElse(null)
+                ? stateStore.get(actor.canonicalIdentity(), route).orElse(null)
                 : null;
         if (restored != null) restore(restored);
         else initializeAtOrigin();
@@ -154,6 +156,8 @@ final class PatrolController {
     }
 
     void resume() {
+        // Explicit script/admin movement outranks the start-node rest.
+        startWaitTicks = 0;
         manuallyPaused = false;
         manualTarget = null;
         holdAfterManualMove = false;
@@ -169,6 +173,7 @@ final class PatrolController {
         if (body.getWorld() != target.getWorld()) return false;
         manuallyPaused = false;
         combatHeld = false;
+        startWaitTicks = 0;
         manualTarget = target;
         holdAfterManualMove = holdOnArrival;
         failures = 0;
@@ -185,6 +190,7 @@ final class PatrolController {
         if (target.getWorld() != body.getWorld() || NMSManager.getAdapter() == null
                 || !NMSManager.getAdapter().isPositionEntityTicking(target)
                 || !body.teleport(target)) return false;
+        startWaitTicks = 0;
         safeLocation = body.getLocation().clone();
         updatePersistentLocation(true);
         resumeFromBody();
@@ -228,6 +234,7 @@ final class PatrolController {
         diagnostics.put("holdReason", holdReason());
         diagnostics.put("bodyPresent", liveBody() != null);
         diagnostics.put("virtualSpeed", virtualSpeed);
+        diagnostics.put("startWaitTicks", startWaitTicks);
         Location logical = logicalLocation();
         if (logical != null) {
             diagnostics.put("world", logical.getWorld() == null ? actor.origin().worldName() : logical.getWorld().getName());
@@ -330,6 +337,13 @@ final class PatrolController {
             resumeFromBody();
             return;
         }
+        if (startWaitTicks > 0 && manualTarget == null) {
+            startWaitTicks--;
+            clearDestination();
+            faceOriginHeading(body);
+            state = PatrolRuntimeState.HELD;
+            return;
+        }
 
         PathfindingStatus status = driver.status();
         if (tick % 5L == 0L) captureResolvedPath();
@@ -401,7 +415,8 @@ final class PatrolController {
     private void tickDetached() {
         state = PatrolRuntimeState.DETACHED;
         if (materializeCooldown > 0) materializeCooldown--;
-        if (!clockFrozen() && manualTarget == null && virtualSpeed > 0D) advanceDetachedPath(virtualSpeed);
+        if (startWaitTicks > 0) startWaitTicks--;
+        else if (!clockFrozen() && manualTarget == null && virtualSpeed > 0D) advanceDetachedPath(virtualSpeed);
         updatePersistentLocation(false);
 
         if (safeLocation != null
@@ -447,6 +462,7 @@ final class PatrolController {
         Location authoredTarget = route.node(actor.origin(), targetNode);
         if (safeLocation.distanceSquared(authoredTarget) <= 0.25D) {
             currentNode = targetNode;
+            startWaitIfBackAtStart();
             fraction = 0D;
             PatrolRoute.Step step = route.next(currentNode, direction);
             targetNode = step.targetNode();
@@ -502,6 +518,7 @@ final class PatrolController {
         destinationAssigned = false;
         failures = 0;
         currentNode = targetNode;
+        startWaitIfBackAtStart();
         fraction = 0D;
         safeLocation = route.node(actor.origin(), currentNode);
         latestResolvedPath = List.of();
@@ -512,11 +529,15 @@ final class PatrolController {
         state = PatrolRuntimeState.PATROLLING;
         updatePersistentLocation(true);
         checkpoint();
-        issueRouteDestination();
+        if (startWaitTicks == 0) issueRouteDestination();
     }
 
     private void routeFailed() {
         destinationAssigned = false;
+        if (bodyReachedTargetNode()) {
+            routeArrived();
+            return;
+        }
         if (failures++ == 0) {
             issueRouteDestination();
             return;
@@ -524,12 +545,24 @@ final class PatrolController {
 
         failures = 0;
         currentNode = targetNode;
+        if (currentNode != 0) startWaitServed = false;
         PatrolRoute.Step step = route.next(currentNode, direction);
         targetNode = step.targetNode();
         direction = step.direction();
         fraction = 0D;
         checkpoint();
         issueRouteDestination();
+    }
+
+    /** Nodes sit on block corners, so a chair or slab can stop the body just above or beside one. */
+    private boolean bodyReachedTargetNode() {
+        LivingEntity body = liveBody();
+        if (body == null) return false;
+        Location node = route.node(actor.origin(), targetNode);
+        Location at = body.getLocation();
+        if (at.getWorld() != node.getWorld()) return false;
+        double dx = at.getX() - node.getX(), dz = at.getZ() - node.getZ();
+        return dx * dx + dz * dz <= 1D && Math.abs(at.getY() - node.getY()) <= 1D;
     }
 
     private boolean issueRouteDestination() {
@@ -594,12 +627,33 @@ final class PatrolController {
         if (targetNode == currentNode) targetNode = route.next(currentNode, restored.direction()).targetNode();
         direction = restored.direction() < 0 ? -1 : 1;
         fraction = Math.max(0D, Math.min(1D, restored.fraction()));
+        // A restored actor at the start node already took its rest there; the next lap earns another one.
+        startWaitServed = currentNode == 0;
         virtualSpeed = route.virtualSpeed() == null ? restored.virtualSpeed() : route.virtualSpeed();
         safeLocation = restored.safeLocation() == null ? null : restored.safeLocation().resolve();
         if (safeLocation == null || safeLocation.getWorld() == null
                 || !actor.origin().worldName().equals(safeLocation.getWorld().getName())) {
             safeLocation = route.node(actor.origin(), currentNode);
         }
+    }
+
+    /** Starts the start-node rest once per lap; resuming back to the start after it does not restart it. */
+    private void startWaitIfBackAtStart() {
+        if (currentNode != 0) {
+            startWaitServed = false;
+            return;
+        }
+        if (startWaitServed) return;
+        startWaitServed = true;
+        startWaitTicks = route.startNodeWaitTicks();
+    }
+
+    private void faceOriginHeading(LivingEntity body) {
+        float yaw = actor.origin().yaw();
+        float pitch = actor.origin().pitch();
+        Location location = body.getLocation();
+        float yawDelta = Math.abs(((location.getYaw() - yaw) % 360F + 540F) % 360F - 180F);
+        if (yawDelta > 1F || Math.abs(location.getPitch() - pitch) > 1F) body.setRotation(yaw, pitch);
     }
 
     private boolean validNode(int node) {
@@ -620,7 +674,7 @@ final class PatrolController {
         if (!actor.persistsWhileDetached()) return;
         stateStore.put(actor.canonicalIdentity(), new PatrolStateStore.StoredState(
                 actor.canonicalIdentity(), currentNode, targetNode, direction, fraction, virtualSpeed,
-                PatrolStateStore.StoredLocation.from(safeLocation, actor.origin().worldName())));
+                PatrolStateStore.StoredLocation.from(safeLocation, actor.origin().worldName()), route.geometryKey()));
     }
 
     private boolean clockFrozen() {
@@ -635,6 +689,7 @@ final class PatrolController {
         if (aiHeld) return "ai_off";
         if (yieldedHeld) return "yielded";
         if (terrainHeld) return "terrain_unavailable";
+        if (startWaitTicks > 0) return "start_node_wait";
         if (state == PatrolRuntimeState.AI_OFF) return "ai_off";
         if (state == PatrolRuntimeState.HELD) return "script_hold";
         if (manuallyPaused) return "manual";

@@ -326,6 +326,7 @@ public final class PatrolEditor implements Listener {
         private final boolean relative;
         private final double speedModifier;
         private final Double virtualSpeed;
+        private final double startNodeWaitSeconds;
         private final boolean originalAi;
         private final boolean originalAware;
         private boolean closed;
@@ -352,6 +353,7 @@ public final class PatrolEditor implements Listener {
             this.relative = existing == null || existing.relative();
             this.speedModifier = existing == null ? 1D : existing.speedModifier();
             this.virtualSpeed = existing == null ? null : existing.virtualSpeed();
+            this.startNodeWaitSeconds = existing == null ? 0D : existing.startNodeWaitSeconds();
             this.originalAi = originalAi;
             this.originalAware = originalAware;
             this.hadPatrol = existing != null;
@@ -438,6 +440,7 @@ public final class PatrolEditor implements Listener {
             validation.set("patrol.relative", relative);
             validation.set("patrol.speed", speedModifier);
             validation.set("patrol.virtualSpeed", virtualSpeed);
+            validation.set("patrol.startNodeWaitSeconds", startNodeWaitSeconds);
             validation.set("patrol.nodes", nodes.stream().map(node ->
                     Double.toString(node.getX()) + "," + node.getY() + "," + node.getZ()).toList());
             return Objects.requireNonNull(PatrolRoute.parse(validation));
@@ -703,6 +706,9 @@ public final class PatrolEditor implements Listener {
             configuration.set("patrol.speed", route.speedModifier());
             configuration.set("patrol.maxLegDistance", null);
             configuration.set("patrol.virtualSpeed", route.virtualSpeed());
+            // Keep an explicit 0 so premade defaults cannot re-add a rest the owner turned off.
+            if (route.startNodeWaitSeconds() > 0D || configuration.contains("patrol.startNodeWaitSeconds", true))
+                configuration.set("patrol.startNodeWaitSeconds", route.startNodeWaitSeconds());
             configuration.set("patrol.nodes", route.serializeNodes());
         }
 
