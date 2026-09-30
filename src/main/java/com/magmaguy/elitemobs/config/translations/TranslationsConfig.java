@@ -66,9 +66,11 @@ public class TranslationsConfig {
         java.util.Set<String> unknown = placeholders(translated);
         unknown.removeAll(known);
         if (unknown.isEmpty()) return false;
-        if (reportedStalePlaceholders.add(filename + "." + key))
+        // One line per boot: an outdated language file can hit dozens of keys, and the remedy is the same for all of them.
+        if (reportedStalePlaceholders.add(filename + "." + key) && reportedStalePlaceholders.size() == 1)
             Logger.info("Translation for " + filename.replace(".yml", "") + "." + key + " uses " + String.join(", ", unknown)
-                    + ", which the current English text no longer has. Showing the English text until that translation is updated.");
+                    + ", which the current English text no longer has, so the English text is shown instead. Other lines from "
+                    + "an outdated translation file are handled the same way without further messages.");
         return true;
     }
 
