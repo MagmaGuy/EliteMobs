@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.commands;
 
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule;
 import com.magmaguy.elitemobs.commands.admin.GetTierCommand;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -25,5 +26,6 @@ public class LootDebugLimitedCommand extends AdvancedCommand {
         Integer parsedLevel = commandData.getIntegerArgument("level");
         if (parsedLevel == null) return;
         GetTierCommand.getLimited(commandData.getPlayerSender(), parsedLevel);
+        AdvancedCombatModule.scaleClassesForDebugLoadout(commandData.getPlayerSender(), parsedLevel);
     }
 }

@@ -6,7 +6,6 @@ import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
 import com.magmaguy.magmacore.command.SenderType;
 import com.magmaguy.magmacore.command.arguments.IntegerCommandArgument;
-import com.magmaguy.magmacore.util.Logger;
 
 import java.util.List;
 
@@ -27,11 +26,6 @@ public class LootDebugCommand extends AdvancedCommand {
         if (parsedLevel == null) return;
         int level = parsedLevel;
         GetTierCommand.getUnbreakable(commandData.getPlayerSender(), level);
-        if (!AdvancedCombatModule.isInitialized()) return;
-        int formsAtLevel = AdvancedCombatModule.get()
-                .scaleAllClassesForAdministration(commandData.getPlayerSender(), level);
-        if (formsAtLevel > 0)
-            Logger.sendMessage(commandData.getPlayerSender(), "&7Scaled &f" + formsAtLevel
-                    + " &7class branch(es) to level &f" + level + "&7. Pick one with &f/em class&7.");
+        AdvancedCombatModule.scaleClassesForDebugLoadout(commandData.getPlayerSender(), level);
     }
 }

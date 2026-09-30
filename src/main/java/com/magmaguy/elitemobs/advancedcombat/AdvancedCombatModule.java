@@ -413,6 +413,28 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
         return formsAtLevel;
     }
 
+    /** Debug loadouts scale every class branch; a refusal is reported instead of silently leaving classes locked. */
+    public static void scaleClassesForDebugLoadout(Player player, int effectiveLevel) {
+        if (!isInitialized()) {
+            Logger.sendMessage(player, "&eClasses were not changed: the [Alpha] Advanced Combat System is disabled.");
+            return;
+        }
+        AdvancedCombatModule module = get();
+        int formsAtLevel = module.scaleAllClassesForAdministration(player, effectiveLevel);
+        if (formsAtLevel > 0) {
+            Logger.sendMessage(player, "&7Scaled &f" + formsAtLevel + " &7class branch(es) to level &f"
+                    + effectiveLevel + "&7. Pick one with &f/em class&7.");
+            return;
+        }
+        UUID playerId = player.getUniqueId();
+        if (module.progression.lockedRunId(playerId).isPresent())
+            Logger.sendMessage(player, "&eClasses were not changed: they are locked for your current dungeon or trial run.");
+        else if (module.progression.snapshot(playerId).isEmpty())
+            Logger.sendMessage(player, "&eClasses were not changed: your class data is not loaded yet. Try again in a moment.");
+        else
+            Logger.sendMessage(player, "&eClasses were not changed at level &f" + effectiveLevel + "&e.");
+    }
+
     public SelectionResult clearSelectedForm(Player player) {
         if (!mayChangeRunSelection(player))
             return new SelectionResult(SelectionResult.Status.LOCKED_FORM,
