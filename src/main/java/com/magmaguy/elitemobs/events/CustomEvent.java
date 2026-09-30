@@ -11,7 +11,8 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.CommandRunner;
-import com.magmaguy.magmacore.instance.MatchInstance;
+import com.magmaguy.magmacore.match.Match;
+import com.magmaguy.magmacore.match.MatchCore;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -61,8 +62,8 @@ public abstract class CustomEvent {
             return false;
         if (EliteMobsWorld.isEliteMobsWorld(location.getWorld().getUID()))
             return false;
-        for (MatchInstance instance : MatchInstance.getInstances())
-            if (instance.isInRegion(location)) return false;
+        for (Match match : MatchCore.matches())
+            if (match.contains(location)) return false;
         return !(EliteMobs.worldGuardIsEnabled &&
                 !WorldGuardFlagChecker.checkFlag(location, WorldGuardCompatibility.getELITEMOBS_EVENTS()));
     }

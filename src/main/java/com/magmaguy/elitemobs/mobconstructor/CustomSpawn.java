@@ -16,7 +16,8 @@ import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.peacebanner.PeaceBannerManager;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
-import com.magmaguy.magmacore.instance.MatchInstance;
+import com.magmaguy.magmacore.match.Match;
+import com.magmaguy.magmacore.match.MatchCore;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -336,8 +337,8 @@ public class CustomSpawn {
                 if (!ValidWorldsConfig.getValidWorlds().contains(playerLocation.getWorld().getName()))
                     continue;
                 boolean isInMatch = false;
-                for (MatchInstance instance : MatchInstance.getInstances())
-                    if (instance.isInRegion(playerLocation)) {
+                for (Match match : MatchCore.matches())
+                    if (match.contains(playerLocation)) {
                         isInMatch = true;
                         break;
                     }
