@@ -17,4 +17,10 @@ public class SpearsFirstStrikeConfig extends SkillBonusConfigFields {
         );
         this.formattedBonusTemplate = "+$value% vs Full HP";
     }
+
+    @Override
+    protected void migrateLegacyDisplayDefaults() {
+        // Earlier builds generated this skill as PASSIVE; the stored type must match or the skill is disabled.
+        migrateStringIfExact("bonusType", "PASSIVE", "CONDITIONAL");
+    }
 }

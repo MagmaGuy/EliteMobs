@@ -168,6 +168,16 @@ public class NPCsConfigFields extends CustomConfigFields {
             fileConfiguration.set(path, replacement);
     }
 
+    /**
+     * Moves an NPC off a disguise alias it used to share with another NPC, but only while the file still carries this
+     * NPC's default skin; an administrator who deliberately pointed it elsewhere keeps their choice.
+     */
+    protected final void migrateDisguiseAliasIfDefault(String legacyDisguise) {
+        if (java.util.Objects.equals(fileConfiguration.getString("disguise"), legacyDisguise)
+                && java.util.Objects.equals(fileConfiguration.getString("customDisguiseData"), customDisguiseData))
+            fileConfiguration.set("disguise", disguise);
+    }
+
     @Override
     public void processConfigFields() {
         migrateLegacyDefaults();
