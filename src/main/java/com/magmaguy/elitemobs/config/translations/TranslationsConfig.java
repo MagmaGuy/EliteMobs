@@ -67,7 +67,7 @@ public class TranslationsConfig {
         unknown.removeAll(known);
         if (unknown.isEmpty()) return false;
         if (reportedStalePlaceholders.add(filename + "." + key))
-            Logger.warn("Translation for " + filename.replace(".yml", "") + "." + key + " uses " + String.join(", ", unknown)
+            Logger.info("Translation for " + filename.replace(".yml", "") + "." + key + " uses " + String.join(", ", unknown)
                     + ", which the current English text no longer has. Showing the English text until that translation is updated.");
         return true;
     }
