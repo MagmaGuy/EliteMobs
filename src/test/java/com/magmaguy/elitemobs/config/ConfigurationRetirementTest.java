@@ -109,6 +109,39 @@ class ConfigurationRetirementTest {
         }
     }
 
+    @Test void releasedGrapplingScriptIsReplacedAndCustomizedOnesStay() throws Exception {
+        Path directory = plugin.getDataFolder().toPath().resolve("enchantments");
+        Files.createDirectories(directory);
+        Path script = directory.resolve("grappling_hook.lua");
+        byte[] released;
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("retired/grappling_hook_10.9.7.lua")) {
+            released = input.readAllBytes();
+        }
+        byte[] bundled;
+        try (InputStream input = plugin.getResource("enchantments/grappling_hook.lua")) {
+            bundled = input.readAllBytes();
+        }
+        Files.write(script, released);
+        OutdatedConfigurationArchive.archiveFor(plugin);
+        assertFalse(Files.exists(script));
+        EnchantmentCatalog.initializeDefaults(plugin, directory, List.of("grappling_hook"));
+        assertArrayEquals(bundled, Files.readAllBytes(script));
+        // The regenerated default never matches, so later boots keep it.
+        OutdatedConfigurationArchive.archiveFor(plugin);
+        assertArrayEquals(bundled, Files.readAllBytes(script));
+        Path archive = plugin.getDataFolder().toPath().getParent().resolve("MagmaCore/outdated files");
+        try (var files = Files.walk(archive)) {
+            var originals = files.filter(Files::isRegularFile).toList();
+            assertEquals(1, originals.size());
+            assertArrayEquals(released, Files.readAllBytes(originals.getFirst()));
+        }
+        byte[] customized = ("-- tuned pull speed\n" + new String(released, java.nio.charset.StandardCharsets.UTF_8))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        Files.write(script, customized);
+        OutdatedConfigurationArchive.archiveFor(plugin);
+        assertArrayEquals(customized, Files.readAllBytes(script));
+    }
+
     @Test void nativeDefaultsNoLongerRegenerateTheRetiredKey() {
         var fields = new EnchantmentsConfigFields("sharpness.yml", true, "Sharpness", 5, 1, true, 10);
         var yaml = new YamlConfiguration();

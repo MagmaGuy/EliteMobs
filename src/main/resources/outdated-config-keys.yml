@@ -19,6 +19,12 @@ customquests:
 
 enchantments:
   - maxLevelV2
+  # Earlier bundled grappling scripts refused pulls that a platform rim blocked.
+  # Only unedited copies of those defaults match; customized scripts stay.
+  - files: [grappling_hook.lua]
+    sha256:
+      - 5611dc61cb4c50c754406a22472a81dfb8019a62708162ed70d1e91515766ecb
+      - 06e885bdee32e7fa3611de5573a296e7cef6c082ecac1be5e45dacab4778202e
 
 # Only these plugin defaults regenerate automatically. Match the retired name
 # before the comma in an enchantments list entry; preserve other custom items.
