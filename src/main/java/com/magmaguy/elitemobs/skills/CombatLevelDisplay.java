@@ -42,6 +42,8 @@ public class CombatLevelDisplay implements Listener {
 
     private static final float DEFAULT_Y_TRANSLATION = 0.5f;
     private static final float BEDROCK_Y_TRANSLATION_BONUS = 1.0f;
+    // Clients smooth other players' movement over 3 ticks; following text glides the same way so it stays on them.
+    private static final int FOLLOWING_TEXT_INTERPOLATION_TICKS = 3;
     private static final Map<UUID, PlayerDisplay> playerDisplays = new ConcurrentHashMap<>();
     private static PlayerCombatState combatState;
     private static BukkitTask refreshTask;
@@ -124,6 +126,7 @@ public class CombatLevelDisplay implements Listener {
                 .shadow(true)
                 .seeThrough(false)
                 .translation(0, passenger ? getDisplayHeight(player) : 0, 0)
+                .teleportDuration(passenger ? 0 : FOLLOWING_TEXT_INTERPOLATION_TICKS)
                 .viewerFilter(viewer -> canSeeNameTag(player, viewer))
                 .build(player.getLocation());
 

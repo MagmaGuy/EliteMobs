@@ -132,11 +132,21 @@ public class DefaultConfig extends ConfigurationFile {
         alwaysShowNametags = ConfigurationEngine.setBoolean(
                 List.of("Sets whether elites and bosses spawned by elitemobs will always show their nametags.", "Not recommended!"),
                 fileConfiguration, "alwaysShowEliteMobNameTags", false);
+        // Minecraft hides the name of a player something rides unless that player is on a scoreboard team, so
+        // passenger labels hid names on most servers. Following text is now the default; the earlier stock value
+        // is switched once and any later choice is kept.
+        boolean followingTextDefaultApplied = ConfigurationEngine.setBoolean(
+                List.of("Internal marker for the one-time switch of combat labels to following text. Do not edit."),
+                fileConfiguration, "combatLabelFollowingTextDefaultApplied", false);
+        if (!followingTextDefaultApplied) {
+            fileConfiguration.set("usePassengerCombatLevelDisplay", false);
+            fileConfiguration.set("combatLabelFollowingTextDefaultApplied", true);
+        }
         usePassengerCombatLevelDisplay = ConfigurationEngine.setBoolean(
-                List.of("Mounts player combat labels as packet-only passengers for smooth movement.",
-                        "Automatically uses the following-text fallback while another entity rides the player.",
-                        "Set to false to always use following text. Passenger mode follows Minecraft's native passenger name-tag rules."),
-                fileConfiguration, "usePassengerCombatLevelDisplay", true);
+                List.of("Mounts player combat labels as packet-only passengers instead of following text.",
+                        "Minecraft then hides the player's own name from other players unless the player is on a scoreboard team.",
+                        "Following text moves with the same client smoothing as the player. Passenger mode still falls back to it while another entity rides the player."),
+                fileConfiguration, "usePassengerCombatLevelDisplay", false);
         preventEliteMobConversionOfNamedMobs = ConfigurationEngine.setBoolean(
                 List.of("Sets whether EliteMobs will prevent converting named mobs to elites.", "Especially important for compatibility with other plugins."),
                 fileConfiguration, "preventEliteMobConversionOfNamedMobs", true);
