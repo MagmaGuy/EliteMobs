@@ -48,7 +48,36 @@ public class TranslationsConfig {
 
         translationsConfigFields.add(filename, key, value);
         Object result = translationsConfigFields.get(filename, key);
-        return result instanceof String ? (String) result : ChatColorConverter.convert(value);
+        if (!(result instanceof String translated)) return ChatColorConverter.convert(value);
+        if (usesUnknownPlaceholders(filename, key, translated, value)) return ChatColorConverter.convert(value);
+        return translated;
+    }
+
+    private static final java.util.regex.Pattern PLACEHOLDER = java.util.regex.Pattern.compile("\\$[A-Za-z][A-Za-z0-9_]*");
+    private static final java.util.Set<String> reportedStalePlaceholders = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    /**
+     * A translation that names a placeholder the current English text no longer has was written for an older default
+     * (for example a skill template whose $token changed). Rendering it would show the raw token, so the English text is
+     * served for that key until the translation is updated. The CSV itself is left untouched.
+     */
+    private static boolean usesUnknownPlaceholders(String filename, String key, String translated, String english) {
+        java.util.Set<String> known = placeholders(english);
+        java.util.Set<String> unknown = placeholders(translated);
+        unknown.removeAll(known);
+        if (unknown.isEmpty()) return false;
+        if (reportedStalePlaceholders.add(filename + "." + key))
+            Logger.warn("Translation for " + filename.replace(".yml", "") + "." + key + " uses " + String.join(", ", unknown)
+                    + ", which the current English text no longer has. Showing the English text until that translation is updated.");
+        return true;
+    }
+
+    private static java.util.Set<String> placeholders(String text) {
+        java.util.Set<String> found = new java.util.TreeSet<>();
+        if (text == null) return found;
+        java.util.regex.Matcher matcher = PLACEHOLDER.matcher(text);
+        while (matcher.find()) found.add(matcher.group());
+        return found;
     }
 
     /**
@@ -67,7 +96,11 @@ public class TranslationsConfig {
 
         translationsConfigFields.add(filename, key, value);
         Object result = translationsConfigFields.get(filename, key);
-        return result instanceof List ? (List<String>) result : ChatColorConverter.convert(value);
+        if (!(result instanceof List)) return ChatColorConverter.convert(value);
+        List<String> translated = (List<String>) result;
+        if (usesUnknownPlaceholders(filename, key, String.join("\n", translated), value == null ? null : String.join("\n", value)))
+            return ChatColorConverter.convert(value);
+        return translated;
     }
 
     /**

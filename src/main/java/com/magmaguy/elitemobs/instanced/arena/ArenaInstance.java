@@ -105,30 +105,39 @@ public class ArenaInstance extends MatchInstance {
         arenaInstances.put(customArenasConfigFields.getFilename(), this);
         arenaWatchdog();
         for (String string : customArenasConfigFields.getArenaMessages()) {
-            String[] splitString = string.split(":");
             String message = "";
             int wave = 0;
-            for (String subString : splitString) {
+            int start = 0;
+            while (start < string.length()) {
+                int end = string.indexOf(':', start);
+                String subString = end < 0 ? string.substring(start) : string.substring(start, end);
                 String[] finalString = subString.split("=", 2);
                 if (finalString.length < 2) {
                     Logger.warn("Failed to parse arena message entry " + subString + " for arena " + customArenasConfigFields.getFilename());
-                    continue;
+                } else {
+                    String key = ChatColor.stripColor(finalString[0]).toLowerCase(Locale.ROOT);
+                    switch (key) {
+                        case "wave":
+                            try {
+                                wave = Integer.parseInt(finalString[1]);
+                            } catch (Exception ex) {
+                                Logger.warn("Failed to parse wave for entry " + subString + " for arena " + customArenasConfigFields.getFilename());
+                            }
+                            break;
+                        case "message":
+                            // Message text may contain colons (translations often add one); it runs until a following
+                            // wave field or the end of the entry.
+                            int textStart = start + subString.indexOf('=') + 1;
+                            int nextWave = string.toLowerCase(Locale.ROOT).indexOf(":wave=", textStart);
+                            end = nextWave;
+                            message = nextWave < 0 ? string.substring(textStart) : string.substring(textStart, nextWave);
+                            break;
+                        default:
+                            Logger.warn("Failed to parse arena message entry " + subString + " for arena " + customArenasConfigFields.getFilename());
+                    }
                 }
-                String key = ChatColor.stripColor(finalString[0]).toLowerCase(Locale.ROOT);
-                switch (key) {
-                    case "wave":
-                        try {
-                            wave = Integer.parseInt(finalString[1]);
-                        } catch (Exception ex) {
-                            Logger.warn("Failed to parse wave for entry " + subString + " for arena " + customArenasConfigFields.getFilename());
-                        }
-                        break;
-                    case "message":
-                        message = finalString[1];
-                        break;
-                    default:
-                        Logger.warn("Failed to parse arena message entry " + subString + " for arena " + customArenasConfigFields.getFilename());
-                }
+                if (end < 0) break;
+                start = end + 1;
             }
             if (!message.isEmpty() && wave > 0) waveMessage.put(wave, ChatColorConverter.convert(message));
         }

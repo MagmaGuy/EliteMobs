@@ -156,8 +156,21 @@ public class NPCsConfigFields extends CustomConfigFields {
         }
     }
 
+    /**
+     * Lets a premade NPC replace a value an earlier build wrote as its default. Only an untouched old default is
+     * replaced, so an administrator's own edit always survives.
+     */
+    protected void migrateLegacyDefaults() {
+    }
+
+    protected final void migrateStringIfExact(String path, String legacyValue, String replacement) {
+        if (java.util.Objects.equals(fileConfiguration.getString(path), legacyValue))
+            fileConfiguration.set(path, replacement);
+    }
+
     @Override
     public void processConfigFields() {
+        migrateLegacyDefaults();
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.name = translatable(filename, "name", processString("name", name, "", true));
         this.role = translatable(filename, "role", processString("role", role, "", true));
