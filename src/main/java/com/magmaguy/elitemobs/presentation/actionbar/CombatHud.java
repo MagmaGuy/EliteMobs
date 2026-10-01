@@ -105,7 +105,8 @@ public final class CombatHud {
                 // Replace only this card's surface, before drawing its icon and live cost.
                 if (!state.affordable()) overlay(line, left, String.valueOf((char) (0xE680 + index)), 61);
                 String glyph = CombatHudAbilityIcons.glyph(slots.get(index));
-                if (!glyph.isEmpty()) overlay(line, left + 3, glyph, 14);
+                // The 13px icon fills the slot inside the card's orange frame.
+                if (!glyph.isEmpty()) overlay(line, left + 6, glyph, 14);
                 String digits = Long.toString((long) Math.ceil(state.cost()));
                 int start = left + 38 - (digits.length() * 4 + 7) / 2;
                 overlay(line, start, String.valueOf((char) (0xE540 + resourceIcon(lineage.resourceType()) - 0xE500)), 6);
