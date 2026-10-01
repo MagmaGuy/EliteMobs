@@ -15,6 +15,8 @@ import java.awt.Color;
 public final class CombatHud {
     private static final String FONT = "elitemobs:combat_hud_concept_16";
     // Overlays are placed in a 190px layout. The panel art extends PANEL_MARGIN past it on each side.
+    // Minecraft sizes a bitmap glyph's advance by its last non-transparent column, so the 210px
+    // red/gray panels must keep a pixel in column 209; an alpha-1 pixel is invisible and enough.
     private static final int CONTENT_WIDTH = 190;
     private static final int PANEL_MARGIN = 10;
     // Half pixels from the end of the HUD line back to the layout origin.
