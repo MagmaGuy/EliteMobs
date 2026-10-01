@@ -345,14 +345,14 @@ public class ItemSettingsConfig extends ConfigurationFile {
                         "Set to an empty string to disable the subtitle."),
                 file, fileConfiguration, "brokenItemSubtitleWarning", "&cYour weapon is broken!", true);
         minimumProcedurallyGeneratedDiamondLootLevelPlusSeven = ConfigurationEngine.setInt(
-                List.of("Sets the minimum level, +7, of bosses that can procedurally generated drop diamond gear in EliteMobs.",
+                List.of("Sets the minimum level, +7, of bosses that can drop procedurally generated diamond gear in EliteMobs.",
                         "There is no procedurally generated netherite gear in EliteMobs, only custom loot."),
                 fileConfiguration, "minimumProcedurallyGeneratedDiamondLootLevelPlusSeven", 10);
         simlootMessageSuccess = ConfigurationEngine.setString(
-                List.of("Sets the message show in chat when successfully rolling for loot through the /em simloot <level> <times> command."),
+                List.of("Sets the message shown in chat when successfully rolling for loot through the /em simloot <level> <times> command."),
                 file, fileConfiguration, "simlootMessageSuccess", "&8[EliteMobs] &2Rolled for loot and got $itemName &2!", true);
         simlootMessageFailure = ConfigurationEngine.setString(
-                List.of("Sets the message show in chat when failing to roll for loot through the /em simloot <level> <times> command."),
+                List.of("Sets the message shown in chat when failing to roll for loot through the /em simloot <level> <times> command."),
                 file, fileConfiguration, "simlootMessageFailure", "&8[EliteMobs] &cRolled for loot and got nothing!", true);
         directDropCustomLootMessage = ConfigurationEngine.setString(
                 List.of("Sets the message that players get when elite loot is deposited directly into their inventories."),
