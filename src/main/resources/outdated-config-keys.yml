@@ -19,12 +19,18 @@ customquests:
 
 enchantments:
   - maxLevelV2
-  # Earlier bundled grappling scripts refused pulls that a platform rim blocked.
-  # Only unedited copies of those defaults match; customized scripts stay.
+  # Earlier bundled enchantment scripts, such as grappling_hook.lua before the platform-rim fix.
+  # Only unedited copies match; the current defaults are never listed, and customized scripts stay.
+  - files: [flamethrower.lua]
+    sha256:
+      - def720bbca122e6cb2b25a51747ac426d93565f8352f568aa59aed944bb8b0c4
   - files: [grappling_hook.lua]
     sha256:
-      - 5611dc61cb4c50c754406a22472a81dfb8019a62708162ed70d1e91515766ecb
       - 06e885bdee32e7fa3611de5573a296e7cef6c082ecac1be5e45dacab4778202e
+      - 5611dc61cb4c50c754406a22472a81dfb8019a62708162ed70d1e91515766ecb
+  - files: [ice_breaker.lua]
+    sha256:
+      - 557cf0669a22eef5bd0f2e80fa01bce894631df15ce5494121cd841b851ab648
 
 # Only these plugin defaults regenerate automatically. Match the retired name
 # before the comma in an enchantments list entry; preserve other custom items.
@@ -138,3 +144,101 @@ customitems:
       - unbind_scroll.yml
     key: enchantments
     listEntryNames: [unbind]
+
+powers:
+  # Earlier bundled premade Lua powers, such as ender_dragon_shockwave.lua before its 10.9.7 fix.
+  # Only unedited copies match; the current defaults are never listed, and customized powers stay.
+  - files: [arrow_rain.lua]
+    sha256:
+      - 2956900900af7fcebb04aa00e818fb094b2e503fbfb632aac8da85a3b0138564
+  - files: [attack_arrow.lua]
+    sha256:
+      - 5a881c8f917a0a706def9d5500decd79bd895053502465e051d274e86e43b47f
+  - files: [attack_confusing.lua]
+    sha256:
+      - 88c2deaa3f830398d473839d457ad85647a453769d420a837ee381637b6e1086
+  - files: [attack_freeze.lua]
+    sha256:
+      - d904a022ab7816f7311739c435f5dc986cb0bbd376d6e4de8f21b0466be6b010
+  - files: [attack_gravity.lua]
+    sha256:
+      - 9df36d37c652ecc01d3c6acfa6ddf4a54518aa838b2b01c3f27226687069e5e1
+  - files: [attack_web.lua]
+    sha256:
+      - 204a7113a5d10cdab92d3b67c6c40eac15a95820c8fb07778c4b3c578c2647c6
+  - files: [bullet_hell.lua]
+    sha256:
+      - 8da3db1ebc96d70db065b818d233bd8f12dac5bf1c1d4be335d701d59a6d1b8d
+  - files: [channel_healing.lua]
+    sha256:
+      - 560cbc86f192db4b0a76c74ea4c828b13e300de21ddb801a4a9af189f53c3181
+  - files: [corpse.lua]
+    sha256:
+      - 73e8627100d14bd4b3d5391b4359b8ca061ff6a0d0c888f8f4528fb6cc056fd1
+  - files: [ender_dragon_aimed_fireball.lua]
+    sha256:
+      - ac6cc0ca5df7551edb4f5375bf26e2b2e2a614316b25d1e7a878745272089f17
+  - files: [ender_dragon_arrow_bombardment.lua]
+    sha256:
+      - 51be1a0debb5fe88f7cf81e26c40824e943324fe31b2d6e4cf3516b12e0a1171
+  - files: [ender_dragon_ender_fireball_bombardment.lua]
+    sha256:
+      - 3d60ae188d98c19e9bca7d46898d0ac1458f0d1bd323ab797fb3b679af329e7a
+  - files: [ender_dragon_endermite_bombardment.lua]
+    sha256:
+      - 542ad3268696056f17c023ee17a6165411420a5a51400f0061ae6b7d78e36ad0
+  - files: [ender_dragon_fireball_bombardment.lua]
+    sha256:
+      - 3e681bfa7ed8e995cf28ebef5593a235f8c1e17ce20065725d8de025452c8c0b
+  - files: [ender_dragon_potion_bombardment.lua]
+    sha256:
+      - 580ced2eb9a45972fbdf814011c3dc97a874578e2cbf6b5096d15471912746b7
+  - files: [ender_dragon_shockwave.lua]
+    sha256:
+      - 551c7bd920158f981de0c6aa980e0a1925f3b348b0f638ef7c35d2f2817e0dc3
+  - files: [ender_dragon_tornado.lua]
+    sha256:
+      - 062b44d7924eab83595d9c4751d08903d03cc8dd640bf009f90457686b230637
+      - d91abeabb69c3f07260be9f11e6f5b626db9f62114cb024f9eb0536a5f51b151
+  - files: [flame_pyre.lua]
+    sha256:
+      - 11dc8bbfe6450e04030161a882366cc8dfaff1c5fc13112ddd7abb4eebf2be9f
+  - files: [flamethrower.lua]
+    sha256:
+      - 06f421e529911b52b53e947448df2fcb3dbdf5e55064878461ac484ad6386536
+  - files: [frost_cone.lua]
+    sha256:
+      - dab18c9de2a82686e3b1a6159bc9c49a2bc3ffb16c0ecbe6dab890c9cd64939f
+  - files: [ground_pound.lua]
+    sha256:
+      - aee10157566a36696a75225fc37904abac62f327f093a44f44531a89c9f45d80
+  - files: [implosion.lua]
+    sha256:
+      - 2478f31fc9d6ce88f4a8d2e6beed81966fdbbe551e74b1f2cdb0eebe4d99c4ff
+  - files: [meteor_shower.lua]
+    sha256:
+      - 972782bfa57b1f0ad664efae069a4be15d323408a598effbb62013974c8c8170
+  - files: [moonwalk.lua]
+    sha256:
+      - 64caae198af6f707225416c4d24c03d49060a9baca4a568cbc0350c148e3f7ab
+  - files: [photon_ray.lua]
+    sha256:
+      - 74f0d9fd8367af4ebf06cfd6b42a8687fa7d2ead1851863efb5502c41cb0030b
+  - files: [skeleton_tracking_arrow.lua]
+    sha256:
+      - 1e900edb9d2ef2a0db325d3cfd17a40ca8a3db0a6323e4140f49d962939e570d
+  - files: [summon_embers.lua]
+    sha256:
+      - 9049d58d55d23c6bb5eb0196168c99efc446a82cc3fafd9aba01e805be31e006
+  - files: [taze.lua]
+    sha256:
+      - 96c354a1c43d1288941ce9d8dfe0bc70025ebc1170ca0198e2424d5eea030430
+  - files: [thunderstorm.lua]
+    sha256:
+      - c373eae913d0f69d3678c76735dbf21f45315d847db045a145a9975835b30fec
+  - files: [zombie_bloat.lua]
+    sha256:
+      - 7f791d73d2bb704f3bbcb01059b9afca045133318ae2d4fa15d0f7bcfadee9ec
+  - files: [zombie_parents.lua]
+    sha256:
+      - ea04d6f890203bc21f641a9a7a1cc91f73b172833a6184fdd03d4423efa48e2e

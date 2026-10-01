@@ -142,6 +142,45 @@ class ConfigurationRetirementTest {
         assertArrayEquals(customized, Files.readAllBytes(script));
     }
 
+    @Test void retirementRulesNeverListACurrentBundledDefault() throws Exception {
+        // A listed current default would be archived and regenerated on every boot.
+        java.util.Map<String, java.util.Map<String, java.util.Set<String>>> retired = new java.util.HashMap<>();
+        try (InputStream input = plugin.getResource(OutdatedConfigurationArchive.RULES_RESOURCE)) {
+            java.util.Map<?, ?> rules = new org.yaml.snakeyaml.Yaml().load(input);
+            for (var category : rules.entrySet())
+                for (Object rule : (List<?>) category.getValue())
+                    if (rule instanceof java.util.Map<?, ?> fields && fields.containsKey("sha256"))
+                        for (Object file : (List<?>) fields.get("files"))
+                            retired.computeIfAbsent((String) category.getKey(), ignored -> new java.util.HashMap<>())
+                                    .computeIfAbsent((String) file, ignored -> new java.util.HashSet<>())
+                                    .addAll(((List<?>) fields.get("sha256")).stream().map(String::valueOf).toList());
+        }
+        int powers = 0;
+        for (Class<? extends com.magmaguy.elitemobs.config.luapowers.LuaPowersConfigFields> type :
+                new com.magmaguy.shaded.reflections.Reflections("com.magmaguy.elitemobs.config.luapowers.premade")
+                        .getSubTypesOf(com.magmaguy.elitemobs.config.luapowers.LuaPowersConfigFields.class)) {
+            if (java.lang.reflect.Modifier.isAbstract(type.getModifiers())) continue;
+            var premade = type.getDeclaredConstructor().newInstance();
+            assertFalse(retired.getOrDefault("powers", java.util.Map.of()).getOrDefault(premade.getFilename(), java.util.Set.of())
+                    .contains(sourceHash(premade.getSource().getBytes(java.nio.charset.StandardCharsets.UTF_8))), premade.getFilename());
+            powers++;
+        }
+        assertTrue(powers > 20, "premade Lua powers were found: " + powers);
+        Path enchantments = Path.of(getClass().getClassLoader().getResource("enchantments/grappling_hook.lua").toURI()).getParent();
+        try (var scripts = Files.list(enchantments)) {
+            for (Path script : scripts.filter(path -> path.toString().endsWith(".lua")).toList())
+                assertFalse(retired.getOrDefault("enchantments", java.util.Map.of())
+                        .getOrDefault(script.getFileName().toString(), java.util.Set.of())
+                        .contains(sourceHash(Files.readAllBytes(script))), script.getFileName().toString());
+        }
+    }
+
+    private static String sourceHash(byte[] source) throws Exception {
+        byte[] normalized = new String(source, java.nio.charset.StandardCharsets.UTF_8).replace("\r", "")
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(normalized));
+    }
+
     @Test void nativeDefaultsNoLongerRegenerateTheRetiredKey() {
         var fields = new EnchantmentsConfigFields("sharpness.yml", true, "Sharpness", 5, 1, true, 10);
         var yaml = new YamlConfiguration();
