@@ -14,13 +14,19 @@ import java.awt.Color;
 /** Resource-pack HUD rendered automatically by the managed-world combat lifecycle. */
 public final class CombatHud {
     private static final String FONT = "elitemobs:combat_hud_concept_16";
+    // Overlays are placed in a 190px layout. The panel art extends PANEL_MARGIN past it on each side.
+    private static final int CONTENT_WIDTH = 190;
+    private static final int PANEL_MARGIN = 10;
+    // Half pixels from the end of the HUD line back to the layout origin.
+    private static final int END_TO_ORIGIN = (CONTENT_WIDTH + PANEL_MARGIN) * 2;
 
     public record Frame(String text, String className) { }
 
     public Frame frame(Player player, boolean active) {
         int animationFrame = (int) Math.floorMod(MonotonicTickClock.currentTick() / 4L, 4L);
         StringBuilder line = new StringBuilder();
-        line.append(active ? '\uE001' : '\uE000').append(spacing(-191));
+        // A bitmap glyph advances its width plus one; step back to the layout origin inside the margin.
+        line.append(active ? '\uE001' : '\uE000').append(spacing(-(CONTENT_WIDTH + PANEL_MARGIN + 1)));
         double health = player.getHealth();
         var maximumAttribute = player.getAttribute(Attribute.MAX_HEALTH);
         double maximum = maximumAttribute == null ? health : maximumAttribute.getValue();
@@ -38,8 +44,9 @@ public final class CombatHud {
         String className = AdvancedCombatModule.activeClassLineageSnapshot(player.getUniqueId())
                 .map(lineage -> lineage.activeForm().displayName()).orElse("");
         if (active) abilityIcons(line, player);
-        // All overlays return to the panel origin. Keep the total advance at 190 GUI pixels.
-        return new Frame(line.append(spacing(190)).toString(), className);
+        // All overlays return to the layout origin. The total advance is the full panel width,
+        // so the action bar centers the art and the layout together.
+        return new Frame(line.append(spacing(CONTENT_WIDTH + PANEL_MARGIN)).toString(), className);
     }
 
     public TextComponent component(String text) {
@@ -59,26 +66,26 @@ public final class CombatHud {
             int left = 78 - badgeWidth;
             // Keep the right edge clear of the diamond; longer translations expand left.
             String border = "\uE600\uE101" + "\uE601\uE101".repeat(badgeWidth - 6) + "\uE602\uE101";
-            component.addExtra(halfPixelSpacing(left * 2 - 380));
+            component.addExtra(halfPixelSpacing(left * 2 - END_TO_ORIGIN));
             component.addExtra(border);
-            component.addExtra(halfPixelSpacing(380 - (left + badgeWidth) * 2));
+            component.addExtra(halfPixelSpacing(END_TO_ORIGIN - (left + badgeWidth) * 2));
             appendText(component, label, left * 2 + (badgeWidth * 2 - width) / 2, width);
         }
         if (feedback == null || feedback.isBlank()) return component;
         var message = CombatHudFeedback.components(feedback, legacy);
         int width = CombatHudFeedback.widthInHalfPixels(message);
-        // The HUD advances 190px. The text overlay must have zero net advance or Minecraft
-        // recenters the entire action bar when feedback changes length.
-        int start = (380 - width) / 2;
+        // The text overlay must have zero net advance or Minecraft recenters the entire
+        // action bar when feedback changes length.
+        int start = (CONTENT_WIDTH * 2 - width) / 2;
         appendText(component, message, start, width);
         return component;
     }
 
     private static void appendText(TextComponent component, net.md_5.bungee.api.chat.BaseComponent[] message,
                                    int start, int width) {
-        component.addExtra(halfPixelSpacing(start - 380));
+        component.addExtra(halfPixelSpacing(start - END_TO_ORIGIN));
         for (var part : message) component.addExtra(part);
-        component.addExtra(halfPixelSpacing(380 - start - width));
+        component.addExtra(halfPixelSpacing(END_TO_ORIGIN - start - width));
     }
 
     private static String halfPixelSpacing(int halfPixels) {

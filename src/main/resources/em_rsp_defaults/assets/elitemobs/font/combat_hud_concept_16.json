@@ -12,8 +12,8 @@
     {
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/gray.png",
-      "height": 54,
-      "ascent": -11,
+      "height": 56,
+      "ascent": -9,
       "chars": [
         ""
       ]
@@ -21,8 +21,8 @@
     {
       "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/red.png",
-      "height": 54,
-      "ascent": -11,
+      "height": 56,
+      "ascent": -9,
       "chars": [
         ""
       ]
