@@ -17,6 +17,13 @@ customquests:
     key: customObjectives.Objective13.filename
     value: scroll_applier_config.yml
 
+# Weapon menus from before Dali's menu art keep slots outside its frames. The
+# current layout moves wands from 25 to 24, so only unedited menus match.
+menus:
+  - files: [skill_bonus_menu.yml]
+    key: wandsSlot
+    value: 25
+
 enchantments:
   - maxLevelV2
   # Earlier bundled enchantment scripts, such as grappling_hook.lua before the platform-rim fix.

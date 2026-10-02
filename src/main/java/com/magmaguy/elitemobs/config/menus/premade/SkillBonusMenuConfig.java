@@ -67,6 +67,8 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
     @Getter
     private static int stavesSlot;
     @Getter
+    private static Material defaultStavesMaterial;
+    @Getter
     private static ItemStack wandsItem;
     @Getter
     private static int wandsSlot;
@@ -166,30 +168,31 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
         weaponSelectMenuName = ConfigurationEngine.setString(file, fileConfiguration, "weaponSelectMenuName", "&6Select Weapon Type", true);
         skillSelectMenuName = ConfigurationEngine.setString(file, fileConfiguration, "skillSelectMenuName", "&6%skill_type% Skills", true);
 
-        // Weapon type items
+        // Weapon type items. Default slots match the frames in weaponselectmenu.png: seven in the
+        // second row (10-16) and two pairs in the third (20-21, 23-24).
         swordsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "swordsItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_SWORD, "&6Swords", List.of("&7View sword skills", "&7Click to select")), true);
-        swordsSlot = ConfigurationEngine.setInt(fileConfiguration, "swordsSlot", 11);
+        swordsSlot = ConfigurationEngine.setInt(fileConfiguration, "swordsSlot", 10);
 
         axesItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "axesItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_AXE, "&6Axes", List.of("&7View axe skills", "&7Click to select")), true);
-        axesSlot = ConfigurationEngine.setInt(fileConfiguration, "axesSlot", 12);
+        axesSlot = ConfigurationEngine.setInt(fileConfiguration, "axesSlot", 11);
 
         bowsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "bowsItem",
                 ItemStackGenerator.generateItemStack(Material.BOW, "&6Bows", List.of("&7View bow skills", "&7Click to select")), true);
-        bowsSlot = ConfigurationEngine.setInt(fileConfiguration, "bowsSlot", 13);
+        bowsSlot = ConfigurationEngine.setInt(fileConfiguration, "bowsSlot", 12);
 
         crossbowsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "crossbowsItem",
                 ItemStackGenerator.generateItemStack(Material.CROSSBOW, "&6Crossbows", List.of("&7View crossbow skills", "&7Click to select")), true);
-        crossbowsSlot = ConfigurationEngine.setInt(fileConfiguration, "crossbowsSlot", 14);
+        crossbowsSlot = ConfigurationEngine.setInt(fileConfiguration, "crossbowsSlot", 13);
 
         tridentsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "tridentsItem",
                 ItemStackGenerator.generateItemStack(Material.TRIDENT, "&6Tridents", List.of("&7View trident skills", "&7Click to select")), true);
-        tridentsSlot = ConfigurationEngine.setInt(fileConfiguration, "tridentsSlot", 15);
+        tridentsSlot = ConfigurationEngine.setInt(fileConfiguration, "tridentsSlot", 14);
 
         hoesItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "hoesItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_HOE, "&6Hoes (Scythes)", List.of("&7View hoe/scythe skills", "&7Click to select")), true);
-        hoesSlot = ConfigurationEngine.setInt(fileConfiguration, "hoesSlot", 20);
+        hoesSlot = ConfigurationEngine.setInt(fileConfiguration, "hoesSlot", 15);
 
         // Maces (1.21+) - use IRON_BLOCK as fallback for older versions
         Material macesMaterial;
@@ -200,7 +203,7 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
         }
         macesItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "macesItem",
                 ItemStackGenerator.generateItemStack(macesMaterial, "&6Maces", List.of("&7View mace skills", "&7Click to select")), true);
-        macesSlot = ConfigurationEngine.setInt(fileConfiguration, "macesSlot", 21);
+        macesSlot = ConfigurationEngine.setInt(fileConfiguration, "macesSlot", 16);
 
         // Spears (1.21.11+) - use IRON_SWORD as fallback for older versions
         Material spearsMaterial;
@@ -211,7 +214,7 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
         }
         spearsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "spearsItem",
                 ItemStackGenerator.generateItemStack(spearsMaterial, "&6Spears", List.of("&7View spear skills", "&7Click to select")), true);
-        spearsSlot = ConfigurationEngine.setInt(fileConfiguration, "spearsSlot", 22);
+        spearsSlot = ConfigurationEngine.setInt(fileConfiguration, "spearsSlot", 20);
 
         // Staves use a spear item (1.21.11+) - use STICK as fallback for older versions
         Material stavesMaterial;
@@ -220,17 +223,18 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
         } catch (NoSuchFieldError e) {
             stavesMaterial = Material.STICK;
         }
+        defaultStavesMaterial = stavesMaterial;
         stavesItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "stavesItem",
                 ItemStackGenerator.generateItemStack(stavesMaterial, "&6Staves", List.of("&7View staff progression", "&7Click to select")), true);
-        stavesSlot = ConfigurationEngine.setInt(fileConfiguration, "stavesSlot", 24);
+        stavesSlot = ConfigurationEngine.setInt(fileConfiguration, "stavesSlot", 23);
 
         wandsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "wandsItem",
                 ItemStackGenerator.generateItemStack(Material.BLAZE_ROD, "&6Wands", List.of("&7View wand progression", "&7Click to select")), true);
-        wandsSlot = ConfigurationEngine.setInt(fileConfiguration, "wandsSlot", 25);
+        wandsSlot = ConfigurationEngine.setInt(fileConfiguration, "wandsSlot", 24);
 
         armorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "armorItem",
                 ItemStackGenerator.generateItemStack(Material.DIAMOND_CHESTPLATE, "&6Armor", List.of("&7View armor skills", "&7Click to select")), true);
-        armorSlot = ConfigurationEngine.setInt(fileConfiguration, "armorSlot", 23);
+        armorSlot = ConfigurationEngine.setInt(fileConfiguration, "armorSlot", 21);
 
         // Hide vanilla attribute tooltips (attack damage, attack speed) for weapon display items
         hideAttributes(swordsItem);

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.advancedcombat.weapons.AdvancedMagicWeaponItems;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SkillBonusMenuConfig;
@@ -61,11 +62,29 @@ public class SkillBonusMenu {
         inventory.setItem(SkillBonusMenuConfig.getArmorSlot(), SkillBonusMenuConfig.getArmorItem());
         inventory.setItem(SkillBonusMenuConfig.getMacesSlot(), SkillBonusMenuConfig.getMacesItem());
         inventory.setItem(SkillBonusMenuConfig.getSpearsSlot(), SkillBonusMenuConfig.getSpearsItem());
-        inventory.setItem(SkillBonusMenuConfig.getStavesSlot(), SkillBonusMenuConfig.getStavesItem());
+        inventory.setItem(SkillBonusMenuConfig.getStavesSlot(), stavesIcon());
         inventory.setItem(SkillBonusMenuConfig.getWandsSlot(), SkillBonusMenuConfig.getWandsItem());
 
         player.openInventory(inventory);
         SkillBonusMenuEvents.weaponSelectMenus.add(inventory);
+    }
+
+    /**
+     * Shows FMM's bundled staff model on the default staves entry when FMM is installed. A configured
+     * replacement item, or a server without the model, keeps the configured icon.
+     */
+    private static ItemStack stavesIcon() {
+        ItemStack icon = SkillBonusMenuConfig.getStavesItem();
+        if (icon == null || icon.getType() != SkillBonusMenuConfig.getDefaultStavesMaterial()
+                || !Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")) return icon;
+        ItemStack staff = icon.clone();
+        try {
+            if (com.magmaguy.freeminecraftmodels.api.ModelItemAPI.applyDisplayModel(
+                    staff, AdvancedMagicWeaponItems.STAFF_FMM_ITEM_ID)) return staff;
+        } catch (LinkageError incompatibleFmm) {
+            // An older FMM without the display model API keeps the configured icon.
+        }
+        return icon;
     }
 
     /**
