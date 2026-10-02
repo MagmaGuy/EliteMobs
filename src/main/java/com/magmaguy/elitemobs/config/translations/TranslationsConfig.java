@@ -53,7 +53,9 @@ public class TranslationsConfig {
         return translated;
     }
 
-    private static final java.util.regex.Pattern PLACEHOLDER = java.util.regex.Pattern.compile("\\$[A-Za-z][A-Za-z0-9_]*");
+    // $prefix is replaced as a literal substring and its stock texts run straight into words ("$prefixYou are..."), so it
+    // is matched on its own first; otherwise "$prefixYou" and "$prefixDu" would read as two different placeholders.
+    private static final java.util.regex.Pattern PLACEHOLDER = java.util.regex.Pattern.compile("\\$prefix|\\$[A-Za-z][A-Za-z0-9_]*");
     private static final java.util.Set<String> reportedStalePlaceholders = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     /**
