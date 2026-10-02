@@ -62,25 +62,25 @@ public class SkillBonusMenu {
         inventory.setItem(SkillBonusMenuConfig.getArmorSlot(), SkillBonusMenuConfig.getArmorItem());
         inventory.setItem(SkillBonusMenuConfig.getMacesSlot(), SkillBonusMenuConfig.getMacesItem());
         inventory.setItem(SkillBonusMenuConfig.getSpearsSlot(), SkillBonusMenuConfig.getSpearsItem());
-        inventory.setItem(SkillBonusMenuConfig.getStavesSlot(), stavesIcon());
-        inventory.setItem(SkillBonusMenuConfig.getWandsSlot(), SkillBonusMenuConfig.getWandsItem());
+        inventory.setItem(SkillBonusMenuConfig.getStavesSlot(), magicWeaponIcon(SkillBonusMenuConfig.getStavesItem(),
+                SkillBonusMenuConfig.getDefaultStavesMaterial(), AdvancedMagicWeaponItems.STAFF_FMM_ITEM_ID));
+        inventory.setItem(SkillBonusMenuConfig.getWandsSlot(), magicWeaponIcon(SkillBonusMenuConfig.getWandsItem(),
+                SkillBonusMenuConfig.getDefaultWandsMaterial(), AdvancedMagicWeaponItems.WAND_FMM_ITEM_ID));
 
         player.openInventory(inventory);
         SkillBonusMenuEvents.weaponSelectMenus.add(inventory);
     }
 
     /**
-     * Shows FMM's bundled staff model on the default staves entry when FMM is installed. A configured
-     * replacement item, or a server without the model, keeps the configured icon.
+     * Shows FMM's bundled staff or wand model on the default menu entry when FMM is installed. A
+     * configured replacement item, or a server without the model, keeps the configured icon.
      */
-    private static ItemStack stavesIcon() {
-        ItemStack icon = SkillBonusMenuConfig.getStavesItem();
-        if (icon == null || icon.getType() != SkillBonusMenuConfig.getDefaultStavesMaterial()
+    private static ItemStack magicWeaponIcon(ItemStack icon, Material defaultMaterial, String fmmModel) {
+        if (icon == null || icon.getType() != defaultMaterial
                 || !Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")) return icon;
-        ItemStack staff = icon.clone();
+        ItemStack weapon = icon.clone();
         try {
-            if (com.magmaguy.freeminecraftmodels.api.ModelItemAPI.applyDisplayModel(
-                    staff, AdvancedMagicWeaponItems.STAFF_FMM_ITEM_ID)) return staff;
+            if (com.magmaguy.freeminecraftmodels.api.ModelItemAPI.applyDisplayModel(weapon, fmmModel)) return weapon;
         } catch (LinkageError incompatibleFmm) {
             // An older FMM without the display model API keeps the configured icon.
         }

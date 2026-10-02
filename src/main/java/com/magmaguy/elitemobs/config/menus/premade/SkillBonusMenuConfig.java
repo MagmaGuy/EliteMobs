@@ -72,6 +72,8 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
     private static ItemStack wandsItem;
     @Getter
     private static int wandsSlot;
+    @Getter
+    private static Material defaultWandsMaterial = Material.BLAZE_ROD;
 
     // Skill status items
     @Getter
@@ -229,7 +231,7 @@ public class SkillBonusMenuConfig extends MenusConfigFields {
         stavesSlot = ConfigurationEngine.setInt(fileConfiguration, "stavesSlot", 23);
 
         wandsItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "wandsItem",
-                ItemStackGenerator.generateItemStack(Material.BLAZE_ROD, "&6Wands", List.of("&7View wand progression", "&7Click to select")), true);
+                ItemStackGenerator.generateItemStack(defaultWandsMaterial, "&6Wands", List.of("&7View wand progression", "&7Click to select")), true);
         wandsSlot = ConfigurationEngine.setInt(fileConfiguration, "wandsSlot", 24);
 
         armorItem = ConfigurationEngine.setItemStack(file, fileConfiguration, "armorItem",
