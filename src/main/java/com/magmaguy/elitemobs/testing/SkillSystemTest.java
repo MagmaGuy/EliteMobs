@@ -170,6 +170,7 @@ public class SkillSystemTest implements Listener {
     private boolean packHunterOverrideActive;
     private final Set<BukkitTask> scheduledTasks = new HashSet<>();
     private BossBar progressBar;
+    private MagicSkillScenarios magicScenarios;
 
     static {
         try {
@@ -396,6 +397,17 @@ public class SkillSystemTest implements Listener {
 
         // Update overall progress bar
         updateOverallProgress();
+
+        // Staff and wand skills react to real casts, so they run behavior scenarios instead of the level sweep.
+        if (MagicSkillScenarios.covers(currentType)) {
+            magicScenarios = new MagicSkillScenarios(player, currentType, combatSimulator, report, testLog, () -> {
+                magicScenarios = null;
+                completedTypes++;
+                testNextType();
+            });
+            magicScenarios.start();
+            return;
+        }
 
         // Delay 2 ticks to let entity despawn propagate, then spawn next dummy
         schedule(() -> {
@@ -970,6 +982,11 @@ public class SkillSystemTest implements Listener {
             for (BukkitTask task : new ArrayList<>(scheduledTasks)) task.cancel();
             scheduledTasks.clear();
         });
+        complete &= cleanupSafely("magic scenarios", () -> {
+            if (magicScenarios != null) magicScenarios.close();
+            magicScenarios = null;
+            com.magmaguy.elitemobs.skills.bonuses.ProcRoll.clear(playerUUID);
+        });
         complete &= cleanupSafely("progress bar", () -> {
             if (progressBar != null) {
                 BossBarOrderManager.hide(player, progressBar);
@@ -1042,7 +1059,8 @@ public class SkillSystemTest implements Listener {
 
     @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInteract(org.bukkit.event.player.PlayerInteractEvent event) {
-        if (event.getPlayer().getUniqueId().equals(playerUUID)) event.setCancelled(true);
+        if (event.getPlayer().getUniqueId().equals(playerUUID) && !MagicSkillScenarios.isFiringCast())
+            event.setCancelled(true);
     }
 
     @EventHandler(priority = org.bukkit.event.EventPriority.LOWEST, ignoreCancelled = true)

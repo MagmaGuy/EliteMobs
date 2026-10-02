@@ -17,8 +17,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * Spellweave (STACKING) - Consecutive missiles on the same target weave stronger spells.
  * Tier 2 unlock.
  * <p>
- * Switching targets or 3 seconds without a hit unravels the weave. Power budget: ~50% uptime on
- * the ramp, so full stacks are worth +40% at level 50 (E = 0.50 * 0.40 = 0.20), the same band as
+ * Switching targets or 3 seconds without a hit unravels the weave. A cast moves the weave only when
+ * none of its missiles reaches the woven target, so Multicast missiles that also strike a nearby
+ * enemy do not break the weave on the one being focused. Missiles land in any order, so a cast that
+ * has only hit other targets so far waits for the next cast to settle it. Power budget: ~50% uptime
+ * on the ramp, so full stacks are worth +40% at level 50 (E = 0.50 * 0.40 = 0.20), the same band as
  * Ranger's Focus.
  */
 public class SpellweaveSkill extends MagicWeaponSkill implements StackingSkill {
@@ -33,6 +36,19 @@ public class SpellweaveSkill extends MagicWeaponSkill implements StackingSkill {
         private UUID target;
         private int stacks;
         private long lastHit;
+        // The latest cast that reached the woven target.
+        private UUID wovenCast;
+        // A newer cast that has so far only hit another target, and that target.
+        private UUID strayCast;
+        private UUID strayTarget;
+
+        private void weaveOnto(UUID newTarget) {
+            target = newTarget;
+            stacks = 0;
+            wovenCast = null;
+            strayCast = null;
+            strayTarget = null;
+        }
     }
 
     public SpellweaveSkill() {
@@ -46,11 +62,20 @@ public class SpellweaveSkill extends MagicWeaponSkill implements StackingSkill {
             return false;
         Weave weave = weaves.computeIfAbsent(event.getPlayer().getUniqueId(), id -> new Weave());
         UUID target = event.getEliteMobEntity().getLivingEntity().getUniqueId();
-        if (!target.equals(weave.target)) {
-            weave.target = target;
-            weave.stacks = 0;
+        UUID cast = event.getMagicHit().attackId();
+        // A newer cast has arrived, so the stray one never reached the woven target.
+        if (weave.strayCast != null && !weave.strayCast.equals(cast)) weave.weaveOnto(weave.strayTarget);
+        if (weave.target == null) weave.weaveOnto(target);
+        if (target.equals(weave.target)) {
+            weave.wovenCast = cast;
+            if (cast.equals(weave.strayCast)) weave.strayCast = null;
+            return true;
         }
-        return true;
+        if (!cast.equals(weave.wovenCast) && weave.strayCast == null) {
+            weave.strayCast = cast;
+            weave.strayTarget = target;
+        }
+        return false;
     }
 
     @Override

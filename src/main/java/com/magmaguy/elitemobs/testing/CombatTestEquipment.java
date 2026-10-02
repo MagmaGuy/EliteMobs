@@ -119,6 +119,11 @@ final class CombatTestEquipment {
         return itemStack;
     }
 
+    void hold(ItemStack item) {
+        inventory.setHeldItemSlot(heldSlot);
+        write(heldSlot, item);
+    }
+
     void equipArmorSet(int level) {
         write(39, createEliteArmor(Material.IRON_HELMET, level));
         write(38, createEliteArmor(Material.IRON_CHESTPLATE, level));

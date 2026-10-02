@@ -21,6 +21,7 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.elitemobs.skills.bonuses.PlayerSkillSelection;
+import com.magmaguy.elitemobs.skills.bonuses.ProcRoll;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.interfaces.ConditionalSkill;
@@ -69,7 +70,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Event fired when an elite mob takes damage from a player.
@@ -560,7 +560,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             case PROC -> {
                 if (skill instanceof ProcSkill procSkill && procSkill.canProc(player, this)) {
                     double procChance = procSkill.getProcChance(skillLevel);
-                    if (ThreadLocalRandom.current().nextDouble() < procChance
+                    if (ProcRoll.rolls(player, skill.getSkillId(), procChance)
                             && com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcCooldownTracker
                                     .tryConsume(player, skill.getSkillId(), procSkill.getInternalCooldownMillis())) {
                         procSkill.onProc(player, this);
@@ -697,7 +697,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             case PROC -> {
                 if (skill instanceof ProcSkill procSkill && procSkill.canProc(player, this)) {
                     double procChance = procSkill.getProcChance(skillLevel);
-                    if (ThreadLocalRandom.current().nextDouble() < procChance
+                    if (ProcRoll.rolls(player, skill.getSkillId(), procChance)
                             && com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcCooldownTracker
                                     .tryConsume(player, skill.getSkillId(), procSkill.getInternalCooldownMillis())) {
                         procSkill.onProc(player, this);

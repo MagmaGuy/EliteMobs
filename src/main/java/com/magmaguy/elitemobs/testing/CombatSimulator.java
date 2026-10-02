@@ -98,11 +98,11 @@ public class CombatSimulator {
     private static DamageOperation damageOperation;
     private static final class DamageOperation {
         private final Player player;
-        private final LivingEntity attacker;
+        private final Entity attacker;
         private final double damage;
         private final boolean blocking;
         private org.bukkit.event.entity.EntityDamageByEntityEvent event;
-        private DamageOperation(Player player, LivingEntity attacker, double damage, boolean blocking) {
+        private DamageOperation(Player player, Entity attacker, double damage, boolean blocking) {
             this.player = player; this.attacker = attacker; this.damage = damage; this.blocking = blocking;
         }
     }
@@ -761,7 +761,11 @@ public class CombatSimulator {
     public double simulateIncomingDamageWithOverride(String skillId, double amount) {
         LivingEntity attacker = getDummyEntity(skillId);
         if (attacker == null) return 0;
+        return takeHitWithOverride(attacker, amount);
+    }
 
+    /** Lands one melee hit of exactly {@code amount} from {@code attacker} and returns the damage taken. */
+    double takeHitWithOverride(LivingEntity attacker, double amount) {
         NMSManager.getAdapter().setDamageCooldownTicks(player, 0);
         player.setHealth(player.getMaxHealth());
         player.setAbsorptionAmount(1000.0);
@@ -866,16 +870,25 @@ public class CombatSimulator {
             Logger.warn("[SkillTest] simulateFatalIncomingDamage: getDummyEntity returned null for " + skillId);
             return 0;
         }
+        return Math.max(0, FATAL_HIT_STARTING_HEALTH - takeFatalHit(attacker));
+    }
 
+    private static final double FATAL_HIT_STARTING_HEALTH = 5.0;
+
+    /**
+     * Lands a hit worth twice the player's maximum health from {@code attacker} and returns the
+     * player's health right after it. Absorption catches the hit when nothing prevents the death,
+     * so an unsaved player stays at the starting health instead of dying.
+     */
+    double takeFatalHit(LivingEntity attacker) {
         NMSManager.getAdapter().setDamageCooldownTicks(player, 0);
-        player.setHealth(5.0);
+        player.setHealth(FATAL_HIT_STARTING_HEALTH);
         // Absorption catches the hit if all prevention skills fail. EliteMobs determines whether
         // the hit is fatal from health and event damage, so this still exercises the actual
         // prevention pipeline without firing real death/drop/respawn side effects.
         double fatalDamage = player.getMaxHealth() * 2;
         player.setAbsorptionAmount(fatalDamage + 1);
 
-        double healthBefore = player.getHealth();
         testDamageOverride = fatalDamage;
         try {
             damagePlayer(fatalDamage, attacker);
@@ -887,7 +900,45 @@ public class CombatSimulator {
         player.setHealth(player.getMaxHealth());
         player.setAbsorptionAmount(0);
 
-        return Math.max(0, healthBefore - healthAfter);
+        return healthAfter;
+    }
+
+    /**
+     * Lands one arrow hit of exactly {@code amount} shot by {@code shooter} and returns the damage
+     * taken. The hit is delivered straight to the player with the arrow as its direct source, so
+     * it reaches EliteMobs as the elite's projectile without depending on the arrow's flight.
+     */
+    double takeProjectileHitWithOverride(LivingEntity shooter, double amount) {
+        Arrow arrow = shooter.getWorld().spawn(shooter.getEyeLocation(), Arrow.class, spawned -> {
+            spawned.setShooter(shooter);
+            spawned.setGravity(false);
+            spawned.setVelocity(new org.bukkit.util.Vector());
+        });
+        try {
+            NMSManager.getAdapter().setDamageCooldownTicks(player, 0);
+            player.setHealth(player.getMaxHealth());
+            player.setAbsorptionAmount(1000.0);
+            double totalBefore = player.getHealth() + player.getAbsorptionAmount();
+            DamageOperation previous = damageOperation;
+            damageOperation = new DamageOperation(player, arrow, amount, false);
+            try {
+                player.damage(amount, org.bukkit.damage.DamageSource.builder(org.bukkit.damage.DamageType.ARROW)
+                        .withDirectEntity(arrow).withCausingEntity(shooter).build());
+            } finally {
+                damageOperation = previous;
+            }
+            double taken = totalBefore - (player.getHealth() + player.getAbsorptionAmount());
+            player.setHealth(player.getMaxHealth());
+            player.setAbsorptionAmount(0);
+            return Math.max(0, taken);
+        } finally {
+            arrow.remove();
+        }
+    }
+
+    /** Puts a diagnostic-owned item in the player's hand. */
+    void holdTestItem(org.bukkit.inventory.ItemStack item) {
+        equipment.hold(item);
     }
 
     // ===== DAMAGE BREAKDOWN TESTING =====
