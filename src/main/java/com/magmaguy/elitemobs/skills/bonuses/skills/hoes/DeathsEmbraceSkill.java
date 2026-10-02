@@ -16,14 +16,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Death's Embrace (COOLDOWN) - Cheat death once per cooldown.
- * When you would take fatal damage, instead heal to 20% health and gain brief invulnerability.
+ * A fatal hit from an elite while holding a hoe is cancelled and leaves you at 10% health.
  * Tier 4 unlock.
+ * <p>
+ * Balance is hardcoded; the config only supplies presentation. The old config curve saved the
+ * player every 30-38 seconds at 20% health and added +250% hoe damage at level 75 (a baseValue of
+ * 1.0 read as a bonus fraction). Saves now sit beside Last Stand (1 HP, 120s) and Divine Shield
+ * (120s, 60s floor): 10% health, 90s at unlock and 80s at level 100.
  */
 public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
 
     public static final String SKILL_ID = "hoes_deaths_embrace";
-    private static final long BASE_COOLDOWN = 60; // 60 seconds
-    private static final double HEAL_PERCENT = 0.20; // Heal to 20% HP
+    private static final long BASE_COOLDOWN = 120; // 120 seconds, minus 0.4s per level
+    private static final long MINIMUM_COOLDOWN = 60;
+    private static final double HEAL_PERCENT = 0.10; // Heal to 10% HP
     private static final double BASE_PASSIVE_BONUS = 0.05; // 5% passive damage
 
     private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
@@ -31,17 +37,14 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
 
     public DeathsEmbraceSkill() {
         super(SkillType.HOES, 75, "Death's Embrace",
-              "Cheat death once per minute, reviving with health.",
+              "Cheat death once per cooldown, reviving with 10% health.",
               SkillBonusType.COOLDOWN, 4, SKILL_ID);
     }
 
     @Override
     public long getCooldownSeconds(int skillLevel) {
-        if (configFields != null && configFields.getCooldownSeconds() > 0)
-            return Math.max(1L, Math.round(configFields.calculateCooldown(skillLevel)));
-        // Base cooldown - 0.4s per level
         long reduction = (long) (skillLevel * 0.4);
-        return Math.max(30, BASE_COOLDOWN - reduction);
+        return Math.max(MINIMUM_COOLDOWN, BASE_COOLDOWN - reduction);
     }
 
     @Override
@@ -115,8 +118,7 @@ public class DeathsEmbraceSkill extends SkillBonus implements CooldownSkill {
     }
 
     public double getPassiveDamageBonus(int skillLevel) {
-        if (configFields != null) return configFields.calculateValue(skillLevel);
-        return scaled(BASE_PASSIVE_BONUS, 0.001, skillLevel);
+        return scaled(BASE_PASSIVE_BONUS, 0.001, skillLevel); // +12.5% at unlock, +15% at level 100
     }
 
     @Override

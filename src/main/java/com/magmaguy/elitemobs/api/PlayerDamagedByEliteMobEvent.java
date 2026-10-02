@@ -24,8 +24,12 @@ import com.magmaguy.elitemobs.skills.bonuses.skills.armor.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.hoes.DeathsEmbraceSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.maces.DivineShieldSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.spears.PhalanxSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.staves.BattlemagesGuardSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.staves.PhoenixMantleSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.swords.ParrySkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.swords.RiposteSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.wands.ArcaneWardSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.wands.SpellMirrorSkill;
 import com.magmaguy.elitemobs.testing.CombatSimulator;
 import com.magmaguy.elitemobs.utils.DebugMessage;
 import com.magmaguy.elitemobs.utils.EventCaller;
@@ -331,6 +335,16 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             setSkillModifiedDamage(phalanxDamage);
         }
 
+        // Staff and wand defensive skills
+        if (SpellMirrorSkill.tryMirror(player, this, getDamage())) {
+            setCancelled(true);
+            return true;
+        }
+        double guardedDamage = BattlemagesGuardSkill.applyGuard(player, this, getDamage());
+        if (guardedDamage != getDamage()) setSkillModifiedDamage(guardedDamage);
+        double wardedDamage = ArcaneWardSkill.applyWard(player, this, getDamage());
+        if (wardedDamage != getDamage()) setSkillModifiedDamage(wardedDamage);
+
         // Check death prevention skills from weapon types
         if (player.getHealth() - getDamage() <= 0) {
             if (DeathsEmbraceSkill.preventDeath(player)) {
@@ -338,6 +352,10 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                 return true;
             }
             if (DivineShieldSkill.preventDeath(player, getDamage())) {
+                setCancelled(true);
+                return true;
+            }
+            if (PhoenixMantleSkill.preventDeath(player)) {
                 setCancelled(true);
                 return true;
             }

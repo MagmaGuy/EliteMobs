@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.combatsystem;
 
+import com.magmaguy.elitemobs.skills.MagicStrike;
 import com.magmaguy.elitemobs.skills.SkillType;
 
 import java.util.ArrayDeque;
@@ -54,10 +55,28 @@ public final class CombatDamageContext {
      * synchronous damage listener has finished. Delayed missiles must snapshot this at launch.
      */
     public static void runPlayerToEliteBypass(PlayerDamageSource source, Runnable damageCall) {
+        runPlayerToEliteBypass(source, new DamageOverride(true, 1.0), damageCall);
+    }
+
+    /**
+     * Delivers the primary hit of a staff or wand attack. It keeps the custom-damage pipeline, and
+     * the one-shot override marks only this hit as eligible for weapon skills. Damage that skills
+     * deal from inside it does not inherit the mark, so it cannot trigger skills again.
+     */
+    public static void runMagicWeaponHit(PlayerDamageSource source, MagicStrike strike, Runnable damageCall) {
+        if (source == null || source.progressionSkill() == null || strike == null) {
+            runPlayerToEliteBypass(source, damageCall);
+            return;
+        }
+        runPlayerToEliteBypass(source, new DamageOverride(true, 1.0,
+                new MagicHit(source.attackId(), strike, source.progressionSkill())), damageCall);
+    }
+
+    private static void runPlayerToEliteBypass(PlayerDamageSource source, DamageOverride override, Runnable damageCall) {
         Integer previousDepth = ACTIVE_PLAYER_TO_ELITE_BYPASS.get();
         ACTIVE_PLAYER_TO_ELITE_BYPASS.set(previousDepth == null ? 1 : previousDepth + 1);
         if (source != null) stackForPush(ACTIVE_PLAYER_TO_ELITE_SOURCES).addLast(source);
-        try (Scope ignored = bypassPlayerToElite()) {
+        try (Scope ignored = push(PLAYER_TO_ELITE, override)) {
             damageCall.run();
         } finally {
             if (source != null) {
@@ -204,7 +223,18 @@ public final class CombatDamageContext {
         }
     }
 
-    public record DamageOverride(boolean bypass, double specialMultiplier) {
+    public record DamageOverride(boolean bypass, double specialMultiplier, MagicHit magicHit) {
+        public DamageOverride(boolean bypass, double specialMultiplier) {
+            this(bypass, specialMultiplier, null);
+        }
+    }
+
+    /** The primary hit of one staff or wand attack. Every target hit by the same attack shares its ID. */
+    public record MagicHit(UUID attackId, MagicStrike strike, SkillType skill) {
+        public MagicHit {
+            if (attackId == null || strike == null || skill == null)
+                throw new IllegalArgumentException("A magic hit needs its attack, strike and skill");
+        }
     }
 
     public enum ClassAbilityTargetShape {

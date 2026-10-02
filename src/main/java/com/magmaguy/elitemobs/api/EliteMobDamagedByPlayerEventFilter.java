@@ -659,7 +659,8 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEliteMobAttacked(EntityDamageByEntityEvent event) {
-        boolean bypass = CombatDamageContext.consumePlayerToElite().bypass();
+        CombatDamageContext.DamageOverride damageOverride = CombatDamageContext.consumePlayerToElite();
+        boolean bypass = damageOverride.bypass();
         if (bypass || CombatDamageContext.isPlayerToEliteBypassActive())
             com.magmaguy.magmacore.enchantments.EnchantmentInputs.markExplicitDamage(MetadataHandler.PLUGIN, event);
 
@@ -861,6 +862,8 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
         }
 
         EliteMobDamagedByPlayerEvent eliteMobDamagedByPlayerEvent = new EliteMobDamagedByPlayerEvent(eliteEntity, player, event, damage, criticalHit, bypass, damageModifier);
+        // A staff or wand's primary hit stays custom damage but still runs its weapon skills.
+        eliteMobDamagedByPlayerEvent.setMagicHit(damageOverride.magicHit());
 
         // For ranged attacks, propagate launch-time weapon data so applySkillBonuses()
         // uses the correct skill type and level (not the player's current mainhand).

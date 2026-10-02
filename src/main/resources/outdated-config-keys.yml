@@ -17,6 +17,12 @@ customquests:
     key: customObjectives.Objective13.filename
     value: scroll_applier_config.yml
 
+# Death's Embrace described its old 20% heal and 60s cooldown before its rebalance.
+skillbonuses:
+  - files: [hoes_deaths_embrace.yml]
+    key: description
+    value: ['&7Cheat death once and', '&7revive with 20% health. 60s CD.']
+
 # Weapon menus from before Dali's menu art keep slots outside its frames. The
 # current layout moves wands from 25 to 24, so only unedited menus match.
 menus:

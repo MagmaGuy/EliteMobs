@@ -127,8 +127,9 @@ public class SkillBonusEventHandler implements Listener {
         if (!SkillsConfig.isSkillSystemEnabled()) return;
         if (SkillsConfig.isWorldExcludedFromSkills(event.getPlayer())) return;
         // Skip skill processing for bypass/custom damage events (DOT ticks, AOE secondary hits, etc.)
-        // These are intentionally flagged to prevent recursive skill activation
-        if (event.isCustomDamage()) return;
+        // These are intentionally flagged to prevent recursive skill activation. A staff or wand's
+        // primary hit is custom damage too, but it is the weapon's real attack and runs its skills.
+        if (event.isCustomDamage() && event.getMagicHit() == null) return;
         event.applySkillBonuses();
     }
 

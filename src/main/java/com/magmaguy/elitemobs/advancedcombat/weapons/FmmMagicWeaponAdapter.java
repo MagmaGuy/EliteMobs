@@ -8,7 +8,9 @@ import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatEnemyAuthorization;
 import com.magmaguy.elitemobs.advancedcombat.damage.AdvancedDamageScaling;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.skills.MagicStrike;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.freeminecraftmodels.api.magic.MagicAttackKind;
 import com.magmaguy.freeminecraftmodels.api.magic.MagicAttackRequest;
 import com.magmaguy.freeminecraftmodels.api.magic.MagicAttackResolver;
 import com.magmaguy.freeminecraftmodels.api.magic.MagicDamageApplication;
@@ -155,10 +157,21 @@ final class FmmMagicWeaponAdapter
             SkillType progressionSkill,
             double damage,
             MagicDamageApplication application) {
-        CombatDamageContext.runPlayerToEliteBypass(
+        CombatDamageContext.runMagicWeaponHit(
                 new CombatDamageContext.PlayerDamageSource(request.attackId(), progressionSkill,
                         fact(request, "critical") == 1D, fact(request, "loud_strikes")),
+                strike(request.attackKind()),
                 () -> application.apply(damage));
+    }
+
+    /** Attack kinds this build does not know still deal damage, without weapon skills. */
+    private static MagicStrike strike(MagicAttackKind attackKind) {
+        return switch (attackKind) {
+            case STAFF_FIREBALL -> MagicStrike.STAFF_FIREBALL;
+            case STAFF_MELEE -> MagicStrike.STAFF_MELEE;
+            case WAND_MISSILE -> MagicStrike.WAND_MISSILE;
+            default -> null;
+        };
     }
 
     private static double fact(MagicAttackRequest request, String key) {

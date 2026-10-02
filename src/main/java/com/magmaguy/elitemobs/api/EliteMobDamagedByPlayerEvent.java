@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.skills.MagicStrike;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
@@ -39,6 +40,8 @@ import com.magmaguy.elitemobs.skills.bonuses.skills.maces.StunningForceSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.swords.ExposeWeaknessSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.swords.RiposteSkill;
 import com.magmaguy.elitemobs.skills.bonuses.skills.tridents.PoseidonsFavorSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.wands.HexBrandSkill;
+import com.magmaguy.elitemobs.skills.bonuses.skills.wands.UnravelSkill;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardCompatibility;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.utils.DebugMessage;
@@ -229,12 +232,15 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
 
     private static final HandlerList handlers = new HandlerList();
     // Cross-skill target debuff bonuses, processed in the same fixed order the previous
-    // hand-rolled blocks ran in: HuntersMark, DeathMark, Judgment, ExposeWeakness.
+    // hand-rolled blocks ran in: HuntersMark, DeathMark, Judgment, ExposeWeakness; then the
+    // wand debuffs, HexBrand and Unravel.
     private static final List<String> TARGET_DEBUFF_SKILL_IDS = List.of(
             HuntersMarkSkill.SKILL_ID,
             DeathMarkSkill.SKILL_ID,
             JudgmentSkill.SKILL_ID,
-            ExposeWeaknessSkill.SKILL_ID);
+            ExposeWeaknessSkill.SKILL_ID,
+            HexBrandSkill.SKILL_ID,
+            UnravelSkill.SKILL_ID);
     private final ClassAbilityDamageAttribution classAbilityDamageAttribution =
             new ClassAbilityDamageAttribution();
     @Getter
@@ -273,6 +279,19 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
     @Getter
     @Setter
     private int rangedSkillLevel = 0;
+
+    /**
+     * The staff or wand attack this event is the primary hit of, or null for every other hit.
+     * Magic hits are custom damage, but unlike skill side effects they still run weapon skills.
+     */
+    @Getter
+    @Setter
+    private CombatDamageContext.MagicHit magicHit = null;
+
+    /** The staff or wand attack shape of this hit, or null when it is not a primary magic hit. */
+    public MagicStrike getMagicStrike() {
+        return magicHit == null ? null : magicHit.strike();
+    }
 
     /**
      * Event fired when an elite is damaged by a player.
@@ -422,7 +441,11 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
         // For melee, read from current mainhand.
         SkillType weaponSkillType;
         int skillLevel;
-        if (rangedAttack) {
+        if (magicHit != null) {
+            // The attack was captured at cast time; the player may hold something else on impact.
+            weaponSkillType = magicHit.skill();
+            skillLevel = SkillBonusRegistry.getPlayerSkillLevel(player, weaponSkillType);
+        } else if (rangedAttack) {
             // Ranged identity is captured from the firing item. Missing or invalid launch
             // metadata must not turn a delayed projectile into whatever the player happens to
             // hold when it lands.
@@ -535,7 +558,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
     private void processSideEffectSkill(SkillBonus skill, int skillLevel) {
         switch (skill.getBonusType()) {
             case PROC -> {
-                if (skill instanceof ProcSkill procSkill) {
+                if (skill instanceof ProcSkill procSkill && procSkill.canProc(player, this)) {
                     double procChance = procSkill.getProcChance(skillLevel);
                     if (ThreadLocalRandom.current().nextDouble() < procChance
                             && com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcCooldownTracker
@@ -672,7 +695,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
                 yield 1.0;
             }
             case PROC -> {
-                if (skill instanceof ProcSkill procSkill) {
+                if (skill instanceof ProcSkill procSkill && procSkill.canProc(player, this)) {
                     double procChance = procSkill.getProcChance(skillLevel);
                     if (ThreadLocalRandom.current().nextDouble() < procChance
                             && com.magmaguy.elitemobs.skills.bonuses.interfaces.ProcCooldownTracker
@@ -688,6 +711,7 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
             case COOLDOWN -> {
                 if (skill instanceof CooldownSkill cooldownSkill) {
                     if (!cooldownSkill.triggersOnOffensiveHit()) yield 1.0;
+                    if (cooldownSkill.sharesActivation(player, this)) yield 1.0 + skill.getBonusValue(skillLevel);
                     if (!cooldownSkill.isOnCooldown(player)) {
                         // Ask the skill whether it actually fired. Skills with their own gating
                         // condition report false, in which case neither the cooldown nor the

@@ -10,8 +10,10 @@ import com.magmaguy.elitemobs.skills.bonuses.skills.crossbows.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.hoes.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.maces.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.spears.*;
+import com.magmaguy.elitemobs.skills.bonuses.skills.staves.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.swords.*;
 import com.magmaguy.elitemobs.skills.bonuses.skills.tridents.*;
+import com.magmaguy.elitemobs.skills.bonuses.skills.wands.*;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -59,6 +61,10 @@ public class SkillBonusInitializer {
 
         // Register SPEARS skills
         registerSpearsSkills();
+
+        // Register STAVES and WANDS skills
+        registerStavesSkills();
+        registerWandsSkills();
 
         Logger.info("Registered " + SkillBonusRegistry.getAllBonuses().size() + " skill bonuses.");
     }
@@ -262,6 +268,52 @@ public class SkillBonusInitializer {
         // Tier 4 (Level 75)
         registerSkill(new PolearmMasterySkill(), new SpearsPolearmMasteryConfig());
         registerSkill(new ImpalerSkill(), new SpearsImpalerConfig());
+    }
+
+    /**
+     * Registers all STAVES skill bonuses.
+     */
+    private static void registerStavesSkills() {
+        // Tier 1 (Level 10)
+        registerSkill(new SmolderSkill(), new StavesSmolderConfig());
+        registerSkill(new ConcussiveBlastSkill(), new StavesConcussiveBlastConfig());
+        registerSkill(new BattlemagesGuardSkill(), new StavesBattlemagesGuardConfig());
+
+        // Tier 2 (Level 25)
+        registerSkill(new StokeTheFlamesSkill(), new StavesStokeTheFlamesConfig());
+        registerSkill(new WildfireSkill(), new StavesWildfireConfig());
+        registerSkill(new RepelSkill(), new StavesRepelConfig());
+
+        // Tier 3 (Level 50)
+        registerSkill(new ScorchedEarthSkill(), new StavesScorchedEarthConfig());
+        registerSkill(new ImmolateSkill(), new StavesImmolateConfig());
+
+        // Tier 4 (Level 75)
+        registerSkill(new SunfallSkill(), new StavesSunfallConfig());
+        registerSkill(new PhoenixMantleSkill(), new StavesPhoenixMantleConfig());
+    }
+
+    /**
+     * Registers all WANDS skill bonuses.
+     */
+    private static void registerWandsSkills() {
+        // Tier 1 (Level 10)
+        registerSkill(new HexBrandSkill(), new WandsHexBrandConfig());
+        registerSkill(new ChillingBoltSkill(), new WandsChillingBoltConfig());
+        registerSkill(new ArcaneWardSkill(), new WandsArcaneWardConfig());
+
+        // Tier 2 (Level 25)
+        registerSkill(new SpellweaveSkill(), new WandsSpellweaveConfig());
+        registerSkill(new ArcingBoltSkill(), new WandsArcingBoltConfig());
+        registerSkill(new DuelistsFocusSkill(), new WandsDuelistsFocusConfig());
+
+        // Tier 3 (Level 50)
+        registerSkill(new UnravelSkill(), new WandsUnravelConfig());
+        registerSkill(new EchoBoltSkill(), new WandsEchoBoltConfig());
+
+        // Tier 4 (Level 75)
+        registerSkill(new StarfallVolleySkill(), new WandsStarfallVolleyConfig());
+        registerSkill(new SpellMirrorSkill(), new WandsSpellMirrorConfig());
     }
 
     /**

@@ -89,4 +89,12 @@ public interface CooldownSkill {
     default boolean triggersOnOffensiveHit() {
         return true;
     }
+
+    /**
+     * Whether this hit belongs to an activation that already fired, such as another target of the
+     * same fireball. It receives the activation's damage bonus without starting a new cooldown.
+     */
+    default boolean sharesActivation(Player player, Object event) {
+        return false;
+    }
 }

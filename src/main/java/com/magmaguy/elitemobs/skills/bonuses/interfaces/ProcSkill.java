@@ -40,4 +40,12 @@ public interface ProcSkill {
     default long getInternalCooldownMillis() {
         return 0L;
     }
+
+    /**
+     * Whether this hit can roll the proc at all. Checked before the roll, so a skill limited to one
+     * kind of attack (a staff's fireball, a wand's missile) neither procs nor reports on other hits.
+     */
+    default boolean canProc(Player player, Object context) {
+        return true;
+    }
 }
