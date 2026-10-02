@@ -104,7 +104,8 @@ public final class CombatHud {
                 int left = 4 + index * 61;
                 // Replace only this card's surface, before drawing its icon and live cost.
                 if (!state.affordable()) overlay(line, left, String.valueOf((char) (0xE680 + index)), 61);
-                String glyph = CombatHudAbilityIcons.glyph(slots.get(index));
+                // Resource cost is the only cast gate, so unaffordable is the disabled state.
+                String glyph = CombatHudAbilityIcons.glyph(slots.get(index), state.affordable());
                 // The 13px icon fills the slot inside the card's orange frame.
                 if (!glyph.isEmpty()) overlay(line, left + 6, glyph, 14);
                 String digits = Long.toString((long) Math.ceil(state.cost()));

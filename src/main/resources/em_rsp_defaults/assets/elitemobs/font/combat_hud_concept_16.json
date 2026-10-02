@@ -245,6 +245,33 @@
     },
     {
       "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/paladin.mobility_disabled.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/paladin.signature_disabled.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elitemobs:gui/combat_hud_probe/abilities/paladin.utility_disabled.png",
+      "height": 13,
+      "ascent": -47,
+      "chars": [
+        ""
+      ]
+    },
+    {
+      "type": "bitmap",
       "file": "elitemobs:gui/combat_hud_probe/class_diamond.png",
       "height": 42,
       "ascent": 1,

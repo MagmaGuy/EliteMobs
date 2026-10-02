@@ -14,8 +14,10 @@ final class CombatHudAbilityIcons {
 
     private CombatHudAbilityIcons() { }
 
-    static String glyph(AbilitySlot slot) {
-        Character glyph = GLYPHS.get(slot.name());
+    /** The slot's icon, or its disabled variant when the ability cannot be cast; falls back to the normal icon. */
+    static String glyph(AbilitySlot slot, boolean usable) {
+        Character glyph = usable ? null : GLYPHS.get(slot.name() + "_DISABLED");
+        if (glyph == null) glyph = GLYPHS.get(slot.name());
         return glyph == null ? "" : glyph.toString();
     }
 
