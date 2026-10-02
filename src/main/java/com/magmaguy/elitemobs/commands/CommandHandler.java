@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.advancedcombat.menu.ClassSelectionMenu;
 import com.magmaguy.magmacore.command.CommandManager;
 import com.magmaguy.magmacore.nightbreak.NightbreakDownloadContentCommand;
 import com.magmaguy.magmacore.nightbreak.NightbreakDownloadEverythingCommand;
+import com.magmaguy.magmacore.nightbreak.NightbreakApplyPluginUpdateCommand;
 import com.magmaguy.magmacore.nightbreak.NightbreakDownloadPluginUpdateCommand;
 import com.magmaguy.magmacore.nightbreak.NightbreakForceReinstallContentCommand;
 import com.magmaguy.magmacore.nightbreak.NightbreakRecommendedPluginsCommand;
@@ -100,6 +101,7 @@ public class CommandHandler {
             emCommand.registerCommand(new PatrolCommand(patrolAction));
         emCommand.registerCommand(new NightbreakRecommendedPluginsCommand(MetadataHandler.PLUGIN, EliteMobs.NIGHTBREAK_PLUGIN_SPEC));
         emCommand.registerCommand(new NightbreakDownloadPluginUpdateCommand(MetadataHandler.PLUGIN, EliteMobs.NIGHTBREAK_PLUGIN_SPEC));
+        emCommand.registerCommand(new NightbreakApplyPluginUpdateCommand(MetadataHandler.PLUGIN, EliteMobs.NIGHTBREAK_PLUGIN_SPEC));
         emCommand.registerCommand(new NightbreakDownloadEverythingCommand<>(MetadataHandler.PLUGIN,
                 EliteMobs.NIGHTBREAK_PLUGIN_SPEC,
                 CommandHandler::nightbreakBulkPackages,

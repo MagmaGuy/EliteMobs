@@ -631,6 +631,12 @@ public class EliteMobs extends JavaPlugin {
     public void onDisable() {
         com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.close();
         MetadataHandler.shutdownRequested = true;
+        // bStats runs its own scheduler thread; without this every reload leaves one
+        // reporting for, and holding on to, the previous instance.
+        if (metrics != null) {
+            metrics.shutdown();
+            metrics = null;
+        }
         if (enchantmentAnvil != null) { enchantmentAnvil.close(); enchantmentAnvil = null; }
         CustomItem.shutdownCacheRegeneration();
         com.magmaguy.elitemobs.commands.LanguageCommand.shutdown();
