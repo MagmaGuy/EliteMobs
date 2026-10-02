@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.spears;
 
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusRegistry;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
@@ -89,9 +90,10 @@ public class PhalanxSkill extends SkillBonus {
     public static double applyFrontalReduction(Player player, Object event, double currentDamage) {
         if (!activePlayers.contains(player.getUniqueId())) return currentDamage;
 
-        // Check if player is holding a spear
-        String mainHandName = player.getInventory().getItemInMainHand().getType().name();
-        if (!mainHandName.endsWith("_SPEAR")) return currentDamage;
+        // Check if player is holding a spear. Staves share the spear item, so resolve the weapon
+        // instead of reading its material.
+        if (WeaponIdentityResolver.progressionSkill(player.getInventory().getItemInMainHand()) != SkillType.SPEARS)
+            return currentDamage;
 
         SkillBonus skill = SkillBonusRegistry.getSkillById(SKILL_ID);
         if (!(skill instanceof PhalanxSkill phalanx)) return currentDamage;

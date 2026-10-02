@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.skills.bonuses.skills.spears;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.skills.SkillType;
+import com.magmaguy.elitemobs.skills.WeaponIdentityResolver;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonus;
 import com.magmaguy.elitemobs.skills.bonuses.SkillBonusType;
 import org.bukkit.NamespacedKey;
@@ -102,8 +103,9 @@ public class PolearmMasterySkill extends SkillBonus {
     @Override
     public void applyBonus(Player player, int skillLevel) {
         activePlayers.add(player.getUniqueId());
-        // Apply attack speed bonus if player is already holding a spear
-        if (player.getInventory().getItemInMainHand().getType().name().endsWith("_SPEAR")) {
+        // Apply attack speed bonus if player is already holding a spear. Staves share the spear
+        // item, so resolve the weapon instead of reading its material.
+        if (WeaponIdentityResolver.progressionSkill(player.getInventory().getItemInMainHand()) == SkillType.SPEARS) {
             applyAttackSpeedBonus(player, skillLevel);
         }
     }
