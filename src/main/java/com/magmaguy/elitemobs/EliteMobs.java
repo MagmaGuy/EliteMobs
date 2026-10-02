@@ -403,6 +403,25 @@ public class EliteMobs extends JavaPlugin {
         }
     }
 
+    /**
+     * FMM keeps the dungeon predicate registered on enable, and with it this instance, until it is
+     * removed. EliteMobs compiles against an FMM API without the removal method, so it is looked up
+     * reflectively and skipped on jars that lack it.
+     */
+    private static void unregisterModelsDungeonLocator() {
+        org.bukkit.plugin.Plugin models = Bukkit.getPluginManager().getPlugin(MODELS_PLUGIN);
+        if (models == null || !models.isEnabled()) return;
+        try {
+            Class.forName("com.magmaguy.freeminecraftmodels.api.LocationAPI", false, models.getClass().getClassLoader())
+                    .getMethod("unregisterDungeonLocator", String.class)
+                    .invoke(null, "EliteMobs");
+        } catch (ClassNotFoundException | NoSuchMethodException ignored) {
+            // Older FMM jar without the removal method; nothing to remove from here.
+        } catch (ReflectiveOperationException | LinkageError e) {
+            Logger.warn("Failed to unregister the EliteMobs dungeon locator from " + MODELS_PLUGIN + ": " + e);
+        }
+    }
+
     private void syncInitialization(PluginInitializationContext initializationContext) {
         //Initializes custom models
         initializationContext.step("Custom Models");
@@ -637,6 +656,7 @@ public class EliteMobs extends JavaPlugin {
             metrics.shutdown();
             metrics = null;
         }
+        unregisterModelsDungeonLocator();
         if (enchantmentAnvil != null) { enchantmentAnvil.close(); enchantmentAnvil = null; }
         CustomItem.shutdownCacheRegeneration();
         com.magmaguy.elitemobs.commands.LanguageCommand.shutdown();
