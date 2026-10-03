@@ -666,7 +666,7 @@ permissions:
     default: false
 
   elitemobs.perks.xp.customboost.all:
-    description: Applies the the configured custom XP multiplier to all weapon and armor skills
+    description: Applies the configured custom XP multiplier to all weapon and armor skills
     default: false
     children:
       elitemobs.perks.xp.customboost.armor: true
@@ -681,35 +681,35 @@ permissions:
       elitemobs.perks.xp.customboost.staves: true
       elitemobs.perks.xp.customboost.wands: true
   elitemobs.perks.xp.customboost.armor:
-    description: Applies the the configured custom XP multiplier to armor
+    description: Applies the configured custom XP multiplier to armor
     default: false
   elitemobs.perks.xp.customboost.swords:
-    description: Applies the the configured custom XP multiplier to swords
+    description: Applies the configured custom XP multiplier to swords
     default: false
   elitemobs.perks.xp.customboost.axes:
-    description: Applies the the configured custom XP multiplier to axes
+    description: Applies the configured custom XP multiplier to axes
     default: false
   elitemobs.perks.xp.customboost.bows:
-    description: Applies the the configured custom XP multiplier to bows
+    description: Applies the configured custom XP multiplier to bows
     default: false
   elitemobs.perks.xp.customboost.crossbows:
-    description: Applies the the configured custom XP multiplier to crossbows
+    description: Applies the configured custom XP multiplier to crossbows
     default: false
   elitemobs.perks.xp.customboost.tridents:
-    description: Applies the the configured custom XP multiplier to tridents
+    description: Applies the configured custom XP multiplier to tridents
     default: false
   elitemobs.perks.xp.customboost.hoes:
-    description: Applies the the configured custom XP multiplier to hoes
+    description: Applies the configured custom XP multiplier to hoes
     default: false
   elitemobs.perks.xp.customboost.maces:
-    description: Applies the the configured custom XP multiplier to maces
+    description: Applies the configured custom XP multiplier to maces
     default: false
   elitemobs.perks.xp.customboost.spears:
-    description: Applies the the configured custom XP multiplier to spears
+    description: Applies the configured custom XP multiplier to spears
     default: false
   elitemobs.perks.xp.customboost.staves:
-    description: Applies the the configured custom XP multiplier to staves
+    description: Applies the configured custom XP multiplier to staves
     default: false
   elitemobs.perks.xp.customboost.wands:
-    description: Applies the the configured custom XP multiplier to wands
+    description: Applies the configured custom XP multiplier to wands
     default: false

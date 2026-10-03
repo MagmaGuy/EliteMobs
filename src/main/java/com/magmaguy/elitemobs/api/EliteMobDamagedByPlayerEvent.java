@@ -297,9 +297,9 @@ public class EliteMobDamagedByPlayerEvent extends EliteDamageEvent {
      * Event fired when an elite is damaged by a player.
      *
      * @param eliteEntity    Elite damaged.
-     * @param player         Player acting as the damged.
+     * @param player         Player acting as the damaged.
      * @param event          Original Minecraft damage event.
-     * @param damage         Damage. Can be modifed!
+     * @param damage         Damage. Can be modified!
      * @param criticalStrike Whether the strike is a critical strike.
      * @param isCustomDamage Whether the amount of damage is custom, meaning it should apply with no damage reduction of any kind, including armor!
      * @param damageModifier Damage modifiers that the boss may have to reduce incoming damage.

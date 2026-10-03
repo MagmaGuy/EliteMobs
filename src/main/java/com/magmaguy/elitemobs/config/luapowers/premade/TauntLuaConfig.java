@@ -158,7 +158,7 @@ public class TauntLuaConfig extends LuaPowersConfigFields {
             "Weakling!",
             "Pathetic.",
             "Maybe this will wake you up.",
-            "This is just the beggining!",
+            "This is just the beginning!",
             "We're just getting started!",
             "That was just a warm-up!",
             "You are no match for me!",
