@@ -36,7 +36,9 @@ final class TransportMenu implements Listener, AutoCloseable {
         show(player, "Travel destinations", npcAnchor(npc), options);
     }
 
-    void openNetwork(Player player, Supplier<Location> anchor, TransportNetwork network, String fromNode) {
+    /** A non-null departure anchor gives the chosen flight's countdown the same zone as a direct portal flight. */
+    void openNetwork(Player player, Supplier<Location> anchor, TransportNetwork network, String fromNode,
+                     Location departureAnchor, double departureRadius) {
         TransportNode from = network.nodes().get(fromNode);
         if (from == null) { TransportModule.message(player, "This flight point is not part of " + network.id() + "."); return; }
         if (!from.unlockedFor(player)) { TransportModule.message(player, lockedMessage(from)); return; }
@@ -48,7 +50,8 @@ final class TransportMenu implements Listener, AutoCloseable {
             options.add(new Option((unlocked ? "&6" : "&8") + destination.name(),
                     unlocked ? "&7Click to fly" : lockedMessage(destination),
                     unlocked ? Material.FEATHER : Material.GRAY_DYE,
-                    unlocked ? () -> module.startFlight(player, network.id(), fromNode, destination.id()) : null,
+                    unlocked ? () -> module.startFlight(player, network.id(), fromNode, destination.id(),
+                            departureAnchor, departureRadius) : null,
                     unlocked ? null : lockedMessage(destination)));
         }
         show(player, "Flight paths", anchor, options);

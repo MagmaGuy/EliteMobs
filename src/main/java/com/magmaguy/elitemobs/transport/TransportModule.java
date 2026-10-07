@@ -79,8 +79,8 @@ public final class TransportModule implements Listener, AutoCloseable {
         return startFlight(player, networkId, fromNode, toNode, null, 0);
     }
 
-    private boolean startFlight(Player player, String networkId, String fromNode, String toNode,
-                                Location departureAnchor, double departureRadius) {
+    boolean startFlight(Player player, String networkId, String fromNode, String toNode,
+                        Location departureAnchor, double departureRadius) {
         TransportNetwork network = files.network(networkId);
         if (network == null) { message(player, "Unknown flight network " + networkId + "."); return false; }
         TransportNode from = network.nodes().get(fromNode), to = network.nodes().get(toNode);
@@ -97,8 +97,9 @@ public final class TransportModule implements Listener, AutoCloseable {
     }
 
     /**
-     * As above, but a direct flight's countdown only cancels once the player leaves the departure zone, so a
-     * player still settling into a portal keeps their seat. The menu path keeps the any-movement rule.
+     * As above, but the flight's countdown, direct or chosen from the menu, only cancels once the player leaves
+     * the departure zone, so a player settling into or nudged inside a portal keeps their seat. Without a zone,
+     * any movement cancels.
      */
     public void openFlightPoint(Player player, Supplier<Location> anchor, String networkId, String node, String destination,
                                 Location departureAnchor, double departureRadius) {
@@ -108,7 +109,7 @@ public final class TransportModule implements Listener, AutoCloseable {
         }
         TransportNetwork network = files.network(networkId);
         if (network == null) { message(player, "Unknown flight network " + networkId + "."); return; }
-        menu.openNetwork(player, anchor, network, node);
+        menu.openNetwork(player, anchor, network, node, departureAnchor, departureRadius);
     }
 
     /** A server-thread entry point for authored prop scripts. Reports rejection to the player. */

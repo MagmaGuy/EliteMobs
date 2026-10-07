@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.wormhole;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.PluginState;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
 import com.magmaguy.elitemobs.commands.DungeonCommands;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
@@ -9,6 +10,7 @@ import com.magmaguy.elitemobs.config.WormholesConfig;
 import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.dungeons.WorldInstancedDungeonPackage;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.instanced.InstancePlayerMovement;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
 import com.magmaguy.elitemobs.transport.TransportModule;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
@@ -107,6 +109,8 @@ public class WormholeManager {
      * Checks if any players should be teleported by this wormhole
      */
     private void checkForTeleports(WormholeEntry wormholeEntry, List<Player> nearbyPlayers) {
+        // During startup and reloads, transport and packages may not be ready; don't trigger or set cooldowns yet.
+        if (MetadataHandler.pluginState != PluginState.INITIALIZED) return;
         double teleportDistanceSquared = Math.pow(TELEPORT_DISTANCE_MULTIPLIER * wormholeEntry.getWormhole().getWormholeConfigFields().getSizeMultiplier(), 2);
         for (Player player : nearbyPlayers) {
             if (player.getWorld() != wormholeEntry.getLocation().getWorld()
@@ -149,7 +153,7 @@ public class WormholeManager {
             var transport = TransportModule.get();
             if (transport == null) { Logger.sendMessage(player, "&cFlights are unavailable."); return; }
             Location anchor = sourceEntry.getLocation().clone();
-            // A direct flight's countdown tolerates settling into the portal; only leaving it cancels.
+            // The flight's countdown, direct or picked from the menu, tolerates settling into the portal; only leaving it cancels.
             double departureRadius = TELEPORT_DISTANCE_MULTIPLIER * fields.getSizeMultiplier() + SAFE_DISTANCE;
             transport.openFlightPoint(player, () -> anchor, fields.getFlightNetwork(), fields.getFlightNode(),
                     fields.getFlightDestination(), anchor, departureRadius);
@@ -240,7 +244,11 @@ public class WormholeManager {
                     return;
                 }
             }
-            boolean accepted = PlayerTeleportEvent.teleportPlayer(player, target);
+            // Instance copies move players inside their match world, where only match-aware movement is accepted.
+            boolean accepted = sourceEntry.getWormhole().isInstanceCopy()
+                    ? InstancePlayerMovement.teleportWithinWorld(player, target,
+                    org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.PLUGIN)
+                    : PlayerTeleportEvent.teleportPlayer(player, target);
             arrived = accepted && atDestination(player, target);
         } catch (RuntimeException failure) {
             // A post-teleport listener can fail after movement committed.
