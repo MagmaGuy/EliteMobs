@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.dungeons;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfig;
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
@@ -15,6 +16,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,21 +58,42 @@ public final class RetiredWorldRedirect implements Listener {
         Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
             if (!player.isOnline() || !player.getWorld().getName().equals(worldName)) return;
             Location destination = destination(worldName);
-            if (destination != null) PlayerTeleportEvent.teleportPlayer(player, destination.clone());
+            if (destination != null && !PlayerTeleportEvent.teleportPlayer(player, destination.clone()))
+                warnOnce(worldName, "Could not move " + player.getName() + " out of retired world " + worldName + ".");
         });
     }
 
-    /** Null when the world isn't retired, or when the arrival point is missing or would land in a retired world. */
+    /**
+     * True for the server's default world and for any world a package uses as its own or wormhole world.
+     * Reads every package's configuration, so the answer doesn't depend on package initialization order.
+     */
+    public static boolean isInUse(String worldName) {
+        if (!Bukkit.getWorlds().isEmpty() && Bukkit.getWorlds().get(0).getName().equalsIgnoreCase(worldName))
+            return true;
+        for (Map<String, ContentPackagesConfigFields> packages : List.of(ContentPackagesConfig.getDungeonPackages(),
+                ContentPackagesConfig.getEnchantedChallengeDungeonPackages()))
+            for (ContentPackagesConfigFields fields : packages.values())
+                if (worldName.equalsIgnoreCase(fields.getWorldName()) || worldName.equalsIgnoreCase(fields.getWormholeWorldName()))
+                    return true;
+        return false;
+    }
+
+    /** Null when the world isn't retired, is still in use, or has no arrival point outside the retired worlds. */
     private static Location destination(String worldName) {
         ContentPackagesConfigFields fields = retired.get(worldName);
         if (fields == null) return null;
+        if (isInUse(worldName))
+            return warnOnce(worldName, "Retired world " + worldName + " of package " + fields.getFilename()
+                    + " is the default world or still used by a package; its players are not moved.");
         Location destination = fields.getTeleportLocation();
-        if (destination != null && destination.getWorld() != null
-                && !retired.containsKey(destination.getWorld().getName()))
+        if (destination != null && destination.isWorldLoaded() && !retired.containsKey(destination.getWorld().getName()))
             return destination;
-        if (warned.add(worldName))
-            Logger.warn("Players in retired world " + worldName + " cannot be moved: package " + fields.getFilename()
-                    + " has no teleportLocation outside its retired worlds.");
+        return warnOnce(worldName, "Players in retired world " + worldName + " cannot be moved: package "
+                + fields.getFilename() + " has no loaded teleportLocation outside its retired worlds.");
+    }
+
+    private static Location warnOnce(String worldName, String message) {
+        if (warned.add(worldName)) Logger.warn(message);
         return null;
     }
 }

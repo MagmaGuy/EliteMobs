@@ -44,20 +44,27 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
     private void initializeRetiredWorlds() {
         retiredWorlds = new ArrayList<>();
         List<String> retiredWorldNames = contentPackagesConfigFields.getRetiredWorldNames();
-        if (retiredWorldNames == null) return;
+        // Without an installed package there is nowhere to send players, so the server's own fallback places them.
+        if (retiredWorldNames == null || !isInstalled) return;
         for (String retiredWorldName : retiredWorldNames) {
             // A blank name resolves to the server folder itself, which folderExists reports as present.
             if (retiredWorldName == null || retiredWorldName.isBlank()) continue;
             if (Bukkit.getWorld(retiredWorldName) == null && !WorldFolderResolver.folderExists(retiredWorldName)) continue;
+            if (RetiredWorldRedirect.isInUse(retiredWorldName)) {
+                Logger.warn("Retired world " + retiredWorldName + " of package " + contentPackagesConfigFields.getFilename()
+                        + " was not loaded: it is the default world or still used by a package.");
+                continue;
+            }
             Location teleportLocation = contentPackagesConfigFields.getTeleportLocation();
-            if (!isInstalled || teleportLocation == null || teleportLocation.getWorld() == null) {
+            if (teleportLocation == null || !teleportLocation.isWorldLoaded()) {
                 Logger.warn("Retired world " + retiredWorldName + " was not loaded: package "
-                        + contentPackagesConfigFields.getFilename() + " is not installed or has no teleportLocation to send players to.");
+                        + contentPackagesConfigFields.getFilename() + " has no loaded teleportLocation to send players to.");
                 continue;
             }
             World retiredWorld = DungeonUtils.loadWorld(retiredWorldName, contentPackagesConfigFields.getEnvironment(),
                     contentPackagesConfigFields);
-            if (retiredWorld == null) continue;
+            // Names differing only in case resolve to the same world.
+            if (retiredWorld == null || retiredWorlds.contains(retiredWorld)) continue;
             retiredWorlds.add(retiredWorld);
             RetiredWorldRedirect.register(retiredWorld, contentPackagesConfigFields);
         }

@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.dungeons.utility;
 
 import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
+import com.magmaguy.elitemobs.dungeons.RetiredWorldRedirect;
 import com.magmaguy.elitemobs.dungeons.WorldDungeonPackage;
 import com.magmaguy.elitemobs.dungeons.WorldPackage;
 import com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler;
@@ -39,7 +40,7 @@ public class DungeonUtils {
         World world = loadWorld(worldName, environment, worldPackage.getContentPackagesConfigFields());
         String wormholeWorldName = worldPackage.getContentPackagesConfigFields().getWormholeWorldName();
         // A blank name means no wormhole world; loading it would resolve to the server folder.
-        if (wormholeWorldName != null && !wormholeWorldName.isEmpty())
+        if (wormholeWorldName != null && !wormholeWorldName.isBlank())
             loadWorld(wormholeWorldName, environment, worldPackage.getContentPackagesConfigFields());
         if (world != null) worldPackage.setInstalled(true);
         return world;
@@ -62,8 +63,10 @@ public class DungeonUtils {
         World wormholeWorld = worldPackage instanceof WorldDungeonPackage worldDungeonPackage
                 ? worldDungeonPackage.getWormholeWorld()
                 : null;
+        // Never move players out of, or unload, the default world or a world any package still uses.
         List<World> retiredWorlds = worldPackage instanceof WorldDungeonPackage worldDungeonPackage
-                ? worldDungeonPackage.getRetiredWorlds()
+                ? worldDungeonPackage.getRetiredWorlds().stream()
+                        .filter(world -> !RetiredWorldRedirect.isInUse(world.getName())).toList()
                 : List.of();
 
         World fallbackWorld = Bukkit.getWorlds().stream()
@@ -80,13 +83,12 @@ public class DungeonUtils {
             }
         }
 
-        if (!unloadRegisteredWorld(packageWorld, worldPackage.getContentPackagesConfigFields())) return false;
+        // The package world goes last, so a refused unload leaves it loaded and the package installed.
+        for (World retiredWorld : retiredWorlds)
+            if (!unloadRegisteredWorld(retiredWorld, worldPackage.getContentPackagesConfigFields())) return false;
         if (wormholeWorld != packageWorld &&
                 !unloadRegisteredWorld(wormholeWorld, worldPackage.getContentPackagesConfigFields())) return false;
-        for (World retiredWorld : retiredWorlds)
-            if (retiredWorld != packageWorld && retiredWorld != wormholeWorld &&
-                    !unloadRegisteredWorld(retiredWorld, worldPackage.getContentPackagesConfigFields())) return false;
-        return true;
+        return unloadRegisteredWorld(packageWorld, worldPackage.getContentPackagesConfigFields());
     }
 
     private static boolean unloadRegisteredWorld(World world,

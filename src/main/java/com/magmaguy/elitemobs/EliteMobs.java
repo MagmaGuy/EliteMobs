@@ -675,6 +675,7 @@ public class EliteMobs extends JavaPlugin {
         SpiritWalkSupport.shutdown();
         com.magmaguy.elitemobs.combatsystem.combattag.CombatTag.shutdown();
         ZombieNecronomiconSupport.shutdown();
+        RetiredWorldRedirect.shutdown();
         if (MetadataHandler.pluginState == PluginState.INITIALIZING) {
             Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
             MetadataHandler.pluginState = PluginState.UNINITIALIZED;
@@ -694,7 +695,6 @@ public class EliteMobs extends JavaPlugin {
         com.magmaguy.elitemobs.parties.PartyManager.shutdown();
         Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
         Wormhole.shutdown();
-        RetiredWorldRedirect.shutdown();
         RegionalBossEntity.flushOnShutdown();
         InstancedBossEntity.shutdown();
         NPCEntity.shutdown();
