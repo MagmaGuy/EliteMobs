@@ -15,6 +15,7 @@ import com.magmaguy.magmacore.util.ChatColorConverter;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
+import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
@@ -27,6 +28,8 @@ import java.util.function.Supplier;
 /** Follows authored curves with configured mounts. Map makers own path clearance. */
 public final class TransportModule implements Listener, AutoCloseable {
     private static TransportModule instance;
+    /** Paper's dismount events say whether they can be cancelled (death, quit and vehicle removal cannot); Spigot's API has no such method. */
+    private static final java.lang.reflect.Method DISMOUNT_CANCELLABLE = dismountCancellable();
     final TransportFiles files;
     /** Route ids whose mount failure was already logged since the last reload; the fallback repeats on every boarding. */
     private final Set<String> warnedMounts = new HashSet<>();
@@ -190,11 +193,12 @@ public final class TransportModule implements Listener, AutoCloseable {
                 if (!j.boarded) {
                     if (++j.charge >= j.route.countdown()) board(j);
                 } else if (j.player.getVehicle() != j.actor.getLivingEntity()) {
+                    // A dismount the seat lock could not or should not stop (death, teleport, removal) ends the flight.
                     finish(j, false, "Travel interrupted.");
                 } else if (j.status != RouteFlight.Status.FLYING) {
                     finish(j, j.status == RouteFlight.Status.ARRIVED,
                             j.status == RouteFlight.Status.ARRIVED ? "Arrived at " + j.route.name() + "." : "The mount does not support flight.");
-                }
+                } else j.releasing = false; // Still seated after a teleport that kept the vehicle, so lock the seat again.
             } catch (Exception | LinkageError failure) {
                 plugin.getLogger().log(java.util.logging.Level.WARNING, "Transport " + j.route.id() + " failed", failure);
                 finish(j, false, "Travel failed: " + failure.getMessage());
@@ -238,6 +242,7 @@ public final class TransportModule implements Listener, AutoCloseable {
 
     private void finish(Journey j, boolean arrived, String reason) {
         if (!journeys.remove(j.player.getUniqueId(), j)) return;
+        j.releasing = true; // Our own dismount below must not be refused by the seat lock.
         boolean placed = false;
         try {
             if (j.actor != null) {
@@ -284,6 +289,37 @@ public final class TransportModule implements Listener, AutoCloseable {
         }
         if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ())
             finish(journey, false, "Departure cancelled because you moved.");
+    }
+
+    /** A rider who presses sneak mid-flight stays seated. Every other way off the mount still works. */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void keepSeated(EntityDismountEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        Journey j = journeys.get(player.getUniqueId());
+        if (j == null || !j.boarded || j.releasing || j.actor == null) return;
+        if (player.isDead() || player.getGameMode() == GameMode.SPECTATOR) return;
+        LivingEntity body = j.actor.getLivingEntity();
+        // A removed mount is already invalid while it ejects its passengers.
+        if (body == null || !body.isValid() || !event.getDismounted().getUniqueId().equals(body.getUniqueId())) return;
+        if (dismountCancellable(event)) event.setCancelled(true);
+    }
+
+    /** Teleports fire before their dismount. One that goes ahead unseats the rider, and the tick ends the flight. */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void releaseOnTeleport(PlayerTeleportEvent event) {
+        Journey j = journeys.get(event.getPlayer().getUniqueId());
+        if (j != null && j.boarded) j.releasing = true;
+    }
+
+    private static java.lang.reflect.Method dismountCancellable() {
+        try { return EntityDismountEvent.class.getMethod("isCancellable"); }
+        catch (NoSuchMethodException spigot) { return null; }
+    }
+
+    private static boolean dismountCancellable(EntityDismountEvent event) {
+        if (DISMOUNT_CANCELLABLE == null) return true;
+        try { return (boolean) DISMOUNT_CANCELLABLE.invoke(event); }
+        catch (ReflectiveOperationException unexpected) { return false; }
     }
 
     @EventHandler public void quit(PlayerQuitEvent event) {
@@ -355,6 +391,8 @@ public final class TransportModule implements Listener, AutoCloseable {
         EliteEntity actor; RouteFlight flight;
         RouteFlight.Status status = RouteFlight.Status.FLYING;
         boolean boarded, keepLanding; int charge;
+        /** Set when a dismount from the mount is intended: our own release, or a teleport that is going ahead. */
+        boolean releasing;
         // Optional zone the countdown tolerates movement within; null means any movement cancels.
         Location departureAnchor; double departureRadius;
         Journey(Player player, TransportRoute route, World world, CurvedRoute curve, MatchInstance match) {
