@@ -32,7 +32,7 @@ final class TransportMenu implements Listener, AutoCloseable {
         List<Option> options = routes.stream().map(id -> new Option("&6" + module.files.get(id).name(), "&7Click to board",
                 Material.FEATHER, () -> {
                     if (npc.getNPCsConfigFields().getTransportRoutes().contains(id)) TransportModule.startRoute(player, id);
-                })).toList();
+                }, null)).toList();
         show(player, "Travel destinations", npcAnchor(npc), options);
     }
 
@@ -48,7 +48,8 @@ final class TransportMenu implements Listener, AutoCloseable {
             options.add(new Option((unlocked ? "&6" : "&8") + destination.name(),
                     unlocked ? "&7Click to fly" : lockedMessage(destination),
                     unlocked ? Material.FEATHER : Material.GRAY_DYE,
-                    unlocked ? () -> module.startFlight(player, network.id(), fromNode, destination.id()) : null));
+                    unlocked ? () -> module.startFlight(player, network.id(), fromNode, destination.id()) : null,
+                    unlocked ? null : lockedMessage(destination)));
         }
         show(player, "Flight paths", anchor, options);
     }
@@ -85,14 +86,16 @@ final class TransportMenu implements Listener, AutoCloseable {
         event.setCancelled(true);
         if (!(event.getWhoClicked() instanceof Player player) || !choice.player.equals(player.getUniqueId())) return;
         int slot = event.getRawSlot();
-        if (slot < 0 || slot >= choice.options.size() || choice.options.get(slot).action() == null) return;
+        if (slot < 0 || slot >= choice.options.size()) return;
+        Option option = choice.options.get(slot);
+        if (option.action() == null) { if (option.refusal() != null) TransportModule.message(player, option.refusal()); return; }
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (!player.isOnline() || player.getOpenInventory().getTopInventory() != choice.inventory) return;
             player.closeInventory();
             Location anchor = choice.anchor.get();
             if (anchor == null || anchor.getWorld() != player.getWorld()
                     || anchor.distanceSquared(player.getLocation()) > REACH * REACH) return;
-            choice.options.get(slot).action().run();
+            option.action().run();
         });
     }
 
@@ -108,7 +111,8 @@ final class TransportMenu implements Listener, AutoCloseable {
         opened.clear(); HandlerList.unregisterAll(this);
     }
 
-    private record Option(String label, String lore, Material icon, Runnable action) { }
+    /** A null action keeps the menu open and explains the refusal instead. */
+    private record Option(String label, String lore, Material icon, Runnable action, String refusal) { }
 
     private static final class Choice implements InventoryHolder {
         final UUID player; final Supplier<Location> anchor; final List<Option> options;

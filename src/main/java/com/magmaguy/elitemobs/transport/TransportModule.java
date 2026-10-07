@@ -27,6 +27,8 @@ import java.util.function.Supplier;
 /** Follows authored curves with configured mounts. Map makers own path clearance. */
 public final class TransportModule implements Listener, AutoCloseable {
     private static TransportModule instance;
+    /** Route ids whose mount failure was already logged; the fallback repeats on every boarding. */
+    private static final Set<String> WARNED_MOUNTS = new HashSet<>();
     final TransportFiles files;
     private final Plugin plugin;
     private final Map<UUID, Journey> journeys = new HashMap<>();
@@ -46,6 +48,8 @@ public final class TransportModule implements Listener, AutoCloseable {
         networkEditor = new NetworkEditor(this, plugin);
         Bukkit.getPluginManager().registerEvents(this, plugin);
         task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1, 1);
+        // Players who joined while transport was down (async init, reload, failed init) still carry their landing.
+        for (Player online : Bukkit.getOnlinePlayers()) applyPendingLanding(online);
     }
     public static void initialize() {
         shutdown();
@@ -81,6 +85,7 @@ public final class TransportModule implements Listener, AutoCloseable {
 
     /** Opens a flight point's menu, or flies straight to its fixed destination. */
     public void openFlightPoint(Player player, Supplier<Location> anchor, String networkId, String node, String destination) {
+        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Flight points open on the server thread");
         if (destination != null && !destination.isBlank()) { startFlight(player, networkId, node, destination); return; }
         TransportNetwork network = files.network(networkId);
         if (network == null) { message(player, "Unknown flight network " + networkId + "."); return; }
@@ -110,7 +115,10 @@ public final class TransportModule implements Listener, AutoCloseable {
             prepareMount(journey);
         } catch (Exception | LinkageError failure) {
             finish(journey, false, null);
-            plugin.getLogger().warning("Transport " + route.id() + " could not spawn its mount; teleporting instead: " + failure);
+            if (WARNED_MOUNTS.add(route.id()))
+                plugin.getLogger().warning("Transport " + route.id() + " could not spawn its mount; teleporting instead: " + failure);
+            if (player.hasPermission("elitemobs.transport.admin"))
+                message(player, "&cMount unavailable, teleporting instead: " + failure.getMessage());
             return teleportInstead(player, route, world, curve);
         }
         message(player, "Stand still. Departing for " + route.name() + " in " + route.countdown() / 20D + " seconds.");
@@ -207,7 +215,7 @@ public final class TransportModule implements Listener, AutoCloseable {
 
     private void finish(Journey j, boolean arrived, String reason) {
         if (!journeys.remove(j.player.getUniqueId(), j)) return;
-        if (!j.keepLanding) j.player.getPersistentDataContainer().remove(pendingLanding);
+        boolean placed = false;
         try {
             if (j.actor != null) {
                 try {
@@ -220,7 +228,7 @@ public final class TransportModule implements Listener, AutoCloseable {
                 boolean accepted = InstancePlayerMovement.teleportWithinWorld(j.player, j.destination,
                         PlayerTeleportEvent.TeleportCause.PLUGIN);
                 Location actual = j.player.getLocation();
-                boolean placed = accepted && actual.getWorld().equals(j.destination.getWorld())
+                placed = accepted && actual.getWorld().equals(j.destination.getWorld())
                         && actual.distanceSquared(j.destination) < 0.000001D;
                 if (placed) { j.player.setFallDistance(0); markArrivalPortal(j.player, j.destination); }
                 else reason = "Travel interrupted. The final destination could not be reached.";
@@ -231,6 +239,11 @@ public final class TransportModule implements Listener, AutoCloseable {
         } catch (Exception error) {
             plugin.getLogger().warning("Transport cleanup: " + error);
             if (j.player.isOnline()) message(j.player, "Travel interrupted.");
+        } finally {
+            // Kept for a rider who quit mid-air, or whose shutdown landing failed; the login and init sweeps retry it.
+            // An online rider whose ordinary arrival failed is already at the route's end, so a later retry would only surprise them.
+            boolean retry = j.keepLanding || arrived && !placed && closed && j.match == null;
+            if (!retry) j.player.getPersistentDataContainer().remove(pendingLanding);
         }
     }
 
@@ -246,10 +259,12 @@ public final class TransportModule implements Listener, AutoCloseable {
     @EventHandler public void quit(PlayerQuitEvent event) {
         networkEditor.end(event.getPlayer().getUniqueId());
         Journey j = journeys.get(event.getPlayer().getUniqueId());
-        if (j != null) { j.keepLanding = j.boarded; finish(j, false, null); }
+        // Instance riders are returned by instance recovery; instance world names are reused, so no key points into one.
+        if (j != null) { j.keepLanding = j.boarded && j.match == null; finish(j, false, null); }
     }
-    @EventHandler public void join(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+    @EventHandler public void join(PlayerJoinEvent event) { applyPendingLanding(event.getPlayer()); }
+
+    private void applyPendingLanding(Player player) {
         var data = player.getPersistentDataContainer();
         String stored = data.get(pendingLanding, PersistentDataType.STRING);
         if (stored == null) return;
@@ -257,7 +272,9 @@ public final class TransportModule implements Listener, AutoCloseable {
         Location landing = decode(stored);
         if (landing == null) return; // That world is gone; instance recovery owns players returning to removed instances.
         Bukkit.getScheduler().runTask(plugin, () -> {
-            if (player.isOnline() && player.teleport(landing)) player.setFallDistance(0);
+            if (!player.isOnline() || !player.teleport(landing)) return;
+            player.setFallDistance(0);
+            markArrivalPortal(player, landing);
         });
     }
     @EventHandler public void leave(MatchLeaveEvent event) {
@@ -273,9 +290,10 @@ public final class TransportModule implements Listener, AutoCloseable {
         Journey j = journeys.get(player.getUniqueId()); if (j != null) finish(j, false, "Travel cancelled.");
     }
     @Override public void close() {
+        closed = true;
         // Boarded riders land at their destination rather than mid-air.
         for (Journey j : List.copyOf(journeys.values())) finish(j, j.boarded && j.player.isOnline(), null);
-        closed = true; task.cancel(); editor.close(); menu.close(); networkEditor.close(); HandlerList.unregisterAll(this);
+        task.cancel(); editor.close(); menu.close(); networkEditor.close(); HandlerList.unregisterAll(this);
     }
     static void message(Player player, String text) { player.sendMessage(ChatColorConverter.convert("&6[Travel] &f" + text)); }
 

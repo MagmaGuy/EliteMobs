@@ -14,10 +14,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import java.util.*;
+import java.util.logging.Level;
 
 /** Player-local network drafts. Labels and lines are spawned for the editing player only. */
 public final class NetworkEditor implements AutoCloseable {
     private static final double VIEW = 128;
+    /** Each line display sits at its segment's start, so short segments stay within tracking range. */
+    private static final double SEGMENT = 32;
     private static final float WIDTH = 0.08f;
     private final TransportModule module;
     private final Plugin plugin;
@@ -35,6 +38,18 @@ public final class NetworkEditor implements AutoCloseable {
             if (action.equals("list")) { TransportModule.message(player, String.join(", ", module.files.networkIds())); return; }
             Session s = sessions.get(player.getUniqueId());
             if (s == null) throw new IllegalArgumentException("Use /em transport network edit <network> first.");
+            // These work from anywhere, so a draft can always be saved or dropped.
+            switch (action) {
+                case "save" -> {
+                    module.files.saveNetwork(network(s));
+                    end(player.getUniqueId());
+                    TransportModule.message(player, "Saved " + s.id + ".");
+                    return;
+                }
+                case "cancel" -> { end(player.getUniqueId()); TransportModule.message(player, "Draft discarded."); return; }
+                case "status" -> { status(player, s); return; }
+                default -> { }
+            }
             if (!player.getWorld().equals(s.world)) throw new IllegalArgumentException("Return to the network's world to edit it.");
             switch (action) {
                 case "add" -> add(player, s, arg(args, 0, "node id"), Arrays.copyOfRange(args, 1, args.length));
@@ -70,6 +85,7 @@ public final class NetworkEditor implements AutoCloseable {
                 case "undo" -> {
                     if (s.undo.isEmpty()) throw new IllegalArgumentException("Nothing to undo.");
                     s.nodes = s.undo.pop();
+                    s.preview = List.of();
                     if (s.selected != null && !s.nodes.containsKey(s.selected)) s.selected = null;
                 }
                 case "preview" -> {
@@ -78,18 +94,14 @@ public final class NetworkEditor implements AutoCloseable {
                 }
                 case "ride" -> { module.start(player, network(s).route(arg(args, 0, "from node"), arg(args, 1, "to node"))); return; }
                 case "generate" -> { generate(player, s, known(s, arg(args, 0, "first node")), known(s, arg(args, 1, "second node"))); return; }
-                case "save" -> {
-                    module.files.saveNetwork(network(s));
-                    end(player.getUniqueId());
-                    TransportModule.message(player, "Saved " + s.id + ".");
-                    return;
-                }
-                case "cancel" -> { end(player.getUniqueId()); TransportModule.message(player, "Draft discarded."); return; }
-                case "status" -> { }
                 default -> throw new IllegalArgumentException("Unknown network editor action.");
             }
-            TransportModule.message(player, s.id + ": " + s.nodes.size() + " nodes" + (s.selected == null ? "" : ", selected " + s.selected) + ".");
+            status(player, s);
         } catch (Exception failure) { TransportModule.message(player, failure.getMessage()); }
+    }
+
+    private static void status(Player player, Session s) {
+        TransportModule.message(player, s.id + ": " + s.nodes.size() + " nodes" + (s.selected == null ? "" : ", selected " + s.selected) + ".");
     }
 
     private void open(Player player, String id) {
@@ -125,6 +137,7 @@ public final class NetworkEditor implements AutoCloseable {
         catch (RuntimeException failure) { s.nodes = before; throw failure; }
         if (s.undo.size() == 32) s.undo.removeLast();
         s.undo.push(before);
+        s.preview = List.of();
     }
 
     private static void link(Session s, String a, String b, boolean add) {
@@ -167,36 +180,76 @@ public final class NetworkEditor implements AutoCloseable {
     // ---- Placeholder generator ----
 
     private void generate(Player player, Session s, TransportNode a, TransportNode b) {
+        if (s.sampler != null) throw new IllegalArgumentException("Terrain sampling is already running for this network.");
         Vector start = a.location(), end = b.location();
         Vector flat = end.clone().subtract(start).setY(0);
         double length = flat.length();
         if (length < 16) throw new IllegalArgumentException("Those nodes are too close to need a generated chain.");
-        Vector direction = flat.clone().normalize(), side = new Vector(-direction.getZ(), 0, direction.getX());
-        int samples = (int) Math.ceil(length / 4);
-        double[] heights = new double[samples + 1];
-        World world = s.world;
+        Sampler sampler = new Sampler(player, s, a, b, start, flat.normalize(), length);
+        sampler.runTaskTimer(plugin, 1, 1);
+        s.sampler = sampler;
         TransportModule.message(player, "Sampling terrain between " + a.id() + " and " + b.id() + "...");
-        new BukkitRunnable() {
-            int index;
-            @Override public void run() {
-                if (sessions.get(player.getUniqueId()) != s || !player.isOnline()) { cancel(); return; }
-                for (int budget = 0; budget < 32 && index <= samples; budget++, index++) {
-                    Vector center = start.clone().add(direction.clone().multiply(length * index / samples));
-                    double highest = world.getMinHeight();
-                    for (int offset = -3; offset <= 3; offset += 3) {
-                        int x = (int) Math.floor(center.getX() + side.getX() * offset), z = (int) Math.floor(center.getZ() + side.getZ() * offset);
-                        // Existing terrain only: never generate chunks.
-                        if (world.isChunkGenerated(x >> 4, z >> 4))
-                            highest = Math.max(highest, world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING) + 1);
+    }
+
+    /** Reads heights from existing chunks only: at most two unloaded chunks are loaded per tick, and none is generated. */
+    private final class Sampler extends BukkitRunnable {
+        final Player player; final Session s; final TransportNode a, b; final Vector start, direction, side;
+        final double length; final int samples;
+        /** Highest surface per sample, or NaN where no generated terrain was found. */
+        final double[] heights;
+        /** Chunk key to whether its terrain can be read. */
+        final Map<Long, Boolean> chunks = new HashMap<>();
+        final List<Long> loadedHere = new ArrayList<>();
+        int index, column;
+        double highest = Double.NaN;
+
+        Sampler(Player player, Session s, TransportNode a, TransportNode b, Vector start, Vector direction, double length) {
+            this.player = player; this.s = s; this.a = a; this.b = b; this.start = start; this.direction = direction;
+            this.length = length;
+            side = new Vector(-direction.getZ(), 0, direction.getX());
+            samples = (int) Math.ceil(length / 4);
+            heights = new double[samples + 1];
+        }
+
+        @Override public void run() {
+            if (sessions.get(player.getUniqueId()) != s || !player.isOnline()) { stop(Bukkit.getWorld(s.world.getUID()) != null); return; }
+            World world = s.world;
+            int loads = 0;
+            for (int budget = 0; budget < 96 && index <= samples; budget++) {
+                Vector center = start.clone().add(direction.clone().multiply(length * index / samples));
+                double offset = (column - 1) * 3;
+                int x = (int) Math.floor(center.getX() + side.getX() * offset), z = (int) Math.floor(center.getZ() + side.getZ() * offset);
+                int cx = x >> 4, cz = z >> 4;
+                long key = (long) cx << 32 | cz & 0xFFFFFFFFL;
+                Boolean readable = chunks.get(key);
+                if (readable == null) {
+                    if (world.isChunkLoaded(cx, cz)) readable = true;
+                    else {
+                        if (loads == 2) return; // Resume from this column next tick.
+                        loads++;
+                        readable = world.loadChunk(cx, cz, false); // false: an ungenerated chunk stays unknown.
+                        if (readable) loadedHere.add(key);
                     }
-                    heights[index] = highest;
+                    chunks.put(key, readable);
                 }
-                if (index <= samples) return;
-                cancel();
-                try { insertChain(player, s, a, b, start, direction, length, heights); }
-                catch (RuntimeException failure) { TransportModule.message(player, failure.getMessage()); }
+                if (readable && world.isChunkLoaded(cx, cz)) {
+                    int y = world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING);
+                    if (y >= world.getMinHeight()) highest = Double.isNaN(highest) ? y + 1 : Math.max(highest, y + 1);
+                }
+                if (++column == 3) { heights[index++] = highest; highest = Double.NaN; column = 0; }
             }
-        }.runTaskTimer(plugin, 1, 1);
+            if (index <= samples) return;
+            stop(true);
+            try { insertChain(player, s, a, b, start, direction, length, heights); }
+            catch (RuntimeException failure) { TransportModule.message(player, failure.getMessage()); }
+        }
+
+        void stop(boolean release) {
+            cancel();
+            if (s.sampler == this) s.sampler = null;
+            if (release) for (long key : loadedHere) s.world.unloadChunkRequest((int) (key >> 32), (int) key);
+            loadedHere.clear();
+        }
     }
 
     private void insertChain(Player player, Session s, TransportNode a, TransportNode b, Vector start, Vector direction,
@@ -205,20 +258,24 @@ public final class NetworkEditor implements AutoCloseable {
             throw new IllegalArgumentException("A node was removed while the terrain was sampled.");
         int samples = heights.length - 1, window = 8; // 8 samples is about 32 blocks either side
         double spacing = length / samples, ceiling = s.world.getMaxHeight() - 4;
+        double startY = a.location().getY(), endY = b.location().getY();
         double[] cruise = new double[heights.length];
         for (int i = 0; i <= samples; i++) {
             double highest = Double.NEGATIVE_INFINITY;
-            for (int j = Math.max(0, i - window); j <= Math.min(samples, i + window); j++) highest = Math.max(highest, heights[j]);
-            cruise[i] = Math.min(ceiling, highest + 12);
+            for (int j = Math.max(0, i - window); j <= Math.min(samples, i + window); j++)
+                if (!Double.isNaN(heights[j])) highest = Math.max(highest, heights[j]);
+            // Unknown terrain never pulls the chain below the straight line between the endpoints.
+            double floor = startY + (endY - startY) * i / samples;
+            cruise[i] = Math.min(ceiling, Math.max(highest + 12, floor));
         }
         List<Vector> chain = new ArrayList<>();
-        if (cruise[0] - a.location().getY() > 2) chain.add(new Vector(a.location().getX(), cruise[0], a.location().getZ()));
+        if (cruise[0] - startY > 2) chain.add(new Vector(a.location().getX(), cruise[0], a.location().getZ()));
         int stride = Math.max(1, (int) Math.round(48 / spacing));
         for (int i = stride; i < samples - stride / 2; i += stride) {
             Vector flat = start.clone().add(direction.clone().multiply(length * i / samples));
             chain.add(new Vector(flat.getX(), cruise[i], flat.getZ()));
         }
-        if (cruise[samples] - b.location().getY() > 2) chain.add(new Vector(b.location().getX(), cruise[samples], b.location().getZ()));
+        if (cruise[samples] - endY > 2) chain.add(new Vector(b.location().getX(), cruise[samples], b.location().getZ()));
         edit(s, () -> {
             if (s.nodes.get(a.id()).neighbors().contains(b.id())) link(s, a.id(), b.id(), false);
             String previous = a.id();
@@ -247,12 +304,23 @@ public final class NetworkEditor implements AutoCloseable {
             var entry = iterator.next();
             Player player = Bukkit.getPlayer(entry.getKey());
             Session s = entry.getValue();
-            if (player == null) { clearVisuals(s); iterator.remove(); continue; }
+            boolean worldLoaded = Bukkit.getWorld(s.world.getUID()) != null;
+            if (player == null || !worldLoaded) {
+                dispose(s, worldLoaded);
+                iterator.remove();
+                if (player != null) TransportModule.message(player, "The world of " + s.id + " was unloaded, so the draft was discarded.");
+                continue;
+            }
             if (player.getWorld() != s.world) { clearVisuals(s); continue; }
-            Vector viewer = player.getLocation().toVector();
-            drawLabels(player, s, viewer);
-            drawLinks(player, s, viewer);
-            drawCurve(player, s, viewer);
+            try {
+                Vector viewer = player.getLocation().toVector();
+                drawLabels(player, s, viewer);
+                drawLinks(player, s, viewer);
+                drawCurve(player, s, viewer);
+            } catch (RuntimeException | LinkageError failure) {
+                if (!s.drawFailureLogged) plugin.getLogger().log(Level.WARNING, "Network editor visuals for " + s.id + " failed", failure);
+                s.drawFailureLogged = true;
+            }
         }
     }
 
@@ -264,7 +332,13 @@ public final class NetworkEditor implements AutoCloseable {
             String text = (node.id().equals(s.selected) ? "&e" : "&f") + node.id() + (node.destination() ? "\n&6" + node.name() : "");
             Location at = node.location().add(new Vector(0, 0.75, 0)).toLocation(s.world);
             TextDisplay label = s.labels.get(node.id());
-            if (label == null || !label.isValid()) {
+            // An invalid handle may still be an entity in an unloaded chunk, so remove it rather than orphan it.
+            if (label != null && !label.isValid()) { label.remove(); s.labels.remove(node.id()); label = null; }
+            if (!spawnable(s.world, at)) {
+                if (label != null) { label.remove(); s.labels.remove(node.id()); }
+                continue;
+            }
+            if (label == null) {
                 label = s.world.spawn(at, TextDisplay.class, display -> {
                     display.setVisibleByDefault(false);
                     display.setPersistent(false);
@@ -279,23 +353,24 @@ public final class NetworkEditor implements AutoCloseable {
         s.labels.entrySet().removeIf(e -> { if (wanted.contains(e.getKey())) return false; e.getValue().remove(); return true; });
     }
 
+    /** Links are split into short segments so each display stays near the stretch it draws. */
     private void drawLinks(Player player, Session s, Vector viewer) {
         Set<String> wanted = new HashSet<>();
         for (TransportNode node : s.nodes.values())
             for (String neighbor : node.neighbors()) {
                 TransportNode other = s.nodes.get(neighbor);
                 if (other == null || node.id().compareTo(neighbor) > 0) continue;
-                if (node.location().distanceSquared(viewer) > VIEW * VIEW && other.location().distanceSquared(viewer) > VIEW * VIEW) continue;
-                String key = node.id() + "|" + neighbor;
-                wanted.add(key);
-                Location from = node.location().toLocation(s.world), to = other.location().toLocation(s.world);
-                DrawLine.LineData line = s.lines.get(key);
-                if (line == null || line.getDisplay() == null || !line.getDisplay().isValid()) {
-                    line = DrawLine.drawLine(from, to, WIDTH, Material.LIGHT_BLUE_CONCRETE, -1, player);
-                    if (line != null) s.lines.put(key, line);
-                } else if (!line.getStart().equals(from) || !line.getEnd().equals(to)) DrawLine.updateLine(line, from, to);
+                Vector from = node.location(), to = other.location();
+                int pieces = (int) Math.ceil(from.distance(to) / SEGMENT);
+                for (int k = 0; k < pieces; k++) {
+                    Vector a = lerp(from, to, (double) k / pieces), b = lerp(from, to, (double) (k + 1) / pieces);
+                    if (lerp(a, b, 0.5).distanceSquared(viewer) > VIEW * VIEW) continue;
+                    String key = node.id() + "|" + neighbor + "#" + k;
+                    wanted.add(key);
+                    segment(player, s, s.lines, key, a.toLocation(s.world), b.toLocation(s.world), Material.LIGHT_BLUE_CONCRETE);
+                }
             }
-        s.lines.entrySet().removeIf(e -> { if (wanted.contains(e.getKey())) return false; e.getValue().remove(); return true; });
+        s.lines.entrySet().removeIf(e -> { if (wanted.contains(e.getKey())) return false; discard(e.getValue()); return true; });
     }
 
     /** The A* preview in green; otherwise the projected curve through the selected node to where you stand, in yellow. */
@@ -314,7 +389,7 @@ public final class NetworkEditor implements AutoCloseable {
         try {
             if (points.size() >= 2) {
                 CurvedRoute curve = new CurvedRoute(points);
-                double step = Math.max(2, curve.length() / 256);
+                double step = Math.min(SEGMENT, Math.max(2, curve.length() / 256));
                 for (double d = 0; d < curve.length() && segments.size() < 256; d += step) {
                     Vector a = curve.at(d), b = curve.at(Math.min(curve.length(), d + step));
                     if (a.distanceSquared(viewer) <= VIEW * VIEW && a.distanceSquared(b) > 0)
@@ -322,36 +397,70 @@ public final class NetworkEditor implements AutoCloseable {
                 }
             }
         } catch (IllegalArgumentException degenerate) { segments.clear(); }
-        if (material != s.curveMaterial) { s.curveLines.forEach(DrawLine.LineData::remove); s.curveLines.clear(); s.curveMaterial = material; }
-        while (s.curveLines.size() > segments.size()) s.curveLines.removeLast().remove();
+        if (material != s.curveMaterial) { s.curveLines.values().forEach(NetworkEditor::discard); s.curveLines.clear(); s.curveMaterial = material; }
+        Set<String> wanted = new HashSet<>();
         for (int i = 0; i < segments.size(); i++) {
-            Location[] segment = segments.get(i);
-            if (i < s.curveLines.size()) {
-                var display = s.curveLines.get(i).getDisplay();
-                if (display != null && display.isValid()) { DrawLine.updateLine(s.curveLines.get(i), segment[0], segment[1]); continue; }
-            }
-            DrawLine.LineData line = DrawLine.drawLine(segment[0], segment[1], WIDTH, material, -1, player);
-            if (line == null) continue;
-            if (i < s.curveLines.size()) { s.curveLines.get(i).remove(); s.curveLines.set(i, line); }
-            else s.curveLines.add(line);
+            String key = Integer.toString(i);
+            wanted.add(key);
+            segment(player, s, s.curveLines, key, segments.get(i)[0], segments.get(i)[1], material);
         }
+        s.curveLines.entrySet().removeIf(e -> { if (wanted.contains(e.getKey())) return false; discard(e.getValue()); return true; });
+    }
+
+    /** Reuses the keyed display while it is valid; never spawns or moves one into an unloaded chunk. */
+    private static void segment(Player player, Session s, Map<String, DrawLine.LineData> lines, String key,
+                                Location start, Location end, Material material) {
+        DrawLine.LineData line = lines.get(key);
+        if (line != null && (line.getDisplay() == null || !line.getDisplay().isValid())) { discard(line); lines.remove(key); line = null; }
+        if (!spawnable(s.world, start)) {
+            if (line != null) { discard(line); lines.remove(key); }
+            return;
+        }
+        if (line == null) {
+            line = DrawLine.drawLine(start, end, WIDTH, material, -1, player);
+            if (line != null) lines.put(key, line);
+        } else if (!line.getStart().equals(start) || !line.getEnd().equals(end)) DrawLine.updateLine(line, start, end);
+    }
+
+    /** DrawLine places its display within a few hundredths of a block of the segment start. */
+    private static boolean spawnable(World world, Location at) {
+        for (double dx : new double[]{-0.1, 0.1})
+            for (double dz : new double[]{-0.1, 0.1})
+                if (!world.isChunkLoaded((int) Math.floor(at.getX() + dx) >> 4, (int) Math.floor(at.getZ() + dz) >> 4)) return false;
+        return true;
+    }
+
+    private static Vector lerp(Vector from, Vector to, double fraction) {
+        return from.clone().add(to.clone().subtract(from).multiply(fraction));
+    }
+
+    /** LineData.remove() skips invalid displays, which may still exist in an unloaded chunk. */
+    private static void discard(DrawLine.LineData line) {
+        if (line != null && line.getDisplay() != null) line.getDisplay().remove();
     }
 
     private static void clearVisuals(Session s) {
         s.labels.values().forEach(TextDisplay::remove); s.labels.clear();
-        s.lines.values().forEach(DrawLine.LineData::remove); s.lines.clear();
-        s.curveLines.forEach(DrawLine.LineData::remove); s.curveLines.clear();
+        s.lines.values().forEach(NetworkEditor::discard); s.lines.clear();
+        s.curveLines.values().forEach(NetworkEditor::discard); s.curveLines.clear();
+    }
+
+    /** Stops a draft's sampling and visuals. In an unloaded world its entities and chunk tickets are already gone. */
+    private static void dispose(Session s, boolean worldLoaded) {
+        if (s.sampler != null) s.sampler.stop(worldLoaded);
+        if (worldLoaded) clearVisuals(s);
+        else { s.labels.clear(); s.lines.clear(); s.curveLines.clear(); }
     }
 
     /** Ends a player's draft and removes its visuals. */
     void end(UUID player) {
         Session s = sessions.remove(player);
-        if (s != null) clearVisuals(s);
+        if (s != null) dispose(s, Bukkit.getWorld(s.world.getUID()) != null);
     }
 
     @Override public void close() {
         refresh.cancel();
-        sessions.values().forEach(NetworkEditor::clearVisuals);
+        sessions.values().forEach(s -> dispose(s, Bukkit.getWorld(s.world.getUID()) != null));
         sessions.clear();
     }
 
@@ -364,8 +473,11 @@ public final class NetworkEditor implements AutoCloseable {
         List<TransportNode> preview = List.of();
         final Map<String, TextDisplay> labels = new HashMap<>();
         final Map<String, DrawLine.LineData> lines = new HashMap<>();
-        final List<DrawLine.LineData> curveLines = new ArrayList<>();
+        final Map<String, DrawLine.LineData> curveLines = new HashMap<>();
         Material curveMaterial;
+        /** The running terrain sampler; one at a time per draft. */
+        Sampler sampler;
+        boolean drawFailureLogged;
         Session(String id, World world, String authoredWorld, TransportNetwork existing) {
             this.id = id; this.world = world; this.authoredWorld = authoredWorld;
             transportEntity = existing == null ? "transport_cannon_seat.yml" : existing.transportEntity();
