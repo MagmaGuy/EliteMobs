@@ -18,7 +18,7 @@ import java.util.List;
 
 public class PackageCommand {
     private static final List<String> CONTENT_DIRECTORIES = List.of(
-            "custombosses", "customevents", "npcs", "npc_scripts", "transport_routes", "customitems",
+            "custombosses", "customevents", "npcs", "npc_scripts", "transport_routes", "transport_networks", "customitems",
             "customquests", "customarenas", "customspawns", "customtreasurechests", "wormholes",
             "world_blueprints", "powers", "behaviors");
 
