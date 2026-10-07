@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.instanced;
 
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
+import com.magmaguy.elitemobs.wormhole.WormholeManager;
 import com.magmaguy.magmacore.match.MatchPlayer;
 import com.magmaguy.magmacore.match.MoveReason;
 import org.bukkit.Location;
@@ -17,7 +18,13 @@ final class EliteMatchPlayer extends MatchPlayer {
 
     @Override
     protected boolean teleport(Location destination, MoveReason reason) {
-        if (reason != MoveReason.ENTRY) return super.teleport(destination, reason);
+        if (reason != MoveReason.ENTRY) {
+            boolean moved = super.teleport(destination, reason);
+            // Exits return players to where they entered, often inside the entrance portal; don't reopen it.
+            var wormholes = WormholeManager.getInstance(true);
+            if (moved && wormholes != null) wormholes.addPlayerToCooldown(getPlayer(), destination);
+            return moved;
+        }
         // Entry goes through EliteMobs' own teleport event, which starts dungeon music.
         boolean moved = PlayerTeleportEvent.teleportPlayer(getPlayer(), destination);
         // The lives counter doubles as EliteMobs' "has entered" marker.

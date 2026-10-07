@@ -123,6 +123,8 @@ public class WormholeManager {
     private boolean canPlayerTeleport(WormholeEntry wormholeEntry, Player player) {
         UUID playerId = player.getUniqueId();
         if (activeTravel.contains(playerId) || unresolvedTravel.containsKey(playerId)) return false;
+        // Flight paths can pass through portals; a rider must not be teleported off the mount or reopen a menu.
+        if (TransportModule.isInTransit(player)) return false;
         PlayerWormholeData cooldown = playerTeleportData.get(playerId);
         if (cooldown != null && !cooldown.canTeleport()) return false;
         // Check permissions
@@ -147,7 +149,10 @@ public class WormholeManager {
             var transport = TransportModule.get();
             if (transport == null) { Logger.sendMessage(player, "&cFlights are unavailable."); return; }
             Location anchor = sourceEntry.getLocation().clone();
-            transport.openFlightPoint(player, () -> anchor, fields.getFlightNetwork(), fields.getFlightNode(), fields.getFlightDestination());
+            // A direct flight's countdown tolerates settling into the portal; only leaving it cancels.
+            double departureRadius = TELEPORT_DISTANCE_MULTIPLIER * fields.getSizeMultiplier() + SAFE_DISTANCE;
+            transport.openFlightPoint(player, () -> anchor, fields.getFlightNetwork(), fields.getFlightNode(),
+                    fields.getFlightDestination(), anchor, departureRadius);
             return;
         }
 
@@ -162,11 +167,13 @@ public class WormholeManager {
         // Only one-ended flight portals lack a second entry, and they returned above.
         if (destinationEntry == null) return;
 
-        // An instanced dungeon has no fixed teleport location: start its normal entry flow
-        // (difficulty browser, party and ready check) before any payment or teleport.
+        // An installed instanced dungeon has no fixed teleport location: start its normal entry flow
+        // (difficulty browser, party and ready check) before any payment or teleport. Uninstalled ones
+        // fall through to the missing-portal message and download hint below.
         String destinationKey = destinationEntry.getLocationString();
         if (destinationKey != null && !destinationKey.contains(",")
-                && EMPackage.getEmPackages().get(destinationKey) instanceof WorldInstancedDungeonPackage) {
+                && EMPackage.getEmPackages().get(destinationKey) instanceof WorldInstancedDungeonPackage instancedPackage
+                && instancedPackage.isInstalled()) {
             addPlayerToCooldown(player, sourceEntry);
             DungeonCommands.teleport(player, destinationKey);
             return;

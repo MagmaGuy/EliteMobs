@@ -14,6 +14,7 @@ public class WormholeConfig extends CustomConfig {
     public WormholeConfig() {
         super("wormholes", "com.magmaguy.elitemobs.config.wormholes.premade", WormholeConfigFields.class);
         wormholes = new HashMap<>();
+        Wormhole.clearInstancedBlueprints();
         for (String key : super.getCustomConfigFieldsHashMap().keySet()) {
             if (super.getCustomConfigFieldsHashMap().get(key).isEnabled()) {
                 wormholes.put(key, (WormholeConfigFields) super.getCustomConfigFieldsHashMap().get(key));

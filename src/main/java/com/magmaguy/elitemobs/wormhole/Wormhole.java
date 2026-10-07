@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.wormhole;
 
 import com.magmaguy.elitemobs.config.wormholes.WormholeConfigFields;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Color;
 import org.bukkit.World;
@@ -36,6 +37,8 @@ public class Wormhole {
     }
 
     private Wormhole(WormholeConfigFields wormholeConfigFields, String instanceWorldName) {
+        // Make sure the manager is initialized. Done first so nothing after the entries register can fail but entry 2.
+        WormholeManager.getInstance(false);
         this.wormholeConfigFields = wormholeConfigFields;
         this.instanceWorldName = instanceWorldName;
         this.particleColor = Color.fromRGB(wormholeConfigFields.getParticleColor());
@@ -43,12 +46,15 @@ public class Wormhole {
             this.cachedRotations = new ArrayList<>(new VisualEffects(wormholeConfigFields).getCachedRotations());
         }
         wormholeEntry1 = new WormholeEntry(this, rebind(getWormholeConfigFields().getLocation1(), instanceWorldName), 1);
-        wormholeEntry2 = wormholeConfigFields.isFlightPortal() && wormholeConfigFields.getLocation2() == null
-                ? null : new WormholeEntry(this, rebind(getWormholeConfigFields().getLocation2(), instanceWorldName), 2);
+        try {
+            wormholeEntry2 = wormholeConfigFields.isFlightPortal() && wormholeConfigFields.getLocation2() == null
+                    ? null : new WormholeEntry(this, rebind(getWormholeConfigFields().getLocation2(), instanceWorldName), 2);
+        } catch (RuntimeException failure) {
+            // A half-built wormhole must not leave its first end ticking without a tracked owner.
+            wormholeEntry1.discard();
+            throw failure;
+        }
         wormholes.add(this);
-
-        // Make sure the manager is initialized
-        WormholeManager.getInstance(false);
     }
 
     /** Instanced wormholes are created per dungeon copy, like instanced NPCs. */
@@ -57,20 +63,29 @@ public class Wormhole {
         instancedBlueprints.computeIfAbsent(blueprintWorld, ignored -> new ArrayList<>()).add(fields);
     }
 
+    /** Called before the wormhole configs load, so a reload during initialization can't duplicate blueprints. */
+    public static void clearInstancedBlueprints() {
+        instancedBlueprints.clear();
+    }
+
     public static void initializeInstancedWormholes(String blueprintWorldName, World instanceWorld) {
-        for (WormholeConfigFields fields : instancedBlueprints.getOrDefault(blueprintWorldName, List.of()))
-            instancedWormholes.computeIfAbsent(instanceWorld.getUID(), ignored -> new ArrayList<>())
-                    .add(new Wormhole(fields, instanceWorld.getName()));
+        for (WormholeConfigFields fields : instancedBlueprints.getOrDefault(blueprintWorldName, List.of())) {
+            try {
+                Wormhole copy = new Wormhole(fields, instanceWorld.getName());
+                instancedWormholes.computeIfAbsent(instanceWorld.getUID(), ignored -> new ArrayList<>()).add(copy);
+            } catch (RuntimeException failure) {
+                Logger.warn("Failed to create instanced wormhole " + fields.getFilename() + " in " + instanceWorld.getName() + ": " + failure);
+            }
+        }
     }
 
     public static void removeInstancedWormholes(World instanceWorld) {
         List<Wormhole> removed = instancedWormholes.remove(instanceWorld.getUID());
         if (removed == null) return;
         for (Wormhole wormhole : removed) {
-            wormhole.stop();
             wormholes.remove(wormhole);
-            WormholeEntry.getWormholeEntries().remove(wormhole.wormholeEntry1);
-            if (wormhole.wormholeEntry2 != null) WormholeEntry.getWormholeEntries().remove(wormhole.wormholeEntry2);
+            wormhole.wormholeEntry1.discard();
+            if (wormhole.wormholeEntry2 != null) wormhole.wormholeEntry2.discard();
         }
     }
 

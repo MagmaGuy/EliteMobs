@@ -73,20 +73,36 @@ public final class TransportModule implements Listener, AutoCloseable {
 
     /** Flies from one network node to a destination, checking the departure and destination permissions. */
     public boolean startFlight(Player player, String networkId, String fromNode, String toNode) {
+        return startFlight(player, networkId, fromNode, toNode, null, 0);
+    }
+
+    private boolean startFlight(Player player, String networkId, String fromNode, String toNode,
+                                Location departureAnchor, double departureRadius) {
         TransportNetwork network = files.network(networkId);
         if (network == null) { message(player, "Unknown flight network " + networkId + "."); return false; }
         TransportNode from = network.nodes().get(fromNode), to = network.nodes().get(toNode);
         if (from == null || to == null || !to.destination()) { message(player, "Unknown flight point."); return false; }
         if (!from.unlockedFor(player)) { message(player, TransportMenu.lockedMessage(from)); return false; }
         if (!to.unlockedFor(player)) { message(player, TransportMenu.lockedMessage(to)); return false; }
-        try { return start(player, network.route(fromNode, toNode)); }
+        try { return start(player, network.route(fromNode, toNode), departureAnchor, departureRadius); }
         catch (IllegalArgumentException failure) { message(player, failure.getMessage()); return false; }
     }
 
     /** Opens a flight point's menu, or flies straight to its fixed destination. */
     public void openFlightPoint(Player player, Supplier<Location> anchor, String networkId, String node, String destination) {
+        openFlightPoint(player, anchor, networkId, node, destination, null, 0);
+    }
+
+    /**
+     * As above, but a direct flight's countdown only cancels once the player leaves the departure zone, so a
+     * player still settling into a portal keeps their seat. The menu path keeps the any-movement rule.
+     */
+    public void openFlightPoint(Player player, Supplier<Location> anchor, String networkId, String node, String destination,
+                                Location departureAnchor, double departureRadius) {
         if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Flight points open on the server thread");
-        if (destination != null && !destination.isBlank()) { startFlight(player, networkId, node, destination); return; }
+        if (destination != null && !destination.isBlank()) {
+            startFlight(player, networkId, node, destination, departureAnchor, departureRadius); return;
+        }
         TransportNetwork network = files.network(networkId);
         if (network == null) { message(player, "Unknown flight network " + networkId + "."); return; }
         menu.openNetwork(player, anchor, network, node);
@@ -98,6 +114,10 @@ public final class TransportModule implements Listener, AutoCloseable {
         return instance.start(player, instance.files.get(routeId));
     }
     public boolean start(Player player, TransportRoute route) {
+        return start(player, route, null, 0);
+    }
+
+    private boolean start(Player player, TransportRoute route, Location departureAnchor, double departureRadius) {
         if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Transport starts on the server thread");
         if (closed || !player.isOnline() || player.isDead() || journeys.containsKey(player.getUniqueId())) {
             message(player, "You cannot board right now."); return false;
@@ -109,6 +129,8 @@ public final class TransportModule implements Listener, AutoCloseable {
         catch (Exception failure) { message(player, failure.getMessage()); return false; }
         if (Bukkit.getServicesManager().load(EliteMindService.class) == null) return teleportInstead(player, route, world, curve);
         Journey journey = new Journey(player, route, world, curve, PlayerData.getMatchInstance(player));
+        journey.departureAnchor = departureAnchor == null ? null : departureAnchor.clone();
+        journey.departureRadius = departureRadius;
         journeys.put(player.getUniqueId(), journey);
         try {
             requireTransportEntity(route);
@@ -253,6 +275,13 @@ public final class TransportModule implements Listener, AutoCloseable {
         Journey journey = journeys.get(event.getPlayer().getUniqueId());
         if (journey == null || journey.boarded || event.getTo() == null) return;
         Location from = event.getFrom(), to = event.getTo();
+        if (journey.departureAnchor != null) {
+            // Portal departures only cancel once the player leaves the portal's zone.
+            if (to.getWorld() != journey.departureAnchor.getWorld()
+                    || to.distanceSquared(journey.departureAnchor) > journey.departureRadius * journey.departureRadius)
+                finish(journey, false, "Departure cancelled because you moved.");
+            return;
+        }
         if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ())
             finish(journey, false, "Departure cancelled because you moved.");
     }
@@ -326,6 +355,8 @@ public final class TransportModule implements Listener, AutoCloseable {
         EliteEntity actor; RouteFlight flight;
         RouteFlight.Status status = RouteFlight.Status.FLYING;
         boolean boarded, keepLanding; int charge;
+        // Optional zone the countdown tolerates movement within; null means any movement cancels.
+        Location departureAnchor; double departureRadius;
         Journey(Player player, TransportRoute route, World world, CurvedRoute curve, MatchInstance match) {
             this.player = player; this.route = route; this.world = world; this.curve = curve; this.match = match;
             destination = curve.at(curve.length()).toLocation(world);

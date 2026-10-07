@@ -305,6 +305,16 @@ public class WormholeEntry implements PersistentObject {
         remove();
     }
 
+    /** Retires this entry for good: visuals, persistence registration and its place in the tick set. */
+    void discard() {
+        stop();
+        if (persistentObjectHandler != null) {
+            persistentObjectHandler.remove();
+            persistentObjectHandler = null;
+        }
+        wormholeEntries.remove(this);
+    }
+
     private void remove(){
         if (textDisplay != null && textDisplay.isValid()) {
             textDisplay.remove();
