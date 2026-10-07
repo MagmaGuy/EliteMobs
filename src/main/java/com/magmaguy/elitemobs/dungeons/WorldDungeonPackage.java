@@ -71,8 +71,9 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
     }
 
     private void initializeWormholeWorld() {
+        // A blank name would resolve to the server folder itself.
         if (contentPackagesConfigFields.getWormholeWorldName() != null &&
-                !contentPackagesConfigFields.getWormholeWorldName().isEmpty()) {
+                !contentPackagesConfigFields.getWormholeWorldName().isBlank()) {
             // Check if the wormhole world file exists before attempting to load it
             String wormholeWorldName = contentPackagesConfigFields.getWormholeWorldName();
             // Picks up the wormhole world at either legacy or Paper-26.1+ modern layout.
@@ -84,6 +85,16 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
             }
             // If the world doesn't exist, silently skip loading (no warning needed as it's optional)
         }
+    }
+
+    @Override
+    public void doInstall(Player player) {
+        super.doInstall(player);
+        if (!isInstalled) return;
+        // WorldPackage.doInstall loads these worlds, but only baseInitialization records them,
+        // and an earlier uninstall in this session cleared both.
+        initializeWormholeWorld();
+        initializeRetiredWorlds();
     }
 
     @Override

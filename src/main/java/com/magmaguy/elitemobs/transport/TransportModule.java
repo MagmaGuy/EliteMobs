@@ -198,7 +198,14 @@ public final class TransportModule implements Listener, AutoCloseable {
                 } else if (j.status != RouteFlight.Status.FLYING) {
                     finish(j, j.status == RouteFlight.Status.ARRIVED,
                             j.status == RouteFlight.Status.ARRIVED ? "Arrived at " + j.route.name() + "." : "The mount does not support flight.");
-                } else j.releasing = false; // Still seated after a teleport that kept the vehicle, so lock the seat again.
+                } else {
+                    j.releasing = false; // Still seated after a teleport that kept the vehicle, so lock the seat again.
+                    // Sneak no longer frees a rider, so a flight that stops advancing sets them down at the destination.
+                    double distance = j.flight.distance();
+                    j.stalledTicks = distance > j.lastDistance ? 0 : j.stalledTicks + 1;
+                    j.lastDistance = distance;
+                    if (j.stalledTicks >= 100) finish(j, true, "Travel took too long; you have been set down at your destination.");
+                }
             } catch (Exception | LinkageError failure) {
                 plugin.getLogger().log(java.util.logging.Level.WARNING, "Transport " + j.route.id() + " failed", failure);
                 finish(j, false, "Travel failed: " + failure.getMessage());
@@ -291,7 +298,7 @@ public final class TransportModule implements Listener, AutoCloseable {
             finish(journey, false, "Departure cancelled because you moved.");
     }
 
-    /** A rider who presses sneak mid-flight stays seated. Every other way off the mount still works. */
+    /** Refuses only the rider's own sneak dismount mid-flight. Every other way off the mount still works. */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void keepSeated(EntityDismountEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
@@ -301,6 +308,8 @@ public final class TransportModule implements Listener, AutoCloseable {
         LivingEntity body = j.actor.getLivingEntity();
         // A removed mount is already invalid while it ejects its passengers.
         if (body == null || !body.isValid() || !event.getDismounted().getUniqueId().equals(body.getUniqueId())) return;
+        // Only the rider's own sneak is refused: the server dismounts a sneaking passenger while the flag is still set.
+        if (!player.isSneaking()) return;
         if (dismountCancellable(event)) event.setCancelled(true);
     }
 
@@ -393,6 +402,8 @@ public final class TransportModule implements Listener, AutoCloseable {
         boolean boarded, keepLanding; int charge;
         /** Set when a dismount from the mount is intended: our own release, or a teleport that is going ahead. */
         boolean releasing;
+        /** Ticks the boarded flight has not advanced; the watchdog lands the rider after five seconds. */
+        int stalledTicks; double lastDistance = -1;
         // Optional zone the countdown tolerates movement within; null means any movement cancels.
         Location departureAnchor; double departureRadius;
         Journey(Player player, TransportRoute route, World world, CurvedRoute curve, MatchInstance match) {

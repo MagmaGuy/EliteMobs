@@ -96,7 +96,8 @@ public class DungeonUtils {
         if (world == null) return true;
 
         EliteMobsWorld.destroy(world.getUID());
-        if (Bukkit.unloadWorld(world, false)) return true;
+        // Already unloaded by an earlier, partly failed uninstall: count it as done so a retry can finish.
+        if (Bukkit.getWorld(world.getUID()) == null || Bukkit.unloadWorld(world, false)) return true;
 
         // Keep protection state accurate when Bukkit refuses the unload.
         EliteMobsWorld.create(world.getUID(), contentPackagesConfigFields);
