@@ -27,9 +27,9 @@ import java.util.function.Supplier;
 /** Follows authored curves with configured mounts. Map makers own path clearance. */
 public final class TransportModule implements Listener, AutoCloseable {
     private static TransportModule instance;
-    /** Route ids whose mount failure was already logged; the fallback repeats on every boarding. */
-    private static final Set<String> WARNED_MOUNTS = new HashSet<>();
     final TransportFiles files;
+    /** Route ids whose mount failure was already logged since the last reload; the fallback repeats on every boarding. */
+    private final Set<String> warnedMounts = new HashSet<>();
     private final Plugin plugin;
     private final Map<UUID, Journey> journeys = new HashMap<>();
     private final BukkitTask task;
@@ -115,10 +115,11 @@ public final class TransportModule implements Listener, AutoCloseable {
             prepareMount(journey);
         } catch (Exception | LinkageError failure) {
             finish(journey, false, null);
-            if (WARNED_MOUNTS.add(route.id()))
+            if (warnedMounts.add(route.id()))
                 plugin.getLogger().warning("Transport " + route.id() + " could not spawn its mount; teleporting instead: " + failure);
             if (player.hasPermission("elitemobs.transport.admin"))
-                message(player, "&cMount unavailable, teleporting instead: " + failure.getMessage());
+                message(player, "&cMount unavailable, teleporting instead: "
+                        + (failure.getMessage() == null ? failure.getClass().getSimpleName() : failure.getMessage()));
             return teleportInstead(player, route, world, curve);
         }
         message(player, "Stand still. Departing for " + route.name() + " in " + route.countdown() / 20D + " seconds.");

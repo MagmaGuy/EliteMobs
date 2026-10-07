@@ -191,15 +191,18 @@ public final class NetworkEditor implements AutoCloseable {
         TransportModule.message(player, "Sampling terrain between " + a.id() + " and " + b.id() + "...");
     }
 
-    /** Reads heights from existing chunks only: at most two unloaded chunks are loaded per tick, and none is generated. */
+    /**
+     * Samples terrain from heightmap snapshots of chunks that already exist. An unloaded chunk is loaded only when it
+     * was generated before, at most two per tick, and its load request is released as soon as it is snapshotted. While
+     * such a chunk loads, the server may still prepare its neighbours as it would for any chunk load.
+     */
     private final class Sampler extends BukkitRunnable {
         final Player player; final Session s; final TransportNode a, b; final Vector start, direction, side;
         final double length; final int samples;
         /** Highest surface per sample, or NaN where no generated terrain was found. */
         final double[] heights;
-        /** Chunk key to whether its terrain can be read. */
-        final Map<Long, Boolean> chunks = new HashMap<>();
-        final List<Long> loadedHere = new ArrayList<>();
+        /** Chunk key to its heightmap snapshot; a null value marks a chunk that does not exist. */
+        final Map<Long, ChunkSnapshot> chunks = new HashMap<>();
         int index, column;
         double highest = Double.NaN;
 
@@ -212,7 +215,8 @@ public final class NetworkEditor implements AutoCloseable {
         }
 
         @Override public void run() {
-            if (sessions.get(player.getUniqueId()) != s || !player.isOnline()) { stop(Bukkit.getWorld(s.world.getUID()) != null); return; }
+            if (Bukkit.getWorld(s.world.getUID()) == null) { stop(); return; }
+            if (sessions.get(player.getUniqueId()) != s || !player.isOnline()) { stop(); return; }
             World world = s.world;
             int loads = 0;
             for (int budget = 0; budget < 96 && index <= samples; budget++) {
@@ -221,34 +225,37 @@ public final class NetworkEditor implements AutoCloseable {
                 int x = (int) Math.floor(center.getX() + side.getX() * offset), z = (int) Math.floor(center.getZ() + side.getZ() * offset);
                 int cx = x >> 4, cz = z >> 4;
                 long key = (long) cx << 32 | cz & 0xFFFFFFFFL;
-                Boolean readable = chunks.get(key);
-                if (readable == null) {
-                    if (world.isChunkLoaded(cx, cz)) readable = true;
+                if (!chunks.containsKey(key)) {
+                    ChunkSnapshot snapshot = null;
+                    if (world.isChunkLoaded(cx, cz)) snapshot = world.getChunkAt(cx, cz).getChunkSnapshot(true, false, false);
                     else {
                         if (loads == 2) return; // Resume from this column next tick.
                         loads++;
-                        readable = world.loadChunk(cx, cz, false); // false: an ungenerated chunk stays unknown.
-                        if (readable) loadedHere.add(key);
+                        if (world.loadChunk(cx, cz, false)) { // false: an ungenerated chunk stays unknown.
+                            try { snapshot = world.getChunkAt(cx, cz).getChunkSnapshot(true, false, false); }
+                            finally { world.unloadChunkRequest(cx, cz); }
+                        }
                     }
-                    chunks.put(key, readable);
+                    chunks.put(key, snapshot);
                 }
-                if (readable && world.isChunkLoaded(cx, cz)) {
-                    int y = world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING);
+                ChunkSnapshot snapshot = chunks.get(key);
+                if (snapshot != null) {
+                    // Snapshot heightmaps are MOTION_BLOCKING; an empty column reports one below the world's floor.
+                    int y = snapshot.getHighestBlockYAt(x & 15, z & 15);
                     if (y >= world.getMinHeight()) highest = Double.isNaN(highest) ? y + 1 : Math.max(highest, y + 1);
                 }
                 if (++column == 3) { heights[index++] = highest; highest = Double.NaN; column = 0; }
             }
             if (index <= samples) return;
-            stop(true);
+            stop();
             try { insertChain(player, s, a, b, start, direction, length, heights); }
             catch (RuntimeException failure) { TransportModule.message(player, failure.getMessage()); }
         }
 
-        void stop(boolean release) {
+        void stop() {
             cancel();
             if (s.sampler == this) s.sampler = null;
-            if (release) for (long key : loadedHere) s.world.unloadChunkRequest((int) (key >> 32), (int) key);
-            loadedHere.clear();
+            chunks.clear();
         }
     }
 
@@ -445,9 +452,9 @@ public final class NetworkEditor implements AutoCloseable {
         s.curveLines.values().forEach(NetworkEditor::discard); s.curveLines.clear();
     }
 
-    /** Stops a draft's sampling and visuals. In an unloaded world its entities and chunk tickets are already gone. */
+    /** Stops a draft's sampling and visuals. In an unloaded world its entities are already gone. */
     private static void dispose(Session s, boolean worldLoaded) {
-        if (s.sampler != null) s.sampler.stop(worldLoaded);
+        if (s.sampler != null) s.sampler.stop();
         if (worldLoaded) clearVisuals(s);
         else { s.labels.clear(); s.lines.clear(); s.curveLines.clear(); }
     }
