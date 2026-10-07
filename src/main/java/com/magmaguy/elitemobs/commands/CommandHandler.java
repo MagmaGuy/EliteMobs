@@ -97,6 +97,10 @@ public class CommandHandler {
         emCommand.registerCommand(new DebugInfoCommand());
         for (String action : java.util.List.of("create", "edit", "add", "remove", "move", "undo", "save", "cancel", "ride", "start", "stop", "status", "list", "reload"))
             emCommand.registerCommand(new TransportCommand(action));
+        for (String action : List.of("edit", "list", "undo", "preview", "generate", "ride", "save", "cancel", "status"))
+            emCommand.registerCommand(new TransportNetworkCommand("network", action));
+        for (String action : List.of("add", "select", "link", "unlink", "move", "remove", "destination", "permission", "hint", "yaw"))
+            emCommand.registerCommand(new TransportNetworkCommand("node", action));
         for (String patrolAction : List.of("edit", "add", "remove", "undo", "mode", "save", "cancel", "status"))
             emCommand.registerCommand(new PatrolCommand(patrolAction));
         emCommand.registerCommand(new NightbreakRecommendedPluginsCommand(MetadataHandler.PLUGIN, EliteMobs.NIGHTBREAK_PLUGIN_SPEC));

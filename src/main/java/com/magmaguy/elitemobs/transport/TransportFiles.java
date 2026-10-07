@@ -44,6 +44,7 @@ final class TransportFiles {
     boolean hasDefinition(String id) { return configuration.getCustomConfigFieldsHashMap().containsKey(id + ".yml"); }
     List<String> ids() { return List.copyOf(loaded.keySet()); }
     TransportNetwork network(String id) { return loadedNetworks.get(id); }
+    boolean hasNetworkDefinition(String id) { return networkConfiguration.getCustomConfigFieldsHashMap().containsKey(id + ".yml"); }
     List<String> networkIds() { return List.copyOf(loadedNetworks.keySet()); }
     void save(TransportRoute route) throws IOException {
         var fields = configuration.getCustomConfigFieldsHashMap().get(route.id() + ".yml");

@@ -16,9 +16,13 @@ import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.player.*;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
+import java.util.function.Supplier;
 
 /** Follows authored curves with configured mounts. Map makers own path clearance. */
 public final class TransportModule implements Listener, AutoCloseable {
@@ -29,6 +33,8 @@ public final class TransportModule implements Listener, AutoCloseable {
     private final BukkitTask task;
     private final TransportEditor editor;
     private final TransportMenu menu;
+    private final NamespacedKey pendingLanding;
+    private final NetworkEditor networkEditor;
     private volatile boolean closed;
 
     private TransportModule(Plugin plugin) throws Exception {
@@ -36,6 +42,8 @@ public final class TransportModule implements Listener, AutoCloseable {
         files = new TransportFiles(plugin.getDataFolder().toPath(), plugin.getLogger());
         editor = new TransportEditor(this, plugin);
         menu = new TransportMenu(this, plugin);
+        pendingLanding = new NamespacedKey(plugin, "pending_flight_landing");
+        networkEditor = new NetworkEditor(this, plugin);
         Bukkit.getPluginManager().registerEvents(this, plugin);
         task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1, 1);
     }
@@ -51,7 +59,33 @@ public final class TransportModule implements Listener, AutoCloseable {
         return instance != null && instance.riding(player);
     }
     public TransportEditor editor() { return editor; }
-    public void openDestinations(Player player, com.magmaguy.elitemobs.npcs.NPCEntity npc) { menu.open(player, npc); }
+    public NetworkEditor networkEditor() { return networkEditor; }
+    public void openDestinations(Player player, com.magmaguy.elitemobs.npcs.NPCEntity npc) {
+        var fields = npc.getNPCsConfigFields();
+        if (fields.getTransportNetwork() == null) { menu.open(player, npc); return; }
+        openFlightPoint(player, TransportMenu.npcAnchor(npc), fields.getTransportNetwork(), fields.getTransportNode(),
+                fields.getTransportDestination());
+    }
+
+    /** Flies from one network node to a destination, checking the departure and destination permissions. */
+    public boolean startFlight(Player player, String networkId, String fromNode, String toNode) {
+        TransportNetwork network = files.network(networkId);
+        if (network == null) { message(player, "Unknown flight network " + networkId + "."); return false; }
+        TransportNode from = network.nodes().get(fromNode), to = network.nodes().get(toNode);
+        if (from == null || to == null || !to.destination()) { message(player, "Unknown flight point."); return false; }
+        if (!from.unlockedFor(player)) { message(player, TransportMenu.lockedMessage(from)); return false; }
+        if (!to.unlockedFor(player)) { message(player, TransportMenu.lockedMessage(to)); return false; }
+        try { return start(player, network.route(fromNode, toNode)); }
+        catch (IllegalArgumentException failure) { message(player, failure.getMessage()); return false; }
+    }
+
+    /** Opens a flight point's menu, or flies straight to its fixed destination. */
+    public void openFlightPoint(Player player, Supplier<Location> anchor, String networkId, String node, String destination) {
+        if (destination != null && !destination.isBlank()) { startFlight(player, networkId, node, destination); return; }
+        TransportNetwork network = files.network(networkId);
+        if (network == null) { message(player, "Unknown flight network " + networkId + "."); return; }
+        menu.openNetwork(player, anchor, network, node);
+    }
 
     /** A server-thread entry point for authored prop scripts. Reports rejection to the player. */
     public static boolean startRoute(Player player, String routeId) {
@@ -64,24 +98,42 @@ public final class TransportModule implements Listener, AutoCloseable {
             message(player, "You cannot board right now."); return false;
         }
         if (route == null) { message(player, "Unknown transport route."); return false; }
+        World world;
+        CurvedRoute curve;
+        try { world = resolveWorld(player, route); curve = route.curve(); }
+        catch (Exception failure) { message(player, failure.getMessage()); return false; }
+        if (Bukkit.getServicesManager().load(EliteMindService.class) == null) return teleportInstead(player, route, world, curve);
+        Journey journey = new Journey(player, route, world, curve, PlayerData.getMatchInstance(player));
+        journeys.put(player.getUniqueId(), journey);
         try {
-            if (Bukkit.getServicesManager().load(EliteMindService.class) == null)
-                throw new IllegalStateException("Native flying Minds are unavailable on this server version.");
             requireTransportEntity(route);
-            World world = resolveWorld(player, route);
-            CurvedRoute curve = route.curve();
-            MatchInstance match = PlayerData.getMatchInstance(player);
-            Journey journey = new Journey(player, route, world, curve, match);
-            journeys.put(player.getUniqueId(), journey);
-            try {
-                prepareMount(journey);
-            } catch (Exception | LinkageError failure) {
-                finish(journey, false, null);
-                throw failure;
-            }
-            message(player, "Stand still. Departing for " + route.name() + " in " + route.countdown() / 20D + " seconds.");
-            return true;
-        } catch (Exception | LinkageError failure) { message(player, failure.getMessage()); return false; }
+            prepareMount(journey);
+        } catch (Exception | LinkageError failure) {
+            finish(journey, false, null);
+            plugin.getLogger().warning("Transport " + route.id() + " could not spawn its mount; teleporting instead: " + failure);
+            return teleportInstead(player, route, world, curve);
+        }
+        message(player, "Stand still. Departing for " + route.name() + " in " + route.countdown() / 20D + " seconds.");
+        return true;
+    }
+
+    private boolean teleportInstead(Player player, TransportRoute route, World world, CurvedRoute curve) {
+        Location destination = curve.at(curve.length()).toLocation(world);
+        destination.setYaw(route.arrivalYaw());
+        if (!InstancePlayerMovement.teleportWithinWorld(player, destination, PlayerTeleportEvent.TeleportCause.PLUGIN)) {
+            message(player, "Travel failed."); return false;
+        }
+        player.setFallDistance(0);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 0));
+        markArrivalPortal(player, destination);
+        message(player, "Arrived at " + route.name() + ".");
+        return true;
+    }
+
+    /** Arriving inside a flight portal must not reopen it until the player steps out. */
+    private static void markArrivalPortal(Player player, Location destination) {
+        var wormholes = com.magmaguy.elitemobs.wormhole.WormholeManager.getInstance(true);
+        if (wormholes != null) wormholes.addPlayerToCooldown(player, destination);
     }
 
     static World resolveWorld(Player player, TransportRoute route) {
@@ -148,12 +200,14 @@ public final class TransportModule implements Listener, AutoCloseable {
         if (!body.addPassenger(j.player) || j.player.getVehicle() != body)
             throw new IllegalStateException("Could not seat the player on the mount");
         j.boarded = true;
+        j.player.getPersistentDataContainer().set(pendingLanding, PersistentDataType.STRING, encode(j.destination));
         j.player.setFallDistance(0);
         j.world.playSound(body.getLocation(), Sound.ENTITY_HORSE_SADDLE, 1, 1);
     }
 
     private void finish(Journey j, boolean arrived, String reason) {
         if (!journeys.remove(j.player.getUniqueId(), j)) return;
+        if (!j.keepLanding) j.player.getPersistentDataContainer().remove(pendingLanding);
         try {
             if (j.actor != null) {
                 try {
@@ -168,7 +222,7 @@ public final class TransportModule implements Listener, AutoCloseable {
                 Location actual = j.player.getLocation();
                 boolean placed = accepted && actual.getWorld().equals(j.destination.getWorld())
                         && actual.distanceSquared(j.destination) < 0.000001D;
-                if (placed) j.player.setFallDistance(0);
+                if (placed) { j.player.setFallDistance(0); markArrivalPortal(j.player, j.destination); }
                 else reason = "Travel interrupted. The final destination could not be reached.";
             } else if (arrived) {
                 reason = "Travel interrupted.";
@@ -190,8 +244,21 @@ public final class TransportModule implements Listener, AutoCloseable {
     }
 
     @EventHandler public void quit(PlayerQuitEvent event) {
+        networkEditor.end(event.getPlayer().getUniqueId());
         Journey j = journeys.get(event.getPlayer().getUniqueId());
-        if (j != null) finish(j, false, null);
+        if (j != null) { j.keepLanding = j.boarded; finish(j, false, null); }
+    }
+    @EventHandler public void join(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        var data = player.getPersistentDataContainer();
+        String stored = data.get(pendingLanding, PersistentDataType.STRING);
+        if (stored == null) return;
+        data.remove(pendingLanding);
+        Location landing = decode(stored);
+        if (landing == null) return; // That world is gone; instance recovery owns players returning to removed instances.
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (player.isOnline() && player.teleport(landing)) player.setFallDistance(0);
+        });
     }
     @EventHandler public void leave(MatchLeaveEvent event) {
         Journey j = journeys.get(event.getPlayer().getUniqueId()); if (j != null) finish(j, false, null);
@@ -206,10 +273,26 @@ public final class TransportModule implements Listener, AutoCloseable {
         Journey j = journeys.get(player.getUniqueId()); if (j != null) finish(j, false, "Travel cancelled.");
     }
     @Override public void close() {
-        for (Journey j : List.copyOf(journeys.values())) finish(j, false, null);
-        closed = true; task.cancel(); editor.close(); menu.close(); HandlerList.unregisterAll(this);
+        // Boarded riders land at their destination rather than mid-air.
+        for (Journey j : List.copyOf(journeys.values())) finish(j, j.boarded && j.player.isOnline(), null);
+        closed = true; task.cancel(); editor.close(); menu.close(); networkEditor.close(); HandlerList.unregisterAll(this);
     }
     static void message(Player player, String text) { player.sendMessage(ChatColorConverter.convert("&6[Travel] &f" + text)); }
+
+    private static String encode(Location location) {
+        return location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," + location.getZ() + "," + location.getYaw();
+    }
+
+    private static Location decode(String text) {
+        String[] values = text.split(",");
+        if (values.length != 5) return null;
+        World world = Bukkit.getWorld(values[0]);
+        if (world == null) return null;
+        try {
+            return new Location(world, Double.parseDouble(values[1]), Double.parseDouble(values[2]),
+                    Double.parseDouble(values[3]), Float.parseFloat(values[4]), 0);
+        } catch (NumberFormatException invalid) { return null; }
+    }
 
     private static com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields requireTransportEntity(TransportRoute route) {
         var config = com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig.getCustomBoss(route.transportEntity());
@@ -223,7 +306,7 @@ public final class TransportModule implements Listener, AutoCloseable {
         final MatchInstance match; final Location destination;
         EliteEntity actor; RouteFlight flight;
         RouteFlight.Status status = RouteFlight.Status.FLYING;
-        boolean boarded; int charge;
+        boolean boarded, keepLanding; int charge;
         Journey(Player player, TransportRoute route, World world, CurvedRoute curve, MatchInstance match) {
             this.player = player; this.route = route; this.world = world; this.curve = curve; this.match = match;
             destination = curve.at(curve.length()).toLocation(world);

@@ -95,6 +95,12 @@ public class NPCsConfigFields extends CustomConfigFields {
     @Getter
     private List<String> transportRoutes = new ArrayList<>();
     @Getter
+    private String transportNetwork;
+    @Getter
+    private String transportNode;
+    @Getter
+    private String transportDestination;
+    @Getter
     private PatrolRoute patrolRoute;
     /** Zero disables proximity pauses. Independent of chatter and manual patrol holds. */
     @Getter
@@ -226,6 +232,9 @@ public class NPCsConfigFields extends CustomConfigFields {
         this.syncMovement = processBoolean("syncMovement", syncMovement, false, true);
         this.scripts = processStringList("scripts", scripts, new ArrayList<>(), false);
         this.transportRoutes = processStringList("transportRoutes", transportRoutes, new ArrayList<>(), false);
+        this.transportNetwork = processString("transportNetwork", transportNetwork, null, false);
+        this.transportNode = processString("transportNode", transportNode, null, false);
+        this.transportDestination = processString("transportDestination", transportDestination, null, false);
         patrolPauseNearPlayersRadius = processDouble("patrol.pauseNearPlayersRadius", patrolPauseNearPlayersRadius, 0D, false);
         patrolFaceNearbyPlayers = processBoolean("patrol.faceNearbyPlayers", patrolFaceNearbyPlayers, false, false);
         if (!Double.isFinite(patrolPauseNearPlayersRadius) || patrolPauseNearPlayersRadius < 0D) {
