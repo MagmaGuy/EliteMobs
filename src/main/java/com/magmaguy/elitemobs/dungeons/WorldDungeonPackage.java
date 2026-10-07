@@ -23,10 +23,10 @@ import java.util.List;
 public class WorldDungeonPackage extends WorldPackage implements Dungeon {
     private int lowestLevel;
     private int highestLevel;
+    // No initializers on these two: the EMPackage constructor runs baseInitialization before this class's
+    // initializers, and an initializer would then discard the worlds it loaded.
     @Getter
-    private World wormholeWorld = null;
-    // No initializer: the EMPackage constructor runs baseInitialization before this class's initializers,
-    // and an initializer would then discard the worlds it loaded.
+    private World wormholeWorld;
     @Getter
     private List<World> retiredWorlds;
 
