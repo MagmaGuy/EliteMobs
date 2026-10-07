@@ -17,6 +17,13 @@ public record TransportNetwork(String id, String world, String transportEntity, 
         if (!Double.isFinite(speed) || speed <= 0 || !Double.isFinite(acceleration) || acceleration <= 0 || countdown < 0)
             throw new IllegalArgumentException("Network " + id + " has an invalid speed, acceleration or countdown");
         nodes = Collections.unmodifiableMap(new LinkedHashMap<>(nodes));
+        for (var entry : nodes.entrySet()) {
+            if (entry.getValue() == null || !entry.getValue().id().equals(entry.getKey()))
+                throw new IllegalArgumentException("Network " + id + " stores a node under the wrong id: " + entry.getKey());
+            for (String neighbor : entry.getValue().neighbors())
+                if (!nodes.containsKey(neighbor))
+                    throw new IllegalArgumentException("Network " + id + " node " + entry.getKey() + " links to missing node " + neighbor);
+        }
     }
 
     /** Builds a network whose links are symmetric, dropping links that cannot be flown. */
@@ -100,7 +107,8 @@ public record TransportNetwork(String id, String world, String transportEntity, 
         }
         return distance.keySet().stream().filter(nodeId -> !nodeId.equals(from)).map(nodes::get)
                 .filter(TransportNode::destination)
-                .sorted(Comparator.comparingDouble(node -> distance.get(node.id()))).toList();
+                .sorted(Comparator.comparingDouble((TransportNode node) -> distance.get(node.id())).thenComparing(TransportNode::id))
+                .toList();
     }
 
     /** The flight between two nodes as an ordinary route, so journeys need no network-specific code. */
@@ -118,6 +126,7 @@ public record TransportNetwork(String id, String world, String transportEntity, 
     static TransportNetwork read(String id, ConfigurationSection yaml, Consumer<String> warn) {
         List<TransportNode> raw = new ArrayList<>();
         ConfigurationSection section = yaml.getConfigurationSection("nodes");
+        if (yaml.contains("nodes") && section == null) warn.accept("nodes must be a map of node sections");
         if (section != null) for (String nodeId : section.getKeys(false)) {
             ConfigurationSection node = section.getConfigurationSection(nodeId);
             if (node == null) { warn.accept("node " + nodeId + " is not a section"); continue; }
@@ -125,7 +134,7 @@ public record TransportNetwork(String id, String world, String transportEntity, 
                 raw.add(new TransportNode(nodeId, parse(node.getString("location")), node.getString("name"),
                         node.getString("permission"), node.getString("lockedHint"), (float) node.getDouble("arrivalYaw", 0),
                         new LinkedHashSet<>(node.getStringList("neighbors")), node.getBoolean("placeholder", false)));
-            } catch (IllegalArgumentException invalid) { warn.accept(invalid.getMessage()); }
+            } catch (IllegalArgumentException invalid) { warn.accept("node " + nodeId + " skipped: " + invalid.getMessage()); }
         }
         return linked(id, yaml.getString("world"), yaml.getString("transportEntity", "transport_cannon_seat.yml"),
                 yaml.getDouble("speed", 24), yaml.getDouble("acceleration", 16), yaml.getInt("countdownTicks", 60), raw, warn);
@@ -137,15 +146,18 @@ public record TransportNetwork(String id, String world, String transportEntity, 
             yaml.set("world", world); yaml.set("transportEntity", transportEntity);
             yaml.set("speed", speed); yaml.set("acceleration", acceleration); yaml.set("countdownTicks", countdown);
         }
-        yaml.set("nodes", null);
+        // Update in place so comments and unknown keys inside surviving nodes are kept.
+        ConfigurationSection section = yaml.isConfigurationSection("nodes") ? yaml.getConfigurationSection("nodes") : yaml.createSection("nodes");
+        for (String key : section.getKeys(false)) if (!nodes.containsKey(key)) section.set(key, null);
         for (TransportNode node : nodes.values()) {
-            String path = "nodes." + node.id() + ".";
-            yaml.set(path + "location", format(node.location()));
-            if (node.destination()) { yaml.set(path + "name", node.name()); yaml.set(path + "arrivalYaw", node.arrivalYaw()); }
-            if (node.permission() != null) yaml.set(path + "permission", node.permission());
-            if (node.lockedHint() != null) yaml.set(path + "lockedHint", node.lockedHint());
-            if (node.placeholder()) yaml.set(path + "placeholder", true);
-            yaml.set(path + "neighbors", node.neighbors().stream().sorted().toList());
+            ConfigurationSection entry = section.isConfigurationSection(node.id()) ? section.getConfigurationSection(node.id()) : section.createSection(node.id());
+            entry.set("location", format(node.location()));
+            entry.set("name", node.name());
+            entry.set("arrivalYaw", node.destination() ? (Object) node.arrivalYaw() : null);
+            entry.set("permission", node.permission());
+            entry.set("lockedHint", node.lockedHint());
+            entry.set("placeholder", node.placeholder() ? true : null);
+            entry.set("neighbors", node.neighbors().stream().sorted().toList());
         }
     }
 

@@ -66,6 +66,8 @@ final class TransportFiles {
     void saveNetwork(TransportNetwork network) throws IOException {
         var fields = networkConfiguration.getCustomConfigFieldsHashMap().get(network.id() + ".yml");
         Path target = fields == null ? networks.resolve(network.id() + ".yml") : fields.getFile().toPath();
+        if (fields != null && network(network.id()) == null)
+            throw new IOException("Network file exists but is disabled or invalid. Fix or remove it first: " + target);
         YamlConfiguration yaml = new YamlConfiguration();
         yaml.options().parseComments(true);
         try { if (Files.exists(target)) yaml.load(target.toFile()); }
