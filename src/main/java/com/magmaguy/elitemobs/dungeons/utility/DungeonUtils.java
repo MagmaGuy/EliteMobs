@@ -37,8 +37,10 @@ public class DungeonUtils {
         String worldName = worldPackage.getContentPackagesConfigFields().getWorldName();
         World.Environment environment = worldPackage.getContentPackagesConfigFields().getEnvironment();
         World world = loadWorld(worldName, environment, worldPackage.getContentPackagesConfigFields());
-        if (worldPackage.getContentPackagesConfigFields().getWormholeWorldName() != null)
-            loadWorld(worldPackage.getContentPackagesConfigFields().getWormholeWorldName(), environment, worldPackage.getContentPackagesConfigFields());
+        String wormholeWorldName = worldPackage.getContentPackagesConfigFields().getWormholeWorldName();
+        // A blank name means no wormhole world; loading it would resolve to the server folder.
+        if (wormholeWorldName != null && !wormholeWorldName.isEmpty())
+            loadWorld(wormholeWorldName, environment, worldPackage.getContentPackagesConfigFields());
         if (world != null) worldPackage.setInstalled(true);
         return world;
     }
@@ -60,13 +62,17 @@ public class DungeonUtils {
         World wormholeWorld = worldPackage instanceof WorldDungeonPackage worldDungeonPackage
                 ? worldDungeonPackage.getWormholeWorld()
                 : null;
+        List<World> retiredWorlds = worldPackage instanceof WorldDungeonPackage worldDungeonPackage
+                ? worldDungeonPackage.getRetiredWorlds()
+                : List.of();
 
         World fallbackWorld = Bukkit.getWorlds().stream()
-                .filter(world -> world != packageWorld && world != wormholeWorld)
+                .filter(world -> world != packageWorld && world != wormholeWorld && !retiredWorlds.contains(world))
                 .findFirst()
                 .orElse(null);
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getWorld() != packageWorld && player.getWorld() != wormholeWorld) continue;
+            if (player.getWorld() != packageWorld && player.getWorld() != wormholeWorld
+                    && !retiredWorlds.contains(player.getWorld())) continue;
             if (fallbackWorld == null || !player.teleport(fallbackWorld.getSpawnLocation())) {
                 Logger.warn("Could not move " + player.getName() + " out of dungeon world " +
                         player.getWorld().getName() + "; refusing to unload it.");
@@ -75,8 +81,12 @@ public class DungeonUtils {
         }
 
         if (!unloadRegisteredWorld(packageWorld, worldPackage.getContentPackagesConfigFields())) return false;
-        return wormholeWorld == packageWorld ||
-                unloadRegisteredWorld(wormholeWorld, worldPackage.getContentPackagesConfigFields());
+        if (wormholeWorld != packageWorld &&
+                !unloadRegisteredWorld(wormholeWorld, worldPackage.getContentPackagesConfigFields())) return false;
+        for (World retiredWorld : retiredWorlds)
+            if (retiredWorld != packageWorld && retiredWorld != wormholeWorld &&
+                    !unloadRegisteredWorld(retiredWorld, worldPackage.getContentPackagesConfigFields())) return false;
+        return true;
     }
 
     private static boolean unloadRegisteredWorld(World world,

@@ -142,6 +142,7 @@ public class EventsRegistrer {
                 register(new com.magmaguy.elitemobs.parties.PartyInteractionHint());
         }
         register(new com.magmaguy.elitemobs.wormhole.WormholePlayerListener());
+        register(new com.magmaguy.elitemobs.dungeons.RetiredWorldRedirect());
 
         //Mob damage
         register(new EliteMobGenericDamagedHandler());

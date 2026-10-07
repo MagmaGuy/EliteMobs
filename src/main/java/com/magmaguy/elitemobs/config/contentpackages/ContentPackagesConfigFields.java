@@ -48,6 +48,8 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     @Setter
     private String wormholeWorldName;
     @Getter
+    private List<String> retiredWorldNames = null;
+    @Getter
     private String schematicName = null;
     @Getter
     private World.Environment environment = World.Environment.NORMAL;
@@ -371,6 +373,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         }
         this.worldName = processString("worldName", worldName, null, false);
         this.wormholeWorldName = processString("wormholeWorldName", wormholeWorldName, null, false);
+        this.retiredWorldNames = processStringList("retiredWorldNames", retiredWorldNames, null, false);
         this.schematicName = processString("schematicName", schematicName, null, false);
         this.environment = processEnum("environment", environment, null, World.Environment.class, false);
         this.protect = processBoolean("protect", protect, true, true);

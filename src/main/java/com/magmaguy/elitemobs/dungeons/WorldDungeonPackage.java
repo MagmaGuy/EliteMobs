@@ -6,11 +6,16 @@ import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
 import com.magmaguy.elitemobs.treasurechest.TreasureChest;
+import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.magmacore.util.WorldFolderResolver;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is specifically for world-based dungeons
@@ -20,6 +25,10 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
     private int highestLevel;
     @Getter
     private World wormholeWorld = null;
+    // No initializer: the EMPackage constructor runs baseInitialization before this class's initializers,
+    // and an initializer would then discard the worlds it loaded.
+    @Getter
+    private List<World> retiredWorlds;
 
     public WorldDungeonPackage(ContentPackagesConfigFields contentPackagesConfigFields) {
         super(contentPackagesConfigFields);
@@ -29,6 +38,29 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
     public void baseInitialization() {
         super.baseInitialization();
         initializeWormholeWorld();
+        initializeRetiredWorlds();
+    }
+
+    private void initializeRetiredWorlds() {
+        retiredWorlds = new ArrayList<>();
+        List<String> retiredWorldNames = contentPackagesConfigFields.getRetiredWorldNames();
+        if (retiredWorldNames == null) return;
+        for (String retiredWorldName : retiredWorldNames) {
+            // A blank name resolves to the server folder itself, which folderExists reports as present.
+            if (retiredWorldName == null || retiredWorldName.isBlank()) continue;
+            if (Bukkit.getWorld(retiredWorldName) == null && !WorldFolderResolver.folderExists(retiredWorldName)) continue;
+            Location teleportLocation = contentPackagesConfigFields.getTeleportLocation();
+            if (!isInstalled || teleportLocation == null || teleportLocation.getWorld() == null) {
+                Logger.warn("Retired world " + retiredWorldName + " was not loaded: package "
+                        + contentPackagesConfigFields.getFilename() + " is not installed or has no teleportLocation to send players to.");
+                continue;
+            }
+            World retiredWorld = DungeonUtils.loadWorld(retiredWorldName, contentPackagesConfigFields.getEnvironment(),
+                    contentPackagesConfigFields);
+            if (retiredWorld == null) continue;
+            retiredWorlds.add(retiredWorld);
+            RetiredWorldRedirect.register(retiredWorld, contentPackagesConfigFields);
+        }
     }
 
     private void initializeWormholeWorld() {
@@ -67,6 +99,8 @@ public class WorldDungeonPackage extends WorldPackage implements Dungeon {
         treasureChestList.clear();
         npcEntities.clear();
         wormholeWorld = null;
+        for (World retiredWorld : retiredWorlds) RetiredWorldRedirect.unregister(retiredWorld.getName());
+        retiredWorlds.clear();
     }
 
     private void getEntities() {
