@@ -319,6 +319,8 @@ public class WormholeEntry implements PersistentObject {
     }
 
     public void updateLocation(Player player) {
+        // An instance copy shares the blueprint's config file; never write an instance world location into it.
+        if (wormhole.isInstanceCopy()) return;
         Location replacement = player.getLocation().add(0,
                 wormhole.getWormholeConfigFields().getSizeMultiplier(), 0);
         wormhole.getWormholeConfigFields().setWormholeEntryLocation(replacement, wormholeNumber);

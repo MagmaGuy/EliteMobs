@@ -19,6 +19,8 @@ public class WormholeNavigation {
     public static Location findDirectWormholeEntry(World sourceWorld, World destinationWorld) {
         if (sourceWorld == null || destinationWorld == null || sourceWorld.equals(destinationWorld)) return null;
         for (Wormhole wormhole : Wormhole.getWormholes()) {
+            // A one-ended flight portal doesn't link two worlds.
+            if (wormhole.getWormholeEntry2() == null) continue;
             Location entry1 = wormhole.getWormholeEntry1().getLocation();
             Location entry2 = wormhole.getWormholeEntry2().getLocation();
             if (isEntryInWorld(entry1, sourceWorld) && isEntryInWorld(entry2, destinationWorld))

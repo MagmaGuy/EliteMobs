@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.CustomConfigFields;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.wormhole.Wormhole;
+import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -46,6 +47,20 @@ public class WormholeConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private String customModel2 = null;
+    // Optional flight section: stepping in opens this network node's flight menu instead of teleporting.
+    @Getter
+    @Setter
+    private String flightNetwork;
+    @Getter
+    @Setter
+    private String flightNode;
+    @Getter
+    @Setter
+    private String flightDestination;
+    // Both ends live in a dungeon blueprint world; a copy is created per instance, like instanced NPCs.
+    @Getter
+    @Setter
+    private boolean instanced;
 
     public WormholeConfigFields(String filename,
                                 boolean isEnabled,
@@ -67,7 +82,14 @@ public class WormholeConfigFields extends CustomConfigFields {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.location1 = processString("location1", location1, null, true);
         this.location1Text = translatable(filename, "location1Text", processString("location1Text", location1Text, null, false));
-        this.location2 = processString("location2", location2, null, true);
+        this.flightNetwork = processString("flight.network", flightNetwork, null, false);
+        this.flightNode = processString("flight.node", flightNode, null, false);
+        this.flightDestination = processString("flight.destination", flightDestination, null, false);
+        this.instanced = processBoolean("instanced", instanced, false, false);
+        if (isFlightPortal() && (flightNode == null || flightNode.isBlank()))
+            Logger.warn("Wormhole " + filename + " has a flight section without flight.node! Its flight menu will not know where it departs from.");
+        // Flight portals may be one-ended, so they don't get a location2 default written into them.
+        this.location2 = processString("location2", location2, null, !isFlightPortal());
         this.location2Text = translatable(filename, "location2Text", processString("location2Text", location2Text, null, false));
         this.permission = processString("permission", permission, null, false);
         this.coinCost = processDouble("coinCost", coinCost, 0, false);
@@ -77,6 +99,10 @@ public class WormholeConfigFields extends CustomConfigFields {
         this.sizeMultiplier = processDouble("sizeMultiplier", sizeMultiplier, 1D, false);
         this.customModel1 = processString("customModel1", customModel1, null, false);
         this.customModel2 = processString("customModel2", customModel2, null, false);
+    }
+
+    public boolean isFlightPortal() {
+        return flightNetwork != null && !flightNetwork.isBlank();
     }
 
     public void setWormholeEntryLocation(Location location, int wormholeNumber) {

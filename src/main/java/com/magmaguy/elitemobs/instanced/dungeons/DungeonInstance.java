@@ -639,6 +639,7 @@ public class DungeonInstance extends MatchInstance {
     }
 
     private static void cleanupWorldScopedState(World worldToDelete) {
+        com.magmaguy.elitemobs.wormhole.Wormhole.removeInstancedWormholes(worldToDelete);
         com.magmaguy.elitemobs.explosionregen.Explosion.discardForWorld(worldToDelete.getUID());
         UUID worldUUID = worldToDelete.getUID();
         EliteMobsWorld.destroy(worldUUID);
@@ -790,6 +791,7 @@ public class DungeonInstance extends MatchInstance {
             instancedBossEntities = InstancedBossEntity.initializeInstancedBosses(contentPackagesConfigFields.getWorldName(), world, players.size(), dungeonInstance);
             NPCEntity.initializeInstancedNPCs(contentPackagesConfigFields.getWorldName(), world, players.size(), dungeonInstance);
             TreasureChest.initializeInstancedTreasureChests(contentPackagesConfigFields.getWorldName(), world);
+            com.magmaguy.elitemobs.wormhole.Wormhole.initializeInstancedWormholes(contentPackagesConfigFields.getWorldName(), world);
         }
     }
 

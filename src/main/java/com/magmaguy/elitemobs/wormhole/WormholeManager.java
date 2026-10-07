@@ -2,11 +2,15 @@ package com.magmaguy.elitemobs.wormhole;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.PlayerTeleportEvent;
+import com.magmaguy.elitemobs.commands.DungeonCommands;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.config.WormholesConfig;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
+import com.magmaguy.elitemobs.dungeons.WorldInstancedDungeonPackage;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns;
+import com.magmaguy.elitemobs.transport.TransportModule;
 import com.magmaguy.elitemobs.utils.DiscordLinks;
 import com.magmaguy.magmacore.util.ChunkLocationChecker;
 import com.magmaguy.magmacore.util.Logger;
@@ -136,6 +140,17 @@ public class WormholeManager {
      * Teleports a player through a wormhole
      */
     private void teleportPlayer(WormholeEntry sourceEntry, Player player) {
+        // Flight portals open their node's flight menu instead of teleporting, charging or blinding.
+        var fields = sourceEntry.getWormhole().getWormholeConfigFields();
+        if (fields.isFlightPortal()) {
+            addPlayerToCooldown(player, sourceEntry); // Step out and back in to reopen the menu.
+            var transport = TransportModule.get();
+            if (transport == null) { Logger.sendMessage(player, "&cFlights are unavailable."); return; }
+            Location anchor = sourceEntry.getLocation().clone();
+            transport.openFlightPoint(player, () -> anchor, fields.getFlightNetwork(), fields.getFlightNode(), fields.getFlightDestination());
+            return;
+        }
+
         // Determine destination wormhole
         WormholeEntry destinationEntry;
 
@@ -143,6 +158,18 @@ public class WormholeManager {
             destinationEntry = sourceEntry.getWormhole().getWormholeEntry2();
         } else {
             destinationEntry = sourceEntry.getWormhole().getWormholeEntry1();
+        }
+        // Only one-ended flight portals lack a second entry, and they returned above.
+        if (destinationEntry == null) return;
+
+        // An instanced dungeon has no fixed teleport location: start its normal entry flow
+        // (difficulty browser, party and ready check) before any payment or teleport.
+        String destinationKey = destinationEntry.getLocationString();
+        if (destinationKey != null && !destinationKey.contains(",")
+                && EMPackage.getEmPackages().get(destinationKey) instanceof WorldInstancedDungeonPackage) {
+            addPlayerToCooldown(player, sourceEntry);
+            DungeonCommands.teleport(player, destinationKey);
+            return;
         }
 
         Location destination = destinationEntry.getLocation();

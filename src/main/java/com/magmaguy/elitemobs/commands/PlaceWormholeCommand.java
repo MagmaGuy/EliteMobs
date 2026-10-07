@@ -27,12 +27,19 @@ public class PlaceWormholeCommand extends AdvancedCommand {
     @Override
     public void execute(CommandData commandData) {
         for (Wormhole wormhole : Wormhole.getWormholes()) {
+            // Instance copies share their blueprint's file; moving one would write an instance world into it.
+            if (wormhole.isInstanceCopy()) continue;
             if (wormhole.getWormholeConfigFields().getFilename().equals(commandData.getStringArgument("filename")))
                 switch (commandData.getStringArgument("wormholeOption")) {
                     case "1":
                         wormhole.getWormholeEntry1().updateLocation(commandData.getPlayerSender());
                         return;
                     case "2":
+                        // A one-ended flight portal has no second end to move.
+                        if (wormhole.getWormholeEntry2() == null) {
+                            Logger.sendMessage(commandData.getCommandSender(), CommandMessagesConfig.getWormholeSetFailedMessage());
+                            return;
+                        }
                         wormhole.getWormholeEntry2().updateLocation(commandData.getPlayerSender());
                         return;
                     default:
