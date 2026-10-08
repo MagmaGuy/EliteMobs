@@ -206,6 +206,7 @@ public final class TransportModule implements Listener, AutoCloseable {
                     j.stalledTicks = distance > j.lastDistance ? 0 : j.stalledTicks + 1;
                     j.lastDistance = distance;
                     if (j.stalledTicks >= 100) finish(j, true, "Travel took too long; you have been set down at your destination.");
+                    else if (j.winged) flap(j);
                 }
             } catch (Exception | LinkageError failure) {
                 plugin.getLogger().log(java.util.logging.Level.WARNING, "Transport " + j.route.id() + " failed", failure);
@@ -226,6 +227,7 @@ public final class TransportModule implements Listener, AutoCloseable {
                     }
                 }).build();
         var entityConfig = requireTransportEntity(j.route);
+        j.winged = WINGED.contains(entityConfig.getEntityType());
         var profile = new EliteMindBodyProfile(EliteMindBodyLocomotion.FLYING, entityConfig.getScale(),
                 true, entityConfig.getEntityType().getKey());
         j.actor = EliteMindServiceModule.spawnInternal(new InternalMindActorSpawnRequest(plugin,
@@ -235,6 +237,20 @@ public final class TransportModule implements Listener, AutoCloseable {
                     body.setInvulnerable(true);
                     body.setGravity(false);
                 }, entityConfig)).orElseThrow(() -> new IllegalStateException("Native flying Minds are unavailable on this server version"));
+    }
+
+    /** Feathered mounts shed feathers and beat their wings while they fly; seats and other carriers stay quiet. */
+    private static final Set<EntityType> WINGED = Set.of(EntityType.CHICKEN, EntityType.PARROT);
+    private static final org.bukkit.inventory.ItemStack FEATHER = new org.bukkit.inventory.ItemStack(Material.FEATHER);
+
+    private static void flap(Journey j) {
+        LivingEntity body = j.actor.getLivingEntity();
+        Location center = body.getLocation().add(0, body.getHeight() * 0.6, 0);
+        if (j.flightTicks % 2 == 0)
+            j.world.spawnParticle(Particle.ITEM, center, 2, body.getWidth() * 0.5, body.getHeight() * 0.2, body.getWidth() * 0.5, 0.04, FEATHER);
+        if (j.flightTicks % 10 == 0)
+            j.world.playSound(center, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.NEUTRAL, 0.8f, 1.4f);
+        j.flightTicks++;
     }
 
     private void board(Journey j) throws Exception {
@@ -405,6 +421,7 @@ public final class TransportModule implements Listener, AutoCloseable {
         boolean releasing;
         /** Ticks the boarded flight has not advanced; the watchdog lands the rider after five seconds. */
         int stalledTicks; double lastDistance = -1;
+        boolean winged; int flightTicks;
         // Optional zone the countdown tolerates movement within; null means any movement cancels.
         Location departureAnchor; double departureRadius;
         Journey(Player player, TransportRoute route, World world, CurvedRoute curve, MatchInstance match) {
