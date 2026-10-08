@@ -44,10 +44,13 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 public class QuestTracking {
 
@@ -55,6 +58,12 @@ public class QuestTracking {
     private static final double VERTICAL_EXIT_RADIUS = 6;
     private static final double VERTICAL_ENTER_HEIGHT = 5;
     private static final double VERTICAL_EXIT_HEIGHT = 3;
+    // Destinations backed by a loaded entity are re-read this often, so walking NPCs and moving bosses stay current.
+    private static final long LIVE_REFRESH_TICKS = 10L;
+    // The full lookup reruns quickly while nothing is loaded, to notice a target loading in, and rarely otherwise.
+    // Spawns, deaths, unloads, world changes and quest progress also refresh it at once.
+    private static final long FULL_REFRESH_TICKS_WITHOUT_LIVE_TARGETS = 20L * 10L;
+    private static final long FULL_REFRESH_TICKS_WITH_LIVE_TARGETS = 20L * 30L;
 
     // PlaceholderAPI reads the tracked quest from scoreboard and chat threads.
     @Getter
@@ -75,6 +84,12 @@ public class QuestTracking {
     private Set<VerticalDestination> verticalDestinations = new HashSet<>();
     private boolean targetsAbove;
     private boolean targetsBelow;
+    // Destination Location instances that follow a loaded entity, updated in place between full lookups.
+    private Map<Location, Supplier<Location>> liveTargets = new IdentityHashMap<>();
+    // Only set during a full lookup: live positions found so far, and those that reached a destination list.
+    private Map<Location, Supplier<Location>> liveCandidates;
+    private Map<Location, Supplier<Location>> collectingLiveTargets;
+    private long ticksSinceFullRefresh = FULL_REFRESH_TICKS_WITH_LIVE_TARGETS;
 
     private void queueLocationRefresh() {
         if (stopped || refreshQueued) return;
@@ -134,16 +149,58 @@ public class QuestTracking {
         locationRefresher = new BukkitRunnable() {
             @Override
             public void run() {
-                if (!player.isValid()) {
+                if (!player.isOnline()) {
                     stop();
                     return;
                 }
-                updateLocations(quest);
+                // Dying keeps the quest tracked; destinations resume after the respawn.
+                if (player.isDead()) return;
+                ticksSinceFullRefresh += LIVE_REFRESH_TICKS;
+                long fullRefreshTicks = liveTargets.isEmpty()
+                        ? FULL_REFRESH_TICKS_WITHOUT_LIVE_TARGETS
+                        : FULL_REFRESH_TICKS_WITH_LIVE_TARGETS;
+                if (ticksSinceFullRefresh >= fullRefreshTicks) updateLocations(quest);
+                else refreshLiveTargets();
             }
-        }.runTaskTimer(MetadataHandler.PLUGIN, 0L, 20L * 60L);
+        }.runTaskTimer(MetadataHandler.PLUGIN, 0L, LIVE_REFRESH_TICKS);
+    }
+
+    private void refreshLiveTargets() {
+        for (Map.Entry<Location, Supplier<Location>> target : liveTargets.entrySet()) {
+            Location current = target.getValue().get();
+            if (current == null || current.getWorld() == null) {
+                // The entity died or unloaded; a full lookup falls back to its saved or authored location.
+                queueLocationRefresh();
+                return;
+            }
+            Location destination = target.getKey();
+            destination.setWorld(current.getWorld());
+            destination.setX(current.getX());
+            destination.setY(current.getY());
+            destination.setZ(current.getZ());
+        }
+    }
+
+    // Registers a position read from a loaded entity; it becomes a live target if it reaches a destination list.
+    private Location live(Location location, Supplier<Location> source) {
+        if (location != null && liveCandidates != null) liveCandidates.put(location, source);
+        return location;
     }
 
     public void updateLocations(Quest quest) {
+        ticksSinceFullRefresh = 0;
+        liveCandidates = new IdentityHashMap<>();
+        collectingLiveTargets = new IdentityHashMap<>();
+        try {
+            resolveDestinations(quest);
+        } finally {
+            liveTargets = collectingLiveTargets;
+            liveCandidates = null;
+            collectingLiveTargets = null;
+        }
+    }
+
+    private void resolveDestinations(Quest quest) {
         List<ObjectiveDestinations> destinations = new ArrayList<>();
         DestinationLookup lookup = new DestinationLookup();
         if (!quest.getQuestObjectives().isOver()) {
@@ -193,9 +250,9 @@ public class QuestTracking {
         turnInNPCs.addAll(getNPCLocations(quest.getQuestTaker()));
     }
 
-    private static final class DestinationLookup {
-        private final java.util.Map<String, List<Location>> resolved = new HashMap<>();
-        private java.util.Map<String, List<Location>> loaded;
+    private final class DestinationLookup {
+        private final Map<String, List<Location>> resolved = new HashMap<>();
+        private Map<String, List<Location>> loaded;
 
         private List<Location> loaded(String filename) {
             if (loaded == null) {
@@ -205,7 +262,10 @@ public class QuestTracking {
                     String identity = boss.getPhaseBossEntity() != null
                             ? boss.getPhaseBossEntity().getPhase1Config().getFilename()
                             : boss.getCustomBossesConfigFields().getFilename();
-                    loaded.computeIfAbsent(identity, ignored -> new ArrayList<>()).add(entity.getLocation());
+                    Location location = entity.isValid()
+                            ? live(entity.getLocation(), () -> entity.isValid() ? entity.getLocation() : null)
+                            : entity.getLocation();
+                    loaded.computeIfAbsent(identity, ignored -> new ArrayList<>()).add(location);
                 }
             }
             return loaded.getOrDefault(filename, List.of());
@@ -217,10 +277,13 @@ public class QuestTracking {
         if (npcFilename == null) return locations;
         NPCsConfigFields npcsConfigFields = NPCsConfig.getNpcEntities().get(npcFilename);
         if (npcsConfigFields == null || !npcsConfigFields.isEnabled()) return locations;
-        // Runtime NPCs carry the cloned world and their current patrol position.
+        // Runtime NPCs carry the cloned world. A loaded one is followed where it stands, so a patrolling NPC
+        // is tracked as it walks; an unloaded one falls back to its saved patrol position.
         for (var npc : EntityTracker.getNpcEntities().values()) {
             if (!npcFilename.equals(npc.getNPCsConfigFields().getFilename())) continue;
-            Location location = npc.getPersistentLocation();
+            Location location = npc.isValid()
+                    ? live(npc.getVillager().getLocation(), () -> npc.isValid() ? npc.getVillager().getLocation() : null)
+                    : npc.getPersistentLocation();
             if (location != null && player.getWorld().equals(location.getWorld()))
                 addLocation(locations, location);
         }
@@ -264,7 +327,10 @@ public class QuestTracking {
     }
 
     private void addRegionalBossLocation(List<Location> locations, RegionalBossEntity regionalBossEntity) {
-        Location location = regionalBossEntity.getLocation();
+        Location location = regionalBossEntity.isValid()
+                ? live(regionalBossEntity.getLocation(),
+                () -> regionalBossEntity.isValid() ? regionalBossEntity.getLocation() : null)
+                : regionalBossEntity.getLocation();
         if (location == null)
             location = regionalBossEntity.getPersistentLocation();
         addLocation(locations, location);
@@ -310,6 +376,8 @@ public class QuestTracking {
             if (isSameBlockLocation(existingLocation, location))
                 return;
         locations.add(location);
+        Supplier<Location> source = liveCandidates == null ? null : liveCandidates.get(location);
+        if (source != null) collectingLiveTargets.put(location, source);
     }
 
     private boolean isSameBlockLocation(Location location1, Location location2) {
@@ -326,6 +394,7 @@ public class QuestTracking {
         stopped = true;
         previousVerticalDestinations.clear();
         verticalDestinations.clear();
+        liveTargets = new IdentityHashMap<>();
         playerTrackingQuests.remove(player.getUniqueId());
         resetPlayerScoreboard();
         if (locationRefresher != null) locationRefresher.cancel();
@@ -456,8 +525,7 @@ public class QuestTracking {
             double deltaY = location.getY() - playerLocation.getY();
             double deltaZ = location.getZ() - playerLocation.getZ();
             double horizontalDistanceSquared = deltaX * deltaX + deltaZ * deltaZ;
-            VerticalDestination destination = new VerticalDestination(location.getWorld().getUID(),
-                    location.getX(), location.getY(), location.getZ(), deltaY > 0);
+            VerticalDestination destination = new VerticalDestination(verticalKey(location), deltaY > 0);
             boolean wasVertical = previousVerticalDestinations.contains(destination);
             double radius = wasVertical ? VERTICAL_EXIT_RADIUS : VERTICAL_ENTER_RADIUS;
             // Compare feet to feet so camera pitch, sneaking and eye height do not affect the cue.
@@ -486,7 +554,29 @@ public class QuestTracking {
     }
 
     // Ignore target yaw/pitch when locations refresh; direction changes must cross the entry threshold again.
-    private record VerticalDestination(UUID worldId, double x, double y, double z, boolean above) {}
+    private record VerticalDestination(Object key, boolean above) {}
+
+    // A live target moves, so its hysteresis follows the destination instance it updates in place. Other targets
+    // are keyed by position, which a full lookup rebuilding the same location keeps.
+    private Object verticalKey(Location location) {
+        return liveTargets.containsKey(location)
+                ? new LiveKey(location)
+                : new PointKey(location.getWorld().getUID(), location.getX(), location.getY(), location.getZ());
+    }
+
+    private record PointKey(UUID worldId, double x, double y, double z) {}
+
+    private record LiveKey(Location destination) {
+        @Override
+        public boolean equals(Object other) {
+            return other instanceof LiveKey key && key.destination == destination;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(destination);
+        }
+    }
 
     private String getSymbol(Objective objective) {
         //case for portals
