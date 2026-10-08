@@ -92,7 +92,7 @@ public final class NetworkEditor implements AutoCloseable {
                     s.preview = args.length == 0 ? List.of() : network(s).path(arg(args, 0, "from node"), arg(args, 1, "to node"));
                     if (args.length > 0 && s.preview.isEmpty()) throw new IllegalArgumentException("No path connects those nodes.");
                 }
-                case "ride" -> { module.start(player, network(s).route(arg(args, 0, "from node"), arg(args, 1, "to node"))); return; }
+                case "ride" -> { module.testRide(player, network(s).route(arg(args, 0, "from node"), arg(args, 1, "to node"))); return; }
                 case "generate" -> { generate(player, s, known(s, arg(args, 0, "first node")), known(s, arg(args, 1, "second node"))); return; }
                 default -> throw new IllegalArgumentException("Unknown network editor action.");
             }

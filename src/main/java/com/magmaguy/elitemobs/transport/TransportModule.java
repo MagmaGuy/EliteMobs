@@ -121,6 +121,24 @@ public final class TransportModule implements Listener, AutoCloseable {
         return start(player, route, null, 0);
     }
 
+    /**
+     * Editor test rides depart from the route's first point wherever the author stands. A mount spawns only in a
+     * loaded chunk, so the author is moved to the departure first; settling after the move does not cancel it.
+     */
+    boolean testRide(Player player, TransportRoute route) {
+        if (route == null) { message(player, "Unknown transport route."); return false; }
+        Location departure;
+        try { departure = route.curve().at(0).toLocation(resolveWorld(player, route)); }
+        catch (Exception failure) { message(player, failure.getMessage()); return false; }
+        departure.setYaw(player.getLocation().getYaw());
+        departure.setPitch(player.getLocation().getPitch());
+        if (player.getLocation().distanceSquared(departure) > 1
+                && !InstancePlayerMovement.teleportWithinWorld(player, departure, PlayerTeleportEvent.TeleportCause.PLUGIN)) {
+            message(player, "Could not move you to the departure point."); return false;
+        }
+        return start(player, route, departure, 2);
+    }
+
     private boolean start(Player player, TransportRoute route, Location departureAnchor, double departureRadius) {
         if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Transport starts on the server thread");
         if (closed || !player.isOnline() || player.isDead() || journeys.containsKey(player.getUniqueId())) {

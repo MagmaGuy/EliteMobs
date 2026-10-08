@@ -73,7 +73,7 @@ public final class TransportEditor implements AutoCloseable {
                     TransportModule.message(player, "Saved " + draft.id + ". Board at its first waypoint with /em transport start " + draft.id + ".");
                     return;
                 }
-                case "ride" -> { module.start(player, draft.route(player.getLocation().getYaw())); return; }
+                case "ride" -> { module.testRide(player, draft.route(player.getLocation().getYaw())); return; }
                 case "status" -> { }
                 default -> throw new IllegalArgumentException("Unknown editor action.");
             }
