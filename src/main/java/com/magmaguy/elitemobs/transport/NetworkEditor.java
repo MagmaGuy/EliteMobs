@@ -161,6 +161,17 @@ public final class NetworkEditor implements AutoCloseable {
                 s.nodes.values(), warning -> { });
     }
 
+    /** Node ids in the player's open draft, for command suggestions. */
+    public List<String> draftNodeIds(Player player) {
+        Session s = sessions.get(player.getUniqueId());
+        return s == null ? List.of() : s.nodes.keySet().stream().sorted().toList();
+    }
+
+    /** Loaded network ids, for command suggestions. */
+    public List<String> networkIds() {
+        return module.files.networkIds().stream().sorted().toList();
+    }
+
     private static TransportNode known(Session s, String id) {
         TransportNode node = s.nodes.get(id);
         if (node == null) throw new IllegalArgumentException("Unknown node " + id + ".");
