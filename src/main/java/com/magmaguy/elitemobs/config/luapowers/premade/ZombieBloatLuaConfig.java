@@ -88,7 +88,7 @@ public class ZombieBloatLuaConfig extends InlineLuaPowerConfig {
                   living_entity_effect(context, nearby_valid_living_entities)
 
                   context.scheduler:run_after(10, function(context)
-                    if giant ~= nil and giant:is_valid() then
+                    if giant ~= nil and giant:is_alive() then
                       giant:remove()
                     end
                     if event_zombie:is_alive() then

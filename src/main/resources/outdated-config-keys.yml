@@ -251,6 +251,7 @@ powers:
       - c373eae913d0f69d3678c76735dbf21f45315d847db045a145a9975835b30fec
   - files: [zombie_bloat.lua]
     sha256:
+      - 425bcbba6f4be40b4f22ae5110fa1c1d9ad2a30d45c605de2c38b68c779bf8b4
       - 7f791d73d2bb704f3bbcb01059b9afca045133318ae2d4fa15d0f7bcfadee9ec
   - files: [zombie_parents.lua]
     sha256:
