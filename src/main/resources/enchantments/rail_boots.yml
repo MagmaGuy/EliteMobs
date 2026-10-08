@@ -9,6 +9,6 @@ parameters:
   value: 20
   procedural: false
   double_tap_ticks: 10
-  speed: 0.5
+  speed: 0.8
   lifetime_ticks: 36000
   stop_on_unequip: true
