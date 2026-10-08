@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfig;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfig;
 import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
+import com.magmaguy.elitemobs.dungeons.EMPackage;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -23,6 +24,7 @@ import com.magmaguy.elitemobs.utils.BossBarOrderManager;
 import com.magmaguy.elitemobs.utils.ConfigurationLocation;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
 import com.magmaguy.elitemobs.wormhole.WormholeNavigation;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.SpigotMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -45,8 +47,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,6 +68,12 @@ public class QuestTracking {
     // Spawns, deaths, unloads, world changes and quest progress also refresh it at once.
     private static final long FULL_REFRESH_TICKS_WITHOUT_LIVE_TARGETS = 20L * 10L;
     private static final long FULL_REFRESH_TICKS_WITH_LIVE_TARGETS = 20L * 30L;
+    // Far targets this much higher or lower, and this steep relative to their horizontal distance, get a height arrow
+    // beside their compass symbol. Smaller exit values keep the arrow steady while the player bobs around the edge.
+    private static final double FAR_HEIGHT_ENTER = 10;
+    private static final double FAR_HEIGHT_EXIT = 7;
+    private static final double FAR_STEEPNESS_ENTER = 1D / 3D;
+    private static final double FAR_STEEPNESS_EXIT = 1D / 4D;
 
     // PlaceholderAPI reads the tracked quest from scoreboard and chat threads.
     @Getter
@@ -90,6 +100,16 @@ public class QuestTracking {
     private Map<Location, Supplier<Location>> liveCandidates;
     private Map<Location, Supplier<Location>> collectingLiveTargets;
     private long ticksSinceFullRefresh = FULL_REFRESH_TICKS_WITH_LIVE_TARGETS;
+    // Only set during a full lookup: the instanced dungeons each destination list leads into, by list instance, for
+    // targets that exist only inside dungeon copies; and blueprint world names already matched to their dungeon.
+    private Map<List<Location>, Set<String>> collectingDungeons;
+    private Map<String, Optional<String>> dungeonsByWorldName;
+    private final Set<String> turnInDungeons = new LinkedHashSet<>();
+    // Portals to aim at when no destination is in the player's world, worked out once per full lookup.
+    private List<Location> navigationEntries = List.of();
+    private String unreachableDungeonName;
+    private Set<VerticalDestination> previousFarHeightCues = new HashSet<>();
+    private Set<VerticalDestination> farHeightCues = new HashSet<>();
 
     private void queueLocationRefresh() {
         if (stopped || refreshQueued) return;
@@ -191,13 +211,76 @@ public class QuestTracking {
         ticksSinceFullRefresh = 0;
         liveCandidates = new IdentityHashMap<>();
         collectingLiveTargets = new IdentityHashMap<>();
+        collectingDungeons = new IdentityHashMap<>();
+        dungeonsByWorldName = new HashMap<>();
         try {
             resolveDestinations(quest);
+            resolveNavigation();
         } finally {
             liveTargets = collectingLiveTargets;
             liveCandidates = null;
             collectingLiveTargets = null;
+            collectingDungeons = null;
+            dungeonsByWorldName = null;
         }
+    }
+
+    // Picks the portals the compass points at when nothing is in the player's world: for each destination in another
+    // world the wormhole landing closest to it, and for each dungeon objective the nearest portal that starts it.
+    private void resolveNavigation() {
+        List<Location> entries = new ArrayList<>();
+        Set<String> dungeons = new LinkedHashSet<>();
+        Location from = player.getLocation();
+        if (questIsDone) {
+            for (Location destination : turnInNPCs) addDirectEntry(entries, from, destination);
+            dungeons.addAll(turnInDungeons);
+        } else {
+            for (ObjectiveDestinations objective : objectiveDestinations) {
+                for (Location destination : objective.getDestinations()) addDirectEntry(entries, from, destination);
+                dungeons.addAll(objective.getDungeons());
+            }
+        }
+        String unreachable = null;
+        for (String dungeon : dungeons) {
+            Location launcher = WormholeNavigation.findInstanceLauncher(from, dungeon);
+            if (launcher != null) addDistinctEntry(entries, launcher);
+            else if (unreachable == null) unreachable = dungeon;
+        }
+        navigationEntries = entries;
+        unreachableDungeonName = unreachable == null ? null : dungeonDisplayName(unreachable);
+    }
+
+    private void addDirectEntry(List<Location> entries, Location from, Location destination) {
+        if (destination == null || destination.getWorld() == null || destination.getWorld().equals(from.getWorld()))
+            return;
+        addDistinctEntry(entries, WormholeNavigation.findDirectWormholeEntry(from, destination));
+    }
+
+    private void addDistinctEntry(List<Location> entries, Location entry) {
+        if (entry == null) return;
+        for (Location existing : entries)
+            if (isSameBlockLocation(existing, entry)) return;
+        entries.add(entry);
+    }
+
+    private static String dungeonDisplayName(String packageFilename) {
+        EMPackage emPackage = EMPackage.getEmPackages().get(packageFilename);
+        String name = emPackage == null || emPackage.getContentPackagesConfigFields() == null
+                ? null : emPackage.getContentPackagesConfigFields().getName();
+        return name == null ? packageFilename : ChatColorConverter.convert(name);
+    }
+
+    // The dungeons a destination list leads into; only meaningful during a full lookup.
+    private Set<String> dungeonsFor(List<Location> locations) {
+        if (collectingDungeons == null) return new LinkedHashSet<>();
+        return collectingDungeons.computeIfAbsent(locations, ignored -> new LinkedHashSet<>());
+    }
+
+    private String dungeonForWorldName(String worldName) {
+        if (worldName == null) return null;
+        if (dungeonsByWorldName == null) return WormholeNavigation.instancedPackageForWorldName(worldName);
+        return dungeonsByWorldName.computeIfAbsent(worldName,
+                name -> Optional.ofNullable(WormholeNavigation.instancedPackageForWorldName(name))).orElse(null);
     }
 
     private void resolveDestinations(Quest quest) {
@@ -206,6 +289,7 @@ public class QuestTracking {
         if (!quest.getQuestObjectives().isOver()) {
             questIsDone = false;
             turnInNPCs.clear();
+            turnInDungeons.clear();
             for (Objective objective : quest.getQuestObjectives().getObjectives())
                 if (objective != null && !objective.isObjectiveCompleted())
                     if (objective instanceof CustomKillObjective)
@@ -238,8 +322,11 @@ public class QuestTracking {
 
     private List<ObjectiveDestinations> getFetchLocations(CustomFetchObjective objective, DestinationLookup lookup) {
         List<Location> locations = new ArrayList<>();
-        for (String filename : CustomBossesConfig.bossesDropping(objective.getKey()))
-            getCustomBossLocations(filename, lookup).forEach(location -> addLocation(locations, location));
+        for (String filename : CustomBossesConfig.bossesDropping(objective.getKey())) {
+            List<Location> bossLocations = getCustomBossLocations(filename, lookup);
+            bossLocations.forEach(location -> addLocation(locations, location));
+            dungeonsFor(locations).addAll(dungeonsFor(bossLocations));
+        }
         for (TreasureChest chest : TreasureChest.chestsDropping(objective.getKey()))
             addLocation(locations, chest.getLocation());
         return List.of(new ObjectiveDestinations(objective, locations));
@@ -247,7 +334,10 @@ public class QuestTracking {
 
     private void getTurnInNPC() {
         turnInNPCs.clear();
-        turnInNPCs.addAll(getNPCLocations(quest.getQuestTaker()));
+        turnInDungeons.clear();
+        List<Location> locations = getNPCLocations(quest.getQuestTaker());
+        turnInNPCs.addAll(locations);
+        turnInDungeons.addAll(dungeonsFor(locations));
     }
 
     private final class DestinationLookup {
@@ -291,15 +381,18 @@ public class QuestTracking {
         if (npcsConfigFields.isInstanced()) {
             // NPCs may not have materialized yet. Resolve their authored coordinates only
             // against this player's matching dungeon, never another party's copy or blueprint.
+            List<String> authored = new ArrayList<>();
+            if (npcsConfigFields.getLocations() != null) authored.addAll(npcsConfigFields.getLocations());
+            if (npcsConfigFields.getSpawnLocation() != null) authored.add(npcsConfigFields.getSpawnLocation());
             if (PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeon
                     && player.getWorld().equals(dungeon.getWorld())) {
-                List<String> authored = new ArrayList<>();
-                if (npcsConfigFields.getLocations() != null) authored.addAll(npcsConfigFields.getLocations());
-                if (npcsConfigFields.getSpawnLocation() != null) authored.add(npcsConfigFields.getSpawnLocation());
                 for (String raw : authored)
                     if (raw != null && !raw.isBlank() && dungeon.getContentPackagesConfigFields().getWorldName()
                             .equals(ConfigurationLocation.worldName(raw)))
                         addLocation(locations, ConfigurationLocation.serializeWithInstance(dungeon.getWorld(), raw));
+            } else {
+                // Outside the dungeon, the blueprint coordinates name the dungeon to point the player towards.
+                addLocationStrings(locations, authored);
             }
             return locations;
         }
@@ -314,14 +407,15 @@ public class QuestTracking {
         List<Location> locations = new ArrayList<>();
         if (customBossFilename == null) return locations;
         CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(customBossFilename);
-        if (customBossesConfigFields != null) {
+        if (customBossesConfigFields != null)
             RegionalBossEntity.getRegionalBossEntities(customBossesConfigFields)
                     .forEach(regionalBossEntity -> addRegionalBossLocation(locations, regionalBossEntity));
-            if (locations.isEmpty())
-                addLocationStrings(locations, customBossesConfigFields.getSpawnLocations());
-        }
+        // Spawned copies come before the authored spawn points, so a boss inside the player's own dungeon is
+        // followed where it is; copies in other parties' dungeons only name that dungeon.
         if (locations.isEmpty())
             lookup.loaded(customBossFilename).forEach(location -> addLocation(locations, location));
+        if (locations.isEmpty() && dungeonsFor(locations).isEmpty() && customBossesConfigFields != null)
+            addLocationStrings(locations, customBossesConfigFields.getSpawnLocations());
         lookup.resolved.put(customBossFilename, locations);
         return locations;
     }
@@ -363,6 +457,12 @@ public class QuestTracking {
             addLocation(locations, ConfigurationLocation.serializeWithInstance(dungeon.getWorld(), rawLocation));
             return;
         }
+        // Coordinates in an instanced dungeon's blueprint world, which is never loaded, lead into that dungeon.
+        String blueprintDungeon = dungeonForWorldName(ConfigurationLocation.worldName(rawLocation));
+        if (blueprintDungeon != null) {
+            dungeonsFor(locations).add(blueprintDungeon);
+            return;
+        }
         addLocation(locations, ConfigurationLocation.serialize(rawLocation, true));
     }
 
@@ -370,8 +470,16 @@ public class QuestTracking {
         if (location == null || location.getWorld() == null) return;
         // A loaded copy belonging to another party must not suppress the authored
         // destination fallback for the player's own instance.
-        if (PlayerData.getMatchInstance(player) instanceof DungeonInstance dungeon
-                && !location.getWorld().equals(dungeon.getWorld())) return;
+        var match = PlayerData.getMatchInstance(player);
+        if (match instanceof DungeonInstance dungeon && !location.getWorld().equals(dungeon.getWorld())) return;
+        if (!(match instanceof DungeonInstance)) {
+            // Outside any dungeon, a target in another party's dungeon copy leads into that dungeon instead.
+            String copiedDungeon = WormholeNavigation.instancedPackageForWorld(location.getWorld());
+            if (copiedDungeon != null) {
+                dungeonsFor(locations).add(copiedDungeon);
+                return;
+            }
+        }
         for (Location existingLocation : locations)
             if (isSameBlockLocation(existingLocation, location))
                 return;
@@ -394,6 +502,8 @@ public class QuestTracking {
         stopped = true;
         previousVerticalDestinations.clear();
         verticalDestinations.clear();
+        previousFarHeightCues.clear();
+        farHeightCues.clear();
         liveTargets = new IdentityHashMap<>();
         playerTrackingQuests.remove(player.getUniqueId());
         resetPlayerScoreboard();
@@ -441,6 +551,10 @@ public class QuestTracking {
         previousVerticalDestinations = verticalDestinations;
         verticalDestinations = reusable;
         verticalDestinations.clear();
+        Set<VerticalDestination> reusableFarCues = previousFarHeightCues;
+        previousFarHeightCues = farHeightCues;
+        farHeightCues = reusableFarCues;
+        farHeightCues.clear();
         targetsAbove = false;
         targetsBelow = false;
         var match = PlayerData.getMatchInstance(player);
@@ -451,6 +565,7 @@ public class QuestTracking {
         }
         if (waiting) {
             previousVerticalDestinations.clear();
+            previousFarHeightCues.clear();
             compassBar.setTitle("Waiting for the dungeon to start");
             BossBarOrderManager.show(player, compassBar);
             return;
@@ -460,34 +575,37 @@ public class QuestTracking {
         List<LocationAndSymbol> locationAndSymbols = projectLocations();
         if (!locationAndSymbols.isEmpty() || targetsAbove || targetsBelow)
             for (LocationAndSymbol pair : locationAndSymbols)
-                compassText = compassText.substring(0, pair.getKey()) + pair.getValue() + compassText.substring(pair.getKey() + 1);
+                compassText = drawSymbol(compassText, pair);
         else {
-            World world = null;
-            boolean locationsOutOfBounds = false;
-            List<Location> destinations = questIsDone ? new ArrayList<>(turnInNPCs)
-                    : objectiveDestinations.stream().flatMap(objective -> objective.getDestinations().stream()).toList();
-            for (Location location : destinations)
-                if (location != null && location.getWorld() != null) {
-                    world = location.getWorld();
-                    if (world.equals(player.getWorld())) {
-                        locationsOutOfBounds = true;
-                        break;
-                    }
+            World otherWorld = null;
+            boolean destinationInThisWorld = false;
+            if (questIsDone) {
+                for (Location location : turnInNPCs) {
+                    if (location == null || location.getWorld() == null) continue;
+                    if (location.getWorld().equals(player.getWorld())) destinationInThisWorld = true;
+                    else otherWorld = location.getWorld();
                 }
-
-            if (!locationsOutOfBounds) {
-                if (world != null) {
-                    boolean wormholeIsViable = false;
-                    Location wormholeLocation = WormholeNavigation.findDirectWormholeEntry(player.getWorld(), world);
-                    if (wormholeLocation != null) {
-                        LocationAndSymbol pair = processLocations(wormholeLocation, null);
-                        if (pair != null)
-                            compassText = compassText.substring(0, pair.getKey()) + pair.getValue() + compassText.substring(pair.getKey() + 1);
-                        wormholeIsViable = true;
+            } else {
+                for (ObjectiveDestinations objective : objectiveDestinations)
+                    for (Location location : objective.getDestinations()) {
+                        if (location == null || location.getWorld() == null) continue;
+                        if (location.getWorld().equals(player.getWorld())) destinationInThisWorld = true;
+                        else otherWorld = location.getWorld();
                     }
-                    if (!wormholeIsViable)
-                        compassText = QuestsConfig.getQuestDestinationInOtherWorld().replace("$world", world.getName());
-                } else
+            }
+
+            // A destination behind the player in this world leaves the compass blank.
+            if (!destinationInThisWorld) {
+                if (!navigationEntries.isEmpty()) {
+                    for (Location entry : navigationEntries) {
+                        LocationAndSymbol pair = processLocations(entry, null);
+                        if (pair != null) compassText = drawSymbol(compassText, pair);
+                    }
+                } else if (unreachableDungeonName != null)
+                    compassText = QuestsConfig.getQuestDestinationInInstance().replace("$dungeon", unreachableDungeonName);
+                else if (otherWorld != null)
+                    compassText = QuestsConfig.getQuestDestinationInOtherWorld().replace("$world", otherWorld.getName());
+                else
                     compassText = QuestsConfig.getNoQuestDestinationFound();
             }
         }
@@ -540,9 +658,27 @@ public class QuestTracking {
             double angle = getAngle(deltaX, deltaZ, playerLocation.getYaw());
             if (Math.abs(angle) > Math.PI / 2D) return null;
             //Convert to degrees, each character has a resolution of 3 degrees
-            return new LocationAndSymbol((int) (angle * 57D / 3D), getSymbol(objective));
+            return new LocationAndSymbol((int) (angle * 57D / 3D),
+                    getSymbol(objective) + farHeightArrow(destination, deltaY, horizontalDistanceSquared));
         }
         return null;
+    }
+
+    // A far target well above or below gets an arrow beside its symbol, so a tower top or a cave reads at a glance.
+    private String farHeightArrow(VerticalDestination destination, double deltaY, double horizontalDistanceSquared) {
+        boolean wasShown = previousFarHeightCues.contains(destination);
+        double minimumHeight = wasShown ? FAR_HEIGHT_EXIT : FAR_HEIGHT_ENTER;
+        double steepness = wasShown ? FAR_STEEPNESS_EXIT : FAR_STEEPNESS_ENTER;
+        double height = Math.abs(deltaY);
+        if (height < minimumHeight || height * height < steepness * steepness * horizontalDistanceSquared) return "";
+        farHeightCues.add(destination);
+        return deltaY > 0 ? "↑" : "↓";
+    }
+
+    // Symbols can carry a height arrow, so they replace as many compass characters as they are long.
+    private static String drawSymbol(String compassText, LocationAndSymbol pair) {
+        int end = Math.min(compassText.length(), pair.getKey() + pair.getValue().length());
+        return compassText.substring(0, pair.getKey()) + pair.getValue() + compassText.substring(end);
     }
 
     private double getAngle(double deltaX, double deltaZ, float yaw) {
@@ -682,10 +818,14 @@ public class QuestTracking {
         private final Objective objective;
         @Getter
         private final List<Location> destinations;
+        // Instanced dungeons whose copies hold this objective's targets.
+        @Getter
+        private final Set<String> dungeons;
 
         private ObjectiveDestinations(Objective objective, List<Location> destinations) {
             this.objective = objective;
             this.destinations = destinations;
+            this.dungeons = Set.copyOf(dungeonsFor(destinations));
         }
     }
 

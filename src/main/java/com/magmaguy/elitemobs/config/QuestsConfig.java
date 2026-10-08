@@ -118,6 +118,8 @@ public class QuestsConfig extends ConfigurationFile {
     @Getter
     private static String questDestinationInOtherWorld;
     @Getter
+    private static String questDestinationInInstance;
+    @Getter
     private static String questAlreadyCompletedMessage;
     @Getter
     private static String questPrerequisitesMissingMessage;
@@ -482,6 +484,10 @@ public class QuestsConfig extends ConfigurationFile {
         questDestinationInOtherWorld = ConfigurationEngine.setString(
                 List.of("Sets the message that appears when the quest target is in a different world."),
                 file, fileConfiguration, "questDestinationInOtherWorld", "[EM] Go to world $world!", true);
+        questDestinationInInstance = ConfigurationEngine.setString(
+                List.of("Sets the message that appears when the quest target is inside an instanced dungeon",
+                        "and no portal to that dungeon was found. $dungeon is the dungeon's name."),
+                file, fileConfiguration, "questDestinationInInstance", "[EM] Enter $dungeon!", true);
 
         questAlreadyCompletedMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent to players when trying to accept a quest they have already completed."),
