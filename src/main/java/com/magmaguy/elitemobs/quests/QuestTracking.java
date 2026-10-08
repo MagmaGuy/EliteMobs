@@ -47,6 +47,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class QuestTracking {
 
@@ -55,8 +56,9 @@ public class QuestTracking {
     private static final double VERTICAL_ENTER_HEIGHT = 5;
     private static final double VERTICAL_EXIT_HEIGHT = 3;
 
+    // PlaceholderAPI reads the tracked quest from scoreboard and chat threads.
     @Getter
-    private static final HashMap<UUID, QuestTracking> playerTrackingQuests = new HashMap<>();
+    private static final ConcurrentHashMap<UUID, QuestTracking> playerTrackingQuests = new ConcurrentHashMap<>();
     private final Player player;
     @Getter
     private final Quest quest;

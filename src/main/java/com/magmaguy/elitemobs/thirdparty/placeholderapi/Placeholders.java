@@ -3,11 +3,19 @@ package com.magmaguy.elitemobs.thirdparty.placeholderapi;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
+import com.magmaguy.elitemobs.quests.Quest;
+import com.magmaguy.elitemobs.quests.QuestTracking;
+import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
+import com.magmaguy.magmacore.util.ChatColorConverter;
+import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
+
+import java.util.List;
+import java.util.Objects;
 
 public class Placeholders extends PlaceholderExpansion {
 
@@ -122,6 +130,9 @@ public class Placeholders extends PlaceholderExpansion {
         if (!PlayerData.isInMemory(player.getUniqueId()) || PlayerData.getPlayerData(player.getUniqueId()) == null)
             return "Uninitialized player data!";
 
+        if (identifier.startsWith("quest_"))
+            return questPlaceholder(player, identifier);
+
         switch (identifier) {
             case "player_combat_tier":
             case "player_combat_level":
@@ -187,6 +198,52 @@ public class Placeholders extends PlaceholderExpansion {
         // We return null if an invalid placeholder (f.e. %someplugin_placeholder3%)
         // was provided
         return null;
+    }
+
+    /**
+     * Quest placeholders describe the quest the player is tracking, so another scoreboard plugin can show it
+     * with useQuestScoreboards off. Objective lines are the same text as the EliteMobs quest sidebar, which
+     * shows a single turn-in line once every objective is done. Without a tracked quest they are empty.
+     */
+    private static String questPlaceholder(Player player, String identifier) {
+        if (identifier.equals("quest_active_count"))
+            return "" + PlayerData.getQuests(player.getUniqueId()).size();
+        QuestTracking tracking = QuestTracking.getPlayerTrackingQuests().get(player.getUniqueId());
+        Quest quest = tracking == null ? null : tracking.getQuest();
+        switch (identifier) {
+            case "quest_is_tracking":
+                return quest != null ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
+            case "quest_tracked_name":
+                return quest == null || quest.getQuestName() == null ? "" : ChatColorConverter.convert(quest.getQuestName());
+            case "quest_tracked_complete":
+                return quest != null && quest.getQuestObjectives().isOver()
+                        ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
+        }
+        List<String> lines = quest == null ? List.of() : quest.getQuestObjectives().getScoreboardObjectiveText();
+        if (identifier.equals("quest_tracked_objective_count")) return "" + lines.size();
+        if (!identifier.startsWith("quest_tracked_objective_")) return null;
+
+        // quest_tracked_objective_<n> is a sidebar line; _name, _current and _target are that objective's raw values.
+        String[] parts = identifier.substring("quest_tracked_objective_".length()).split("_", 2);
+        int index;
+        try {
+            index = Integer.parseInt(parts[0]) - 1;
+        } catch (NumberFormatException exception) {
+            return null;
+        }
+        if (index < 0) return null;
+        if (parts.length == 1) return index < lines.size() ? ChatColorConverter.convert(lines.get(index)) : "";
+        List<Objective> objectives = quest == null || quest.getQuestObjectives().getObjectives() == null
+                ? List.of()
+                : quest.getQuestObjectives().getObjectives().stream().filter(Objects::nonNull).toList();
+        Objective objective = index < objectives.size() ? objectives.get(index) : null;
+        return switch (parts[1]) {
+            case "name" -> objective == null || objective.getObjectiveName() == null
+                    ? "" : ChatColorConverter.convert(objective.getObjectiveName());
+            case "current" -> objective == null ? "" : "" + objective.getCurrentAmount();
+            case "target" -> objective == null ? "" : "" + objective.getTargetAmount();
+            default -> null;
+        };
     }
 
 }
