@@ -132,12 +132,8 @@ public class WormholeManager {
         PlayerWormholeData cooldown = playerTeleportData.get(playerId);
         if (cooldown != null && !cooldown.canTeleport()) return false;
         // Check permissions
-        if (!PlayerQuestCooldowns.getBypassedPlayers().contains(player) &&
-                wormholeEntry.getWormhole().getWormholeConfigFields().getPermission() != null &&
-                !wormholeEntry.getWormhole().getWormholeConfigFields().getPermission().isEmpty() &&
-                !player.hasPermission(wormholeEntry.getWormhole().getWormholeConfigFields().getPermission())) {
+        if (!PlayerQuestCooldowns.mayEnter(player, wormholeEntry.getWormhole().getWormholeConfigFields().getPermission()))
             return false;
-        }
 
         return true;
     }

@@ -48,6 +48,11 @@ public class PlayerQuestCooldowns implements Serializable {
         return bypassedPlayers.contains(player.getUniqueId());
     }
 
+    /** Quest bypass lets staff through every permission gate on content: wormholes, flight nodes, dungeons and arenas. */
+    public static boolean mayEnter(Player player, String permission) {
+        return permission == null || permission.isEmpty() || player.hasPermission(permission) || bypassesQuestRestrictions(player);
+    }
+
     public static PlayerQuestCooldowns initializePlayer() {
         return new PlayerQuestCooldowns();
     }

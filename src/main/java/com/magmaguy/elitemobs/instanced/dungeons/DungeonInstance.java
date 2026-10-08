@@ -199,11 +199,10 @@ public class DungeonInstance extends MatchInstance {
             return;
         }
 
-        if (instancedDungeonsConfigFields.getPermission() != null && !instancedDungeonsConfigFields.getPermission().isEmpty())
-            if (!player.hasPermission(instancedDungeonsConfigFields.getPermission())) {
-                player.sendMessage(DungeonsConfig.getDungeonNoPermissionMessage());
-                return;
-            }
+        if (!com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns.mayEnter(player, instancedDungeonsConfigFields.getPermission())) {
+            player.sendMessage(DungeonsConfig.getDungeonNoPermissionMessage());
+            return;
+        }
 
         List<UUID> entryMemberIds = instancedDungeonsConfigFields.isEnchantmentChallenge()
                 ? List.of(player.getUniqueId())
@@ -476,8 +475,7 @@ public class DungeonInstance extends MatchInstance {
                         .replace("$player", member.getName()));
                 return List.of();
             }
-            String permission = configFields.getPermission();
-            if (permission != null && !permission.isEmpty() && !member.hasPermission(permission)) {
+            if (!com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns.mayEnter(member, configFields.getPermission())) {
                 PartyManager.sendConfiguredMessage(initiator, PartyConfig.getDungeonPartyNoPermissionMessage()
                         .replace("$player", member.getName()));
                 return List.of();

@@ -90,11 +90,10 @@ public class DynamicDungeonInstance extends DungeonInstance {
             return;
         }
 
-        if (dynamicDungeonConfigFields.getPermission() != null && !dynamicDungeonConfigFields.getPermission().isEmpty())
-            if (!player.hasPermission(dynamicDungeonConfigFields.getPermission())) {
-                player.sendMessage(DungeonsConfig.getDynamicDungeonNoPermissionMessage());
-                return;
-            }
+        if (!com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns.mayEnter(player, dynamicDungeonConfigFields.getPermission())) {
+            player.sendMessage(DungeonsConfig.getDynamicDungeonNoPermissionMessage());
+            return;
+        }
 
         List<UUID> entryMemberIds = prepareDungeonEntryRoster(player, dynamicDungeonConfigFields);
         if (entryMemberIds.isEmpty()) return;

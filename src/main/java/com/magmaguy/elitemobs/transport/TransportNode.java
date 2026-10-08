@@ -21,10 +21,8 @@ public record TransportNode(String id, Vector location, String name, String perm
     }
     @Override public Vector location() { return location.clone(); }
     public boolean destination() { return name != null; }
-    /** Staff with /em quest bypass on pass every node, like quest-gated wormholes. */
     public boolean unlockedFor(Player player) {
-        return permission == null || player.hasPermission(permission)
-                || com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns.bypassesQuestRestrictions(player);
+        return com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns.mayEnter(player, permission);
     }
 
     TransportNode withLocation(Vector next) { return new TransportNode(id, next, name, permission, lockedHint, arrivalYaw, neighbors, placeholder); }

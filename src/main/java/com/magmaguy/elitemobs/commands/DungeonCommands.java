@@ -87,8 +87,7 @@ public class DungeonCommands {
                         .replace("$player", member.getName()));
                 return List.of();
             }
-            String permission = emPackage.getContentPackagesConfigFields().getPermission();
-            if (permission != null && !permission.isEmpty() && !member.hasPermission(permission)) {
+            if (!com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns.mayEnter(member, emPackage.getContentPackagesConfigFields().getPermission())) {
                 PartyManager.sendConfiguredMessage(initiator, PartyConfig.getDungeonPartyNoPermissionMessage()
                         .replace("$player", member.getName()));
                 return List.of();

@@ -415,6 +415,11 @@ public abstract class MatchInstance extends Match {
     }
 
     @Override
+    protected boolean hasJoinPermission(Player player) {
+        return com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns.mayEnter(player, permission);
+    }
+
+    @Override
     protected Location entryDestination(MatchPlayer participant) {
         return state == InstancedRegionState.WAITING && lobbyLocation != null ? lobbyLocation : startLocation;
     }

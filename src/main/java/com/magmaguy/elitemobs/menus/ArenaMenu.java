@@ -49,13 +49,11 @@ public class ArenaMenu {
             event.setCancelled(true);
             if (event.getSlot() == ArenaMenuConfig.getPlayerItemSlot()) {
                 ArenaInstance arenaInstance = menus.get(event.getInventory()).getArenaInstance();
-                if (arenaInstance.getCustomArenasConfigFields().getPermission() != null &&
-                        !arenaInstance.getCustomArenasConfigFields().getPermission().isEmpty())
-                    if (!player.hasPermission(arenaInstance.getCustomArenasConfigFields().getPermission())) {
-                        player.sendMessage(ArenasConfig.getNoArenaPermissionMessage());
-                        player.closeInventory();
-                        return;
-                    }
+                if (!com.magmaguy.elitemobs.quests.playercooldowns.PlayerQuestCooldowns.mayEnter(player, arenaInstance.getCustomArenasConfigFields().getPermission())) {
+                    player.sendMessage(ArenasConfig.getNoArenaPermissionMessage());
+                    player.closeInventory();
+                    return;
+                }
                 menus.get(event.getInventory()).getArenaInstance().addNewPlayer(player);
                 player.closeInventory();
                 return;
