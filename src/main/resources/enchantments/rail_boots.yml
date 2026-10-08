@@ -1,0 +1,14 @@
+isEnabled: true
+name: Railboots
+maxLevel: 1
+validSlots: [FEET]
+stacking: source_item
+conflicts: [elitemobs:plasma_boots]
+script: rail_boots.lua
+parameters:
+  value: 20
+  procedural: false
+  double_tap_ticks: 10
+  speed: 0.5
+  lifetime_ticks: 36000
+  stop_on_unequip: true

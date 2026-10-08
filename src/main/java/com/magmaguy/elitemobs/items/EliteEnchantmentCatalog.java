@@ -21,7 +21,7 @@ public final class EliteEnchantmentCatalog {
     private static final Set<ScriptHook> HOOKS = Set.of(THREAT_BONUS, CRITICAL_CHANCE, HUNTER_BONUS);
     private static final Set<ScriptHook> ALL_HOOKS = java.util.stream.Stream.concat(HOOKS.stream(),
             EnchantmentInputs.HOOKS.stream()).collect(java.util.stream.Collectors.toUnmodifiableSet());
-    private static final Set<String> SHARED = Set.of("loud_strikes", "critical_strikes", "drilling", "ice_breaker", "summon_wolf", "summon_merchant", "flamethrower", "lightning", "hunter", "earthquake", "plasma_boots", "grappling_hook", "meteor_shower");
+    private static final Set<String> SHARED = Set.of("loud_strikes", "critical_strikes", "drilling", "ice_breaker", "summon_wolf", "summon_merchant", "flamethrower", "lightning", "hunter", "earthquake", "plasma_boots", "grappling_hook", "meteor_shower", "rail_boots");
     /** EM acquisition probabilities and Soulbind ownership retain their existing configuration owner. */
     public static final Set<String> HOST_SETTINGS = Set.of("soulbind", "multicast", "blast_radius", "ignition");
     private static volatile EnchantmentCatalog catalog;
