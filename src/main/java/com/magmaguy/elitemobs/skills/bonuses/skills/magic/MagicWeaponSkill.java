@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.skills.bonuses.skills.magic;
 
+import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatEnemyAuthorization;
 import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
@@ -97,10 +98,26 @@ public abstract class MagicWeaponSkill extends SkillBonus {
         return enemies;
     }
 
-    /** Skill damage on top of the weapon's hit. It cannot trigger weapon skills again. */
+    /**
+     * Skill damage on top of the weapon's hit. It cannot trigger weapon skills again.
+     * <p>
+     * It lands outside the vanilla hurt cooldown and puts the target's cooldown back afterwards.
+     * Otherwise a follow-up within 10 ticks of any hit at least as strong (an Echo Bolt at the edge
+     * of its window, the next Starfall bolt, a party member's sword) was silently swallowed.
+     */
     protected static void sideDamage(Player player, LivingEntity target, double damage) {
         if (!player.isOnline() || target.isDead() || !target.isValid() || !Double.isFinite(damage) || damage <= 0) return;
-        CombatDamageContext.runPlayerToEliteBypass(() -> target.damage(damage, player));
+        int previousTicks = NMSManager.getAdapter().getDamageCooldownTicks(target);
+        double previousDamage = target.getLastDamage();
+        try {
+            NMSManager.getAdapter().setDamageCooldownTicks(target, 0);
+            CombatDamageContext.runPlayerToEliteBypass(() -> target.damage(damage, player));
+        } finally {
+            if (target.isValid() && !target.isDead()) {
+                NMSManager.getAdapter().setDamageCooldownTicks(target, previousTicks);
+                target.setLastDamage(previousDamage);
+            }
+        }
     }
 
     protected static Location chest(LivingEntity entity) {
