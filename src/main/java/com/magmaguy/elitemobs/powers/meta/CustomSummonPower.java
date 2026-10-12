@@ -61,6 +61,8 @@ public class CustomSummonPower extends ElitePower implements Listener {
         }
         CustomBossEntity customBossEntity = new CustomBossEntity(fields);
         customBossEntity.setSummoningEntity(summoningEntity);
+        // Same as custom_summon reinforcements: a regional or instanced summoner's WorldGuard bypass carries over.
+        customBossEntity.setBypassesProtections(summoningEntity.getBypassesProtections());
         if (summoningEntity instanceof CustomBossEntity summoner && summoner.isNormalizedCombat())
             customBossEntity.setNormalizedCombat();
         summoningEntity.addReinforcement(customBossEntity);

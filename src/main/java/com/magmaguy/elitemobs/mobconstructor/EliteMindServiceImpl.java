@@ -26,6 +26,7 @@ import com.magmaguy.magmacore.ai.MindBodyRehydration;
 import com.magmaguy.magmacore.ai.MindBodyCapabilities;
 import com.magmaguy.magmacore.ai.MindBodyLocomotion;
 import com.magmaguy.magmacore.ai.MindBodyProfile;
+import com.magmaguy.magmacore.ai.MindBodyRejectedException;
 import com.magmaguy.magmacore.ai.MindHandle;
 import com.magmaguy.magmacore.ai.MindHost;
 import com.magmaguy.magmacore.ai.MindProgram;
@@ -91,11 +92,18 @@ final class EliteMindServiceImpl implements EliteMindService, Listener {
         MindHandle handle = mindHost.open(actor.getEliteUUID(), entry.instantiate());
         boolean configured = false;
         try {
-            MobBody body = mindHost.spawnBody(location, profile, preparedBody -> {
-                CrashFix.persistentTracker(preparedBody.entity());
-                ((EliteEntity) actor).setEliteMindBinding(new EliteMindBinding(entry, handle, preparedBody));
-                configure.accept(preparedBody.entity());
-            });
+            MobBody body;
+            try {
+                body = mindHost.spawnBody(location, profile, preparedBody -> {
+                    CrashFix.persistentTracker(preparedBody.entity());
+                    ((EliteEntity) actor).setEliteMindBinding(new EliteMindBinding(entry, handle, preparedBody));
+                    configure.accept(preparedBody.entity());
+                });
+            } catch (MindBodyRejectedException rejected) {
+                // A cancelled spawn (protection or entity-limit plugins) is an ordinary refused spawn.
+                // The custom boss reports it, counts it and cleans up, as it does for world.spawn.
+                return null;
+            }
             configured = true;
             return body.entity();
         } finally {
