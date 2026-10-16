@@ -121,7 +121,8 @@ dependencies {
     ///Shaded in
     implementation group: 'org.bstats', name: 'bstats-bukkit', version: '3.0.2'
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
-    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: '2.2.0-SNAPSHOT'){
+    // -PmagmacoreVersion=... builds against a branch MagmaCore published beside the shared snapshot.
+    implementation (group: 'com.magmaguy', name: 'MagmaCore', version: project.findProperty('magmacoreVersion') ?: '2.2.0-SNAPSHOT'){
         changing = true
     }
 
