@@ -86,6 +86,10 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     @Getter
     @Setter
     private boolean isMount = false;
+    /** A model mount keeps its body tracked by clients, so a seated player rides it instead of staying behind. */
+    @Getter
+    @Setter
+    private boolean rideableModel = false;
     @Getter
     @Setter
     private CustomModel customModel = null;

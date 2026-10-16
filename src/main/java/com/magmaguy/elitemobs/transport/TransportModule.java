@@ -254,7 +254,7 @@ public final class TransportModule implements Listener, AutoCloseable {
                     body.setPersistent(false); body.setRemoveWhenFarAway(false); body.setCanPickupItems(false);
                     body.setInvulnerable(true);
                     body.setGravity(false);
-                }, entityConfig)).orElseThrow(() -> new IllegalStateException("Native flying Minds are unavailable on this server version"));
+                }, entityConfig, true)).orElseThrow(() -> new IllegalStateException("Native flying Minds are unavailable on this server version"));
     }
 
     /** Feathered mounts shed feathers and beat their wings while they fly; seats and other carriers stay quiet. */

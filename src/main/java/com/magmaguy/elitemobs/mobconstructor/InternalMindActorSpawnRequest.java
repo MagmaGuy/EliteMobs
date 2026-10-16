@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 /**
  * EliteMobs-internal request for one transient native actor with a fresh Java Mind program.
  * This deliberately does not broaden the public Lua Mind API.
+ * {@code rideable} keeps a custom-model body tracked by clients so a player can ride it.
  */
 public record InternalMindActorSpawnRequest(
         Plugin systemOwner,
@@ -22,12 +23,13 @@ public record InternalMindActorSpawnRequest(
         EliteMindBodyProfile bodyProfile,
         MindProgram program,
         Consumer<EliteEntity> initializer,
-        com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields customBoss) {
+        com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields customBoss,
+        boolean rideable) {
 
     public InternalMindActorSpawnRequest(Plugin owner, UUID player, Location location, int level,
                                          EliteMindBodyProfile profile, MindProgram program,
                                          Consumer<EliteEntity> initializer) {
-        this(owner, player, location, level, profile, program, initializer, null);
+        this(owner, player, location, level, profile, program, initializer, null, false);
     }
 
     public InternalMindActorSpawnRequest {

@@ -29,10 +29,10 @@ public class CustomModel implements CustomModelInterface {
     private CustomModelFMM customModelFMM;
     private boolean initialized = false;
 
-    private CustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
+    private CustomModel(LivingEntity livingEntity, String modelName, String nametagName, boolean rideable) {
         switch (modelPlugin) {
             case FREE_MINECRAFT_MODELS:
-                customModelFMM = new CustomModelFMM(livingEntity, modelName, nametagName);
+                customModelFMM = new CustomModelFMM(livingEntity, modelName, nametagName, rideable);
                 initialized = customModelFMM.getDynamicEntity() != null;
                 break;
             case MODEL_ENGINE:
@@ -104,7 +104,13 @@ public class CustomModel implements CustomModelInterface {
     }
 
     public static CustomModel generateCustomModel(LivingEntity livingEntity, String modelName, String nametagName) {
-        CustomModel customModel = new CustomModel(livingEntity, modelName, nametagName);
+        return generateCustomModel(livingEntity, modelName, nametagName, false);
+    }
+
+    /** A rideable model leaves its body tracked by clients, so players seated on that body travel with it. */
+    public static CustomModel generateCustomModel(LivingEntity livingEntity, String modelName, String nametagName,
+                                                  boolean rideable) {
+        CustomModel customModel = new CustomModel(livingEntity, modelName, nametagName, rideable);
         return customModel.initialized ? customModel : null;
     }
 

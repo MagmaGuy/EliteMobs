@@ -158,7 +158,8 @@ public class CustomBossMegaConsumer {
         if (customBossesConfigFields.getCustomModel() == null || customBossesConfigFields.getCustomModel().isEmpty())
             return;
         try {
-            customBossEntity.setCustomModel(CustomModel.generateCustomModel(livingEntity, customBossesConfigFields.getCustomModel(), customBossEntity.getName()));
+            customBossEntity.setCustomModel(CustomModel.generateCustomModel(livingEntity, customBossesConfigFields.getCustomModel(), customBossEntity.getName(),
+                    customBossEntity.isRideableModel()));
             warnIfNameCanNeverRender();
         } catch (Exception exception) {
             customBossEntity.setCustomModel(null);

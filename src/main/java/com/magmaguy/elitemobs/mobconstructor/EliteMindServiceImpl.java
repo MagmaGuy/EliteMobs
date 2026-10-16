@@ -305,6 +305,7 @@ final class EliteMindServiceImpl implements EliteMindService, Listener {
         var actor = new com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity(config);
         actor.setLevel(config.getLevel() > 0 ? config.getLevel() : request.level());
         actor.setPersistent(false);
+        actor.setRideableModel(request.rideable());
         actor.addCustomData(new NamespacedKey(request.systemOwner(), "native_mind_player_owner"), request.playerOwnerId());
         MobBody[] body = new MobBody[1];
         MindHandle[] handle = new MindHandle[1];

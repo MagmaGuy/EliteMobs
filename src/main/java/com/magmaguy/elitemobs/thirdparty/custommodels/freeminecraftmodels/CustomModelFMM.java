@@ -40,8 +40,12 @@ public class CustomModelFMM implements CustomModelInterface {
     @Getter
     private final DynamicEntity dynamicEntity;
 
-    public CustomModelFMM(LivingEntity livingEntity, String modelName, String nametagName) {
-        dynamicEntity = DynamicEntity.create(modelName, livingEntity);
+    public CustomModelFMM(LivingEntity livingEntity, String modelName, String nametagName, boolean rideable) {
+        // FMM normally hides the body from clients. A client that cannot see a vehicle never seats its
+        // passenger, so mounts keep the body tracked and only make it invisible.
+        dynamicEntity = rideable
+                ? DynamicEntity.createWithInvisibility(modelName, livingEntity)
+                : DynamicEntity.create(modelName, livingEntity);
         if (dynamicEntity == null) return;
         dynamicEntity.setDisplayName(nametagName);
     }
