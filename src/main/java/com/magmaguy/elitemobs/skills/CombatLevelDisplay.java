@@ -323,6 +323,9 @@ public class CombatLevelDisplay implements Listener {
                     Player player = Bukkit.getPlayer(entry.getKey());
                     if (player == null) continue;
                     PlayerDisplay display = entry.getValue();
+                    // A player on foot with a label on foot has nothing to catch here; the 5-tick refresh
+                    // handles the rest without this pass touching every player's passenger list each tick.
+                    if (display.mode != Mode.VEHICLE && player.getVehicle() == null) continue;
                     Mode wanted = modeFor(player);
                     if (display.mode != wanted || wanted == Mode.VEHICLE && !display.isValid(player)) updateDisplay(player);
                 }
