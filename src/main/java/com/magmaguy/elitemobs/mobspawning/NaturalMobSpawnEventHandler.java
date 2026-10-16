@@ -18,6 +18,7 @@ import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardFlagChecker;
 import com.magmaguy.elitemobs.thirdparty.worldguard.WorldGuardSpawnEventBypasser;
 import com.magmaguy.elitemobs.utils.PlayerScanner;
 import com.magmaguy.easyminecraftgoals.NMSManager;
+import com.magmaguy.magmacore.ai.MindBodyRejectedException;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Location;
@@ -29,7 +30,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.*;
@@ -38,6 +41,8 @@ import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.*;
  * Created by MagmaGuy on 24/04/2017.
  */
 public class NaturalMobSpawnEventHandler implements Listener {
+
+    private final Set<EntityType> refusedBehaviorSpawnTypes = new HashSet<>();
 
     /**
      * This gets the level the natural Elite Mob should have. This level is determined by the power of the armor and weapons
@@ -170,6 +175,14 @@ public class NaturalMobSpawnEventHandler implements Listener {
                         eliteMobLevel, event.getSpawnReason(), null);
                 event.setCancelled(true);
                 livingEntity = eliteEntity.getLivingEntity();
+            } catch (MindBodyRejectedException rejected) {
+                // Another plugin cancelled the replacement body's CUSTOM spawn. The vanilla spawn still goes
+                // ahead unconverted, and a mob stacker can refuse every spawn in a farm, so say it once per type.
+                if (refusedBehaviorSpawnTypes.add(event.getEntityType()))
+                    Logger.warn("Another plugin cancelled the elite replacement spawn for " + event.getEntityType()
+                            + ", so it spawned as a normal mob. Mob stackers and spawn limiters that cancel CUSTOM"
+                            + " spawns cause this. EliteMobs reports this once per mob type until the next restart.");
+                return;
             } catch (RuntimeException failure) {
                 Logger.warn("Could not apply elite behavior to " + event.getEntityType() + ": " + failure.getMessage());
                 return;
