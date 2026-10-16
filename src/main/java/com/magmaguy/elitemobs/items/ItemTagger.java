@@ -163,7 +163,7 @@ public class ItemTagger {
             return 0;
         if (enchantmentKey.getNamespace().equals("elitemobs") && EliteEnchantmentCatalog.ownsFilename(enchantmentKey.getKey()))
             return com.magmaguy.magmacore.enchantments.EnchantmentItems.inspectCustom(itemMeta).getOrDefault(enchantmentKey.toString(), 0);
-        Integer level = itemMeta.getPersistentDataContainer().get(enchantmentKey, PersistentDataType.INTEGER);
+        Integer level = getWholeNumber(itemMeta.getPersistentDataContainer(), enchantmentKey);
         if (level == null) {
             Enchantment enchantment = Enchantment.getByKey(enchantmentKey);
             if (enchantment != null)
@@ -461,8 +461,23 @@ public class ItemTagger {
     public static int getStoredItemLevel(@Nullable ItemStack itemStack) {
         if (itemStack == null) return -1;
         if (itemStack.getItemMeta() == null) return -1;
-        Integer level = itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_LEVEL, PersistentDataType.INTEGER);
+        Integer level = getWholeNumber(itemStack.getItemMeta().getPersistentDataContainer(), ELITE_LEVEL);
         return level == null ? -1 : level;
+    }
+
+    /**
+     * Reads a whole-number tag whatever integral type it was stored as. Some older items carry these keys as a
+     * byte or short, and Paper throws instead of returning null when a typed INTEGER read finds another type.
+     * That exception used to abort the whole equipment scan and strip every equipment effect from the player.
+     */
+    @Nullable
+    private static Integer getWholeNumber(PersistentDataContainer container, NamespacedKey key) {
+        if (container.has(key, PersistentDataType.INTEGER)) return container.get(key, PersistentDataType.INTEGER);
+        if (container.has(key, PersistentDataType.BYTE)) return (int) container.get(key, PersistentDataType.BYTE);
+        if (container.has(key, PersistentDataType.SHORT)) return (int) container.get(key, PersistentDataType.SHORT);
+        if (container.has(key, PersistentDataType.LONG))
+            return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, container.get(key, PersistentDataType.LONG)));
+        return null;
     }
 
     public static void setItemLevel(@Nullable ItemStack itemStack, int level) {
