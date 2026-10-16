@@ -142,11 +142,23 @@ public class DefaultConfig extends ConfigurationFile {
             fileConfiguration.set("usePassengerCombatLevelDisplay", false);
             fileConfiguration.set("combatLabelFollowingTextDefaultApplied", true);
         }
+        // Passenger labels are the default again: MagmaCore now keeps a team-less player's name with a
+        // client-only scoreboard team, so the reason for the earlier switch to following text is gone. The
+        // stock value is switched once; any later choice is kept.
+        boolean passengerDefaultApplied = ConfigurationEngine.setBoolean(
+                List.of("Internal marker for the one-time switch of combat labels back to passengers. Do not edit."),
+                fileConfiguration, "combatLabelPassengerDefaultApplied", false);
+        if (!passengerDefaultApplied) {
+            fileConfiguration.set("usePassengerCombatLevelDisplay", true);
+            fileConfiguration.set("combatLabelPassengerDefaultApplied", true);
+        }
         usePassengerCombatLevelDisplay = ConfigurationEngine.setBoolean(
-                List.of("Mounts player combat labels as packet-only passengers instead of following text.",
-                        "Minecraft then hides the player's own name from other players unless the player is on a scoreboard team.",
-                        "Following text moves with the same client smoothing as the player. Passenger mode still falls back to it while another entity rides the player."),
-                fileConfiguration, "usePassengerCombatLevelDisplay", false);
+                List.of("Mounts player combat labels as packet-only passengers, which the client places from the player's own",
+                        "position every frame, so the label never trails on foot. Other players keep seeing the player's name:",
+                        "a team-less player gets a client-only scoreboard team with name tags always visible on each viewer's client.",
+                        "False uses following text, which teleports after the player with a short glide. Passenger mode still falls",
+                        "back to following text while another entity rides the player."),
+                fileConfiguration, "usePassengerCombatLevelDisplay", true);
         preventEliteMobConversionOfNamedMobs = ConfigurationEngine.setBoolean(
                 List.of("Sets whether EliteMobs will prevent converting named mobs to elites.", "Especially important for compatibility with other plugins."),
                 fileConfiguration, "preventEliteMobConversionOfNamedMobs", true);

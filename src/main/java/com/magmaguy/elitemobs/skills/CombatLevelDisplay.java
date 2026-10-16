@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.skills;
 import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.easyminecraftgoals.internal.FakeText;
 import com.magmaguy.easyminecraftgoals.internal.FollowingText;
+import com.magmaguy.easyminecraftgoals.internal.PacketNameTagTeams;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.combatsystem.combattag.PlayerCombatState;
 import com.magmaguy.elitemobs.config.SkillsConfig;
@@ -240,6 +241,27 @@ public class CombatLevelDisplay implements Listener {
         if (display != null) {
             display.close();
         }
+        PacketNameTagTeams.releaseSubject(player.getUniqueId());
+    }
+
+    /**
+     * A passenger hides a team-less player's name on every other client. While a label rides a player who has
+     * no real team on a viewer's scoreboard, that viewer gets a client-only team that keeps the name visible;
+     * the team goes away with the label, the passenger mode, or a real team.
+     */
+    private static void reconcileNameTags() {
+        for (Map.Entry<UUID, PlayerDisplay> entry : playerDisplays.entrySet()) {
+            Player subject = Bukkit.getPlayer(entry.getKey());
+            boolean riding = entry.getValue().mode == Mode.PASSENGER && subject != null && subject.isOnline();
+            for (Player viewer : Bukkit.getOnlinePlayers()) {
+                if (viewer.getUniqueId().equals(entry.getKey())) continue;
+                if (riding && viewer.getWorld().equals(subject.getWorld())
+                        && viewer.getScoreboard().getEntryTeam(subject.getName()) == null)
+                    PacketNameTagTeams.keep(viewer, subject);
+                else
+                    PacketNameTagTeams.release(viewer, entry.getKey());
+            }
+        }
     }
 
     /**
@@ -296,6 +318,7 @@ public class CombatLevelDisplay implements Listener {
             vehicleTask = null;
         }
         combatState = null;
+        for (UUID subject : playerDisplays.keySet()) PacketNameTagTeams.releaseSubject(subject);
         for (PlayerDisplay display : playerDisplays.values()) {
             display.close();
         }
@@ -313,6 +336,7 @@ public class CombatLevelDisplay implements Listener {
             @Override
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers()) updateDisplay(player);
+                reconcileNameTags();
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20L, 5L);
         // Boarding and dismounting change the mode; catch them within the tick instead of the next refresh.
