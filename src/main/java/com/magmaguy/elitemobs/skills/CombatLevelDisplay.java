@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -27,6 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.util.Vector;
 
 import java.util.Map;
 import java.util.UUID;
@@ -47,29 +49,46 @@ public class CombatLevelDisplay implements Listener {
     private static final Map<UUID, PlayerDisplay> playerDisplays = new ConcurrentHashMap<>();
     private static PlayerCombatState combatState;
     private static BukkitTask refreshTask;
+    private static BukkitTask vehicleTask;
 
     public static void setCombatState(PlayerCombatState state) {
         combatState = state;
     }
 
+    /** How the label follows its player. */
+    private enum Mode {
+        /** A packet passenger of the player; hides the player's own name unless they are on a team. */
+        PASSENGER,
+        /**
+         * A packet passenger of the entity the player rides. Clients place a rider and its vehicle's other
+         * passengers from the same smoothed vehicle position, so the label stays on the rider's head however
+         * the vehicle moves, and the player keeps their name.
+         */
+        VEHICLE,
+        /** Teleported after the player every tick with the same glide clients give remote players. */
+        FOLLOWING
+    }
+
     private static final class PlayerDisplay {
         private final FakeText display;
         private final FollowingText tracking;
+        private final Mode mode;
         private String text;
 
-        private PlayerDisplay(FakeText display, FollowingText tracking, String text) {
+        private PlayerDisplay(FakeText display, FollowingText tracking, Mode mode, String text) {
             this.display = display;
             this.tracking = tracking;
+            this.mode = mode;
             this.text = text;
         }
 
-        private boolean isPassenger() {
-            return tracking == null;
-        }
-
         private boolean isValid(Player player) {
-            return tracking != null ? tracking.isValid()
-                    : display.isAutoTracked() && player.equals(display.getVehicle());
+            return switch (mode) {
+                case FOLLOWING -> tracking.isValid();
+                case PASSENGER -> display.isAutoTracked() && player.equals(display.getVehicle());
+                case VEHICLE -> display.isAutoTracked() && display.getVehicle() != null
+                        && display.getVehicle().equals(player.getVehicle());
+            };
         }
 
         private void close() {
@@ -119,31 +138,56 @@ public class CombatLevelDisplay implements Listener {
         boolean showHealth = shouldShowHealth(player);
         String text = renderText(player, showHealth);
         if (text.isBlank()) return;
-        boolean passenger = shouldUsePassenger(player);
+        Mode mode = modeFor(player);
+        // Passengers sit at a seat: the player's own head, or the vehicle seat the player's feet are at.
+        float translationY = switch (mode) {
+            case PASSENGER -> getDisplayHeight(player);
+            case VEHICLE -> (float) player.getHeight() + getDisplayHeight(player);
+            case FOLLOWING -> 0;
+        };
         FakeText fakeText = NMSManager.getAdapter().fakeTextBuilder()
                 .text(ChatColorConverter.convert(text))
                 .billboard(Display.Billboard.CENTER)
                 .shadow(true)
                 .seeThrough(false)
-                .translation(0, passenger ? getDisplayHeight(player) : 0, 0)
-                .teleportDuration(passenger ? 0 : FOLLOWING_TEXT_INTERPOLATION_TICKS)
+                .translation(0, translationY, 0)
+                .teleportDuration(mode == Mode.FOLLOWING ? FOLLOWING_TEXT_INTERPOLATION_TICKS : 0)
                 .viewerFilter(viewer -> canSeeNameTag(player, viewer))
                 .build(player.getLocation());
 
         FollowingText tracking = null;
-        if (passenger) {
-            fakeText.attachTo(player);
-        } else {
-            tracking = new FollowingText(fakeText, player,
+        switch (mode) {
+            case PASSENGER -> fakeText.attachTo(player);
+            case VEHICLE -> fakeText.attachTo(player.getVehicle());
+            case FOLLOWING -> tracking = new FollowingText(fakeText, player,
                     () -> player.getLocation().add(0, player.getHeight() + getDisplayHeight(player), 0),
                     viewer -> canSeeNameTag(player, viewer));
         }
-        playerDisplays.put(player.getUniqueId(), new PlayerDisplay(fakeText, tracking, text));
+        playerDisplays.put(player.getUniqueId(), new PlayerDisplay(fakeText, tracking, mode, text));
     }
 
-    private static boolean shouldUsePassenger(Player player) {
+    private static Mode modeFor(Player player) {
+        if (canRideVehicle(player)) return Mode.VEHICLE;
         // Our text is packet-only, so it never appears in Bukkit's passenger list.
-        return DefaultConfig.isUsePassengerCombatLevelDisplay() && player.getPassengers().isEmpty();
+        if (DefaultConfig.isUsePassengerCombatLevelDisplay() && player.getPassengers().isEmpty()) return Mode.PASSENGER;
+        return Mode.FOLLOWING;
+    }
+
+    /**
+     * A riding player's position is not sent to clients; they derive it from the vehicle, so following text
+     * cannot keep up with it. The label rides the vehicle instead when it would share the player's seat.
+     */
+    private static boolean canRideVehicle(Player player) {
+        Entity vehicle = player.getVehicle();
+        if (vehicle == null || !vehicle.isValid()) return false;
+        var adapter = NMSManager.getAdapter();
+        if (adapter == null) return false;
+        int riderSeat = vehicle.getPassengers().indexOf(player);
+        if (riderSeat < 0) return false;
+        // Packet passengers follow the real ones; a seat of its own would leave the label beside the player.
+        Vector riderOffset = adapter.getPassengerSeatOffset(vehicle, riderSeat);
+        Vector labelOffset = adapter.getPassengerSeatOffset(vehicle, vehicle.getPassengers().size());
+        return riderOffset != null && labelOffset != null && riderOffset.distanceSquared(labelOffset) < 1.0E-6;
     }
 
     /**
@@ -202,8 +246,7 @@ public class CombatLevelDisplay implements Listener {
             return;
         }
         PlayerDisplay display = playerDisplays.get(player.getUniqueId());
-        if (display != null && display.isValid(player)
-                && display.isPassenger() == shouldUsePassenger(player)) {
+        if (display != null && display.isValid(player) && display.mode == modeFor(player)) {
             if (!text.equals(display.text)) {
                 display.display.setText(ChatColorConverter.convert(text));
                 display.text = text;
@@ -235,6 +278,10 @@ public class CombatLevelDisplay implements Listener {
             refreshTask.cancel();
             refreshTask = null;
         }
+        if (vehicleTask != null) {
+            vehicleTask.cancel();
+            vehicleTask = null;
+        }
         combatState = null;
         for (PlayerDisplay display : playerDisplays.values()) {
             display.close();
@@ -255,6 +302,19 @@ public class CombatLevelDisplay implements Listener {
                 for (Player player : Bukkit.getOnlinePlayers()) updateDisplay(player);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20L, 5L);
+        // Boarding and dismounting change the mode; catch them within the tick instead of the next refresh.
+        vehicleTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Map.Entry<UUID, PlayerDisplay> entry : playerDisplays.entrySet()) {
+                    Player player = Bukkit.getPlayer(entry.getKey());
+                    if (player == null) continue;
+                    PlayerDisplay display = entry.getValue();
+                    Mode wanted = modeFor(player);
+                    if (display.mode != wanted || wanted == Mode.VEHICLE && !display.isValid(player)) updateDisplay(player);
+                }
+            }
+        }.runTaskTimer(MetadataHandler.PLUGIN, 20L, 1L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
