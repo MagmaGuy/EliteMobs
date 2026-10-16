@@ -139,10 +139,11 @@ public class CombatLevelDisplay implements Listener {
         String text = renderText(player, showHealth);
         if (text.isBlank()) return;
         Mode mode = modeFor(player);
-        // Passengers sit at a seat: the player's own head, or the vehicle seat the player's feet are at.
+        // Passengers sit at a seat: the label on the player's own head, or on the vehicle seat, where a riding
+        // player hangs below the seat by their own vehicle attachment (0.6 blocks), so the label climbs less.
         float translationY = switch (mode) {
             case PASSENGER -> getDisplayHeight(player);
-            case VEHICLE -> (float) player.getHeight() + getDisplayHeight(player);
+            case VEHICLE -> (float) (player.getHeight() - riderDropBelowSeat(player)) + getDisplayHeight(player);
             case FOLLOWING -> 0;
         };
         FakeText fakeText = NMSManager.getAdapter().fakeTextBuilder()
@@ -171,6 +172,18 @@ public class CombatLevelDisplay implements Listener {
         // Our text is packet-only, so it never appears in Bukkit's passenger list.
         if (DefaultConfig.isUsePassengerCombatLevelDisplay() && player.getPassengers().isEmpty()) return Mode.PASSENGER;
         return Mode.FOLLOWING;
+    }
+
+    /** How far the server seats the rider below the vehicle's seat point; players sit 0.6 blocks down. */
+    private static double riderDropBelowSeat(Player player) {
+        Entity vehicle = player.getVehicle();
+        var adapter = NMSManager.getAdapter();
+        if (vehicle == null || adapter == null) return 0;
+        int riderSeat = vehicle.getPassengers().indexOf(player);
+        Vector seat = riderSeat < 0 ? null : adapter.getPassengerSeatOffset(vehicle, riderSeat);
+        if (seat == null) return 0;
+        double drop = vehicle.getLocation().getY() + seat.getY() - player.getLocation().getY();
+        return Math.max(0, Math.min(1.5, drop));
     }
 
     /**
