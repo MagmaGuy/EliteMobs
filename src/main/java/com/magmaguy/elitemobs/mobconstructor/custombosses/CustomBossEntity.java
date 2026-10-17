@@ -714,7 +714,11 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
                 persistentObjectHandler = null;
             }
             removeTracking();
-            if (!removalReason.equals(RemovalReason.SHUTDOWN) &&
+            //The reset readies this object for its next spawn. Once a shutdown or /em reload starts, no boss object
+            //spawns again, whatever the removal reason (dungeon teardown removes with WORLD_UNLOAD, culls with
+            //REINFORCEMENT_CULL), and rebuilding the phase 1 powers would schedule their tasks on a disabled plugin.
+            if (!MetadataHandler.shutdownRequested &&
+                    !removalReason.equals(RemovalReason.SHUTDOWN) &&
                     !removalReason.equals(RemovalReason.DEATH) &&
                     !removalReason.equals(RemovalReason.ARENA_RESET))
                 if (phaseBossEntity != null)

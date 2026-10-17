@@ -132,6 +132,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class EliteMobs extends JavaPlugin {
     private boolean missingModelsWarningSent;
@@ -649,178 +650,192 @@ public class EliteMobs extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.close();
+        shutdownStep(com.magmaguy.elitemobs.items.EliteEnchantmentCatalog::close);
         MetadataHandler.shutdownRequested = true;
         // bStats runs its own scheduler thread; without this every reload leaves one
         // reporting for, and holding on to, the previous instance.
         if (metrics != null) {
-            metrics.shutdown();
+            shutdownStep(metrics::shutdown);
             metrics = null;
         }
-        unregisterModelsDungeonLocator();
-        if (enchantmentAnvil != null) { enchantmentAnvil.close(); enchantmentAnvil = null; }
-        CustomItem.shutdownCacheRegeneration();
-        com.magmaguy.elitemobs.commands.LanguageCommand.shutdown();
-        ClassSelectionMenu.shutdown();
-        MagmaCore.requestInitializationShutdown(this);
-        PatrolEditor.shutdown();
-        com.magmaguy.elitemobs.transport.TransportModule.shutdown();
-        PatrolService.shutdown();
+        shutdownStep(EliteMobs::unregisterModelsDungeonLocator);
+        if (enchantmentAnvil != null) { shutdownStep(enchantmentAnvil::close); enchantmentAnvil = null; }
+        shutdownStep(CustomItem::shutdownCacheRegeneration);
+        shutdownStep(com.magmaguy.elitemobs.commands.LanguageCommand::shutdown);
+        shutdownStep(ClassSelectionMenu::shutdown);
+        shutdownStep(() -> MagmaCore.requestInitializationShutdown(this));
+        shutdownStep(PatrolEditor::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.transport.TransportModule::shutdown);
+        shutdownStep(PatrolService::shutdown);
         // Physical class servants and portal surfaces must be removed while their native Mind
         // runtime is still available.
-        com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule.shutdownIfInitialized();
-        EliteMindServiceModule.shutdown();
-        EliteLuaPowerServiceModule.shutdown();
-        AutoclickerThrottle.shutdown();
-        SpiritWalkSupport.shutdown();
-        com.magmaguy.elitemobs.combatsystem.combattag.CombatTag.shutdown();
-        ZombieNecronomiconSupport.shutdown();
-        RetiredWorldRedirect.shutdown();
+        shutdownStep(com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule::shutdownIfInitialized);
+        shutdownStep(EliteMindServiceModule::shutdown);
+        shutdownStep(EliteLuaPowerServiceModule::shutdown);
+        shutdownStep(AutoclickerThrottle::shutdown);
+        shutdownStep(SpiritWalkSupport::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.combatsystem.combattag.CombatTag::shutdown);
+        shutdownStep(ZombieNecronomiconSupport::shutdown);
+        shutdownStep(RetiredWorldRedirect::shutdown);
         if (MetadataHandler.pluginState == PluginState.INITIALIZING) {
-            Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
+            shutdownStep(() -> Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN));
             MetadataHandler.pluginState = PluginState.UNINITIALIZED;
-            HealthDisplayCoordinator.shutdown();
-            MagmaCore.shutdown(this);
+            shutdownStep(HealthDisplayCoordinator::shutdown);
+            shutdownStep(() -> MagmaCore.shutdown(this));
             Logger.info("EliteMobs shutdown during init -- cancelled async loading.");
             return;
         }
         if (MetadataHandler.pluginState == PluginState.UNINITIALIZED) {
-            HealthDisplayCoordinator.shutdown();
-            MagmaCore.shutdown(this);
+            shutdownStep(HealthDisplayCoordinator::shutdown);
+            shutdownStep(() -> MagmaCore.shutdown(this));
             return;
         }
         Logger.info("Starting EliteMobs shutdown sequence...");
-        Explosion.shutdown();
-        PeaceBannerManager.shutdown();
-        com.magmaguy.elitemobs.parties.PartyManager.shutdown();
-        Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN);
-        Wormhole.shutdown();
-        RegionalBossEntity.flushOnShutdown();
-        InstancedBossEntity.shutdown();
-        NPCEntity.shutdown();
-        PersistentObjectHandler.shutdown();
-        EntityTracker.wipeShutdown();
-        TimedEvent.shutdown();
-        ActionEvent.shutdown();
-        PeaceBannerItem.unregisterRecipe();
-        validWorldList.clear();
-        CustomBossesConfigFields.getRegionalElites().clear();
-        CustomItem.getCustomItems().clear();
-        CustomItem.getCustomItemStackList().clear();
-        CustomItem.getCustomItemStackShopList().clear();
-        CustomItem.getLimitedItems().clear();
-        CustomItem.getScalableItems().clear();
-        CustomItem.getFixedItems().clear();
-        CustomItem.getTieredLoot().clear();
-        CustomItem.getWeighedFixedItems().clear();
-        EMPackage.shutdown();
-        RegionalBossEntity.regionalBossesShutdown();
-        if (this.placeholders != null) ((Placeholders) placeholders).unregister();
-        com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects.shutdown();
-        HandlerList.unregisterAll(MetadataHandler.PLUGIN);
-        TreasureChest.shutdown();
-        WorldOperationQueue.shutdown();
-        MatchInstance.shutdown();
-        DynamicQuest.shutdown();
-        ProceduralShopMenu.shutdown();
-        EliteMobsWorld.shutdown();
-        Navigation.shutdown();
-        QuestDialogueBossBarManager.shutdown();
-        BossBarUtil.shutdown();
-        com.magmaguy.elitemobs.testing.SkillSystemTest.shutdown();
-        ScriptAction.shutdown();
-        CustomMusic.shutdown();
-        CustomBossEntity.shutdown();
-        com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay.shutdown();
+        shutdownStep(Explosion::shutdown);
+        shutdownStep(PeaceBannerManager::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.parties.PartyManager::shutdown);
+        shutdownStep(() -> Bukkit.getServer().getScheduler().cancelTasks(MetadataHandler.PLUGIN));
+        shutdownStep(Wormhole::shutdown);
+        shutdownStep(RegionalBossEntity::flushOnShutdown);
+        shutdownStep(InstancedBossEntity::shutdown);
+        shutdownStep(NPCEntity::shutdown);
+        shutdownStep(PersistentObjectHandler::shutdown);
+        shutdownStep(EntityTracker::wipeShutdown);
+        shutdownStep(TimedEvent::shutdown);
+        shutdownStep(ActionEvent::shutdown);
+        shutdownStep(PeaceBannerItem::unregisterRecipe);
+        shutdownStep(validWorldList::clear);
+        shutdownStep(() -> CustomBossesConfigFields.getRegionalElites().clear());
+        shutdownStep(() -> CustomItem.getCustomItems().clear());
+        shutdownStep(() -> CustomItem.getCustomItemStackList().clear());
+        shutdownStep(() -> CustomItem.getCustomItemStackShopList().clear());
+        shutdownStep(() -> CustomItem.getLimitedItems().clear());
+        shutdownStep(() -> CustomItem.getScalableItems().clear());
+        shutdownStep(() -> CustomItem.getFixedItems().clear());
+        shutdownStep(() -> CustomItem.getTieredLoot().clear());
+        shutdownStep(() -> CustomItem.getWeighedFixedItems().clear());
+        shutdownStep(EMPackage::shutdown);
+        shutdownStep(RegionalBossEntity::regionalBossesShutdown);
+        if (this.placeholders != null) shutdownStep(() -> ((Placeholders) placeholders).unregister());
+        shutdownStep(com.magmaguy.elitemobs.items.potioneffects.PlayerPotionEffects::shutdown);
+        shutdownStep(() -> HandlerList.unregisterAll(MetadataHandler.PLUGIN));
+        shutdownStep(TreasureChest::shutdown);
+        shutdownStep(WorldOperationQueue::shutdown);
+        shutdownStep(MatchInstance::shutdown);
+        shutdownStep(DynamicQuest::shutdown);
+        shutdownStep(ProceduralShopMenu::shutdown);
+        shutdownStep(EliteMobsWorld::shutdown);
+        shutdownStep(Navigation::shutdown);
+        shutdownStep(QuestDialogueBossBarManager::shutdown);
+        shutdownStep(BossBarUtil::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.testing.SkillSystemTest::shutdown);
+        shutdownStep(ScriptAction::shutdown);
+        shutdownStep(CustomMusic::shutdown);
+        shutdownStep(CustomBossEntity::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.combatsystem.displays.BossHealthDisplay::shutdown);
         // Memory leak fixes - clear static collections
-        ItemLootShower.shutdown();
-        com.magmaguy.elitemobs.utils.MessageThrottler.shutdown();
-        TrackingFireballSupport.shutdown();
-        VersionChecker.shutdown();
-        KeepNeutralsAngry.shutdown();
-        SharedLootTable.shutdown();
-        LootMenu.shutdown();
-        TeleportsPage.TeleportsPageEvents.shutdown();
-        BossTrackingPage.BossTrackingPageEvents.shutdown();
+        shutdownStep(ItemLootShower::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.utils.MessageThrottler::shutdown);
+        shutdownStep(TrackingFireballSupport::shutdown);
+        shutdownStep(VersionChecker::shutdown);
+        shutdownStep(KeepNeutralsAngry::shutdown);
+        shutdownStep(SharedLootTable::shutdown);
+        shutdownStep(LootMenu::shutdown);
+        shutdownStep(TeleportsPage.TeleportsPageEvents::shutdown);
+        shutdownStep(BossTrackingPage.BossTrackingPageEvents::shutdown);
         // Additional memory leak fixes
-        PlayerDeathMessageByEliteMob.shutdown();
-        NPCInteractions.shutdown();
-        com.magmaguy.elitemobs.items.GearRestrictionHandler.shutdown();
-        com.magmaguy.elitemobs.antiexploit.FarmingProtection.shutdown();
-        NPCProximitySensor.shutdown();
-        PlayerQuestCooldowns.shutdown();
-        GetLootMenu.shutdown();
-        TransitiveBlockCommand.shutdown();
-        Saturation.shutdown();
-        Heal.shutdown();
-        Harm.shutdown();
-        ScriptListener.shutdown();
-        CombatEnterScanPower.shutdown();
-        QuestTracking.shutdown();
+        shutdownStep(PlayerDeathMessageByEliteMob::shutdown);
+        shutdownStep(NPCInteractions::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.items.GearRestrictionHandler::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.antiexploit.FarmingProtection::shutdown);
+        shutdownStep(NPCProximitySensor::shutdown);
+        shutdownStep(PlayerQuestCooldowns::shutdown);
+        shutdownStep(GetLootMenu::shutdown);
+        shutdownStep(TransitiveBlockCommand::shutdown);
+        shutdownStep(Saturation::shutdown);
+        shutdownStep(Heal::shutdown);
+        shutdownStep(Harm::shutdown);
+        shutdownStep(ScriptListener::shutdown);
+        shutdownStep(CombatEnterScanPower::shutdown);
+        shutdownStep(QuestTracking::shutdown);
         // Menu shutdowns
-        CustomShopMenu.shutdown();
-        SellMenu.shutdown();
-        RepairMenu.shutdown();
-        ScrapperMenu.shutdown();
-        UnbindMenu.shutdown();
+        shutdownStep(CustomShopMenu::shutdown);
+        shutdownStep(SellMenu::shutdown);
+        shutdownStep(RepairMenu::shutdown);
+        shutdownStep(ScrapperMenu::shutdown);
+        shutdownStep(UnbindMenu::shutdown);
         // Gambling menu shutdowns
-        com.magmaguy.elitemobs.menus.gambling.BettingMenu.shutdown();
-        com.magmaguy.elitemobs.menus.gambling.BlackjackGame.shutdown();
-        com.magmaguy.elitemobs.menus.gambling.CoinFlipGame.shutdown();
-        com.magmaguy.elitemobs.menus.gambling.HigherLowerGame.shutdown();
-        com.magmaguy.elitemobs.menus.gambling.SlotMachineGame.shutdown();
-        com.magmaguy.elitemobs.gambling.DebtCollectorManager.shutdown();
-        com.magmaguy.elitemobs.economy.GamblingEconomyHandler.shutdown();
-        DynamicDungeonBrowser.shutdown();
-        InstancedDungeonBrowser.shutdown();
-        BuyOrSellMenu.BuyOrSellMenuEvents.shutdown();
-        Quest.shutdown();
-        QuestInventoryMenu.shutdown();
-        com.magmaguy.elitemobs.utils.SimpleScoreboard.shutdown();
-        com.magmaguy.elitemobs.quests.menus.QuestScreenSession.shutdown();
-        StatsPage.StatsPageEvents.shutdown();
-        GearPage.GearPageEvents.shutdown();
-        CommandsPage.CommandsPageEvents.shutdown();
-        CoverPage.CoverPageEvents.shutdown();
-        SkillsPage.SkillsPageEvents.shutdown();
-        StatusInventorySafety.shutdown();
-        SkillSystemMigration.shutdown();
-        SkillBonusInitializer.shutdown();
-        SkillXPBar.shutdown();
-        CombatLevelDisplay.shutdown();
-        com.magmaguy.elitemobs.advancedcombat.AdvancedCombatRuntime.shutdownIfInitialized();
-        HealthDisplayCoordinator.shutdown();
-        com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor.shutdown();
-        com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime.shutdownIfInitialized();
-        com.magmaguy.elitemobs.utils.BossBarOrderManager.shutdown();
-        ArenaMenu.ArenaMenuEvents.shutdown();
-        ItemEnchantmentMenu.ItemEnchantMenuEvents.shutdown();
-        EliteScrollMenu.EliteScrollMenuEvents.shutdown();
+        shutdownStep(com.magmaguy.elitemobs.menus.gambling.BettingMenu::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.menus.gambling.BlackjackGame::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.menus.gambling.CoinFlipGame::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.menus.gambling.HigherLowerGame::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.menus.gambling.SlotMachineGame::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.gambling.DebtCollectorManager::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.economy.GamblingEconomyHandler::shutdown);
+        shutdownStep(DynamicDungeonBrowser::shutdown);
+        shutdownStep(InstancedDungeonBrowser::shutdown);
+        shutdownStep(BuyOrSellMenu.BuyOrSellMenuEvents::shutdown);
+        shutdownStep(Quest::shutdown);
+        shutdownStep(QuestInventoryMenu::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.utils.SimpleScoreboard::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.quests.menus.QuestScreenSession::shutdown);
+        shutdownStep(StatsPage.StatsPageEvents::shutdown);
+        shutdownStep(GearPage.GearPageEvents::shutdown);
+        shutdownStep(CommandsPage.CommandsPageEvents::shutdown);
+        shutdownStep(CoverPage.CoverPageEvents::shutdown);
+        shutdownStep(SkillsPage.SkillsPageEvents::shutdown);
+        shutdownStep(StatusInventorySafety::shutdown);
+        shutdownStep(SkillSystemMigration::shutdown);
+        shutdownStep(SkillBonusInitializer::shutdown);
+        shutdownStep(SkillXPBar::shutdown);
+        shutdownStep(CombatLevelDisplay::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.advancedcombat.AdvancedCombatRuntime::shutdownIfInitialized);
+        shutdownStep(HealthDisplayCoordinator::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.combatsystem.combattag.DungeonCombatRuntime::shutdownIfInitialized);
+        shutdownStep(com.magmaguy.elitemobs.utils.BossBarOrderManager::shutdown);
+        shutdownStep(ArenaMenu.ArenaMenuEvents::shutdown);
+        shutdownStep(ItemEnchantmentMenu.ItemEnchantMenuEvents::shutdown);
+        shutdownStep(EliteScrollMenu.EliteScrollMenuEvents::shutdown);
         // Third pass memory leak fixes
-        CrashFix.shutdown();
-        com.magmaguy.elitemobs.commands.admin.RemoveCommand.shutdown();
-        com.magmaguy.magmacore.instance.InstanceProtector.shutdown();
-        ConfigurationLocation.shutdown();
+        shutdownStep(CrashFix::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.commands.admin.RemoveCommand::shutdown);
+        shutdownStep(com.magmaguy.magmacore.instance.InstanceProtector::shutdown);
+        shutdownStep(ConfigurationLocation::shutdown);
         // Fourth pass memory leak fixes
-        ElitePlayerInventory.shutdown();
-        KeepNeutralsAngry.shutdown();
-        Navigation.shutdown();
-        com.magmaguy.elitemobs.combatsystem.PlayerAttackCooldownTracker.shutdown();
-        GameClock.shutdown();
-        DynamicQuest.shutdown();
-        DungeonInstance.shutdown();
-        ArenaInstance.shutdown();
-        LuaPowerManager.shutdown();
-        NPCScriptManager.shutdown();
+        shutdownStep(ElitePlayerInventory::shutdown);
+        shutdownStep(KeepNeutralsAngry::shutdown);
+        shutdownStep(Navigation::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.combatsystem.PlayerAttackCooldownTracker::shutdown);
+        shutdownStep(GameClock::shutdown);
+        shutdownStep(DynamicQuest::shutdown);
+        shutdownStep(DungeonInstance::shutdown);
+        shutdownStep(ArenaInstance::shutdown);
+        shutdownStep(LuaPowerManager::shutdown);
+        shutdownStep(NPCScriptManager::shutdown);
         // Final pass memory leak fixes
-        ElitePower.shutdown();
-        EliteScriptBlueprint.shutdown();
-        EliteMobProperties.shutdown();
+        shutdownStep(ElitePower::shutdown);
+        shutdownStep(EliteScriptBlueprint::shutdown);
+        shutdownStep(EliteMobProperties::shutdown);
         Logger.info("Saving EliteMobs databases...");
-        PlayerData.closeConnection();
-        MagmaCore.shutdown(this);
+        shutdownStep(PlayerData::closeConnection);
+        shutdownStep(() -> MagmaCore.shutdown(this));
         MetadataHandler.pluginState = PluginState.UNINITIALIZED;
         Logger.info("All done! Good night.");
+    }
+
+    /**
+     * Runs one onDisable step. A failed step is logged and the next one still runs: later steps release state that
+     * outlives this plugin instance (packet handlers on player channels, dungeon worlds, the database connection),
+     * and a restart-free update enables the next instance straight away. LinkageError covers optional-dependency
+     * classes that can no longer load.
+     */
+    private void shutdownStep(Runnable step) {
+        try {
+            step.run();
+        } catch (RuntimeException | LinkageError failure) {
+            getLogger().log(Level.WARNING, "An EliteMobs shutdown step failed; the remaining steps still run.", failure);
+        }
     }
 
     /*
