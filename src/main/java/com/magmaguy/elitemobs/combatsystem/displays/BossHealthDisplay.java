@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.EliteMobEnterCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobExitCombatEvent;
 import com.magmaguy.elitemobs.api.EliteMobHealEvent;
+import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -100,6 +101,7 @@ public class BossHealthDisplay implements Listener {
     public void onDamage(EliteMobDamagedByPlayerEvent event) {
         EliteEntity eliteEntity = event.getEliteMobEntity();
         if (!eliteEntity.isValid()) return;
+        BossHealthBarManager.markEngaged(eliteEntity, event.getPlayer());
 
         Vector offset = new Vector(
                 ThreadLocalRandom.current().nextDouble(-1.5, 1.5),
@@ -114,6 +116,12 @@ public class BossHealthDisplay implements Listener {
         EliteOverheadHealthDisplay display = getOrCreateDisplay(eliteEntity);
         display.resetCombatTimer();
         display.markDirty();
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerDamaged(PlayerDamagedByEliteMobEvent event) {
+        if (event.getEliteMobEntity() == null || !event.getEliteMobEntity().isValid()) return;
+        BossHealthBarManager.markEngaged(event.getEliteMobEntity(), event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

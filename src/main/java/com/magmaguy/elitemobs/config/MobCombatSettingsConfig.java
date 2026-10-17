@@ -390,7 +390,8 @@ public class MobCombatSettingsConfig extends ConfigurationFile {
                 fileConfiguration, "bossBarHealthMultiplierThreshold", 1.0);
         combatDisplayTimeoutSeconds = ConfigurationEngine.setInt(
                 List.of("Sets how many seconds after the last combat action the overhead visual and numeric health displays remain visible.",
-                        "Top-of-screen boss bars instead follow the boss's current target."),
+                        "Top-of-screen boss bars (at most 3 per player) show the boss targeting a player who has none,",
+                        "then bosses the player damaged or was damaged by within this many seconds."),
                 fileConfiguration, "combatDisplayTimeoutSeconds", 30);
         useFixedHealthBarSize = ConfigurationEngine.setBoolean(
                 List.of("Sets if the health bar should always be a fixed size (10 bars) regardless of boss health multiplier.",
