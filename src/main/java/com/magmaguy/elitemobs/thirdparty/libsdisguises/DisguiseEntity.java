@@ -149,9 +149,12 @@ public class DisguiseEntity {
                 + " plugin cancelling UndisguiseEvent?)"));
     }
 
-    /** False without LibsDisguises or when its API fails, so callers can treat the entity as itself. */
+    /**
+     * Call only while LibsDisguises is enabled: this class cannot load without it. False when its API fails, so
+     * callers can treat the entity as itself.
+     */
     public static boolean isDisguised(Entity entity) {
-        if (entity == null || !Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return false;
+        if (entity == null) return false;
         try {
             return DisguiseAPI.isDisguised(entity);
         } catch (Throwable throwable) {

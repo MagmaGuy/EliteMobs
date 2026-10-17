@@ -121,7 +121,9 @@ final class EliteOverheadHealthDisplay {
      * while its bones ride it. A disguise seats riders at its own height, not the body's, so it keeps teleports.
      */
     private static LivingEntity ridingVehicle(LivingEntity body, CustomModel model) {
-        if (body == null || !body.isValid() || DisguiseEntity.isDisguised(body)) return null;
+        if (body == null || !body.isValid()) return null;
+        // DisguiseEntity needs LibsDisguises' classes to load, so it is only touched while that plugin is enabled.
+        if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises") && DisguiseEntity.isDisguised(body)) return null;
         if (model == null) return body;
         return model.bonesRideEntity() ? body : null;
     }
