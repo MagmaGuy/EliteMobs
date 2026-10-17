@@ -13,8 +13,14 @@ public final class MenuPresentation {
 
     public static boolean supportsDialogs(Player player) {
         return PlayerData.getUseBookMenus(player.getUniqueId())
-                && !BedrockChecker.isBedrock(player)
+                && !usesInventoryMenusForBedrock(player)
                 && !DefaultConfig.isOnlyUseBedrockMenus()
                 && !VersionChecker.serverVersionOlderThan(21, 6);
+    }
+
+    /** Bedrock players get inventory menus unless the server lets Geyser turn dialogs into forms. */
+    public static boolean usesInventoryMenusForBedrock(Player player) {
+        if (!BedrockChecker.isBedrock(player)) return false;
+        return !DefaultConfig.isAllowDialogMenusForBedrockPlayers() || VersionChecker.serverVersionOlderThan(21, 6);
     }
 }

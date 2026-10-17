@@ -51,6 +51,8 @@ public class DefaultConfig extends ConfigurationFile {
     @Getter
     private static boolean onlyUseBedrockMenus;
     @Getter
+    private static boolean allowDialogMenusForBedrockPlayers;
+    @Getter
     private static int characterLimitForBookMenuPages;
     @Getter
     private static boolean useGlassToFillMenuEmptySpace;
@@ -203,6 +205,11 @@ public class DefaultConfig extends ConfigurationFile {
         onlyUseBedrockMenus = ConfigurationEngine.setBoolean(
                 List.of("Sets whether the /em menu will only use the inventory-based menu style which is compatible with bedrock.", "As a reminder, players can otherwise do the command /em alt to switch between /em menu styles"),
                 fileConfiguration, "onlyUseBedrockMenus", false);
+        allowDialogMenusForBedrockPlayers = ConfigurationEngine.setBoolean(
+                List.of("Sets whether Bedrock players get the dialog version of the /em, quest and class menus instead of the inventory version.",
+                        "Only turn this on if your Geyser turns Paper dialogs into Bedrock forms (Geyser 2.8.2 or newer). Needs Minecraft 1.21.6 or newer.",
+                        "Shops and other inventory-only menus stay inventories."),
+                fileConfiguration, "allowDialogMenusForBedrockPlayers", false);
         characterLimitForBookMenuPages = ConfigurationEngine.setInt(
                 List.of("Sets the character limit per line for book menu pages.", "Lower this amount if text is getting cut off in book menus such as for quests"),
                 fileConfiguration, "characterLimitForBookMenuPagesV2", 170);
