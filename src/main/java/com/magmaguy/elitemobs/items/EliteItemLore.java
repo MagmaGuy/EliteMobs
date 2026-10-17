@@ -16,6 +16,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.magmacore.enchantments.EnchantmentDefinitions;
 import com.magmaguy.magmacore.enchantments.EnchantmentItemProfile;
 import com.magmaguy.magmacore.enchantments.EnchantmentItems;
+import com.magmaguy.magmacore.enchantments.ItemSets;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Round;
 import lombok.Getter;
@@ -57,6 +58,8 @@ public class EliteItemLore {
     private boolean hasCustomEnchantments;
     private boolean magicWeapon;
     private int customEnchantmentsPosition = -1;
+    private List<String> itemSetLore = List.of();
+    private boolean itemSetPlaced;
 
     public EliteItemLore(ItemStack itemStack, boolean showItemWorth) {
         this(itemStack, showItemWorth, false);
@@ -107,7 +110,12 @@ public class EliteItemLore {
         constructPotionEffects();
 
         constructItemWorth();
-        hasCustomEnchantments = !EnchantmentItems.inspectCustom(this.itemMeta).isEmpty();
+        // Construction may run off the server thread, so it resolves through its captured definitions.
+        java.util.function.Function<String, EnchantmentItems.Resolved> resolver = construction == null
+                ? EnchantmentDefinitions::resolve : construction.enchantments().resolver();
+        // Records the set section on this meta; MagmaCore redraws it as the holder equips pieces.
+        itemSetLore = ItemSets.presentation(this.itemMeta, null, resolver);
+        hasCustomEnchantments = ItemSets.hasEnchantmentLines(this.itemMeta, resolver);
 
         this.itemStack.setItemMeta(this.itemMeta);
         java.util.function.UnaryOperator<List<String>> rebuild = hostLore -> {
@@ -229,6 +237,8 @@ public class EliteItemLore {
 
     private void writeNewLore() {
         customEnchantmentsPosition = -1;
+        itemSetPlaced = false;
+        boolean structurePlacesItemSet = ItemSettingsConfig.getLoreStructure().stream().anyMatch(line -> line.contains("$itemSet"));
         if (thirdPartyLore != null)
             lore.addAll(thirdPartyLore);
 
@@ -291,8 +301,17 @@ public class EliteItemLore {
             } else if (string.contains("$loreResaleValue")) {
                 lore.add(itemWorth);
             } else if (string.contains("$customLore")) {
-                for (String entry : customLore)
-                    lore.add(ChatColorConverter.convert(entry));
+                for (String entry : customLore) {
+                    if (entry.contains("$itemSet")) addItemSetLore();
+                    else lore.add(ChatColorConverter.convert(entry));
+                }
+                // Lore structures written before item sets existed show the set right after the item's lore.
+                if (!structurePlacesItemSet) addItemSetLore();
+            } else if (string.contains("$ifItemSet")) {
+                if (!itemSetLore.isEmpty() && !itemSetPlaced)
+                    lore.add(string.replace("$ifItemSet", ""));
+            } else if (string.contains("$itemSet")) {
+                addItemSetLore();
             } else if (string.contains("$soulbindInfo")) {
                 lore.add(soulbindInfo);
                 //bypasses in case of conditional formatting
@@ -311,6 +330,12 @@ public class EliteItemLore {
             } else if (!string.isEmpty())
                 lore.add(ChatColorConverter.convert(string));
         }
+    }
+
+    private void addItemSetLore() {
+        if (itemSetPlaced) return;
+        itemSetPlaced = true;
+        lore.addAll(itemSetLore);
     }
 
     /**

@@ -174,6 +174,8 @@ public class ItemSettingsConfig extends ConfigurationFile {
                         "$itemSource - shows where the item came from, like a mob or a shop",
                         "$ifLore - makes a line only appear if the item has custom lore. Only applies for custom items",
                         "$customLore - shows the entirety of the custom lore. Only applies for custom items",
+                        "$itemSet - shows the item set this item belongs to, with worn pieces in green and missing pieces in red. Without this placeholder it shows right after $customLore. A custom item can also put $itemSet in its own lore",
+                        "$ifItemSet - makes a line only appear if the item belongs to an item set",
                         "$ifEnchantments - makes a line only appear if the item has any enchantments",
                         "$enchantments - shows the enchantments on the item",
                         "$eliteEnchantments - shows the elite enchantments on the item",

@@ -107,6 +107,9 @@ public final class EliteEnchantmentCatalog {
         int weaponLevel = 0;
         Map<String, Boolean> usableSlots = new LinkedHashMap<>();
         Map<String, Integer> equippedLevels = new TreeMap<>();
+        Map<String, ItemStack> worn = new LinkedHashMap<>();
+        for (var entry : equipment.entrySet())
+            if (entry.getKey() instanceof String slot && entry.getValue() instanceof ItemStack item) worn.put(slot, item);
         for (var entry : equipment.entrySet()) {
             var slot = EnchantmentDefinition.Slot.valueOf((String) entry.getKey());
             if (!(entry.getValue() instanceof ItemStack item)) throw new IllegalArgumentException("Invalid source item");
@@ -119,12 +122,13 @@ public final class EliteEnchantmentCatalog {
                 var definition = definition(enchantment.getKey());
                 if (definition == null || enchantment.getValue() < 1
                         || !definition.validSlots().isEmpty() && !definition.validSlots().contains(slot)
-                        || !definition.itemTypes().isEmpty() && !definition.itemTypes().contains(profile.type())) continue;
+                        || !definition.itemTypes().isEmpty() && !definition.itemTypes().contains(profile.type())
+                        || !ItemSets.appliesAt(definition, slot, worn)) continue;
                 equippedLevels.merge(enchantment.getKey(), enchantment.getValue(), Math::addExact);
             }
             if (slot == EnchantmentDefinition.Slot.MAINHAND)
                 weaponLevel = com.magmaguy.elitemobs.playerdata.PlayerItem.readWeaponTier(player, item);
-            threat += contribution(item, THREAT_BONUS, actorId, slot);
+            threat += contribution(item, THREAT_BONUS, actorId, slot, worn);
         }
         if (!Double.isFinite(threat)) throw new IllegalArgumentException("Invalid captured threat bonus");
         return Map.of("weapon_level", weaponLevel, "loud_strikes", threat,
@@ -148,6 +152,12 @@ public final class EliteEnchantmentCatalog {
     }
 
     public static double contribution(ItemStack item, ScriptHook hook, UUID actor, EnchantmentDefinition.Slot slot) {
+        return contribution(item, hook, actor, slot, null);
+    }
+
+    /** worn is the actor's equipment by slot name; null reads it from the actor when a set needs it. */
+    public static double contribution(ItemStack item, ScriptHook hook, UUID actor, EnchantmentDefinition.Slot slot,
+                                      Map<String, ItemStack> worn) {
         if (item == null || !item.hasItemMeta() || com.magmaguy.elitemobs.api.utils.EliteItemManager.isOnLastDamage(item)) return 0;
         Map<String, Integer> levels;
         try { levels = EnchantmentItems.inspectCustom(item.getItemMeta()); }
@@ -163,6 +173,14 @@ public final class EliteEnchantmentCatalog {
                     || !definition.validSlots().isEmpty() && !definition.validSlots().contains(slot)
                     || !definition.itemTypes().isEmpty() && !definition.itemTypes().contains(profile.type())
                     || !definition.attackKinds().isEmpty() && Collections.disjoint(definition.attackKinds(), profile.attackKinds())) continue;
+            if (definition.isSet()) {
+                // A set contributes once, from its first piece, and only while every piece is worn.
+                if (worn == null) {
+                    var player = actor == null ? null : org.bukkit.Bukkit.getPlayer(actor);
+                    worn = player == null ? Map.of() : EnchantmentActions.captureEquipment(player);
+                }
+                if (!ItemSets.appliesAt(definition, slot, worn)) continue;
+            }
             var resolved = EnchantmentDefinitions.resolve(entry.getKey());
             if (resolved == null || !resolved.available()) continue;
             requests.add(new EnchantmentQueries.Query(resolved.provider(), entry.getKey(), hook,
