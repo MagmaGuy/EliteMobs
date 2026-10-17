@@ -18,6 +18,7 @@ import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityLeftClickCallb
 import com.magmaguy.freeminecraftmodels.customentity.ModeledEntityRightClickCallback;
 import com.magmaguy.freeminecraftmodels.customentity.core.Bone;
 import com.magmaguy.freeminecraftmodels.customentity.core.OBBHitDetection;
+import com.magmaguy.freeminecraftmodels.customentity.core.Skeleton;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.AbstractArrow;
@@ -31,6 +32,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -164,6 +168,36 @@ public class CustomModelFMM implements CustomModelInterface {
     public void setSyncMovement(boolean syncMovement) {
         if (dynamicEntity == null) return;
         dynamicEntity.setSyncMovement(syncMovement);
+    }
+
+    @Override
+    public boolean bonesRideEntity() {
+        if (IS_RIDDEN == null || dynamicEntity == null) return false;
+        Skeleton skeleton = dynamicEntity.getSkeleton();
+        if (skeleton == null) return false;
+        try {
+            return (boolean) IS_RIDDEN.invokeExact(skeleton);
+        } catch (Throwable throwable) {
+            return false;
+        }
+    }
+
+    @Override
+    public Set<UUID> getModelViewers() {
+        // FMM shows a hidden body only to the model's viewers, so only their clients can seat a rider on it.
+        if (dynamicEntity == null || dynamicEntity.getSkeleton() == null) return Set.of();
+        return dynamicEntity.getSkeleton().getSkeletonWatchers().getViewers();
+    }
+
+    // Skeleton#isRidden arrived with FMM 2.12.7. Older FMM always teleports its bones, so nothing rides its bodies.
+    private static final MethodHandle IS_RIDDEN = findIsRidden();
+
+    private static MethodHandle findIsRidden() {
+        try {
+            return MethodHandles.publicLookup().findVirtual(Skeleton.class, "isRidden", MethodType.methodType(boolean.class));
+        } catch (ReflectiveOperationException | LinkageError unavailable) {
+            return null;
+        }
     }
 
     /**

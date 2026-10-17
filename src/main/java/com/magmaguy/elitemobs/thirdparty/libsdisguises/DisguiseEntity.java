@@ -149,6 +149,16 @@ public class DisguiseEntity {
                 + " plugin cancelling UndisguiseEvent?)"));
     }
 
+    /** False without LibsDisguises or when its API fails, so callers can treat the entity as itself. */
+    public static boolean isDisguised(Entity entity) {
+        if (entity == null || !Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return false;
+        try {
+            return DisguiseAPI.isDisguised(entity);
+        } catch (Throwable throwable) {
+            return false;
+        }
+    }
+
     public static void setDisguiseNameVisibility(boolean disguiseNameVisibility, Entity entity, String name) {
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) return;
         Disguise disguise = DisguiseAPI.getDisguise(entity);

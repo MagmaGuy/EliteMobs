@@ -1,25 +1,34 @@
 package com.magmaguy.elitemobs.combatsystem.displays;
 
-import com.magmaguy.easyminecraftgoals.internal.FakeText;
+import com.magmaguy.easyminecraftgoals.internal.PacketNameTagTeams;
+import com.magmaguy.easyminecraftgoals.internal.StackedText;
+import com.magmaguy.easyminecraftgoals.thirdparty.BedrockChecker;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
-import com.magmaguy.elitemobs.utils.VisualDisplay;
+import com.magmaguy.elitemobs.thirdparty.custommodels.CustomModel;
+import com.magmaguy.elitemobs.thirdparty.libsdisguises.DisguiseEntity;
 import com.magmaguy.magmacore.util.ChatColorConverter;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-/** Owns the overhead visual and numeric health display for one elite entity. */
+/**
+ * Owns the overhead visual and numeric health display for one elite entity.
+ * <p>
+ * Java rows ride the elite's body whenever every Java viewer's client tracks it, so they move with the body's own
+ * client-side smoothing instead of chasing it by teleports, which ran ahead of it. Bedrock rows keep teleporting.
+ */
 final class EliteOverheadHealthDisplay {
 
     private static final String FULL_BAR = "▌";
@@ -31,13 +40,14 @@ final class EliteOverheadHealthDisplay {
     private static final String COLOR_EMPTY = "&8";
     private static final int BARS_PER_ROW = 10;
     private static final double VIEW_DISTANCE = 30;
-    private static final double ROW_HEIGHT = 0.22;
+    private static final int BACKGROUND_ARGB = Color.fromARGB(80, 0, 0, 0).asARGB();
 
     private final EliteEntity eliteEntity;
-    private final List<FakeText> healthBarDisplays = new ArrayList<>();
-    private final Map<FakeText, Set<UUID>> audiences = new HashMap<>();
+    // Rows top to bottom: the numeric health, then the bar rows. The bottom row sits at the base location.
+    private final StackedText rows = new StackedText();
+    private final Set<UUID> nameTagViewers = new HashSet<>();
     private final double healthMultiplier;
-    private FakeText numericDisplay;
+    private UUID nameTagSubject;
     private long lastCombatTime;
     private boolean dirty = true;
 
@@ -47,6 +57,9 @@ final class EliteOverheadHealthDisplay {
         this.healthMultiplier = eliteEntity instanceof CustomBossEntity customBoss
                 ? customBoss.getHealthMultiplier()
                 : eliteEntity.getHealthMultiplier();
+        rows.setLineGap(0);
+        rows.setBackgroundArgb(BACKGROUND_ARGB);
+        rows.setShadow(true);
     }
 
     EliteEntity eliteEntity() {
@@ -75,66 +88,114 @@ final class EliteOverheadHealthDisplay {
         dirty = false;
         double currentHealth = eliteEntity.getHealth();
         double maxHealth = eliteEntity.getMaxHealth();
-        if (MobCombatSettingsConfig.isDisplayVisualHealthBars()) createHealthBars(currentHealth, maxHealth);
-        else while (!healthBarDisplays.isEmpty()) removeText(healthBarDisplays.removeLast());
-        if (MobCombatSettingsConfig.isDisplayNumericHealth()) createNumericDisplay(currentHealth, maxHealth);
-        else if (numericDisplay != null) {
-            removeText(numericDisplay);
-            numericDisplay = null;
-        }
+        List<String> lines = new ArrayList<>();
+        if (MobCombatSettingsConfig.isDisplayNumericHealth()) lines.add(numericLine(currentHealth, maxHealth));
+        if (MobCombatSettingsConfig.isDisplayVisualHealthBars()) lines.addAll(barLines(currentHealth, maxHealth));
+        rows.setLines(lines);
     }
 
+    /** Runs on the primary thread every tick. */
     void updatePositions() {
         if (!isValid()) return;
         Location baseLocation = getBaseLocation();
         if (baseLocation == null) return;
-        for (int index = 0; index < healthBarDisplays.size(); index++) {
-            FakeText display = healthBarDisplays.get(index);
-            if (display != null) display.teleport(baseLocation.clone().add(0, index * ROW_HEIGHT, 0));
-        }
-        if (numericDisplay != null) {
-            int rows = MobCombatSettingsConfig.isDisplayVisualHealthBars() ? calculateBarLayout().rows() : 0;
-            numericDisplay.teleport(baseLocation.clone().add(0, rows * ROW_HEIGHT, 0));
-        }
-        reconcileViewers(baseLocation);
+        LivingEntity body = eliteEntity.getLivingEntity();
+        CustomModel model = eliteEntity instanceof CustomBossEntity customBoss ? customBoss.getCustomModel() : null;
+        LivingEntity vehicle = ridingVehicle(body, model);
+        rows.ride(vehicle);
+        rows.move(baseLocation);
+        List<Player> viewers = viewers(baseLocation, vehicle, model);
+        rows.syncViewers(viewers);
+        // Only a plain body shows its own vanilla name; a model's name is its own riding nameplate.
+        reconcileNameTags(vehicle != null && model == null ? vehicle : null, viewers);
     }
 
     void cleanup() {
-        cleanupVisualDisplays();
+        rows.remove();
+        releaseNameTags();
     }
 
-    private void createHealthBars(double currentHealth, double maxHealth) {
-        Location baseLocation = getBaseLocation();
-        if (baseLocation == null) return;
+    /**
+     * The body the rows ride, or null to teleport them. A rider is only seated by clients that track the body:
+     * every nearby client tracks a plain body, while a modeled body is shown only to the model's viewers, and only
+     * while its bones ride it. A disguise seats riders at its own height, not the body's, so it keeps teleports.
+     */
+    private static LivingEntity ridingVehicle(LivingEntity body, CustomModel model) {
+        if (body == null || !body.isValid() || DisguiseEntity.isDisguised(body)) return null;
+        if (model == null) return body;
+        return model.bonesRideEntity() ? body : null;
+    }
 
+    private static List<Player> viewers(Location base, LivingEntity vehicle, CustomModel model) {
+        Set<UUID> modelViewers = vehicle != null && model != null ? model.getModelViewers() : null;
+        List<Player> viewers = new ArrayList<>();
+        for (Entity entity : base.getWorld().getNearbyEntities(base, VIEW_DISTANCE, VIEW_DISTANCE, VIEW_DISTANCE,
+                entity -> entity instanceof Player)) {
+            Player player = (Player) entity;
+            if (player.getLocation().distanceSquared(base) > VIEW_DISTANCE * VIEW_DISTANCE) continue;
+            // A Java rider on a body the client does not track would be left where it spawned.
+            if (modelViewers != null && !BedrockChecker.isBedrock(player)
+                    && !modelViewers.contains(player.getUniqueId())) continue;
+            viewers.add(player);
+        }
+        return viewers;
+    }
+
+    /**
+     * A rider hides a team-less mob's name tag. While the rows ride a plain body that has no real team on a Java
+     * viewer's scoreboard, that viewer gets a client-only team that keeps the name tag as it was without the rider.
+     */
+    private void reconcileNameTags(LivingEntity subject, List<Player> viewers) {
+        if (nameTagSubject != null && (subject == null || !nameTagSubject.equals(subject.getUniqueId())))
+            releaseNameTags();
+        if (subject == null) return;
+        nameTagSubject = subject.getUniqueId();
+        String entry = PacketNameTagTeams.scoreboardEntry(subject);
+        Set<UUID> kept = new HashSet<>();
+        for (Player viewer : viewers) {
+            // Bedrock rows do not ride, and a real team already decides the name tag on that viewer's client.
+            if (BedrockChecker.isBedrock(viewer) || viewer.getScoreboard().getEntryTeam(entry) != null) continue;
+            PacketNameTagTeams.keep(viewer, subject);
+            kept.add(viewer.getUniqueId());
+        }
+        for (UUID viewer : nameTagViewers)
+            if (!kept.contains(viewer)) PacketNameTagTeams.release(Bukkit.getPlayer(viewer), nameTagSubject);
+        nameTagViewers.clear();
+        nameTagViewers.addAll(kept);
+    }
+
+    private void releaseNameTags() {
+        if (nameTagSubject == null) return;
+        for (UUID viewer : nameTagViewers) PacketNameTagTeams.release(Bukkit.getPlayer(viewer), nameTagSubject);
+        nameTagViewers.clear();
+        nameTagSubject = null;
+    }
+
+    /** Bar rows top to bottom; the bottom row fills first. */
+    private List<String> barLines(double currentHealth, double maxHealth) {
         BarLayout layout = calculateBarLayout();
-        while (healthBarDisplays.size() > layout.rows()) removeText(healthBarDisplays.removeLast());
         double healthRatio = maxHealth <= 0 ? 0 : Math.max(0, Math.min(1, currentHealth / maxHealth));
         int filledBars = (int) Math.ceil(healthRatio * layout.totalBars());
         String filledColor = healthColor(healthRatio * 100);
         int barsRemaining = filledBars;
         int totalBarsRemaining = layout.totalBars();
 
+        List<String> lines = new ArrayList<>();
         for (int row = 0; row < layout.rows(); row++) {
             int rowSize = Math.min(layout.barsPerRow(), totalBarsRemaining);
             int filledInRow = Math.min(rowSize, barsRemaining);
             StringBuilder text = new StringBuilder();
             for (int index = 0; index < filledInRow; index++) text.append(filledColor).append(FULL_BAR);
             for (int index = filledInRow; index < rowSize; index++) text.append(COLOR_EMPTY).append(EMPTY_BAR);
-
-            String rendered = ChatColorConverter.convert(text.toString());
-            if (row < healthBarDisplays.size()) {
-                setTextIfChanged(healthBarDisplays.get(row), rendered);
-            } else {
-                FakeText display = createFakeText(baseLocation.clone().add(0, row * ROW_HEIGHT, 0), rendered);
-                if (display != null) healthBarDisplays.add(display);
-            }
+            lines.add(ChatColorConverter.convert(text.toString()));
             barsRemaining -= filledInRow;
             totalBarsRemaining -= rowSize;
         }
+        Collections.reverse(lines);
+        return lines;
     }
 
-    private void createNumericDisplay(double currentHealth, double maxHealth) {
+    private String numericLine(double currentHealth, double maxHealth) {
         double healthRatio = maxHealth <= 0 ? 0 : currentHealth / maxHealth;
         String color = healthColor(healthRatio * 100);
         String text = eliteEntity.isScaledCombat()
@@ -142,14 +203,7 @@ final class EliteOverheadHealthDisplay {
                 : color + "&l" + DisplayTextFormatter.number(currentHealth) +
                 MobCombatSettingsConfig.getHealthDisplaySeparator() + color + "&l" +
                 DisplayTextFormatter.number(maxHealth);
-        Location baseLocation = getBaseLocation();
-        if (baseLocation == null) return;
-
-        int rows = MobCombatSettingsConfig.isDisplayVisualHealthBars() ? calculateBarLayout().rows() : 0;
-        String rendered = ChatColorConverter.convert(text);
-        if (numericDisplay == null)
-            numericDisplay = createFakeText(baseLocation.clone().add(0, rows * ROW_HEIGHT, 0), rendered);
-        else setTextIfChanged(numericDisplay, rendered);
+        return ChatColorConverter.convert(text);
     }
 
     private BarLayout calculateBarLayout() {
@@ -183,61 +237,6 @@ final class EliteOverheadHealthDisplay {
             if (nametagLocation != null) return nametagLocation.clone().subtract(0, .9, 0);
         }
         return entity.getLocation().clone().add(0, entity.getEyeHeight() + 0.8, 0);
-    }
-
-    private FakeText createFakeText(Location location, String text) {
-        if (location == null || location.getWorld() == null) return null;
-        FakeText display = VisualDisplay.createStyledFakeText(
-                location, text, Color.fromARGB(80, 0, 0, 0), true, 1.0f);
-        if (display == null) return null;
-        audiences.put(display, new HashSet<>());
-        return display;
-    }
-
-    private static void setTextIfChanged(FakeText display, String text) {
-        if (!text.equals(display.getText())) display.setText(text);
-    }
-
-    private void reconcileViewers(Location base) {
-        if (base.getWorld() == null || audiences.isEmpty()) return;
-        Map<UUID, Location> playerLocations = new HashMap<>();
-        // Health can stay unchanged while viewers move. Query once for all rows,
-        // then use each label's exact range before changing its audience.
-        for (var entity : base.getWorld().getNearbyEntities(base,
-                VIEW_DISTANCE, VIEW_DISTANCE + healthBarDisplays.size() * ROW_HEIGHT,
-                VIEW_DISTANCE, entity -> entity instanceof Player)) {
-            Player player = (Player) entity;
-            playerLocations.put(player.getUniqueId(), player.getLocation());
-        }
-        audiences.forEach((display, viewers) -> {
-            Location location = display.getLocation();
-            playerLocations.forEach((playerId, playerLocation) -> {
-                if (playerLocation.distanceSquared(location) <= VIEW_DISTANCE * VIEW_DISTANCE) {
-                    if (viewers.add(playerId)) display.displayTo(playerId);
-                } else if (viewers.remove(playerId)) display.hideFrom(playerId);
-            });
-            viewers.removeIf(playerId -> {
-                if (playerLocations.containsKey(playerId)) return false;
-                display.hideFrom(playerId);
-                return true;
-            });
-        });
-    }
-
-    private void removeText(FakeText display) {
-        audiences.remove(display);
-        display.remove();
-    }
-
-    private void cleanupVisualDisplays() {
-        if (numericDisplay != null) {
-            removeText(numericDisplay);
-            numericDisplay = null;
-        }
-        healthBarDisplays.forEach(display -> {
-            if (display != null) removeText(display);
-        });
-        healthBarDisplays.clear();
     }
 
     private record BarLayout(int totalBars, int barsPerRow, int rows) {

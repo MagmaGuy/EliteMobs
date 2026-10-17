@@ -3,6 +3,9 @@ package com.magmaguy.elitemobs.thirdparty.custommodels;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import org.bukkit.Location;
 
+import java.util.Set;
+import java.util.UUID;
+
 public interface CustomModelInterface {
     void shoot();
 
@@ -41,4 +44,20 @@ public interface CustomModelInterface {
      * @param syncMovement true to sync movement, false otherwise
      */
     void setSyncMovement(boolean syncMovement);
+
+    /**
+     * Whether Java clients place this model's bones as passengers of its base entity, so other packet text can
+     * ride that entity too. False while the bones are teleported or the model plugin cannot tell.
+     */
+    default boolean bonesRideEntity() {
+        return false;
+    }
+
+    /**
+     * Players the model is shown to. While {@link #bonesRideEntity()}, these are the only Java players whose clients
+     * track the base entity the bones ride.
+     */
+    default Set<UUID> getModelViewers() {
+        return Set.of();
+    }
 }

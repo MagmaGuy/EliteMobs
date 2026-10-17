@@ -19,6 +19,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
+import java.util.Set;
+import java.util.UUID;
+
 
 public class CustomModel implements CustomModelInterface {
     @Getter
@@ -221,6 +224,18 @@ public class CustomModel implements CustomModelInterface {
             case FREE_MINECRAFT_MODELS -> customModelFMM.setSyncMovement(syncMovement);
             case MODEL_ENGINE -> customModelMEG.setSyncMovement(syncMovement);
         }
+    }
+
+    @Override
+    public boolean bonesRideEntity() {
+        return modelPlugin == ModelPlugin.FREE_MINECRAFT_MODELS && customModelFMM != null
+                && customModelFMM.bonesRideEntity();
+    }
+
+    @Override
+    public Set<UUID> getModelViewers() {
+        return modelPlugin == ModelPlugin.FREE_MINECRAFT_MODELS && customModelFMM != null
+                ? customModelFMM.getModelViewers() : Set.of();
     }
 
     /** Lets the model own body/head facing; null releases the previous target. */
