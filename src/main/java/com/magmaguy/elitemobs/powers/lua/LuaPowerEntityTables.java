@@ -514,6 +514,38 @@ final class LuaPowerEntityTables {
             TimedScriptStateManager.applyInvulnerability(this, livingEntity, args.checkboolean(1), args.optint(2, 0));
             return LuaValue.NIL;
         }));
+        // Plain entities a script spawned; players and elites have their own lifecycles.
+        entity.set("remove", method(entity, args -> {
+            if (livingEntity instanceof Player || EntityTracker.getEliteMobEntity(livingEntity) != null) return LuaValue.FALSE;
+            livingEntity.remove();
+            return LuaValue.TRUE;
+        }));
+        entity.set("set_invisible", method(entity, args -> {
+            livingEntity.setInvisible(args.checkboolean(1));
+            return LuaValue.NIL;
+        }));
+        entity.set("set_silent", method(entity, args -> {
+            livingEntity.setSilent(args.checkboolean(1));
+            return LuaValue.NIL;
+        }));
+        if (livingEntity instanceof org.bukkit.entity.ArmorStand armorStand) {
+            entity.set("set_marker", method(entity, args -> {
+                armorStand.setMarker(args.checkboolean(1));
+                return LuaValue.NIL;
+            }));
+            entity.set("set_small", method(entity, args -> {
+                armorStand.setSmall(args.checkboolean(1));
+                return LuaValue.NIL;
+            }));
+            entity.set("set_base_plate", method(entity, args -> {
+                armorStand.setBasePlate(args.checkboolean(1));
+                return LuaValue.NIL;
+            }));
+            entity.set("set_arms", method(entity, args -> {
+                armorStand.setArms(args.checkboolean(1));
+                return LuaValue.NIL;
+            }));
+        }
         entity.set("remove_elite", method(entity, args -> {
             EliteEntity entityRef = EntityTracker.getEliteMobEntity(livingEntity);
             if (entityRef != null) {

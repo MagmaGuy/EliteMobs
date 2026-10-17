@@ -42,6 +42,7 @@ final class LuaWorldTableBuilder {
     private final LuaPowerEntityTables entityTables;
     private final LuaPowerScriptApi.OwnedTaskController taskController;
     private final LuaPowerScriptApi.CallbackInvoker callbackInvoker;
+    private final java.util.Set<LuaDisplayVisual> displayVisuals = new java.util.LinkedHashSet<>();
 
     LuaWorldTableBuilder(ScriptDefinition definition,
                          EliteEntity eliteEntity,
@@ -56,7 +57,13 @@ final class LuaWorldTableBuilder {
         this.taskController = taskController;
         this.callbackInvoker = callbackInvoker;
         taskController.ownCleanup(() -> ScriptListener.removeLuaFallingBlocks(this));
+        // Visuals end with the power even when its script never removes them.
+        taskController.ownCleanup(() -> {
+            for (LuaDisplayVisual visual : List.copyOf(displayVisuals)) visual.remove();
+            displayVisuals.clear();
+        });
     }
+
 
     LuaTable build() {
         // Start from Magmacore's canonical world table so every primitive defined there (and any
@@ -240,6 +247,7 @@ final class LuaWorldTableBuilder {
             }
             LuaTable options = args.narg() >= 3 && args.arg(3).istable() ? args.arg(3).checktable() : new LuaTable();
             Entity entity = location.getWorld().spawnEntity(location, entityType);
+            if (!options.get("persistent").isnil()) entity.setPersistent(options.get("persistent").checkboolean());
             Vector velocity = support.toVector(options.get("velocity"));
             if (velocity != null) {
                 entity.setVelocity(velocity);
@@ -266,6 +274,26 @@ final class LuaWorldTableBuilder {
                         options.get("max_ticks").optint(20 * 60 * 5));
             }
             return entityTables.createEntityReferenceTable(entity);
+        }));
+        world.set("spawn_display_at_location", method(world, args -> {
+            Location location = support.toLocation(args.arg1());
+            if (location == null || location.getWorld() == null) return LuaValue.NIL;
+            LuaTable options = args.narg() >= 2 && args.arg(2).istable() ? args.arg(2).checktable() : new LuaTable();
+            LuaDisplayVisual visual = LuaDisplayVisual.spawn(location, options, support);
+            if (visual == null) {
+                Logger.warn("spawn_display_at_location in Lua power " + definition.getFileName()
+                        + " needs exactly one valid item or block and a positive scale.");
+                return LuaValue.NIL;
+            }
+            displayVisuals.add(visual);
+            int duration = options.get("duration").optint(0);
+            if (duration > 0) {
+                com.magmaguy.elitemobs.utils.GameClock.scheduleLater(duration, () -> {
+                    visual.remove();
+                    displayVisuals.remove(visual);
+                });
+            }
+            return visual.table(() -> displayVisuals.remove(visual));
         }));
         world.set("spawn_falling_block_at_location", method(world, args -> {
             Location location = support.toLocation(args.arg1());
