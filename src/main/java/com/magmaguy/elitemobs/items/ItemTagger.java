@@ -223,12 +223,9 @@ public class ItemTagger {
     }
 
     public static double getEliteDamageAttribute(@Nullable ItemStack itemStack) {
-        double value = 0;
-        if (itemStack != null &&
-                itemStack.getItemMeta() != null &&
-                itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DAMAGE, PersistentDataType.DOUBLE) != null)
-            return itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DAMAGE, PersistentDataType.DOUBLE);
-        return value;
+        if (itemStack == null || itemStack.getItemMeta() == null) return 0;
+        Double value = getDecimalNumber(itemStack.getItemMeta().getPersistentDataContainer(), ELITE_DAMAGE);
+        return value == null ? 0 : value;
     }
 
     public static double getEliteDamageAttribute(@Nullable Projectile projectile) {
@@ -441,14 +438,8 @@ public class ItemTagger {
     public static double getEliteDefenseAttribute(@Nullable ItemStack itemStack) {
         if (itemStack == null) return 0D;
         if (itemStack.getItemMeta() == null) return 0D;
-        try {
-            Double value = itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DEFENSE, PersistentDataType.DOUBLE);
-            return value != null ? value : 0D;
-        } catch (IllegalArgumentException e) {
-            // Legacy items may have stored this as Float
-            Float value = itemStack.getItemMeta().getPersistentDataContainer().get(ELITE_DEFENSE, PersistentDataType.FLOAT);
-            return value != null ? value.doubleValue() : 0D;
-        }
+        Double value = getDecimalNumber(itemStack.getItemMeta().getPersistentDataContainer(), ELITE_DEFENSE);
+        return value != null ? value : 0D;
     }
 
     public static void setEliteDefenseAttribute(@Nullable ItemStack itemStack, double defenseValue) {
@@ -478,6 +469,19 @@ public class ItemTagger {
         if (container.has(key, PersistentDataType.LONG))
             return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, container.get(key, PersistentDataType.LONG)));
         return null;
+    }
+
+    /**
+     * Reads a numeric tag whatever number type it was stored as. Older items can carry eliteDamage or eliteDefense
+     * as a float or a whole number, and Paper throws instead of returning null when a typed DOUBLE read finds another
+     * type. For eliteDamage that threw on join and kept the player's equipment from ever being cached.
+     */
+    @Nullable
+    private static Double getDecimalNumber(PersistentDataContainer container, NamespacedKey key) {
+        if (container.has(key, PersistentDataType.DOUBLE)) return container.get(key, PersistentDataType.DOUBLE);
+        if (container.has(key, PersistentDataType.FLOAT)) return container.get(key, PersistentDataType.FLOAT).doubleValue();
+        Integer whole = getWholeNumber(container, key);
+        return whole == null ? null : whole.doubleValue();
     }
 
     public static void setItemLevel(@Nullable ItemStack itemStack, int level) {
