@@ -296,9 +296,6 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private BossType bossType = BossType.NORMAL;
-    // The pet: section, when this boss is a pet species.
-    @Getter
-    private com.magmaguy.elitemobs.pets.PetSpecies pet = null;
     @Getter
     @Setter
     private boolean classLoot;
@@ -554,7 +551,6 @@ public class CustomBossesConfigFields extends CustomConfigFields {
             this.patrolRoute = null;
             Logger.warn("Invalid patrol in " + filename + ": " + exception.getMessage());
         }
-        this.pet = com.magmaguy.elitemobs.pets.PetSpecies.parse(this, fileConfiguration.getConfigurationSection("pet"));
     }
 
     public boolean isCustomModelExists() {

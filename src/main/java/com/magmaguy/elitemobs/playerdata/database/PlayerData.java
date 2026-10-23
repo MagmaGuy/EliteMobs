@@ -295,15 +295,6 @@ public class PlayerData {
         setDatabaseValue(uuid, "DisplayName", displayName);
     }
 
-    /** The player's pet collection as JSON, read from the database; see {@code pets.PetCollection}. */
-    public static String getPetsJson(UUID uuid) {
-        return getDatabaseString(uuid, "Pets");
-    }
-
-    public static void setPetsJson(UUID uuid, String json) {
-        setDatabaseValue(uuid, "Pets", json);
-    }
-
     public static double getCurrency(UUID uuid) {
         if (!isInMemory(uuid))
             return getDatabaseLong(uuid, "CurrencyCents") / 100.0;

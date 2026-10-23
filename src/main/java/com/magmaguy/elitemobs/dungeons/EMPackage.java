@@ -244,9 +244,6 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
                 case MODELS_PACKAGE:
                     new ModelsPackage(contentPackagesConfigFields);
                     break;
-                case PETS_PACKAGE:
-                    new PetsPackage(contentPackagesConfigFields);
-                    break;
             }
         }
     }

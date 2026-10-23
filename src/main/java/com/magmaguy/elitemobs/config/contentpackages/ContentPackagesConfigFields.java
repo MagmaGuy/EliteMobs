@@ -188,10 +188,6 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     private List<String> modelNames;
     @Getter
     @Setter
-    //For pet packages: the custom boss files that carry a pet section
-    private List<String> petFilenames;
-    @Getter
-    @Setter
     private List<String> setupMenuDescription = new ArrayList<>();
     @Getter
     @Setter
@@ -434,8 +430,6 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         this.customEventFilenames = processStringList("customEventFilenames", customEventFilenames, null, false);
         if (customEventFilenames != null) contentType = ContentType.EVENTS_PACKAGE;
         this.modelNames = processStringList("modelNames", modelNames, null, false);
-        this.petFilenames = processStringList("petFilenames", petFilenames, null, false);
-        if (petFilenames != null) contentType = ContentType.PETS_PACKAGE;
         if (modelNames != null) contentType = ContentType.MODELS_PACKAGE;
         this.setupMenuDescription = processStringList("setupMenuDescription", setupMenuDescription, new ArrayList<>(), false);
         this.dungeonLockoutMinutes = processInt("dungeonLockoutMinutes", dungeonLockoutMinutes, 4320, true);
@@ -493,9 +487,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         META_PACKAGE,
         ITEMS_PACKAGE,
         EVENTS_PACKAGE,
-        MODELS_PACKAGE,
-        /** Pet species: custom boss files with a pet section, plus their models. */
-        PETS_PACKAGE
+        MODELS_PACKAGE
     }
 
     public enum DungeonSizeCategory {
