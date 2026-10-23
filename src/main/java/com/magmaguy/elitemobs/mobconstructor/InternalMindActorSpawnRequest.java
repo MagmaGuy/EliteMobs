@@ -14,6 +14,8 @@ import java.util.function.Consumer;
  * EliteMobs-internal request for one transient native actor with a fresh Java Mind program.
  * This deliberately does not broaden the public Lua Mind API.
  * {@code rideable} keeps a custom-model body tracked by clients so a player can ride it.
+ * {@code customModelOverride} shows a configured boss with another model than its file names, for a
+ * variant or a baby of the same species.
  */
 public record InternalMindActorSpawnRequest(
         Plugin systemOwner,
@@ -24,12 +26,21 @@ public record InternalMindActorSpawnRequest(
         MindProgram program,
         Consumer<EliteEntity> initializer,
         com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields customBoss,
-        boolean rideable) {
+        boolean rideable,
+        String customModelOverride) {
 
     public InternalMindActorSpawnRequest(Plugin owner, UUID player, Location location, int level,
                                          EliteMindBodyProfile profile, MindProgram program,
                                          Consumer<EliteEntity> initializer) {
-        this(owner, player, location, level, profile, program, initializer, null, false);
+        this(owner, player, location, level, profile, program, initializer, null, false, null);
+    }
+
+    public InternalMindActorSpawnRequest(Plugin owner, UUID player, Location location, int level,
+                                         EliteMindBodyProfile profile, MindProgram program,
+                                         Consumer<EliteEntity> initializer,
+                                         com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields customBoss,
+                                         boolean rideable) {
+        this(owner, player, location, level, profile, program, initializer, customBoss, rideable, null);
     }
 
     public InternalMindActorSpawnRequest {

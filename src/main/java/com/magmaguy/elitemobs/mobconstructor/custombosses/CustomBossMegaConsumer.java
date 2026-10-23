@@ -154,11 +154,15 @@ public class CustomBossMegaConsumer {
     }
 
     private void setCustomModel(LivingEntity livingEntity) {
-        if (!customBossesConfigFields.isCustomModelExists()) return;
-        if (customBossesConfigFields.getCustomModel() == null || customBossesConfigFields.getCustomModel().isEmpty())
-            return;
+        String override = customBossEntity.getCustomModelOverride();
+        boolean useOverride = override != null && CustomModel.customModelsEnabled() && CustomModel.modelExists(override);
+        if (override != null && !useOverride)
+            Logger.warn("Custom Boss " + customBossesConfigFields.getFilename() + " asked for model " + override + ", which is not loaded; using its own model");
+        if (!useOverride && !customBossesConfigFields.isCustomModelExists()) return;
+        String modelName = useOverride ? override : customBossesConfigFields.getCustomModel();
+        if (modelName == null || modelName.isEmpty()) return;
         try {
-            customBossEntity.setCustomModel(CustomModel.generateCustomModel(livingEntity, customBossesConfigFields.getCustomModel(), customBossEntity.getName(),
+            customBossEntity.setCustomModel(CustomModel.generateCustomModel(livingEntity, modelName, customBossEntity.getName(),
                     customBossEntity.isRideableModel()));
             warnIfNameCanNeverRender();
         } catch (Exception exception) {

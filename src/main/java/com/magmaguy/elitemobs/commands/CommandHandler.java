@@ -50,6 +50,8 @@ public class CommandHandler {
         emCommand.registerCommand(new VersionCommand());
         emCommand.registerCommand(new ReloadCommand());
         emCommand.registerCommand(new KillCommand());
+        emCommand.registerCommand(new PetsCommand());
+        emCommand.registerCommand(new PetAdminCommand());
         emCommand.registerCommand(new KillRadiusCommand());
         emCommand.registerCommand(new KillTypeCommand());
         emCommand.registerCommand(new KillTypeRadiusCommand());

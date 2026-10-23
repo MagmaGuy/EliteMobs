@@ -97,6 +97,9 @@ public class GenerateDatabase {
         // Gambling debt
         addEntryIfEmpty(columns, "GamblingDebt", ColumnValues.REAL);
         addEntryIfEmpty(columns, "GamblingDebtCents", ColumnValues.BIGINT);
+
+        // Pet collection (JSON)
+        addEntryIfEmpty(columns, "Pets", ColumnValues.TEXT);
     }
 
     private static void createAdvancedCombatTables() throws Exception {

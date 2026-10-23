@@ -168,6 +168,7 @@ public class EliteMobs extends JavaPlugin {
         new EnchantmentsConfig();
         new AntiExploitConfig();
         new CombatTagConfig();
+        new com.magmaguy.elitemobs.config.PetsConfig();
         new AntiExploitConfig();
         new AdventurersGuildConfig();
         new ValidWorldsConfig();
@@ -451,6 +452,13 @@ public class EliteMobs extends JavaPlugin {
         EliteMindServiceModule.initialize();
         PatrolService.initialize();
         PatrolEditor.initialize();
+        initializationContext.step("Pets");
+        Bukkit.getPluginManager().registerEvents(new com.magmaguy.elitemobs.pets.PetListeners(), this);
+        Bukkit.getPluginManager().registerEvents(new com.magmaguy.elitemobs.pets.PetsMenu.Events(), this);
+        // The model-click listener names FreeMinecraftModels classes, so it only loads when FMM is present.
+        if (Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels"))
+            Bukkit.getPluginManager().registerEvents(new com.magmaguy.elitemobs.pets.PetListeners.ModelClicks(), this);
+        com.magmaguy.elitemobs.pets.PetManager.initialize();
 
         //Launch the local data cache
         initializationContext.step("Player Database");
@@ -669,6 +677,8 @@ public class EliteMobs extends JavaPlugin {
         shutdownStep(PatrolService::shutdown);
         // Physical class servants and portal surfaces must be removed while their native Mind
         // runtime is still available.
+        shutdownStep(com.magmaguy.elitemobs.pets.PetManager::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.pets.PetsMenu::shutdown);
         shutdownStep(com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule::shutdownIfInitialized);
         shutdownStep(EliteMindServiceModule::shutdown);
         shutdownStep(EliteLuaPowerServiceModule::shutdown);
