@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.config.ProceduralItemGenerationSettingsConfig;
 import com.magmaguy.elitemobs.config.ClassLootSettingsConfig;
 import com.magmaguy.elitemobs.config.ClassLootSettingsConfig.Difficulty;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.ClassLootSettingsConfig.Rank;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
@@ -78,8 +79,10 @@ public final class ClassLootItemConstructor {
                 .replace("$bossLevel", "").replace("$minibossLevel", "").replace("$normalLevel", "")
                 .replace("$eventBossLevel", "").replace("$reinforcementLevel", "")
                 .replace("$level", Integer.toString(source == null ? level : source.getLevel())).strip();
+        String familyName = ItemSettingsConfig.getClassLootFamilyName(family);
+        String difficultyName = ItemSettingsConfig.getClassLootDifficultyName(difficulty);
         java.util.function.UnaryOperator<String> expand = value -> value.replace("$boss", bossName)
-                .replace("$weapon", family.label()).replace("$item", family.label()).replace("$difficulty", difficulty.name());
+                .replace("$weapon", familyName).replace("$item", familyName).replace("$difficulty", difficultyName);
         String model = fields.getFmmItemModel();
         if ((model == null || model.isBlank()) && family.magicType() != null) model = family.magicType().fmmItemId();
         ItemStack result = ItemConstructor.constructItem(Math.max(1, level), expand.apply(fields.getName()),

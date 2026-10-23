@@ -1,11 +1,14 @@
 package com.magmaguy.elitemobs.config;
 
+import com.magmaguy.elitemobs.items.ClassLootFamily;
 import com.magmaguy.magmacore.config.ConfigurationFile;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public class ItemSettingsConfig extends ConfigurationFile {
     @Getter
@@ -134,8 +137,20 @@ public class ItemSettingsConfig extends ConfigurationFile {
     private static List<String> eliteItemScrollLore;
     @Getter
     private static String eliteItemModel;
+    private static Map<ClassLootSettingsConfig.Difficulty, String> classLootDifficultyNames = Map.of();
+    private static Map<ClassLootFamily, String> classLootFamilyNames = Map.of();
 
     private static ItemSettingsConfig instance;
+
+    /** What class loot names show for $difficulty. */
+    public static String getClassLootDifficultyName(ClassLootSettingsConfig.Difficulty difficulty) {
+        return classLootDifficultyNames.getOrDefault(difficulty, difficulty.name());
+    }
+
+    /** What class loot names show for $weapon and $item. */
+    public static String getClassLootFamilyName(ClassLootFamily family) {
+        return classLootFamilyNames.getOrDefault(family, family.label());
+    }
 
     public ItemSettingsConfig() {
         super("ItemSettings.yml");
@@ -405,5 +420,17 @@ public class ItemSettingsConfig extends ConfigurationFile {
                         "&felite item!"),
                 true);
         eliteItemModel = ConfigurationEngine.setString(List.of(), file, fileConfiguration, "eliteItemModel", "elitemobs:elitescroll/elitescroll", false);
+        Map<ClassLootSettingsConfig.Difficulty, String> difficultyNames = new EnumMap<>(ClassLootSettingsConfig.Difficulty.class);
+        for (ClassLootSettingsConfig.Difficulty difficulty : ClassLootSettingsConfig.Difficulty.values())
+            difficultyNames.put(difficulty, ConfigurationEngine.setString(List.of(
+                            "Sets what class loot item names show for $difficulty on " + difficulty + " difficulty loot"), file,
+                    fileConfiguration, "classLootDifficultyNames." + difficulty, difficulty.name(), true));
+        classLootDifficultyNames = Map.copyOf(difficultyNames);
+        Map<ClassLootFamily, String> familyNames = new EnumMap<>(ClassLootFamily.class);
+        for (ClassLootFamily family : ClassLootFamily.values())
+            familyNames.put(family, ConfigurationEngine.setString(List.of(
+                            "Sets what class loot item names show for $weapon and $item on " + family + " loot"), file,
+                    fileConfiguration, "classLootFamilyNames." + family, family.label(), true));
+        classLootFamilyNames = Map.copyOf(familyNames);
     }
 }
