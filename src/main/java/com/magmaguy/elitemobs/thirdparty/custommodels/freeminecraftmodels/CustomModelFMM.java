@@ -69,17 +69,6 @@ public class CustomModelFMM implements CustomModelInterface {
         return true;
     }
 
-    /** Asks FMM for a click surface the size of the model's hitbox bone; false when this FMM cannot give one. */
-    public boolean setClickSurface(boolean clickSurface) {
-        if (SET_CLICK_SURFACE == null || dynamicEntity == null) return false;
-        try {
-            SET_CLICK_SURFACE.invokeExact(dynamicEntity, clickSurface);
-            return true;
-        } catch (Throwable throwable) {
-            return false;
-        }
-    }
-
     public CustomModelFMM(LivingEntity livingEntity, String modelName, String nametagName,
                           ModeledEntityLeftClickCallback leftClickCallback,
                           ModeledEntityRightClickCallback rightClickCallback) {
@@ -202,18 +191,6 @@ public class CustomModelFMM implements CustomModelInterface {
 
     // Skeleton#isRidden arrived with FMM 2.12.7. Older FMM always teleports its bones, so nothing rides its bodies.
     private static final MethodHandle IS_RIDDEN = findIsRidden();
-
-    // DynamicEntity#setClickSurface arrived after FMM 2.12.9. Older FMM leaves clicks to the body's box and the OBB.
-    private static final MethodHandle SET_CLICK_SURFACE = findSetClickSurface();
-
-    private static MethodHandle findSetClickSurface() {
-        try {
-            return MethodHandles.publicLookup().findVirtual(DynamicEntity.class, "setClickSurface",
-                    MethodType.methodType(void.class, boolean.class));
-        } catch (ReflectiveOperationException | LinkageError unavailable) {
-            return null;
-        }
-    }
 
     private static MethodHandle findIsRidden() {
         try {
