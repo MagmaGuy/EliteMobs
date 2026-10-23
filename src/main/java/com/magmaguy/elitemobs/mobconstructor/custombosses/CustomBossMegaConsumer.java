@@ -162,8 +162,11 @@ public class CustomBossMegaConsumer {
         String modelName = useOverride ? override : customBossesConfigFields.getCustomModel();
         if (modelName == null || modelName.isEmpty()) return;
         try {
-            customBossEntity.setCustomModel(CustomModel.generateCustomModel(livingEntity, modelName, customBossEntity.getName(),
-                    customBossEntity.isRideableModel()));
+            CustomModel customModel = CustomModel.generateCustomModel(livingEntity, modelName, customBossEntity.getName(),
+                    customBossEntity.isRideableModel());
+            // Players feed and order a pet by clicking its model, which is bigger than the hidden body's own box.
+            if (customModel != null && customBossesConfigFields.getPet() != null) customModel.setClickSurface(true);
+            customBossEntity.setCustomModel(customModel);
             warnIfNameCanNeverRender();
         } catch (Exception exception) {
             customBossEntity.setCustomModel(null);

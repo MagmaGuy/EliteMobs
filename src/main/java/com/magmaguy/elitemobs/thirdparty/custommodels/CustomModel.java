@@ -238,6 +238,15 @@ public class CustomModel implements CustomModelInterface {
                 ? customModelFMM.getModelViewers() : Set.of();
     }
 
+    /**
+     * Gives the model a click surface the size of its hitbox bone, so players click the model they see rather than its
+     * body's own box. Only FreeMinecraftModels offers one.
+     */
+    public boolean setClickSurface(boolean clickSurface) {
+        return modelPlugin == ModelPlugin.FREE_MINECRAFT_MODELS && customModelFMM != null
+                && customModelFMM.setClickSurface(clickSurface);
+    }
+
     /** Lets the model own body/head facing; null releases the previous target. */
     public boolean setLookTarget(Location target) {
         return modelPlugin == ModelPlugin.FREE_MINECRAFT_MODELS && customModelFMM != null
