@@ -1,183 +1,228 @@
-[![Crowdin](https://badges.crowdin.net/elitemobs/localized.svg)](https://crowdin.com/project/elitemobs)
-[![BStats](https://bstats.org/signatures/bukkit/EliteMobs.svg)](https://bstats.org/plugin/bukkit/EliteMobs/1081)
+<p align="center">
+  <a href="https://discord.gg/GKyzTgT">
+    <img src="https://imgur.com/mvyJwOf.png" alt="Discord" width="180"/>
+  </a>
+  <a href="https://nightbreak.io/plugin/elitemobs/">
+    <img src="https://imgur.com/OLYJlM8.png" alt="Nightbreak" width="180"/>
+  </a>
+  <a href="https://www.patreon.com/magmaguy">
+    <img src="https://imgur.com/rWCe9W9.png" alt="Patreon" width="180"/>
+  </a>
+  <a href="https://wiki.nightbreak.io/EliteMobs/info">
+    <img src="https://imgur.com/M48vTUC.png" alt="Wiki" width="180"/>
+  </a>
+</p>
 
-# EliteMobs
+<div align="center">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/Ev2KGfB3DDw?si=eLTrkWeibpnHy8F6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
 
-EliteMobs is a Spigot/Paper plugin built around custom bosses. On top of the boss system it adds an interlocking set of
-RPG-style features: quests, arenas, dungeons, custom and procedurally generated items and enchantments, an in-game
-economy, player progression and skills, NPCs, and shops.
 
-[Download](https://nightbreak.io/plugin/elitemobs/) · [Modrinth](https://modrinth.com/plugin/elitemobs) · [Documentation](https://wiki.nightbreak.io/) · [Support](https://discord.gg/nightbreak)
+# 🟠 Main Features (100% optional and configurable!)
 
-## Features
+- **Elite Mobs!** Fight against mobs with levels and special powers that show up randomly in your worlds!
+- **Dungeons, Arenas, Adventures & Events!** Enjoy many dungeons, arenas, adventures and events we made — [about 50% are free!](https://nightbreak.io/plugin/elitemobs/#content)
+- **One-click installation!** Instantly install and uninstall content!
+- **Custom Furniture!** With the [**EliteMobs prop pack**](https://nightbreak.io/plugin/freeminecraftmodels/#elitemobs-prop-pack), all of the EliteMobs builds and maps come with their own custom props and furniture pieces!
+- **Custom Models!** This plugin has [Free Minecraft Models](https://nightbreak.io/plugin/freeminecraftmodels) integration!
+- **Self-contained RPG item progression with custom mechanics!** Kill higher level bosses for higher level loot, interact with custom immersive NPCs and use our custom enchanting and repairing systems for elite items!
+- **Weapon skills!** Eleven [weapon and armor skills](https://wiki.nightbreak.io/EliteMobs/skill_system) level up as you fight and unlock [skill bonuses](https://wiki.nightbreak.io/EliteMobs/skill_bonuses) at levels 10, 25, 50 and 75.
+- **Classes!** The [[Alpha] Advanced Combat System](https://wiki.nightbreak.io/EliteMobs/advanced_combat) adds 76 classes with trainer trials, passives and three active abilities.
+- **Parties!** Form a [party](https://wiki.nightbreak.io/EliteMobs/party_system) to enter dungeons together after a ready check, share kill credit for quests and roll [need or greed](https://wiki.nightbreak.io/EliteMobs/group_loot) on Elite gear.
+- **Quests!** Follow story quests in adventures or take [dynamic quests](https://wiki.nightbreak.io/EliteMobs/creating_quests#dynamic-quests), and let the quest tracker point you to your target.
+- **Flight networks!** Flight masters and wormholes fly players between stations along [flight routes](https://wiki.nightbreak.io/EliteMobs/flight_networks) you build in game.
+- **Shops and gambling!** Spend Elite Coins in the [shops](https://wiki.nightbreak.io/EliteMobs/shop_system) or bet them on Blackjack, Coin Flip, Slots and Higher/Lower at the [gambling NPCs](https://wiki.nightbreak.io/EliteMobs/gambling_system).
+- **Make your own content!** Create [bosses, items, quests, NPCs, dungeons and arenas](https://wiki.nightbreak.io/EliteMobs/creating_content), with boss powers written in [EliteScript](https://wiki.nightbreak.io/EliteMobs/elitescript_info) or [Lua](https://wiki.nightbreak.io/EliteMobs/lua_getting_started).
+- **Bedrock support!** Players joining through Geyser get menus that work on Bedrock, and see custom boss and NPC models when [Free Minecraft Models and Resource Pack Manager are set up for Bedrock](https://wiki.nightbreak.io/EliteMobs/custom_models#bedrock-geyser-support).
+- **Restart-free updates!** Update installed content from the in-game [setup menu](https://wiki.nightbreak.io/EliteMobs/setup#content-commands), and swap in a new EliteMobs version without restarting the server with [`/em applypluginupdate`](https://wiki.nightbreak.io/global/nightbreak_setup_and_content_management#applying-updates-without-a-restart).
+- **Fully translatable!** If you can see it in-game, you can translate it, or use community-made translations!
+- **Highly responsive support!** [Join the Discord!](https://discord.gg/9f5QSka)
+- **Want an even better experience?** Works best with [BetterStructures](https://nightbreak.io/plugin/betterstructures), [Free Minecraft Models](https://nightbreak.io/plugin/freeminecraftmodels), [Resurrection Chest](https://nightbreak.io/plugin/resurrectionchest), and [Resource Pack Manager](https://nightbreak.io/plugin/resourcepackmanager) — all free!
 
-- **Custom bosses**: Regional, instanced and event bosses defined in config, with a scriptable power system.
-- **Dungeons**: Installable, packageable instanced content with kill-percentage and kill-target objectives.
-- **Arenas**: Wave-based combat instances (optional MythicMobs integration for arena mobs).
-- **Quests**: Static and dynamic quests with objectives, tracking, rewards and quest NPCs.
-- **Parties**: Five-player, session-scoped groups with shared kill credit, need/greed Elite gear, and a compact sidebar.
-- **Items & enchantments**: Custom items plus procedurally generated gear, custom enchantments, and scrolls.
-- **Economy & shops**: Elite currency with custom, dynamic and sell shops; Vault integration.
-- **Progression**: Player ranks, level scaling, a skills system and the Adventurer's Guild hub.
-- **NPCs**: Configurable NPCs for shops, quests, ranks, repairs and more.
-- **Wormholes**, treasure chests, timed/custom world events, and an explosion-regeneration system.
 
-## Requirements
+# 🟠 How to Setup:
 
-- Java 21 (the plugin builds on a Java 21 toolchain).
-- A Spigot or Paper server. `plugin.yml` declares `api-version: 1.21.4`; the build compiles against the Spigot
-  `26.2-R0.1-SNAPSHOT` API. Use the Java version required by your server and check the download page for release compatibility.
-- No hard dependencies. All integrations are optional (`softdepend`): Multiverse-Core, WorldGuard, Vault,
-  PlaceholderAPI, HolographicDisplays, DiscordSRV, LibsDisguises, ModelEngine, Geyser-Spigot, MythicMobs, LevelledMobs,
-  InfernalMobs, FreeMinecraftModels. Vault is required for economy features; the others enable the corresponding
-  integration when present.
+<div align="center">
+  <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/0ap49TSCfvk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  <div style="margin-top: 5px;">
+    <a href="https://nightbreak.io/plugin/elitemobs/#setup">Quick setup instructions!</a> |
+    <a href="https://wiki.nightbreak.io/EliteMobs/permissions_and_commands">Full permissions list here</a>
+  </div>
+</div>
 
-## [Alpha] Advanced Combat System
 
-Release `10.9.0` includes 76 classes with progression, passives, and mobility, signature, and utility abilities. The Adventurer's Guild provides class instructors, starter training, and solo class-unlock challenges. Class-aware gear and FreeMinecraftModels staff and wand integration connect equipment to combat progression.
+<p align="center">
+  <a href="https://itch.io/s/201155/yearly-sale">
+    <img src="https://img.itch.zone/aW1nLzMwMDA3NjM3LnBuZw==/original/Mz69Hw.png" alt="Nightbreak Yearly Sale - 20% off through November 15" width="804"/>
+  </a>
+</p>
 
-The system is enabled by default in `AdvancedCombatSystem.yml`. Set `enabled: false` to disable it. While the alpha baseline is being evaluated, class balance and localization settings are intentionally limited.
+# 🟠 Additional downloads:
 
-Press **F** to open the ability-selection window, then **F** for mobility, **left-click** for signature, or **right-click** for utility. With `allowClassAbilitiesOutsideEliteMobsWorlds` enabled, players can opt in outside EliteMobs content by double-tapping F while sneaking.
+<p align="center">
+  <a href="https://nightbreak.io/plugin/elitemobs/#content">
+    Click here for every free & premium download with more info!
+  </a>
+</p>
 
-ResourcePackManager enables the graphical combat HUD. `enableCombatHud: false`, or an unavailable ResourcePackManager, uses the text display instead. Players must accept the server resource pack for the graphical HUD. Install FreeMinecraftModels when your encounters or equipment use its models.
+<p align="center">
+  <a href="https://nightbreak.io/plugin/elitemobs/#yggdrasil-realm">
+    <img src="https://i.postimg.cc/bwFLp7Rk/Vid-o-sans-titre-R-alis-e-avec-Clipchamp-1.gif" width="804"/>
+  </a>
+</p>
 
-## Skill XP permission perks
+<p align="center">
+  <a href="https://nightbreak.io/plugin/elitemobs/#the-adventurers-guild">
+    <img src="https://imgur.com/niztxj2.png" width="400"/>
+  </a>
+  <a href="https://nightbreak.io/plugin/elitemobs/#the-dark-cathedral">
+    <img src="https://imgur.com/oVgoXbu.png" width="400"/>
+  </a>
+</p>
 
-Grant `elitemobs.perks.xp.<perk>.all` for all weapon/armor skills, or replace `all`
-with `armor`, `swords`, `axes`, `bows`, `crossbows`, `tridents`, `hoes`, `maces`,
-`spears`, `staves`, or `wands`. These permissions default to false, including for
-operators. The `.all` permissions inherit the individual nodes, so a permission
-manager can explicitly deny a particular skill.
+<p align="center">
+  <a href="https://nightbreak.io/plugin/elitemobs/#the-oasis-adventure">
+    <img src="https://imgur.com/wI6iiVN.png" width="400"/>
+  </a>
+  <a href="https://nightbreak.io/plugin/elitemobs/#primis-adventure">
+    <img src="https://imgur.com/RaLZeoC.png" width="400"/>
+  </a>
+</p>
 
-| Perk | XP multiplier |
-|---|---|
-| `10percentboost` | 1.1 |
-| `25percentboost` | 1.25 |
-| `50percentboost` | 1.5 |
-| `double` | 2 |
-| `150percentboost` | 2.5 |
-| `triple` | 3 |
-| `quadruple` | 4 |
-| `customboost` | `customXpPerkMultiplier` in `skills.yml`, default 1 |
+<p align="center">
+  <a href="https://nightbreak.io/plugin/elitemobs/#100-events">
+    <img src="https://imgur.com/8c2Z3m3.jpg" width="400"/>
+  </a>
+  <a href="https://nightbreak.io/plugin/elitemobs/#iron-league-arena">
+    <img src="https://imgur.com/Hf1zzdI.jpg" width="400"/>
+  </a>
+</p>
 
-As in mcMMO, the custom perk overrides fixed perks; otherwise only the largest
-granted fixed multiplier applies. Permissions are checked at each eligible award,
-so temporary grants and revocations take effect without reloading EliteMobs.
-For example, LuckPerms users can grant a 30-minute boost with
-`/lp user PlayerName permission settemp elitemobs.perks.xp.25percentboost.all true 30m`.
-Boosts apply after the native weapon/armor multiplier and round down to whole XP.
-They preserve anti-farm checks, dungeon lockouts, world exclusions and skill-level
-eligibility. They do not boost class XP, currency, loot, vanilla XP, or administrative
-XP writes. Numeric awards saturate at the remaining `long` capacity.
 
-## Installation
+# 🟠 Screenshots:
 
-1. Drop `EliteMobs.jar` into your server's `plugins/` folder.
-2. (Optional) Install any of the soft-dependency plugins above to enable their integrations.
-3. Start the server, then run the first-time setup (`/em initialize`, requires `elitemobs.initialize`). Use `/em setup` afterward to manage content.
+<p align="center">
+  <img src="https://i.postimg.cc/Qtxq4137/image-24.png" width="400"/>
+  <img src="https://i.postimg.cc/x13x60zW/image-27.png" width="400"/>
+</p>
+<p align="center">
+  <img src="https://i.postimg.cc/nzDqwkWC/image-25.png" width="400"/>
+  <img src="https://i.postimg.cc/BbwsLTqB/image-23.png" width="400"/>
+</p>
+<p align="center">
+  <img src="https://i.postimg.cc/bwmG0SpD/45.png" width="400"/>
+  <img src="https://i.postimg.cc/HWP9srwY/image-28.png" width="400"/>
+</p>
+<p align="center">
+  <img src="https://i.postimg.cc/DfbP02B1/image-26.png" width="400"/>
+  <img src="https://i.postimg.cc/1X29fGB1/image-29.png" width="400"/>
+</p>
 
-## Commands
 
-Two commands are registered (see `plugin.yml`):
+# 🟠 View More by Magmaguy!
 
-| Command            | Aliases | Description    |
-|--------------------|---------|----------------|
-| `/elitemobs`       | `/em`   | Main command   |
-| `/adventurersguild`| `/ag`   | Main command   |
+<p align="center">
+  <a href="https://nightbreak.io/plugin/elitemobs">
+    <img src="https://i.postimg.cc/zXQRn1jD/Elite-Mobs.png" width="300"/>
+  </a>
+  <a href="https://nightbreak.io/plugin/betterstructures">
+    <img src="https://i.postimg.cc/3rVK1rPq/Better-Structures.png" width="300"/>
+  </a>
+</p>
+<p align="center">
+  <a href="https://nightbreak.io/plugin/extractioncraft">
+    <img src="https://i.postimg.cc/gjV6VMYz/extractioncraft.png" width="300"/>
+  </a>
+  <a href="https://nightbreak.io/plugin/eternaltd">
+    <img src="https://i.postimg.cc/Kjf8cCGM/ETD.png" width="300"/>
+  </a>
+</p>
+<p align="center">
+  <a href="https://nightbreak.io/plugin/resourcepackmanager">
+    <img src="https://i.postimg.cc/Y0GdtBfX/Resource-Pack-Manager.png" width="300"/>
+  </a>
+  <a href="https://nightbreak.io/plugin/freeminecraftmodels">
+    <img src="https://i.postimg.cc/0Qxv6ZHd/FMM.png" width="300"/>
+  </a>
+</p>
+<p align="center">
+  <a href="https://nightbreak.io/plugin/betterfood">
+    <img src="https://i.postimg.cc/JzcDSB80/Better-Food.png" width="300"/>
+  </a>
+  <a href="https://nightbreak.io/plugin/resurrectionchest">
+    <img src="https://i.imgur.com/qpgXCge.png" width="300"/>
+  </a>
+</p>
 
-Both are dispatched through MagmaCore's `CommandManager` (see `commands/CommandHandler.java`), which exposes a large set
-of player and admin subcommands. Run `/em help` in-game for the full list, or consult the wiki.
 
-### Parties
+# 🟠 Partner servers:
 
-Parties are enabled by default through `Party.yml` and last only while their members remain logged in. A party contains
-one creator plus up to four invited players. Membership is never written to the player database.
+Matecraft is the official EliteMobs server! It is run by me and is always **up-to-date with the latest experimental features and new dungeons**! Check it out if you want to see my plugins the way they were originally developed to work! It's got a cozy community of dedicated and welcoming players that call it home!
 
-Entering or creating an instanced dungeon starts a ready check for the initiating player's entire current party. The
-initiator is ready automatically; the dungeon is prepared only after every other member accepts the exact dungeon,
-difficulty and dynamic level shown in chat. Capacity, package permissions, active-instance state, party membership,
-and cancellable join events are validated for everyone before anybody is moved. Open-world dungeon teleports start
-the normal safe-teleport countdown for every available party member; an individual can still cancel their own
-teleport by moving. Personal item-enchantment challenges remain solo because they escrow the owner's item.
+<p align="center">
+  <b>elitesurvival.matecraft.org</b>
+  <br/>
+  <img src="https://i.postimg.cc/wBhbQ8vs/header.gif" width="763"/>
+</p>
 
-| Command | Purpose |
-|---|---|
-| `/em party create` | Create a party. |
-| `/em party invite <player>` | Invite an online player. Any current member may invite. |
-| `/em party accept` | Accept the most recent unexpired invitation. |
-| `/em party leave` | Leave the party. Leadership passes to the next member when necessary. |
-| `/em party ready <token>` | Accept the clickable instanced-dungeon ready check. |
-| `/em party decline <token>` | Decline and cancel the clickable ready check for the party. |
+<p align="center">
+  <a href="https://bstats.org/plugin/bukkit/EliteMobs/1081">
+    <img src="https://bstats.org/signatures/bukkit/EliteMobs.svg" alt="bStats"/>
+  </a>
+</p>
 
-Nearby party members in the same world receive credit for matching active kill objectives, including quest-specific
-boss kills. Quests remain separate per player: parties never accept quests, turn quests in, or collect rewards for
-another member. Fetch items, NPC dialogue, and arena participation remain personal because their underlying item,
-story, and match requirements must not be bypassed.
 
-Normal Elite equipment and special Elite gear earned while at least two party members are nearby enter the existing
-need/greed flow exposed by `/em loot`. Coins and Elite Scrolls remain personal. Each drop has an independent vote,
-large pools are paginated, overlapping roll sessions can be cycled by running `/em loot` again, and dungeon boss
-lockouts are applied before a player is admitted to a vote.
-Party vote pools retain the normal 60-second inactivity window but have a configurable hard lifetime of 120 seconds
-by default, so a steady stream of drops cannot keep one vote open forever. Players who make no selection remain in
-the Greed pool.
+# 🟠 Translations:
 
-The sidebar lists the leader and members with compact five-segment health bars and marks downed members clearly. While
-the viewer is in an instanced dungeon, each participating member also shows their remaining lives. It incorporates the
-currently tracked quest when space permits and alternates between the invite and leave command hints. Health colors and
-glyphs, `sharedProgressRange`, invitation expiry, rotation timing, styling, and messages are configurable in `Party.yml`.
-The combined sidebar itself can be disabled independently; normal EliteMobs quest scoreboards then remain in use.
+<details>
+<summary>Translations</summary>
 
-## Permissions
-
-Permissions are defined in `plugin.yml`. The high-level nodes:
-
-- `elitemobs.*`: all commands (default: op).
-- `elitemobs.user`: recommended player permission set; bundles the player-facing nodes (shops, quests, ranks, repair,
-  scrap, teleports, NPC interactions, etc.) (default: true).
-- Individual nodes follow the `elitemobs.<area>.<action>` convention. Admin actions (setup, spawning, killing, loot
-  debug, currency manipulation, reloads, packaging) default to `op`; player actions default to `true`.
-
-See `plugin.yml` for the authoritative, per-node list.
-
-## Configuration
-
-EliteMobs is config-heavy. On first run it generates its files under `plugins/EliteMobs/`. Configuration is split by
-domain, mirroring the `com.magmaguy.elitemobs.config` package: including custom bosses, custom items, enchantments,
-quests, events, arenas, treasure chests, NPCs, spawns, powers (including Lua powers), mob properties, menus, potion
-effects, skill bonuses and wormholes. Translations are managed via Crowdin. See the
-[wiki](https://wiki.nightbreak.io/) for the configuration reference.
-
-## Building from source
-
-The project builds with JDK 21 and Gradle and shades its runtime dependencies into a single jar. On Windows, use the included wrapper:
-
-```powershell
-.\gradlew.bat shadowJar
+**To activate a translation:**  
+Run the command:  
+```
+/elitemobs language <language>
 ```
 
-For a Unix checkout, install the Gradle version specified by [gradle-wrapper.properties](gradle/wrapper/gradle-wrapper.properties), currently `9.1.0`, and run `gradle shadowJar`. This repository currently tracks the Windows wrapper only.
+**Example:**
+```
+/elitemobs language spanish
+```
 
-The shaded jar is written to `build/libs/EliteMobs.jar`. When `MC_DIST_DIR` is set, the stable deployable copy is also
-written to that directory as `EliteMobs.jar`. The build relocates bStats and `easyminecraftgoals`, and shades MagmaCore
-and commons-io.
+EliteMobs downloads the translation the first time you pick it.  
+Translations can be found in:  
+`~/plugins/EliteMobs/translations`
+
+Want to contribute? [Help translate on Crowdin!](https://crowdin.com/project/elitemobs)
+
+</details>
 
 
-If you change MagmaCore locally, run its `publishToMavenLocal` task before rebuilding EliteMobs. Do the same for locally changed plugin API dependencies using their own build tools.
+# 🟠 Third Party plugin compatibility:
 
-## Developer API
+<details>
+<summary>Third Party Plugins</summary>
 
-[Java class and method reference](https://wiki.nightbreak.io/javadoc/elitemobs/index.html).
+EliteMobs can optionally be paired with:
 
-Events, tracked entities, item helpers and Lua power services: [EliteMobs developer reference](https://wiki.nightbreak.io/developers/elitemobs). See the [Java API index](https://wiki.nightbreak.io/developers) for dependency setup and lifecycle guidance.
+- [**FreeMinecraftModels**](https://www.spigotmc.org/resources/free-minecraft-models.111660/) – custom boss models
+- [**ResourcePackManager**](https://www.spigotmc.org/resources/resource-pack-manager.118574/) – automatic resource pack management
+- [**BetterStructures**](https://www.spigotmc.org/resources/betterstructures.103241/) – custom buildings with EliteMobs bosses and loot
+- [**LibsDisguises**](https://www.spigotmc.org/resources/libs-disguises-free.81/) – disguise bosses as other entities, including player skins
+- [**DiscordSRV**](https://www.spigotmc.org/resources/discordsrv.18494/) – post Discord announcements about bosses
+- [**WorldGuard**](https://dev.bukkit.org/projects/worldguard) – EliteMobs flags for regions
+- [**PlaceholderAPI**](https://www.spigotmc.org/resources/placeholderapi.6245/) – placeholders for leaderboards/chat/tabs
+- [**Vault**](https://www.spigotmc.org/resources/vault.34315/) – economy integration (not recommended)
+- [**Geyser**](https://geysermc.org/) - Bedrock players get menus that work on Bedrock
+- [**MythicMobs**](https://www.spigotmc.org/resources/mythicmobs.5702/) - MythicMobs mobs can fight in arena waves
 
-Maven: `com.magmaguy:EliteMobs:10.9.0` from [MagmaGuy's repository](https://repo.magmaguy.com/#/releases). Use `provided` or `compileOnly` scope for the installed plugin.
+</details>
 
-## Troubleshooting and support
 
-Check `/em version`, the startup log, and whether the required content packs and optional plugins loaded. For missing visuals, confirm both model loading and resource-pack delivery. For custom content errors, include the affected YAML or Lua file and the complete exception, along with server and plugin versions. Remove account tokens and other credentials from anything you share.
+# 🟠 Developers
 
-## License
-
-See [LICENSE](LICENSE). Downloadable content and third-party assets can have separate terms.
+- [Java API guide](https://wiki.nightbreak.io/developers/elitemobs): events, tracked entities, item helpers, Lua power and Mind services, and building from source
+- [Generated Java reference](https://wiki.nightbreak.io/javadoc/elitemobs/index.html)
+- [Maven repository and coordinates](https://wiki.nightbreak.io/developers)
+- [Lua scripting](https://wiki.nightbreak.io/EliteMobs/lua_getting_started): Lua boss powers, NPC scripts and behavior programs, on the shared [Lua scripting engine](https://wiki.nightbreak.io/global/lua_scripting_engine)
+- [Source code](https://github.com/MagmaGuy/EliteMobs)
+- License: [GPL-3.0](https://github.com/MagmaGuy/EliteMobs/blob/master/LICENSE) for the source code; downloadable content and third-party assets can have their own terms
