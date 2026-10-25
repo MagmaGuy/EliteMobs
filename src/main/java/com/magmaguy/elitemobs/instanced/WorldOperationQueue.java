@@ -58,33 +58,20 @@ public class WorldOperationQueue {
         WorldOperation operation = new WorldOperation(
                 player, asyncOperation, syncOperation, operationName, terminalCallback,
                 operationGeneration.get(), new AtomicBoolean(false));
-        if (MetadataHandler.shutdownRequested || operation.isAbandoned()) {
+        if (MetadataHandler.shutdownRequested || !player.isOnline()) {
             runTerminalCallback(operation);
             return;
         }
         operationQueue.add(operation);
 
-        if (player != null) {
-            int queuePosition = operationQueue.size() + (isProcessing.get() ? 1 : 0);
-            if (queuePosition > 1) {
-                player.sendMessage(DungeonsConfig.getDungeonPreparingQueueMessage().replace("$position", String.valueOf(queuePosition)));
-            } else {
-                player.sendMessage(DungeonsConfig.getDungeonPreparingMessage());
-            }
+        int queuePosition = operationQueue.size() + (isProcessing.get() ? 1 : 0);
+        if (queuePosition > 1) {
+            player.sendMessage(DungeonsConfig.getDungeonPreparingQueueMessage().replace("$position", String.valueOf(queuePosition)));
+        } else {
+            player.sendMessage(DungeonsConfig.getDungeonPreparingMessage());
         }
 
         processNextOperation();
-    }
-
-    /**
-     * Queues server maintenance on world files, such as converting a world blueprint. It shares
-     * the queue with player operations, so it never runs while a copy reads the same files.
-     */
-    public static void queueSystemOperation(Supplier<Boolean> asyncOperation,
-                                            Runnable syncOperation,
-                                            String operationName,
-                                            Runnable terminalCallback) {
-        queueOperation(null, asyncOperation, syncOperation, operationName, terminalCallback);
     }
 
     private static void processNextOperation() {
@@ -93,7 +80,7 @@ public class WorldOperationQueue {
         }
 
         WorldOperation next = operationQueue.poll();
-        while (next != null && (next.isAbandoned() || MetadataHandler.shutdownRequested)) {
+        while (next != null && (!next.player.isOnline() || MetadataHandler.shutdownRequested)) {
             runTerminalCallback(next);
             next = operationQueue.poll();
         }
@@ -141,7 +128,7 @@ public class WorldOperationQueue {
             }
 
             if (!success) {
-                if (operation.isPlayerOnline()) {
+                if (operation.player.isOnline()) {
                     operation.player.sendMessage(DungeonsConfig.getDungeonCopyFailedMessage());
                     operation.player.sendMessage(DungeonsConfig.getDungeonPrepareFailedMessage());
                 }
@@ -156,7 +143,7 @@ public class WorldOperationQueue {
             } catch (Exception e) {
                 Logger.warn("World operation '" + operation.operationName + "' failed during sync phase: " + e.getMessage());
                 e.printStackTrace();
-                if (operation.isPlayerOnline()) {
+                if (operation.player.isOnline()) {
                     operation.player.sendMessage(DungeonsConfig.getDungeonLoadFailedMessage());
                 }
             } finally {
@@ -176,7 +163,7 @@ public class WorldOperationQueue {
     private static void notifyQueuePositions() {
         int position = 1;
         for (WorldOperation op : operationQueue) {
-            if (op.isPlayerOnline()) {
+            if (op.player.isOnline()) {
                 op.player.sendMessage(DungeonsConfig.getDungeonPreparingQueueMessage().replace("$position", String.valueOf(position)));
             }
             position++;
@@ -198,7 +185,7 @@ public class WorldOperationQueue {
         WorldOperation currentOperation = activeOperation;
         if (currentOperation != null) runTerminalCallback(currentOperation);
         for (WorldOperation op : operationQueue) {
-            if (op.isPlayerOnline()) {
+            if (op.player.isOnline()) {
                 op.player.sendMessage(DungeonsConfig.getDungeonCancelledShutdownMessage());
             }
             runTerminalCallback(op);
@@ -216,16 +203,7 @@ public class WorldOperationQueue {
             Runnable terminalCallback,
             int generation,
             AtomicBoolean terminalized
-    ) {
-        // System operations have no player; they are never abandoned and have nobody to notify.
-        boolean isAbandoned() {
-            return player != null && !player.isOnline();
-        }
-
-        boolean isPlayerOnline() {
-            return player != null && player.isOnline();
-        }
-    }
+    ) {}
 
     private static void runTerminalCallback(WorldOperation operation) {
         if (!operation.terminalized.compareAndSet(false, true)) return;
