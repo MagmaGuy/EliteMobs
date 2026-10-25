@@ -59,6 +59,9 @@ public class WorldInstancedDungeonPackage extends EMPackage implements CombatCon
         // the running instance lifecycle cleans up worlds it creates.
         this.isDownloaded = true;
         this.isInstalled = contentPackagesConfigFields.isEnabled();
+        com.magmaguy.elitemobs.utils.WorldInstantiator.convertBlueprint(
+                contentPackagesConfigFields.getWorldName(), contentPackagesConfigFields.getDungeonConfigFolderName(),
+                contentPackagesConfigFields.getEnvironment());
     }
 
     @Override
