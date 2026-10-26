@@ -1172,7 +1172,7 @@ public class CommandMessagesConfig extends ConfigurationFile {
         // Download all content command
         downloadAllNoTokenMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when no account token is registered for download all"),
-                file, fileConfiguration, "downloadAllNoTokenMessage", "&c[EliteMobs] No account token registered. Use /nightbreaklogin <token> first.", true);
+                file, fileConfiguration, "downloadAllNoTokenMessage", "&c[EliteMobs] This server is not linked to a Nightbreak account. Run /nightbreaklogin first.", true);
         downloadAllNothingMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when all available packages are already downloaded"),
                 file, fileConfiguration, "downloadAllNothingMessage", "&a[EliteMobs] No new content to download! All available packages are already downloaded.", true);
@@ -1219,7 +1219,7 @@ public class CommandMessagesConfig extends ConfigurationFile {
         // Update content command
         updateNoTokenMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when no account token is registered"),
-                file, fileConfiguration, "updateNoTokenMessage", "&c[EliteMobs] No account token registered. Use /nightbreaklogin <token> first.", true);
+                file, fileConfiguration, "updateNoTokenMessage", "&c[EliteMobs] This server is not linked to a Nightbreak account. Run /nightbreaklogin first.", true);
         updateAllUpToDateMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when all content is up to date"),
                 file, fileConfiguration, "updateAllUpToDateMessage", "&a[EliteMobs] All content is up to date!", true);

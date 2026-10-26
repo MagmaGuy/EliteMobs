@@ -164,9 +164,9 @@ public class EliteFirstTimeSetupMenu {
                                                String manualInstallPrefix, String discordPrefix) {
         Logger.sendSimpleMessage(player, InitializeConfig.getSeparatorLine());
         sendText(player, confirm);
-        sendLink(player, nightbreakLoginPrefix,
-                InitializeConfig.getAccountLinkDisplay(), InitializeConfig.getAccountLinkHover(),
-                "https://nightbreak.io/account/");
+        sendCommand(player, nightbreakLoginPrefix, "",
+                InitializeConfig.getNightbreakLoginDisplay(), InitializeConfig.getNightbreakLoginHover(),
+                "/nightbreaklogin");
         // "Step 2: Install & manage content in-game with /em setup!"
         sendCommand(player, downloadAllPrefix, downloadAllSuffix,
                 InitializeConfig.getEmSetupDisplay(),

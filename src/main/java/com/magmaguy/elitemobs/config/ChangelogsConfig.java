@@ -82,7 +82,7 @@ public class ChangelogsConfig extends ConfigurationFile {
                         "Shown when someone without nightbreak.login uses /nightbreaklogout."),
                 message("logoutSuccess", "&aThis server is no longer connected to a Nightbreak account.",
                         "Shown after the shared Nightbreak account token is removed."),
-                message("logoutReconnect", "&7Use &a/nightbreaklogin <token> &7to connect it again.",
+                message("logoutReconnect", "&7Use &a/nightbreaklogin &7to connect it again.",
                         "Shown after logout to explain how an administrator can reconnect the server."),
                 message("logoutFailure", "&cThe shared Nightbreak account token could not be removed.",
                         "Shown when the shared Nightbreak account token could not be removed."));

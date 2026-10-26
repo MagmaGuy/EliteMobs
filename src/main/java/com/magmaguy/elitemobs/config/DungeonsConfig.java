@@ -661,17 +661,17 @@ public class DungeonsConfig extends ConfigurationFile {
                 List.of("Sets the separator line used in download messages."),
                 file, fileConfiguration, "contentDownloadSeparator", NightbreakChatStyle.separator(), true);
         contentNightbreakPromptLine1 = ConfigurationEngine.setString(
-                List.of("Sets the first line of the account token prompt."),
+                List.of("Sets the first line of the server link prompt."),
                 file, fileConfiguration, "contentNightbreakPromptLine1", "&eThis content can be downloaded automatically after connecting this server.", true);
         contentNightbreakPromptLine2 = ConfigurationEngine.setString(
-                List.of("Sets the second line of the account token prompt.",
-                        "Followed by a clickable nightbreak.io/account link."),
-                file, fileConfiguration, "contentNightbreakPromptLine2", "<g:#B8860B:#DAA520>Step 1:</g> &7Get your token at: ", true);
+                List.of("Sets the second line of the server link prompt.",
+                        "Followed by a clickable /nightbreaklogin command."),
+                file, fileConfiguration, "contentNightbreakPromptLine2", "<g:#B8860B:#DAA520>Step 1:</g> &7Link this server with ", true);
         contentNightbreakPromptLine3 = ConfigurationEngine.setString(
-                List.of("Sets the third line of the account token prompt."),
-                file, fileConfiguration, "contentNightbreakPromptLine3", "<g:#B8860B:#DAA520>Step 2:</g> &7Run: &e/nightbreaklogin <your-token>", true);
+                List.of("Sets the third line of the server link prompt."),
+                file, fileConfiguration, "contentNightbreakPromptLine3", "<g:#B8860B:#DAA520>Step 2:</g> &7Open the link it prints, approve this server, then click this content again.", true);
         contentNightbreakPromptLine4 = ConfigurationEngine.setString(
-                List.of("Sets the fourth line of the account token prompt.",
+                List.of("Sets the fourth line of the server link prompt.",
                         "Followed by a clickable content link."),
                 file, fileConfiguration, "contentNightbreakPromptLine4", "&8Or download manually at: ", true);
         contentCheckingAccessMessage = ConfigurationEngine.setString(
@@ -689,8 +689,8 @@ public class DungeonsConfig extends ConfigurationFile {
                 file, fileConfiguration, "contentInvalidTokenMessage", "&e[EliteMobs] The saved account token needs to be updated.", true);
         contentInvalidTokenInstructions = ConfigurationEngine.setString(
                 List.of("Sets the follow-up message shown after an invalid account token.",
-                        "Followed by a clickable nightbreak.io/account link."),
-                file, fileConfiguration, "contentInvalidTokenInstructions", "&7Get a new token here, then run &e/nightbreaklogin <token>&7: ", true);
+                        "Followed by a clickable /nightbreaklogin command."),
+                file, fileConfiguration, "contentInvalidTokenInstructions", "&7Link this server again with ", true);
         contentDownloadedReloadMessage = ConfigurationEngine.setString(
                 List.of("Sets the message shown when content has been downloaded and a reload is triggered."),
                 file, fileConfiguration, "contentDownloadedReloadMessage", "&a[EliteMobs] Content downloaded! Reloading EliteMobs...", true);
@@ -717,7 +717,7 @@ public class DungeonsConfig extends ConfigurationFile {
                 file, fileConfiguration, "contentItchLink", "&d\u2022 itch.io: ", true);
         contentLinkAccountMessage = ConfigurationEngine.setString(
                 List.of("Sets the message telling the player how to link their account after purchasing."),
-                file, fileConfiguration, "contentLinkAccountMessage", "&7After purchasing, use &e/nightbreaklogin <token> &7to link your account.", true);
+                file, fileConfiguration, "contentLinkAccountMessage", "&7After purchasing, use &e/nightbreaklogin &7to link your account.", true);
 
         // WorldInstancedDungeonPackage messages
         instancedDungeonInstalledMessage = ConfigurationEngine.setString(

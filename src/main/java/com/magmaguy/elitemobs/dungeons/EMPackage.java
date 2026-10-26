@@ -478,10 +478,10 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
             Logger.sendSimpleMessage(player, DungeonsConfig.getContentNightbreakPromptLine1());
             player.spigot().sendMessage(
                     SpigotMessage.simpleMessage(DungeonsConfig.getContentNightbreakPromptLine2()),
-                    SpigotMessage.hoverLinkMessage(
-                            InitializeConfig.getAccountLinkDisplay(),
-                            InitializeConfig.getAccountLinkHover(),
-                            "https://nightbreak.io/account/"));
+                    SpigotMessage.commandHoverMessage(
+                            InitializeConfig.getNightbreakLoginDisplay(),
+                            InitializeConfig.getNightbreakLoginHover(),
+                            "/nightbreaklogin"));
             Logger.sendSimpleMessage(player, DungeonsConfig.getContentNightbreakPromptLine3());
             player.spigot().sendMessage(
                     SpigotMessage.simpleMessage(DungeonsConfig.getContentNightbreakPromptLine4()),
@@ -572,10 +572,10 @@ public abstract class EMPackage extends ContentPackage implements NightbreakMana
         player.sendMessage(DungeonsConfig.getContentInvalidTokenMessage());
         player.spigot().sendMessage(
                 SpigotMessage.simpleMessage(DungeonsConfig.getContentInvalidTokenInstructions()),
-                SpigotMessage.hoverLinkMessage(
-                        InitializeConfig.getAccountLinkDisplay(),
-                        InitializeConfig.getAccountLinkHover(),
-                        "https://nightbreak.io/account/"));
+                SpigotMessage.commandHoverMessage(
+                        InitializeConfig.getNightbreakLoginDisplay(),
+                        InitializeConfig.getNightbreakLoginHover(),
+                        "/nightbreaklogin"));
     }
 
     protected ContentState getContentState() {

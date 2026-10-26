@@ -640,8 +640,7 @@ public class VersionChecker {
                 ? " (HTTP " + NightbreakAccount.getLastAuthFailureStatus() + ")"
                 : "";
         Logger.warn("The saved account token needs to be updated" + status
-                + ". Get a new token at https://nightbreak.io/account/ and run "
-                + "/nightbreaklogin <token>, then run /em setup again.");
+                + ". Run /nightbreaklogin to link this server again, then run /em setup again.");
     }
 
     public static class VersionCheckerEvents implements Listener {

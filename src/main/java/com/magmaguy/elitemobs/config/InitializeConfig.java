@@ -127,10 +127,6 @@ public class InitializeConfig extends ConfigurationFile {
     @Getter
     private static String discordLinkHover;
     @Getter
-    private static String accountLinkDisplay;
-    @Getter
-    private static String accountLinkHover;
-    @Getter
     private static String contentLinkDisplay;
     @Getter
     private static String contentLinkHover;
@@ -148,6 +144,10 @@ public class InitializeConfig extends ConfigurationFile {
     private static String emSetupDisplay;
     @Getter
     private static String emSetupHover;
+    @Getter
+    private static String nightbreakLoginDisplay;
+    @Getter
+    private static String nightbreakLoginHover;
     @Getter
     private static String emCommandDisplay;
     @Getter
@@ -235,7 +235,7 @@ public class InitializeConfig extends ConfigurationFile {
                 List.of("Confirmation message sent after selecting recommended preset"),
                 file, fileConfiguration, "recommendedPresetClickConfirm", "<g:#228B22:#32CD32>Recommended installation</g> &7activated!", true);
         recommendedPresetClickNightbreakLogin = ConfigurationEngine.setString(
-                List.of("Account token prompt sent after selecting recommended preset"),
+                List.of("Server link prompt sent after selecting recommended preset, followed by a clickable /nightbreaklogin"),
                 file, fileConfiguration, "recommendedPresetClickNightbreakLogin", "<g:#B8860B:#DAA520>Step 1:</g> &7Connect this server: ", true);
         recommendedPresetClickDownloadAll = ConfigurationEngine.setString(
                 List.of("In-game content management message sent after selecting recommended preset"),
@@ -276,7 +276,7 @@ public class InitializeConfig extends ConfigurationFile {
                 List.of("Confirmation message sent after selecting content-only preset"),
                 file, fileConfiguration, "contentOnlyPresetClickConfirm", "<g:#DAA520:#F0C040>Content-only installation</g> &7activated!", true);
         contentOnlyPresetClickNightbreakLogin = ConfigurationEngine.setString(
-                List.of("Account token prompt sent after selecting content-only preset"),
+                List.of("Server link prompt sent after selecting content-only preset, followed by a clickable /nightbreaklogin"),
                 file, fileConfiguration, "contentOnlyPresetClickNightbreakLogin", "<g:#B8860B:#DAA520>Step 1:</g> &7Connect this server: ", true);
         contentOnlyPresetClickDownloadAll = ConfigurationEngine.setString(
                 List.of("In-game content management message sent after selecting content-only preset"),
@@ -359,12 +359,6 @@ public class InitializeConfig extends ConfigurationFile {
         discordLinkHover = ConfigurationEngine.setString(
                 List.of("Hover tooltip for the Discord link"),
                 file, fileConfiguration, "discordLinkHover", "&7Click to join the Discord!", true);
-        accountLinkDisplay = ConfigurationEngine.setString(
-                List.of("Display text for the clickable account token link"),
-                file, fileConfiguration, "accountLinkDisplay", "&9&nnightbreak.io/account", true);
-        accountLinkHover = ConfigurationEngine.setString(
-                List.of("Hover tooltip for the account token link"),
-                file, fileConfiguration, "accountLinkHover", "&7Click to open the account token page", true);
         contentLinkDisplay = ConfigurationEngine.setString(
                 List.of("Display text for the clickable content browse link"),
                 file, fileConfiguration, "contentLinkDisplay", "&9&nnightbreak.io/elitemobs", true);
@@ -391,6 +385,12 @@ public class InitializeConfig extends ConfigurationFile {
         emSetupHover = ConfigurationEngine.setString(
                 List.of("Hover tooltip for the /em setup command"),
                 file, fileConfiguration, "emSetupHover", "&7Click to run /em setup", true);
+        nightbreakLoginDisplay = ConfigurationEngine.setString(
+                List.of("Display text for the clickable /nightbreaklogin command"),
+                file, fileConfiguration, "nightbreakLoginDisplay", "&a&n/nightbreaklogin", true);
+        nightbreakLoginHover = ConfigurationEngine.setString(
+                List.of("Hover tooltip for the /nightbreaklogin command"),
+                file, fileConfiguration, "nightbreakLoginHover", "&7Click to get a link that connects this server to your Nightbreak account", true);
         emCommandDisplay = ConfigurationEngine.setString(
                 List.of("Display text for the clickable /em command"),
                 file, fileConfiguration, "emCommandDisplay", "&a&n/em", true);
