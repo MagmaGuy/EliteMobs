@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -245,6 +246,55 @@ class ClassAbilityInputRouterTest {
         assertEquals(1, actionBars.size());
     }
 
+    @Test
+    void bedrockSneakOpensTheWindowWithBedrockControlsAndKeepsTheSneak() {
+        input.bedrock = true;
+        heldSlot.set(4);
+        PlayerToggleSneakEvent sneak = new PlayerToggleSneakEvent(player, true);
+        router.onSneak(sneak);
+
+        assertTrue(router.isGestureOpen(player.getUniqueId()));
+        assertEquals(List.of("[Slot 1] Blink  [Attack] Arcane Bolt  [Use] Mana Ward"), actionBars);
+        assertFalse(sneak.isCancelled());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"MOBILITY", "SIGNATURE", "UTILITY"})
+    void bedrockSneakThenHotbarAttackOrUseCastsTheAbility(AbilitySlot ability) {
+        input.bedrock = true;
+        heldSlot.set(4);
+        router.onSneak(new PlayerToggleSneakEvent(player, true));
+        switch (ability) {
+            case MOBILITY -> router.onAbilityHotbarSelection(new PlayerItemHeldEvent(player, 4, 0));
+            case SIGNATURE -> router.onChordInteract(new PlayerInteractEvent(player, Action.LEFT_CLICK_AIR, null, null, BlockFace.SELF));
+            case UTILITY -> router.onChordInteract(new PlayerInteractEvent(player, Action.RIGHT_CLICK_AIR, null, null, BlockFace.SELF));
+        }
+
+        assertEquals(List.of(ability), input.usedSlots);
+    }
+
+    @Test
+    void sneakingOpensNothingForJavaOrWhenTheSneakEnds() {
+        router.onSneak(new PlayerToggleSneakEvent(player, true));
+        input.bedrock = true;
+        router.onSneak(new PlayerToggleSneakEvent(player, false));
+
+        assertFalse(router.isGestureOpen(player.getUniqueId()));
+        assertEquals(List.of(), actionBars);
+    }
+
+    @Test
+    void bedrockOutsideCombatContentNeedsTheCommandToggle() {
+        input.bedrock = true;
+        input.alwaysAvailable = false;
+        router.onSneak(new PlayerToggleSneakEvent(player, true));
+        assertFalse(router.isGestureOpen(player.getUniqueId()));
+
+        router.toggleOutsideControls(player);
+        router.onSneak(new PlayerToggleSneakEvent(player, true));
+        assertTrue(router.isGestureOpen(player.getUniqueId()));
+    }
+
     private static <T> T proxy(Class<T> type, InvocationHandler handler) {
         return type.cast(Proxy.newProxyInstance(
                 type.getClassLoader(),
@@ -270,6 +320,7 @@ class ClassAbilityInputRouterTest {
 
         private final List<AbilitySlot> usedSlots = new ArrayList<>();
         private boolean alwaysAvailable = true;
+        private boolean bedrock;
 
         @Override
         public boolean hasActiveClass(Player player) {
@@ -278,7 +329,7 @@ class ClassAbilityInputRouterTest {
 
         @Override
         public boolean fLayerSupported(Player player) {
-            return true;
+            return !bedrock;
         }
 
         @Override

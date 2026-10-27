@@ -319,6 +319,16 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
                 .isPresent();
     }
 
+    /** The ability controls this player's client uses, for hints and the text HUD. */
+    private String controls(Player player) {
+        return fLayerSupported(player) ? ClassSkillTutorial.CONTROLS : ClassSkillTutorial.BEDROCK_CONTROLS;
+    }
+
+    /** The command form of the outside-content control toggle, for players without an F key. */
+    public void toggleOutsideControls(Player player) {
+        inputRouter.toggleOutsideControls(player);
+    }
+
     @Override
     public boolean fLayerSupported(Player player) {
         return !BedrockChecker.isBedrock(player);
@@ -673,9 +683,8 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
         if (waiting) {
             practicingPlayers.add(player.getUniqueId());
             resources.setPracticeMode(player, true);
-            if (fLayerSupported(player))
-                ActionBarCompositor.show(player, ActionBarCompositor.Source.CONTEXT_HINT,
-                        ChatColorConverter.convert(ClassSkillTutorial.CONTROLS));
+            ActionBarCompositor.show(player, ActionBarCompositor.Source.CONTEXT_HINT,
+                    ChatColorConverter.convert(controls(player)));
         } else endLobbyPractice(player);
         if (fLayerSupported(player)) skillTutorial.prompt(player, progression, waiting);
     }
@@ -753,7 +762,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
         double maximum = resource == null
                 ? BuiltInClassContent.resourceDefinitions().get(lineage.resourceType()).maximum()
                 : resource.maximum();
-        String controls = ClassSkillTutorial.CONTROLS;
+        String controls = controls(player);
         String compact = healthDisplay + " &8| &e" + resourceName(lineage.resourceType())
                 + " " + Math.round(amount) + "/" + Math.round(maximum);
         if (isWaitingForMatch(player)) return compact;
@@ -1003,13 +1012,15 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
         Bukkit.getScheduler().runTaskLater(MetadataHandler.PLUGIN, () -> {
             if (!player.isOnline() || !AdvancedCombatSystemConfig.isEnabled()) return;
             if (!AdvancedCombatSystemConfig.isShowJoinMessage()) return;
-            if (!outsideControlsAllowed() || !fLayerSupported(player)) return;
+            if (!outsideControlsAllowed()) return;
             if (!progression.snapshot(player.getUniqueId())
                     .map(profile -> profile.forms().values().stream().anyMatch(FormProgressSnapshot::unlocked))
                     .orElse(false)) return;
             player.sendMessage(ChatColorConverter.convert(
                     ClassPresentationTheme.gradient(ClassPresentationTheme.ELITE, "[Alpha] Advanced Combat System")
-                            + " &8» &7New: hold &fsneak&7 and double-tap &fF&7 to toggle class"
+                            + (fLayerSupported(player)
+                            ? " &8» &7New: hold &fsneak&7 and double-tap &fF&7 to toggle class"
+                            : " &8» &7New: use &f/em class controls&7 to toggle class")
                             + " controls anywhere outside EliteMobs content."));
         }, CONTROL_TOGGLE_NOTICE_DELAY_TICKS);
     }

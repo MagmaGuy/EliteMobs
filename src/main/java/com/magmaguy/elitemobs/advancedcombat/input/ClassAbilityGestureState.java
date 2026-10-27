@@ -10,6 +10,8 @@ import java.util.Objects;
  * bindings so a player can still activate the ability assigned to their already-selected slot,
  * which a vanilla client does not report as a slot change. Left click selects signature;
  * right click selects utility inside the window. Jumping does not change this state.
+ * Bedrock clients have no F key, so for them starting to sneak opens a longer window; mobility
+ * is then a hotbar selection, since a second sneak is already a double-tap for sneak enchantments.
  * The state contains no
  * Bukkit objects, which keeps timing and precedence testable without a server.</p>
  */
@@ -17,13 +19,17 @@ public final class ClassAbilityGestureState {
 
     /** 600 ms at the normal server tick rate. */
     public static final long CHORD_WINDOW_TICKS = 12L;
+    /** One second: a controller or touch toggle-sneak is slower to follow up than a key press. */
+    public static final long SNEAK_WINDOW_TICKS = 20L;
     private static final long CLOSED_TICK = Long.MIN_VALUE;
-    private static final ClassAbilityGestureState CLOSED = new ClassAbilityGestureState(CLOSED_TICK);
+    private static final ClassAbilityGestureState CLOSED = new ClassAbilityGestureState(CLOSED_TICK, CHORD_WINDOW_TICKS);
 
     private final long openedAtTick;
+    private final long windowTicks;
 
-    private ClassAbilityGestureState(long openedAtTick) {
+    private ClassAbilityGestureState(long openedAtTick, long windowTicks) {
         this.openedAtTick = openedAtTick;
+        this.windowTicks = windowTicks;
     }
 
     public static ClassAbilityGestureState closed() {
@@ -33,7 +39,17 @@ public final class ClassAbilityGestureState {
     public Transition pressF(long currentTick, boolean sneaking) {
         if (!sneaking && isOpenAt(currentTick))
             return new Transition(CLOSED, Outcome.MOBILITY);
-        return new Transition(new ClassAbilityGestureState(currentTick), Outcome.CHORD_OPENED);
+        return new Transition(new ClassAbilityGestureState(currentTick, CHORD_WINDOW_TICKS), Outcome.CHORD_OPENED);
+    }
+
+    /** Opens, or reopens, the Bedrock window when the player starts to sneak. */
+    public Transition pressSneak(long currentTick) {
+        return new Transition(new ClassAbilityGestureState(currentTick, SNEAK_WINDOW_TICKS), Outcome.CHORD_OPENED);
+    }
+
+    /** How long this window stays open after it opened. */
+    public long windowTicks() {
+        return windowTicks;
     }
 
     /** Resolves a left click while the F chord is open: it selects signature. */
@@ -68,7 +84,7 @@ public final class ClassAbilityGestureState {
 
     public boolean isOpenAt(long currentTick) {
         if (openedAtTick == CLOSED_TICK || currentTick < openedAtTick) return false;
-        return currentTick - openedAtTick <= CHORD_WINDOW_TICKS;
+        return currentTick - openedAtTick <= windowTicks;
     }
 
     public enum Outcome {

@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -37,7 +38,8 @@ import java.util.UUID;
  * F,F selects mobility, F+left-click signature and F+right-click utility.
  * Hotbar inputs also work inside the open chord. Jumping is never a chord input.
  * Sneak-double-F toggles
- * the layer outside managed content when permitted. Bedrock has no F-key input.
+ * the layer outside managed content when permitted. Bedrock has no F-key input, so starting to
+ * sneak opens the window for Bedrock players instead, and /em class controls is their toggle.
  */
 public final class ClassAbilityInputRouter implements Listener {
 
@@ -97,14 +99,14 @@ public final class ClassAbilityInputRouter implements Listener {
             case TOGGLE_BLOCKED -> {
                 // The vanilla swap proceeds; the message only explains why the layer cannot enable.
                 closeGesture(player);
-                sendControlFeedback(player, action);
+                sendControlFeedback(player, action, true);
             }
             case TOGGLED_ON, TOGGLED_OFF -> {
                 // Deliberately not cancelled: this second vanilla swap undoes the first tap's swap,
                 // so the double-tap leaves the player's hands exactly as they started.
                 closeGesture(player);
                 input.onControlModeChanged(player);
-                sendControlFeedback(player, action);
+                sendControlFeedback(player, action, true);
             }
             case OPEN_ABILITIES -> {
                 event.setCancelled(true);
@@ -116,6 +118,27 @@ public final class ClassAbilityInputRouter implements Listener {
                         MonotonicTickClock.currentTick(), player.isSneaking()));
             }
         }
+    }
+
+    /**
+     * Starting to sneak opens the ability window for Bedrock players, who have no F key. The sneak itself always
+     * goes through, so dialogue, flight, dismounting and sneak enchantments keep it; a sneak another plugin
+     * cancelled (dialogue advances this way) opens nothing.
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onSneak(PlayerToggleSneakEvent event) {
+        if (!event.isSneaking()) return;
+        Player player = event.getPlayer();
+        if (input.fLayerSupported(player) || !controlsEnabled(player)) return;
+        applyGestureTransition(player, ClassAbilityGestureState.closed().pressSneak(MonotonicTickClock.currentTick()));
+    }
+
+    /** The command form of the outside-content toggle, for players without an F key. */
+    public void toggleOutsideControls(Player player) {
+        ClassControlMode.FAction action = controlMode.toggle(player.getUniqueId(), input.outsideControlsAllowed());
+        closeGesture(player);
+        if (action != ClassControlMode.FAction.TOGGLE_BLOCKED) input.onControlModeChanged(player);
+        sendControlFeedback(player, action, input.fLayerSupported(player));
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -224,24 +247,25 @@ public final class ClassAbilityInputRouter implements Listener {
         long generation = ++nextGestureGeneration;
         BukkitTask timeout = Bukkit.getScheduler().runTaskLater(plugin,
                 () -> expireGesture(playerId, generation),
-                ClassAbilityGestureState.CHORD_WINDOW_TICKS + 1L);
+                state.windowTicks() + 1L);
         pendingGestures.put(playerId, new PendingGesture(state, generation, timeout));
         // A vanilla client sends no slot-change packet when the pressed digit is the already-held
         // slot, so advertise that ability's mirror key (7/8/9) instead of a key that cannot work.
         int heldSlot = player.getInventory().getHeldItemSlot();
+        boolean javaKeys = input.fLayerSupported(player);
         ActionBarCompositor.show(
                 player,
                 ActionBarCompositor.Source.ABILITY_INPUT,
-                ChatColor.GRAY + "[" + (heldSlot == 0 ? "7" : "1") + "/F] "
+                ChatColor.GRAY + "[" + (javaKeys ? "" : "Slot ") + (heldSlot == 0 ? "7" : "1") + (javaKeys ? "/F] " : "] ")
                         + ChatColor.WHITE
                         + input.abilityName(player, AbilitySlot.MOBILITY)
-                        + ChatColor.GRAY + "  [" + (heldSlot == 1 ? "8" : "2") + "/LMB] "
+                        + ChatColor.GRAY + "  [" + (javaKeys ? (heldSlot == 1 ? "8" : "2") + "/LMB" : "Attack") + "] "
                         + ChatColor.WHITE
                         + input.abilityName(player, AbilitySlot.SIGNATURE)
-                        + ChatColor.GRAY + "  [" + (heldSlot == 2 ? "9" : "3") + "/RMB] "
+                        + ChatColor.GRAY + "  [" + (javaKeys ? (heldSlot == 2 ? "9" : "3") + "/RMB" : "Use") + "] "
                         + ChatColor.WHITE
                         + input.abilityName(player, AbilitySlot.UTILITY),
-                ClassAbilityGestureState.CHORD_WINDOW_TICKS + 1L);
+                state.windowTicks() + 1L);
     }
 
     private void expireGesture(UUID playerId, long generation) {
@@ -286,12 +310,14 @@ public final class ClassAbilityInputRouter implements Listener {
                 input.outsideControlsAllowed());
     }
 
-    private static void sendControlFeedback(Player player, ClassControlMode.FAction action) {
+    private static void sendControlFeedback(Player player, ClassControlMode.FAction action, boolean javaKeys) {
         String header = ClassPresentationTheme.gradient(
                 ClassPresentationTheme.PURPLE, "Class Controls");
         String message = switch (action) {
-            case TOGGLED_ON -> header + " &8» &aON &8- &7F,F: Mobility | F+LMB: Signature | F+RMB: Utility";
-            case TOGGLED_OFF -> header + " &8» &cOFF &8- &7F swaps hands again";
+            case TOGGLED_ON -> header + " &8» &aON &8- " + (javaKeys
+                    ? "&7F,F: Mobility | F+LMB: Signature | F+RMB: Utility"
+                    : com.magmaguy.elitemobs.advancedcombat.presentation.ClassSkillTutorial.BEDROCK_CONTROLS);
+            case TOGGLED_OFF -> header + " &8» &cOFF &8- " + (javaKeys ? "&7F swaps hands again" : "&7sneaking is just sneaking again");
             case TOGGLE_BLOCKED -> header + " &8» &cBLOCKED &8- &7outside EliteMobs worlds";
             default -> null;
         };

@@ -99,6 +99,16 @@ class ClassControlModeTest {
     }
 
     @Test
+    void commandToggleFlipsTheLayerAndRespectsTheServerSetting() {
+        assertEquals(TOGGLED_ON, controls.toggle(playerId, true));
+        assertTrue(controls.enabled(playerId, false, true));
+        assertEquals(TOGGLED_OFF, controls.toggle(playerId, true));
+        assertFalse(controls.enabled(playerId, false, true));
+        assertEquals(TOGGLE_BLOCKED, controls.toggle(playerId, false));
+        assertFalse(controls.enabled(playerId, false, true));
+    }
+
+    @Test
     void clearRemovesTheSessionToggleAndAnyPendingTap() {
         controls.pressF(playerId, 1000, true, false, true, true);
         controls.clear(playerId);

@@ -77,6 +77,19 @@ final class ClassControlMode {
         return FAction.TOGGLED_ON;
     }
 
+    /** The command form of the sneak double-F toggle, for clients without an F key. */
+    FAction toggle(UUID playerId, boolean outsideAllowed) {
+        Objects.requireNonNull(playerId, "playerId");
+        pendingToggleTaps.remove(playerId);
+        if (!outsideAllowed) {
+            outsideEnabled.remove(playerId);
+            return FAction.TOGGLE_BLOCKED;
+        }
+        if (outsideEnabled.remove(playerId)) return FAction.TOGGLED_OFF;
+        outsideEnabled.add(playerId);
+        return FAction.TOGGLED_ON;
+    }
+
     void clear(UUID playerId) {
         Objects.requireNonNull(playerId, "playerId");
         outsideEnabled.remove(playerId);

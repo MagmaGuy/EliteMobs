@@ -124,6 +124,19 @@ class ClassAbilityGestureStateTest {
     }
 
     @Test
+    void bedrockSneakOpensALongerWindowThanF() {
+        ClassAbilityGestureState sneak = ClassAbilityGestureState.closed().pressSneak(600).next();
+        ClassAbilityGestureState f = ClassAbilityGestureState.closed().pressF(600, false).next();
+
+        assertTrue(sneak.isOpenAt(600 + ClassAbilityGestureState.SNEAK_WINDOW_TICKS));
+        assertFalse(sneak.isOpenAt(601 + ClassAbilityGestureState.SNEAK_WINDOW_TICKS));
+        assertFalse(f.isOpenAt(601 + ClassAbilityGestureState.CHORD_WINDOW_TICKS));
+        // A selection the F window would already have missed still lands in the sneak window.
+        assertEquals(SIGNATURE, sneak.leftClick(600 + ClassAbilityGestureState.SNEAK_WINDOW_TICKS).outcome());
+        assertEquals(MOBILITY, sneak.selectHotbar(615, 0).outcome());
+    }
+
+    @Test
     void plainFAfterExpiryStartsANewChord() {
         ClassAbilityGestureState open = ClassAbilityGestureState.closed()
                 .pressF(500, false)

@@ -181,6 +181,7 @@ public class CommandHandler {
             emCommand.registerCommand(new AdvancedClassCommand());
             emCommand.registerCommand(new AdvancedClassInfoCommand());
             emCommand.registerCommand(new AdvancedClassSelectCommand());
+            emCommand.registerCommand(new AdvancedClassControlsCommand());
             emCommand.registerCommand(new AdvancedClassTestSetCommand());
             emCommand.registerCommand(new AdvancedClassTestForgetCommand());
             ClassSelectionMenu.commands().forEach(emCommand::registerCommand);
