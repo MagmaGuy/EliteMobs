@@ -117,10 +117,10 @@ public class DungeonCommands {
                 .replace("$amount", cleared + ""));
     }
 
-    public static void reopenTeleportBrowser(Player player, TeleportMenuSource teleportMenuSource) {
+    public static void reopenTeleportBrowser(Player player, TeleportMenuSource teleportMenuSource, EMPackage from) {
         switch (teleportMenuSource) {
             case INVENTORY -> TeleportsPage.showTeleportInventory(player);
-            case DIALOGUE -> PlayerStatusScreenDialog.showTeleportsDialog(player);
+            case DIALOGUE -> PlayerStatusScreenDialog.showTeleportsDialogAt(player, from);
             case NONE -> {
             }
         }

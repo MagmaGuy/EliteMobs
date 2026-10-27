@@ -164,6 +164,7 @@ public class CommandHandler {
         emCommand.registerCommand(new SpawnTeleportCommand());
         emCommand.registerCommand(new DungeonTeleportCommand());
         emCommand.registerCommand(new DungeonTeleportDialogCommand());
+        emCommand.registerCommand(new TeleportsDialogCommand());
         emCommand.registerCommand(new TrackBossCommand());
         emCommand.registerCommand(new PayCommand());
         emCommand.registerCommand(new AdventurersGuildArgCommand());

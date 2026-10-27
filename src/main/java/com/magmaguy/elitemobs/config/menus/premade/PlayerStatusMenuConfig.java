@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.config.menus.premade;
 
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
+import com.magmaguy.elitemobs.config.contentpackages.ContentPackagesConfigFields.DungeonSizeCategory;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
 import com.magmaguy.elitemobs.playerdata.statusscreen.PlayerStatusScreen;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
@@ -12,7 +13,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public class PlayerStatusMenuConfig extends MenusConfigFields {
     private static final String ROOT_TITLE = "<g:#8B0000:#CC4400:#DAA520>EliteMobs</g> &7Menu";
@@ -109,6 +112,7 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     private static String onBossTrackHover;
     @Getter
     private static String onTeleportHover;
+    private static final Map<DungeonSizeCategory, String> teleportGroupNames = new EnumMap<>(DungeonSizeCategory.class);
 
     @Getter
     private static String indexChestMenuName;
@@ -276,10 +280,33 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
     private static String dialogActiveQuestsFormat;
     @Getter
     private static String dialogBackButton;
+    @Getter
+    private static String dialogTeleportGroupButton;
+    @Getter
+    private static String dialogTeleportGroupBackButton;
 
 
     public PlayerStatusMenuConfig() {
         super("player_status_screen", true);
+    }
+
+    public static String getTeleportGroupName(DungeonSizeCategory size) {
+        String name = teleportGroupNames.get(size);
+        return name != null ? name : defaultTeleportGroupName(size);
+    }
+
+    private static String defaultTeleportGroupName(DungeonSizeCategory size) {
+        return switch (size) {
+            case ADVENTURE -> "&6&lAdventures";
+            case LAIR -> "&c&lLairs";
+            case MINIDUNGEON -> "&e&lMinidungeons";
+            case SANCTUM -> "&b&lSanctums";
+            case DUNGEON -> "&3&lDungeons";
+            case RAID -> "&4&lRaids";
+            case REALM -> "&5&lRealms";
+            case ARENA -> "&d&lArenas";
+            case OTHER -> "&7&lOther";
+        };
     }
 
     private static void indexLineCreator(int line, String text, String hover, String command, FileConfiguration fileConfiguration, File file) {
@@ -916,6 +943,10 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
                 ItemStackGenerator.generateItemStack(Material.END_PORTAL_FRAME,
                         "&6&lEliteMobs Hub", List.of("&7Visit the Adventurer's Guild.", "", "&aClick to teleport!")), true);
         teleportGuildSlot = ConfigurationEngine.setInt(fileConfiguration, "teleportGuildSlot", 49);
+        for (DungeonSizeCategory size : DungeonSizeCategory.values())
+            teleportGroupNames.put(size, ConfigurationEngine.setString(
+                    List.of("Heading for teleport-list dungeons whose size category is " + size.name() + "."),
+                    file, fileConfiguration, "teleportGroupNames." + size.name(), defaultTeleportGroupName(size), true));
 
         bossTrackerChestMenuName = ConfigurationEngine.setString(file, fileConfiguration, "bossTrackerChestMenuName", BOSS_TITLE, true);
 
@@ -1116,6 +1147,12 @@ public class PlayerStatusMenuConfig extends MenusConfigFields {
         dialogTitleTeleports = ConfigurationEngine.setString(
                 List.of("Title for the Teleports dialog section."),
                 file, fileConfiguration, "dialog.titleTeleports", TELEPORTS_TITLE, true);
+        dialogTeleportGroupButton = ConfigurationEngine.setString(
+                List.of("Teleports dialog button that opens one group of dungeons. Use $group for its name and $count for its size."),
+                file, fileConfiguration, "dialog.teleportGroupButton", "$group &7($count)", true);
+        dialogTeleportGroupBackButton = ConfigurationEngine.setString(
+                List.of("Back button on a teleport group, returning to the full teleport list."),
+                file, fileConfiguration, "dialog.teleportGroupBackButton", "← Back to Teleports", true);
 
         dialogTitleCommands = ConfigurationEngine.setString(
                 List.of("Title for the Quick Actions dialog section."),

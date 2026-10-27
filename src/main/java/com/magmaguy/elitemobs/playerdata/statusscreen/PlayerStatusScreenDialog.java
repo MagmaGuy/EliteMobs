@@ -202,38 +202,20 @@ public class PlayerStatusScreenDialog {
             builder.addBody(DialogManager.PlainMessageBody.of(teleportText.toString().trim()).width(DIALOG_WIDTH));
         }
 
-        // Add dungeon teleport buttons
-        for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
-            if (!emPackage.isInstalled() ||
-                    !(emPackage instanceof CombatContent) ||
-                    emPackage.getContentPackagesConfigFields().isEnchantmentChallenge()) continue;
-            if (!emPackage.getContentPackagesConfigFields().isListedInTeleports()) continue;
-
-            String dungeonName = processText(emPackage.getContentPackagesConfigFields().getName());
-            String playerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
-            String hoverInfo;
-            if (playerInfo != null) {
-                hoverInfo = PlayerStatusMenuConfig.getOnTeleportHover() + "\n" +
-                                playerInfo
-                                        .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
-                                        .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
-                                        .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "");
-            } else {
-                hoverInfo = PlayerStatusMenuConfig.getOnTeleportHover();
-            }
-
-            DialogManager.ActionButton button = DialogManager.ActionButton.of(
-                    dungeonName,
-                    new DialogManager.RunCommandAction("/elitemobs dungeontpdialog " +
-                            emPackage.getContentPackagesConfigFields().getFilename())
-            ).width(DIALOG_WIDTH);
-
-            if (hoverInfo != null && !hoverInfo.isEmpty()) {
-                button.tooltip(processText(hoverInfo));
-            }
-
-            builder.columns(1);
-            builder.addAction(button);
+        List<TeleportGroups.Group<EMPackage>> groups = TeleportGroups.current();
+        if (groups.size() > 1 && TeleportGroups.dungeonCount(groups) > TeleportGroups.DIALOG_GROUPING_THRESHOLD) {
+            // Dialogs cannot show headings between buttons, so a long list opens one group at a time.
+            for (TeleportGroups.Group<EMPackage> group : groups)
+                builder.addAction(DialogManager.ActionButton.of(
+                        processText(PlayerStatusMenuConfig.getDialogTeleportGroupButton()
+                                .replace("$group", group.name())
+                                .replace("$count", group.dungeons().size() + "")),
+                        new DialogManager.RunCommandAction("/elitemobs teleportsdialog " + group.key())
+                ).width(DIALOG_WIDTH));
+        } else {
+            for (TeleportGroups.Group<EMPackage> group : groups)
+                for (EMPackage emPackage : group.dungeons())
+                    builder.addAction(dungeonTeleportButton(emPackage));
         }
 
         // Back button
@@ -241,6 +223,68 @@ public class PlayerStatusScreenDialog {
         addBackButton(builder);
 
         return builder;
+    }
+
+    /**
+     * Opens one teleport group, with a button back to the full teleport list.
+     */
+    public static void showTeleportGroupDialog(Player player, String groupKey) {
+        TeleportGroups.Group<EMPackage> group = TeleportGroups.find(groupKey);
+        if (group == null) {
+            showTeleportsDialog(player);
+            return;
+        }
+        DialogManager.MultiActionDialogBuilder builder = new DialogManager.MultiActionDialogBuilder();
+        builder.title(processText(group.name()));
+        for (EMPackage emPackage : group.dungeons())
+            builder.addAction(dungeonTeleportButton(emPackage));
+        builder.columns(1);
+        builder.addAction(DialogManager.ActionButton.of(
+                PlayerStatusMenuConfig.getDialogTeleportGroupBackButton(),
+                new DialogManager.RunCommandAction("/elitemobs teleportsdialog")
+        ).width(DIALOG_WIDTH));
+        DialogManager.sendDialog(player, builder);
+    }
+
+    /**
+     * Reopens the teleport list where a player left it: the group holding the dungeon they backed out of,
+     * when the list is grouped.
+     */
+    public static void showTeleportsDialogAt(Player player, EMPackage emPackage) {
+        List<TeleportGroups.Group<EMPackage>> groups = TeleportGroups.current();
+        if (emPackage != null && groups.size() > 1 && TeleportGroups.dungeonCount(groups) > TeleportGroups.DIALOG_GROUPING_THRESHOLD)
+            for (TeleportGroups.Group<EMPackage> group : groups)
+                if (group.dungeons().contains(emPackage)) {
+                    showTeleportGroupDialog(player, group.key());
+                    return;
+                }
+        showTeleportsDialog(player);
+    }
+
+    private static DialogManager.ActionButton dungeonTeleportButton(EMPackage emPackage) {
+        String dungeonName = processText(emPackage.getContentPackagesConfigFields().getName());
+        String playerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
+        String hoverInfo;
+        if (playerInfo != null) {
+            hoverInfo = PlayerStatusMenuConfig.getOnTeleportHover() + "\n" +
+                            playerInfo
+                                    .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
+                                    .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
+                                    .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "");
+        } else {
+            hoverInfo = PlayerStatusMenuConfig.getOnTeleportHover();
+        }
+
+        DialogManager.ActionButton button = DialogManager.ActionButton.of(
+                dungeonName,
+                new DialogManager.RunCommandAction("/elitemobs dungeontpdialog " +
+                        emPackage.getContentPackagesConfigFields().getFilename())
+        ).width(DIALOG_WIDTH);
+
+        if (hoverInfo != null && !hoverInfo.isEmpty()) {
+            button.tooltip(processText(hoverInfo));
+        }
+        return button;
     }
 
     /**

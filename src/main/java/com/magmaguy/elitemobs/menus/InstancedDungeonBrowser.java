@@ -125,7 +125,8 @@ public class InstancedDungeonBrowser extends EliteMenu {
 
             if (instancedDungeonBrowser.hasBackButton() && event.getSlot() == BACK_SLOT) {
                 event.getWhoClicked().closeInventory();
-                DungeonCommands.reopenTeleportBrowser((Player) event.getWhoClicked(), instancedDungeonBrowser.teleportMenuSource);
+                DungeonCommands.reopenTeleportBrowser((Player) event.getWhoClicked(), instancedDungeonBrowser.teleportMenuSource,
+                        instancedDungeonBrowser.emPackage);
                 return;
             }
 

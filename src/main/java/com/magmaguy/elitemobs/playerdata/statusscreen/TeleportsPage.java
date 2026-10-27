@@ -40,27 +40,29 @@ public class TeleportsPage {
             configTextComponent.addExtra(line);
         }
 
-        //Fills the minidungeon components
+        //Fills the dungeon components, with a heading line before each group when there are several
         int counter = 0;
         ArrayList<TextComponent> textComponents = new ArrayList<>();
+        List<TeleportGroups.Group<EMPackage>> groups = TeleportGroups.current();
 
-        for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
-            if (!emPackage.isInstalled() ||
-                    !(emPackage instanceof CombatContent) ||
-                    emPackage.getContentPackagesConfigFields().isEnchantmentChallenge()) continue;
-            if (!emPackage.getContentPackagesConfigFields().isListedInTeleports()) continue;
-
-            TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(emPackage.getContentPackagesConfigFields().getName() + "\n"));
-            String playerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
-            String hoverMessage = PlayerStatusMenuConfig.getOnTeleportHover() +
-                    (playerInfo != null ? "\n" + playerInfo
-                            .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
-                            .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
-                            .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "") : "");
-            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverMessage).create()));
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + emPackage.getContentPackagesConfigFields().getFilename()));
-            textComponents.add(message);
-            counter++;
+        for (TeleportGroups.Group<EMPackage> group : groups) {
+            if (groups.size() > 1) {
+                textComponents.add(new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(group.name() + "\n")));
+                counter++;
+            }
+            for (EMPackage emPackage : group.dungeons()) {
+                TextComponent message = new TextComponent(PlayerStatusScreen.convertLightColorsToBlack(emPackage.getContentPackagesConfigFields().getName() + "\n"));
+                String playerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
+                String hoverMessage = PlayerStatusMenuConfig.getOnTeleportHover() +
+                        (playerInfo != null ? "\n" + playerInfo
+                                .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
+                                .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
+                                .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "") : "");
+                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverMessage).create()));
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/elitemobs dungeontp " + emPackage.getContentPackagesConfigFields().getFilename()));
+                textComponents.add(message);
+                counter++;
+            }
         }
 
         if (counter == 0) {
@@ -94,29 +96,65 @@ public class TeleportsPage {
         Set<Integer> reservedSlots = new HashSet<>(actions.keySet());
         reservedSlots.add(53);
         Map<Integer, EMPackage> dungeons = new HashMap<>();
-        int slot = 0;
-        for (EMPackage emPackage : EMPackage.getEmPackages().values()) {
-            if (!emPackage.isInstalled() ||
-                    !(emPackage instanceof CombatContent) ||
-                    emPackage.getContentPackagesConfigFields().isEnchantmentChallenge()) continue;
-            if (!emPackage.getContentPackagesConfigFields().isListedInTeleports()) continue;
-
-            while (slot < 53 && reservedSlots.contains(slot)) slot++;
-            if (slot >= 53) break;
-            String chestPlayerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
-            String loreText = chestPlayerInfo != null ? chestPlayerInfo
-                            .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
-                            .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
-                            .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "") : "";
-            inventory.setItem(slot, ItemStackGenerator.generateItemStack(Material.PAPER, emPackage.getContentPackagesConfigFields().getName()
-                    , Collections.singletonList(loreText)));
-            dungeons.put(slot, emPackage);
-            slot++;
+        List<TeleportGroups.Group<EMPackage>> groups = TeleportGroups.current();
+        List<Integer> slots = chestSlots(groups, reservedSlots);
+        int slotIndex = 0;
+        boolean headers = slots.size() > TeleportGroups.dungeonCount(groups);
+        for (TeleportGroups.Group<EMPackage> group : groups) {
+            if (headers) {
+                if (slotIndex >= slots.size()) break;
+                inventory.setItem(slots.get(slotIndex++), ItemStackGenerator.generateItemStack(Material.BOOK, group.name()));
+            }
+            for (EMPackage emPackage : group.dungeons()) {
+                if (slotIndex >= slots.size()) break;
+                int slot = slots.get(slotIndex++);
+                String chestPlayerInfo = emPackage.getContentPackagesConfigFields().getPlayerInfo();
+                String loreText = chestPlayerInfo != null ? chestPlayerInfo
+                                .replace("$bossCount", emPackage.getCustomBossEntityList().size() + "")
+                                .replace("$lowestTier", ((CombatContent) emPackage).getLowestLevel() + "")
+                                .replace("$highestTier", ((CombatContent) emPackage).getHighestLevel() + "") : "";
+                inventory.setItem(slot, ItemStackGenerator.generateItemStack(Material.PAPER, emPackage.getContentPackagesConfigFields().getName()
+                        , Collections.singletonList(loreText)));
+                dungeons.put(slot, emPackage);
+            }
         }
         inventory.setItem(53, PlayerStatusMenuConfig.getBackItem());
         if (requestingPlayer.openInventory(inventory) == null) return;
         StatusInventorySafety.protect(inventory);
         TeleportsPageEvents.pageInventories.put(inventory, new TeleportMenuState(dungeons, actions));
+    }
+
+    /**
+     * Picks the chest slots for the grouped teleport list. Each group gets a heading item and starts on a
+     * fresh row when that all fits; otherwise headings flow inline, and when even that would push dungeons
+     * off the page the headings are dropped so the menu lists as many dungeons as before.
+     */
+    private static List<Integer> chestSlots(List<TeleportGroups.Group<EMPackage>> groups, Set<Integer> reservedSlots) {
+        if (groups.size() > 1) {
+            List<Integer> rowAligned = placeChestSlotsWithHeadings(groups, reservedSlots, true);
+            if (rowAligned != null) return rowAligned;
+            List<Integer> inline = placeChestSlotsWithHeadings(groups, reservedSlots, false);
+            if (inline != null) return inline;
+        }
+        List<Integer> plain = new ArrayList<>();
+        for (int slot = 0; slot < 53; slot++)
+            if (!reservedSlots.contains(slot)) plain.add(slot);
+        return plain.subList(0, Math.min(plain.size(), TeleportGroups.dungeonCount(groups)));
+    }
+
+    private static List<Integer> placeChestSlotsWithHeadings(List<TeleportGroups.Group<EMPackage>> groups,
+                                                             Set<Integer> reservedSlots, boolean rowAligned) {
+        List<Integer> slots = new ArrayList<>();
+        int slot = 0;
+        for (TeleportGroups.Group<EMPackage> group : groups) {
+            if (rowAligned && slot % 9 != 0) slot += 9 - slot % 9;
+            for (int i = 0; i < group.dungeons().size() + 1; i++) {
+                while (slot < 53 && reservedSlots.contains(slot)) slot++;
+                if (slot >= 53) return null;
+                slots.add(slot++);
+            }
+        }
+        return slots;
     }
 
     private static void addAction(Inventory inventory, Map<Integer, String> actions, int slot,

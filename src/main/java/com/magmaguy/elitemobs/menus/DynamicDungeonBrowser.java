@@ -216,7 +216,7 @@ public class DynamicDungeonBrowser extends EliteMenu {
 
             if (browser.hasBackButton() && event.getSlot() == BACK_SLOT) {
                 event.getWhoClicked().closeInventory();
-                DungeonCommands.reopenTeleportBrowser(player, browser.teleportMenuSource);
+                DungeonCommands.reopenTeleportBrowser(player, browser.teleportMenuSource, browser.emPackage);
                 return;
             }
 
