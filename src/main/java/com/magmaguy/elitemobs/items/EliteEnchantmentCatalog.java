@@ -72,7 +72,10 @@ public final class EliteEnchantmentCatalog {
                                 input.actor(), input.target(), () -> com.magmaguy.elitemobs.combatsystem.EnchantmentDamage.apply(
                                         input.attackId(), input.providerFacts(),
                                         input::applyDamage)));
-                    });
+                    },
+                    // Gear powers stay off in worlds ValidWorlds.yml sets to false, when the server asks for that.
+                    actor -> !(actor instanceof org.bukkit.entity.Player player)
+                            || !com.magmaguy.elitemobs.config.ValidWorldsConfig.itemPowersDormant(player));
         else hosted.reload(catalog);
         revision++;
     }

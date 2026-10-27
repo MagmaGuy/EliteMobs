@@ -91,7 +91,8 @@ final class FmmMagicWeaponAdapter
         }
         if (elite == null) {
             application.apply(request.balance().standaloneDamage()
-                    * EliteItemManager.getEliteDamageEnchantmentMultiplier(request.weapon()));
+                    * (com.magmaguy.elitemobs.config.ValidWorldsConfig.itemPowersDormant(request.attacker()) ? 1D
+                    : EliteItemManager.getEliteDamageEnchantmentMultiplier(request.weapon())));
             return;
         }
 
@@ -111,6 +112,15 @@ final class FmmMagicWeaponAdapter
                              com.magmaguy.freeminecraftmodels.api.magic.MagicAttackKind attackKind) {
         com.magmaguy.elitemobs.items.ItemDurability.prepareMagicWeapon(weapon);
         return !EliteItemManager.isOnLastDamage(weapon);
+    }
+
+    /**
+     * Overrides MagicAttackResolver#enchantmentsActive on FMM builds that have it (FMM after 2.13.0); older FMM
+     * builds never call it. Without @Override because EliteMobs compiles against an older FMM API.
+     */
+    public boolean enchantmentsActive(org.bukkit.entity.Player player, ItemStack weapon,
+                                      com.magmaguy.freeminecraftmodels.api.magic.MagicAttackKind attackKind) {
+        return !com.magmaguy.elitemobs.config.ValidWorldsConfig.itemPowersDormant(player);
     }
 
     @Override

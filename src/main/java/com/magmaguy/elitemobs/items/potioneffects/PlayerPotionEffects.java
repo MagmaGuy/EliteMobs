@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.potioneffects;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ValidWorldsConfig;
 import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.items.potioneffects.custom.Harm;
 import com.magmaguy.elitemobs.items.potioneffects.custom.Heal;
@@ -17,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -103,25 +105,34 @@ public class PlayerPotionEffects implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    ElitePlayerInventory inventory = ElitePlayerInventory.playerInventories.get(player.getUniqueId());
-                    if (player.isDead() || inventory == null || PlayerData.getPlayerData(player.getUniqueId()) == null) {
-                        reconcileContinuousPotionEffects(player, Map.of());
-                        continue;
-                    }
-
-                    try {
-                        applyContinuousPotionEffects(inventory.getContinuousPotionEffects(true), player);
-                        failedEquipmentQueries.remove(player.getUniqueId());
-                    } catch (RuntimeException failure) {
-                        reconcileContinuousPotionEffects(player, Map.of());
-                        if (failedEquipmentQueries.add(player.getUniqueId()))
-                            MetadataHandler.PLUGIN.getLogger().log(java.util.logging.Level.WARNING,
-                                    "Could not refresh equipment effects for " + player.getUniqueId(), failure);
-                    }
-                }
+                for (Player player : Bukkit.getOnlinePlayers()) refreshContinuousEffects(player);
             }
         }.runTaskTimer(MetadataHandler.PLUGIN, 20L, 20L);
+    }
+
+    private void refreshContinuousEffects(Player player) {
+        ElitePlayerInventory inventory = ElitePlayerInventory.playerInventories.get(player.getUniqueId());
+        if (player.isDead() || inventory == null || PlayerData.getPlayerData(player.getUniqueId()) == null
+                || ValidWorldsConfig.itemPowersDormant(player)) {
+            reconcileContinuousPotionEffects(player, Map.of());
+            return;
+        }
+
+        try {
+            applyContinuousPotionEffects(inventory.getContinuousPotionEffects(true), player);
+            failedEquipmentQueries.remove(player.getUniqueId());
+        } catch (RuntimeException failure) {
+            reconcileContinuousPotionEffects(player, Map.of());
+            if (failedEquipmentQueries.add(player.getUniqueId()))
+                MetadataHandler.PLUGIN.getLogger().log(java.util.logging.Level.WARNING,
+                        "Could not refresh equipment effects for " + player.getUniqueId(), failure);
+        }
+    }
+
+    /** Gear effects can stop or resume with the world, so settle them on arrival rather than at the next refresh. */
+    @EventHandler
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        if (ValidWorldsConfig.isDisableEliteItemPowersInInvalidWorlds()) refreshContinuousEffects(event.getPlayer());
     }
 
     public static void addOnHitCooldown(Set<UUID> cooldownList, Player player, long delay) {
@@ -310,6 +321,7 @@ public class PlayerPotionEffects implements Listener {
             return;
 
         if (ElitePlayerInventory.playerInventories.get(player.getUniqueId()) == null) return;
+        if (ValidWorldsConfig.itemPowersDormant(player)) return;
 
         LivingEntity damagee;
         if (event.getEntity() instanceof LivingEntity)
