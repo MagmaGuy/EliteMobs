@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.menus.RepairMenu;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
@@ -17,7 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @EnabledIfEnvironmentVariable(named = "NIGHTBREAK_TEMP_TICKET_TESTS", matches = "true")
 class RepairCoinPriceTemporaryTest extends RepairMenuTemporaryFixture {
 
-    private final int halfBroken = Material.DIAMOND_CHESTPLATE.getMaxDurability() / 2;
+    // Read after MockBukkit starts: Material cannot initialize without a server.
+    private int halfBroken;
+
+    @BeforeEach void readDurability() {
+        halfBroken = Material.DIAMOND_CHESTPLATE.getMaxDurability() / 2;
+    }
 
     @Test void halfBrokenLevel100ItemCosts50AndRepairChargesExactlyThat() {
         balance = 120;
