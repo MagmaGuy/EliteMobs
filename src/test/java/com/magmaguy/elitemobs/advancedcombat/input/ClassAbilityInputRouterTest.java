@@ -192,7 +192,7 @@ class ClassAbilityInputRouterTest {
         assertEquals(Event.Result.DENY, click.useItemInHand());
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "jump keeps the chord open for {0}")
     @CsvSource({"MOBILITY", "SIGNATURE", "UTILITY"})
     void jumpLeavesTheChordAndDisplayOpenForTheNextAbility(AbilitySlot nextAbility) throws Exception {
         router.onSwapHands(new PlayerSwapHandItemsEvent(player, null, null));
@@ -304,7 +304,7 @@ class ClassAbilityInputRouterTest {
         return new PlayerInputEvent(player, pressed);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Bedrock sneak, then hotbar, attack or use casts {0}")
     @CsvSource({"MOBILITY", "SIGNATURE", "UTILITY"})
     void bedrockSneakThenHotbarAttackOrUseCastsTheAbility(AbilitySlot ability) {
         input.bedrock = true;
