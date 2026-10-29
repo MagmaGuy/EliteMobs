@@ -9,6 +9,24 @@ npcs:
   - files: [guide_1.yml]
     key: questFileName
     value: [ag_welcome_quest_1.yml, ag_adventurer_training.yml]
+  # Repairs cost coins now and scrappers buy items. Regenerate Kelly and Reggie
+  # while their scrap lines are still the unedited defaults.
+  - files: [scrapper_config.yml]
+    key: dialog
+    value:
+      - Scrappy deals!
+      - Get your scrap here!
+      - 75% chance to work!
+      - There are no refunds.
+      - Recycle, reuse, reduce!
+  - files: [repairman_config.yml]
+    key: greetings
+    value:
+      - Get your items repaired!
+      - Repairing items for scrap!
+      - Turn that scrap into durability!
+      - Need a repair?
+      - Got damaged items?
 
 # Scotty does not spawn with scrolls disabled. Regenerate the old welcome quest
 # without his objective; its replacement no longer matches this rule.
@@ -16,6 +34,12 @@ customquests:
   - files: [ag_welcome_quest_1.yml]
     key: customObjectives.Objective13.filename
     value: scroll_applier_config.yml
+  # Regenerate it while Reggie's line still asks for scrap.
+  - files: [ag_welcome_quest_1.yml]
+    key: customObjectives.Objective8.dialog
+    value:
+      - "&8[&aReggie&8]&f Need your Elite items repaired? Just bring me some scrap, and I'll make them as good as new!"
+      - Remember, the higher the level of your scrap, the better I can repair you Elite item!
 
 # Death's Embrace described its old 20% heal and 60s cooldown before its rebalance.
 skillbonuses:
@@ -29,6 +53,8 @@ menus:
   - files: [skill_bonus_menu.yml]
     key: wandsSlot
     value: 25
+  # The scrapper menu is retired; scrappers open the sell menu.
+  - scrapChance
 
 enchantments:
   - maxLevelV2
@@ -45,9 +71,11 @@ enchantments:
     sha256:
       - 557cf0669a22eef5bd0f2e80fa01bce894631df15ce5494121cd841b851ab648
 
-# Only these plugin defaults regenerate automatically. Match the retired name
-# before the comma in an enchantments list entry; preserve other custom items.
+# Match the retired name before the comma in an enchantments list entry;
+# preserve other custom items.
 customitems:
+  # Elite scrap is retired (repairs cost coins) and no longer regenerates.
+  # Scrap players still hold is recognized by its tags and exchanged for coins.
   - files:
       - elite_scrap_tiny.yml
       - elite_scrap_small.yml
@@ -56,6 +84,14 @@ customitems:
       - elite_scrap_huge.yml
     key: enchantments
     listEntryNames: [repair]
+  - files:
+      - elite_scrap_tiny.yml
+      - elite_scrap_small.yml
+      - elite_scrap_medium.yml
+      - elite_scrap_large.yml
+      - elite_scrap_huge.yml
+    key: consumable.type
+    value: repair_scrap
 
   # Retired shipped books and acquisition items. Custom copies are not matched.
   - files:
