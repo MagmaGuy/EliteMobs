@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptFloat;
 import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptInteger;
 import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptVector;
 import com.magmaguy.elitemobs.utils.PotionEffectTypeUtil;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
 import org.bukkit.Color;
@@ -123,7 +124,7 @@ public class ScriptActionBlueprint {
         this.scriptName = scriptName;
         this.scriptFilename = scriptFilename;
         processMapList(entry);
-        translateText();
+        translateText(entry);
         if (conditionsBlueprint == null)
             conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) null, scriptName, scriptFilename);
         if (scriptTargets == null) scriptTargets = new ScriptTargetsBlueprint(entry, scriptName, scriptFilename);
@@ -138,17 +139,31 @@ public class ScriptActionBlueprint {
      * Content package imports overwrite the files these lines live in, so they are translated by their English rather
      * than by a field in the file. See {@link TranslationsConfig#translateText(String)}.
      */
-    private void translateText() {
+    private void translateText(Map<?, ?> entry) {
         if (actionType == null) return;
         switch (actionType) {
-            case MESSAGE, ACTION_BAR_MESSAGE, BOSS_BAR_MESSAGE -> sValue = TranslationsConfig.translateText(sValue);
+            case MESSAGE, ACTION_BAR_MESSAGE, BOSS_BAR_MESSAGE -> sValue = translated(entry, "svalue", sValue);
             case TITLE_MESSAGE -> {
-                title = TranslationsConfig.translateText(title);
-                subtitle = TranslationsConfig.translateText(subtitle);
+                title = translated(entry, "title", title);
+                subtitle = translated(entry, "subtitle", subtitle);
             }
             default -> {
             }
         }
+    }
+
+    /**
+     * Looks the line up as the author wrote it, because {@code parseString} has already converted its colours, and
+     * converts a translation the same way.
+     */
+    private static String translated(Map<?, ?> entry, String key, String parsed) {
+        for (Map.Entry<?, ?> field : entry.entrySet()) {
+            if (!(field.getKey() instanceof String name) || !name.equalsIgnoreCase(key) || field.getValue() == null) continue;
+            String authored = field.getValue() + "";
+            String translated = TranslationsConfig.translateText(authored);
+            return translated.equals(authored) ? parsed : ChatColorConverter.convert(translated);
+        }
+        return parsed;
     }
 
     private void processMapList(Map<?, ?> entry) {

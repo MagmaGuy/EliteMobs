@@ -4,11 +4,11 @@ import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.magmacore.util.Logger;
 import com.magmaguy.shaded.luaj.vm2.Lua;
 import com.magmaguy.shaded.luaj.vm2.LuaString;
+import com.magmaguy.shaded.luaj.vm2.LuaValue;
 import com.magmaguy.shaded.luaj.vm2.ast.*;
 import com.magmaguy.shaded.luaj.vm2.parser.LuaParser;
-import com.magmaguy.shaded.luaj.vm2.parser.LuaParserTokenManager;
+import com.magmaguy.shaded.luaj.vm2.parser.LuaParserConstants;
 import com.magmaguy.shaded.luaj.vm2.parser.ParseException;
-import com.magmaguy.shaded.luaj.vm2.parser.SimpleCharStream;
 import com.magmaguy.shaded.luaj.vm2.parser.TokenMgrError;
 
 import java.io.StringReader;
@@ -25,7 +25,8 @@ import java.util.*;
  * A literal counts as text when it reaches the message argument of {@code send_message}, {@code show_action_bar} or
  * {@code show_boss_bar}, or the title and subtitle of {@code show_title}: directly, through {@code ..}, as a value of
  * {@code and}/{@code or}, or through a local only ever assigned that literal ({@code PREFIX .. "line"}). Text built at
- * run time stays English.
+ * run time stays English, and so does a file LuaJ's parser cannot read: it rejects {@code \'} inside a single-quoted
+ * string, which the compiler accepts.
  */
 final class LuaScriptText {
 
@@ -40,37 +41,39 @@ final class LuaScriptText {
 
     static String translate(String source, String fileName) {
         if (TranslationsConfig.isEnglish()) return source;
-        // LuaJ stores columns as shorts.
-        if (source.lines().anyMatch(line -> line.length() >= Short.MAX_VALUE)) return source;
+        List<Integer> lineStarts = new ArrayList<>();
+        for (int start = 0; ; start = source.indexOf('\n', start) + 1) {
+            lineStarts.add(start);
+            int end = source.indexOf('\n', start);
+            // LuaJ stores columns as shorts.
+            if ((end < 0 ? source.length() : end) - start >= Short.MAX_VALUE) return source;
+            if (end < 0) break;
+        }
         Collection<Exp.Constant> literals;
         try {
             literals = findTextLiterals(source);
         } catch (ParseException | TokenMgrError | RuntimeException unreadable) {
-            // The compiler reports a broken script on its own; it just stays English.
+            Logger.warn("Could not read the text of Lua power " + fileName + " for translation (" + unreadable.getMessage()
+                    + "); it stays in English.");
             return source;
         }
 
-        int[] lineStarts = source.lines().mapToInt(String::length).toArray();
-        for (int i = 0, offset = 0; i < lineStarts.length; i++) {
-            int length = lineStarts[i];
-            lineStarts[i] = offset;
-            offset += length + 1;
-        }
         Map<String, String> translations = new HashMap<>();
         TreeMap<Integer, Replacement> replacements = new TreeMap<>();
         for (Exp.Constant literal : literals) {
             String english = literal.value.tojstring();
             String translated = translations.computeIfAbsent(english, TranslationsConfig::translateText);
             // A literal passed without parentheses, f"text", carries no position and stays English.
-            if (translated.equals(english) || literal.beginLine <= 0 || literal.endLine > lineStarts.length) continue;
-            int start = lineStarts[literal.beginLine - 1] + literal.beginColumn - 1;
-            int end = lineStarts[literal.endLine - 1] + literal.endColumn;
-            if (start < 0 || end > source.length() || start >= end
-                    || "'\"[".indexOf(source.charAt(start)) < 0 || "'\"]".indexOf(source.charAt(end - 1)) < 0) {
+            if (translated.equals(english) || literal.beginLine <= 0) continue;
+            int start = offset(source, lineStarts, literal.beginLine, literal.beginColumn);
+            int last = offset(source, lineStarts, literal.endLine, literal.endColumn);
+            // LuaJ starts a local's initial value at the token before it, the = or the , of the assignment.
+            while (start >= 0 && start < last && "'\"[".indexOf(source.charAt(start)) < 0) start++;
+            if (start < 0 || last <= start || !isLiteral(source.substring(start, last + 1), literal.value)) {
                 Logger.warn("Could not place translated text in Lua power " + fileName + "; it stays in English.");
                 return source;
             }
-            replacements.put(start, new Replacement(end, quote(translated)));
+            replacements.put(start, new Replacement(last + 1, quote(translated)));
         }
 
         StringBuilder translatedSource = new StringBuilder(source);
@@ -79,8 +82,27 @@ final class LuaScriptText {
         return translatedSource.toString();
     }
 
+    /** Whether the text is exactly one string literal with this value, so a replacement can only ever cover it. */
+    private static boolean isLiteral(String text, LuaValue value) {
+        try {
+            LuaParser parser = new LuaParser(new StringReader(text));
+            return parser.Str().raweq(value) && parser.getNextToken().kind == LuaParserConstants.EOF;
+        } catch (ParseException | TokenMgrError | RuntimeException notALiteral) {
+            return false;
+        }
+    }
+
+    /** The index of the character LuaJ reports at this line and column, or -1. LuaJ counts a tab as one column. */
+    private static int offset(String source, List<Integer> lineStarts, int line, int column) {
+        if (line < 1 || line > lineStarts.size() || column < 1) return -1;
+        int start = lineStarts.get(line - 1);
+        int end = source.indexOf('\n', start);
+        int index = start + column - 1;
+        return index < (end < 0 ? source.length() : end) ? index : -1;
+    }
+
     private static Collection<Exp.Constant> findTextLiterals(String source) throws ParseException {
-        Chunk chunk = new LuaParser(new LuaParserTokenManager(new SourceStream(source))).Chunk();
+        Chunk chunk = new LuaParser(new StringReader(source)).Chunk();
         chunk.accept(new NameResolver());
 
         Map<Variable, Exp.Constant> constantLocals = new IdentityHashMap<>();
@@ -143,13 +165,5 @@ final class LuaScriptText {
     }
 
     private record Replacement(int end, String literal) {
-    }
-
-    /** LuaJ's lexer counts a tab as eight columns; one column per character lets positions index the source. */
-    private static final class SourceStream extends SimpleCharStream {
-        SourceStream(String source) {
-            super(new StringReader(source));
-            tabSize = 1;
-        }
     }
 }
