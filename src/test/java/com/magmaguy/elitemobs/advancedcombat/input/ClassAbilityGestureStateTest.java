@@ -137,6 +137,18 @@ class ClassAbilityGestureStateTest {
     }
 
     @Test
+    void jumpSelectsMobilityOnlyInsideAnOpenWindow() {
+        ClassAbilityGestureState sneak = ClassAbilityGestureState.closed().pressSneak(600).next();
+        ClassAbilityGestureState.Transition jump = sneak.jump(600 + ClassAbilityGestureState.SNEAK_WINDOW_TICKS);
+
+        assertEquals(MOBILITY, jump.outcome());
+        assertTrue(jump.consumesInput());
+        assertFalse(jump.next().isOpenAt(615));
+        assertEquals(PASS_THROUGH, sneak.jump(601 + ClassAbilityGestureState.SNEAK_WINDOW_TICKS).outcome());
+        assertEquals(PASS_THROUGH, ClassAbilityGestureState.closed().jump(600).outcome());
+    }
+
+    @Test
     void plainFAfterExpiryStartsANewChord() {
         ClassAbilityGestureState open = ClassAbilityGestureState.closed()
                 .pressF(500, false)

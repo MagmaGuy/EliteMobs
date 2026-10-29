@@ -8,6 +8,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Input;
 import org.bukkit.Server;
 import org.bukkit.Statistic;
 import org.bukkit.block.BlockFace;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInputEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerStatisticIncrementEvent;
@@ -254,8 +256,52 @@ class ClassAbilityInputRouterTest {
         router.onSneak(sneak);
 
         assertTrue(router.isGestureOpen(player.getUniqueId()));
-        assertEquals(List.of("[Slot 1] Blink  [Attack] Arcane Bolt  [Use] Mana Ward"), actionBars);
+        assertEquals(List.of("[Jump] Blink  [Attack] Arcane Bolt  [Use] Mana Ward"), actionBars);
         assertFalse(sneak.isCancelled());
+    }
+
+    @Test
+    void bedrockJumpInsideTheSneakWindowCastsMobility() {
+        input.bedrock = true;
+        router.onSneak(new PlayerToggleSneakEvent(player, true));
+        router.onJump(keys(true, true));
+
+        assertEquals(List.of(AbilitySlot.MOBILITY), input.usedSlots);
+        assertFalse(router.isGestureOpen(player.getUniqueId()));
+    }
+
+    @Test
+    void bedrockJumpCastsOnlyOnAFreshPress() {
+        input.bedrock = true;
+        // Jump pressed with the opening sneak: the input arrives first, so the jump is already held.
+        router.onJump(keys(true, true));
+        router.onSneak(new PlayerToggleSneakEvent(player, true));
+        // Another key changing while jump stays down is not a press either.
+        router.onJump(keys(true, false));
+        assertEquals(List.of(), input.usedSlots);
+        assertTrue(router.isGestureOpen(player.getUniqueId()));
+
+        router.onJump(keys(false, false));
+        router.onJump(keys(true, false));
+        assertEquals(List.of(AbilitySlot.MOBILITY), input.usedSlots);
+    }
+
+    @Test
+    void javaJumpInsideTheFWindowCastsNothing() {
+        router.onSwapHands(new PlayerSwapHandItemsEvent(player, null, null));
+        router.onJump(keys(true, false));
+
+        assertEquals(List.of(), input.usedSlots);
+        assertTrue(router.isGestureOpen(player.getUniqueId()));
+    }
+
+    private PlayerInputEvent keys(boolean jump, boolean sneak) {
+        Input pressed = proxy(Input.class, (proxy, method, arguments) -> switch (method.getName()) {
+            case "isJump" -> jump;
+            case "isSneak" -> sneak;
+            default -> defaultValue(method.getReturnType());
+        });
+        return new PlayerInputEvent(player, pressed);
     }
 
     @ParameterizedTest
