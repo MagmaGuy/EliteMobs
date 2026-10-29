@@ -62,6 +62,7 @@ import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
 import com.magmaguy.elitemobs.quests.CustomQuest;
 import com.magmaguy.elitemobs.quests.QuestLockoutHandler;
 import com.magmaguy.elitemobs.quests.QuestTracking;
+import com.magmaguy.elitemobs.quests.RetiredNPCObjectives;
 import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.quests.menus.QuestInventoryMenu;
 import com.magmaguy.elitemobs.quests.objectives.ArenaObjective;
@@ -320,6 +321,7 @@ public class EventsRegistrer {
         register(new CustomFetchObjective.CustomFetchObjectiveEvents());
         register(new ArenaObjective.ArenaObjectiveEvents());
         register(new QuestAcceptEvent.QuestAcceptEventHandler());
+        register(new RetiredNPCObjectives());
         register(new ClassUnlockObjective.Events());
         register(new QuestCompleteEvent.QuestCompleteEventHandler());
         register(new QuestObjectivesCompletedEvent.QuestObjectivesCompletedEventHandler());

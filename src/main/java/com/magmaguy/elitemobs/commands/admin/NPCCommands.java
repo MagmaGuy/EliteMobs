@@ -13,7 +13,8 @@ public class NPCCommands {
     public static void set(Player player, String npcFileName) {
 
         NPCsConfigFields npCsConfigFields = NPCsConfig.getNpcEntities().get(npcFileName);
-        if (npCsConfigFields == null) {
+        // Retired scrap roles cannot be placed; enabling one would bring back an NPC with nothing to do.
+        if (npCsConfigFields == null || npCsConfigFields.isRetiredRole()) {
             player.sendMessage(CommandMessagesConfig.getInvalidNpcFilenameMessage());
             return;
         }

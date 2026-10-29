@@ -129,18 +129,6 @@ public class NPCInteractions implements Listener {
                         PlayerPreTeleportEvent.teleportPlayer(player, previousLocation);
                 }
                 break;
-            case SCRAPPER:
-                // Scrap is retired; scrappers buy unwanted elite items and old scrap for coins instead.
-                if (player.hasPermission("elitemobs.scrap.npc")) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            SellMenu sellMenu = new SellMenu();
-                            sellMenu.constructSellMenu(player);
-                        }
-                    }.runTaskLater(MetadataHandler.PLUGIN, 1);
-                }
-                break;
             case REPAIRMAN:
                 if (player.hasPermission("elitemobs.repair.npc")) {
                     new BukkitRunnable() {
@@ -186,14 +174,6 @@ public class NPCInteractions implements Listener {
                         player.performCommand(npcEntity.getNPCsConfigFields().getCommand());
                     }
                 }.runTaskLater(MetadataHandler.PLUGIN, 1);
-                break;
-            case ENHANCER:
-            case REFINER:
-            case SMELTER:
-                player.sendMessage(CommandMessagesConfig.getNpcFeatureReplacedMessage());
-                if (player.isOp() || player.hasPermission("elitemobs.*")) {
-                    player.sendMessage(CommandMessagesConfig.getNpcRemoveInstructions());
-                }
                 break;
             case ENCHANTER:
                 if (player.hasPermission("elitemobs.enchant.npc"))
@@ -313,11 +293,7 @@ public class NPCInteractions implements Listener {
         NONE,
         SELL,
         TELEPORT_BACK,
-        SCRAPPER,
-        SMELTER,
         REPAIRMAN,
-        ENHANCER,
-        REFINER,
         UNBINDER,
         ARENA_MASTER,
         COMMAND,

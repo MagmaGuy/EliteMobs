@@ -368,10 +368,6 @@ public class CommandMessagesConfig extends ConfigurationFile {
     private static String npcFeatureComingSoonMessage;
     @Getter
     private static String npcCannotRenameMessage;
-    @Getter
-    private static String npcFeatureReplacedMessage;
-    @Getter
-    private static String npcRemoveInstructions;
 
     // SharedLootTable messages
     @Getter
@@ -1069,12 +1065,6 @@ public class CommandMessagesConfig extends ConfigurationFile {
         npcCannotRenameMessage = ConfigurationEngine.setString(
                 List.of("Sets the message sent when a player tries to rename an NPC"),
                 file, fileConfiguration, "npcCannotRenameMessage", "[EliteMobs] You can't rename NPCs using name tags!", true);
-        npcFeatureReplacedMessage = ConfigurationEngine.setString(
-                List.of("Sets the message sent when a player interacts with a deprecated NPC (enhancer/refiner/smelter)"),
-                file, fileConfiguration, "npcFeatureReplacedMessage", "&8[EliteMobs] &cThis feature has been replaced! This NPC should be removed by an admin as soon as possible.", true);
-        npcRemoveInstructions = ConfigurationEngine.setString(
-                List.of("Sets the instructions sent to admins on how to remove a deprecated NPC"),
-                file, fileConfiguration, "npcRemoveInstructions", "&2To remove this NPC, use the command &6/em remove &2and hit the NPC!", true);
 
         // SharedLootTable messages
         lootVoteSeparator = ConfigurationEngine.setString(

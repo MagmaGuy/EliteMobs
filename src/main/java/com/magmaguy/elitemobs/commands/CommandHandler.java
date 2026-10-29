@@ -139,7 +139,6 @@ public class CommandHandler {
         emCommand.registerCommand(new EliteScrollCommand());
         emCommand.registerCommand(new ScrollGetCommand());
         emCommand.registerCommand(new ScrollGiveCommand());
-        emCommand.registerCommand(new ScrapCommand());
         emCommand.registerCommand(new UnbindCommand());
         emCommand.registerCommand(new MoneyCheckCommand());
         emCommand.registerCommand(new QuestAcceptCommand());

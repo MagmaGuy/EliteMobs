@@ -9,16 +9,22 @@ npcs:
   - files: [guide_1.yml]
     key: questFileName
     value: [ag_welcome_quest_1.yml, ag_adventurer_training.yml]
-  # Repairs cost coins now and scrappers buy items. Regenerate Kelly and Reggie
-  # while their scrap lines are still the unedited defaults.
+  # Scrap is retired with its scrapper, enhancer, refiner and smelter NPCs, which
+  # no longer spawn. Archive EliteMobs' own copies of them, edited or not.
   - files: [scrapper_config.yml]
-    key: dialog
-    value:
-      - Scrappy deals!
-      - Get your scrap here!
-      - 75% chance to work!
-      - There are no refunds.
-      - Recycle, reuse, reduce!
+    key: interactionType
+    value: SCRAPPER
+  - files: [enhancer_config.yml]
+    key: interactionType
+    value: ENHANCER
+  - files: [refiner_config.yml]
+    key: interactionType
+    value: REFINER
+  - files: [smelter.yml]
+    key: interactionType
+    value: SMELTER
+  # Repairs cost coins now. Regenerate Reggie while his greetings still offer
+  # repairs for scrap.
   - files: [repairman_config.yml]
     key: greetings
     value:
@@ -34,7 +40,11 @@ customquests:
   - files: [ag_welcome_quest_1.yml]
     key: customObjectives.Objective13.filename
     value: scroll_applier_config.yml
-  # Regenerate it while Reggie's line still asks for scrap.
+  # Kelly is gone, so her talk-to objective could never be finished. Regenerate
+  # the quest without it, edited or not, and while Reggie's line asks for scrap.
+  - files: [ag_welcome_quest_1.yml]
+    key: customObjectives.Objective9.filename
+    value: scrapper_config.yml
   - files: [ag_welcome_quest_1.yml]
     key: customObjectives.Objective8.dialog
     value:
@@ -53,7 +63,7 @@ menus:
   - files: [skill_bonus_menu.yml]
     key: wandsSlot
     value: 25
-  # The scrapper menu is retired; scrappers open the sell menu.
+  # The scrapper menu is retired with scrap.
   - scrapChance
 
 enchantments:

@@ -50,6 +50,11 @@ public class NPCsConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private NPCInteractions.NPCInteractionType interactionType = NPCInteractions.NPCInteractionType.NONE;
+    /** Roles of the retired scrap system. Content that still ships these NPCs keeps its files, but they never spawn. */
+    private static final java.util.Set<String> RETIRED_ROLES = java.util.Set.of("SCRAPPER", "ENHANCER", "REFINER", "SMELTER");
+    /** True when this NPC's interactionType is a retired scrap role, so it stays switched off. */
+    @Getter
+    private boolean retiredRole = false;
     @Getter
     @Setter
     private double timeout = 0;
@@ -217,7 +222,14 @@ public class NPCsConfigFields extends CustomConfigFields {
         this.farewell = translatable(filename, "farewell", processStringList("farewell", farewell, new ArrayList<>(), true));
         this.canTalk = processBoolean("canTalk", canTalk, true, true);
         this.activationRadius = processDouble("activationRadius", activationRadius, 3, true);
-        this.interactionType = processEnum("interactionType", interactionType, NPCInteractions.NPCInteractionType.NONE, NPCInteractions.NPCInteractionType.class, true);
+        String configuredRole = fileConfiguration.getString("interactionType");
+        retiredRole = configuredRole != null && RETIRED_ROLES.contains(configuredRole.toUpperCase(Locale.ROOT));
+        if (retiredRole) {
+            // Switched off in memory only; the file is left as authored so content packages stay unmodified.
+            isEnabled = false;
+            interactionType = NPCInteractions.NPCInteractionType.NONE;
+        } else
+            this.interactionType = processEnum("interactionType", interactionType, NPCInteractions.NPCInteractionType.NONE, NPCInteractions.NPCInteractionType.class, true);
         this.timeout = processDouble("timeout", timeout, 0, false);
         this.noPreviousLocationMessage = translatable(filename, "noPreviousLocationMessage", processString("noPreviousLocationMessage", noPreviousLocationMessage, "", false));
         this.questFilenames = processStringList("questFileName", questFilenames, new ArrayList<>(), false);

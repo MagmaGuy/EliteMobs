@@ -177,9 +177,6 @@ permissions:
   elitemobs.respawn.force:
     description: Allows admins to force respawn all regional bosses
     default: op
-  elitemobs.scrap.command:
-    description: Allows players to use the scrap command, which opens the sell menu
-    default: true
   elitemobs.setup:
     description: Allows admins to use the setup commands
     default: op
@@ -240,9 +237,6 @@ permissions:
   elitemobs.back.npc:
     description: Allows players to talk to the back teleport npc
     default: true
-  elitemobs.scrap.npc:
-    description: Allows players to talk to the scrap npc, who buys items and old scrap for coins
-    default: true
   elitemobs.repair.npc:
     description: Allows players to talk to the repair npc
     default: true
@@ -293,7 +287,6 @@ permissions:
       elitemobs.quit: true
       elitemobs.rank.command: true
       elitemobs.repair.command: true
-      elitemobs.scrap.command: true
       elitemobs.shareitem: true
       elitemobs.shop.custom: true
       elitemobs.shop.dynamic: true
@@ -306,7 +299,6 @@ permissions:
       elitemobs.shop.custom.npc: true
       elitemobs.shop.sell.npc: true
       elitemobs.back.npc: true
-      elitemobs.scrap.npc: true
       elitemobs.repair.npc: true
       elitemobs.unbind.npc: true
       elitemobs.enchant.npc: true
