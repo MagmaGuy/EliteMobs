@@ -7,6 +7,7 @@ import com.magmaguy.elitemobs.config.powers.PowersConfigFields.PowerType;
 import com.magmaguy.elitemobs.config.translations.TranslationCsvParser;
 import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
+import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.shaded.luaj.vm2.LuaTable;
 import com.magmaguy.shaded.luaj.vm2.Varargs;
 import com.magmaguy.shaded.luaj.vm2.lib.VarArgFunction;
@@ -42,6 +43,10 @@ class ScriptTextTranslationTemporaryTest {
 
     private static final Path WORKSPACE = Path.of("..").toAbsolutePath().normalize();
     private static final String BOILER_LINE = "&6[Living Boiler] &fLet my steam boil your skin!";
+    private static final String GRADIENT_TITLE = "<gradient:#FCA5A5:#DC2626>Phase 2</gradient>";
+    // A text call whose message starts with a string literal; such a file must register at least one row.
+    private static final Pattern LITERAL_TEXT_CALL =
+            Pattern.compile(":(send_message|show_action_bar|show_boss_bar|show_title)\\s*\\(\\s*['\"\\[]");
 
     private JavaPlugin previousPlugin;
     private String previousLanguage;
@@ -108,7 +113,7 @@ class ScriptTextTranslationTemporaryTest {
                 "Untranslated line",
                 "Wave 3",
                 "BLOCK_NOTE_BLOCK_HARP"), shown(load(power)));
-        assertEquals(BOILER_LINE, airship().get(0).getSValue());
+        assertEquals(ChatColorConverter.convert(BOILER_LINE), airship().get(0).getSValue());
         TranslationsConfig.shutdown();
         assertFalse(Files.exists(translations), "an English server writes no translation files");
     }
@@ -117,22 +122,24 @@ class ScriptTextTranslationTemporaryTest {
     void eliteScriptTextActionsAreTranslatedOncePerLine() throws Exception {
         Map<String, String> french = Map.of(
                 BOILER_LINE, "&6[Chaudière vivante] &fQue ma vapeur te brûle la peau !",
-                "&cPhase 2", "&cPhase deux",
+                GRADIENT_TITLE, "<gradient:#FCA5A5:#DC2626>Phase deux</gradient>",
                 "&eThe steam rises!", "&eLa vapeur monte !",
                 "$player is boiling", "$player bout",
                 "Boiler pressure", "Pression de $boss");
         translateTo(this::airship, french::get);
 
         List<ScriptActionBlueprint> actions = airship();
-        assertEquals("&6[Chaudière vivante] &fQue ma vapeur te brûle la peau !", actions.get(0).getSValue());
-        assertEquals("&6[Chaudière vivante] &fQue ma vapeur te brûle la peau !", actions.get(1).getSValue());
-        assertEquals("&cPhase deux", actions.get(2).getTitle());
-        assertEquals("&eLa vapeur monte !", actions.get(2).getSubtitle());
+        String boiler = ChatColorConverter.convert("&6[Chaudière vivante] &fQue ma vapeur te brûle la peau !");
+        assertEquals(boiler, actions.get(0).getSValue());
+        assertEquals(boiler, actions.get(1).getSValue());
+        assertEquals(ChatColorConverter.convert("<gradient:#FCA5A5:#DC2626>Phase deux</gradient>"), actions.get(2).getTitle());
+        assertEquals(ChatColorConverter.convert("&eLa vapeur monte !"), actions.get(2).getSubtitle());
         assertEquals("$player bout", actions.get(3).getSValue());
         assertEquals("Boiler pressure", actions.get(4).getSValue(), "a translation naming an unknown placeholder is refused");
         assertEquals("minecraft:block.smoker.smoke", actions.get(5).getSValue());
 
         List<String> rows = scriptTextEnglish();
+        assertTrue(rows.contains(GRADIENT_TITLE), "translators see the line as authored: " + rows);
         assertEquals(1, Collections.frequency(rows, BOILER_LINE), "the same line in two files is one row");
         assertFalse(rows.contains("minecraft:block.smoker.smoke"), "a sound name is not text");
         assertEquals(french.size(), rows.size(), "one row per distinct line: " + rows);
@@ -149,6 +156,8 @@ class ScriptTextTranslationTemporaryTest {
 
         assertEquals(english != null, translated != null, "translation changed whether the power loads");
         if (english == null) return;
+        if (LITERAL_TEXT_CALL.matcher(Files.readString(file.toPath())).find())
+            assertFalse(scriptTextEnglish().isEmpty(), "a literal passed to a text call registered no row");
         if (!scriptTextEnglish().isEmpty())
             assertNotEquals(english.getLuaPowerDefinition().getSource(), translated.getLuaPowerDefinition().getSource(),
                     "registered text was not placed in the source (the loader fell back to English)");
@@ -203,7 +212,7 @@ class ScriptTextTranslationTemporaryTest {
                 action("the_airship_boiler_steam_cloud.yml", Map.of("action", "MESSAGE", "sValue", BOILER_LINE)),
                 action("another_boiler.yml", Map.of("action", "MESSAGE", "sValue", BOILER_LINE)),
                 action("the_airship_boiler_steam_cloud.yml",
-                        Map.of("action", "TITLE_MESSAGE", "title", "&cPhase 2", "subtitle", "&eThe steam rises!")),
+                        Map.of("action", "TITLE_MESSAGE", "title", GRADIENT_TITLE, "subtitle", "&eThe steam rises!")),
                 action("the_airship_boiler_steam_cloud.yml", Map.of("action", "ACTION_BAR_MESSAGE", "sValue", "$player is boiling")),
                 action("the_airship_boiler_steam_cloud.yml", Map.of("action", "BOSS_BAR_MESSAGE", "sValue", "Boiler pressure")),
                 action("the_airship_boiler_steam_cloud.yml",
@@ -226,7 +235,7 @@ class ScriptTextTranslationTemporaryTest {
                  api_version = 1,
                  on_spawn = function(c)
                 \tc.player:send_message(PREFIX .. "&fMe had that fart in for THREE WEEKS!")
-                \tc.player:send_message('It\\'s "boiling"')
+                \tc.player:send_message("It's \\"boiling\\"")
                 \tif MODE == 'Hot' then c.player:send_message('Hot') end
                 \tc.player:show_title("Steam rises", 'The boiler wakes', 10, 40, 10)
                 \tc.player:send_message([[Long
