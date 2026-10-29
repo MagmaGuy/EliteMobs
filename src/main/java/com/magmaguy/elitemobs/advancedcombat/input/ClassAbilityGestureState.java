@@ -9,9 +9,9 @@ import java.util.Objects;
  * Hotbar keys 1, 2 and 3 select mobility, signature and utility. Keys 7, 8 and 9 mirror those
  * bindings so a player can still activate the ability assigned to their already-selected slot,
  * which a vanilla client does not report as a slot change. Left click selects signature;
- * right click selects utility inside the window. Jumping does not change this state.
- * Bedrock clients have no F key, so for them starting to sneak opens a longer window; mobility
- * is then a hotbar selection, since a second sneak is already a double-tap for sneak enchantments.
+ * right click selects utility inside the window. Bedrock clients have no F key, so for them starting
+ * to sneak opens a longer window, and a jump or a hotbar selection is mobility, since a second sneak
+ * is already a double-tap for sneak enchantments. The router reports jumps from Bedrock clients only.
  * The state contains no
  * Bukkit objects, which keeps timing and precedence testable without a server.</p>
  */
@@ -60,6 +60,11 @@ public final class ClassAbilityGestureState {
     /** Resolves a right click while the F chord is open: it selects utility. */
     public Transition rightClick(long currentTick) {
         return inWindowSelection(currentTick, Outcome.UTILITY);
+    }
+
+    /** Resolves a jump while the Bedrock window is open: it selects mobility. */
+    public Transition jump(long currentTick) {
+        return inWindowSelection(currentTick, Outcome.MOBILITY);
     }
 
     private Transition inWindowSelection(long currentTick, Outcome outcome) {

@@ -13,8 +13,8 @@ import java.util.UUID;
 /** Chat onboarding; only the prompt throttle is session-scoped, milestones live in the class store. */
 public final class ClassSkillTutorial {
     public static final String CONTROLS = "&7F,F: Mobility | F+LMB: Signature | F+RMB: Utility";
-    /** Bedrock has no F key: sneaking opens the window, then a hotbar slot, an attack or a use picks the ability. */
-    public static final String BEDROCK_CONTROLS = "&7Sneak, then Slot 1: Mobility | Attack: Signature | Use: Utility";
+    /** Bedrock has no F key: sneaking opens the window, then a jump, an attack or a use picks the ability. */
+    public static final String BEDROCK_CONTROLS = "&7Sneak, then Jump: Mobility | Attack: Signature | Use: Utility";
     private final Set<UUID> prompted = new HashSet<>();
 
     public void prompt(Player player, ClassProgressionModule progression, boolean waiting) {

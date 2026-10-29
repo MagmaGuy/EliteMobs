@@ -16,6 +16,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInputEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -36,10 +37,11 @@ import java.util.UUID;
 /**
  * Interprets the F-key ability layer without owning combat behavior.
  * F,F selects mobility, F+left-click signature and F+right-click utility.
- * Hotbar inputs also work inside the open chord. Jumping is never a chord input.
+ * Hotbar inputs also work inside the open chord. Jumping is not a Java chord input.
  * Sneak-double-F toggles
  * the layer outside managed content when permitted. Bedrock has no F-key input, so starting to
- * sneak opens the window for Bedrock players instead, and /em class controls is their toggle.
+ * sneak opens the window for Bedrock players instead, a jump inside it is their mobility, and
+ * /em class controls is their toggle.
  */
 public final class ClassAbilityInputRouter implements Listener {
 
@@ -50,6 +52,8 @@ public final class ClassAbilityInputRouter implements Listener {
     private final Map<UUID, PendingGesture> pendingGestures = new HashMap<>();
     private final Map<UUID, RecentDispatch> recentDispatches = new HashMap<>();
     private final Set<UUID> dispatchingAbilities = new HashSet<>();
+    // Players whose jump key is down, so only a fresh press casts, not a held jump or another key changing.
+    private final Set<UUID> heldJumps = new HashSet<>();
     private long nextGestureGeneration;
 
     public ClassAbilityInputRouter(Plugin plugin, ClassAbilityInput input) {
@@ -80,6 +84,7 @@ public final class ClassAbilityInputRouter implements Listener {
         controlMode.clearAll();
         recentDispatches.clear();
         dispatchingAbilities.clear();
+        heldJumps.clear();
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -139,6 +144,24 @@ public final class ClassAbilityInputRouter implements Listener {
         closeGesture(player);
         if (action != ClassControlMode.FAction.TOGGLE_BLOCKED) input.onControlModeChanged(player);
         sendControlFeedback(player, action, input.fLayerSupported(player));
+    }
+
+    /**
+     * A jump inside the Bedrock window casts mobility. Jump is one button on controller, touch and keyboard, where
+     * reaching hotbar slot 1 on a controller takes several bumper presses. The jump itself still happens: input
+     * events cannot be cancelled and the client already moved. Java players keep F,F.
+     */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onJump(PlayerInputEvent event) {
+        Player player = event.getPlayer();
+        if (!event.getInput().isJump()) {
+            heldJumps.remove(player.getUniqueId());
+            return;
+        }
+        if (!heldJumps.add(player.getUniqueId())) return;
+        PendingGesture pending = pendingGestures.get(player.getUniqueId());
+        if (pending == null || input.fLayerSupported(player)) return;
+        applyGestureTransition(player, pending.state().jump(MonotonicTickClock.currentTick()));
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -228,6 +251,7 @@ public final class ClassAbilityInputRouter implements Listener {
         Player player = event.getPlayer();
         clearPlayer(player);
         controlMode.clear(player.getUniqueId());
+        heldJumps.remove(player.getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -256,7 +280,7 @@ public final class ClassAbilityInputRouter implements Listener {
         ActionBarCompositor.show(
                 player,
                 ActionBarCompositor.Source.ABILITY_INPUT,
-                ChatColor.GRAY + "[" + (javaKeys ? "" : "Slot ") + (heldSlot == 0 ? "7" : "1") + (javaKeys ? "/F] " : "] ")
+                ChatColor.GRAY + "[" + (javaKeys ? (heldSlot == 0 ? "7" : "1") + "/F" : "Jump") + "] "
                         + ChatColor.WHITE
                         + input.abilityName(player, AbilitySlot.MOBILITY)
                         + ChatColor.GRAY + "  [" + (javaKeys ? (heldSlot == 1 ? "8" : "2") + "/LMB" : "Attack") + "] "
