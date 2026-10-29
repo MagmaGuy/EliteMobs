@@ -43,6 +43,8 @@ public class DefaultConfig extends ConfigurationFile {
     @Getter
     private static boolean preventVanillaReinforcementsForEliteEntities;
     @Getter
+    private static boolean hideEliteDeathsFromConsole;
+    @Getter
     private static boolean doRegenerateContainers;
     @Getter
     private static int defaultTransitiveBlockLimiter;
@@ -184,6 +186,11 @@ public class DefaultConfig extends ConfigurationFile {
         preventVanillaReinforcementsForEliteEntities = ConfigurationEngine.setBoolean(
                 List.of("Sets if elites will prevent spawning vanilla reinforcements, such as for the Zombie reinforcement feature."),
                 fileConfiguration, "preventVanillaReinforcementsForEliteEntities", true);
+        hideEliteDeathsFromConsole = ConfigurationEngine.setBoolean(
+                List.of("Sets if EliteMobs hides Minecraft's 'Named entity ... died' console line for elites and bosses.",
+                        "Minecraft logs that line for every mob with a custom name, and every elite has one, so mob farms flood the console.",
+                        "Other named mobs, such as name-tagged pets, still log. spigot.yml's log-named-deaths turns the line off for every mob."),
+                fileConfiguration, "hideEliteDeathsFromConsole", true);
         try {
             defaultSpawnLocation = ConfigurationLocation.serialize(
                     ConfigurationEngine.setString(

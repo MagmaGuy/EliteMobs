@@ -120,6 +120,7 @@ import com.magmaguy.magmacore.location.LocationQueryRegistry;
 import com.magmaguy.magmacore.nightbreak.NightbreakPluginSpec;
 import com.magmaguy.magmacore.nightbreak.NightbreakPluginUpdater;
 import com.magmaguy.magmacore.util.Logger;
+import com.magmaguy.magmacore.util.NamedDeathLogFilter;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -221,6 +222,8 @@ public class EliteMobs extends JavaPlugin {
         Bukkit.getLogger().info("By MagmaGuy - v. " + MetadataHandler.PLUGIN.getDescription().getVersion());
 
         MagmaCore.onEnable(this);
+        // Hides vanilla's "Named entity ... died" console line for elites; the config switch is read at each death.
+        NamedDeathLogFilter.register(entity -> DefaultConfig.isHideEliteDeathsFromConsole() && EntityTracker.isEliteMob(entity));
         if (!missingModelsWarningSent && !Bukkit.getPluginManager().isPluginEnabled(MODELS_PLUGIN)) {
             missingModelsWarningSent = true;
             Logger.warn("Wands, staves, their enchantments, and the mage class require FreeMinecraftModels. "
