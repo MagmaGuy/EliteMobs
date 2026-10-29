@@ -518,9 +518,10 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         this.slimeSize = processInt("slimeSize", slimeSize, 4, false);
         this.neutral = processBoolean("neutral", neutral, false, false);
 
-        this.onKillMessage = ConfigurationEngine.setString(
+        ConfigurationEngine.setString(
                 List.of("Sets the message that is shown when a boss is killed", "Placeholders:", "$player - display name of the player (with prefix/suffix)", "$playerName - plain username of the player (no prefix/suffix)"),
-                file, fileConfiguration, "onKillMessage", null, true);
+                file, fileConfiguration, "onKillMessage", null, false);
+        this.onKillMessage = translatableText(filename, "onKillMessage", fileConfiguration.getString("onKillMessage"));
 
         String bossTypeString = ConfigurationEngine.setString(file, fileConfiguration, "bossType", "NORMAL", false);
         try {

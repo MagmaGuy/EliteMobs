@@ -606,7 +606,8 @@ public class TranslationsConfigFields {
         if (movedTranslationCount > 0)
             Logger.info("Moved " + movedTranslationCount + " content translations in " + languageName
                     + ".csv to keys made from their English (text.<hash>), so content package updates keep them.");
-        if (conflictingTranslationCount > 0)
+        // Kept conflicts are found again on every boot, so they are only reported alongside the move that found them.
+        if (conflictingTranslationCount > 0 && movedTranslationCount > 0)
             Logger.warn(conflictingTranslationCount + " content lines in " + languageName
                     + ".csv were translated differently in two places (e.g. " + String.join(", ", conflictingSample)
                     + "). The first translation is used everywhere; the other rows were kept for you to compare.");
