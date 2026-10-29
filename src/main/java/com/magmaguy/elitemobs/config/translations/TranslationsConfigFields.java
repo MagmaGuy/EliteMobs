@@ -51,6 +51,7 @@ import java.util.Objects;
 public class TranslationsConfigFields {
 
     private static final String TRANSLATIONS_DATA_SUFFIX = "_data.csv";
+    static final String TEXT_KEY_PREFIX = "text.";
     private static final String ENGLISH_COLUMN = "en";
     /**
      * Reconciliation counters are summarised in a single console line, so only a handful of example keys are kept.
@@ -67,6 +68,9 @@ public class TranslationsConfigFields {
     private final List<String> staleSample = new ArrayList<>();
     private final List<String> handWrittenSample = new ArrayList<>();
     private final List<String> customizedSample = new ArrayList<>();
+    private final List<String> conflictingSample = new ArrayList<>();
+    private int movedTranslationCount = 0;
+    private int conflictingTranslationCount = 0;
     private TranslationCsvParser.TranslationData translationData;
     /**
      * The shipped English / shipped translation each live row was last reconciled against. Persisted to
@@ -336,23 +340,56 @@ public class TranslationsConfigFields {
      * recorded baseline. See the class javadoc for what each outcome means.
      */
     public synchronized void add(String filename, String key, Object value) {
+        value = withAmpersandCodes(value);
         if (value == null || stopped) return;
+        register(filename.replace(".yml", "") + "." + key, value);
+    }
 
-        String filteredFilename = filename.replace(".yml", "");
-        String realKey = filteredFilename + "." + key;
-
-        // Process value (fix color codes)
-        if (value instanceof String s) {
-            String fixed = fixConfigColors(s);
-            if (fixed.isEmpty()) return;
-            value = fixed;
-        } else if (value instanceof List<?> list) {
-            @SuppressWarnings("unchecked")
-            List<String> fixedList = fixConfigColors((List<String>) list);
-            if (fixedList.isEmpty()) return;
-            value = fixedList;
+    /**
+     * Registers text under the key made from its English, {@code text.<hash>}.
+     * <p>
+     * Content fields were keyed {@code <file>.<field>} before. When that row was written for this same English, its
+     * translation moves to the text key and the row is removed, so nothing a translator wrote is lost and no inert
+     * duplicate is left to edit. A row written for other English describes text that no longer exists and is left
+     * alone, and so is one translated differently from a translation the text key already has.
+     *
+     * @param legacyFilename the content file, or null for text that never had a field key (script text)
+     */
+    public synchronized void addText(String hash, String legacyFilename, String legacyKey, Object value) {
+        value = withAmpersandCodes(value);
+        if (value == null || stopped) return;
+        String textKey = TEXT_KEY_PREFIX + hash;
+        if (legacyFilename != null && moveLegacyRow(legacyFilename.replace(".yml", "") + "." + legacyKey, textKey, value)) {
+            dirty = true;
+            baselineDirty = true;
+            changeGeneration++;
+            scheduleSave();
         }
+        register(textKey, value);
+    }
 
+    private boolean moveLegacyRow(String legacyKey, String textKey, Object english) {
+        if (!translationData.hasKey(legacyKey)) return false;
+        int width = Math.max(otherLanguageWidth(translationData, legacyKey), otherLanguageWidth(baselineData, legacyKey));
+        if (!csvValuesEqual(translationData.get(legacyKey, ENGLISH_COLUMN), english, width)) return false;
+        Object legacy = translationData.get(legacyKey, languageCode);
+        if (!ENGLISH_COLUMN.equals(languageCode) && !isMissingTranslation(legacy) && !csvValuesEqual(legacy, english, width)) {
+            Object current = translationData.get(textKey, languageCode);
+            if (isMissingTranslation(current) || csvValuesEqual(current, english, width)) {
+                translationData.set(textKey, languageCode, legacy);
+                movedTranslationCount++;
+            } else if (!Objects.equals(current, legacy)) {
+                conflictingTranslationCount++;
+                recordSample(conflictingSample, legacyKey);
+                return false;
+            }
+        }
+        translationData.remove(legacyKey);
+        baselineData.remove(legacyKey);
+        return true;
+    }
+
+    private void register(String realKey, Object value) {
         ReconciliationOutcome outcome = reconcile(translationData, baselineData, realKey, value, languageCode);
 
         switch (outcome) {
@@ -566,6 +603,13 @@ public class TranslationsConfigFields {
         if (shapeConflictCount > 0)
             Logger.warn(shapeConflictCount + " translation keys in " + languageName
                     + ".csv changed between text and lists. Their existing rows were preserved; update their shapes manually.");
+        if (movedTranslationCount > 0)
+            Logger.info("Moved " + movedTranslationCount + " content translations in " + languageName
+                    + ".csv to keys made from their English (text.<hash>), so content package updates keep them.");
+        if (conflictingTranslationCount > 0)
+            Logger.warn(conflictingTranslationCount + " content lines in " + languageName
+                    + ".csv were translated differently in two places (e.g. " + String.join(", ", conflictingSample)
+                    + "). The first translation is used everywhere; the other rows were kept for you to compare.");
 
         if (adoptedKeyCount > 0 && refreshedKeyCount == 0 && customizedEnglishCount == 0 && addedKeyCount == 0) {
             Logger.info("Recorded translation baselines for " + adoptedKeyCount + " keys in "
@@ -598,6 +642,20 @@ public class TranslationsConfigFields {
         if (customizedEnglishCount > 0 && !customizedSample.isEmpty())
             Logger.warn("Hand-edited English cells in " + languageName + ".csv were not refreshed (e.g. "
                     + String.join(", ", customizedSample) + "). Clear those cells to let EliteMobs manage them again.");
+    }
+
+    /** The value with § codes written as &, or null when there is nothing to register. */
+    @SuppressWarnings("unchecked")
+    private Object withAmpersandCodes(Object value) {
+        if (value instanceof String string) {
+            String fixed = fixConfigColors(string);
+            return fixed.isEmpty() ? null : fixed;
+        }
+        if (value instanceof List<?> list) {
+            List<String> fixed = fixConfigColors((List<String>) list);
+            return fixed.isEmpty() ? null : fixed;
+        }
+        return value;
     }
 
     private String fixConfigColors(String value) {

@@ -193,8 +193,8 @@ public class NPCsConfigFields extends CustomConfigFields {
     public void processConfigFields() {
         migrateLegacyDefaults();
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.name = translatable(filename, "name", processString("name", name, "", true));
-        this.role = translatable(filename, "role", processString("role", role, "", true));
+        this.name = translatableText(filename, "name", processString("name", name, "", true));
+        this.role = translatableText(filename, "role", processString("role", role, "", true));
         try {
             if (Bukkit.getServer() == null) {
                 processString("profession", professionConfigName(), "nitwit", false);
@@ -217,9 +217,9 @@ public class NPCsConfigFields extends CustomConfigFields {
         }
         this.spawnLocation = processString("spawnLocation", spawnLocation, null, true);
         this.locations = processStringList("spawnLocations", locations, null, false);
-        this.greetings = translatable(filename, "greetings", processStringList("greetings", greetings, new ArrayList<>(), true));
-        this.dialog = translatable(filename, "dialog", processStringList("dialog", dialog, new ArrayList<>(), true));
-        this.farewell = translatable(filename, "farewell", processStringList("farewell", farewell, new ArrayList<>(), true));
+        this.greetings = translatableText(filename, "greetings", processStringList("greetings", greetings, new ArrayList<>(), true));
+        this.dialog = translatableText(filename, "dialog", processStringList("dialog", dialog, new ArrayList<>(), true));
+        this.farewell = translatableText(filename, "farewell", processStringList("farewell", farewell, new ArrayList<>(), true));
         this.canTalk = processBoolean("canTalk", canTalk, true, true);
         this.activationRadius = processDouble("activationRadius", activationRadius, 3, true);
         String configuredRole = fileConfiguration.getString("interactionType");
@@ -231,7 +231,7 @@ public class NPCsConfigFields extends CustomConfigFields {
         } else
             this.interactionType = processEnum("interactionType", interactionType, NPCInteractions.NPCInteractionType.NONE, NPCInteractions.NPCInteractionType.class, true);
         this.timeout = processDouble("timeout", timeout, 0, false);
-        this.noPreviousLocationMessage = translatable(filename, "noPreviousLocationMessage", processString("noPreviousLocationMessage", noPreviousLocationMessage, "", false));
+        this.noPreviousLocationMessage = translatableText(filename, "noPreviousLocationMessage", processString("noPreviousLocationMessage", noPreviousLocationMessage, "", false));
         this.questFilenames = processStringList("questFileName", questFilenames, new ArrayList<>(), false);
         this.disguise = processString("disguise", disguise, null, false);
         this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);

@@ -431,7 +431,7 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         }
         this.behavior = processString("behavior", behavior, null, false);
         this.instanced = processBoolean("instanced", instanced, false, false);
-        this.name = translatable(filename, "name", processString("name", name, "Default Name", true));
+        this.name = translatableText(filename, "name", processString("name", name, "Default Name", true));
         //Levels are strings because "dynamic" is a valid value
         this.level = processString("level", level, "dynamic", true);
         this.isPersistent = processBoolean("isPersistent", isPersistent, false, false);
@@ -448,27 +448,27 @@ public class CustomBossesConfigFields extends CustomConfigFields {
         this.onSpawnCommands = processStringList("onSpawnCommands", onSpawnCommands, new ArrayList<>(), false);
         this.onCombatEnterCommands = processStringList("onCombatEnterCommands", onCombatEnterCommands, new ArrayList<>(), false);
         this.onCombatLeaveCommands = processStringList("onCombatLeaveCommands", onCombatLeaveCommands, new ArrayList<>(), false);
-        this.deathMessages = translatable(filename, "deathMessages", processStringList("deathMessages", deathMessages, new ArrayList<>(), false));
+        this.deathMessages = translatableText(filename, "deathMessages", processStringList("deathMessages", deathMessages, new ArrayList<>(), false));
         this.uniqueLootList = processList("uniqueLootList", uniqueLootList, new ArrayList<>(), false);
         this.customLootTable = new CustomLootTable(this);
 
         //this can't be converted directly to an enum list because there are some special string features in here
         this.powers = processList("powers", powers, null, false);
-        this.onDamageMessages = translatable(filename, "onDamageMessages", processStringList("onDamageMessages", onDamageMessages, new ArrayList<>(), false));
-        this.onDamagedMessages = translatable(filename, "onDamagedMessages", processStringList("onDamagedMessages", onDamagedMessages, new ArrayList<>(), false));
+        this.onDamageMessages = translatableText(filename, "onDamageMessages", processStringList("onDamageMessages", onDamageMessages, new ArrayList<>(), false));
+        this.onDamagedMessages = translatableText(filename, "onDamagedMessages", processStringList("onDamagedMessages", onDamagedMessages, new ArrayList<>(), false));
         this.trails = processStringList("trails", trails, new ArrayList<>(), false);
         this.phases = processStringList("phases", phases, new ArrayList<>(), false);
         this.phaseSpawnLocation = processString("phaseSpawnLocation", phaseSpawnLocation, null, false);
-        this.locationMessage = translatable(filename, "locationMessage", processString("locationMessage", locationMessage, null, false));
+        this.locationMessage = translatableText(filename, "locationMessage", processString("locationMessage", locationMessage, null, false));
         this.mountedEntity = processString("mountedEntity", mountedEntity, null, false);
         if (mountedEntity != null && mountedEntity.equals(filename)) {
             Logger.warn("Custom Boss " + filename + " has itself for a mount. This makes an infinite loop of the boss mounting itself. The boss mount will not be used for safety reasons.");
             this.mountedEntity = null;
         }
         this.customModelMountPointID = processString("customModelMountPointID", customModelMountPointID, null, false);
-        this.spawnMessage = translatable(filename, "spawnMessage", processString("spawnMessage", spawnMessage, null, false));
-        this.deathMessage = translatable(filename, "deathMessage", processString("deathMessage", deathMessage, null, false));
-        this.escapeMessage = translatable(filename, "escapeMessage", processString("escapeMessage", escapeMessage, null, false));
+        this.spawnMessage = translatableText(filename, "spawnMessage", processString("spawnMessage", spawnMessage, null, false));
+        this.deathMessage = translatableText(filename, "deathMessage", processString("deathMessage", deathMessage, null, false));
+        this.escapeMessage = translatableText(filename, "escapeMessage", processString("escapeMessage", escapeMessage, null, false));
         this.disguise = processString("disguise", disguise, null, false);
         this.customDisguiseData = processString("customDisguiseData", customDisguiseData, null, false);
         this.customModel = processString("customModel", customModel, null, false);

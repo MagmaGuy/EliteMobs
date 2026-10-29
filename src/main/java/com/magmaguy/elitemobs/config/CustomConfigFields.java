@@ -75,6 +75,21 @@ public class CustomConfigFields extends com.magmaguy.magmacore.config.CustomConf
     }
 
     /**
+     * {@link #translatable(String, String, String)} for content package text, which is keyed by its English instead of
+     * by this field so that its translation survives package updates. See {@link TranslationsConfig#addText}.
+     */
+    protected String translatableText(String filename, String key, String value) {
+        return TranslationsConfig.addText(filename, key, value);
+    }
+
+    /**
+     * List counterpart of {@link #translatableText(String, String, String)}.
+     */
+    protected List<String> translatableText(String filename, String key, List<String> value) {
+        return TranslationsConfig.addText(filename, key, value);
+    }
+
+    /**
      * Registers the translatable text inside a configuration section and hands back a section carrying the translated
      * values.
      * <p>
@@ -102,7 +117,7 @@ public class CustomConfigFields extends com.magmaguy.magmacore.config.CustomConf
         ConfigurationSection translated = new YamlConfiguration().createSection(path);
         copySection(source, translated);
         for (String key : translatableKeys)
-            translated.set(key, TranslationsConfig.add(filename, key, source.getString(key)));
+            translated.set(key, TranslationsConfig.addText(filename, key, source.getString(key)));
         return translated;
     }
 

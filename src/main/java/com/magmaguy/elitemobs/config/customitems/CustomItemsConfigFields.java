@@ -113,8 +113,8 @@ public class CustomItemsConfigFields extends CustomConfigFields {
         } else {
             this.material = processEnum("material", material, Material.WOODEN_SWORD, Material.class, true);
         }
-        this.name = translatable(filename, "name", processString("name", name, "Default name", true));
-        this.lore = translatable(filename, "lore", processStringList("lore", lore, new ArrayList<>(), true));
+        this.name = translatableText(filename, "name", processString("name", name, "Default name", true));
+        this.lore = translatableText(filename, "lore", processStringList("lore", lore, new ArrayList<>(), true));
         this.enchantments = processStringList("enchantments", enchantments, null, false);
         this.potionEffects = processStringList("potionEffects", potionEffects, null, false);
         this.dropWeight = processString("dropWeight", dropWeight, "dynamic", false);

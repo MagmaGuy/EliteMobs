@@ -109,11 +109,11 @@ public class CustomQuestsConfigFields extends CustomConfigFields {
         this.questAcceptPermissions = processStringList("questAcceptPermissions", questAcceptPermissions, null, false);
         this.questLockoutPermission = processString("questLockoutPermission", questLockoutPermission, null, false);
         this.questLockoutMinutes = processInt("questLockoutMinutes", questLockoutMinutes, -1, false);
-        this.questName = translatable(filename, "name", processString("name", questName, filename, true));
-        this.questLore = translatable(filename, "questLore", processStringList("questLore", questLore, new ArrayList<>(), false));
+        this.questName = translatableText(filename, "name", processString("name", questName, filename, true));
+        this.questLore = translatableText(filename, "questLore", processStringList("questLore", questLore, new ArrayList<>(), false));
         this.temporaryPermissions = processStringList("temporaryPermissions", temporaryPermissions, new ArrayList<>(), false);
-        this.questAcceptDialog = translatable(filename, "questAcceptDialog", processStringList("questAcceptDialog", questAcceptDialog, new ArrayList<>(), false));
-        this.questCompleteDialog = translatable(filename, "questCompleteMessage", processStringList("questCompleteMessage", questCompleteDialog, new ArrayList<>(), false));
+        this.questAcceptDialog = translatableText(filename, "questAcceptDialog", processStringList("questAcceptDialog", questAcceptDialog, new ArrayList<>(), false));
+        this.questCompleteDialog = translatableText(filename, "questCompleteMessage", processStringList("questCompleteMessage", questCompleteDialog, new ArrayList<>(), false));
         this.questCompleteCommands = processStringList("questCompleteCommands", questCompleteCommands, new ArrayList<>(), false);
         this.turnInNPC = processString("turnInNPC", turnInNPC, "", false);
         this.trackable = processBoolean("trackable", trackable, true, false);
@@ -208,10 +208,10 @@ public class CustomQuestsConfigFields extends CustomConfigFields {
         Map<String, Object> parsedMap = new HashMap<>();
         for (Map.Entry<String, Object> entry : objectiveValues.entrySet())
             if (entry.getKey().equals("dialog"))
-                parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + objectiveName + "." + entry.getKey(), (List<String>) entry.getValue()));
+                parsedMap.put(entry.getKey(), translatableText(filename, "customObjectives." + objectiveName + "." + entry.getKey(), (List<String>) entry.getValue()));
             else if (entry.getKey().equals("npcName") || entry.getKey().equals("itemName")
                     || entry.getKey().equals("name") || entry.getKey().equals("location"))
-                parsedMap.put(entry.getKey(), translatable(filename, "customObjectives." + objectiveName + "." + entry.getKey(), (String) entry.getValue()));
+                parsedMap.put(entry.getKey(), translatableText(filename, "customObjectives." + objectiveName + "." + entry.getKey(), (String) entry.getValue()));
             else
                 parsedMap.put(entry.getKey(), entry.getValue());
         return parsedMap;

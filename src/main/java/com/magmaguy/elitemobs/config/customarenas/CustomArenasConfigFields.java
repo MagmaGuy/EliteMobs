@@ -78,7 +78,7 @@ public class CustomArenasConfigFields extends CustomConfigFields {
     public void processConfigFields() {
         arenaContainer = processString("arenaContainer", arenaContainer, null, false);
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
-        this.arenaName = translatable(filename, "arenaName", processString("arenaName", arenaName, "Default name", false));
+        this.arenaName = translatableText(filename, "arenaName", processString("arenaName", arenaName, "Default name", false));
         this.corner1 = processString("corner1", corner1, null, false);
         this.corner2 = processString("corner2", corner2, null, false);
         this.startLocation = processString("startLocation", startLocation, null, false);
@@ -91,7 +91,7 @@ public class CustomArenasConfigFields extends CustomConfigFields {
         arenaRewards = new CustomLootTable(this);
         this.minimumPlayerCount = processInt("minimumPlayerCount", minimumPlayerCount, 1, false);
         this.maximumPlayerCount = processInt("maximumPlayerCount", maximumPlayerCount, 100, false);
-        this.arenaMessages = translatable(filename, "arenaMessages", processStringList("arenaMessages", arenaMessages, new ArrayList<>(), false));
+        this.arenaMessages = translatableText(filename, "arenaMessages", processStringList("arenaMessages", arenaMessages, new ArrayList<>(), false));
         this.cylindricalArena = processBoolean("cylindricalArena", cylindricalArena, false, false);
         this.permission = processString("permission", permission, null, false);
         this.teleportLocation = processLocation("teleportLocation", teleportLocation, null, false);

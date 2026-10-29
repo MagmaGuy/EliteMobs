@@ -25,7 +25,7 @@ public class TranslationsConfig {
      * Only creates TranslationsConfigFields if not using English.
      */
     public TranslationsConfig() {
-        scriptTextKeys.clear();
+        textKeys.clear();
         if (isEnglish()) {
             translationsConfigFields = null;
             Logger.info("Language set to English - using plugin defaults");
@@ -108,40 +108,85 @@ public class TranslationsConfig {
         return translated;
     }
 
-    private static final String SCRIPT_TEXT = "script_text";
+    private static final String TEXT = "text";
     // Colour and hex codes, so that a fragment like "&r " or "&8] " is not offered to translators as a line of its own.
     private static final java.util.regex.Pattern FORMATTING =
             java.util.regex.Pattern.compile("[&§](#[0-9A-Fa-f]{6}|[0-9A-Fa-fK-Ok-oRrXx])");
-    private static final java.util.Map<String, String> scriptTextKeys = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<String, Object> textKeys = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
      * Translates a line of script text, the messages and titles in EliteScript actions and the literals in Lua powers,
      * and returns it raw: callers fill in placeholders and convert colours afterwards, as they do for English.
-     * <p>
-     * Script text has no field name to key it by, and content packages are overwritten on every import, so the key is
-     * derived from the English itself ({@code script_text.<hash>}, with the line in the {@code en} column). A
-     * translation therefore only ever shows for the exact line it was written for, a line repeated across files and
-     * packages is translated once, and the CSV, which imports never touch, carries the translation across package
-     * updates. A reworded line is a new row and shows in English until it is translated; the old row stays behind.
+     * Keyed by its English; see {@link #addText(String, String, String)}.
      */
     public static String translateText(String english) {
         if (english == null || isEnglish() || translationsConfigFields == null) return english;
-        String normalized = english.replace('§', '&');
-        if (FORMATTING.matcher(normalized).replaceAll("").chars().noneMatch(Character::isLetter)) return english;
-        String key = scriptTextKey(normalized);
-        String claimed = scriptTextKeys.putIfAbsent(key, normalized);
-        // Two lines sharing a hash would share a translation, so the second one stays English.
-        if (claimed != null && !claimed.equals(normalized)) return english;
-        translationsConfigFields.add(SCRIPT_TEXT, key, normalized);
-        if (!(translationsConfigFields.getRaw(SCRIPT_TEXT, key) instanceof String translated)
-                || usesUnknownPlaceholders(SCRIPT_TEXT, key, translated, normalized)) return english;
-        return translated;
+        return lookUpText(null, null, english) instanceof String translated ? translated : english;
     }
 
-    private static String scriptTextKey(String text) {
+    /**
+     * Adds a content field (boss, item, NPC, quest, arena, event, wormhole or content package text) and returns the
+     * display-ready value.
+     * <p>
+     * Content packages are overwritten on every import, so content text is keyed by its English rather than by its
+     * field: {@code text.<hash>}, with the line in the {@code en} column. A translation only ever shows for the exact
+     * text it was written for, text repeated across files and packages is translated once, and the CSV, which imports
+     * never touch, carries translations across package updates. Reworded text is a new row and shows in English until
+     * it is translated. A translation stored under the field key ({@code <file>.<field>}) moves over the first time.
+     */
+    public static String addText(String filename, String key, String value) {
+        if (isEnglish() || value == null) return ChatColorConverter.convert(value);
+        if (translationsConfigFields == null) {
+            Logger.warn("TranslationsConfig not initialized, defaulting to English! (String)");
+            return ChatColorConverter.convert(value);
+        }
+        return ChatColorConverter.convert(lookUpText(filename, key, value) instanceof String translated ? translated : value);
+    }
+
+    /**
+     * List counterpart of {@link #addText(String, String, String)}. The whole list is one row, so a translation may
+     * use a different number of lines.
+     */
+    @SuppressWarnings("unchecked")
+    public static List<String> addText(String filename, String key, List<String> value) {
+        if (isEnglish() || value == null) return ChatColorConverter.convert(value);
+        if (translationsConfigFields == null) {
+            Logger.warn("TranslationsConfig not initialized, defaulting to English! (List)");
+            return ChatColorConverter.convert(value);
+        }
+        return ChatColorConverter.convert(lookUpText(filename, key, value) instanceof List<?> translated
+                ? (List<String>) translated : value);
+    }
+
+    /**
+     * Registers text under the key made from its English and returns the raw translation, or null when the English
+     * should be shown.
+     */
+    @SuppressWarnings("unchecked")
+    private static Object lookUpText(String filename, String key, Object english) {
+        Object normalized = english instanceof List<?> list
+                ? list.stream().map(line -> String.valueOf(line).replace('§', '&')).toList()
+                : ((String) english).replace('§', '&');
+        String text = normalized instanceof List<?> list ? String.join("\n", (List<String>) list) : (String) normalized;
+        if (FORMATTING.matcher(text).replaceAll("").chars().noneMatch(Character::isLetter)) return null;
+        String hash = textKey(normalized);
+        Object claimed = textKeys.putIfAbsent(hash, normalized);
+        // Two texts sharing a hash would share a translation, so the second one stays English.
+        if (claimed != null && !claimed.equals(normalized)) return null;
+        translationsConfigFields.addText(hash, filename, key, normalized);
+        Object translated = translationsConfigFields.getRaw(TEXT, hash);
+        if (translated == null || (translated instanceof List) != (normalized instanceof List)) return null;
+        String translatedText = translated instanceof List<?> list ? String.join("\n", (List<String>) list) : (String) translated;
+        return usesUnknownPlaceholders(TEXT, hash, translatedText, text) ? null : translated;
+    }
+
+    /** A list hashes with a leading NUL, which no configured text contains, so it never shares a key with a string. */
+    @SuppressWarnings("unchecked")
+    private static String textKey(Object text) {
+        String input = text instanceof List<?> list ? "\0" + String.join("\0", (List<String>) list) : (String) text;
         try {
             byte[] digest = java.security.MessageDigest.getInstance("SHA-256")
-                    .digest(text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    .digest(input.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             return java.util.HexFormat.of().formatHex(digest, 0, 6);
         } catch (java.security.NoSuchAlgorithmException impossible) {
             throw new IllegalStateException(impossible);

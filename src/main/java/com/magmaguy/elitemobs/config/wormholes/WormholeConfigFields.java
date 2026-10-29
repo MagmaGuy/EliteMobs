@@ -81,7 +81,7 @@ public class WormholeConfigFields extends CustomConfigFields {
     public void processConfigFields() {
         this.isEnabled = processBoolean("isEnabled", isEnabled, true, true);
         this.location1 = processString("location1", location1, null, true);
-        this.location1Text = translatable(filename, "location1Text", processString("location1Text", location1Text, null, false));
+        this.location1Text = translatableText(filename, "location1Text", processString("location1Text", location1Text, null, false));
         this.flightNetwork = processString("flight.network", flightNetwork, null, false);
         this.flightNode = processString("flight.node", flightNode, null, false);
         this.flightDestination = processString("flight.destination", flightDestination, null, false);
@@ -90,7 +90,7 @@ public class WormholeConfigFields extends CustomConfigFields {
             Logger.warn("Wormhole " + filename + " has a flight section without flight.node! Its flight menu will not know where it departs from.");
         // Flight portals may be one-ended, so they don't get a location2 default written into them.
         this.location2 = processString("location2", location2, null, !isFlightPortal());
-        this.location2Text = translatable(filename, "location2Text", processString("location2Text", location2Text, null, false));
+        this.location2Text = translatableText(filename, "location2Text", processString("location2Text", location2Text, null, false));
         this.permission = processString("permission", permission, null, false);
         this.coinCost = processDouble("coinCost", coinCost, 0, false);
         this.style = processEnum("style", style, Wormhole.WormholeStyle.CUBE, Wormhole.WormholeStyle.class, false);

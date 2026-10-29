@@ -439,6 +439,13 @@ public class TranslationCsvParser {
         }
 
         /**
+         * Removes a key and every language's value for it.
+         */
+        public void remove(String key) {
+            translations.remove(key);
+        }
+
+        /**
          * Checks if a key exists.
          */
         public boolean hasKey(String key) {

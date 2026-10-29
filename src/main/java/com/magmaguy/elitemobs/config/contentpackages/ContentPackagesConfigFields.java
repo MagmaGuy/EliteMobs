@@ -360,9 +360,9 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
     public void processConfigFields() {
         instanceDefinition = null;
         this.isEnabled = processBoolean("isEnabled", isEnabled, false, true);
-        this.name = translatable(filename, "name", processString("name", name, null, true));
+        this.name = translatableText(filename, "name", processString("name", name, null, true));
         this.downloadLink = processString("downloadLink" , downloadLink, downloadLink, false);
-        this.customInfo = translatable(filename, "customInfo", processStringList("customInfo", customInfo, null, true));
+        this.customInfo = translatableText(filename, "customInfo", processStringList("customInfo", customInfo, null, true));
         this.relativeBossLocations = processStringList("relativeBossLocations", relativeBossLocations, null, false);
         this.relativeTreasureChestLocations = processStringList("relativeTreasureChestLocations", relativeTreasureChestLocations, null, false);
         this.dungeonSizeCategory = processEnum("dungeonSizeCategory", dungeonSizeCategory, null, DungeonSizeCategory.class, false);
@@ -383,9 +383,9 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
         this.corner1 = processVector("corner1", corner1, null, false);
         this.corner2 = processVector("corner2", corner2, null, false);
         this.dungeonVersion = processInt("dungeonVersion", dungeonVersion, 0, false);
-        this.playerInfo = translatable(filename, "playerInfo", processString("playerInfo", playerInfo, null, false));
-        this.regionEnterMessage = translatable(filename, "regionEnterMessage", processString("regionEnterMessage", regionEnterMessage, null, false));
-        this.regionLeaveMessage = translatable(filename, "regionLeaveMessage", processString("regionLeaveMessage", regionLeaveMessage, null, false));
+        this.playerInfo = translatableText(filename, "playerInfo", processString("playerInfo", playerInfo, null, false));
+        this.regionEnterMessage = translatableText(filename, "regionEnterMessage", processString("regionEnterMessage", regionEnterMessage, null, false));
+        this.regionLeaveMessage = translatableText(filename, "regionLeaveMessage", processString("regionLeaveMessage", regionLeaveMessage, null, false));
         this.hasCustomModels = processBoolean("hasCustomModels", hasCustomModels, false, false);
         this.startLocationString = processString("startLocation", startLocationString, null, false);
         this.teleportLocationString = processString("teleportLocation", teleportLocationString, null, false);
@@ -413,7 +413,7 @@ public class ContentPackagesConfigFields extends CustomConfigFields {
                 if (difficulty.get("id") == null)
                     difficulty.put("id", difficultyResolver.resolve(difficulty.get("name")));
                 if (difficulty.containsKey("name"))
-                    difficulty.put("name", TranslationsConfig.add(filename, "difficulties." + i + ".name", (String) difficulty.get("name")));
+                    difficulty.put("name", TranslationsConfig.addText(filename, "difficulties." + i + ".name", (String) difficulty.get("name")));
                 mutableDifficulties.add(difficulty);
             }
             this.difficulties = mutableDifficulties;
