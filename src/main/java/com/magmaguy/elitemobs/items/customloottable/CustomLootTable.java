@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
+import com.magmaguy.elitemobs.items.ItemConsumables;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -52,15 +53,26 @@ public class CustomLootTable implements Serializable {
         for (Object raw : lootTable) {
             try {
                 if (raw instanceof String value && !value.contains("=")) {
-                    new EliteCustomLootEntry(entries, value, filename);
+                    String[] legacy = value.split(":", -1);
+                    int scrapTier = legacy.length <= 3 ? ItemConsumables.retiredScrapTier(legacy[0]) : 0;
+                    if (scrapTier > 0) {
+                        Map<String, Object> definition = new LinkedHashMap<>();
+                        if (legacy.length > 1) definition.put("chance", legacy[1]);
+                        if (legacy.length > 2) definition.put("permission", legacy[2]);
+                        new CurrencyCustomLootEntry(entries, retiredScrapReward(definition, scrapTier), filename);
+                    } else new EliteCustomLootEntry(entries, value, filename);
                 } else {
                     Map<String, Object> definition = CustomLootEntry.fields(raw);
+                    int scrapTier = ItemConsumables.retiredScrapTier(
+                            definition.get("filename") instanceof String file ? file : null);
                     if (definition.containsKey("currencyamount"))
                         new CurrencyCustomLootEntry(entries, definition, filename);
                     else if (definition.containsKey("material") || definition.containsKey("type"))
                         new VanillaCustomLootEntry(entries, definition, filename);
                     else if (definition.containsKey("command"))
                         new CommandLootTable(entries, definition, filename);
+                    else if (scrapTier > 0)
+                        new CurrencyCustomLootEntry(entries, retiredScrapReward(definition, scrapTier), filename);
                     else new EliteCustomLootEntry(entries, definition, filename);
                 }
             } catch (RuntimeException failure) {
@@ -76,6 +88,20 @@ public class CustomLootTable implements Serializable {
                 } else waveRewards.put(customLootEntry.getWave(), new ArrayList<>(List.of(customLootEntry)));
             }
         }
+    }
+
+    /**
+     * Elite scrap is retired, but content still lists it as a reward. Those entries pay the scrap's coin value,
+     * multiplied by the amount they would have given, with their chance, wave and permission unchanged.
+     */
+    private static Map<String, Object> retiredScrapReward(Map<String, Object> definition, int scrapTier) {
+        Map<String, Object> reward = new LinkedHashMap<>(definition);
+        reward.remove("filename");
+        reward.remove("difficultyid");
+        long amount = reward.containsKey("amount") ? Long.parseLong(String.valueOf(reward.remove("amount"))) : 1L;
+        long coins = Math.max(0L, amount) * ItemSettingsConfig.getRetiredScrapCoinValue(scrapTier);
+        reward.put("currencyamount", (int) Math.min(Integer.MAX_VALUE, coins));
+        return reward;
     }
 
     public void generateCurrencyEntry(int currencyAmount) {

@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.enchantments.EnchantmentsConfigFields;
 import com.magmaguy.elitemobs.config.customitems.CustomItemsConfig;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfig;
-import com.magmaguy.elitemobs.items.ItemConsumables;
 import com.magmaguy.magmacore.MagmaCore;
 import com.magmaguy.magmacore.config.OutdatedConfigurationArchive;
 import com.magmaguy.magmacore.enchantments.EnchantmentCatalog;
@@ -190,7 +189,7 @@ class ConfigurationRetirementTest {
         assertFalse(yaml.contains("maxLevelV2"));
     }
 
-    @Test void archivedScrapDefaultsRegenerateWithoutRetiredEnchantments() throws Exception {
+    @Test void archivedScrapDefaultsStayRetired() throws Exception {
         Path directory = plugin.getDataFolder().toPath().resolve("customitems");
         Files.createDirectories(directory);
         List<String> sizes = List.of("tiny", "small", "medium", "large", "huge");
@@ -206,18 +205,11 @@ class ConfigurationRetirementTest {
         assertEquals(currentYaml, Files.readString(current));
         MagmaCore.createInstance(plugin);
         new CustomItemsConfig();
-        for (int index = 0; index < sizes.size(); index++) {
-            String name = "elite_scrap_" + sizes.get(index) + ".yml";
-            var fields = CustomItemsConfig.getCustomItems().get(name);
-            assertTrue(fields.isEnabled());
-            assertEquals(new ItemConsumables.Definition(ItemConsumables.Type.REPAIR_SCRAP, index + 1), fields.getConsumable());
-            assertTrue(fields.getEnchantments().isEmpty());
-            var yaml = YamlConfiguration.loadConfiguration(directory.resolve(name).toFile());
-            assertEquals("repair_scrap", yaml.getString("consumable.type"));
-            assertEquals(index + 1, yaml.getInt("consumable.tier"));
+        // Repairs cost coins now, so the scrap defaults no longer regenerate.
+        for (String size : sizes) {
+            assertNull(CustomItemsConfig.getCustomItems().get("elite_scrap_" + size + ".yml"));
+            assertFalse(Files.exists(directory.resolve("elite_scrap_" + size + ".yml")));
         }
-        OutdatedConfigurationArchive.archiveFor(plugin);
-        for (String size : sizes) assertTrue(Files.exists(directory.resolve("elite_scrap_" + size + ".yml")));
         Path archive = plugin.getDataFolder().toPath().getParent().resolve("MagmaCore/outdated files");
         try (var files = Files.walk(archive)) {
             var originals = files.filter(Files::isRegularFile).toList();

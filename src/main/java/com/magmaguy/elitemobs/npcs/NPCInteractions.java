@@ -130,12 +130,13 @@ public class NPCInteractions implements Listener {
                 }
                 break;
             case SCRAPPER:
+                // Scrap is retired; scrappers buy unwanted elite items and old scrap for coins instead.
                 if (player.hasPermission("elitemobs.scrap.npc")) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            ScrapperMenu scrapperMenu = new ScrapperMenu();
-                            scrapperMenu.constructScrapMenu(player);
+                            SellMenu sellMenu = new SellMenu();
+                            sellMenu.constructSellMenu(player);
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 }

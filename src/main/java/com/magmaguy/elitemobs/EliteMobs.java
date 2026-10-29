@@ -765,7 +765,6 @@ public class EliteMobs extends JavaPlugin {
         shutdownStep(CustomShopMenu::shutdown);
         shutdownStep(SellMenu::shutdown);
         shutdownStep(RepairMenu::shutdown);
-        shutdownStep(ScrapperMenu::shutdown);
         shutdownStep(UnbindMenu::shutdown);
         // Gambling menu shutdowns
         shutdownStep(com.magmaguy.elitemobs.menus.gambling.BettingMenu::shutdown);

@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.items.ItemConsumables;
 import com.magmaguy.elitemobs.items.ItemWorthCalculator;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
@@ -167,7 +168,9 @@ public class SellMenu extends EliteMenu implements Listener {
             //CASE: If the player clicked on something in their inventory to put it on the shop
 
             //Check if it's an elitemobs item. The soulbind check only says if the player would be able to pick it up, and vanilla items can be picked up
-            if (!EliteItemManager.isEliteMobsItem(event.getCurrentItem())) {
+            //Old elite scrap sells at its tier value now that repairs cost coins
+            if (!EliteItemManager.isEliteMobsItem(event.getCurrentItem())
+                    && ItemConsumables.scrapTier(event.getCurrentItem()) == 0) {
                 event.getWhoClicked().sendMessage(EconomySettingsConfig.getShopSaleInstructions());
                 return;
             }

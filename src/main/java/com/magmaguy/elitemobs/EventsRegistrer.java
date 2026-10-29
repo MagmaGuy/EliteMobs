@@ -261,7 +261,6 @@ public class EventsRegistrer {
         register(new BuyOrSellMenu.BuyOrSellMenuEvents());
         register(new SellMenu());
 //        register(new SetupMenu.SetupMenuListeners());
-        register(new ScrapperMenu.ScrapperMenuEvents());
         register(new RepairMenu.RepairMenuEvents());
         register(new UnbindMenu.UnbinderMenuEvents());
         register(new ItemEnchantmentMenu.ItemEnchantMenuEvents());

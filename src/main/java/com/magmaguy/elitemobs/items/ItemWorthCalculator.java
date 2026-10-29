@@ -33,6 +33,9 @@ public class ItemWorthCalculator {
     }
 
     public static double determineResaleWorth(ItemStack itemStack, Player player) {
+        // Old elite scrap no longer repairs anything; shops buy it at its tier value instead.
+        int scrapValue = ItemConsumables.scrapCoinValue(itemStack);
+        if (scrapValue > 0) return scrapValue;
         double value = ItemTagger.getItemValue(itemStack);
         value = value == -1 ? Round.twoDecimalPlaces(determineItemWorth(itemStack, player) * (EconomySettingsConfig.getResaleValue() / 100)) :
                 Round.twoDecimalPlaces(value * (EconomySettingsConfig.getResaleValue() / 100));

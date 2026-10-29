@@ -18,14 +18,15 @@ public class RepairMenuConfig extends MenusConfigFields {
     public static String shopName;
     public static ItemStack infoButton;
     public static ItemStack eliteItemInputInfoButton;
-    public static ItemStack eliteScrapInputInfoButton;
+    public static ItemStack repairCostInfoButton;
+    public static ItemStack repairCostButton;
     public static ItemStack outputInfoButton;
     public static int infoSlot;
     public static int eliteItemInputInformationSlot;
-    public static int eliteScrapInputInformationSlot;
+    public static int repairCostInformationSlot;
     public static int outputInformationSlot;
     public static int eliteItemInputSlot;
-    public static int eliteScrapInputSlot;
+    public static int repairCostSlot;
     public static int outputSlot;
     public static ItemStack cancelButton;
     public static int cancelSlot;
@@ -40,13 +41,15 @@ public class RepairMenuConfig extends MenusConfigFields {
     public void processAdditionalFields() {
         shopName = ConfigurationEngine.setString(file, fileConfiguration, "shopName", "[EM] Repair menu!", true);
         ItemStackSerializer.serialize(
-                "infoButton",
+                "infoButtonV2",
                 ItemStackGenerator.generateSkullItemStack("magmaguy",
                         "&4&lEliteMobs &r&cby &4&lMagmaGuy",
                         new ArrayList<>(List.of("&8Support the plugins you enjoy!",
-                                "&aUse scrap to repair elite items!"))),
+                                "&aPay elite coins to repair elite items!",
+                                "&aThe more damaged and the higher level",
+                                "&athe item, the more the repair costs."))),
                 fileConfiguration);
-        infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration, file);
+        infoButton = ItemStackSerializer.deserialize("infoButtonV2", fileConfiguration, file);
         CustomModelAdder.addCustomModel(infoButton, CustomModelsConfig.goldenQuestionMark);
         infoSlot = ConfigurationEngine.setInt(fileConfiguration, "infoButtonSlot", 4);
         eliteItemInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteItemInputInformationSlot", 20);
@@ -59,16 +62,24 @@ public class RepairMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         eliteItemInputInfoButton = ItemStackSerializer.deserialize("eliteItemInputInformationButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(eliteItemInputInfoButton, CustomModelsConfig.boxInput);
-        eliteScrapInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteScrapInputInformationSlot", 22);
-        eliteScrapInputSlot = ConfigurationEngine.setInt(fileConfiguration, "eliteScrapInputSlot", 31);
+        repairCostInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "repairCostInformationSlot", 22);
+        repairCostSlot = ConfigurationEngine.setInt(fileConfiguration, "repairCostSlot", 31);
         ItemStackSerializer.serialize(
-                "eliteScrapInputInformationButton",
-                ItemStackGenerator.generateItemStack(Material.GREEN_BANNER,
-                        "&2Elite Scrap Input slots",
-                        List.of("&aThis slot is for your elite scrap!"), MetadataHandler.signatureID),
+                "repairCostInformationButton",
+                ItemStackGenerator.generateItemStack(Material.GOLD_INGOT,
+                        "&2Repair cost",
+                        List.of("&aThe slot below shows what the repair costs!"), MetadataHandler.signatureID),
                 fileConfiguration);
-        eliteScrapInputInfoButton = ItemStackSerializer.deserialize("eliteScrapInputInformationButton", fileConfiguration, file);
-        CustomModelAdder.addCustomModel(eliteScrapInputInfoButton, CustomModelsConfig.boxInput);
+        repairCostInfoButton = ItemStackSerializer.deserialize("repairCostInformationButton", fileConfiguration, file);
+        CustomModelAdder.addCustomModel(repairCostInfoButton, CustomModelsConfig.bagOfCoins);
+        // $price, $currencyName and $currentAmount are filled in for each item placed in the menu.
+        ItemStackSerializer.serialize(
+                "repairCostButton",
+                ItemStackGenerator.generateItemStack(Material.GOLD_NUGGET,
+                        "&6Repair cost: $price $currencyName",
+                        List.of("&7You have $currentAmount $currencyName"), MetadataHandler.signatureID),
+                fileConfiguration);
+        repairCostButton = ItemStackSerializer.deserialize("repairCostButton", fileConfiguration, file);
         outputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "informationOutputButtonSlot", 24);
         outputSlot = ConfigurationEngine.setInt(fileConfiguration, "outputSlot", 33);
         ItemStackSerializer.serialize("cancelButton", ItemStackGenerator.generateItemStack(Material.BARRIER,

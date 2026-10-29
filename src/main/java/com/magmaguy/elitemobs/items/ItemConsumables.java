@@ -1,18 +1,25 @@
 package com.magmaguy.elitemobs.items;
 
-import com.magmaguy.elitemobs.api.utils.EliteItemManager;
+import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
-import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
-import com.magmaguy.magmacore.util.Logger;
-import org.bukkit.entity.Player;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
+
+import java.util.List;
 
 /** EM acquisition roles are resolved through the existing authored item identity. */
 public final class ItemConsumables {
     private ItemConsumables() { }
 
+    /** REPAIR_SCRAP is retired: repairs cost coins, and scrap players still hold is exchanged for coins by tier. */
     public enum Type { LUCKY_TICKET, REPAIR_SCRAP, UNBIND }
+
+    /** The scrap EliteMobs used to ship, by tier. Loot naming these files pays coins instead. */
+    private static final List<String> RETIRED_SCRAP_FILES = List.of("elite_scrap_tiny.yml", "elite_scrap_small.yml",
+            "elite_scrap_medium.yml", "elite_scrap_large.yml", "elite_scrap_huge.yml");
 
     public record Definition(Type type, int tier) {
         public Definition {
@@ -38,27 +45,29 @@ public final class ItemConsumables {
         return definition != null && definition.type() == type;
     }
 
-    public static int repairTier(ItemStack item) {
+    /** Tier 1-5 of held elite scrap, or 0. Shipped scrap is recognized by its tags even after its file is gone. */
+    public static int scrapTier(ItemStack item) {
         Definition definition = resolve(item);
-        return definition != null && definition.type() == Type.REPAIR_SCRAP ? definition.tier() : 0;
+        if (definition != null) return definition.type() == Type.REPAIR_SCRAP ? definition.tier() : 0;
+        if (item == null || item.getType().isAir() || !item.hasItemMeta()) return 0;
+        int tier = retiredScrapTier(ItemTagger.getCustomItemId(item));
+        if (tier > 0) return tier;
+        // Scrap made before custom item IDs carries only the filename-as-key tag.
+        var container = item.getItemMeta().getPersistentDataContainer();
+        for (int index = 0; index < RETIRED_SCRAP_FILES.size(); index++)
+            if (container.has(new NamespacedKey(MetadataHandler.PLUGIN, RETIRED_SCRAP_FILES.get(index)), PersistentDataType.STRING))
+                return index + 1;
+        return 0;
     }
 
-    public static ItemStack generateScrap(ItemStack source, Player player, EliteEntity elite) {
-        int level = EliteItemManager.getRoundedItemLevel(source);
-        int tier = level < 50 ? 1 : level < 100 ? 2 : level < 150 ? 3 : level < 200 ? 4 : 5;
-        String name = switch (tier) {
-            case 1 -> "tiny";
-            case 2 -> "small";
-            case 3 -> "medium";
-            case 4 -> "large";
-            default -> "huge";
-        };
-        CustomItem scrap = CustomItem.getCustomItem("elite_scrap_" + name + ".yml");
-        if (scrap == null || !new Definition(Type.REPAIR_SCRAP, tier).equals(scrap.getCustomItemsConfigFields().getConsumable())) {
-            Logger.warn("Cannot generate elite scrap: the enabled default item must declare repair_scrap tier " + tier);
-            return null;
-        }
-        return scrap.generateItemStack(tier, player, elite);
+    /** Coins one held scrap item is worth, or 0 when the item is not scrap. */
+    public static int scrapCoinValue(ItemStack item) {
+        return ItemSettingsConfig.getRetiredScrapCoinValue(scrapTier(item));
+    }
+
+    /** Tier 1-5 when a filename names scrap EliteMobs used to ship, or 0. */
+    public static int retiredScrapTier(String filename) {
+        return filename == null ? 0 : RETIRED_SCRAP_FILES.indexOf(filename) + 1;
     }
 
     public static ItemStack unbind(ItemStack source) {

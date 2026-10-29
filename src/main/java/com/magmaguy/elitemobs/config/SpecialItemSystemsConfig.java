@@ -135,8 +135,6 @@ public class SpecialItemSystemsConfig extends ConfigurationFile {
 
         addDefaultEnchantmentBook(fileConfiguration, "elite_lucky_ticket", 100);
 
-        addDefaultEnchantmentBook(fileConfiguration, "elite_scrap_huge", 100);
-
         fileConfiguration.setComments("enchantedBookWeightedDropChance",
                 List.of("Sets the chance of a special item dropping over another special item.",
                         "The higher the value, the higher the chance of that item getting picked over other items.",

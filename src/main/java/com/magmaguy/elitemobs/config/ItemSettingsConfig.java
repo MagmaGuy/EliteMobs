@@ -68,7 +68,7 @@ public class ItemSettingsConfig extends ConfigurationFile {
     @Getter
     private static String potionEffectContinuousLore;
     @Getter
-    private static String scrapSucceededMessage;
+    private static double repairCostPerItemLevel;
     @Getter
     private static String eliteEnchantmentColor;
     @Getter
@@ -92,9 +92,12 @@ public class ItemSettingsConfig extends ConfigurationFile {
     @Getter
     private static double eliteDurabilityMultiplier;
     @Getter
-    private static String scrapFailedMessage;
+    private static String repairPaidMessage;
     @Getter
-    private static String scrapNotConfiguredMessage;
+    private static String repairInsufficientFundsMessage;
+    @Getter
+    private static String scrapExchangedMessage;
+    private static final int[] retiredScrapCoinValues = new int[5];
     @Getter
     private static boolean putLootDirectlyIntoPlayerInventory;
     @Getter
@@ -150,6 +153,11 @@ public class ItemSettingsConfig extends ConfigurationFile {
     /** What class loot names show for $weapon and $item. */
     public static String getClassLootFamilyName(ClassLootFamily family) {
         return classLootFamilyNames.getOrDefault(family, family.label());
+    }
+
+    /** Coins one old elite scrap of this tier (1 tiny to 5 huge) is worth. */
+    public static int getRetiredScrapCoinValue(int tier) {
+        return tier < 1 || tier > retiredScrapCoinValues.length ? 0 : Math.max(0, retiredScrapCoinValues[tier - 1]);
     }
 
     public ItemSettingsConfig() {
@@ -333,15 +341,29 @@ public class ItemSettingsConfig extends ConfigurationFile {
                         "Values between 0.0 and 1.0 lower the durability loss and values above 1.0 increase it.",
                         "Example: 0.5 deals 50% of the durability loss, 2.0 deals 200% of the durability loss."),
                 fileConfiguration, "eliteItemsDurabilityLossMultiplier", 1d);
-        scrapSucceededMessage = ConfigurationEngine.setString(
-                List.of("Sets the message that appears when item scrapping is successful."),
-                file, fileConfiguration, "scrapSucceededMessageV2", "&8[EliteMobs] &2Scrapping succeeded $amount times!", true);
-        scrapFailedMessage = ConfigurationEngine.setString(
-                List.of("Sets message that appears when item scrapping fails."),
-                file, fileConfiguration, "scrapFailedMessageV2", "&8[EliteMobs] &cScrapping failed $amount times!", true);
-        scrapNotConfiguredMessage = ConfigurationEngine.setString(
-                List.of("Sets the message that appears when the scrapper has no scrap item configured to produce."),
-                file, fileConfiguration, "scrapNotConfiguredMessage", "&cThe scrapper has no scrap item configured — contact an admin.", true);
+        repairCostPerItemLevel = ConfigurationEngine.setDouble(
+                List.of("Sets how many elite coins a full repair costs per item level.",
+                        "A repair costs this value x the item level x the share of durability missing, rounded up.",
+                        "Example: 1.0 makes a half-broken level 100 item cost 50 coins. 0 makes repairs free."),
+                fileConfiguration, "repairCostPerItemLevel", 1d);
+        repairPaidMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent after a player pays for a repair."),
+                file, fileConfiguration, "repairPaidMessage", "&8[EliteMobs] &fYou spent $price $currencyName to repair $itemName&f! You now have $currentAmount $currencyName.", true);
+        repairInsufficientFundsMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a player cannot afford a repair."),
+                file, fileConfiguration, "repairInsufficientFundsMessage", "&8[EliteMobs] &c$price $currencyName is required to repair $itemName&c, but you only have $currentAmount!", true);
+        scrapExchangedMessage = ConfigurationEngine.setString(
+                List.of("Sets the message sent when a player exchanges old elite scrap for coins in the repair menu."),
+                file, fileConfiguration, "scrapExchangedMessage", "&8[EliteMobs] &2Repairs now cost $currencyName. You received $price $currencyName for $amount scrap!", true);
+        retiredScrapCoinValues[0] = ConfigurationEngine.setInt(
+                List.of("Sets how many elite coins old elite scrap is worth. Scrap is no longer used for repairs.",
+                        "The repair and sell menus exchange scrap players still have at these values,",
+                        "and loot entries that still list elite scrap pay these coins instead."),
+                fileConfiguration, "retiredScrapCoinValue.tiny", 5);
+        retiredScrapCoinValues[1] = ConfigurationEngine.setInt(fileConfiguration, "retiredScrapCoinValue.small", 30);
+        retiredScrapCoinValues[2] = ConfigurationEngine.setInt(fileConfiguration, "retiredScrapCoinValue.medium", 80);
+        retiredScrapCoinValues[3] = ConfigurationEngine.setInt(fileConfiguration, "retiredScrapCoinValue.large", 150);
+        retiredScrapCoinValues[4] = ConfigurationEngine.setInt(fileConfiguration, "retiredScrapCoinValue.huge", 225);
         putLootDirectlyIntoPlayerInventory = ConfigurationEngine.setBoolean(
                 List.of("Sets if elite loot should be placed directly into players' inventories."),
                 fileConfiguration, "putLootDirectlyIntoPlayerInventory", false);

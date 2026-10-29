@@ -17,8 +17,8 @@ public class RepairmanConfig extends NPCsConfigFields {
                 "em_adventurers_guild,283.5,78,266.5,-90,0",
                 new ArrayList<>(List.of(
                         "Get your items repaired!",
-                        "Repairing items for scrap!",
-                        "Turn that scrap into durability!",
+                        "Repairs for a fair price!",
+                        "Turn coins into durability!",
                         "Need a repair?",
                         "Got damaged items?")),
                 new ArrayList<>(List.of(
