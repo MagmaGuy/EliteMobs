@@ -175,7 +175,7 @@ public class ItemSettingsConfig extends ConfigurationFile {
                 List.of("Sets if procedurally generated loot will have different colors based on the quality of the item."),
                 fileConfiguration, "doMMORPGColorsForItems", true);
         preventCustomItemPlacement = ConfigurationEngine.setBoolean(
-                List.of("Sets if the placement of custom items, like banners or blocks, is prevented.", "This is recommended - custom items break when they are placed and can not be recovered!")
+                List.of("Sets if custom items are kept from being placed, like banners or blocks, or thrown and used up, like Eyes of Ender or bone meal.", "This is recommended - custom items break when they are placed and can not be recovered!")
                 , fileConfiguration, "preventCustomItemPlacement", true);
         loreStructure = ConfigurationEngine.setList(
                 List.of("Sets the format for the lore of custom all EliteMobs items!",
