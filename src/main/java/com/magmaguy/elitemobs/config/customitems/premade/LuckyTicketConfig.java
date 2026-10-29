@@ -17,7 +17,7 @@ public class LuckyTicketConfig extends CustomItemsConfigFields {
                 new ArrayList<>(List.of(
                         "&2Doubles the chance of successfully",
                         "&2enchanting an item!")));
-        setConsumable(new ItemConsumables.Definition(ItemConsumables.Type.LUCKY_TICKET, 0));
+        setConsumable(new ItemConsumables.Definition(ItemConsumables.Type.LUCKY_TICKET));
         setItemType(CustomItem.ItemType.UNIQUE);
         setScalability(CustomItem.Scalability.FIXED);
         setSoulbound(false);

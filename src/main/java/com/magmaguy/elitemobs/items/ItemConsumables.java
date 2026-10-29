@@ -14,18 +14,18 @@ import java.util.List;
 public final class ItemConsumables {
     private ItemConsumables() { }
 
-    /** REPAIR_SCRAP is retired: repairs cost coins, and scrap players still hold is exchanged for coins by tier. */
-    public enum Type { LUCKY_TICKET, REPAIR_SCRAP, UNBIND }
+    public enum Type { LUCKY_TICKET, UNBIND }
 
-    /** The scrap EliteMobs used to ship, by tier. Loot naming these files pays coins instead. */
+    /**
+     * The scrap EliteMobs used to ship, by tier. Scrap is retired: repairs cost coins, scrap players still hold is
+     * exchanged for coins, and loot naming these files pays coins instead.
+     */
     private static final List<String> RETIRED_SCRAP_FILES = List.of("elite_scrap_tiny.yml", "elite_scrap_small.yml",
             "elite_scrap_medium.yml", "elite_scrap_large.yml", "elite_scrap_huge.yml");
 
-    public record Definition(Type type, int tier) {
+    public record Definition(Type type) {
         public Definition {
             java.util.Objects.requireNonNull(type, "consumable type");
-            if (type == Type.REPAIR_SCRAP ? tier < 1 || tier > 5 : tier != 0)
-                throw new IllegalArgumentException("Repair scrap requires tier 1-5; other consumables have no tier");
         }
     }
 
@@ -45,10 +45,8 @@ public final class ItemConsumables {
         return definition != null && definition.type() == type;
     }
 
-    /** Tier 1-5 of held elite scrap, or 0. Shipped scrap is recognized by its tags even after its file is gone. */
+    /** Tier 1-5 of held elite scrap, or 0. Scrap is recognized by its tags; its item files are gone. */
     public static int scrapTier(ItemStack item) {
-        Definition definition = resolve(item);
-        if (definition != null) return definition.type() == Type.REPAIR_SCRAP ? definition.tier() : 0;
         if (item == null || item.getType().isAir() || !item.hasItemMeta()) return 0;
         int tier = retiredScrapTier(ItemTagger.getCustomItemId(item));
         if (tier > 0) return tier;

@@ -17,7 +17,7 @@ public class UnbindScrollConfig extends CustomItemsConfigFields {
                 new ArrayList<>(List.of("&5Allows users to unbind one",
                         "&5soulbound item at the Unbinder!",
                         "&5Use wisely!")));
-        setConsumable(new ItemConsumables.Definition(ItemConsumables.Type.UNBIND, 0));
+        setConsumable(new ItemConsumables.Definition(ItemConsumables.Type.UNBIND));
         setItemType(CustomItem.ItemType.UNIQUE);
     }
 }

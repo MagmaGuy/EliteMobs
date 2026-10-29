@@ -31,7 +31,7 @@ public class UnbinderMenuConfig extends MenusConfigFields {
     @Getter
     private static int eliteItemInputInformationSlot;
     @Getter
-    private static int eliteScrapInputInformationSlot;
+    private static int unbindScrollInputInformationSlot;
     @Getter
     private static int outputInformationSlot;
     @Getter
@@ -75,7 +75,7 @@ public class UnbinderMenuConfig extends MenusConfigFields {
                 fileConfiguration);
         eliteItemInputInfoButton = ItemStackSerializer.deserialize("eliteItemInputInformationButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(eliteItemInputInfoButton, CustomModelsConfig.boxInput);
-        eliteScrapInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "unbindScrollInputInformationSlot", 22);
+        unbindScrollInputInformationSlot = ConfigurationEngine.setInt(fileConfiguration, "unbindScrollInputInformationSlot", 22);
         eliteUnbindInputSlot = ConfigurationEngine.setInt(fileConfiguration, "unbindScrollInputSlot", 31);
         ItemStackSerializer.serialize(
                 "unbindScrollInputInformationButton",

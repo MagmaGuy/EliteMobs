@@ -32,33 +32,6 @@
         },
         {
             "type": "bitmap",
-            "file": "elitemobs:gui/scrappermenu.png",
-            "ascent": 136,
-            "height": 256,
-            "chars": [
-                "󰸂"
-            ]
-        },
-        {
-            "type": "bitmap",
-            "file": "elitemobs:gui/refinemenu.png",
-            "ascent": 136,
-            "height": 256,
-            "chars": [
-                "󰸃"
-            ]
-        },
-        {
-            "type": "bitmap",
-            "file": "elitemobs:gui/smeltmenu.png",
-            "ascent": 136,
-            "height": 256,
-            "chars": [
-                "󰸄"
-            ]
-        },
-        {
-            "type": "bitmap",
             "file": "elitemobs:gui/sellmenu.png",
             "ascent": 136,
             "height": 256,

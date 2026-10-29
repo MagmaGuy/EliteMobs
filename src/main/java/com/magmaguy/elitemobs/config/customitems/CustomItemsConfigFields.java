@@ -157,9 +157,9 @@ public class CustomItemsConfigFields extends CustomConfigFields {
     private void processConsumable() {
         try {
             if (configHas("consumable") && !fileConfiguration.isConfigurationSection("consumable"))
-                throw new IllegalArgumentException("consumable must contain type and optional repair tier");
+                throw new IllegalArgumentException("consumable must contain a type");
             var section = fileConfiguration.getConfigurationSection("consumable");
-            if (section != null && !java.util.Set.of("type", "tier").containsAll(section.getKeys(false)))
+            if (section != null && !java.util.Set.of("type").containsAll(section.getKeys(false)))
                 throw new IllegalArgumentException("Unknown consumable field");
             String type = processString("consumable.type", consumable == null ? null
                     : consumable.type().name().toLowerCase(java.util.Locale.ROOT), null, false);
@@ -170,14 +170,9 @@ public class CustomItemsConfigFields extends CustomConfigFields {
             }
             if (material == null || material.isAir() || !material.isItem())
                 throw new IllegalArgumentException("Consumables require a valid item material");
-            var parsed = ItemConsumables.Type.valueOf(type.toUpperCase(java.util.Locale.ROOT));
-            if (configHas("consumable.tier") && !(fileConfiguration.get("consumable.tier") instanceof Integer))
-                throw new IllegalArgumentException("consumable.tier must be an integer");
-            if (parsed != ItemConsumables.Type.REPAIR_SCRAP && configHas("consumable.tier"))
-                throw new IllegalArgumentException("Only repair_scrap accepts consumable.tier");
-            int tier = parsed == ItemConsumables.Type.REPAIR_SCRAP
-                    ? processInt("consumable.tier", consumable == null ? 0 : consumable.tier(), 0, false) : 0;
-            consumable = new ItemConsumables.Definition(parsed, tier);
+            if (type.equalsIgnoreCase("repair_scrap"))
+                throw new IllegalArgumentException("repair_scrap was retired with elite scrap; repairs cost elite coins now");
+            consumable = new ItemConsumables.Definition(ItemConsumables.Type.valueOf(type.toUpperCase(java.util.Locale.ROOT)));
         } catch (IllegalArgumentException invalid) {
             consumable = null;
             isEnabled = false;

@@ -57,13 +57,13 @@ public class UnbindMenu extends EliteMenu {
     }
 
     /**
-     * Creates a menu for scrapping elitemobs items. Only special Elite Mob items can be scrapped here.
+     * Creates the unbind menu. Only Elite Mob items can be unbound here.
      *
      * @param player Player for whom the inventory will be created
      */
     public void constructUnbinderMenu(Player player) {
         RecipeLayout layout = new RecipeLayout(UnbinderMenuConfig.getEliteItemInputSlot(), UnbinderMenuConfig.getEliteUnbindInputSlot(), UnbinderMenuConfig.getOutputSlot(),
-                UnbinderMenuConfig.getEliteItemInputInformationSlot(), UnbinderMenuConfig.getEliteScrapInputInformationSlot(), UnbinderMenuConfig.getOutputInformationSlot(),
+                UnbinderMenuConfig.getEliteItemInputInformationSlot(), UnbinderMenuConfig.getUnbindScrollInputInformationSlot(), UnbinderMenuConfig.getOutputInformationSlot(),
                 UnbinderMenuConfig.getInfoSlot(), UnbinderMenuConfig.getCancelSlot(), UnbinderMenuConfig.getConfirmSlot());
         String menuName = UnbinderMenuConfig.getShopName();
         if (DefaultConfig.useResourcePackModels())
