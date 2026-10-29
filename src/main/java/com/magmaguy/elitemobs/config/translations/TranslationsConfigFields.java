@@ -422,6 +422,25 @@ public class TranslationsConfigFields {
      * Returns target language value if available, otherwise falls back to English.
      */
     public synchronized Object get(String filename, String key) {
+        Object value = getRaw(filename, key);
+
+        // Apply color conversion
+        if (value instanceof String s) {
+            return ChatColorConverter.convert(s);
+        } else if (value instanceof List<?> list) {
+            @SuppressWarnings("unchecked")
+            List<String> stringList = (List<String>) list;
+            return ChatColorConverter.convert(stringList);
+        }
+
+        return value;
+    }
+
+    /**
+     * {@link #get(String, String)} without the color conversion, for text whose placeholders are filled in before it
+     * is converted.
+     */
+    public synchronized Object getRaw(String filename, String key) {
         String filteredFilename = filename.replace(".yml", "");
         String realKey = filteredFilename + "." + key;
 
@@ -437,15 +456,6 @@ public class TranslationsConfigFields {
         // Fall back to English
         if (value == null) {
             value = translationData.get(realKey, ENGLISH_COLUMN);
-        }
-
-        // Apply color conversion
-        if (value instanceof String s) {
-            return ChatColorConverter.convert(s);
-        } else if (value instanceof List<?> list) {
-            @SuppressWarnings("unchecked")
-            List<String> stringList = (List<String>) list;
-            return ChatColorConverter.convert(stringList);
         }
 
         return value;

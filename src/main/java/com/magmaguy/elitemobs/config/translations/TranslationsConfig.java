@@ -25,6 +25,7 @@ public class TranslationsConfig {
      * Only creates TranslationsConfigFields if not using English.
      */
     public TranslationsConfig() {
+        scriptTextKeys.clear();
         if (isEnglish()) {
             translationsConfigFields = null;
             Logger.info("Language set to English - using plugin defaults");
@@ -105,6 +106,46 @@ public class TranslationsConfig {
         if (usesUnknownPlaceholders(filename, key, String.join("\n", translated), value == null ? null : String.join("\n", value)))
             return ChatColorConverter.convert(value);
         return translated;
+    }
+
+    private static final String SCRIPT_TEXT = "script_text";
+    // Colour and hex codes, so that a fragment like "&r " or "&8] " is not offered to translators as a line of its own.
+    private static final java.util.regex.Pattern FORMATTING =
+            java.util.regex.Pattern.compile("[&§](#[0-9A-Fa-f]{6}|[0-9A-Fa-fK-Ok-oRrXx])");
+    private static final java.util.Map<String, String> scriptTextKeys = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /**
+     * Translates a line of script text, the messages and titles in EliteScript actions and the literals in Lua powers,
+     * and returns it raw: callers fill in placeholders and convert colours afterwards, as they do for English.
+     * <p>
+     * Script text has no field name to key it by, and content packages are overwritten on every import, so the key is
+     * derived from the English itself ({@code script_text.<hash>}, with the line in the {@code en} column). A
+     * translation therefore only ever shows for the exact line it was written for, a line repeated across files and
+     * packages is translated once, and the CSV, which imports never touch, carries the translation across package
+     * updates. A reworded line is a new row and shows in English until it is translated; the old row stays behind.
+     */
+    public static String translateText(String english) {
+        if (english == null || isEnglish() || translationsConfigFields == null) return english;
+        String normalized = english.replace('§', '&');
+        if (FORMATTING.matcher(normalized).replaceAll("").chars().noneMatch(Character::isLetter)) return english;
+        String key = scriptTextKey(normalized);
+        String claimed = scriptTextKeys.putIfAbsent(key, normalized);
+        // Two lines sharing a hash would share a translation, so the second one stays English.
+        if (claimed != null && !claimed.equals(normalized)) return english;
+        translationsConfigFields.add(SCRIPT_TEXT, key, normalized);
+        if (!(translationsConfigFields.getRaw(SCRIPT_TEXT, key) instanceof String translated)
+                || usesUnknownPlaceholders(SCRIPT_TEXT, key, translated, normalized)) return english;
+        return translated;
+    }
+
+    private static String scriptTextKey(String text) {
+        try {
+            byte[] digest = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(digest, 0, 6);
+        } catch (java.security.NoSuchAlgorithmException impossible) {
+            throw new IllegalStateException(impossible);
+        }
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.powers.scripts.caching;
 
+import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.WeatherType;
 import com.magmaguy.elitemobs.powers.scripts.primitives.ScriptFloat;
@@ -122,6 +123,7 @@ public class ScriptActionBlueprint {
         this.scriptName = scriptName;
         this.scriptFilename = scriptFilename;
         processMapList(entry);
+        translateText();
         if (conditionsBlueprint == null)
             conditionsBlueprint = new ScriptConditionsBlueprint((Map<?, ?>) null, scriptName, scriptFilename);
         if (scriptTargets == null) scriptTargets = new ScriptTargetsBlueprint(entry, scriptName, scriptFilename);
@@ -130,6 +132,23 @@ public class ScriptActionBlueprint {
                 scriptTargets.getCoverage().getValue() == 1D &&
                 !scriptTargets.isCustomCoverage())
             scriptTargets.setCoverage(.3f);
+    }
+
+    /**
+     * Content package imports overwrite the files these lines live in, so they are translated by their English rather
+     * than by a field in the file. See {@link TranslationsConfig#translateText(String)}.
+     */
+    private void translateText() {
+        if (actionType == null) return;
+        switch (actionType) {
+            case MESSAGE, ACTION_BAR_MESSAGE, BOSS_BAR_MESSAGE -> sValue = TranslationsConfig.translateText(sValue);
+            case TITLE_MESSAGE -> {
+                title = TranslationsConfig.translateText(title);
+                subtitle = TranslationsConfig.translateText(subtitle);
+            }
+            default -> {
+            }
+        }
     }
 
     private void processMapList(Map<?, ?> entry) {

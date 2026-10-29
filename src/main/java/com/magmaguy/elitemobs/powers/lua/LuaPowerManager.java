@@ -105,6 +105,15 @@ public final class LuaPowerManager {
                                                     PowerType powerType) throws IOException {
         java.nio.file.Path path = file.toPath().toRealPath();
         String source = readSource(path, path.getParent(), new HashSet<>(), 0);
+        String translated = LuaScriptText.translate(source, registryKey);
+        if (!translated.equals(source)) {
+            try {
+                return registerLuaPower(registryKey, file, translated, effect, powerType).configFields;
+            } catch (RuntimeException rejected) {
+                Logger.warn("The translated text of Lua power " + registryKey + " did not load (" + rejected.getMessage()
+                        + "); it runs in English.");
+            }
+        }
         return registerLuaPower(registryKey, file, source, effect, powerType).configFields;
     }
 
