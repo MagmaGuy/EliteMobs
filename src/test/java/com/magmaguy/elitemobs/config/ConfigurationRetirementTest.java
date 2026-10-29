@@ -90,10 +90,14 @@ class ConfigurationRetirementTest {
         var replacement = YamlConfiguration.loadConfiguration(quest.toFile());
         var objectives = replacement.getConfigurationSection("customObjectives");
         assertNotNull(objectives);
-        assertEquals(15, objectives.getKeys(false).size());
+        assertEquals(14, objectives.getKeys(false).size());
         assertFalse(objectives.contains("Objective13"));
-        for (String objective : objectives.getKeys(false))
+        // Kelly the scrapper was removed with elite scrap.
+        assertFalse(objectives.contains("Objective9"));
+        for (String objective : objectives.getKeys(false)) {
             assertNotEquals("scroll_applier_config.yml", objectives.getString(objective + ".filename"));
+            assertNotEquals("scrapper_config.yml", objectives.getString(objective + ".filename"));
+        }
         assertEquals("wood_league_arena_master.yml", objectives.getString("Objective14.filename"));
         assertEquals("story_dungeons_quest_giver.yml", objectives.getString("Objective15.filename"));
         assertEquals("training_dummy_lv1.yml", objectives.getString("Objective16.filename"));

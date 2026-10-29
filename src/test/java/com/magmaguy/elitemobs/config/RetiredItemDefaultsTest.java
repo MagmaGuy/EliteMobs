@@ -59,6 +59,8 @@ class RetiredItemDefaultsTest {
         var expectedEnchantments = new HashMap<String, List<String>>();
         var expectedConsumables = new HashMap<String, ItemConsumables.Definition>();
         var oldFiles = new HashMap<String, String>();
+        // Elite scrap is retired: its old files are archived and nothing replaces them.
+        var retiredScrap = new java.util.HashSet<String>();
         assertEquals(63, oldItems.getMapList("items").size());
         for (var oldItem : oldItems.getMapList("items")) {
             String filename = (String) oldItem.get("file");
@@ -67,7 +69,7 @@ class RetiredItemDefaultsTest {
                 expectedEnchantments.put(filename, fields.getEnchantments() == null
                         ? List.of() : List.copyOf(fields.getEnchantments()));
                 expectedConsumables.put(filename, fields.getConsumable());
-            }
+            } else if (ItemConsumables.retiredScrapTier(filename) > 0) retiredScrap.add(filename);
             String old = "# operator customization\nisEnabled: true\nmaterial: PAPER\nname: Old customized name\n"
                     + "enchantments: ['" + oldItem.get("retired") + ",1']\n";
             oldFiles.put(filename, old);
@@ -88,13 +90,16 @@ class RetiredItemDefaultsTest {
         assertAll(expectedEnchantments.keySet().stream().map(filename ->
                 () -> assertFalse(Files.exists(directory.resolve(filename)), "obsolete default retained: " + filename)));
         assertEquals(currentYaml, Files.readString(current));
+        assertEquals(5, retiredScrap.size(), "fixture must exercise the retired scrap files");
+        assertAll(retiredScrap.stream().map(filename ->
+                () -> assertFalse(Files.exists(directory.resolve(filename)), "retired scrap retained: " + filename)));
         for (String filename : oldFiles.keySet()) {
-            if (!defaults.containsKey(filename))
+            if (!defaults.containsKey(filename) && !retiredScrap.contains(filename))
                 assertEquals(oldFiles.get(filename), Files.readString(directory.resolve(filename)),
                         "non-default content must not be archived: " + filename);
         }
         List<String> archived = archiveContents();
-        assertEquals(expectedEnchantments.size(), archived.size());
+        assertEquals(expectedEnchantments.size() + retiredScrap.size(), archived.size());
         for (String filename : expectedEnchantments.keySet()) assertTrue(archived.contains(oldFiles.get(filename)));
 
         new CustomItemsConfig();
@@ -104,6 +109,10 @@ class RetiredItemDefaultsTest {
             assertTrue(replacement.isEnabled(), filename);
             assertEquals(expectedEnchantments.get(filename), replacement.getEnchantments(), filename);
             assertEquals(expectedConsumables.get(filename), replacement.getConsumable(), filename);
+        }
+        for (String filename : retiredScrap) {
+            assertNull(CustomItemsConfig.getCustomItems().get(filename), filename);
+            assertFalse(Files.exists(directory.resolve(filename)), filename);
         }
         OutdatedConfigurationArchive.archiveFor(plugin);
         assertEquals(archived.size(), archiveContents().size(), "second startup must not archive replacements");
