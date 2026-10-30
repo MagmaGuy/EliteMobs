@@ -57,6 +57,7 @@ public final class PartyManager implements Listener {
         partyByPlayer.clear();
         pendingInvites.clear();
         dungeonParties.clear();
+        PartyPlaceholderSnapshot.clear();
         onlineMembers.forEach(PartySidebar::clearPlayer);
         PartySidebar.shutdown();
     }
@@ -136,6 +137,7 @@ public final class PartyManager implements Listener {
         partyByPlayer.put(creator.getUniqueId(), party.getId());
         if (notify) send(creator, PartyConfig.getPartyCreatedMessage());
         PartySidebar.refresh(creator);
+        PartyPlaceholderSnapshot.rebuild();
         return PartyOperationResult.SUCCESS;
     }
 
@@ -403,6 +405,7 @@ public final class PartyManager implements Listener {
         if (party.isEmpty()) {
             parties.remove(party.getId());
             invalidatePendingInvites(invite -> invite.partyId().equals(party.getId()));
+            PartyPlaceholderSnapshot.rebuild();
             return;
         }
 
@@ -456,6 +459,7 @@ public final class PartyManager implements Listener {
             Player member = Bukkit.getPlayer(memberId);
             if (member != null) PartySidebar.refresh(member);
         }
+        PartyPlaceholderSnapshot.rebuild();
     }
 
     private static void broadcast(Party party, String message, UUID excludedPlayer) {

@@ -3,15 +3,10 @@ package com.magmaguy.elitemobs.parties;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.config.QuestsConfig;
-import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
-import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.dialogue.QuestDialogueBossBarManager;
 import com.magmaguy.elitemobs.utils.SimpleScoreboard;
-import com.magmaguy.elitemobs.advancedcombat.CombatHealthFormatter;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
 import org.bukkit.Bukkit;
@@ -51,6 +46,8 @@ public final class PartySidebar {
             public void run() {
                 PartyManager.cleanupExpiredInvites();
                 cleanupExpiredViews();
+                // PlaceholderAPI reads party values from this snapshot, also when the sidebar is off.
+                PartyPlaceholderSnapshot.rebuild();
                 if (!isEnabled()) return;
                 if (++secondsSinceActionRotation >= PartyConfig.getSidebarRotationSeconds()) {
                     showInviteAction = !showInviteAction;
@@ -107,15 +104,11 @@ public final class PartySidebar {
         if (QuestsConfig.isHideQuestScoreboardDuringQuestDialogue()
                 && QuestDialogueBossBarManager.hasActiveSession(player)) return;
 
-        DungeonInstance dungeonInstance = getDungeonInstance(player);
+        DungeonInstance dungeonInstance = PartyMemberDisplay.getDungeonInstance(player);
         List<String> lines = new ArrayList<>();
-        for (UUID memberId : party.getMembersInDisplayOrder()) {
-            Player member = Bukkit.getPlayer(memberId);
-            String template = memberId.equals(party.getLeader())
-                    ? PartyConfig.getSidebarLeaderLine()
-                    : PartyConfig.getSidebarMemberLine();
-            lines.add(renderMemberLine(template, member, dungeonInstance));
-        }
+        for (UUID memberId : party.getMembersInDisplayOrder())
+            lines.add(PartyMemberDisplay.renderLine(PartyMemberDisplay.template(party, memberId),
+                    PartyMemberDisplay.state(Bukkit.getPlayer(memberId), dungeonInstance)));
 
         QuestView questView = currentQuestView(player);
         int reservedActionLines = 1;
@@ -142,60 +135,6 @@ public final class PartySidebar {
             return;
         SimpleScoreboard.updateScoreboard(player, title, lines);
         lastRenderedSidebars.put(player.getUniqueId(), snapshot);
-    }
-
-    private static String renderMemberLine(String template, Player member, DungeonInstance dungeonInstance) {
-        boolean downed = member != null
-                && dungeonInstance != null
-                && dungeonInstance.isSpectator(member)
-                && dungeonInstance.getRemainingLives(member) != null;
-        String health = renderHealth(member, downed);
-        if (downed) health += PartyConfig.getSidebarDownedDisplay();
-        String lives = renderLives(member, dungeonInstance);
-        boolean hasHealthPlaceholder = template.contains("$health");
-        boolean hasLivesPlaceholder = template.contains("$lives");
-        String rendered = template
-                .replace("$player", member == null ? PartyConfig.getUnknownPlayerName() : member.getName())
-                .replace("$health", health)
-                .replace("$lives", lives);
-        // Preserve the new information for existing Party.yml files whose customized line
-        // templates predate the placeholders.
-        if (!hasHealthPlaceholder) rendered += health;
-        if (!hasLivesPlaceholder) rendered += lives;
-        return color(rendered);
-    }
-
-    private static String renderHealth(Player member, boolean downed) {
-        if (member == null || !member.isOnline()) return " &8-/-";
-        AttributeInstance attribute = member.getAttribute(Attribute.MAX_HEALTH);
-        double maximum = Math.max(1D, attribute == null ? member.getHealth() : attribute.getValue());
-        double current = downed || member.isDead() ? 0D : Math.max(0D, Math.min(maximum, member.getHealth()));
-        double fraction = current / maximum;
-        // Green at full health, red at half health, almost black when downed.
-        int from = fraction >= .5D ? 0xFF0000 : 0x080000;
-        int to = fraction >= .5D ? 0x55FF55 : 0xFF0000;
-        double blend = fraction >= .5D ? (fraction - .5D) * 2D : fraction * 2D;
-        int red = interpolateChannel(from >> 16, to >> 16, blend);
-        int green = interpolateChannel(from >> 8, to >> 8, blend);
-        int blue = interpolateChannel(from, to, blend);
-        String tint = net.md_5.bungee.api.ChatColor.of(new java.awt.Color(red, green, blue)).toString();
-        return " " + tint + CombatHealthFormatter.format(current) + "&7/&f" + CombatHealthFormatter.format(maximum);
-    }
-
-    private static int interpolateChannel(int from, int to, double blend) {
-        return (int) Math.round((from & 255) + ((to & 255) - (from & 255)) * blend);
-    }
-
-    private static String renderLives(Player member, DungeonInstance dungeonInstance) {
-        if (member == null || dungeonInstance == null) return "";
-        Integer lives = dungeonInstance.getRemainingLives(member);
-        if (lives == null) return "";
-        return PartyConfig.getSidebarLivesDisplay().replace("$lives", String.valueOf(Math.max(0, lives)));
-    }
-
-    private static DungeonInstance getDungeonInstance(Player viewer) {
-        MatchInstance matchInstance = PlayerData.getMatchInstance(viewer);
-        return matchInstance instanceof DungeonInstance dungeonInstance ? dungeonInstance : null;
     }
 
     static void clearPlayer(Player player) {

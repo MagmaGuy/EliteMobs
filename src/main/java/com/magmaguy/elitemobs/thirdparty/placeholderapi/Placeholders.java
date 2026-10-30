@@ -2,10 +2,14 @@ package com.magmaguy.elitemobs.thirdparty.placeholderapi;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
+import com.magmaguy.elitemobs.parties.Party;
+import com.magmaguy.elitemobs.parties.PartyMemberDisplay;
+import com.magmaguy.elitemobs.parties.PartyPlaceholderSnapshot;
 import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.quests.Quest;
 import com.magmaguy.elitemobs.quests.QuestTracking;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
+import com.magmaguy.elitemobs.advancedcombat.CombatHealthFormatter;
 import com.magmaguy.elitemobs.skills.CombatLevelCalculator;
 import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.elitemobs.skills.SkillXPCalculator;
@@ -132,6 +136,8 @@ public class Placeholders extends PlaceholderExpansion {
 
         if (identifier.startsWith("quest_"))
             return questPlaceholder(player, identifier);
+        if (identifier.startsWith("party_"))
+            return partyPlaceholder(player, identifier);
 
         switch (identifier) {
             case "player_combat_tier":
@@ -242,6 +248,56 @@ public class Placeholders extends PlaceholderExpansion {
                     ? "" : ChatColorConverter.convert(objective.getObjectiveName());
             case "current" -> objective == null ? "" : "" + objective.getCurrentAmount();
             case "target" -> objective == null ? "" : "" + objective.getTargetAmount();
+            default -> null;
+        };
+    }
+
+    /**
+     * Party placeholders describe the player's EliteMobs party, so another scoreboard plugin can show it with
+     * sidebarEnabled off in Party.yml. Members are numbered from 1, leader first, like the party sidebar, and
+     * member lines are the same text as that sidebar. They read a main-thread snapshot refreshed every second,
+     * so they are safe from asynchronous scoreboards. Without a party, or past the last member, they are empty.
+     */
+    private static String partyPlaceholder(Player player, String identifier) {
+        PartyPlaceholderSnapshot.PartyView party = PartyPlaceholderSnapshot.get(player.getUniqueId());
+        switch (identifier) {
+            case "party_in_party":
+                return party != null ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
+            case "party_size":
+                return party == null ? "0" : "" + party.members().size();
+            case "party_max_size":
+                return "" + Party.MAX_MEMBERS;
+            case "party_leader":
+                return party == null ? "" : party.leader();
+            case "party_members":
+                return party == null ? "" : String.join(", ",
+                        party.members().stream().map(member -> member.state().name()).toList());
+        }
+        if (!identifier.startsWith("party_member_")) return null;
+
+        // party_member_<n> is a member's name; _line is their party sidebar line and the rest are raw values.
+        String[] parts = identifier.substring("party_member_".length()).split("_", 2);
+        int index;
+        try {
+            index = Integer.parseInt(parts[0]) - 1;
+        } catch (NumberFormatException exception) {
+            return null;
+        }
+        if (index < 0) return null;
+        PartyPlaceholderSnapshot.MemberView member =
+                party == null || index >= party.members().size() ? null : party.members().get(index);
+        PartyMemberDisplay.MemberState state = member == null ? null : member.state();
+        if (parts.length == 1) return state == null ? "" : state.name();
+        return switch (parts[1]) {
+            case "line" -> member == null ? "" : member.line();
+            case "health" -> state == null || state.health() == null ? "" : CombatHealthFormatter.format(state.health());
+            case "max_health" ->
+                    state == null || state.maxHealth() == null ? "" : CombatHealthFormatter.format(state.maxHealth());
+            case "lives" -> state == null || state.lives() == null ? "" : "" + state.lives();
+            case "downed" -> state == null ? "" : state.downed()
+                    ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
+            case "online" -> state == null ? "" : state.online()
+                    ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
             default -> null;
         };
     }
