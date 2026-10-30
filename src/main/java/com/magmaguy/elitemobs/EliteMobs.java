@@ -165,8 +165,6 @@ public class EliteMobs extends JavaPlugin {
         new EconomySettingsConfig();
         new EventsConfig();
         new SkillsConfig();
-        com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.prepare();
-        new EnchantmentsConfig();
         new AntiExploitConfig();
         new CombatTagConfig();
         new AntiExploitConfig();
@@ -180,7 +178,6 @@ public class EliteMobs extends JavaPlugin {
         CommandsConfig.initializeConfigs();
         new DiscordSRVConfig();
         new PeaceBannerConfig();
-        new CustomEventsConfig();
         new QuestsConfig();
         new PartyConfig();
         new WormholesConfig();
@@ -318,6 +315,24 @@ public class EliteMobs extends JavaPlugin {
     private void asyncInitialization(PluginInitializationContext initializationContext) {
         initializationContext.step("Configs");
         initializeConfigs();
+        initializationContext.step("Database");
+        new DatabaseConfig();
+        initializationContext.step("Skill Bonuses Config");
+        new SkillBonusesConfig();
+        initializationContext.step("Power Stances");
+        MinorPowerStanceMath.initializeVectorCache();
+        MajorPowerStanceMath.initializeVectorCache();
+        initializationContext.step("Configuration Export");
+        ConfigurationExporter.initializeConfigs();
+        //Initialize importer before loading content configs so that newly imported
+        //files are on disk when the config classes scan for them.
+        initializationContext.step("Content Importer");
+        waitForModelRegistryRebuild(MagmaCore.initializeImporter(this));
+        // Enchantments and events come after the importer so a pack imported on this boot or reload
+        // registers its own enchantments and events now, not only on the next reload.
+        initializationContext.step("Enchantments");
+        com.magmaguy.elitemobs.items.EliteEnchantmentCatalog.prepare();
+        new EnchantmentsConfig();
         // Publish on the server thread before authored item construction resolves providers.
         try {
             Bukkit.getScheduler().callSyncMethod(this, () -> {
@@ -330,22 +345,10 @@ public class EliteMobs extends JavaPlugin {
         } catch (java.util.concurrent.ExecutionException failure) {
             throw new IllegalStateException("Cannot publish enchantments", failure.getCause());
         }
-        initializationContext.step("Database");
-        new DatabaseConfig();
-        initializationContext.step("Skill Bonuses Config");
-        new SkillBonusesConfig();
         initializationContext.step("Events");
+        new CustomEventsConfig();
         ActionEvent.initializeBlueprintEvents();
         TimedEvent.initializeBlueprintEvents();
-        initializationContext.step("Power Stances");
-        MinorPowerStanceMath.initializeVectorCache();
-        MajorPowerStanceMath.initializeVectorCache();
-        initializationContext.step("Configuration Export");
-        ConfigurationExporter.initializeConfigs();
-        //Initialize importer before loading content configs so that newly imported
-        //files are on disk when the config classes scan for them.
-        initializationContext.step("Content Importer");
-        waitForModelRegistryRebuild(MagmaCore.initializeImporter(this));
         initializationContext.step("Powers Config");
         new LuaPowersConfig();
         new PowersConfig();
