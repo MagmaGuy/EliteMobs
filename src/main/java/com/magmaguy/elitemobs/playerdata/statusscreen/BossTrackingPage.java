@@ -1,7 +1,9 @@
 package com.magmaguy.elitemobs.playerdata.statusscreen;
 
+import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.PlayerStatusMenuConfig;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.BossTrackingBar;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
@@ -121,7 +123,14 @@ public class BossTrackingPage {
             CustomBossEntity boss = bosses.get(event.getSlot());
             if (boss != null) {
                 player.closeInventory();
-                boss.getBossTrackingBar().addTrackingPlayer(player);
+                // The menu keeps the bosses it opened with; a boss that died while it
+                // was open has no tracking bar left.
+                BossTrackingBar trackingBar = boss.exists() ? boss.getBossTrackingBar() : null;
+                if (trackingBar == null) {
+                    Logger.sendSimpleMessage(player, DefaultConfig.getBossAlreadyGoneMessage());
+                    return;
+                }
+                trackingBar.addTrackingPlayer(player);
                 return;
             }
             if (event.getSlot() == 53) {

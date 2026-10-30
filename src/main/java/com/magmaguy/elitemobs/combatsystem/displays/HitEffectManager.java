@@ -85,12 +85,28 @@ final class HitEffectManager {
         return location != null && location.getWorld() != null && location.getWorld().equals(player.getWorld());
     }
 
+    /**
+     * Places the shield 1.5 blocks from the elite towards the player. Returns null when no finite
+     * location exists, so callers never hand NaN to a spawn or teleport.
+     */
     private static Location resistLocation(Player player, EliteEntity eliteEntity) {
-        Vector direction = player.getLocation().subtract(eliteEntity.getLocation())
-                .toVector().normalize().multiply(1.5);
-        Location location = eliteEntity.getLocation().add(direction);
+        Location playerLocation = player.getLocation();
+        Location eliteLocation = eliteEntity.getLocation();
+        if (!isFinite(playerLocation.toVector()) || !isFinite(eliteLocation.toVector())) return null;
+        Vector direction = playerLocation.toVector().subtract(eliteLocation.toVector());
+        // A player standing exactly on the elite leaves no direction to normalize; face the
+        // shield back towards the player instead.
+        if (!isFinite(direction) || direction.lengthSquared() < 1.0E-6)
+            direction = playerLocation.getDirection().multiply(-1);
+        if (!isFinite(direction) || direction.lengthSquared() < 1.0E-6) return null;
+        direction.normalize().multiply(1.5);
+        Location location = eliteLocation.add(direction);
         location.setDirection(direction);
         return location;
+    }
+
+    private static boolean isFinite(Vector vector) {
+        return Double.isFinite(vector.getX()) && Double.isFinite(vector.getY()) && Double.isFinite(vector.getZ());
     }
 
     private interface HitEffect {
@@ -110,6 +126,7 @@ final class HitEffectManager {
             this.eliteEntity = eliteEntity;
             this.player = player;
             Location location = resistLocation(player, eliteEntity);
+            if (location == null) throw new IllegalStateException("Resist effect has no finite location");
             if (location.getWorld() == null) throw new IllegalStateException("Resist effect has no world");
             ArmorStand spawnedArmorStand = location.getWorld().spawn(location, ArmorStand.class, stand -> {
                 stand.setVisible(false);
@@ -132,10 +149,13 @@ final class HitEffectManager {
         @Override
         public boolean update() {
             if (ticks > 20 || !sameValidWorld(eliteEntity, player)) return false;
-            try {
-                armorStand.teleport(resistLocation(player, eliteEntity));
-            } catch (IllegalArgumentException ignored) {
-                // A transient non-finite direction only skips this frame.
+            Location location = resistLocation(player, eliteEntity);
+            if (location != null) {
+                try {
+                    armorStand.teleport(location);
+                } catch (IllegalArgumentException ignored) {
+                    // A rejected teleport only skips this frame.
+                }
             }
             ticks++;
             return true;
