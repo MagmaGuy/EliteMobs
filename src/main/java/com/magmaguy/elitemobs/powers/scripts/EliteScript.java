@@ -158,7 +158,10 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
         closeRuntime(RemovalReason.OTHER);
     }
 
-    /** Death scripts may finish their finite aftermath; every other removal stops all action work. */
+    /**
+     * On death, death scripts and finite non-repeating actions that were already waiting may finish,
+     * for at most {@link ScriptAction#MAX_POST_DEATH_TICKS}. Every other removal stops all action work.
+     */
     public void closeRuntime(RemovalReason removalReason) {
         finishDeathActions = removalReason == RemovalReason.DEATH && (!closed || finishDeathActions);
         closed = true;
@@ -175,7 +178,7 @@ public class EliteScript extends ElitePower implements Cloneable, ScriptRuntimeO
 
     private boolean suppressed(EliteEntity eliteEntity, ScriptActionData previousData) {
         return eliteEntity == null || eliteEntity.getPowerSuppression().isSuppressed()
-                || (closed && !(finishDeathActions && previousData != null && previousData.originatesFromDeath()));
+                || (closed && !(finishDeathActions && previousData != null && previousData.mayRunAfterOwnerDeath()));
     }
 
     public static class EliteScriptEvents implements Listener {

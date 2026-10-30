@@ -76,6 +76,44 @@ public class ScriptActionData {
         return false;
     }
 
+    // Set on an invocation still queued when its boss died; RUN_SCRIPT children inherit both through the chain.
+    private boolean queuedBeforeOwnerDeath;
+    private Location ownerDeathLocation;
+
+    /** Records that this invocation outlives its boss, and where the boss's body was when it died. */
+    void survivedOwnerDeath(Location deathLocation, boolean queuedBeforeDeath) {
+        if (queuedBeforeDeath) queuedBeforeOwnerDeath = true;
+        if (ownerDeathLocation == null && deathLocation != null) ownerDeathLocation = deathLocation.clone();
+    }
+
+    /** True when this invocation, or the one that ran it, was already waiting when the boss died. */
+    boolean queuedBeforeOwnerDeath() {
+        for (ScriptActionData data = this; data != null; data = data.inheritedScriptActionData) {
+            if (data.queuedBeforeOwnerDeath) return true;
+        }
+        return false;
+    }
+
+    /** Death scripts and work queued before the death may both finish after the boss is gone. */
+    boolean mayRunAfterOwnerDeath() {
+        return originatesFromDeath() || queuedBeforeOwnerDeath();
+    }
+
+    /**
+     * The boss's location for resolving same_as_boss worlds and nearby targets. A dead boss keeps
+     * reporting where it died; when it no longer reports any location, work that outlived the death
+     * falls back to the location recorded at the death. Returns null when that world is unloaded.
+     */
+    Location bossLocation() {
+        Location current = eliteEntity == null ? null : eliteEntity.getLocation();
+        if (current != null) return current;
+        for (ScriptActionData data = this; data != null; data = data.inheritedScriptActionData) {
+            if (data.ownerDeathLocation != null)
+                return data.ownerDeathLocation.isWorldLoaded() ? data.ownerDeathLocation.clone() : null;
+        }
+        return null;
+    }
+
     /** Each action owns its targets, so this identifies a RUN_SCRIPT cycle without another registry. */
     boolean repeatsActionInChain() {
         for (ScriptActionData data = inheritedScriptActionData; data != null; data = data.inheritedScriptActionData) {

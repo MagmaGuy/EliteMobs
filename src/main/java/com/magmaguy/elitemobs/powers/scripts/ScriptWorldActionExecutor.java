@@ -158,7 +158,7 @@ final class ScriptWorldActionExecutor {
      */
     void runPush(ScriptActionData scriptActionData) {
         Vector velocity = action.getBlueprint().getScriptRelativeVectorBlueprint() != null
-                ? new ScriptRelativeVector(action.getBlueprint().getScriptRelativeVectorBlueprint(), action.runtimeOwner(), scriptActionData.getEliteEntity().getLocation()).getVector(scriptActionData)
+                ? new ScriptRelativeVector(action.getBlueprint().getScriptRelativeVectorBlueprint(), action.runtimeOwner(), scriptActionData.bossLocation()).getVector(scriptActionData)
                 : action.getBlueprint().getVValue();
 
         // Ensure velocity is finite, otherwise default to zero vector

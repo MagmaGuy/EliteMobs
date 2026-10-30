@@ -62,14 +62,17 @@ public class ScriptTargets {
             return null;
         }
         Location parsedLocation = ConfigurationLocation.serialize(locationString);
-        if (parsedLocation.getWorld() == null && locationString.split(",")[0].equalsIgnoreCase("same_as_boss")) {
-            parsedLocation.setWorld(eliteEntity.getLocation().getWorld());
+        //Falls back to where the boss died, so actions that outlive it still resolve its world.
+        Location bossLocation = scriptActionData != null ? scriptActionData.bossLocation() : eliteEntity.getLocation();
+        World bossWorld = bossLocation == null ? null : bossLocation.getWorld();
+        if (parsedLocation.getWorld() == null && bossWorld != null
+                && locationString.split(",")[0].equalsIgnoreCase("same_as_boss")) {
+            parsedLocation.setWorld(bossWorld);
         }
-        if (parsedLocation.getWorld() == null && eliteEntity.getLocation() != null && eliteEntity.getLocation().getWorld() != null) {
+        if (parsedLocation.getWorld() == null && bossWorld != null) {
             //Instanced dungeons clone the blueprint world under "<blueprintWorldName>_<number>", so a
             //configured world name that isn't loaded must still resolve when the boss is inside an
             //instance of that blueprint world - otherwise teleports and zone origins get a null world.
-            World bossWorld = eliteEntity.getLocation().getWorld();
             String configuredWorldName = ConfigurationLocation.worldName(locationString);
             if (configuredWorldName != null && !configuredWorldName.isBlank() &&
                     bossWorld.getName().matches(Pattern.quote(configuredWorldName) + "_\\d+"))
@@ -91,7 +94,7 @@ public class ScriptTargets {
     //Get living entity targets. New array lists so they are not immutable.
     public Collection<LivingEntity> getTargetEntities(ScriptActionData scriptActionData) {
         //If a script zone exists, it overrides the check entirely to expose zone-based fields
-        Location eliteEntityLocation = scriptActionData.getEliteEntity().getLocation();
+        Location eliteEntityLocation = scriptActionData.bossLocation();
 
         if (targetBlueprint == null) {
             Logger.warn("An action tried to run with an invalid target! Check which on it is by reading the startup logs and fix it! No target will be acquired for now.");

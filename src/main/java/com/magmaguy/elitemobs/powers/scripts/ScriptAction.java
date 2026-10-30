@@ -19,6 +19,7 @@ import com.magmaguy.elitemobs.powers.scripts.caching.ScriptActionBlueprint;
 import com.magmaguy.elitemobs.powers.scripts.enums.ActionType;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.elitemobs.utils.BossBarOrderManager;
+import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.magmacore.util.AttributeManager;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import com.magmaguy.magmacore.util.Logger;
@@ -47,6 +48,15 @@ public class ScriptAction {
     private static final int DEFAULT_BOSS_BAR_DURATION_TICKS = 100;
 
     /**
+     * Hard limit on how long any script action may keep running after its boss dies: death scripts,
+     * their RUN_SCRIPT chains and repeats, and waited actions queued before the death. The longest
+     * shipped post-death sequence is The Steamworks' 2-minute slow-fall barrier (2,460 ticks).
+     */
+    public static final int MAX_POST_DEATH_TICKS = 3600;
+    // One warning per action definition, so a boss that dies often does not flood the console.
+    private static final Set<String> postDeathCapWarnings = ConcurrentHashMap.newKeySet();
+
+    /**
      * A thread-safe set of player UUIDs who are currently invulnerable due to scripts.
      */
     @Getter
@@ -65,6 +75,7 @@ public class ScriptAction {
     private final Set<ScheduledAction> scheduledActions = new HashSet<>();
     private boolean closed;
     private boolean finishDeathActions;
+    private long ownerDeathTick = -1L;
 
     /**
      * Constructs a new ScriptAction with the given blueprint, script map, and elite script.
@@ -185,7 +196,7 @@ public class ScriptAction {
                     }
 
                     //Cancel if the entity's world is no longer loaded (e.g. world/chunk unloaded)
-                    Location entityLocation = scriptActionData.getEliteEntity().getLocation();
+                    Location entityLocation = scriptActionData.bossLocation();
                     if (entityLocation == null || entityLocation.getWorld() == null) {
                         cancel();
                         return;
@@ -295,16 +306,50 @@ public class ScriptAction {
                 || scriptActionData.getEliteEntity().getPowerSuppression().isSuppressed();
     }
 
+    /**
+     * After a death, death scripts may finish their finite chains, and a non-repeating action that was
+     * already waiting may still run, as it did before 10.9.5. Content such as The Quarry summons the boss
+     * that opens the next room from a waited action, so dropping it at death softlocked the dungeon.
+     * Nothing runs past {@link #MAX_POST_DEATH_TICKS}.
+     */
     private boolean canFinishAfterDeath(ScriptActionData data) {
-        return finishDeathActions && data != null && data.originatesFromDeath()
-                && !data.repeatsActionInChain() && sourceWorldIsLoaded(data)
-                && (blueprint.getRepeatEvery().getValue() <= 0 || blueprint.getTimes().getValue() > 0);
+        if (!finishDeathActions || data == null) return false;
+        boolean repeats = blueprint.getRepeatEvery().getValue() > 0;
+        boolean admitted = data.originatesFromDeath() || (data.queuedBeforeOwnerDeath() && !repeats);
+        if (!admitted || data.repeatsActionInChain() || !sourceWorldIsLoaded(data)
+                || (repeats && blueprint.getTimes().getValue() <= 0)) return false;
+        if (!postDeathWindowExpired()) return true;
+        warnPostDeathCap();
+        return false;
+    }
+
+    private boolean postDeathWindowExpired() {
+        if (ownerDeathTick < 0) return false;
+        long elapsed = GameClock.getCurrentTick() - ownerDeathTick;
+        // A negative span means the clock restarted with the plugin; nothing from before may continue.
+        return elapsed < 0 || elapsed >= MAX_POST_DEATH_TICKS;
+    }
+
+    private void warnPostDeathCap() {
+        String key = blueprint.getScriptFilename() + "|" + blueprint.getScriptName() + "|" + blueprint.getActionType();
+        if (!postDeathCapWarnings.add(key)) return;
+        Logger.warn("Stopped action " + blueprint.getActionType() + " in script '" + blueprint.getScriptName()
+                + "' of '" + blueprint.getScriptFilename() + "' because its boss died more than "
+                + MAX_POST_DEATH_TICKS + " ticks ago. Actions may run for at most " + MAX_POST_DEATH_TICKS
+                + " ticks after their boss dies. This warning is shown once per action.");
     }
 
     private boolean sourceWorldIsLoaded(ScriptActionData data) {
-        Location location = data.getEliteEntity() == null ? null : data.getEliteEntity().getLocation();
+        Location location = data.bossLocation();
         return location != null && location.getWorld() != null
                 && Bukkit.getWorld(location.getWorld().getUID()) != null;
+    }
+
+    /** Marks a pending invocation that outlives the death and pins where the boss died for its targets. */
+    private void keepThroughDeath(ScriptActionData data) {
+        if (data == null || data.getEliteEntity() == null) return;
+        boolean queuedBeforeDeath = !data.originatesFromDeath() && blueprint.getRepeatEvery().getValue() <= 0;
+        data.survivedOwnerDeath(data.getEliteEntity().getLocation(), queuedBeforeDeath);
     }
 
     /** Landing callbacks still belong to the action that launched them, even after its owner resumes. */
@@ -315,12 +360,17 @@ public class ScriptAction {
     /**
      * A phase switch keeps the logical boss alive, so entity validity cannot own these callbacks.
      * Cancel them with this action; temporary-state restoration tasks retain their existing lifetime.
+     * On death, work admitted by {@link #canFinishAfterDeath} keeps running inside the post-death window.
      */
     void close(boolean finishDeathActions) {
+        boolean firstDeathClose = finishDeathActions && !closed;
         this.finishDeathActions = finishDeathActions && (!closed || this.finishDeathActions);
         closed = true;
-        for (ScheduledAction action : new ArrayList<>(scheduledActions))
+        if (firstDeathClose) ownerDeathTick = GameClock.getCurrentTick();
+        for (ScheduledAction action : new ArrayList<>(scheduledActions)) {
+            if (this.finishDeathActions) keepThroughDeath(action.data);
             if (!canFinishAfterDeath(action.data)) action.cancel();
+        }
     }
 
     private abstract class ScheduledAction extends BukkitRunnable {
@@ -376,11 +426,26 @@ public class ScriptAction {
      */
     protected Collection<LivingEntity> getTargets(ScriptActionData scriptActionData) {
         Collection<LivingEntity> livingTargets = scriptConditions.validateEntities(scriptActionData, scriptTargets.getTargetEntities(scriptActionData));
+        if (closed) livingTargets = withoutDeadBoss(livingTargets, scriptActionData);
         scriptTargets.setAnonymousTargets(new ArrayList<>(livingTargets), scriptActionData);
         if (blueprint.isDebug()) {
             livingTargets.forEach(livingTarget -> Logger.showLocation(livingTarget.getLocation()));
         }
         return livingTargets;
+    }
+
+    /**
+     * Effects aimed at the boss itself are skipped once it is dead. Location-based actions still use its
+     * body's position, and SET_WEATHER only reads the target's world, so it keeps the body.
+     */
+    private Collection<LivingEntity> withoutDeadBoss(Collection<LivingEntity> targets, ScriptActionData data) {
+        if (blueprint.getActionType() == ActionType.SET_WEATHER || data.getEliteEntity() == null) return targets;
+        LivingEntity body = data.getEliteEntity().getUnsyncedLivingEntity();
+        if (body == null || body.isValid()) return targets;
+        UUID bodyId = body.getUniqueId();
+        List<LivingEntity> remaining = new ArrayList<>(targets);
+        remaining.removeIf(target -> target == body || target.getUniqueId().equals(bodyId));
+        return remaining;
     }
 
     /**
@@ -590,6 +655,7 @@ public class ScriptAction {
         TimedScriptStateManager.shutdown();
         invulnerablePlayers.clear();
         scriptDamageDepth.remove();
+        postDeathCapWarnings.clear();
     }
 
     /**
@@ -941,7 +1007,7 @@ public class ScriptAction {
 
     private void setFacing(ScriptActionData scriptActionData) {
         Vector direction = blueprint.getScriptRelativeVectorBlueprint() != null
-                ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, scriptActionData.getEliteEntity().getLocation()).getVector(scriptActionData)
+                ? new ScriptRelativeVector(blueprint.getScriptRelativeVectorBlueprint(), runtimeOwner, scriptActionData.bossLocation()).getVector(scriptActionData)
                 : blueprint.getVValue();
 
         if (direction == null) {
