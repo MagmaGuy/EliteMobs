@@ -12,8 +12,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -46,11 +49,13 @@ import java.util.Objects;
  * language cell is blank, so it is the shipped default's mirror, not a place anyone edits to change what players
  * see. The {@code <lang_code>} column is human-owned. Reconciliation therefore <strong>never writes the language
  * column of an existing row</strong> - it only ever refreshes {@code en}, and reports how many translations were
- * left pointing at English text that has since changed.
+ * left pointing at English text that has since changed. Only a downloaded translation update writes that column, and
+ * only where it still holds the recorded translation ({@link #applyPendingUpdate}).
  */
 public class TranslationsConfigFields {
 
     private static final String TRANSLATIONS_DATA_SUFFIX = "_data.csv";
+    private static final String BEFORE_UPDATE_SUFFIX = ".csv.before-update";
     static final String TEXT_KEY_PREFIX = "text.";
     private static final String ENGLISH_COLUMN = "en";
     /**
@@ -103,6 +108,10 @@ public class TranslationsConfigFields {
     private BukkitTask pendingFlush;
     private int writeFailures;
     private int shapeConflictCount;
+    /**
+     * The merged translation update, deleted once the merge is saved.
+     */
+    private volatile Path appliedUpdate;
 
     public TranslationsConfigFields() {
         // Parse language name from config (e.g., "french" or "french.yml" -> "french")
@@ -283,6 +292,146 @@ public class TranslationsConfigFields {
         baselineData = loadBaseline();
         baselineData.addLanguage(ENGLISH_COLUMN);
         baselineData.addLanguage(languageCode);
+
+        applyPendingUpdate(folder);
+    }
+
+    /**
+     * Merges a translation update downloaded by {@link TranslationUpdater} into the live file, before any key registers.
+     * <p>
+     * A row takes the published translation while it still holds the translation recorded in the baseline, which is
+     * what was last shipped for it. A row with no baseline was never registered on this server and takes it too. A
+     * translation edited since it was recorded is kept and counted. The {@code en} cell follows the translation it was
+     * published with, unless it was edited by hand; registration then reconciles it with the English this build ships.
+     * Rows missing here are added, except the field-key copies of content lines, which {@link #moveLegacyRow} would
+     * remove again.
+     * <p>
+     * The update is renamed to {@code .applying} first and deleted only once the merge is saved, so a crash before that
+     * applies it again on the next start. The file as it was before the merge is kept as
+     * {@code <language>.csv.before-update}, because baselines adopted before they were tracked may hold hand edits.
+     */
+    private void applyPendingUpdate(Path folder) {
+        if (!writable || !DefaultConfig.isAutoUpdateTranslations()) return;
+        Path update = folder.resolve(languageName + TranslationUpdater.UPDATE_SUFFIX);
+        Path applying = folder.resolve(languageName + TranslationUpdater.APPLYING_SUFFIX);
+        try {
+            //A newer download supersedes one whose merge was never saved.
+            if (Files.exists(update))
+                Files.move(update, applying, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            Logger.warn("Could not apply the downloaded " + languageName + " translation update: " + e.getMessage());
+            return;
+        }
+        if (!Files.exists(applying)) return;
+        TranslationCsvParser.TranslationData published;
+        try {
+            published = TranslationCsvParser.parse(applying);
+        } catch (IOException e) {
+            Logger.warn("Discarded a downloaded " + languageName + " translation update that could not be read: " + e.getMessage());
+            deleteAppliedUpdate(applying);
+            return;
+        }
+        if (!published.getLanguages().contains(languageCode)) {
+            Logger.warn("Discarded a downloaded " + languageName + " translation update without a " + languageCode + " column.");
+            deleteAppliedUpdate(applying);
+            return;
+        }
+
+        Map<Object, Object> contentTranslations = new HashMap<>();
+        for (String key : published.getKeys())
+            if (key.startsWith(TEXT_KEY_PREFIX))
+                contentTranslations.put(published.get(key, ENGLISH_COLUMN), published.get(key, languageCode));
+
+        int updated = 0;
+        int added = 0;
+        int kept = 0;
+        boolean recorded = false;
+        List<String> keptSample = new ArrayList<>();
+        for (String key : published.getKeys()) {
+            Object publishedEnglish = published.get(key, ENGLISH_COLUMN);
+            Object publishedTranslation = published.get(key, languageCode);
+            if (isMissingTranslation(publishedTranslation)) continue;
+
+            if (!translationData.hasKey(key)) {
+                if (!key.startsWith(TEXT_KEY_PREFIX) && contentTranslations.containsKey(publishedEnglish)
+                        && Objects.equals(contentTranslations.get(publishedEnglish), publishedTranslation)) continue;
+                if (publishedEnglish != null) translationData.set(key, ENGLISH_COLUMN, publishedEnglish);
+                translationData.set(key, languageCode, publishedTranslation);
+                added++;
+                continue;
+            }
+
+            if (mixesShapes(translationData, key, publishedTranslation) || mixesShapes(baselineData, key, publishedTranslation)
+                    || (publishedEnglish != null && (publishedEnglish instanceof List) != (publishedTranslation instanceof List)))
+                continue;
+            int width = Math.max(Math.max(otherLanguageWidth(translationData, key), otherLanguageWidth(baselineData, key)),
+                    otherLanguageWidth(published, key));
+            Object liveEnglish = translationData.get(key, ENGLISH_COLUMN);
+            Object liveTranslation = translationData.get(key, languageCode);
+            Object recordedTranslation = baselineData.get(key, languageCode);
+
+            if (csvValuesEqual(liveTranslation, publishedTranslation, width)) {
+                //Already current, perhaps because someone wrote the same fix. It now counts as shipped.
+                if (recordedTranslation != null && !csvValuesEqual(recordedTranslation, publishedTranslation, width)) {
+                    baselineData.set(key, languageCode, liveTranslation);
+                    recorded = true;
+                }
+                continue;
+            }
+            if (recordedTranslation != null && !csvValuesEqual(liveTranslation, recordedTranslation, width)) {
+                kept++;
+                recordSample(keptSample, key);
+                continue;
+            }
+
+            translationData.set(key, languageCode, publishedTranslation);
+            if (baselineData.hasKey(key)) baselineData.set(key, languageCode, publishedTranslation);
+            Object recordedEnglish = baselineData.get(key, ENGLISH_COLUMN);
+            if (publishedEnglish != null
+                    && (recordedEnglish == null || csvValuesEqual(liveEnglish, recordedEnglish, width))) {
+                translationData.set(key, ENGLISH_COLUMN, publishedEnglish);
+                if (recordedEnglish != null) baselineData.set(key, ENGLISH_COLUMN, publishedEnglish);
+            }
+            updated++;
+        }
+
+        if (kept > 0)
+            Logger.info(kept + " translations you edited in " + languageName + ".csv were kept instead of the downloaded"
+                    + " update (e.g. " + String.join(", ", keptSample) + ").");
+        if (updated == 0 && added == 0 && !recorded) {
+            deleteAppliedUpdate(applying);
+            return;
+        }
+        if (updated > 0) {
+            try {
+                Files.copy(translationsPath, folder.resolve(languageName + BEFORE_UPDATE_SUFFIX), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                Logger.warn("Could not keep a copy of " + languageName + ".csv before updating it: " + e.getMessage());
+            }
+        }
+        Logger.info("Applied the downloaded " + languageName + " translations: " + updated + " updated, " + added
+                + " added." + (updated > 0 ? " The previous file is kept as translations/" + languageName + BEFORE_UPDATE_SUFFIX + "." : ""));
+        appliedUpdate = applying;
+        if (updated > 0 || added > 0) dirty = true;
+        if (updated > 0 || recorded) baselineDirty = true;
+        changeGeneration++;
+        scheduleSave();
+    }
+
+    private static boolean mixesShapes(TranslationCsvParser.TranslationData data, String key, Object value) {
+        for (String language : data.getLanguages()) {
+            Object existing = data.get(key, language);
+            if (existing != null && (existing instanceof List) != (value instanceof List)) return true;
+        }
+        return false;
+    }
+
+    private void deleteAppliedUpdate(Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            Logger.warn("Could not remove the applied " + languageName + " translation update: " + e.getMessage());
+        }
     }
 
     private TranslationCsvParser.TranslationData loadTranslations(String csvFilename) {
@@ -377,6 +526,11 @@ public class TranslationsConfigFields {
             Object current = translationData.get(textKey, languageCode);
             if (isMissingTranslation(current) || csvValuesEqual(current, english, width)) {
                 translationData.set(textKey, languageCode, legacy);
+                //A shipped translation replacing a placeholder is recorded as shipped, so translation updates still
+                //reach it. One edited after its own baseline stays unrecorded and is kept as an edit.
+                Object recordedLegacy = baselineData.get(legacyKey, languageCode);
+                if (baselineData.hasKey(textKey) && (recordedLegacy == null || csvValuesEqual(recordedLegacy, legacy, width)))
+                    baselineData.set(textKey, languageCode, legacy);
                 movedTranslationCount++;
             } else if (!Objects.equals(current, legacy)) {
                 conflictingTranslationCount++;
@@ -572,6 +726,12 @@ public class TranslationsConfigFields {
             // Baselines never advance when publishing the corresponding live CSV failed.
             if (snapshot.live != null) TranslationCsvParser.write(snapshot.live, translationsPath);
             if (snapshot.baseline != null) TranslationCsvParser.write(snapshot.baseline, baselinePath);
+            //Every snapshot is taken after the merge, so the first successful save holds it.
+            Path applied = appliedUpdate;
+            if (applied != null) {
+                appliedUpdate = null;
+                deleteAppliedUpdate(applied);
+            }
             return true;
         } catch (IOException | RuntimeException failure) {
             Logger.warn("Could not save translations/" + languageName
@@ -629,9 +789,11 @@ public class TranslationsConfigFields {
             Logger.warn(staleTranslationCount + " shipped translations in " + languageName
                     + ".csv now describe English text that has been corrected"
                     + (staleSample.isEmpty() ? "" : " (e.g. " + String.join(", ", staleSample) + ")")
-                    + ". Nothing was overwritten. To pull the current translation, delete translations/"
+                    + (DefaultConfig.isAutoUpdateTranslations() && TranslationUpdater.remoteLanguage(languageName) != null
+                    ? ". Nothing was overwritten. Updated translations replace them automatically once they are published."
+                    : ". Nothing was overwritten. To pull the current translation, delete translations/"
                     + languageName + ".csv and translations/" + languageName + TRANSLATIONS_DATA_SUFFIX
-                    + ", then run '/em language " + languageName + "'.");
+                    + ", then run '/em language " + languageName + "'."));
 
         if (handWrittenTranslationCount > 0)
             Logger.warn(handWrittenTranslationCount + " translations you edited yourself in " + languageName

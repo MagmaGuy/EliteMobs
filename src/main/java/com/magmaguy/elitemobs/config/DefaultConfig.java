@@ -92,6 +92,8 @@ public class DefaultConfig extends ConfigurationFile {
     private static double bedrockNPCRoleYOffset;
     @Getter
     private static boolean autoDownloadPluginUpdates;
+    @Getter
+    private static boolean autoUpdateTranslations;
 
     public static boolean useResourcePackModels(){
         return DefaultConfig.useResourcePackEvenIfResourcePackManagerIsNotInstalled || Bukkit.getPluginManager().isPluginEnabled("ResourcePackManager");
@@ -130,6 +132,12 @@ public class DefaultConfig extends ConfigurationFile {
         language = ConfigurationEngine.setString(
                 List.of("Sets the language file used by EliteMobs", "Do NOT change this manually! It is meant to be installed with the command '/em language <languagefile>'"),
                 file, fileConfiguration, "language", "english", false);
+        //Read before the translations load, because loading them applies a downloaded update
+        autoUpdateTranslations = ConfigurationEngine.setBoolean(
+                List.of("Sets whether EliteMobs downloads updated translations for the language set with '/em language'.",
+                        "It checks magmaguy.com at startup and every 24 hours, and applies an update on the next restart or '/em reload'.",
+                        "Translations you edited in the language file are kept."),
+                fileConfiguration, "autoUpdateTranslations", true);
         //This needs to be initialized as soon as the language is figured out
         new TranslationsConfig();
 

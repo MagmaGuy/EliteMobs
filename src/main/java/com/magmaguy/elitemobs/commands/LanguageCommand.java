@@ -3,7 +3,7 @@ package com.magmaguy.elitemobs.commands;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.translations.TranslationCsvParser;
+import com.magmaguy.elitemobs.config.translations.TranslationUpdater;
 import com.magmaguy.elitemobs.config.translations.TranslationsConfigFields;
 import com.magmaguy.magmacore.command.AdvancedCommand;
 import com.magmaguy.magmacore.command.CommandData;
@@ -13,10 +13,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -34,13 +30,6 @@ import java.util.UUID;
  */
 public class LanguageCommand extends AdvancedCommand {
 
-    // Remote-available languages (CSV files hosted on server)
-    private static final List<String> REMOTE_LANGUAGES = List.of(
-            "french", "german", "spanish", "italian", "portuguese", "portugueseBrazilian",
-            "russian", "chineseSimplified", "chineseTraditional", "japanese", "korean",
-            "polish", "dutch", "czech", "hungarian", "romanian", "turkish", "vietnamese", "indonesian"
-    );
-
     private final List<String> suggestions;
     private static Request activeRequest;
 
@@ -51,7 +40,7 @@ public class LanguageCommand extends AdvancedCommand {
         Set<String> langs = new LinkedHashSet<>();
         langs.add("english");  // Default - uses plugin files directly
         langs.add("custom");   // Auto-generated English→English for customization
-        langs.addAll(REMOTE_LANGUAGES);
+        langs.addAll(TranslationUpdater.REMOTE_LANGUAGES);
 
         Path folder = Paths.get(
                 MetadataHandler.PLUGIN.getDataFolder().getAbsolutePath(),
@@ -218,6 +207,7 @@ public class LanguageCommand extends AdvancedCommand {
             if (!Files.exists(request.target)) {
                 Files.move(request.temporary, request.target, StandardCopyOption.ATOMIC_MOVE);
                 TranslationsConfigFields.discardBaseline(request.target.getParent(), request.language);
+                TranslationUpdater.freshCopyInstalled(request.target.getParent(), request.language, request.etag);
             }
             activeRequest = null;
             Logger.sendMessage(request.sender, CommandMessagesConfig.getLanguageDownloadSuccessMessage()
@@ -245,6 +235,7 @@ public class LanguageCommand extends AdvancedCommand {
         final Path temporary;
         final CommandSender sender;
         volatile boolean cancelled;
+        volatile String etag;
         BukkitTask worker;
         BukkitTask completion;
 
@@ -256,26 +247,7 @@ public class LanguageCommand extends AdvancedCommand {
         }
 
         void download() throws Exception {
-            HttpURLConnection current = (HttpURLConnection) new URL(
-                    "https://magmaguy.com/api/elitemobs_translations/" + language + ".csv").openConnection();
-            if (cancelled) { current.disconnect(); return; }
-            try {
-                current.setRequestMethod("GET");
-                current.setConnectTimeout(10_000);
-                current.setReadTimeout(30_000);
-                int status = current.getResponseCode();
-                if (status != HttpURLConnection.HTTP_OK) throw new java.io.IOException("HTTP " + status);
-                Files.createDirectories(target.getParent());
-                try (InputStream in = current.getInputStream();
-                     OutputStream out = Files.newOutputStream(temporary, StandardOpenOption.CREATE_NEW)) {
-                    byte[] buffer = new byte[8192];
-                    int count;
-                    while (!cancelled && (count = in.read(buffer)) != -1) out.write(buffer, 0, count);
-                }
-                if (!cancelled) TranslationCsvParser.parse(temporary);
-            } finally {
-                current.disconnect();
-            }
+            etag = TranslationUpdater.download(language, temporary, null, () -> cancelled);
         }
 
         synchronized void cancel() {

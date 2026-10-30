@@ -619,6 +619,7 @@ public class EliteMobs extends JavaPlugin {
         Check for new plugin version or for dungeon updates
          */
         VersionChecker.check();
+        com.magmaguy.elitemobs.config.translations.TranslationUpdater.start();
 
         DynamicQuest.startRandomizingQuests();
         CustomBossEntity.startUpdatingDynamicLevels();
@@ -665,6 +666,7 @@ public class EliteMobs extends JavaPlugin {
         if (enchantmentAnvil != null) { shutdownStep(enchantmentAnvil::close); enchantmentAnvil = null; }
         shutdownStep(CustomItem::shutdownCacheRegeneration);
         shutdownStep(com.magmaguy.elitemobs.commands.LanguageCommand::shutdown);
+        shutdownStep(com.magmaguy.elitemobs.config.translations.TranslationUpdater::shutdown);
         shutdownStep(ClassSelectionMenu::shutdown);
         shutdownStep(() -> MagmaCore.requestInitializationShutdown(this));
         shutdownStep(PatrolEditor::shutdown);
