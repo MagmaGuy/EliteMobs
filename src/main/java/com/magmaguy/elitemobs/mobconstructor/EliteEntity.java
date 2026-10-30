@@ -787,10 +787,10 @@ public class EliteEntity {
 
         setMaxHealth();
 
+        // Keep the name EliteMobs built. Reading it back from the entity would return Bukkit's copy,
+        // which is cut at 256 characters, so long gradient names lost their end in messages.
         if (getName() == null)
             setDefaultName(EliteMobProperties.getPluginData(entityType));
-
-        this.name = livingEntity.getCustomName();
     }
 
     private boolean commitNormalizedSpawn() {
