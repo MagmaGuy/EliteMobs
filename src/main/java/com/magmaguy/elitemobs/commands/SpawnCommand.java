@@ -13,6 +13,7 @@ import com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs.EliteMobProp
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -102,20 +103,16 @@ public class SpawnCommand {
                                               String fileName,
                                               String world,
                                               Vector coords) {
-        try {
-            Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
-            CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
-            if (customBossesConfigFields == null) {
-                commandSender.sendMessage(CommandMessagesConfig.getFilenameNotValidMessage().replace("$filename", fileName));
-                return;
-            }
-            CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
-            customBossEntity.setSpawnLocation(location);
-            customBossEntity.spawn(false);
-        } catch (Exception e) {
-            commandSender.sendMessage(CommandMessagesConfig.getWorldNotValidMessage());
+        Location location = commandLocation(commandSender, world, coords);
+        if (location == null) return;
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
+        if (customBossesConfigFields == null) {
+            commandSender.sendMessage(CommandMessagesConfig.getFilenameNotValidMessage().replace("$filename", fileName));
+            return;
         }
-
+        CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
+        customBossEntity.setSpawnLocation(location);
+        customBossEntity.spawn(false);
     }
 
     public static void spawnCustomBossCommand(CommandSender commandSender,
@@ -123,21 +120,27 @@ public class SpawnCommand {
                                               String world,
                                               Vector coords,
                                               int level) {
-        try {
-            Location location = new Location(Bukkit.getWorld(world), coords.getX(), coords.getY(), coords.getZ());
-            CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
-            if (customBossesConfigFields == null) {
-                commandSender.sendMessage(CommandMessagesConfig.getFilenameNotValidMessage().replace("$filename", fileName));
-                return;
-            }
-            CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
-            customBossEntity.setSpawnLocation(location);
-            customBossEntity.setLevel(level);
-            customBossEntity.spawn(false);
-        } catch (Exception e) {
-            commandSender.sendMessage(CommandMessagesConfig.getWorldNotValidMessage());
+        Location location = commandLocation(commandSender, world, coords);
+        if (location == null) return;
+        CustomBossesConfigFields customBossesConfigFields = CustomBossesConfig.getCustomBoss(fileName);
+        if (customBossesConfigFields == null) {
+            commandSender.sendMessage(CommandMessagesConfig.getFilenameNotValidMessage().replace("$filename", fileName));
+            return;
         }
+        CustomBossEntity customBossEntity = new CustomBossEntity(customBossesConfigFields);
+        customBossEntity.setSpawnLocation(location);
+        customBossEntity.setLevel(level);
+        customBossEntity.spawn(false);
+    }
 
+    // Spawn failures used to be reported as an invalid world; only a missing world gets that message now.
+    private static Location commandLocation(CommandSender commandSender, String world, Vector coords) {
+        World bukkitWorld = Bukkit.getWorld(world);
+        if (bukkitWorld == null) {
+            commandSender.sendMessage(CommandMessagesConfig.getWorldNotValidMessage());
+            return null;
+        }
+        return new Location(bukkitWorld, coords.getX(), coords.getY(), coords.getZ());
     }
 
     public static void spawnCustomBossCommand(Player player, String fileName, int level) {
