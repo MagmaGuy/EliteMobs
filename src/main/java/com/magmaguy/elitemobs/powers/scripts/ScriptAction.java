@@ -836,7 +836,7 @@ public class ScriptAction {
      */
     private void runPlayAnimation(ScriptActionData scriptActionData) {
         getTargets(scriptActionData).forEach(target -> {
-            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
+            EliteEntity eliteEntity = scriptActionData.eliteOf(target);
             if (eliteEntity instanceof CustomBossEntity customBossEntity && customBossEntity.getCustomModel() != null) {
                 customBossEntity.getCustomModel().playAnimationByName(blueprint.getSValue());
             }
@@ -984,7 +984,7 @@ public class ScriptAction {
         int duration = blueprint.getDuration().getValue();
 
         targets.forEach(target -> {
-            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
+            EliteEntity eliteEntity = scriptActionData.eliteOf(target);
             if (eliteEntity instanceof CustomBossEntity customBossEntity) {
                 Navigation.navigateTo(customBossEntity, speed, destination, avoidObstacles, duration);
             }
@@ -1031,7 +1031,7 @@ public class ScriptAction {
     private void runHeal(ScriptActionData scriptActionData) {
         double healAmount = blueprint.getAmount().getValue();
         getTargets(scriptActionData).forEach(target -> {
-            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
+            EliteEntity eliteEntity = scriptActionData.eliteOf(target);
             if (eliteEntity != null) {
                 // your existing Elite‐only heal
                 eliteEntity.heal(healAmount);
@@ -1046,7 +1046,7 @@ public class ScriptAction {
 
     private void runRemoveElite(ScriptActionData scriptActionData) {
         getTargets(scriptActionData).forEach(target -> {
-            EliteEntity eliteEntity = EntityTracker.getEliteMobEntity(target);
+            EliteEntity eliteEntity = scriptActionData.eliteOf(target);
             if (eliteEntity != null) {
                 eliteEntity.remove(RemovalReason.OTHER);
             }

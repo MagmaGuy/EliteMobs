@@ -293,7 +293,7 @@ final class ScriptWorldActionExecutor {
         int duration = action.getBlueprint().getDuration().getValue();
 
         action.getTargets(scriptActionData).forEach(target -> {
-            EliteEntity bossEntity = EntityTracker.getEliteMobEntity(target);
+            EliteEntity bossEntity = scriptActionData.eliteOf(target);
             if (bossEntity != null) {
                 for (String tag : tags) {
                     TimedScriptStateManager.apply(
@@ -326,7 +326,7 @@ final class ScriptWorldActionExecutor {
         int duration = action.getBlueprint().getDuration().getValue();
 
         action.getTargets(scriptActionData).forEach(target -> {
-            EliteEntity bossEntity = EntityTracker.getEliteMobEntity(target);
+            EliteEntity bossEntity = scriptActionData.eliteOf(target);
             if (bossEntity != null) {
                 for (String tag : tags) {
                     TimedScriptStateManager.apply(

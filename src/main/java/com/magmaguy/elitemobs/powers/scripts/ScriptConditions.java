@@ -1,6 +1,5 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
-import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.scripts.caching.ScriptConditionsBlueprint;
@@ -73,34 +72,34 @@ public class ScriptConditions {
     /**
      * Checks if a living entity has all the required tags, honoring inversion.
      */
-    private boolean hasTagsCheck(LivingEntity target) {
+    private boolean hasTagsCheck(EliteEntity actor, LivingEntity target) {
         List<String> tags = conditionsBlueprint.getHasTags();
         if (tags == null) return true;
-        boolean actual = tagsUninverted(target, tags);
+        boolean actual = tagsUninverted(actor, target, tags);
         return eval(actual, Boolean.TRUE, conditionsBlueprint.getRunIfHasTagIs());
     }
 
     /**
      * Checks if a living entity does not have any of the disallowed tags, honoring inversion.
      */
-    private boolean doesNotHaveTags(LivingEntity target) {
+    private boolean doesNotHaveTags(EliteEntity actor, LivingEntity target) {
         List<String> tags = conditionsBlueprint.getDoesNotHaveTags();
         if (tags == null) return true;
-        boolean actual = tagsUninverted(target, tags);
+        boolean actual = tagsUninverted(actor, target, tags);
         return eval(actual, Boolean.FALSE, conditionsBlueprint.getRunIfDoesNotHaveTagIs());
     }
 
     /**
      * Helper: fetches entity's tags and returns true if all blueprintTags are present.
      */
-    private boolean tagsUninverted(LivingEntity target, List<String> blueprintTags) {
+    private boolean tagsUninverted(EliteEntity actor, LivingEntity target, List<String> blueprintTags) {
         List<String> entityTags = null;
         try {
             if (target instanceof Player player) {
                 ElitePlayerInventory inv = ElitePlayerInventory.getPlayer(player);
                 if (inv != null) entityTags = new ArrayList<>(inv.getTags());
             } else {
-                EliteEntity mob = EntityTracker.getEliteMobEntity(target);
+                EliteEntity mob = ScriptActionData.eliteOf(actor, target);
                 if (mob != null) entityTags = new ArrayList<>(mob.getTags());
             }
         } catch (Exception e) {
@@ -177,7 +176,7 @@ public class ScriptConditions {
         int count = entities.size();
 
         if (!targetCountLowerThan(count) || !targetCountGreaterThan(count)) return false;
-        for (LivingEntity e : entities) if (!checkConditions(e)) return false;
+        for (LivingEntity e : entities) if (!checkConditions(eliteEntity, e)) return false;
         for (Location loc : scriptTargets.getTargetLocations(data, entities)) if (!checkConditions(loc)) return false;
         return checkRandomizer();
     }
@@ -195,18 +194,18 @@ public class ScriptConditions {
         Collection<LivingEntity> entities = scriptTargets.getTargetEntities(data);
         int count = entities.size();
         if (!targetCountLowerThan(count) || !targetCountGreaterThan(count)) return false;
-        for (LivingEntity e : entities) if (!checkConditions(e)) return false;
+        for (LivingEntity e : entities) if (!checkConditions(data.getEliteEntity(), e)) return false;
         for (Location loc : scriptTargets.getTargetLocations(data, entities)) if (!checkConditions(loc)) return false;
         return checkRandomizer();
     }
 
-    private boolean checkConditions(LivingEntity livingEntity) {
+    private boolean checkConditions(EliteEntity actor, LivingEntity livingEntity) {
         if (scriptTargets == null) return true;
         if (livingEntity == null) return false;
         return isAliveCheck(livingEntity)
-                && hasTagsCheck(livingEntity)
+                && hasTagsCheck(actor, livingEntity)
                 && checkConditions(livingEntity.getLocation())
-                && doesNotHaveTags(livingEntity);
+                && doesNotHaveTags(actor, livingEntity);
     }
 
     private boolean checkConditions(Location location) {
@@ -251,9 +250,9 @@ public class ScriptConditions {
         if (scriptTargets == null) return original;
         if (data == null) { Logger.warn("ScriptActionData is null in validateEntities."); return original; }
         if (scriptTargets.getTargetBlueprint().getTargetType().equals(TargetType.ACTION_TARGET)) {
-            original.removeIf(ent -> !checkConditions(ent));
+            original.removeIf(ent -> !checkConditions(data.getEliteEntity(), ent));
         } else {
-            for (LivingEntity e : scriptTargets.getTargetEntities(data)) if (!checkConditions(e)) return new ArrayList<>();
+            for (LivingEntity e : scriptTargets.getTargetEntities(data)) if (!checkConditions(data.getEliteEntity(), e)) return new ArrayList<>();
         }
         return original;
     }

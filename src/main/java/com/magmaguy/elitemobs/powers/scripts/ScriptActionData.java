@@ -1,12 +1,14 @@
 package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.api.EliteMobDeathEvent;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.powers.scripts.enums.TargetType;
 import com.magmaguy.magmacore.scripting.zones.Shape;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 
@@ -37,6 +39,21 @@ public class ScriptActionData {
 
     void captureInheritedTargets(ScriptTargets targets, List<?> values) {
         inheritedTargets.put(targets, copyTargets(values));
+    }
+
+    /** The elite that owns this target, or null when it is not an elite. */
+    public EliteEntity eliteOf(Entity target) {
+        return eliteOf(eliteEntity, target);
+    }
+
+    /**
+     * Spawn scripts run inside EliteMobSpawnEvent, before EntityTracker publishes their elite, so the script's own
+     * elite is matched by its body before the tracker is asked.
+     */
+    static EliteEntity eliteOf(EliteEntity actor, Entity target) {
+        if (actor != null && target != null
+                && (actor.getLivingEntity() == target || actor.getUnsyncedLivingEntity() == target)) return actor;
+        return target == null ? null : EntityTracker.getEliteMobEntity(target);
     }
 
     private static List<?> copyTargets(List<?> targets) {
