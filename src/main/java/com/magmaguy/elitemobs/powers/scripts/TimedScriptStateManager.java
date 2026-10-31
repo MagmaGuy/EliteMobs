@@ -2,6 +2,9 @@ package com.magmaguy.elitemobs.powers.scripts;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.magmacore.util.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -38,7 +41,7 @@ public final class TimedScriptStateManager {
             discard(key, state);
             state = null;
         }
-        State selected = state == null ? new State(current) : state;
+        State selected = state == null ? new State(current, worldOf(targetId)) : state;
         Mutation mutation = new Mutation(owner, value);
         if (durationTicks > 0)
             mutation.task = MetadataHandler.PLUGIN.getServer().getScheduler().runTaskLater(
@@ -60,17 +63,28 @@ public final class TimedScriptStateManager {
     }
 
     public static void applyInvulnerability(Object owner, LivingEntity target, boolean value, int durationTicks) {
+        writeInvulnerability(Objects.requireNonNull(owner, "owner"), target, value, durationTicks);
+    }
+
+    /** A lasting write: replaces any timed invulnerability on the target and tracks nothing to restore. */
+    static void setInvulnerability(LivingEntity target, boolean value) {
+        writeInvulnerability(null, target, value, 0);
+    }
+
+    private static void writeInvulnerability(Object owner, LivingEntity target, boolean value, int durationTicks) {
         UUID id = target.getUniqueId();
-        applyOwned(owner, id, "invulnerable", new Invulnerability(value, target instanceof Player && value),
-                durationTicks, () -> new Invulnerability(target.isInvulnerable(),
-                        target instanceof Player && ScriptAction.getInvulnerablePlayers().contains(id)),
-                state -> {
-                    target.setInvulnerable(state.nativeValue());
-                    if (target instanceof Player) {
-                        if (state.scriptOwned()) ScriptAction.getInvulnerablePlayers().add(id);
-                        else ScriptAction.getInvulnerablePlayers().remove(id);
-                    }
-                });
+        Invulnerability invulnerability = new Invulnerability(value, target instanceof Player && value);
+        Supplier<Invulnerability> reader = () -> new Invulnerability(target.isInvulnerable(),
+                target instanceof Player && ScriptAction.getInvulnerablePlayers().contains(id));
+        Consumer<Invulnerability> writer = state -> {
+            target.setInvulnerable(state.nativeValue());
+            if (target instanceof Player) {
+                if (state.scriptOwned()) ScriptAction.getInvulnerablePlayers().add(id);
+                else ScriptAction.getInvulnerablePlayers().remove(id);
+            }
+        };
+        if (owner == null) apply(id, "invulnerable", invulnerability, durationTicks, reader, writer);
+        else applyOwned(owner, id, "invulnerable", invulnerability, durationTicks, reader, writer);
     }
 
     public static boolean releaseProperty(Object owner, UUID targetId, String property) {
@@ -87,6 +101,19 @@ public final class TimedScriptStateManager {
         for (StateKey key : Set.copyOf(keys)) {
             State state = states.get(key);
             if (state != null) release(key, state, state.active.get(owner));
+        }
+    }
+
+    /**
+     * Drops the state of an unloading world's entities without writing to them. Each state's writer
+     * holds its entity and the entity holds its world, so a leftover state keeps the world in memory.
+     */
+    public static void discardWorld(World world) {
+        for (Map.Entry<StateKey, State> entry : new ArrayList<>(states.entrySet())) {
+            State state = entry.getValue();
+            if (!world.getUID().equals(state.worldId)) continue;
+            Entity entity = Bukkit.getEntity(entry.getKey().targetId);
+            if (entity == null || entity.getWorld().equals(world)) discard(entry.getKey(), state);
         }
     }
 
@@ -132,6 +159,12 @@ public final class TimedScriptStateManager {
         }
     }
 
+    /** Players change worlds and are cleaned up when they quit, so their state belongs to no world. */
+    private static UUID worldOf(UUID targetId) {
+        Entity entity = Bukkit.getEntity(targetId);
+        return entity == null || entity instanceof Player ? null : entity.getWorld().getUID();
+    }
+
     private static void unindex(Object owner, StateKey key) {
         Set<StateKey> keys = ownerKeys.get(owner);
         if (keys == null) return;
@@ -151,10 +184,11 @@ public final class TimedScriptStateManager {
     }
     private static final class State {
         final Object baseline;
+        final UUID worldId;
         final Map<Object, Mutation> active = new LinkedHashMap<>();
         Supplier<Object> reader;
         Consumer<Object> writer;
         Object appliedValue;
-        State(Object baseline) { this.baseline = baseline; }
+        State(Object baseline, UUID worldId) { this.baseline = baseline; this.worldId = worldId; }
     }
 }

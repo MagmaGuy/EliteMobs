@@ -653,6 +653,11 @@ public class ScriptAction {
      */
     public static void shutdown() {
         TimedScriptStateManager.shutdown();
+        // Permanent script invulnerability is untracked, so nothing above restored it.
+        invulnerablePlayers.forEach(uuid -> {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) player.setInvulnerable(false);
+        });
         invulnerablePlayers.clear();
         scriptDamageDepth.remove();
         postDeathCapWarnings.clear();

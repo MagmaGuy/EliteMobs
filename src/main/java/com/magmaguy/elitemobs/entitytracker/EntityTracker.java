@@ -9,6 +9,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.EliteMindServiceModule;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
 import com.magmaguy.elitemobs.npcs.NPCEntity;
+import com.magmaguy.elitemobs.powers.scripts.TimedScriptStateManager;
 import com.magmaguy.elitemobs.tagger.PersistentTagger;
 import com.magmaguy.elitemobs.utils.EventCaller;
 import com.magmaguy.magmacore.util.TemporaryBlockManager;
@@ -232,6 +233,8 @@ public class EntityTracker implements Listener {
             if (npcEntity.referencesWorld(world))
                 npcEntity.remove(RemovalReason.WORLD_UNLOAD);
         npcEntities.values().removeIf(npcEntity -> npcEntity.referencesWorld(world));
+
+        TimedScriptStateManager.discardWorld(world);
     }
 
     /**

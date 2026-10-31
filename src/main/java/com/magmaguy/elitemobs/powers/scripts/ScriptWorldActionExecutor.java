@@ -275,8 +275,12 @@ final class ScriptWorldActionExecutor {
         boolean invulnerable = action.getBlueprint().isInvulnerable();
         int duration = action.getBlueprint().getDuration().getValue();
 
-        action.getTargets(scriptActionData).forEach(target ->
-                TimedScriptStateManager.applyInvulnerability(action, target, invulnerable, duration));
+        action.getTargets(scriptActionData).forEach(target -> {
+            // Without a duration the change is permanent. Tracking it under the action would hold the
+            // entity, and through it a closed instance world, in memory until shutdown.
+            if (duration > 0) TimedScriptStateManager.applyInvulnerability(action, target, invulnerable, duration);
+            else TimedScriptStateManager.setInvulnerability(target, invulnerable);
+        });
     }
 
     /**
