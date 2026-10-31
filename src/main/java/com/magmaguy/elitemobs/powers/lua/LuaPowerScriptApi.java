@@ -192,7 +192,8 @@ final class LuaPowerScriptApi {
         Map<UUID, LivingEntity> inside = new HashMap<>();
         final int[] taskId = new int[1];
         taskId[0] = taskController.runRepeating(1, 1, () -> {
-            if (!eliteEntity.exists() || eliteEntity.getLivingEntity() == null || !eliteEntity.getLivingEntity().isValid()) {
+            LivingEntity body = support.bossBody();
+            if (!eliteEntity.exists() || body == null || !body.isValid()) {
                 taskController.cancel(taskId[0]);
                 return;
             }
@@ -262,7 +263,7 @@ final class LuaPowerScriptApi {
         Map<String, Object> spec = (Map<String, Object>) LuaTableConverter.toJavaObject(specTable);
         LuaScriptRuntimeOwner runtimeOwner = zoneHandle == null ? new LuaScriptRuntimeOwner(definition.getFileName()) : zoneHandle.runtimeOwner;
         Location actionLocation = actionLocationValue == null || actionLocationValue.isnil()
-                ? eliteEntity.getLocation()
+                ? support.bossLocation()
                 : support.toLocation(actionLocationValue);
         ScriptRelativeVector vector = new ScriptRelativeVector(
                 new ScriptRelativeVectorBlueprint("__lua_vector__", definition.getFileName(), spec),
@@ -299,8 +300,9 @@ final class LuaPowerScriptApi {
     }
 
     private void damageTarget(LivingEntity target, double amount) {
-        if (eliteEntity.getLivingEntity() != null) {
-            target.damage(amount, eliteEntity.getLivingEntity());
+        LivingEntity body = support.bossBody();
+        if (body != null) {
+            target.damage(amount, body);
         } else {
             target.damage(amount);
         }

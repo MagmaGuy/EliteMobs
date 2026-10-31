@@ -47,10 +47,53 @@ final class LuaPowerSupport {
 
     private final ScriptDefinition definition;
     private final EliteEntity eliteEntity;
+    // Death phase: the boss died and only its surviving scheduled tasks still run.
+    private boolean deathPhase = false;
+    private Location deathLocation = null;
+    private LivingEntity deathBody = null;
 
     LuaPowerSupport(ScriptDefinition definition, EliteEntity eliteEntity) {
         this.definition = definition;
         this.eliteEntity = eliteEntity;
+    }
+
+    /** From now on the boss has no body and stays where it died. */
+    void enterDeathPhase(Location deathLocation, LivingEntity deathBody) {
+        this.deathPhase = true;
+        this.deathLocation = deathLocation == null ? null : deathLocation.clone();
+        this.deathBody = deathBody;
+    }
+
+    /** Drops the dead body reference once the runtime has shut down. */
+    void releaseDeathBody() {
+        deathBody = null;
+    }
+
+    boolean isDeathPhase() {
+        return deathPhase;
+    }
+
+    /** The body the boss died in, kept only so its table keeps its shape; never act on it. */
+    LivingEntity deathBody() {
+        return deathBody;
+    }
+
+    /** The boss's location: where it died during the death phase, its current location otherwise. */
+    Location bossLocation() {
+        if (deathPhase) return deathLocation == null ? null : deathLocation.clone();
+        return eliteEntity.getLocation();
+    }
+
+    /** The boss's living body, or null during the death phase. */
+    LivingEntity bossBody() {
+        return deathPhase ? null : eliteEntity.getLivingEntity();
+    }
+
+    /** Whether the entity is the boss's own body, alive or, during the death phase, dead. */
+    boolean isBossBody(Entity entity) {
+        if (entity == null) return false;
+        LivingEntity body = deathPhase ? deathBody : eliteEntity.getLivingEntity();
+        return body != null && entity.getUniqueId().equals(body.getUniqueId());
     }
 
     LuaTable toLocationTable(Location location) {
@@ -80,13 +123,14 @@ final class LuaPowerSupport {
     }
 
     Location toLocation(LuaValue value) {
-        if (value == null || value.isnil()) return eliteEntity.getLocation();
-        if (!value.istable()) return eliteEntity.getLocation();
+        if (value == null || value.isnil()) return bossLocation();
+        if (!value.istable()) return bossLocation();
         LuaTable table = value.checktable();
         if (table.get("current_location").istable()) {
             table = table.get("current_location").checktable();
         }
-        World world = eliteEntity.getLocation() == null ? null : eliteEntity.getLocation().getWorld();
+        Location bossLocation = bossLocation();
+        World world = bossLocation == null ? null : bossLocation.getWorld();
         if (table.get("world").isstring()) {
             world = Bukkit.getWorld(table.get("world").tojstring());
         }
@@ -463,7 +507,8 @@ final class LuaPowerSupport {
     }
 
     void generateFakeExplosion(List<Location> blockLocations, Location explosionSourceLocation) {
-        if (eliteEntity.getLivingEntity() == null || blockLocations == null || blockLocations.isEmpty()) {
+        LivingEntity body = bossBody();
+        if (body == null || blockLocations == null || blockLocations.isEmpty()) {
             return;
         }
         List<Block> blocks = new ArrayList<>();
@@ -474,7 +519,7 @@ final class LuaPowerSupport {
             blocks.add(blockLocation.getBlock());
         }
         PowersConfigFields powersConfigFields = PowersConfig.getPower(definition.getFileName());
-        Explosion.generateFakeExplosion(blocks, eliteEntity.getLivingEntity(), powersConfigFields, explosionSourceLocation);
+        Explosion.generateFakeExplosion(blocks, body, powersConfigFields, explosionSourceLocation);
     }
 
     void runGoldNuggetDamage(List<ProjectileDamage.FakeProjectile> projectiles) {
@@ -668,12 +713,13 @@ final class LuaPowerSupport {
     }
 
     Shape createShape(LuaValue zoneDefinition) {
-        if (!zoneDefinition.istable() || eliteEntity.getLocation() == null) return null;
+        Location bossLocation = bossLocation();
+        if (!zoneDefinition.istable() || bossLocation == null) return null;
         LuaTable table = zoneDefinition.checktable();
         String kind = getString(table, "kind", "type");
         Location center = resolveLocation(table.get("origin"));
         if (center == null) {
-            center = eliteEntity.getLocation();
+            center = bossLocation;
         }
         Location destination = resolveLocation(table.get("destination"));
         if (destination == null && center != null) {

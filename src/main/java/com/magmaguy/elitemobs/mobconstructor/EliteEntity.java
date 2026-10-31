@@ -1548,6 +1548,8 @@ public class EliteEntity {
             try {
                 if (elitePower instanceof EliteScript eliteScript)
                     eliteScript.closeRuntime(removalReason);
+                else if (elitePower instanceof LuaElitePower luaElitePower)
+                    luaElitePower.closeRuntime(removalReason);
                 else
                     elitePower.closeRuntime();
             } catch (RuntimeException exception) {

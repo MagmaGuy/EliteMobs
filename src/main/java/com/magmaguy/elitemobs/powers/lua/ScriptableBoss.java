@@ -15,13 +15,17 @@ import com.magmaguy.shaded.luaj.vm2.LuaValue;
 import com.magmaguy.shaded.luaj.vm2.Varargs;
 import com.magmaguy.shaded.luaj.vm2.lib.VarArgFunction;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -72,8 +76,83 @@ public class ScriptableBoss extends ScriptableEntity {
     private LuaPowerScriptApi scriptApi;
     private ElitePowerActionRequest currentMindAction;
 
+    // Death phase: the boss died while some of its scheduled tasks still had work to finish.
+    private static final Set<ScriptableBoss> deathPhases = Collections.newSetFromMap(new IdentityHashMap<>());
+    // One warning per power file, so a boss that dies often does not flood the console.
+    private static final Set<String> deathPhaseCapWarnings = new HashSet<>();
+    private boolean died = false;
+    private ScriptInstance deathPhaseInstance;
+    private Location deathLocation;
+    private LivingEntity deathBody;
+
     public ScriptableBoss(EliteEntity eliteEntity) {
         this.eliteEntity = eliteEntity;
+    }
+
+    /**
+     * Moves this boss's runtime into its death phase, or shuts it down when none of its tasks
+     * outlive the boss. Call while the dying body is still attached, so its location is known.
+     *
+     * @return true when the runtime stays in the death phase
+     */
+    boolean retire(ScriptInstance instance, int maxTicks) {
+        if (instance.isClosed()) return false;
+        died = true;
+        deathLocation = eliteEntity.getLocation();
+        deathBody = eliteEntity.getLivingEntity();
+        if (support != null) support.enterDeathPhase(deathLocation, deathBody);
+        deathPhaseInstance = instance;
+        deathPhases.add(this);
+        String fileName = instance.getDefinition().getFileName();
+        boolean retiring = instance.retire(maxTicks, () -> warnDeathPhaseCap(fileName, maxTicks));
+        if (!retiring) forgetDeathPhase();
+        return retiring;
+    }
+
+    private boolean isInDeathPhase() {
+        return deathPhaseInstance != null;
+    }
+
+    private void forgetDeathPhase() {
+        deathPhases.remove(this);
+        deathPhaseInstance = null;
+        deathBody = null;
+        if (support != null) support.releaseDeathBody();
+    }
+
+    @Override
+    public void onShutdown() {
+        if (isInDeathPhase()) forgetDeathPhase();
+    }
+
+    private static void warnDeathPhaseCap(String fileName, int maxTicks) {
+        if (!deathPhaseCapWarnings.add(fileName)) return;
+        Logger.warn("Stopped Lua power '" + fileName + "' because its boss died more than " + maxTicks
+                + " ticks ago. Tasks a boss script keeps after its boss dies may run for at most " + maxTicks
+                + " ticks; cancel a repeating task once its work is done. This warning is shown once per power.");
+    }
+
+    /** Ends every death phase; used when EliteMobs shuts down or reloads. */
+    public static void shutdownDeathPhases() {
+        for (ScriptableBoss boss : new ArrayList<>(deathPhases)) {
+            ScriptInstance instance = boss.deathPhaseInstance;
+            if (instance != null) instance.shutdown();
+            boss.forgetDeathPhase();
+        }
+        deathPhases.clear();
+        deathPhaseCapWarnings.clear();
+    }
+
+    /** Ends the death phases of bosses that died in a world that is unloading. */
+    public static void shutdownDeathPhasesIn(World world) {
+        if (world == null) return;
+        for (ScriptableBoss boss : new ArrayList<>(deathPhases)) {
+            Location location = boss.deathLocation;
+            if (location == null || !world.equals(location.getWorld())) continue;
+            ScriptInstance instance = boss.deathPhaseInstance;
+            if (instance != null) instance.shutdown();
+            boss.forgetDeathPhase();
+        }
     }
 
     public EliteEntity getEliteEntity() {
@@ -99,6 +178,7 @@ public class ScriptableBoss extends ScriptableEntity {
         if (helpersReady) return;
         this.fileName = instance.getDefinition().getFileName();
         this.support = new LuaPowerSupport(instance.getDefinition(), eliteEntity);
+        if (died) support.enterDeathPhase(deathLocation, deathBody);
         LuaPowerScriptApi.OwnedTaskController taskController = new LuaPowerScriptApi.OwnedTaskController() {
             @Override
             public int runLater(int ticks, Runnable runnable) {
@@ -147,11 +227,12 @@ public class ScriptableBoss extends ScriptableEntity {
 
     @Override
     public Entity getBukkitEntity() {
-        return eliteEntity.getLivingEntity();
+        return died ? null : eliteEntity.getLivingEntity();
     }
 
     @Override
     public Location getLocation() {
+        if (died) return deathLocation == null ? null : deathLocation.clone();
         return eliteEntity.getLocation();
     }
 
@@ -255,17 +336,20 @@ public class ScriptableBoss extends ScriptableEntity {
         return cooldowns;
     }
 
+    // Every scheduling call accepts a trailing options table; { outlive_boss = true } keeps the
+    // task running after the boss dies (up to ScriptAction.MAX_POST_DEATH_TICKS). Tasks scheduled
+    // in on_death, or from a task that outlives the boss, outlive it without the option.
     private LuaTable createSchedulerTable(ScriptInstance instance) {
         LuaTable scheduler = new LuaTable();
         scheduler.set("run_after", method(scheduler, args -> {
             int ticks = args.checkint(1);
             LuaFunction callback = args.checkfunction(2);
-            return LuaValue.valueOf(instance.ownLuaLater(ticks, callback));
+            return LuaValue.valueOf(instance.ownLuaLater(ticks, callback, outlivesBoss(args, 3)));
         }));
         scheduler.set("run_every", method(scheduler, args -> {
             int ticks = args.checkint(1);
             LuaFunction callback = args.checkfunction(2);
-            return LuaValue.valueOf(instance.ownLuaRepeating(0, ticks, callback));
+            return LuaValue.valueOf(instance.ownLuaRepeating(0, ticks, callback, outlivesBoss(args, 3)));
         }));
         scheduler.set("cancel_task", method(scheduler, args -> {
             instance.cancelOwned(args.checkint(1));
@@ -275,19 +359,25 @@ public class ScriptableBoss extends ScriptableEntity {
         scheduler.set("run_later", method(scheduler, args -> {
             int ticks = args.checkint(1);
             LuaFunction callback = args.checkfunction(2);
-            return LuaValue.valueOf(instance.ownLuaLater(ticks, callback));
+            return LuaValue.valueOf(instance.ownLuaLater(ticks, callback, outlivesBoss(args, 3)));
         }));
         scheduler.set("run_repeating", method(scheduler, args -> {
             int delay = args.checkint(1);
             int interval = args.checkint(2);
             LuaFunction callback = args.checkfunction(3);
-            return LuaValue.valueOf(instance.ownLuaRepeating(delay, interval, callback));
+            return LuaValue.valueOf(instance.ownLuaRepeating(delay, interval, callback, outlivesBoss(args, 4)));
         }));
         scheduler.set("cancel", method(scheduler, args -> {
             instance.cancelOwned(args.checkint(1));
             return LuaValue.NIL;
         }));
         return scheduler;
+    }
+
+    /** Reads the optional { outlive_boss = true } options table at the given argument position. */
+    private static boolean outlivesBoss(Varargs args, int optionsIndex) {
+        LuaTable options = args.opttable(optionsIndex, null);
+        return options != null && options.get("outlive_boss").optboolean(false);
     }
 
     private LuaTable createZonesTable(ScriptInstance instance) {
@@ -313,7 +403,8 @@ public class ScriptableBoss extends ScriptableEntity {
             // when the boss no longer exists. (Replaces the old onTick-driven zoneWatches list.)
             int[] taskId = new int[1];
             taskId[0] = instance.ownRepeating(1, 1, () -> {
-                if (!eliteEntity.exists() || eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
+                // A dead boss has no zone watches; its death phase only finishes scheduled work.
+                if (died || !eliteEntity.exists() || eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
                     instance.cancelOwned(taskId[0]);
                     return;
                 }

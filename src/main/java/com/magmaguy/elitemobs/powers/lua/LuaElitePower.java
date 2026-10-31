@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.powers.lua;
 
 import com.magmaguy.elitemobs.api.*;
+import com.magmaguy.elitemobs.api.internal.RemovalReason;
 import com.magmaguy.elitemobs.config.powers.LuaPowerConfigFields;
 import com.magmaguy.elitemobs.api.power.ElitePowerActionRequest;
 import com.magmaguy.elitemobs.api.power.ElitePowerActionResult;
@@ -10,6 +11,7 @@ import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.ElitePowerPauseReason;
 import com.magmaguy.elitemobs.mobconstructor.ElitePowerPauseState;
 import com.magmaguy.elitemobs.powers.meta.ElitePower;
+import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
 import com.magmaguy.magmacore.scripting.ScriptHook;
 import com.magmaguy.magmacore.scripting.ScriptInstance;
 import com.magmaguy.magmacore.scripting.ScriptQueryResult;
@@ -86,7 +88,8 @@ public class LuaElitePower extends ElitePower {
         }
         initializeInstance(false);
         if (instance != null) {
-            instance.handleEvent(hook, event, directTarget, directTarget);
+            // Tasks on_death schedules outlive the boss: scheduling there has no other purpose.
+            instance.handleEvent(hook, event, directTarget, directTarget, hook == ScriptableBoss.ON_DEATH);
             recordEventHook(hook, !instance.isClosed());
         } else recordEventHook(hook, false);
     }
@@ -145,10 +148,25 @@ public class LuaElitePower extends ElitePower {
 
     @Override
     public void closeRuntime() {
+        closeRuntime(RemovalReason.OTHER);
+    }
+
+    /**
+     * Closes this power's runtime for its owner's removal. A death moves the runtime into its
+     * death phase, where only tasks that outlive the boss keep running, for at most
+     * {@link ScriptAction#MAX_POST_DEATH_TICKS}. Every other removal shuts it down now.
+     * Either way this power lets go of the runtime, so later close calls do not reach it.
+     */
+    public void closeRuntime(RemovalReason removalReason) {
         ScriptInstance closing = instance;
+        ScriptableBoss closingBoss = scriptableBoss;
         if (closing == null) return;
         instance = null;
         scriptableBoss = null;
+        if (removalReason == RemovalReason.DEATH && closingBoss != null) {
+            closingBoss.retire(closing, ScriptAction.MAX_POST_DEATH_TICKS);
+            return;
+        }
         closing.shutdown();
     }
 

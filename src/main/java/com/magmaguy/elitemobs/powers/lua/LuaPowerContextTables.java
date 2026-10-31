@@ -53,20 +53,20 @@ final class LuaPowerContextTables {
             if (eventActor instanceof Player player) {
                 return entityTables.createPlayerTable(player);
             }
-            if (eliteEntity.getLivingEntity() instanceof Mob mob && mob.getTarget() instanceof Player player) {
+            if (support.bossBody() instanceof Mob mob && mob.getTarget() instanceof Player player) {
                 return entityTables.createPlayerTable(player);
             }
             return LuaValue.NIL;
         }));
         players.set("nearby_players", method(players, args -> {
             LuaTable results = new LuaTable();
-            if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
+            if (support.bossLocation() == null || support.bossLocation().getWorld() == null) {
                 return results;
             }
             double radius = args.checkdouble(1);
             int index = 1;
-            for (Player player : eliteEntity.getLocation().getWorld().getPlayers()) {
-                if (player.getLocation().distanceSquared(eliteEntity.getLocation()) <= radius * radius) {
+            for (Player player : support.bossLocation().getWorld().getPlayers()) {
+                if (player.getLocation().distanceSquared(support.bossLocation()) <= radius * radius) {
                     results.set(index++, entityTables.createPlayerTable(player));
                 }
             }
@@ -74,11 +74,11 @@ final class LuaPowerContextTables {
         }));
         players.set("all_players_in_world", method(players, args -> {
             LuaTable results = new LuaTable();
-            if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
+            if (support.bossLocation() == null || support.bossLocation().getWorld() == null) {
                 return results;
             }
             int index = 1;
-            for (Player player : eliteEntity.getLocation().getWorld().getPlayers()) {
+            for (Player player : support.bossLocation().getWorld().getPlayers()) {
                 results.set(index++, entityTables.createPlayerTable(player));
             }
             return results;
@@ -94,27 +94,25 @@ final class LuaPowerContextTables {
             double radius = args.checkdouble(1);
             String filter = args.narg() >= 2 && args.arg(2).isstring() ? args.arg(2).tojstring() : "living";
             LuaTable results = new LuaTable();
-            if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
+            if (support.bossLocation() == null || support.bossLocation().getWorld() == null) {
                 return results;
             }
             int index = 1;
             if ("all".equalsIgnoreCase(filter) || "entities".equalsIgnoreCase(filter)) {
-                for (org.bukkit.entity.Entity entity : eliteEntity.getLocation().getWorld().getNearbyEntities(
-                        eliteEntity.getLocation(), radius, radius, radius)) {
-                    if (eliteEntity.getLivingEntity() != null &&
-                            entity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
+                for (org.bukkit.entity.Entity entity : support.bossLocation().getWorld().getNearbyEntities(
+                        support.bossLocation(), radius, radius, radius)) {
+                    if (support.isBossBody(entity)) {
                         continue;
                     }
                     results.set(index++, entityTables.createEntityReferenceTable(entity));
                 }
             } else {
-                for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation(),
+                for (LivingEntity livingEntity : support.filterEntities(support.bossLocation(),
                         Math.abs(radius), Math.abs(radius), Math.abs(radius), filter)) {
-                    if (eliteEntity.getLivingEntity() != null &&
-                            livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
+                    if (support.isBossBody(livingEntity)) {
                         continue;
                     }
-                    if (livingEntity.getLocation().distanceSquared(eliteEntity.getLocation()) <= radius * radius) {
+                    if (livingEntity.getLocation().distanceSquared(support.bossLocation()) <= radius * radius) {
                         results.set(index++, entityTables.createEntityTable(livingEntity));
                     }
                 }
@@ -139,8 +137,7 @@ final class LuaPowerContextTables {
             double minZ = center.getZ() - halfZ;
             double maxZ = center.getZ() + halfZ;
             for (LivingEntity livingEntity : support.filterEntities(center, halfX, halfY, halfZ, filter)) {
-                if (eliteEntity.getLivingEntity() != null &&
-                        livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
+                if (support.isBossBody(livingEntity)) {
                     continue;
                 }
                 Location entityLocation = livingEntity.getLocation();
@@ -155,13 +152,12 @@ final class LuaPowerContextTables {
         entities.set("get_all_entities", method(entities, args -> {
             String filter = args.narg() >= 1 && args.arg(1).isstring() ? args.arg(1).tojstring() : "living";
             LuaTable results = new LuaTable();
-            if (eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
+            if (support.bossLocation() == null || support.bossLocation().getWorld() == null) {
                 return results;
             }
             int index = 1;
-            for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation().getWorld(), filter)) {
-                if (eliteEntity.getLivingEntity() != null &&
-                        livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
+            for (LivingEntity livingEntity : support.filterEntities(support.bossLocation().getWorld(), filter)) {
+                if (support.isBossBody(livingEntity)) {
                     continue;
                 }
                 results.set(index++, entityTables.createEntityTable(livingEntity));
@@ -229,15 +225,14 @@ final class LuaPowerContextTables {
     LuaTable queryZoneEntities(LuaValue zoneDefinition, LuaValue optionsValue) {
         LuaTable results = new LuaTable();
         com.magmaguy.magmacore.scripting.zones.Shape shape = support.createShape(zoneDefinition);
-        if (shape == null || eliteEntity.getLocation() == null || eliteEntity.getLocation().getWorld() == null) {
+        if (shape == null || support.bossLocation() == null || support.bossLocation().getWorld() == null) {
             return results;
         }
         String filter = support.resolveZoneFilter(optionsValue);
         boolean borderMode = support.resolveZoneMode(optionsValue);
         int index = 1;
-        for (LivingEntity livingEntity : support.filterEntities(eliteEntity.getLocation().getWorld(), shape, filter)) {
-            if (eliteEntity.getLivingEntity() != null &&
-                    livingEntity.getUniqueId().equals(eliteEntity.getLivingEntity().getUniqueId())) {
+        for (LivingEntity livingEntity : support.filterEntities(support.bossLocation().getWorld(), shape, filter)) {
+            if (support.isBossBody(livingEntity)) {
                 continue;
             }
             boolean contains = borderMode ? shape.borderContains(livingEntity) : shape.contains(livingEntity);

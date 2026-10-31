@@ -709,6 +709,7 @@ public class EliteMobs extends JavaPlugin {
         shutdownStep(NPCEntity::shutdown);
         shutdownStep(PersistentObjectHandler::shutdown);
         shutdownStep(EntityTracker::wipeShutdown);
+        shutdownStep(com.magmaguy.elitemobs.powers.lua.ScriptableBoss::shutdownDeathPhases);
         shutdownStep(TimedEvent::shutdown);
         shutdownStep(ActionEvent::shutdown);
         shutdownStep(PeaceBannerItem::unregisterRecipe);

@@ -71,7 +71,8 @@ final class LuaWorldTableBuilder {
         // invariant. EliteMobs' richer / domain-specific methods are layered on below; same-named
         // *_at_location methods intentionally override the generic Magmacore versions to preserve
         // existing boss-script semantics (LightningSpawnBypass, particle-table options, etc.).
-        org.bukkit.World contextWorld = eliteEntity.getLocation() != null ? eliteEntity.getLocation().getWorld() : null;
+        Location bossLocation = support.bossLocation();
+        org.bukkit.World contextWorld = bossLocation != null ? bossLocation.getWorld() : null;
         LuaTable world = com.magmaguy.magmacore.scripting.tables.LuaWorldTable.build(contextWorld);
         world.set("play_sound_at_location", method(world, args -> {
             support.playSound(support.toLocation(args.arg1()), args.checkjstring(2), support.getFloat(args, 3, 1f), support.getFloat(args, 4, 1f));
@@ -146,7 +147,7 @@ final class LuaWorldTableBuilder {
             return LuaValue.NIL;
         }));
         world.set("set_world_time", method(world, args -> {
-            Location location = args.narg() >= 2 ? support.toLocation(args.arg1()) : eliteEntity.getLocation();
+            Location location = args.narg() >= 2 ? support.toLocation(args.arg1()) : support.bossLocation();
             long time = args.narg() >= 2 ? args.checklong(2) : args.checklong(1);
             if (location != null && location.getWorld() != null) {
                 location.getWorld().setTime(time);
@@ -154,7 +155,7 @@ final class LuaWorldTableBuilder {
             return LuaValue.NIL;
         }));
         world.set("set_world_weather", method(world, args -> {
-            Location location = eliteEntity.getLocation();
+            Location location = support.bossLocation();
             int weatherIndex = 1;
             if (args.narg() >= 2 && args.arg1().istable()) {
                 location = support.toLocation(args.arg1());
@@ -195,7 +196,7 @@ final class LuaWorldTableBuilder {
             if (customBossEntity == null) {
                 return LuaValue.NIL;
             }
-            Location location = args.narg() >= 2 ? support.toLocation(args.arg(2)) : eliteEntity.getLocation();
+            Location location = args.narg() >= 2 ? support.toLocation(args.arg(2)) : support.bossLocation();
             int level = args.narg() >= 3 ? args.checkint(3) : eliteEntity.getLevel();
             if (location != null) {
                 customBossEntity.spawn(location, level, false);
