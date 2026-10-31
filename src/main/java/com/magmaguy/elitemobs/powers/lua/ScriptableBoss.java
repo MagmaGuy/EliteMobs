@@ -84,6 +84,7 @@ public class ScriptableBoss extends ScriptableEntity {
     private ScriptInstance deathPhaseInstance;
     private Location deathLocation;
     private LivingEntity deathBody;
+    private LuaPowerSupport.DeathState deathState;
 
     public ScriptableBoss(EliteEntity eliteEntity) {
         this.eliteEntity = eliteEntity;
@@ -100,7 +101,8 @@ public class ScriptableBoss extends ScriptableEntity {
         died = true;
         deathLocation = eliteEntity.getLocation();
         deathBody = eliteEntity.getLivingEntity();
-        if (support != null) support.enterDeathPhase(deathLocation, deathBody);
+        deathState = LuaPowerSupport.DeathState.of(eliteEntity);
+        if (support != null) support.enterDeathPhase(deathLocation, deathBody, deathState);
         deathPhaseInstance = instance;
         deathPhases.add(this);
         String fileName = instance.getDefinition().getFileName();
@@ -178,7 +180,7 @@ public class ScriptableBoss extends ScriptableEntity {
         if (helpersReady) return;
         this.fileName = instance.getDefinition().getFileName();
         this.support = new LuaPowerSupport(instance.getDefinition(), eliteEntity);
-        if (died) support.enterDeathPhase(deathLocation, deathBody);
+        if (died) support.enterDeathPhase(deathLocation, deathBody, deathState);
         LuaPowerScriptApi.OwnedTaskController taskController = new LuaPowerScriptApi.OwnedTaskController() {
             @Override
             public int runLater(int ticks, Runnable runnable) {

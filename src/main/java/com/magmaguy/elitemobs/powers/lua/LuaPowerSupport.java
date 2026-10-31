@@ -13,6 +13,7 @@ import com.magmaguy.elitemobs.playerdata.database.PlayerData;
 import com.magmaguy.elitemobs.powers.ProjectileDamage;
 import com.magmaguy.elitemobs.playerdata.ElitePlayerInventory;
 import com.magmaguy.elitemobs.powers.scripts.ScriptAction;
+import com.magmaguy.elitemobs.powers.specialpowers.ShieldWallSupport;
 import com.magmaguy.elitemobs.utils.GameClock;
 import com.magmaguy.elitemobs.utils.shapes.RotatingRay;
 import com.magmaguy.elitemobs.utils.shapes.StaticRay;
@@ -51,17 +52,32 @@ final class LuaPowerSupport {
     private boolean deathPhase = false;
     private Location deathLocation = null;
     private LivingEntity deathBody = null;
+    private DeathState deathState = null;
+
+    /**
+     * What the boss was when it died. A regional boss respawns as the same EliteEntity, so during the
+     * death phase the boss table reads this instead of the live entity, which may be its next life.
+     */
+    record DeathState(String name, double maximumHealth, int level, int damagerCount, Set<String> tags,
+                      boolean shieldWallActive) {
+        static DeathState of(EliteEntity eliteEntity) {
+            return new DeathState(eliteEntity.getName(), eliteEntity.getMaxHealth(), eliteEntity.getLevel(),
+                    eliteEntity.getDamagers().size(), Collections.unmodifiableSet(new HashSet<>(eliteEntity.getTags())),
+                    ShieldWallSupport.isActive(eliteEntity));
+        }
+    }
 
     LuaPowerSupport(ScriptDefinition definition, EliteEntity eliteEntity) {
         this.definition = definition;
         this.eliteEntity = eliteEntity;
     }
 
-    /** From now on the boss has no body and stays where it died. */
-    void enterDeathPhase(Location deathLocation, LivingEntity deathBody) {
+    /** From now on the boss has no body, stays where it died and reads as it was then. */
+    void enterDeathPhase(Location deathLocation, LivingEntity deathBody, DeathState deathState) {
         this.deathPhase = true;
         this.deathLocation = deathLocation == null ? null : deathLocation.clone();
         this.deathBody = deathBody;
+        this.deathState = deathState;
     }
 
     /** Drops the dead body reference once the runtime has shut down. */
@@ -71,6 +87,11 @@ final class LuaPowerSupport {
 
     boolean isDeathPhase() {
         return deathPhase;
+    }
+
+    /** The boss as it was when it died, or null while it is alive. */
+    DeathState deathState() {
+        return deathPhase ? deathState : null;
     }
 
     /** The body the boss died in, kept only so its table keeps its shape; never act on it. */

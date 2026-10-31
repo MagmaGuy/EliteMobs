@@ -100,14 +100,15 @@ final class LuaBossTableBuilder {
                 : new LuaTable();
 
         // ── Override properties/methods that need EliteEntity-level semantics ──
-        boss.set("name", LuaValue.valueOf(eliteEntity.getName() == null ? definition.getFileName() : eliteEntity.getName()));
+        String name = bossName();
+        boss.set("name", LuaValue.valueOf(name == null ? definition.getFileName() : name));
         boss.set("uuid", LuaValue.valueOf(eliteEntity.getEliteUUID().toString()));
-        boss.set("health", LuaValue.valueOf(eliteEntity.getHealth()));
-        boss.set("maximum_health", LuaValue.valueOf(eliteEntity.getMaxHealth()));
+        boss.set("health", LuaValue.valueOf(bossHealth()));
+        boss.set("maximum_health", LuaValue.valueOf(bossMaximumHealth()));
         boss.set("current_location", support.toLocationTable(support.bossLocation()));
         boss.set("is_alive", method(boss, args -> LuaValue.valueOf(isAlive(support.bossBody()) && eliteEntity.exists())));
-        boss.set("get_health", method(boss, args -> LuaValue.valueOf(eliteEntity.getHealth())));
-        boss.set("get_maximum_health", method(boss, args -> LuaValue.valueOf(eliteEntity.getMaxHealth())));
+        boss.set("get_health", method(boss, args -> LuaValue.valueOf(bossHealth())));
+        boss.set("get_maximum_health", method(boss, args -> LuaValue.valueOf(bossMaximumHealth())));
         boss.set("get_location", method(boss, args -> support.toLocationTable(support.bossLocation())));
         boss.set("restore_health", method(boss, args -> {
             eliteEntity.heal(args.checkdouble(1));
@@ -122,7 +123,7 @@ final class LuaBossTableBuilder {
             eliteEntity.removeTag(args.checkjstring(1));
             return LuaValue.NIL;
         }));
-        boss.set("has_tag", method(boss, args -> LuaValue.valueOf(eliteEntity.hasTag(args.checkjstring(1)))));
+        boss.set("has_tag", method(boss, args -> LuaValue.valueOf(bossHasTag(args.checkjstring(1)))));
         boss.set("get_nearby_elites", method(boss,
                 args -> nearbyEliteTables(args.checkdouble(1))));
         boss.set("reset_custom_name", method(boss, args -> {
@@ -161,11 +162,11 @@ final class LuaBossTableBuilder {
         }));
 
         // ── Boss-only properties ──
-        boss.set("level", LuaValue.valueOf(eliteEntity.getLevel()));
-        boss.set("damager_count", LuaValue.valueOf(eliteEntity.getDamagers().size()));
-        boss.set("is_in_combat", LuaValue.valueOf(eliteEntity.isInCombat()));
+        boss.set("level", LuaValue.valueOf(bossLevel()));
+        boss.set("damager_count", LuaValue.valueOf(bossDamagerCount()));
+        boss.set("is_in_combat", LuaValue.valueOf(!support.isDeathPhase() && eliteEntity.isInCombat()));
         boss.set("exists", LuaValue.valueOf(!support.isDeathPhase() && eliteEntity.exists()));
-        boss.set("get_damager_count", method(boss, args -> LuaValue.valueOf(eliteEntity.getDamagers().size())));
+        boss.set("get_damager_count", method(boss, args -> LuaValue.valueOf(bossDamagerCount())));
         boss.set("despawn", method(boss, args -> {
             eliteEntity.remove(RemovalReason.OTHER);
             return LuaValue.NIL;
@@ -228,7 +229,10 @@ final class LuaBossTableBuilder {
             SpiritWalkSupport.handleBossDamaged(eliteEntity, cause);
             return LuaValue.NIL;
         }));
-        boss.set("shield_wall_is_active", method(boss, args -> LuaValue.valueOf(ShieldWallSupport.isActive(eliteEntity))));
+        boss.set("shield_wall_is_active", method(boss, args -> {
+            LuaPowerSupport.DeathState dead = support.deathState();
+            return LuaValue.valueOf(dead != null ? dead.shieldWallActive() : ShieldWallSupport.isActive(eliteEntity));
+        }));
         boss.set("initialize_shield_wall", method(boss, args -> {
             ShieldWallSupport.initialize(eliteEntity, args.optint(1, 1));
             return LuaValue.NIL;
@@ -434,7 +438,40 @@ final class LuaBossTableBuilder {
 
     // ── Boss-only helpers ──────────────────────────────────────────────
 
+    // During the death phase these read the boss as it was when it died. A regional boss respawns as
+    // the same EliteEntity, so reading the live entity would report its next life.
+    private String bossName() {
+        LuaPowerSupport.DeathState dead = support.deathState();
+        return dead != null ? dead.name() : eliteEntity.getName();
+    }
+
+    private double bossHealth() {
+        return support.isDeathPhase() ? 0D : eliteEntity.getHealth();
+    }
+
+    private double bossMaximumHealth() {
+        LuaPowerSupport.DeathState dead = support.deathState();
+        return dead != null ? dead.maximumHealth() : eliteEntity.getMaxHealth();
+    }
+
+    private int bossLevel() {
+        LuaPowerSupport.DeathState dead = support.deathState();
+        return dead != null ? dead.level() : eliteEntity.getLevel();
+    }
+
+    private int bossDamagerCount() {
+        LuaPowerSupport.DeathState dead = support.deathState();
+        return dead != null ? dead.damagerCount() : eliteEntity.getDamagers().size();
+    }
+
+    private boolean bossHasTag(String tag) {
+        LuaPowerSupport.DeathState dead = support.deathState();
+        return dead != null ? dead.tags().contains(tag) : eliteEntity.hasTag(tag);
+    }
+
     private Entity resolveBossMountEntity() {
+        // A dead boss rides nothing; the live entity's mount may belong to a respawned life.
+        if (support.isDeathPhase()) return null;
         if (eliteEntity instanceof CustomBossEntity customBossEntity) {
             Entity mountEntity = customBossEntity.getMountEntity();
             if (mountEntity != null && mountEntity.isValid()) {
