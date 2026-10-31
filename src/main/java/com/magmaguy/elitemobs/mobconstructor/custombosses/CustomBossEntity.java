@@ -464,7 +464,14 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
         if (customBossesConfigFields.getAnnouncementPriority() < 1 ||
                 !MobCombatSettingsConfig.isShowCustomBossLocation())
             return;
-        bossTrackingLifecycle.activate(notifyPlayers);
+        bossTrackingLifecycle.activate(notifyPlayers && !hasSilentSpawn());
+    }
+
+    // An explicitly blank spawnMessage asks for a silent spawn: no chat line, no DiscordSRV post and no
+    // click-to-track link. Tracking itself stays available. A missing spawnMessage keeps the link.
+    private boolean hasSilentSpawn() {
+        String spawnMessage = customBossesConfigFields.getSpawnMessage();
+        return spawnMessage != null && spawnMessage.isBlank();
     }
 
     public BossTrackingBar getBossTrackingBar() {
@@ -480,7 +487,7 @@ public class CustomBossEntity extends EliteEntity implements Listener, Persisten
     }
 
     private void spawnMessage() {
-        if (customBossesConfigFields.getSpawnMessage() == null) return;
+        if (customBossesConfigFields.getSpawnMessage() == null || hasSilentSpawn()) return;
         if (customBossesConfigFields.getAnnouncementPriority() < 1) return;
         if (getLocation() == null) return;
         if (getLocation().getWorld() == null) return;
