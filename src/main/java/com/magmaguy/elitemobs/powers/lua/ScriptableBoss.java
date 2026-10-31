@@ -313,26 +313,36 @@ public class ScriptableBoss extends ScriptableEntity {
         return log;
     }
 
+    // A dead boss uses no powers: during its death phase its cooldowns are never ready, none are
+    // counting down, and setting one does nothing. A regional boss respawns as the same EliteEntity,
+    // so reaching the live entity here would read and set the cooldowns of its next life.
     private LuaTable createCooldownTable() {
         LuaTable cooldowns = new LuaTable();
-        cooldowns.set("local_ready", method(cooldowns, args ->
-                LuaValue.valueOf(eliteEntity.isSharedCooldownReady(resolveCooldownKey(args, 1)))));
-        cooldowns.set("local_remaining", method(cooldowns, args ->
-                LuaValue.valueOf(eliteEntity.getSharedCooldownRemainingTicks(resolveCooldownKey(args, 1)))));
+        cooldowns.set("local_ready", method(cooldowns, args -> {
+            String key = resolveCooldownKey(args, 1);
+            return LuaValue.valueOf(!died && eliteEntity.isSharedCooldownReady(key));
+        }));
+        cooldowns.set("local_remaining", method(cooldowns, args -> {
+            String key = resolveCooldownKey(args, 1);
+            return LuaValue.valueOf(died ? 0L : eliteEntity.getSharedCooldownRemainingTicks(key));
+        }));
         cooldowns.set("check_local", method(cooldowns, args -> {
             String key = resolveCooldownKey(args, 1);
             int duration = args.checkint(2);
-            if (!eliteEntity.isSharedCooldownReady(key)) return LuaValue.FALSE;
+            if (died || !eliteEntity.isSharedCooldownReady(key)) return LuaValue.FALSE;
             eliteEntity.setSharedCooldown(key, duration);
             return LuaValue.TRUE;
         }));
         cooldowns.set("set_local", method(cooldowns, args -> {
-            eliteEntity.setSharedCooldown(resolveCooldownKey(args, 2), args.checklong(1));
+            String key = resolveCooldownKey(args, 2);
+            long ticks = args.checklong(1);
+            if (!died) eliteEntity.setSharedCooldown(key, ticks);
             return LuaValue.NIL;
         }));
-        cooldowns.set("global_ready", method(cooldowns, args -> LuaValue.valueOf(!eliteEntity.isInCooldown())));
+        cooldowns.set("global_ready", method(cooldowns, args -> LuaValue.valueOf(!died && !eliteEntity.isInCooldown())));
         cooldowns.set("set_global", method(cooldowns, args -> {
-            eliteEntity.doGlobalPowerCooldown(args.checkint(1));
+            int ticks = args.checkint(1);
+            if (!died) eliteEntity.doGlobalPowerCooldown(ticks);
             return LuaValue.NIL;
         }));
         return cooldowns;
