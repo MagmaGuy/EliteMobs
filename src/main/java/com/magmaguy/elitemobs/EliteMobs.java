@@ -263,6 +263,12 @@ public class EliteMobs extends JavaPlugin {
                 Logger.warn("Failed to save max health value! For the plugin to work correctly, you should increase your max health on the spigot.yml config file to " + LevelScaling.DEFAULT_MINECRAFT_MAX_HEALTH);
             }
         }
+        // The server enforces the cap it started with, so a raised cap must be applied before elites use it.
+        if (LevelScaling.getMinecraftMaxHealth() < LevelScaling.DEFAULT_MINECRAFT_MAX_HEALTH) {
+            LevelScaling.applySpigotAttributeCaps();
+            if (LevelScaling.getMinecraftMaxHealth() < LevelScaling.DEFAULT_MINECRAFT_MAX_HEALTH)
+                Logger.warn("Restart the server to apply the max health of " + LevelScaling.DEFAULT_MINECRAFT_MAX_HEALTH + " set in spigot.yml. Until then, elite health is capped at " + LevelScaling.getMinecraftMaxHealth() + ".");
+        }
 
         //Remove entities that should not exist
         CrashFix.startupCheck();

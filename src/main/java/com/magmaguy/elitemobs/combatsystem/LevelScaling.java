@@ -2,6 +2,8 @@ package com.magmaguy.elitemobs.combatsystem;
 
 import org.bukkit.Bukkit;
 
+import java.lang.reflect.Method;
+
 /**
  * Owns the live, playtested EliteMobs combat curve: exponential elite health plus the offensive
  * and defensive skill adjustments used by the damage pipelines. Advanced level-difference
@@ -52,7 +54,17 @@ public class LevelScaling {
      */
     public static final double DEFAULT_MINECRAFT_MAX_HEALTH = 2048D;
 
+    private static final String SPIGOT_CONFIG_CLASS = "org.spigotmc.SpigotConfig";
+
     public static double getMinecraftMaxHealth() {
+        try {
+            // Spigot applies the spigot.yml cap at startup and keeps the applied value here. The configuration can
+            // already hold a higher cap that the server does not enforce yet.
+            double activeMaxHealth = Class.forName(SPIGOT_CONFIG_CLASS).getField("maxHealth").getDouble(null);
+            if (Double.isFinite(activeMaxHealth) && activeMaxHealth > 0D) return activeMaxHealth;
+        } catch (ReflectiveOperationException | LinkageError ignored) {
+            // Pure unit tests have no Spigot server; fall back to the configuration.
+        }
         try {
             double configuredMaxHealth = Bukkit.getServer().spigot().getConfig().getDouble(
                     "settings.attribute.maxHealth.max",
@@ -62,6 +74,21 @@ public class LevelScaling {
             // Bukkit is not initialized in pure unit tests.
         }
         return DEFAULT_MINECRAFT_MAX_HEALTH;
+    }
+
+    /**
+     * Re-applies Spigot's attribute caps from the in-memory spigot.yml. Spigot reads them only at startup, so a max
+     * health cap EliteMobs raises later would otherwise wait for a restart. Check {@link #getMinecraftMaxHealth()}
+     * afterwards; it still reports the old cap if the server could not re-apply it.
+     */
+    public static void applySpigotAttributeCaps() {
+        try {
+            Method attributeMaxes = Class.forName(SPIGOT_CONFIG_CLASS).getDeclaredMethod("attributeMaxes");
+            attributeMaxes.setAccessible(true);
+            attributeMaxes.invoke(null);
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError ignored) {
+            // The server keeps its startup cap until it restarts.
+        }
     }
 
     // ========================================
