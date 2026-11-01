@@ -101,6 +101,9 @@ public class CustomBossesConfigFields extends CustomConfigFields {
     @Getter
     @Setter
     private String spawnMessage = null;
+    /** The file sets spawnMessage to blank text: the boss spawns without a chat line or a click-to-track link. */
+    @Getter
+    private boolean silentSpawn = false;
     @Getter
     @Setter
     private String deathMessage = null;
@@ -466,7 +469,10 @@ public class CustomBossesConfigFields extends CustomConfigFields {
             this.mountedEntity = null;
         }
         this.customModelMountPointID = processString("customModelMountPointID", customModelMountPointID, null, false);
-        this.spawnMessage = translatableText(filename, "spawnMessage", processString("spawnMessage", spawnMessage, null, false));
+        String rawSpawnMessage = processString("spawnMessage", spawnMessage, null, false);
+        // A missing spawnMessage also converts to "", so only the raw entry tells an explicitly blank one apart.
+        this.silentSpawn = rawSpawnMessage != null && rawSpawnMessage.isBlank();
+        this.spawnMessage = translatableText(filename, "spawnMessage", rawSpawnMessage);
         this.deathMessage = translatableText(filename, "deathMessage", processString("deathMessage", deathMessage, null, false));
         this.escapeMessage = translatableText(filename, "escapeMessage", processString("escapeMessage", escapeMessage, null, false));
         this.disguise = processString("disguise", disguise, null, false);
