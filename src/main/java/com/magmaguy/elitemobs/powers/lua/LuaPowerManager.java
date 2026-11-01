@@ -128,7 +128,12 @@ public final class LuaPowerManager {
         try {
             if (Files.size(file) > 4 * 1024 * 1024) throw new IOException("Lua source is too large: " + file);
             StringBuilder source = new StringBuilder();
+            boolean firstLine = true;
             for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
+                // A Windows editor can save a leading byte order mark. It is not Lua, and left in it would hide an
+                // @include on the first line, break an included fragment and stop translation from parsing the text.
+                if (firstLine && !line.isEmpty() && line.charAt(0) == 0xFEFF) line = line.substring(1);
+                firstLine = false;
                 var include = INCLUDE.matcher(line);
                 if (include.matches())
                     source.append(readSource(file.getParent().resolve(include.group(1)), root, active, depth + 1));
