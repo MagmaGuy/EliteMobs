@@ -10,6 +10,7 @@ import com.magmaguy.shaded.luaj.vm2.parser.ParseException;
 import com.magmaguy.shaded.luaj.vm2.parser.TokenMgrError;
 
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -25,7 +26,8 @@ import java.util.*;
  * {@code and}/{@code or}, through a local only ever assigned that literal ({@code PREFIX .. "line"}), or through the
  * locals, helper parameters, tables and helper results {@link LuaScriptTextFlow} follows ({@code say(c, "line")},
  * {@code LINES[i]}, {@code CFG.PREFIX}). Text built at run time stays English, and so does a file LuaJ's parser cannot
- * read: it rejects {@code \'} inside a single-quoted string, which the compiler accepts.
+ * read: it rejects {@code \'} inside a single-quoted string, which the compiler accepts. The English comes from the
+ * literal's UTF-8 source, since the parser's own value drops characters outside Latin-1.
  */
 final class LuaScriptText {
 
@@ -60,19 +62,16 @@ final class LuaScriptText {
         Map<String, String> translations = new HashMap<>();
         TreeMap<Integer, Replacement> replacements = new TreeMap<>();
         for (Exp.Constant literal : literals) {
-            String english = literal.value.tojstring();
+            Placement placement = place(source, lineStarts, literal);
+            String english = placement != null ? placement.english() : literal.value.tojstring();
             String translated = translations.computeIfAbsent(english, TranslationsConfig::translateText);
             // A literal passed without parentheses, f"text", carries no position and stays English.
             if (translated.equals(english) || literal.beginLine <= 0) continue;
-            int start = offset(source, lineStarts, literal.beginLine, literal.beginColumn);
-            int last = offset(source, lineStarts, literal.endLine, literal.endColumn);
-            // LuaJ starts a local's initial value at the token before it, the = or the , of the assignment.
-            while (start >= 0 && start < last && "'\"[".indexOf(source.charAt(start)) < 0) start++;
-            if (start < 0 || last <= start || !isLiteral(source.substring(start, last + 1), literal.value)) {
+            if (placement == null) {
                 Logger.warn("Could not place translated text in Lua power " + fileName + "; it stays in English.");
                 return source;
             }
-            replacements.put(start, new Replacement(last + 1, quote(translated)));
+            replacements.put(placement.start(), new Replacement(placement.end(), quote(translated)));
         }
 
         StringBuilder translatedSource = new StringBuilder(source);
@@ -81,13 +80,35 @@ final class LuaScriptText {
         return translatedSource.toString();
     }
 
-    /** Whether the text is exactly one string literal with this value, so a replacement can only ever cover it. */
-    private static boolean isLiteral(String text, LuaValue value) {
+    /**
+     * Where the literal sits in the source and the text it holds, or null when its span cannot be confirmed as exactly
+     * that one literal, so a replacement can only ever cover it.
+     * <p>
+     * LuaJ's parser keeps only the low byte of each character of a string, so its value loses anything outside
+     * Latin-1 (an em dash becomes a control character). The compiler reads the source as UTF-8, so the text is read
+     * again from the literal's UTF-8 bytes, one character per byte, which the parser keeps whole.
+     */
+    private static Placement place(String source, List<Integer> lineStarts, Exp.Constant literal) {
+        int start = offset(source, lineStarts, literal.beginLine, literal.beginColumn);
+        int last = offset(source, lineStarts, literal.endLine, literal.endColumn);
+        // LuaJ starts a local's initial value at the token before it, the = or the , of the assignment.
+        while (start >= 0 && start < last && "'\"[".indexOf(source.charAt(start)) < 0) start++;
+        if (start < 0 || last <= start) return null;
+        String text = source.substring(start, last + 1);
+        LuaValue parsed = parseLiteral(text);
+        if (parsed == null || !parsed.raweq(literal.value)) return null;
+        LuaValue value = parseLiteral(new String(text.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+        return value == null ? null : new Placement(start, last + 1, value.tojstring());
+    }
+
+    /** The value of the text when it is exactly one string literal, or null. */
+    private static LuaValue parseLiteral(String text) {
         try {
             LuaParser parser = new LuaParser(new StringReader(text));
-            return parser.Str().raweq(value) && parser.getNextToken().kind == LuaParserConstants.EOF;
+            LuaValue value = parser.Str();
+            return parser.getNextToken().kind == LuaParserConstants.EOF ? value : null;
         } catch (ParseException | TokenMgrError | RuntimeException notALiteral) {
-            return false;
+            return null;
         }
     }
 
@@ -121,6 +142,9 @@ final class LuaScriptText {
             }
         }
         return literal.append('"').toString();
+    }
+
+    private record Placement(int start, int end, String english) {
     }
 
     private record Replacement(int end, String literal) {
