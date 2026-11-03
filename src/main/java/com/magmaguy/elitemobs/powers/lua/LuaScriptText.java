@@ -2,8 +2,6 @@ package com.magmaguy.elitemobs.powers.lua;
 
 import com.magmaguy.elitemobs.config.translations.TranslationsConfig;
 import com.magmaguy.magmacore.util.Logger;
-import com.magmaguy.shaded.luaj.vm2.Lua;
-import com.magmaguy.shaded.luaj.vm2.LuaString;
 import com.magmaguy.shaded.luaj.vm2.LuaValue;
 import com.magmaguy.shaded.luaj.vm2.ast.*;
 import com.magmaguy.shaded.luaj.vm2.parser.LuaParser;
@@ -24,9 +22,10 @@ import java.util.*;
  * <p>
  * A literal counts as text when it reaches the message argument of {@code send_message}, {@code show_action_bar} or
  * {@code show_boss_bar}, or the title and subtitle of {@code show_title}: directly, through {@code ..}, as a value of
- * {@code and}/{@code or}, or through a local only ever assigned that literal ({@code PREFIX .. "line"}). Text built at
- * run time stays English, and so does a file LuaJ's parser cannot read: it rejects {@code \'} inside a single-quoted
- * string, which the compiler accepts.
+ * {@code and}/{@code or}, through a local only ever assigned that literal ({@code PREFIX .. "line"}), or through the
+ * locals, helper parameters, tables and helper results {@link LuaScriptTextFlow} follows ({@code say(c, "line")},
+ * {@code LINES[i]}, {@code CFG.PREFIX}). Text built at run time stays English, and so does a file LuaJ's parser cannot
+ * read: it rejects {@code \'} inside a single-quoted string, which the compiler accepts.
  */
 final class LuaScriptText {
 
@@ -104,47 +103,7 @@ final class LuaScriptText {
     private static Collection<Exp.Constant> findTextLiterals(String source) throws ParseException {
         Chunk chunk = new LuaParser(new StringReader(source)).Chunk();
         chunk.accept(new NameResolver());
-
-        Map<Variable, Exp.Constant> constantLocals = new IdentityHashMap<>();
-        chunk.accept(new Visitor() {
-            @Override
-            public void visit(Stat.LocalAssign stat) {
-                if (stat.values != null)
-                    for (int i = 0; i < Math.min(stat.names.size(), stat.values.size()); i++)
-                        if (stat.values.get(i) instanceof Exp.Constant constant && constant.value instanceof LuaString)
-                            constantLocals.put(((Name) stat.names.get(i)).variable, constant);
-                super.visit(stat);
-            }
-        });
-
-        Set<Exp.Constant> literals = Collections.newSetFromMap(new IdentityHashMap<>());
-        chunk.accept(new Visitor() {
-            @Override
-            public void visit(Exp.MethodCall call) {
-                Integer textArguments = TEXT_ARGUMENTS.get(call.name);
-                if (textArguments != null && call.args.exps != null)
-                    for (int i = 0; i < Math.min(textArguments, call.args.exps.size()); i++)
-                        collect((Exp) call.args.exps.get(i), constantLocals, literals);
-                super.visit(call);
-            }
-        });
-        return literals;
-    }
-
-    private static void collect(Exp exp, Map<Variable, Exp.Constant> constantLocals, Set<Exp.Constant> literals) {
-        if (exp instanceof Exp.Constant constant) {
-            if (constant.value instanceof LuaString) literals.add(constant);
-        } else if (exp instanceof Exp.ParensExp parens) {
-            collect(parens.exp, constantLocals, literals);
-        } else if (exp instanceof Exp.BinopExp binop) {
-            // The left of "and" is a condition, whose literals are compared rather than shown.
-            if (binop.op == Lua.OP_CONCAT || binop.op == Lua.OP_OR) collect(binop.lhs, constantLocals, literals);
-            if (binop.op == Lua.OP_CONCAT || binop.op == Lua.OP_OR || binop.op == Lua.OP_AND)
-                collect(binop.rhs, constantLocals, literals);
-        } else if (exp instanceof Exp.NameExp name && name.name.variable != null && name.name.variable.isConstant()) {
-            Exp.Constant initial = constantLocals.get(name.name.variable);
-            if (initial != null) literals.add(initial);
-        }
+        return new LuaScriptTextFlow(chunk, TEXT_ARGUMENTS).literals();
     }
 
     private static String quote(String text) {
