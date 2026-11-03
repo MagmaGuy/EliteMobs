@@ -90,6 +90,26 @@ public class ElitePlayerInventory {
         return eliteEnchantmentDamage;
     }
 
+    /** Smite levels summed across all six slots, matching how Sharpness and Power count. */
+    public int getSmiteLevel(boolean update) {
+        return helmet.getDamageUndeadLevel(player.getInventory().getHelmet(), update) +
+                chestplate.getDamageUndeadLevel(player.getInventory().getChestplate(), update) +
+                leggings.getDamageUndeadLevel(player.getInventory().getLeggings(), update) +
+                boots.getDamageUndeadLevel(player.getInventory().getBoots(), update) +
+                mainhand.getDamageUndeadLevel(player.getInventory().getItemInMainHand(), update) +
+                offhand.getDamageUndeadLevel(player.getInventory().getItemInOffHand(), update);
+    }
+
+    /** Bane of Arthropods levels summed across all six slots, matching how Sharpness and Power count. */
+    public int getBaneOfArthropodsLevel(boolean update) {
+        return helmet.getDamageArthropodsLevel(player.getInventory().getHelmet(), update) +
+                chestplate.getDamageArthropodsLevel(player.getInventory().getChestplate(), update) +
+                leggings.getDamageArthropodsLevel(player.getInventory().getLeggings(), update) +
+                boots.getDamageArthropodsLevel(player.getInventory().getBoots(), update) +
+                mainhand.getDamageArthropodsLevel(player.getInventory().getItemInMainHand(), update) +
+                offhand.getDamageArthropodsLevel(player.getInventory().getItemInOffHand(), update);
+    }
+
     public double getEliteDefense(boolean update) {
         double defense = helmet.getEliteDefense(player.getInventory().getHelmet(), update) +
                 chestplate.getEliteDefense(player.getInventory().getChestplate(), update) +

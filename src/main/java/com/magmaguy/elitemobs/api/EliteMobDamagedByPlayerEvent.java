@@ -124,8 +124,8 @@ import java.util.Set;
  *       <td>{@link WeaponOffenseCalculator#getSweepMultiplier}</td></tr>
  *   <tr><td>equipmentEnchantmentMultiplier</td><td>1.0 + Sharpness / Power levels × 0.025 from equipped items</td><td>multiplicative</td>
  *       <td>{@link ElitePlayerInventory#getEliteEnchantmentDamage}</td></tr>
- *   <tr><td>enchantmentMultiplier</td><td>1.0 + eliteEnchantLvl × 0.025</td><td>[1.0, ~1.2]</td>
- *       <td>Smite / Bane of Arthropods (elite-only levels)</td></tr>
+ *   <tr><td>enchantmentMultiplier</td><td>1.0 + Smite / Bane levels × 0.025 from equipped items, vs sensitive mobs</td><td>multiplicative</td>
+ *       <td>{@link ElitePlayerInventory#getSmiteLevel} / {@link ElitePlayerInventory#getBaneOfArthropodsLevel}</td></tr>
  *   <tr><td>damageModifier</td><td>boss-specific damage reduction</td><td>[0, 1]</td>
  *       <td>CustomBossEntity config</td></tr>
  *   <tr><td>combatMultiplier</td><td>global config multiplier</td><td>configurable</td>

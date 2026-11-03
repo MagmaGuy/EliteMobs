@@ -48,6 +48,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.damage.DamageSource;
@@ -129,24 +130,22 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
     }
 
     /**
-     * Gets the secondary enchantment multiplier (Smite/Bane of Arthropods).
-     * Returns a multiplier (e.g. 1.05 for 5% bonus) rather than flat damage.
+     * Gets the Smite / Bane of Arthropods multiplier against the mobs Minecraft marks as sensitive to them.
+     * Every level counts, summed across all six equipped slots, at the same rate as Sharpness and Power,
+     * so class loot that rolls Smite on armor works the same way its Sharpness does.
+     * <p>
+     * Reads cached slot data: the caller must refresh the inventory first, as the Sharpness/Power step does.
      */
-    private static double getSecondaryEnchantmentMultiplier(Player player, LivingEntity livingEntity) {
-        if (!ItemSettingsConfig.isUseEliteEnchantments()) return 1.0;
-        if (livingEntity instanceof Spider || livingEntity instanceof Silverfish) {
-            int level = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).mainhand.getDamageArthropodsLevel(player.getInventory().getItemInMainHand(), false);
-            level -= Enchantment.BANE_OF_ARTHROPODS.getMaxLevel();
-            if (level < 1) return 1.0;
-            return 1.0 + level * 0.025; // 2.5% per level
-        }
-        if (livingEntity instanceof Zombie || livingEntity instanceof Skeleton || livingEntity instanceof Wither || livingEntity instanceof SkeletonHorse || livingEntity instanceof ZombieHorse || livingEntity.getType().equals(EntityType.ZOMBIFIED_PIGLIN)) {
-            int level = ElitePlayerInventory.playerInventories.get(player.getUniqueId()).mainhand.getDamageUndeadLevel(player.getInventory().getItemInMainHand(), false);
-            level -= Enchantment.SMITE.getMaxLevel();
-            if (level < 1) return 1.0;
-            return 1.0 + level * 0.025; // 2.5% per level
-        }
-        return 1.0;
+    private static double getSecondaryEnchantmentMultiplier(ElitePlayerInventory inventory, LivingEntity livingEntity) {
+        if (inventory == null) return 1.0;
+        EntityType entityType = livingEntity.getType();
+        int level = 0;
+        if (Tag.ENTITY_TYPES_SENSITIVE_TO_SMITE.isTagged(entityType))
+            level += inventory.getSmiteLevel(false);
+        if (Tag.ENTITY_TYPES_SENSITIVE_TO_BANE_OF_ARTHROPODS.isTagged(entityType))
+            level += inventory.getBaneOfArthropodsLevel(false);
+        if (level < 1) return 1.0;
+        return 1.0 + level * EliteItemManager.DAMAGE_ENCHANTMENT_PERCENT_PER_LEVEL;
     }
 
     /**
@@ -227,8 +226,8 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
      *       for sweep secondary targets, 1.0 for primary — handles sword sweep</li>
      *   <li><b>Equipment enchantment multiplier</b> = 1.0 + Sharpness / Power levels × 0.025
      *       summed from all equipped slots, preserving legacy global-slot behavior</li>
-     *   <li><b>Enchantment multiplier</b> = 1.0 + eliteEnchantLevel × 0.025
-     *       — Smite / Bane of Arthropods (elite-only levels above vanilla max)</li>
+     *   <li><b>Enchantment multiplier</b> = 1.0 + Smite / Bane of Arthropods levels × 0.025
+     *       summed from all equipped slots, against mobs tagged sensitive to that enchantment</li>
      * </ol>
      * <p>
      * Expected outcomes at matched combat (weaponSkillLv == mobLv, weaponItemLv == mobLv):
@@ -368,10 +367,10 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
                 : 0D;
         double equipmentEnchantmentMultiplier = 1.0 + equipmentEnchantmentBonus;
 
-        // 9. Secondary enchantment multiplier (Smite/Bane)
+        // 9. Smite/Bane multiplier from all equipped slots (step 8 refreshed the slot cache).
         LivingEntity target = eliteEntity.getLivingEntity();
         double enchantmentMultiplier = (target != null) ?
-                getSecondaryEnchantmentMultiplier(player, target) : 1.0;
+                getSecondaryEnchantmentMultiplier(elitePlayerInventory, target) : 1.0;
 
         // 10. Skill-spawned arrow damage multiplier (Multishot, Arrow Rain, etc.)
         // Skills that spawn extra arrows store a damage multiplier in the arrow's PDC
@@ -474,7 +473,7 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
                     + "% damage)");
             DebugMessage.send(player, "§7× Enchantment multiplier = §f"
                     + String.format("%.3f", enchantmentMultiplier)
-                    + " §8(Smite/Bane elite-only levels above vanilla max)");
+                    + " §8(Smite/Bane levels from all equipped slots vs sensitive mobs; 2.5% each)");
             DebugMessage.send(player, "§7× Arrow damage multiplier = §f"
                     + String.format("%.3f", arrowDamageMultiplier)
                     + " §8(set by Multishot/Arrow Rain skills on extra arrows; 1.0 for normal shots)");
