@@ -54,6 +54,9 @@ public class CustomSpawnConfigFields extends CustomConfigFields {
     private boolean isSurfaceSpawn = false;
     @Getter
     @Setter
+    private boolean canSpawnOnWater = false;
+    @Getter
+    @Setter
     private boolean isUndergroundSpawn = false;
 
     public CustomSpawnConfigFields(String filename, boolean isEnabled) {
@@ -86,6 +89,7 @@ public class CustomSpawnConfigFields extends CustomConfigFields {
         this.bypassWorldGuard = processBoolean("bypassWorldGuard", bypassWorldGuard, false, false);
         this.canSpawnInLight = processBoolean("canSpawnInLight", canSpawnInLight, false, false);
         this.isSurfaceSpawn = processBoolean("isSurfaceSpawn", isSurfaceSpawn, false, false);
+        this.canSpawnOnWater = processBoolean("canSpawnOnWater", canSpawnOnWater, false, false);
         this.isUndergroundSpawn = processBoolean("isUndergroundSpawn", isUndergroundSpawn, false, false);
     }
 }

@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
@@ -147,6 +148,21 @@ public class CustomSpawn {
             return height;
         }
         return Integer.MIN_VALUE;
+    }
+
+    /**
+     * Returns where a mob stands on the column's surface, or null if that surface is a treetop, lava or water
+     * (unless water is allowed), or something solid fills the two blocks above it.
+     */
+    private static Location getSurfaceLocation(Location location, boolean canSpawnOnWater) {
+        //The no-leaves heightmap skips tree canopies, so a forest column resolves to the forest floor
+        Block ground = location.getWorld().getHighestBlockAt(location, HeightMap.MOTION_BLOCKING_NO_LEAVES);
+        //Non-solid blocks in this heightmap are fluids: water, lava and water plants
+        if (!ground.getType().isSolid() && !(canSpawnOnWater && ground.getType() == Material.WATER)) return null;
+        //Under a canopy or at the top of a trunk the leaves fill the space above the ground
+        Block feet = ground.getRelative(BlockFace.UP);
+        if (feet.getType().isSolid() || feet.getRelative(BlockFace.UP).getType().isSolid()) return null;
+        return feet.getLocation().add(0.5, 0, 0.5);
     }
 
     public void queueSpawn() {
@@ -389,10 +405,11 @@ public class CustomSpawn {
             return null;
 
         //Set Y level - Location isn't final yet
-        if (customSpawnConfigFields.isSurfaceSpawn())
+        if (customSpawnConfigFields.isSurfaceSpawn()) {
             //this won't work for Nether environments, but who wants surface spawns on the Nether?
-            location = Objects.requireNonNull(location.getWorld()).getHighestBlockAt(location).getLocation().add(new Vector(0.5, 1, 0.5));
-        else if (customSpawnConfigFields.isUndergroundSpawn()) {
+            location = getSurfaceLocation(location, customSpawnConfigFields.isCanSpawnOnWater());
+            if (location == null) return null;
+        } else if (customSpawnConfigFields.isUndergroundSpawn()) {
             int highestBlockYAt = Objects.requireNonNull(location.getWorld()).getHighestBlockYAt(location);
             Location undergroundLocation = null;
             //Let's hope there's caves

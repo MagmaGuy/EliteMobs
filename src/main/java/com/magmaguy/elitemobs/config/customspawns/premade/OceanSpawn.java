@@ -20,5 +20,6 @@ public class OceanSpawn extends CustomSpawnConfigFields {
                 "DEEP_LUKEWARM_OCEAN",
                 "DEEP_OCEAN")));
         setSurfaceSpawn(true);
+        setCanSpawnOnWater(true);
     }
 }
