@@ -64,7 +64,7 @@ public class CustomBossesConfig extends CustomConfig {
                     List<String> locations = customBossesConfigFields.processStringList("spawnLocations", customBossesConfigFields.getSpawnLocations(), customBossesConfigFields.getSpawnLocations(), false);
                     for (String string : locations) {
                         try {
-                            new RegionalBossEntity(customBossesConfigFields, string).initialize();
+                            RegionalBossEntity.initializeSpawn(customBossesConfigFields, string);
                         } catch (IllegalArgumentException failure) {
                             com.magmaguy.magmacore.util.Logger.warn("Rejected regional boss "
                                     + customBossesConfigFields.getFilename() + " at " + string + ": " + failure.getMessage());

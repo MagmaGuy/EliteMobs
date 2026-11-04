@@ -6,6 +6,7 @@ import com.google.common.collect.Multimaps;
 import com.magmaguy.easyminecraftgoals.NMSManager;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.InstancedDungeonRemoveEvent;
+import com.magmaguy.elitemobs.mobconstructor.custombosses.RegionalBossEntity;
 import com.magmaguy.elitemobs.utils.ChunkVectorizer;
 import com.magmaguy.magmacore.util.Logger;
 import lombok.Getter;
@@ -199,6 +200,8 @@ public class PersistentObjectHandler {
      */
     public static void loadWorld(World world) {
         if (world == null) return;
+        // Regional spawn points saved for this world become bosses only now that it exists.
+        RegionalBossEntity.materializePendingSpawns(world);
         for (PersistentObjectHandler persistentObjectHandler : snapshot(new WorldBucket(world.getName())))
             try {
                 persistentObjectHandler.worldLoad(world);

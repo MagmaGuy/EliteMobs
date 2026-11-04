@@ -79,7 +79,8 @@ public class StatsCommand {
         for (RegionalBossEntity regionalBossEntity : RegionalBossEntity.getRegionalBossEntities())
             if (regionalBossEntity.isValid())
                 loadedCounter++;
-        commandSender.sendMessage(CommandMessagesConfig.getRegionalBossStatsMessage().replace("$total", String.valueOf(RegionalBossEntity.getRegionalBossEntities().size())).replace("$loaded", String.valueOf(loadedCounter)));
+        int regionalTotal = RegionalBossEntity.getRegionalBossEntities().size() + RegionalBossEntity.getPendingSpawnCount();
+        commandSender.sendMessage(CommandMessagesConfig.getRegionalBossStatsMessage().replace("$total", String.valueOf(regionalTotal)).replace("$loaded", String.valueOf(loadedCounter)));
         commandSender.sendMessage(CommandMessagesConfig.getStatsSeparator());
     }
 

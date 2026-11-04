@@ -20,5 +20,6 @@ public class RespawnAllCommand extends AdvancedCommand {
         RegionalBossEntity.getRegionalBossEntities().forEach(regionalBossEntity -> {
             if (regionalBossEntity.isRespawning()) regionalBossEntity.forceRespawn();
         });
+        RegionalBossEntity.clearPendingRespawnTimers();
     }
 }

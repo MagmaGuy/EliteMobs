@@ -493,10 +493,10 @@ public final class PatrolEditor implements Listener {
                 FileConfiguration raw = fields.getWritableFileConfiguration();
                 YamlConfiguration prepared = detached(raw);
                 List<RegionalBossEntity> actors = RegionalBossEntity.getRegionalBossEntities(fields);
+                // Includes points still waiting for an unloaded world, which have no actor yet.
                 List<String> locations = actors.isEmpty()
                         ? new ArrayList<>(raw.getStringList("spawnLocations"))
-                        : new ArrayList<>(actors.stream().filter(actor -> !actor.isRemoved())
-                                .map(RegionalBossEntity::getConfigurationLocationString).toList());
+                        : RegionalBossEntity.getPersistedSpawnLocations(fields);
                 prepared.set("spawnLocations", locations);
                 if (locations.size() <= 1) {
                     applyRoute(prepared, route);

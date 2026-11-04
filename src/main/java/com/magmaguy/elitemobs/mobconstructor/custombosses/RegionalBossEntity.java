@@ -22,18 +22,24 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class RegionalBossEntity extends CustomBossEntity implements PersistentObject, PersistentMovingEntity {
 
     private static final ArrayListMultimap<CustomBossesConfigFields, RegionalBossEntity> regionalBossesFromConfigFields = ArrayListMultimap.create();
+    // Saved spawn points in worlds that are not loaded. They become holders when their world loads.
+    private static final PendingRegionalSpawns pendingSpawns = new PendingRegionalSpawns();
     @Getter
     private final double leashRadius;
     //Format: worldName,x,y,z,pitch,yaw:unixTimeForRespawn
@@ -107,8 +113,60 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
         return new RegionalBossEntity(thisCustomBossConfigurationField, spawnLocation, true, true);
     }
 
+    /**
+     * Starts one saved spawn point of a regional boss file. A point in a loaded world becomes a holder right away.
+     * A point in a world that isn't loaded waits as its raw string until that world loads, because a holder parses
+     * the boss's powers, scripts and transitive blocks, and a server can carry tens of thousands of points for
+     * worlds it never loads.
+     */
+    public static void initializeSpawn(CustomBossesConfigFields customBossesConfigFields, String rawString) {
+        if (Bukkit.getWorld(PendingRegionalSpawns.worldName(rawString)) == null) {
+            pendingSpawns.add(customBossesConfigFields, rawString);
+            return;
+        }
+        new RegionalBossEntity(customBossesConfigFields, rawString).initialize();
+    }
+
+    /**
+     * Turns the points waiting for this world into holders. Both world-load paths reach this through
+     * {@link com.magmaguy.elitemobs.mobconstructor.PersistentObjectHandler#loadWorld(World)}; the drain removes the
+     * points first, so a second call for the same world builds nothing.
+     */
+    public static void materializePendingSpawns(World world) {
+        for (Map.Entry<CustomBossesConfigFields, List<String>> entry : pendingSpawns.drain(world.getName()).entrySet())
+            for (String rawString : entry.getValue())
+                try {
+                    new RegionalBossEntity(entry.getKey(), rawString).initializeAfterWorldLoad();
+                } catch (RuntimeException failure) {
+                    // Keep the point in the file rather than losing it with a broken holder.
+                    pendingSpawns.add(entry.getKey(), rawString);
+                    Logger.warn("Rejected regional boss " + entry.getKey().getFilename() + " at " + rawString
+                            + ": " + failure.getMessage());
+                }
+    }
+
+    public static int getPendingSpawnCount() {
+        return pendingSpawns.size();
+    }
+
+    /** What /em respawn all does to points in unloaded worlds: they spawn as soon as their world loads. */
+    public static void clearPendingRespawnTimers() {
+        for (CustomBossesConfigFields fields : pendingSpawns.clearRespawnTimers())
+            fields.setFilesOutOfSync(true);
+    }
+
+    /** Every saved spawn point of a boss file: live holders, then the points still waiting for their world. */
+    public static List<String> getPersistedSpawnLocations(CustomBossesConfigFields customBossesConfigFields) {
+        List<String> locations = new ArrayList<>();
+        for (RegionalBossEntity boss : regionalBossesFromConfigFields.get(customBossesConfigFields))
+            if (!boss.removed) locations.add(boss.rawString);
+        locations.addAll(pendingSpawns.of(customBossesConfigFields));
+        return locations;
+    }
+
     public static void regionalBossesShutdown() {
         regionalBossesFromConfigFields.clear();
+        pendingSpawns.clear();
     }
 
     public static List<RegionalBossEntity> getRegionalBossEntities(CustomBossesConfigFields customBossesConfigFields) {
@@ -138,11 +196,11 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
     }
 
     private static void save(boolean flush) {
-        for (CustomBossesConfigFields fields : regionalBossesFromConfigFields.keySet()) {
+        Set<CustomBossesConfigFields> owners = new LinkedHashSet<>(regionalBossesFromConfigFields.keySet());
+        owners.addAll(pendingSpawns.owners());
+        for (CustomBossesConfigFields fields : owners) {
             if (!fields.isFilesOutOfSync()) continue;
-            List<String> locations = new ArrayList<>();
-            for (RegionalBossEntity boss : regionalBossesFromConfigFields.get(fields))
-                if (!boss.removed) locations.add(boss.rawString);
+            List<String> locations = getPersistedSpawnLocations(fields);
             try {
                 fields.saveRegionalSpawnLocations(locations, flush);
             } catch (RuntimeException failure) {
@@ -209,6 +267,16 @@ public class RegionalBossEntity extends CustomBossEntity implements PersistentOb
 
     public void initialize() {
         queueSpawn(RegionalBossSpawnPolicy.forPersistedState(unixRespawnTime));
+    }
+
+    /**
+     * Starts a point that waited for its world. A respawn timer that ran out while the world was away resumes the
+     * boss silently, as a holder built at startup would have; a timer still running announces the respawn as usual.
+     */
+    private void initializeAfterWorldLoad() {
+        queueSpawn(unixRespawnTime > System.currentTimeMillis()
+                ? RegionalBossSpawnPolicy.forPersistedState(unixRespawnTime)
+                : SpawnLifecycle.Context.RESTORED);
     }
 
     public void queueSpawn(boolean silent) {
