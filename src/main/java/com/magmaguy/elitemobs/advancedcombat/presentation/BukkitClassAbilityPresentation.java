@@ -74,6 +74,22 @@ public final class BukkitClassAbilityPresentation {
         }
 
         /**
+         * Plays the recurring sound of a field that follows its caster. Valor fields beat war
+         * drums on every pulse and sound a horn when raised; other themes stay silent so their
+         * existing fields keep their sound.
+         */
+        public void fieldPulse(Location origin, int pulseIndex) {
+            if (origin == null || origin.getWorld() == null
+                    || plan.theme() != AbilityPresentationTheme.VALOR) return;
+            World world = origin.getWorld();
+            if (pulseIndex == 0) world.playSound(origin, Sound.EVENT_RAID_HORN, .55F, 1.25F);
+            world.playSound(origin, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 1F, .6F);
+            world.playSound(origin, Sound.ENTITY_RAVAGER_STEP, .7F, .7F);
+            world.playSound(origin, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, .8F, .9F);
+            world.spawnParticle(Particle.NOTE, origin.clone().add(0D, 2.2D, 0D), 3, .6D, .2D, .6D, 1D);
+        }
+
+        /**
          * Renders physical movement or a completed transfer. Blink uses the actual accepted
          * destination. The flourish is visual only and never changes player velocity or position.
          */

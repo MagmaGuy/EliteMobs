@@ -57,5 +57,15 @@ public enum AbilityMechanic {
     BARRIER_BREAK_HEAL,
     THREAT_TRIGGERED_PROTECTION,
     WARD_BREAK_SIGNAL,
-    REQUIRES_CORPSE
+    REQUIRES_CORPSE,
+    /** A piercing line that also catches foes packed beside it. */
+    WIDE_PIERCE,
+    /** Area healing is stronger near the caster and weaker at the edge, in three rings. */
+    PROXIMITY_FALLOFF,
+    /** The caster gains damage reduction that grows with their own missing health. */
+    MISSING_HEALTH_PROTECTION,
+    /** Every delivery also applies one random minor debuff. */
+    RANDOM_MINOR_DEBUFF,
+    /** Ordinary foes receive the spec's {@link OrdinaryFoeVariant} instead of the main payload. */
+    ORDINARY_FOE_VARIANT
 }

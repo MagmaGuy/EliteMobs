@@ -211,7 +211,11 @@ final class ClassMenuInventoryAdapter implements ClassMenuRenderer, Listener {
     }
 
     static List<String> abilityLore(ClassMenuView.AbilityView ability) {
-        return List.of("&f" + ability.displayName(), "", "&7" + ability.description());
+        List<String> lore = new ArrayList<>();
+        lore.add("&f" + ability.displayName());
+        lore.add("");
+        lore.addAll(ClassMenuText.wrap("&7", ability.description()));
+        return List.copyOf(lore);
     }
 
     private static ItemStack requirementsItem(ClassMenuView.FormView form) {

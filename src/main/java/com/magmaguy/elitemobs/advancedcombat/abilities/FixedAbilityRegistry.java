@@ -78,7 +78,8 @@ public final class FixedAbilityRegistry {
         mechanics(specs, "templar.signature", AbilityMechanic.RETALIATION_HEAL);
         mechanics(specs, "justicar.utility", AbilityMechanic.RECENT_ATTACKERS);
         mechanics(specs, "templar.utility", AbilityMechanic.DEBUFF_IMMUNITY);
-        mechanics(specs, "inquisitor.signature", AbilityMechanic.EXECUTE_DAMAGE);
+        mechanics(specs, "inquisitor.signature", AbilityMechanic.EXECUTE_DAMAGE,
+                AbilityMechanic.MISSING_HEALTH_PROTECTION);
         mechanics(specs, "bannerlord.signature", AbilityMechanic.FOLLOW_CASTER_FIELD);
         mechanics(specs, "bannerlord.utility", AbilityMechanic.REQUIRES_ACTIVE_FIELD);
         mechanics(specs, "champion.signature", AbilityMechanic.TAUNTED_TARGETS_ONLY,
@@ -115,7 +116,8 @@ public final class FixedAbilityRegistry {
         mechanics(specs, "dreadnought.utility", AbilityMechanic.CONTROL_IMMUNITY);
         mechanics(specs, "siegebreaker.signature", AbilityMechanic.OPENS_DEFENSE_BREAK);
         mechanics(specs, "siegebreaker.utility", AbilityMechanic.REQUIRES_DEFENSE_BREAK);
-        mechanics(specs, "titanbane.signature", AbilityMechanic.LARGE_OR_BOSS_ONLY);
+        ordinaryFoes(specs, "titanbane.signature", combat(1.8, 8, 2, 40),
+                AbilityEffect.DAMAGE, AbilityEffect.ROOT, AbilityEffect.SLOW, AbilityEffect.BLEED);
         mechanics(specs, "titanbane.utility", AbilityMechanic.LARGE_OR_BOSS_ONLY);
         mechanics(specs, "colossus.signature", AbilityMechanic.WIND_UP);
         mechanics(specs, "colossus.utility", AbilityMechanic.REQUIRES_WIND_UP);
@@ -126,6 +128,8 @@ public final class FixedAbilityRegistry {
         cost(specs, "bloodrager.utility", 30D);
         cost(specs, "deathless.utility", 55D);
         cost(specs, "colossus.utility", 50D);
+        // Fault Line's landing stun and Elemental Exposure's chill pay for themselves in cadence.
+        cost(specs, "crusher.utility", 40D);
         return Collections.unmodifiableMap(specs);
     }
 
@@ -135,7 +139,7 @@ public final class FixedAbilityRegistry {
                 tune(0, 0, 0, 0, 1, 7, 0, 0, 1, 1));
         cost(specs, "ranger.mobility", 40D);
         ranger(specs);
-        mechanics(specs, "bowmaster.signature", AbilityMechanic.PIERCING_CAST);
+        mechanics(specs, "bowmaster.signature", AbilityMechanic.PIERCING_CAST, AbilityMechanic.WIDE_PIERCE);
         mechanics(specs, "raincaller.signature", AbilityMechanic.PROJECTILE_BOMBARDMENT);
         mechanics(specs, "sniper.signature", AbilityMechanic.WIND_UP);
         mechanics(specs, "sniper.signature", AbilityMechanic.MINIMUM_RANGE);
@@ -147,8 +151,10 @@ public final class FixedAbilityRegistry {
         mechanics(specs, "tempest_archer.signature", AbilityMechanic.CHAINING_CAST);
         mechanics(specs, "saboteur.signature", AbilityMechanic.DELAYED_PAYLOAD);
         mechanics(specs, "demolitionist.utility", AbilityMechanic.DETONATING_MARK);
-        mechanics(specs, "dragonslayer.signature", AbilityMechanic.LARGE_OR_BOSS_ONLY,
-                AbilityMechanic.PIERCING_CAST);
+        mechanics(specs, "dragonslayer.signature", AbilityMechanic.PIERCING_CAST);
+        ordinaryFoes(specs, "dragonslayer.signature", tune(1.2, 0, 0, 1.8, 1, 36, 0, 45, 1, 1),
+                AbilityEffect.DAMAGE, AbilityEffect.KNOCKBACK);
+        mechanics(specs, "artillerist.signature", AbilityMechanic.RANDOM_MINOR_DEBUFF);
         mechanics(specs, "dragonslayer.utility", AbilityMechanic.BOSS_ONLY);
         mechanics(specs, "skirmisher.signature", AbilityMechanic.REQUIRES_MOVEMENT);
         mechanics(specs, "trapper.utility", AbilityMechanic.EXTEND_CONTROL_DURATION);
@@ -173,6 +179,8 @@ public final class FixedAbilityRegistry {
         specs.replaceAll((id, spec) -> spec.target() == AbilityTarget.AIMED_ALLY
                 ? spec.withMechanics(AbilityMechanic.ASSISTED_ALLY_TARGETING) : spec);
         mechanics(specs, "priest.signature", AbilityMechanic.LOWEST_HEALTH_FIRST);
+        mechanics(specs, "priest.utility", AbilityMechanic.DEBUFF_IMMUNITY);
+        mechanics(specs, "hierophant.signature", AbilityMechanic.PROXIMITY_FALLOFF);
         mechanics(specs, "saint.signature", AbilityMechanic.LOWEST_HEALTH_FIRST);
         mechanics(specs, "exorcist.signature", AbilityMechanic.LOWEST_HEALTH_FIRST);
         mechanics(specs, "oracle.signature", AbilityMechanic.BARRIER_BREAK_HEAL);
@@ -243,7 +251,7 @@ public final class FixedAbilityRegistry {
         instant(specs, "strategist.signature", AbilitySlot.SIGNATURE, AbilityTarget.NEARBY_ALLIES, support(0, .13, 0, 10, 100), AbilityEffect.SHIELD, AbilityEffect.STRENGTH);
         instant(specs, "conqueror.signature", AbilitySlot.SIGNATURE, AbilityTarget.NEARBY_ENEMIES, tune(1.1, 0, 0, .7, 1, 0, 9, 70, 1, 1), AbilityEffect.DAMAGE, AbilityEffect.PULL, AbilityEffect.TAUNT, AbilityEffect.WEAKEN);
         weaken(specs, "conqueror.signature", .88D);
-        instant(specs, "tyrant.signature", AbilitySlot.SIGNATURE, AbilityTarget.NEARBY_ENEMIES, combat(0, 0, 11, 90), AbilityEffect.FEAR, AbilityEffect.TAUNT, AbilityEffect.WEAKEN);
+        instant(specs, "tyrant.signature", AbilitySlot.SIGNATURE, AbilityTarget.NEARBY_ENEMIES, combat(0, 0, 11, 90), AbilityEffect.FEAR, AbilityEffect.TAUNT, AbilityEffect.WEAKEN, AbilityEffect.SHRINK);
         weaken(specs, "tyrant.signature", .85D);
         instant(specs, "champion.signature", AbilitySlot.SIGNATURE, AbilityTarget.FORWARD_ENEMIES, combat(1.9, 10, 5, 60), AbilityEffect.DAMAGE, AbilityEffect.TAUNT);
 
@@ -269,9 +277,9 @@ public final class FixedAbilityRegistry {
     private static void berserker(Map<String, FixedAbilitySpec> specs) {
         instant(specs, "berserker.signature", AbilitySlot.SIGNATURE, AbilityTarget.SELF, tune(0, 0, 0, 0, 1.18, 0, 0, 100, 1, 1), AbilityEffect.STRENGTH, AbilityEffect.SPEED);
         instant(specs, "bloodrager.signature", AbilitySlot.SIGNATURE, AbilityTarget.SELF, tune(0, 0, 0, 0, 1.22, 0, 0, 100, 1, 1), AbilityEffect.STRENGTH, AbilityEffect.SPEED);
-        instant(specs, "reaver.signature", AbilitySlot.SIGNATURE, AbilityTarget.FORWARD_ENEMIES, combat(1.35, 9, 5, 60), AbilityEffect.DAMAGE, AbilityEffect.LIFESTEAL);
+        instant(specs, "reaver.signature", AbilitySlot.SIGNATURE, AbilityTarget.FORWARD_ENEMIES, tune(1.35, 0, 0, .7, 1, 9, 5, 60, 1, 1), AbilityEffect.DAMAGE, AbilityEffect.LIFESTEAL, AbilityEffect.KNOCKBACK);
         instant(specs, "bloodstorm.signature", AbilitySlot.SIGNATURE, AbilityTarget.NEARBY_ENEMIES, tune(.55, 0, 0, .7, 1, 0, 7, 60, 1, 1), AbilityEffect.DAMAGE, AbilityEffect.LIFESTEAL, AbilityEffect.KNOCKBACK);
-        instant(specs, "deathless.signature", AbilitySlot.SIGNATURE, AbilityTarget.SELF, support(.08, .2, 0, 0, 100), AbilityEffect.HEAL, AbilityEffect.SHIELD, AbilityEffect.SELF_PROTECT);
+        instant(specs, "deathless.signature", AbilitySlot.SIGNATURE, AbilityTarget.SELF, support(.1, .22, 0, 0, 100), AbilityEffect.HEAL, AbilityEffect.SHIELD, AbilityEffect.SELF_PROTECT);
         instant(specs, "slayer.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_ENEMY, combat(2.0, 8, 0, 30), AbilityEffect.DAMAGE);
         instant(specs, "headsman.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_ENEMY, combat(3.2, 9, 0, 30), AbilityEffect.DAMAGE, AbilityEffect.WEAKEN);
         weaken(specs, "headsman.signature", .85D);
@@ -282,7 +290,7 @@ public final class FixedAbilityRegistry {
         weaken(specs, "crusher.signature", .88D);
         instant(specs, "siegebreaker.signature", AbilitySlot.SIGNATURE, AbilityTarget.FORWARD_ENEMIES, combat(2.2, 10, 5, 80), AbilityEffect.DAMAGE, AbilityEffect.WEAKEN, AbilityEffect.INTERRUPT);
         weaken(specs, "siegebreaker.signature", .85D);
-        instant(specs, "titanbane.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_ENEMY, combat(2.7, 11, 0, 65), AbilityEffect.DAMAGE, AbilityEffect.INTERRUPT, AbilityEffect.SLOW);
+        instant(specs, "titanbane.signature", AbilitySlot.SIGNATURE, AbilityTarget.FORWARD_ENEMIES, combat(2.7, 8, 2, 65), AbilityEffect.DAMAGE, AbilityEffect.INTERRUPT, AbilityEffect.SLOW);
         zone(specs, "dreadnought.signature", AbilitySlot.SIGNATURE, AbilityTarget.MIXED_NEARBY, tune(.65, 0, 0, .8, 1, 0, 8, 60, 3, 1), AbilityEffect.DAMAGE, AbilityEffect.LAUNCH);
         instant(specs, "warmonger.signature", AbilitySlot.SIGNATURE, AbilityTarget.NEARBY_ENEMIES, combat(1.3, 0, 10, 70), AbilityEffect.DAMAGE, AbilityEffect.FEAR, AbilityEffect.INTERRUPT);
         zone(specs, "colossus.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_LOCATION, tune(3.6, 0, 0, 1.3, 1, 11, 6, 50, 1, 1), AbilityEffect.DAMAGE, AbilityEffect.LAUNCH, AbilityEffect.INTERRUPT, AbilityEffect.SELF_PROTECT);
@@ -302,7 +310,7 @@ public final class FixedAbilityRegistry {
         weaken(specs, "headsman.utility", .88D);
         instant(specs, "harvester.utility", AbilitySlot.UTILITY, AbilityTarget.NEARBY_ENEMIES, tune(0, 0, 0, .7, 1, 0, 8, 45, 1, 1), AbilityEffect.PULL, AbilityEffect.SLOW);
         instant(specs, "juggernaut.utility", AbilitySlot.UTILITY, AbilityTarget.SELF, support(0, 0, 0, 0, 80), AbilityEffect.CLEANSE, AbilityEffect.SELF_PROTECT);
-        instant(specs, "crusher.utility", AbilitySlot.UTILITY, AbilityTarget.FORWARD_ENEMIES, tune(0, 0, 0, .7, 1, 12, 5, 45, 1, 1), AbilityEffect.LAUNCH, AbilityEffect.INTERRUPT);
+        instant(specs, "crusher.utility", AbilitySlot.UTILITY, AbilityTarget.FORWARD_ENEMIES, tune(0, 0, 0, .7, 1, 12, 5, 40, 1, 1), AbilityEffect.LAUNCH, AbilityEffect.INTERRUPT, AbilityEffect.ROOT);
         mark(specs, "siegebreaker.utility", AbilitySlot.UTILITY, AbilityTarget.NEARBY_ENEMIES, 0, 9, 110, 1.12, AbilityEffect.WEAKEN);
         weaken(specs, "siegebreaker.utility", .90D);
         instant(specs, "titanbane.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_ENEMY, combat(0, 16, 0, 90), AbilityEffect.ROOT, AbilityEffect.SLOW, AbilityEffect.INTERRUPT);
@@ -317,7 +325,7 @@ public final class FixedAbilityRegistry {
         projectile(specs, "bowmaster.signature", AbilityTarget.FORWARD_ENEMIES, tune(1.8, 0, 0, 0, 1, 36, 3, 30, 1, 1), AbilityEffect.DAMAGE);
         projectile(specs, "deadeye.signature", AbilityTarget.AIMED_ENEMY, tune(3.4, 0, 0, 0, 1, 48, 0, 30, 1, 1), AbilityEffect.DAMAGE);
         zone(specs, "raincaller.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_LOCATION, tune(.55, 0, 0, 0, 1, 28, 7, 80, 6, 4), AbilityEffect.DAMAGE);
-        projectile(specs, "arbalist.signature", AbilityTarget.AIMED_ENEMY, tune(2.2, 0, 0, 0, 1, 30, 0, 60, 1, 1), AbilityEffect.DAMAGE, AbilityEffect.WEAKEN);
+        projectile(specs, "arbalist.signature", AbilityTarget.AIMED_ENEMY, tune(2.2, 0, 0, 1, 1, 30, 0, 60, 1, 1), AbilityEffect.DAMAGE, AbilityEffect.WEAKEN, AbilityEffect.KNOCKBACK);
         weaken(specs, "arbalist.signature", .85D);
         projectile(specs, "artillerist.signature", AbilityTarget.AIMED_ENEMY, tune(.85, 0, 0, 0, 1, 28, 0, 30, 1, 5), AbilityEffect.DAMAGE);
         projectile(specs, "dragonslayer.signature", AbilityTarget.AIMED_ENEMY, tune(3.1, 0, 0, 0, 1, 36, 0, 45, 1, 1), AbilityEffect.DAMAGE, AbilityEffect.WEAKEN);
@@ -333,15 +341,15 @@ public final class FixedAbilityRegistry {
         mark(specs, "ranger.utility", AbilitySlot.UTILITY, AbilityTarget.NEARBY_ENEMIES, 0, 14, 120, 1.10);
         mark(specs, "sniper.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_ENEMY, 38, 0, 140, 1.16);
         mark(specs, "bowmaster.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_ENEMY, 48, 0, 120, 1.10);
-        mark(specs, "deadeye.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_ENEMY, 48, 0, 160, 1.18);
+        mark(specs, "deadeye.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_LOCATION, 48, 6, 160, 1.18);
         zone(specs, "raincaller.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_LOCATION, tune(0, 0, 0, 0, 1.10, 28, 7, 120, 6, 1), AbilityEffect.GLOW, AbilityEffect.PARTY_DAMAGE_MARK);
         mark(specs, "arbalist.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_ENEMY, 34, 0, 180, 1.10, AbilityEffect.SLOW);
         instant(specs, "artillerist.utility", AbilitySlot.UTILITY, AbilityTarget.SELF, support(0, 0, 0, 0, 100), AbilityEffect.SPEED, AbilityEffect.STRENGTH);
-        mark(specs, "dragonslayer.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_ENEMY, 42, 0, 180, 1.18, AbilityEffect.WEAKEN);
+        mark(specs, "dragonslayer.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_ENEMY, 42, 0, 180, 1.18, AbilityEffect.WEAKEN, AbilityEffect.ENLARGE);
         weaken(specs, "dragonslayer.utility", .88D);
         mark(specs, "skirmisher.utility", AbilitySlot.UTILITY, AbilityTarget.NEARBY_ENEMIES, 0, 12, 100, 1.10, AbilityEffect.SPEED);
         instant(specs, "windrunner.utility", AbilitySlot.UTILITY, AbilityTarget.SELF, support(0, 0, 0, 0, 100), AbilityEffect.SPEED);
-        zone(specs, "pathfinder.utility", AbilitySlot.UTILITY, AbilityTarget.MIXED_NEARBY, tune(0, 0, 0, 0, 1, 0, 7, 100, 5, 1), AbilityEffect.SPEED);
+        zone(specs, "pathfinder.utility", AbilitySlot.UTILITY, AbilityTarget.MIXED_NEARBY, tune(0, 0, 0, 0, 1, 0, 7, 100, 5, 1), AbilityEffect.SPEED, AbilityEffect.SLOW_FALLING, AbilityEffect.JUMP_BOOST);
         mark(specs, "tempest_archer.utility", AbilitySlot.UTILITY, AbilityTarget.NEARBY_ENEMIES, 0, 13, 100, 1.10, AbilityEffect.SPEED);
         zone(specs, "saboteur.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_LOCATION, tune(0, 0, 0, 0, 1, 20, 6, 120, 6, 1), AbilityEffect.SLOW, AbilityEffect.GLOW);
         instant(specs, "trapper.utility", AbilitySlot.UTILITY, AbilityTarget.NEARBY_ENEMIES, combat(0, 0, 10, 110), AbilityEffect.SLOW, AbilityEffect.GLOW);
@@ -371,7 +379,7 @@ public final class FixedAbilityRegistry {
 
         zone(specs, "cleric.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_LOCATION,
                 tune(0, .04, 0, 0, 1, 14, 6, 120, 6, 1), AbilityExecutionTraits.mobilityAnchor(), AbilityEffect.HEAL);
-        instant(specs, "priest.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_ALLY, support(.03, 0, 22, 0, 30), AbilityEffect.CLEANSE, AbilityEffect.HEAL);
+        instant(specs, "priest.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_ALLY, support(.03, 0, 22, 0, 40), AbilityEffect.CLEANSE, AbilityEffect.HEAL);
         instant(specs, "hierophant.utility", AbilitySlot.UTILITY, AbilityTarget.MIXED_NEARBY, support(0, 0, 0, 11, 35), AbilityEffect.CLEANSE, AbilityEffect.INTERRUPT);
         zone(specs, "saint.utility", AbilitySlot.UTILITY, AbilityTarget.AIMED_LOCATION, tune(0, .045, .03, 0, 1, 18, 7, 120, 6, 1), AbilityEffect.HEAL, AbilityEffect.SHIELD, AbilityEffect.ALLY_PROTECT);
         instant(specs, "exorcist.utility", AbilitySlot.UTILITY, AbilityTarget.NEARBY_ENEMIES, tune(0, 0, 0, .7, 1, 0, 8, 70, 1, 1), AbilityEffect.KNOCKBACK, AbilityEffect.WEAKEN);
@@ -432,8 +440,9 @@ public final class FixedAbilityRegistry {
         instant(specs, "mage.utility", AbilitySlot.UTILITY, AbilityTarget.SELF,
                 tune(0, 0, 0, 0, 1.14, 0, 0, 80, 1, 1), AbilityEffect.STRENGTH);
         mark(specs, "elementalist.utility", AbilitySlot.UTILITY, AbilityTarget.NEARBY_ENEMIES,
-                0, 12, 100, 1.10, AbilityEffect.WEAKEN);
+                0, 12, 100, 1.10, AbilityEffect.WEAKEN, AbilityEffect.CHILL);
         weaken(specs, "elementalist.utility", .90D);
+        cost(specs, "elementalist.utility", 40D);
         mark(specs, "pyromancer.utility", AbilitySlot.UTILITY, AbilityTarget.NEARBY_ENEMIES,
                 0, 11, 100, 1.15, AbilityEffect.WEAKEN);
         weaken(specs, "pyromancer.utility", .88D);
@@ -553,6 +562,18 @@ public final class FixedAbilityRegistry {
         FixedAbilitySpec current = specs.get(id);
         if (current == null) throw new IllegalArgumentException("Unknown ability mechanic target: " + id);
         specs.put(id, current.withMechanics(mechanics));
+    }
+
+    /** Gives an ability built for big foes a separate payload for ordinary ones. */
+    private static void ordinaryFoes(
+            Map<String, FixedAbilitySpec> specs,
+            String id,
+            AbilityTuning tuning,
+            AbilityEffect first,
+            AbilityEffect... rest) {
+        FixedAbilitySpec current = specs.get(id);
+        if (current == null) throw new IllegalArgumentException("Unknown ordinary-foe target: " + id);
+        specs.put(id, current.withOrdinaryFoeVariant(new OrdinaryFoeVariant(EnumSet.of(first, rest), tuning)));
     }
 
     private static void cost(Map<String, FixedAbilitySpec> specs, String id, double amount) {

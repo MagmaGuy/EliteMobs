@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.advancedcombat.analysis;
 
 import com.magmaguy.elitemobs.advancedcombat.abilities.AbilityEffect;
+import com.magmaguy.elitemobs.advancedcombat.abilities.AbilityExecutionTraits;
 import com.magmaguy.elitemobs.advancedcombat.abilities.AbilityFamily;
 import com.magmaguy.elitemobs.advancedcombat.abilities.AbilityLevelScaling;
 import com.magmaguy.elitemobs.advancedcombat.abilities.AbilityMechanic;
@@ -37,6 +38,8 @@ import java.util.Optional;
 public final class ActiveAbilityBalanceAnalyzer {
     private static final double LOW_OUTLIER_RATIO = .67D;
     private static final double HIGH_OUTLIER_RATIO = 1.5D;
+    /** Bleed deals three pulses, each worth 15% of the hit that applied it. */
+    private static final double BLEED_SHARE = .45D;
 
     private ActiveAbilityBalanceAnalyzer() {
     }
@@ -97,8 +100,15 @@ public final class ActiveAbilityBalanceAnalyzer {
                 - AbilityCommitEffects.resolve(spec, evaluationLevel).resourceGrant());
         double efficiency = normalized / Math.max(1D, netResourceCost) * 100D;
         ActiveAbilityBalanceReport.Cadence cadence = cadence(spec, evaluationLevel, resourceType);
+        double ordinaryEffect = spec.ordinaryFoes()
+                .map(variant -> effectBudget(new FixedAbilitySpec(spec.id(), spec.slot(), spec.family(),
+                        spec.target(), variant.effects(), variant.tuning(),
+                        AbilityExecutionTraits.STANDARD, spec.resourceCost())))
+                .map(variantBudget -> variantBudget.scaled()
+                        * AbilityLevelScaling.multiplier(evaluationLevel) + variantBudget.fixed())
+                .orElse(normalized);
         List<ActiveAbilityBalanceReport.TargetScenario> scenarios = targetScenarios(
-                spec, normalized, cadence.sustainableCastsPerMinute(), netResourceCost);
+                spec, normalized, ordinaryEffect, cadence.sustainableCastsPerMinute(), netResourceCost);
         Optional<ActiveAbilityBalanceReport.SummonMetrics> summon = summonMetrics(
                 spec, evaluationLevel);
         drafts.add(new Draft(rootClassId, formId, spec, form.band(), resourceType,
@@ -119,6 +129,8 @@ public final class ActiveAbilityBalanceAnalyzer {
         scaled += spec.tuning().shieldFraction() * 8D * deliveries;
         if (spec.effects().contains(AbilityEffect.LIFESTEAL))
             scaled += spec.tuning().damageMultiplier() * deliveries * .22D;
+        if (spec.effects().contains(AbilityEffect.BLEED))
+            scaled += spec.tuning().damageMultiplier() * deliveries * BLEED_SHARE;
         double fixed = movementBudget(spec);
         boolean missingHealthScaling = spec.executionTraits().mechanics()
                 .contains(AbilityMechanic.MISSING_HEALTH_SCALING);
@@ -147,9 +159,10 @@ public final class ActiveAbilityBalanceAnalyzer {
 
     private static boolean levelScaledEffect(AbilityEffect effect) {
         return switch (effect) {
-            // Cleanse is immediate and binary. Every other non-payload effect is backed by a
-            // level-scaled duration, displacement, modifier, or state amount at runtime.
-            case CLEANSE -> false;
+            // Cleanse is immediate and binary; chill and enlarge use fixed strengths and
+            // durations. Every other non-payload effect is backed by a level-scaled duration,
+            // displacement, modifier, or state amount at runtime.
+            case CLEANSE, CHILL, ENLARGE -> false;
             default -> true;
         };
     }
@@ -171,12 +184,16 @@ public final class ActiveAbilityBalanceAnalyzer {
     private static List<ActiveAbilityBalanceReport.TargetScenario> targetScenarios(
             FixedAbilitySpec spec,
             double perTargetEffect,
+            double ordinaryTargetEffect,
             double sustainableCastsPerMinute,
             double netResourceCost) {
         List<ActiveAbilityBalanceReport.TargetScenario> scenarios = new ArrayList<>();
         for (ActiveAbilityBalanceReport.TargetDensity density : ActiveAbilityBalanceReport.TargetDensity.values()) {
             int affectedTargets = affectedTargets(spec, density.targetCount());
-            double castEffect = perTargetEffect * affectedTargets;
+            // A duel is modelled as the big target the ability is built for; every extra target in
+            // a group or pack is an ordinary foe receiving the ordinary-foe payload, if any.
+            double castEffect = affectedTargets <= 0 ? 0D
+                    : perTargetEffect + ordinaryTargetEffect * (affectedTargets - 1);
             scenarios.add(new ActiveAbilityBalanceReport.TargetScenario(
                     density,
                     density.targetCount(),
@@ -282,6 +299,11 @@ public final class ActiveAbilityBalanceAnalyzer {
             case FEAR -> .65D * durationFactor;
             case ROOT -> .75D * durationFactor;
             case BURN -> .2D * durationFactor;
+            case CHILL -> .15D;
+            case SHRINK -> .15D * durationFactor;
+            case ENLARGE -> .2D;
+            case BLEED -> 0D;
+            case SLOW_FALLING, JUMP_BOOST -> .15D * durationFactor;
         };
     }
 
@@ -310,6 +332,12 @@ public final class ActiveAbilityBalanceAnalyzer {
             case WARD_BREAK_SIGNAL -> 0D;
             case EXTEND_TAUNT -> .2D;
             case SINGLE_ENEMY, CASTER_ONLY_SUPPORT, ASSISTED_ALLY_TARGETING -> 0D;
+            case WIDE_PIERCE -> .1D;
+            // The centre ring heals more and the edge ring less; the average loses a little.
+            case PROXIMITY_FALLOFF -> -.05D;
+            case MISSING_HEALTH_PROTECTION, RANDOM_MINOR_DEBUFF -> .3D;
+            // The ordinary-foe payload is scored separately in the target scenarios.
+            case ORDINARY_FOE_VARIANT -> 0D;
         };
     }
 

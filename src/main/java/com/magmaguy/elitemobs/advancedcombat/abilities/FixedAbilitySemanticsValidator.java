@@ -84,6 +84,24 @@ final class FixedAbilitySemanticsValidator {
         if (!effects.contains(AbilityEffect.WEAKEN)
                 && Double.compare(tuning.weakenMultiplier(), 1D) != 0)
             problems.add("weakenMultiplier has no WEAKEN effect");
+        if (effects.contains(AbilityEffect.BLEED)
+                && (!effects.contains(AbilityEffect.DAMAGE) || tuning.damageMultiplier() <= 0D))
+            problems.add("BLEED needs a damaging hit to scale from");
+        if (mechanics.contains(AbilityMechanic.WIDE_PIERCE)
+                && !mechanics.contains(AbilityMechanic.PIERCING_CAST))
+            problems.add("WIDE_PIERCE has no PIERCING_CAST line");
+        if (mechanics.contains(AbilityMechanic.PROXIMITY_FALLOFF)
+                && !effects.contains(AbilityEffect.HEAL))
+            problems.add("PROXIMITY_FALLOFF has no HEAL effect");
+        spec.ordinaryFoes().ifPresent(variant -> {
+            if (mechanics.contains(AbilityMechanic.LARGE_OR_BOSS_ONLY)
+                    || mechanics.contains(AbilityMechanic.BOSS_ONLY))
+                problems.add("ORDINARY_FOE_VARIANT is unreachable while targeting is size-gated");
+            FixedAbilitySpec ordinary = new FixedAbilitySpec(spec.id(), spec.slot(), spec.family(),
+                    spec.target(), variant.effects(), variant.tuning(), AbilityExecutionTraits.STANDARD,
+                    spec.resourceCost());
+            problems(ordinary).forEach(problem -> problems.add("ordinary-foe variant: " + problem));
+        });
         return List.copyOf(problems);
     }
 }

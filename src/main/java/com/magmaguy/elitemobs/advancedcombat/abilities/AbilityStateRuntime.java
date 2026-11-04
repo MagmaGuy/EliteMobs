@@ -117,9 +117,7 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                 .min()
                 .orElse(Double.POSITIVE_INFINITY);
         double minimumRange = Math.max(8D, spec.tuning().range() * .25D);
-        boolean moving = caster.isSprinting()
-                || caster.getVelocity().getX() * caster.getVelocity().getX()
-                + caster.getVelocity().getZ() * caster.getVelocity().getZ() > .01D;
+        boolean moving = casterMoving(caster);
         if (!AbilityActivationPolicy.permits(
                 mechanics, moving, nearestEnemyDistance, minimumRange, lowestAllyHealth)) return false;
         if ((mechanics.contains(AbilityMechanic.DAMAGE_REDIRECT)
@@ -137,6 +135,27 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                 && live(activeFields, caster.getUniqueId(), now) == null) return false;
         return !mechanics.contains(AbilityMechanic.REQUIRES_WIND_UP)
                 || live(activeWindUps, caster.getUniqueId(), now) != null;
+    }
+
+    /** Explains why {@link #canActivate} refused, so the caster learns what the ability needs. */
+    AbilityFailureReason activationFailure(
+            Player caster,
+            FixedAbilitySpec spec,
+            AbilityTargeting.TargetSelection selection) {
+        if (canActivate(caster, spec, selection)) return AbilityFailureReason.NONE;
+        Set<AbilityMechanic> mechanics = spec.executionTraits().mechanics();
+        if (mechanics.contains(AbilityMechanic.REQUIRES_MOVEMENT) && !casterMoving(caster))
+            return AbilityFailureReason.NOT_MOVING;
+        if (mechanics.contains(AbilityMechanic.LOW_HEALTH_ALLY_ONLY)
+                && qualifyTargets(caster, spec, selection).allies().isEmpty())
+            return AbilityFailureReason.NO_LOW_HEALTH_ALLY;
+        return AbilityFailureReason.NO_VALID_TARGET;
+    }
+
+    private static boolean casterMoving(Player caster) {
+        return caster.isSprinting()
+                || caster.getVelocity().getX() * caster.getVelocity().getX()
+                + caster.getVelocity().getZ() * caster.getVelocity().getZ() > .01D;
     }
 
     AbilityTargeting.TargetSelection qualifyTargets(
@@ -453,17 +472,22 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
         UUID targetId = target.getUniqueId();
         long sourceGeneration = lifecycleGeneration(sourceId);
         long targetGeneration = lifecycleGeneration(targetId);
+        // The ancestor fades in first so its cast, and the echoed heal, still land 30 ticks later.
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (!delayedAllyStillValid(sourceId, sourceGeneration,
                     target, targetId, targetGeneration, 24D)) return;
-            double healed = heal(target, effectiveHealing * pending.echoFraction());
-            if (healed > 0D) {
-                semantics.recordContribution(caster, pending.abilityId(),
-                        new AbilityContribution(0, healed, 0, 0, 0, 1, 0));
-                observeEffect(AbilityRuntimeObservation.Kind.HEAL,
-                        sourceId, targetId, pending.abilityId(), healed, 0, AbilityEffect.HEAL);
-            }
-        }, 30L);
+            AbilityStateSpectacle.ancestralEcho(plugin, target, () -> {
+                if (!delayedAllyStillValid(sourceId, sourceGeneration,
+                        target, targetId, targetGeneration, 24D)) return;
+                double healed = heal(target, effectiveHealing * pending.echoFraction());
+                if (healed > 0D) {
+                    semantics.recordContribution(caster, pending.abilityId(),
+                            new AbilityContribution(0, healed, 0, 0, 0, 1, 0));
+                    observeEffect(AbilityRuntimeObservation.Kind.HEAL,
+                            sourceId, targetId, pending.abilityId(), healed, 0, AbilityEffect.HEAL);
+                }
+            });
+        }, 30L - AbilityStateSpectacle.GHOST_FADE_IN_TICKS);
     }
 
     private FixedAbilitySpec retaliationAbility(Player player) {
@@ -623,6 +647,7 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                 double healed = heal(target, maximumHealth(target) * guard.healingFraction());
                 double shield = maximumHealth(target) * guard.shieldFraction();
                 applyAbsorption(target, shield, 80);
+                AbilityStateSpectacle.deathRefused(plugin, target);
                 Player source = Bukkit.getPlayer(guard.sourceId());
                 if (source != null) {
                     semantics.recordContribution(source, guard.abilityId(),

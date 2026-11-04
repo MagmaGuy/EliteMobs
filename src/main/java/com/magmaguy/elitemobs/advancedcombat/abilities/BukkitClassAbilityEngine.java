@@ -188,10 +188,11 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             BukkitClassAbilityPresentation.Session presentation) {
         AbilityTargeting.TargetSelection selection = targeting.select(player, spec);
         if (!hasApplicableTarget(spec, selection))
-            return AbilityResult.failure(spec.id(), AbilityFailureReason.NO_VALID_TARGET);
-        if (!states.canActivate(player, spec, selection))
-            return AbilityResult.failure(spec.id(), AbilityFailureReason.NO_VALID_TARGET);
+            return AbilityResult.failure(spec.id(), missingTargetReason(spec));
+        AbilityFailureReason gate = states.activationFailure(player, spec, selection);
+        if (gate != AbilityFailureReason.NONE) return AbilityResult.failure(spec.id(), gate);
         presentConstruct(player, spec, selection.origin());
+        if (spec.target() == AbilityTarget.AIMED_LOCATION) presentShotPulse(player, spec, selection.origin());
         if (spec.executionTraits().mechanics().contains(AbilityMechanic.CHAINING_CAST)) {
             launchEffectChain(player, spec, selection, effectiveLevel, presentation);
             return AbilityResult.scheduled(spec.id(), AbilityContribution.NONE);
@@ -332,8 +333,8 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 .toList();
         selection = new AbilityTargeting.TargetSelection(
                 visibleEnemies, selection.allies(), selection.origin());
-        if (!states.canActivate(player, spec, selection))
-            return AbilityResult.failure(spec.id(), AbilityFailureReason.NO_VALID_TARGET);
+        AbilityFailureReason gate = states.activationFailure(player, spec, selection);
+        if (gate != AbilityFailureReason.NONE) return AbilityResult.failure(spec.id(), gate);
         long windUp = mechanics.contains(AbilityMechanic.WIND_UP) ? 15L : 0L;
         if (windUp > 0L) {
             player.getWorld().spawnParticle(Particle.ENCHANT, player.getEyeLocation(),
@@ -420,6 +421,8 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
         AbilityTargeting.TargetSelection initialSelection = targeting.select(player, spec, origin);
         AbilityContribution initial = applyPeriodicAndPresent(
                 presentation, player, spec, initialSelection, effectiveLevel);
+        boolean followsCaster = spec.executionTraits().mechanics().contains(AbilityMechanic.FOLLOW_CASTER_FIELD);
+        if (followsCaster) presentation.fieldPulse(origin, 0);
         if (spec.tuning().repetitions() <= 1) return AbilityResult.success(spec.id(), initial);
 
         int period = Math.max(1, totalDuration / spec.tuning().repetitions());
@@ -446,6 +449,7 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                     pulseOrigin.getWorld().spawnParticle(Particle.ENCHANT, pulseOrigin, 18,
                             spec.tuning().radius() * .45D, .25D,
                             spec.tuning().radius() * .45D, .02D);
+                if (followsCaster) presentation.fieldPulse(pulseOrigin, repetitions);
                 repetitions++;
             }
         }.runTaskTimer(plugin, period, period);
@@ -1449,14 +1453,46 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
         return contribution;
     }
 
+    private static AbilityFailureReason missingTargetReason(FixedAbilitySpec spec) {
+        Set<AbilityMechanic> mechanics = spec.executionTraits().mechanics();
+        if (mechanics.contains(AbilityMechanic.WOUNDED_TARGETS_ONLY)) return AbilityFailureReason.NO_WOUNDED_TARGET;
+        if (mechanics.contains(AbilityMechanic.LOW_HEALTH_ALLY_ONLY)) return AbilityFailureReason.NO_LOW_HEALTH_ALLY;
+        return AbilityFailureReason.NO_VALID_TARGET;
+    }
+
+    /** An instant aimed at a spot fires a visible shot there, then pulses once across its radius. */
+    private static void presentShotPulse(Player player, FixedAbilitySpec spec, Location landing) {
+        if (landing.getWorld() == null || !landing.getWorld().equals(player.getWorld())) return;
+        Location eye = player.getEyeLocation();
+        org.bukkit.util.Vector path = landing.toVector().subtract(eye.toVector());
+        double length = path.length();
+        if (length > 1.0E-6D) {
+            path.multiply(1D / length);
+            for (double travelled = 1D; travelled < length; travelled += .75D)
+                player.getWorld().spawnParticle(Particle.CRIT,
+                        eye.clone().add(path.clone().multiply(travelled)), 1, 0D, 0D, 0D, 0D);
+        }
+        player.getWorld().playSound(eye, Sound.ENTITY_ARROW_SHOOT, .8F, 1.2F);
+        double radius = Math.max(1D, spec.tuning().radius());
+        for (int point = 0; point < 32; point++) {
+            double angle = Math.PI * 2D * point / 32D;
+            landing.getWorld().spawnParticle(Particle.ELECTRIC_SPARK,
+                    landing.getX() + Math.cos(angle) * radius, landing.getY() + .3D,
+                    landing.getZ() + Math.sin(angle) * radius, 1, 0D, 0D, 0D, 0D);
+        }
+        landing.getWorld().spawnParticle(Particle.FLASH, landing.clone().add(0D, .5D, 0D), 1);
+        landing.getWorld().playSound(landing, Sound.ENTITY_ARROW_HIT_PLAYER, 1F, .8F);
+    }
+
     private static boolean hasApplicableTarget(FixedAbilitySpec spec, AbilityTargeting.TargetSelection selection) {
-        boolean enemyEffect = spec.effects().stream().anyMatch(effect -> switch (effect) {
-            case DAMAGE, KNOCKBACK, PULL, LAUNCH, SLOW, WEAKEN, GLOW, PARTY_DAMAGE_MARK, TAUNT, INTERRUPT, FEAR, ROOT, BURN -> true;
+        boolean enemyEffect = spec.declaredEffects().stream().anyMatch(effect -> switch (effect) {
+            case DAMAGE, KNOCKBACK, PULL, LAUNCH, SLOW, WEAKEN, GLOW, PARTY_DAMAGE_MARK, TAUNT, INTERRUPT, FEAR, ROOT, BURN,
+                    CHILL, SHRINK, ENLARGE, BLEED -> true;
             default -> false;
         });
-        boolean allyEffect = spec.effects().stream().anyMatch(effect -> switch (effect) {
+        boolean allyEffect = spec.declaredEffects().stream().anyMatch(effect -> switch (effect) {
             case HEAL, SHIELD, CLEANSE, SELF_PROTECT, ALLY_PROTECT, SPEED, HASTE, RESISTANCE, STRENGTH,
-                    SPELL_STRENGTH, SELF_VULNERABLE -> true;
+                    SPELL_STRENGTH, SELF_VULNERABLE, SLOW_FALLING, JUMP_BOOST -> true;
             default -> false;
         });
         return (enemyEffect && !selection.enemies().isEmpty())

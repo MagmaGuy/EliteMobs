@@ -67,6 +67,11 @@ public final class EliteMobsAbilitySemantics implements AbilitySemantics {
     }
 
     @Override
+    public boolean isLargeOrBoss(LivingEntity candidate) {
+        return EliteAbilityTargetAuthorization.largeOrBoss(candidate);
+    }
+
+    @Override
     public Collection<Player> alliesOf(Player caster) {
         var casterMatch = com.magmaguy.elitemobs.playerdata.database.PlayerData.getMatchInstance(caster);
         List<Player> nearbyParty = PartyManager.getNearbyMembers(caster, caster.getLocation()).stream()

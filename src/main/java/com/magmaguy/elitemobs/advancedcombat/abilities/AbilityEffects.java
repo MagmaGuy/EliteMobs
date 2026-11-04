@@ -33,6 +33,16 @@ import java.util.UUID;
 final class AbilityEffects {
     private static final double DEFAULT_PROTECTION_MULTIPLIER = 0.80D;
     private static final double DEFAULT_STRENGTH_MULTIPLIER = 1.15D;
+    private static final int CHILL_TICKS = 40;
+    private static final double SHRINK_FACTOR = .75D;
+    private static final double ENLARGE_FACTOR = 1.4D;
+    private static final int ENLARGE_TICKS = 60;
+    private static final double MAXIMUM_MISSING_HEALTH_PROTECTION = .30D;
+    private static final int MISSING_HEALTH_PROTECTION_TICKS = 100;
+    private static final int MINOR_DEBUFF_TICKS = 60;
+    private static final double MINOR_WEAKEN_MULTIPLIER = .92D;
+    private static final List<AbilityEffect> MINOR_DEBUFFS = List.of(
+            AbilityEffect.SLOW, AbilityEffect.WEAKEN, AbilityEffect.GLOW, AbilityEffect.BURN);
 
     private final ClassAbilityDamage damage;
     private final AbilitySemantics semantics;
@@ -40,7 +50,26 @@ final class AbilityEffects {
     private final AbilityStateRuntime states;
     private final EliteCrowdControlRuntime crowdControl;
     private final ObservedPotionApplications potions;
+    private final BleedRuntime bleeds;
     private record AppliedControl(double amount, int ticks) { }
+
+    /** The per-enemy half of a payload: main for big foes, the variant for ordinary ones. */
+    private record EnemyPayload(
+            Set<AbilityEffect> effects,
+            AbilityTuning tuning,
+            int levelDuration,
+            int controlDuration,
+            EliteControlEffectPlan slowPlan,
+            double displacement) {
+        static EnemyPayload of(Set<AbilityEffect> effects, AbilityTuning tuning, int effectiveLevel,
+                               AbilityMechanicModifiers mechanicModifiers) {
+            int levelDuration = ActiveAbilityLevelScaling.durationTicks(tuning.durationTicks(), effectiveLevel);
+            return new EnemyPayload(effects, tuning, levelDuration,
+                    scaledDuration(levelDuration, mechanicModifiers.controlDurationMultiplier()),
+                    EliteControlEffectPlan.slow(2, levelDuration, mechanicModifiers),
+                    ActiveAbilityLevelScaling.displacement(tuning.displacement(), effectiveLevel));
+        }
+    }
 
 
     AbilityEffects(
@@ -53,6 +82,7 @@ final class AbilityEffects {
         this.states = states;
         this.crowdControl = new EliteCrowdControlRuntime(MetadataHandler.PLUGIN);
         this.potions = new ObservedPotionApplications(MetadataHandler.PLUGIN);
+        this.bleeds = new BleedRuntime(MetadataHandler.PLUGIN, damage);
     }
 
     AbilityContribution apply(Player caster, FixedAbilitySpec spec,
@@ -154,15 +184,14 @@ final class AbilityEffects {
         Set<AbilityEffect> effects = spec.effects();
         AbilityTuning tuning = spec.tuning();
         AbilityMechanicModifiers mechanicModifiers = semantics.mechanicModifiers(caster);
-        int levelDuration = ActiveAbilityLevelScaling.durationTicks(
-                tuning.durationTicks(), effectiveLevel);
-        int controlDuration = scaledDuration(
-                levelDuration, mechanicModifiers.controlDurationMultiplier());
+        EnemyPayload mainPayload = EnemyPayload.of(effects, tuning, effectiveLevel, mechanicModifiers);
+        EnemyPayload ordinaryPayload = spec.ordinaryFoes()
+                .map(variant -> EnemyPayload.of(variant.effects(), variant.tuning(),
+                        effectiveLevel, mechanicModifiers))
+                .orElse(null);
+        int levelDuration = mainPayload.levelDuration();
+        int controlDuration = mainPayload.controlDuration();
         double controlPotency = mechanicModifiers.controlPotencyMultiplier();
-        EliteControlEffectPlan slowPlan = EliteControlEffectPlan.slow(
-                2, levelDuration, mechanicModifiers);
-        double displacement = ActiveAbilityLevelScaling.displacement(
-                tuning.displacement(), effectiveLevel);
         boolean missingHealthScaling = spec.executionTraits().mechanics()
                 .contains(AbilityMechanic.MISSING_HEALTH_SCALING);
         double classRankScale = AbilityLevelScaling.multiplier(effectiveLevel);
@@ -198,15 +227,24 @@ final class AbilityEffects {
             if (!valid(enemy) || !semantics.canTargetEnemy(caster, enemy, spec)) continue;
             Map<AbilityEffect, AppliedControl> appliedControls = new java.util.EnumMap<>(AbilityEffect.class);
             boolean observedPotionControl = false;
+            EnemyPayload payload = ordinaryPayload != null && !semantics.isLargeOrBoss(enemy)
+                    ? ordinaryPayload : mainPayload;
+            Set<AbilityEffect> enemyEffects = payload.effects();
+            AbilityTuning enemyTuning = payload.tuning();
+            int enemyLevelDuration = payload.levelDuration();
+            int enemyControlDuration = payload.controlDuration();
+            EliteControlEffectPlan slowPlan = payload.slowPlan();
+            double displacement = payload.displacement();
+            double hitAmount = 0D;
 
-            if (effects.contains(AbilityEffect.DAMAGE)
-                    && tuning.damageMultiplier() > 0D
+            if (enemyEffects.contains(AbilityEffect.DAMAGE)
+                    && enemyTuning.damageMultiplier() > 0D
                     && authorized(caster, enemy, spec, AbilityEffect.DAMAGE)) {
                 EliteEntity elite = EntityTracker.getEliteMobEntity(enemy);
                 double amount = AdvancedDamageScaling.classAbility(
                         elite,
                         effectiveLevel,
-                        tuning.damageMultiplier() * states.damageMultiplier(spec, enemy));
+                        enemyTuning.damageMultiplier() * states.damageMultiplier(spec, enemy));
                 double retaliationBonus = retaliationAvailable ? availableRetaliation : 0D;
                 amount += retaliationBonus;
                 double dealt = damage.apply(caster, projectile, enemy, amount,
@@ -217,6 +255,7 @@ final class AbilityEffects {
                 }
                 totalDamage += dealt;
                 if (dealt > 0D) {
+                    hitAmount = amount;
                     affectedEnemies.add(enemy);
                     semantics.observe(AbilityRuntimeObservation.effect(
                             AbilityRuntimeObservation.Kind.DAMAGE,
@@ -225,23 +264,23 @@ final class AbilityEffects {
                 }
             }
 
-            if (effects.contains(AbilityEffect.KNOCKBACK)
+            if (enemyEffects.contains(AbilityEffect.KNOCKBACK)
                     && authorized(caster, enemy, spec, AbilityEffect.KNOCKBACK)) {
                 double changed = displaceAway(caster, enemy, displacement * controlPotency, .25D);
                 if (changed > 0) appliedControls.put(AbilityEffect.KNOCKBACK, new AppliedControl(changed, 0));
             }
-            if (effects.contains(AbilityEffect.PULL)
+            if (enemyEffects.contains(AbilityEffect.PULL)
                     && authorized(caster, enemy, spec, AbilityEffect.PULL)) {
                 double changed = displaceToward(caster, enemy, displacement * controlPotency);
                 if (changed > 0) appliedControls.put(AbilityEffect.PULL, new AppliedControl(changed, 0));
             }
-            if (effects.contains(AbilityEffect.LAUNCH)
+            if (enemyEffects.contains(AbilityEffect.LAUNCH)
                     && authorized(caster, enemy, spec, AbilityEffect.LAUNCH)) {
                 double changed = displaceAway(caster, enemy, displacement * .45D * controlPotency,
                         Math.max(.55D, displacement * controlPotency));
                 if (changed > 0) appliedControls.put(AbilityEffect.LAUNCH, new AppliedControl(changed, 0));
             }
-            if (effects.contains(AbilityEffect.SLOW)
+            if (enemyEffects.contains(AbilityEffect.SLOW)
                     && authorized(caster, enemy, spec, AbilityEffect.SLOW)) {
                 boolean extend = spec.executionTraits().mechanics()
                         .contains(AbilityMechanic.EXTEND_CONTROL_DURATION);
@@ -264,72 +303,113 @@ final class AbilityEffects {
                                     1D, actual.getDuration());
                         });
                 if (extend) {
-                    if (crowdControl.extendRoot(caster, elite, Math.max(20, controlDuration)))
+                    if (crowdControl.extendRoot(caster, elite, Math.max(20, enemyControlDuration)))
                         observeMechanicTriggered(caster, enemy, spec,
                                 AbilityMechanic.EXTEND_CONTROL_DURATION,
-                                AbilityEffect.SLOW, 1D, Math.max(20, controlDuration));
+                                AbilityEffect.SLOW, 1D, Math.max(20, enemyControlDuration));
                 }
             }
-            if (effects.contains(AbilityEffect.ROOT)
+            if (enemyEffects.contains(AbilityEffect.ROOT)
                     && authorized(caster, enemy, spec, AbilityEffect.ROOT)) {
                 EliteEntity elite = EntityTracker.getEliteMobEntity(enemy);
-                if (crowdControl.root(caster, elite, Math.max(20, controlDuration)))
+                int rootTicks = Math.max(20, enemyControlDuration);
+                boolean displaced = appliedControls.containsKey(AbilityEffect.KNOCKBACK)
+                        || appliedControls.containsKey(AbilityEffect.PULL)
+                        || appliedControls.containsKey(AbilityEffect.LAUNCH);
+                if (displaced) {
+                    // Rooting now would zero the velocity this cast just applied.
+                    UUID enemyId = enemy.getUniqueId();
+                    crowdControl.rootAfterLanding(caster, elite, rootTicks, () ->
+                            AbilityControlEvidence.applied(caster.getUniqueId(), enemyId, spec,
+                                    Set.of(AbilityEffect.ROOT), 1, rootTicks).forEach(semantics::observe));
+                } else if (crowdControl.root(caster, elite, rootTicks))
                     appliedControls.put(AbilityEffect.ROOT, new AppliedControl(1, crowdControl.remainingTicks(caster, enemy, AbilityEffect.ROOT)));
             }
-            if (effects.contains(AbilityEffect.WEAKEN)
+            if (enemyEffects.contains(AbilityEffect.WEAKEN)
                     && authorized(caster, enemy, spec, AbilityEffect.WEAKEN)) {
-                int duration = Math.max(20, controlDuration);
+                int duration = Math.max(20, enemyControlDuration);
                 double multiplier = modifiers.weakenOutgoing(
-                        caster, enemy, tuning.weakenMultiplier(), effectiveLevel,
+                        caster, enemy, enemyTuning.weakenMultiplier(), effectiveLevel,
                         controlPotency, duration, spec.id());
                 observeApplied(caster, enemy, spec,
                         AbilityRuntimeObservation.Kind.MODIFIER_APPLIED,
                         AbilityEffect.WEAKEN, multiplier, duration);
                 appliedControls.put(AbilityEffect.WEAKEN, new AppliedControl(multiplier, duration));
             }
-            if (effects.contains(AbilityEffect.INTERRUPT)
+            if (enemyEffects.contains(AbilityEffect.INTERRUPT)
                     && authorized(caster, enemy, spec, AbilityEffect.INTERRUPT)) {
                 EliteEntity elite = EntityTracker.getEliteMobEntity(enemy);
                 if (crowdControl.interrupt(
-                        caster, elite, Math.max(10, Math.min(60, controlDuration))))
+                        caster, elite, Math.max(10, Math.min(60, enemyControlDuration))))
                     appliedControls.put(AbilityEffect.INTERRUPT, new AppliedControl(1, crowdControl.remainingTicks(caster, enemy, AbilityEffect.INTERRUPT)));
             }
-            if (effects.contains(AbilityEffect.FEAR)
+            if (enemyEffects.contains(AbilityEffect.FEAR)
                     && authorized(caster, enemy, spec, AbilityEffect.FEAR)) {
                 EliteEntity elite = EntityTracker.getEliteMobEntity(enemy);
-                if (crowdControl.fear(caster, elite, Math.max(30, controlDuration)))
+                if (crowdControl.fear(caster, elite, Math.max(30, enemyControlDuration)))
                     appliedControls.put(AbilityEffect.FEAR, new AppliedControl(1, crowdControl.remainingTicks(caster, enemy, AbilityEffect.FEAR)));
             }
-            if (effects.contains(AbilityEffect.GLOW)
+            if (enemyEffects.contains(AbilityEffect.GLOW)
                     && authorized(caster, enemy, spec, AbilityEffect.GLOW)) {
                 observedPotionControl |= applyPotion(caster, enemy, spec, AbilityEffect.GLOW,
                         AbilityRuntimeObservation.Kind.CONTROL,
-                        new PotionEffect(PotionEffectType.GLOWING, Math.max(20, levelDuration), 0, false, true, true),
+                        new PotionEffect(PotionEffectType.GLOWING, Math.max(20, enemyLevelDuration), 0, false, true, true),
                         ignored -> { });
             }
-            if (effects.contains(AbilityEffect.BURN)
+            if (enemyEffects.contains(AbilityEffect.BURN)
                     && authorized(caster, enemy, spec, AbilityEffect.BURN)) {
                 int before = enemy.getFireTicks();
-                enemy.setFireTicks(Math.max(before, Math.max(20, Math.min(200, levelDuration))));
+                enemy.setFireTicks(Math.max(before, Math.max(20, Math.min(200, enemyLevelDuration))));
                 int actual = enemy.getFireTicks();
                 if (actual > before) appliedControls.put(AbilityEffect.BURN, new AppliedControl(1, actual));
             }
-            if (effects.contains(AbilityEffect.PARTY_DAMAGE_MARK)
+            if (enemyEffects.contains(AbilityEffect.CHILL)
+                    && authorized(caster, enemy, spec, AbilityEffect.CHILL)) {
+                observedPotionControl |= applyPotion(caster, enemy, spec, AbilityEffect.CHILL,
+                        AbilityRuntimeObservation.Kind.CONTROL,
+                        new PotionEffect(PotionEffectType.SLOWNESS, CHILL_TICKS, 0, false, true, true),
+                        ignored -> { });
+                coldVisual(enemy);
+            }
+            if (enemyEffects.contains(AbilityEffect.SHRINK)
+                    && authorized(caster, enemy, spec, AbilityEffect.SHRINK)) {
+                int shrinkTicks = Math.max(40, Math.min(200, enemyControlDuration));
+                if (crowdControl.scale(caster, EntityTracker.getEliteMobEntity(enemy), SHRINK_FACTOR, shrinkTicks))
+                    appliedControls.put(AbilityEffect.SHRINK, new AppliedControl(SHRINK_FACTOR, shrinkTicks));
+            }
+            if (enemyEffects.contains(AbilityEffect.ENLARGE)
+                    && authorized(caster, enemy, spec, AbilityEffect.ENLARGE)) {
+                if (crowdControl.scale(caster, EntityTracker.getEliteMobEntity(enemy), ENLARGE_FACTOR, ENLARGE_TICKS))
+                    appliedControls.put(AbilityEffect.ENLARGE, new AppliedControl(ENLARGE_FACTOR, ENLARGE_TICKS));
+            }
+            if (enemyEffects.contains(AbilityEffect.BLEED) && hitAmount > 0D
+                    && authorized(caster, enemy, spec, AbilityEffect.BLEED)) {
+                UUID enemyId = enemy.getUniqueId();
+                if (bleeds.bleed(caster, enemy, hitAmount, dealt -> semantics.observe(
+                        AbilityRuntimeObservation.effect(AbilityRuntimeObservation.Kind.DAMAGE,
+                                caster.getUniqueId(), enemyId, spec.id(), dealt, 0, AbilityEffect.BLEED))))
+                    appliedControls.put(AbilityEffect.BLEED, new AppliedControl(
+                            hitAmount * BleedRuntime.PULSE_SHARE,
+                            BleedRuntime.PULSES * BleedRuntime.PERIOD_TICKS));
+            }
+            if (spec.executionTraits().mechanics().contains(AbilityMechanic.RANDOM_MINOR_DEBUFF))
+                observedPotionControl |= applyMinorDebuff(caster, enemy, spec, effectiveLevel, controlPotency);
+            if (enemyEffects.contains(AbilityEffect.PARTY_DAMAGE_MARK)
                     && authorized(caster, enemy, spec, AbilityEffect.PARTY_DAMAGE_MARK)) {
                 double markMultiplier = ActiveAbilityLevelScaling.modifier(
-                        tuning.modifierMultiplier(), effectiveLevel);
+                        enemyTuning.modifierMultiplier(), effectiveLevel);
                 if (markMultiplier > 1D)
                     modifiers.markEnemy(caster, enemy, beneficiaryIds(caster), markMultiplier,
-                            levelDuration, spec.id(), spec.executionTraits().mechanics()
+                            enemyLevelDuration, spec.id(), spec.executionTraits().mechanics()
                                     .contains(AbilityMechanic.HEALTH_SCALED_MARK));
                 states.armDetonation(caster, spec, enemy, effectiveLevel);
                 affectedEnemies.add(enemy);
                 observeApplied(caster, enemy, spec,
                         AbilityRuntimeObservation.Kind.MODIFIER_APPLIED,
                         AbilityEffect.PARTY_DAMAGE_MARK,
-                        markMultiplier, levelDuration);
+                        markMultiplier, enemyLevelDuration);
             }
-            if (effects.contains(AbilityEffect.TAUNT)
+            if (enemyEffects.contains(AbilityEffect.TAUNT)
                     && authorized(caster, enemy, spec, AbilityEffect.TAUNT)) {
                 tauntedEnemies.add(enemy);
                 affectedEnemies.add(enemy);
@@ -374,6 +454,12 @@ final class AbilityEffects {
             if (effects.contains(AbilityEffect.HEAL) && tuning.healingFraction() > 0D
                     && !states.suppressesImmediate(spec, AbilityEffect.HEAL)) {
                 double fraction = tuning.healingFraction();
+                if (spec.executionTraits().mechanics().contains(AbilityMechanic.PROXIMITY_FALLOFF))
+                    fraction *= AbilityHealingPolicy.proximityMultiplier(
+                            ally.getWorld().equals(selection.origin().getWorld())
+                                    ? ally.getLocation().distance(selection.origin())
+                                    : Double.POSITIVE_INFINITY,
+                            tuning.radius());
                 if (spec.executionTraits().mechanics().contains(AbilityMechanic.GROUP_SCALING))
                     fraction *= 1D + Math.min(.75D, Math.max(0, allies.size() - 1) * .15D);
                 if (ally.getUniqueId().equals(caster.getUniqueId()))
@@ -419,10 +505,15 @@ final class AbilityEffects {
                         new PotionEffect(PotionEffectType.SPEED, Math.max(20, effectDuration), 1, false, true, true),
                         ignored -> { });
             }
-            for (AbilityEffect effect : List.of(AbilityEffect.HASTE, AbilityEffect.RESISTANCE)) {
+            for (AbilityEffect effect : List.of(AbilityEffect.HASTE, AbilityEffect.RESISTANCE,
+                    AbilityEffect.SLOW_FALLING, AbilityEffect.JUMP_BOOST)) {
                 if (!effects.contains(effect)) continue;
-                PotionEffectType type = effect == AbilityEffect.HASTE
-                        ? PotionEffectType.HASTE : PotionEffectType.RESISTANCE;
+                PotionEffectType type = switch (effect) {
+                    case HASTE -> PotionEffectType.HASTE;
+                    case RESISTANCE -> PotionEffectType.RESISTANCE;
+                    case SLOW_FALLING -> PotionEffectType.SLOW_FALLING;
+                    default -> PotionEffectType.JUMP_BOOST;
+                };
                 int duration = Math.max(20, effectDuration);
                 supported |= applyPotion(caster, ally, spec, effect,
                         AbilityRuntimeObservation.Kind.MODIFIER_APPLIED,
@@ -490,6 +581,19 @@ final class AbilityEffects {
             supportedAllies++;
         }
 
+        if (spec.executionTraits().mechanics().contains(AbilityMechanic.MISSING_HEALTH_PROTECTION)) {
+            double missing = 1D - Math.max(0D, Math.min(1D, healthFraction(caster)));
+            double protection = 1D - MAXIMUM_MISSING_HEALTH_PROTECTION * missing;
+            if (protection < 1D) {
+                modifiers.modifyIncoming(caster, caster, protection,
+                        MISSING_HEALTH_PROTECTION_TICKS, spec.id() + ".missing_health_protection");
+                semantics.observe(AbilityRuntimeObservation.effect(
+                        AbilityRuntimeObservation.Kind.MODIFIER_APPLIED,
+                        caster.getUniqueId(), caster.getUniqueId(), spec.id(),
+                        protection, MISSING_HEALTH_PROTECTION_TICKS, AbilityEffect.SELF_PROTECT));
+            }
+        }
+
         if (effects.contains(AbilityEffect.LIFESTEAL) && totalDamage > 0D) {
             double healed = heal(caster, totalDamage * .22D * healingMultiplier);
             totalHealing += healed;
@@ -550,6 +654,8 @@ final class AbilityEffects {
         if (!allies.isEmpty())
             caster.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, selection.origin(),
                     Math.min(30, 3 + allies.size() * 2), .7, .5, .7, .02);
+        if (spec.executionTraits().mechanics().contains(AbilityMechanic.PROXIMITY_FALLOFF))
+            proximityRings(selection.origin(), tuning.radius());
 
         return new AbilityContribution(totalDamage, totalHealing, 0, threat,
                 controlledEnemies, supportedAllies, 0);
@@ -558,11 +664,76 @@ final class AbilityEffects {
     void clearSource(UUID sourceId) {
         potions.clearSource(sourceId);
         crowdControl.clearSource(sourceId);
+        bleeds.clearSource(sourceId);
     }
 
     void close() {
         potions.close();
         crowdControl.close();
+        bleeds.close();
+    }
+
+    /** One random minor debuff per delivery: brief slow, weaken, reveal or burn. */
+    private boolean applyMinorDebuff(Player caster, LivingEntity enemy, FixedAbilitySpec spec,
+                                     int effectiveLevel, double potency) {
+        AbilityEffect debuff = MINOR_DEBUFFS.get(
+                java.util.concurrent.ThreadLocalRandom.current().nextInt(MINOR_DEBUFFS.size()));
+        if (!authorized(caster, enemy, spec, debuff)) return false;
+        return switch (debuff) {
+            case SLOW -> applyMinorPotion(caster, enemy, spec, debuff,
+                    new PotionEffect(PotionEffectType.SLOWNESS, MINOR_DEBUFF_TICKS, 0, false, true, true));
+            case GLOW -> applyMinorPotion(caster, enemy, spec, debuff,
+                    new PotionEffect(PotionEffectType.GLOWING, MINOR_DEBUFF_TICKS, 0, false, true, true));
+            case WEAKEN -> {
+                double multiplier = modifiers.weakenOutgoing(caster, enemy, MINOR_WEAKEN_MULTIPLIER,
+                        effectiveLevel, potency, MINOR_DEBUFF_TICKS, spec.id() + ".minor_debuff");
+                observeApplied(caster, enemy, spec, AbilityRuntimeObservation.Kind.MODIFIER_APPLIED,
+                        AbilityEffect.WEAKEN, multiplier, MINOR_DEBUFF_TICKS);
+                yield true;
+            }
+            default -> {
+                int before = enemy.getFireTicks();
+                enemy.setFireTicks(Math.max(before, MINOR_DEBUFF_TICKS));
+                boolean burned = enemy.getFireTicks() > before;
+                if (burned) observeApplied(caster, enemy, spec, AbilityRuntimeObservation.Kind.CONTROL,
+                        AbilityEffect.BURN, 1D, enemy.getFireTicks());
+                yield burned;
+            }
+        };
+    }
+
+    private boolean applyMinorPotion(Player caster, LivingEntity enemy, FixedAbilitySpec spec,
+                                     AbilityEffect effect, PotionEffect requested) {
+        return potions.apply(caster.getUniqueId(), enemy, requested,
+                actual -> observeApplied(caster, enemy, spec, AbilityRuntimeObservation.Kind.CONTROL,
+                        effect, actual.getAmplifier() + 1D, actual.getDuration()),
+                () -> { });
+    }
+
+    private static void coldVisual(LivingEntity enemy) {
+        org.bukkit.Location center = enemy.getLocation().add(0D, enemy.getHeight() * .55D, 0D);
+        if (center.getWorld() == null) return;
+        double spread = Math.max(.3D, enemy.getWidth() * .5D);
+        center.getWorld().spawnParticle(Particle.SNOWFLAKE, center, 14, spread, enemy.getHeight() * .3D, spread, .01D);
+        center.getWorld().spawnParticle(Particle.ITEM_SNOWBALL, center, 6, spread, enemy.getHeight() * .3D, spread, .02D);
+    }
+
+    /** Shows the three healing rings: strongest at the centre, weakest at the edge. */
+    private static void proximityRings(org.bukkit.Location origin, double radius) {
+        if (origin.getWorld() == null || radius <= 0D) return;
+        Particle[] particles = {Particle.END_ROD, Particle.HAPPY_VILLAGER, Particle.COMPOSTER};
+        for (int ring = 1; ring <= 3; ring++) {
+            double ringRadius = radius * ring / 3D;
+            int points = 12 + ring * 6;
+            for (int point = 0; point < points; point++) {
+                double angle = Math.PI * 2D * point / points;
+                origin.getWorld().spawnParticle(particles[ring - 1],
+                        origin.getX() + Math.cos(angle) * ringRadius,
+                        origin.getY() + .2D,
+                        origin.getZ() + Math.sin(angle) * ringRadius,
+                        1, 0D, 0D, 0D, 0D);
+            }
+        }
     }
 
     private List<LivingEntity> nearbyEnemies(Player caster, FixedAbilitySpec spec, double radius) {
@@ -615,7 +786,9 @@ final class AbilityEffects {
                 || effects.contains(AbilityEffect.HASTE)
                 || effects.contains(AbilityEffect.RESISTANCE)
                 || effects.contains(AbilityEffect.STRENGTH)
-                || effects.contains(AbilityEffect.SELF_PROTECT);
+                || effects.contains(AbilityEffect.SELF_PROTECT)
+                || effects.contains(AbilityEffect.SLOW_FALLING)
+                || effects.contains(AbilityEffect.JUMP_BOOST);
     }
 
     private static double heal(Player target, double amount) {

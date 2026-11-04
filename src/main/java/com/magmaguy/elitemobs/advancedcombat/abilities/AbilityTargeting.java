@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 final class AbilityTargeting {
+    private static final double PIERCE_MARGIN = .35D;
+    private static final double WIDE_PIERCE_MARGIN = 1D;
     private final AbilitySemantics semantics;
 
     AbilityTargeting(AbilitySemantics semantics) {
@@ -28,9 +30,11 @@ final class AbilityTargeting {
     }
 
     TargetSelection select(Player caster, FixedAbilitySpec spec) {
-        Location origin = spec.target() == AbilityTarget.AIMED_LOCATION
-                ? aimedLocation(caster, spec.tuning().range())
-                : caster.getLocation();
+        Location origin = spec.target() != AbilityTarget.AIMED_LOCATION
+                ? caster.getLocation()
+                : spec.family() == AbilityFamily.INSTANT
+                ? shotLanding(caster, spec)
+                : aimedLocation(caster, spec.tuning().range());
         return select(caster, spec, origin);
     }
 
@@ -69,6 +73,9 @@ final class AbilityTargeting {
         Location eye = caster.getEyeLocation();
         Vector direction = eye.getDirection().normalize();
         double maximumDistance = obstructionDistance(eye, direction, spec.tuning().range());
+        // A wide pierce also catches foes packed a block to either side of the line.
+        double margin = spec.executionTraits().mechanics().contains(AbilityMechanic.WIDE_PIERCE)
+                ? WIDE_PIERCE_MARGIN : PIERCE_MARGIN;
         List<PiercingLinePolicy.Candidate<LivingEntity>> candidates = new ArrayList<>();
         for (Entity entity : caster.getWorld().getNearbyEntities(
                 caster.getLocation(), maximumDistance, maximumDistance, maximumDistance)) {
@@ -77,8 +84,8 @@ final class AbilityTargeting {
             BoundingBox box = living.getBoundingBox();
             candidates.add(new PiercingLinePolicy.Candidate<>(living,
                     new PiercingLinePolicy.Box(
-                            box.getMinX() - .35D, box.getMinY() - .35D, box.getMinZ() - .35D,
-                            box.getMaxX() + .35D, box.getMaxY() + .35D, box.getMaxZ() + .35D)));
+                            box.getMinX() - margin, box.getMinY() - margin, box.getMinZ() - margin,
+                            box.getMaxX() + margin, box.getMaxY() + margin, box.getMaxZ() + margin)));
         }
         return PiercingLinePolicy.intersections(
                         new PiercingLinePolicy.Point(eye.getX(), eye.getY(), eye.getZ()),
@@ -120,6 +127,13 @@ final class AbilityTargeting {
         Location source = observerFeet.clone().add(0, Math.max(.5D, observerHeight * .5D), 0);
         Location destination = target.getLocation().add(0, target.getHeight() * .5D, 0);
         return unobstructed(source, destination);
+    }
+
+    /** An instant aimed at a spot behaves like a shot: it lands on the first foe or block in its path. */
+    private Location shotLanding(Player caster, FixedAbilitySpec spec) {
+        return aimedEnemy(caster, spec)
+                .map(enemy -> enemy.getLocation().add(0D, enemy.getHeight() * .5D, 0D))
+                .orElseGet(() -> aimedLocation(caster, spec.tuning().range()));
     }
 
     Location aimedLocation(Player caster, double range) {

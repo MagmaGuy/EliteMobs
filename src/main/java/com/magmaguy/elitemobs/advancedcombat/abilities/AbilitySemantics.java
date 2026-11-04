@@ -31,6 +31,14 @@ public interface AbilitySemantics {
         return canTargetEnemy(caster, candidate, spec);
     }
 
+    /**
+     * Whether an enemy counts as a large foe or boss for abilities with an ordinary-foe payload.
+     * Defaults to true so callers without size facts keep each ability's main payload.
+     */
+    default boolean isLargeOrBoss(LivingEntity candidate) {
+        return true;
+    }
+
     default Collection<Player> alliesOf(Player caster) {
         return List.of(caster);
     }

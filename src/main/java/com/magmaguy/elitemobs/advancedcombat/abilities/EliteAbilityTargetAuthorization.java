@@ -34,6 +34,18 @@ final class EliteAbilityTargetAuthorization {
         if (!canTarget(caster, candidate)) return false;
         EliteEntity elite = EntityTracker.getEliteMobEntity(candidate);
         if (elite == null) return false;
+        return AbilityEnemyPolicy.permits(spec.executionTraits().mechanics(), facts(elite, candidate));
+    }
+
+    /** Large and boss Elites receive an ability's main payload; ordinary Elites get its variant. */
+    static boolean largeOrBoss(LivingEntity candidate) {
+        EliteEntity elite = candidate == null ? null : EntityTracker.getEliteMobEntity(candidate);
+        if (elite == null) return false;
+        AbilityEnemyPolicy.EnemyFacts facts = facts(elite, candidate);
+        return facts.boss() || facts.large();
+    }
+
+    private static AbilityEnemyPolicy.EnemyFacts facts(EliteEntity elite, LivingEntity candidate) {
         AttributeInstance maximumHealth = candidate.getAttribute(Attribute.MAX_HEALTH);
         double maximum = maximumHealth == null
                 ? Math.max(1D, candidate.getHealth())
@@ -41,11 +53,10 @@ final class EliteAbilityTargetAuthorization {
         double width = Math.max(
                 candidate.getBoundingBox().getWidthX(),
                 candidate.getBoundingBox().getWidthZ());
-        AbilityEnemyPolicy.EnemyFacts facts = new AbilityEnemyPolicy.EnemyFacts(
+        return new AbilityEnemyPolicy.EnemyFacts(
                 candidate.getHealth() / maximum,
                 !elite.isNaturalEntity() || elite.getHealthMultiplier() > 1.5D,
                 candidate.getHeight() >= 2.5D || width >= 1.4D);
-        return AbilityEnemyPolicy.permits(spec.executionTraits().mechanics(), facts);
     }
 
     static boolean canApply(

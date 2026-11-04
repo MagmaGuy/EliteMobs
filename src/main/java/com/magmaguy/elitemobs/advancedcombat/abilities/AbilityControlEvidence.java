@@ -14,7 +14,8 @@ final class AbilityControlEvidence {
             AbilityEffect.KNOCKBACK, AbilityEffect.PULL, AbilityEffect.LAUNCH,
             AbilityEffect.SLOW, AbilityEffect.WEAKEN, AbilityEffect.GLOW,
             AbilityEffect.INTERRUPT, AbilityEffect.FEAR, AbilityEffect.ROOT,
-            AbilityEffect.BURN);
+            AbilityEffect.BURN, AbilityEffect.CHILL, AbilityEffect.SHRINK,
+            AbilityEffect.ENLARGE, AbilityEffect.BLEED);
 
     private AbilityControlEvidence() {
     }
@@ -34,7 +35,7 @@ final class AbilityControlEvidence {
         for (AbilityEffect effect : successfulEffects) {
             if (!CONTROLS.contains(effect))
                 throw new IllegalArgumentException("Not a control effect: " + effect);
-            if (!spec.effects().contains(effect))
+            if (!spec.declaredEffects().contains(effect))
                 throw new IllegalArgumentException(spec.id() + " does not declare " + effect);
             observations.add(new AbilityRuntimeObservation(
                     AbilityRuntimeObservation.Kind.CONTROL,
@@ -55,7 +56,7 @@ final class AbilityControlEvidence {
             int durationTicks) {
         if (!spec.executionTraits().mechanics().contains(mechanic))
             throw new IllegalArgumentException(spec.id() + " does not declare " + mechanic);
-        if (!spec.effects().contains(effect))
+        if (!spec.declaredEffects().contains(effect))
             throw new IllegalArgumentException(spec.id() + " does not declare " + effect);
         return new AbilityRuntimeObservation(
                 AbilityRuntimeObservation.Kind.MODIFIER_TRIGGERED,

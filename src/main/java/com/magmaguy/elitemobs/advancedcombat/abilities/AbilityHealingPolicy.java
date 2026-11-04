@@ -32,4 +32,13 @@ final class AbilityHealingPolicy {
         return (int) Math.min(Integer.MAX_VALUE,
                 Math.max(1L, Math.round(authoredTicks * multiplier)));
     }
+
+    /** Inner third of the radius heals 25% more, the middle third normally, the outer third 25% less. */
+    static double proximityMultiplier(double distance, double radius) {
+        if (radius <= 0D || !Double.isFinite(distance)) return .75D;
+        double ring = distance / radius;
+        if (ring <= 1D / 3D) return 1.25D;
+        if (ring <= 2D / 3D) return 1D;
+        return .75D;
+    }
 }

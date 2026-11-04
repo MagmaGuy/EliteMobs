@@ -1038,6 +1038,9 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
             case NO_CORPSE -> "&cAim at a recent Elite corpse.";
             case PATH_BLOCKED -> "&c" + abilityName + " is blocked by terrain.";
             case UNSAFE_DESTINATION -> "&c" + abilityName + " could not find safe footing.";
+            case NOT_MOVING -> "&c" + abilityName + " only works while you are moving.";
+            case NO_LOW_HEALTH_ALLY -> "&c" + abilityName + " needs you or an ally below 35% health.";
+            case NO_WOUNDED_TARGET -> "&c" + abilityName + " needs a foe below half health.";
             case ENGINE_CLOSED, WRONG_THREAD, ABILITY_NOT_REGISTERED -> "&c" + abilityName
                     + " is unavailable due to an internal error. Please report this.";
             case INVALID_LEVEL, INVALID_PLAYER, NONE -> "&c" + abilityName + " cannot be used right now.";

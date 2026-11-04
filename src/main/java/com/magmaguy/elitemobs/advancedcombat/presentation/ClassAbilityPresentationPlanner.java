@@ -41,13 +41,13 @@ public final class ClassAbilityPresentationPlanner {
         Objects.requireNonNull(spec, "spec");
         EnumSet<AbilityPresentationCue> cues = EnumSet.of(AbilityPresentationCue.CAST);
         if (isMobility(spec.family())) cues.add(AbilityPresentationCue.MOBILITY);
-        if (spec.effects().contains(AbilityEffect.DAMAGE)) cues.add(AbilityPresentationCue.IMPACT);
+        if (spec.declaredEffects().contains(AbilityEffect.DAMAGE)) cues.add(AbilityPresentationCue.IMPACT);
         if (spec.effects().contains(AbilityEffect.HEAL)
                 || spec.effects().contains(AbilityEffect.LIFESTEAL))
             cues.add(AbilityPresentationCue.HEAL);
-        if (spec.effects().stream().anyMatch(ClassAbilityPresentationPlanner::isBuff))
+        if (spec.declaredEffects().stream().anyMatch(ClassAbilityPresentationPlanner::isBuff))
             cues.add(AbilityPresentationCue.BUFF);
-        if (spec.effects().stream().anyMatch(ClassAbilityPresentationPlanner::isControl))
+        if (spec.declaredEffects().stream().anyMatch(ClassAbilityPresentationPlanner::isControl))
             cues.add(AbilityPresentationCue.CONTROL);
         return new AbilityPresentationPlan(theme(lineage), cues, AbilityPresentationBudget.STANDARD);
     }
@@ -74,7 +74,7 @@ public final class ClassAbilityPresentationPlanner {
     private static boolean isBuff(AbilityEffect effect) {
         return switch (effect) {
             case SHIELD, CLEANSE, SELF_PROTECT, ALLY_PROTECT, SPEED, HASTE, RESISTANCE, STRENGTH,
-                    SPELL_STRENGTH, SELF_VULNERABLE -> true;
+                    SPELL_STRENGTH, SELF_VULNERABLE, SLOW_FALLING, JUMP_BOOST -> true;
             default -> false;
         };
     }
@@ -82,7 +82,7 @@ public final class ClassAbilityPresentationPlanner {
     private static boolean isControl(AbilityEffect effect) {
         return switch (effect) {
             case KNOCKBACK, PULL, LAUNCH, SLOW, WEAKEN, GLOW, PARTY_DAMAGE_MARK,
-                    TAUNT, INTERRUPT, FEAR, ROOT -> true;
+                    TAUNT, INTERRUPT, FEAR, ROOT, CHILL, SHRINK, ENLARGE, BLEED -> true;
             default -> false;
         };
     }

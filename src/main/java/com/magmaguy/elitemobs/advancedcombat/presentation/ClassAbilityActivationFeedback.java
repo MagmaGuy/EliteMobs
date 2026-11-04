@@ -164,6 +164,11 @@ public final class ClassAbilityActivationFeedback {
                         + " speed as HP falls" + duration(levelDuration, " for "));
             else outcomes.add("Speed II" + duration(levelDuration, " for "));
         }
+        boolean slowFalling = spec.effects().contains(AbilityEffect.SLOW_FALLING);
+        boolean jumpBoost = spec.effects().contains(AbilityEffect.JUMP_BOOST);
+        if (slowFalling || jumpBoost)
+            outcomes.add((slowFalling && jumpBoost ? "Slow Falling + Jump Boost"
+                    : slowFalling ? "Slow Falling" : "Jump Boost") + duration(levelDuration, " for "));
         if (spec.effects().contains(AbilityEffect.BURN)) {
             int burnDuration = Math.max(20, Math.min(200, levelDuration));
             outcomes.add("burn" + duration(burnDuration, " for "));
