@@ -110,6 +110,15 @@ public class ElitePlayerInventory {
                 offhand.getDamageArthropodsLevel(player.getInventory().getItemInOffHand(), update);
     }
 
+    /** Thorns level of each armor piece (helmet, chestplate, leggings, boots); Thorns only works from armor. */
+    public int[] getArmorThornsLevels(boolean update) {
+        return new int[]{
+                helmet.getThornsLevel(player.getInventory().getHelmet(), update),
+                chestplate.getThornsLevel(player.getInventory().getChestplate(), update),
+                leggings.getThornsLevel(player.getInventory().getLeggings(), update),
+                boots.getThornsLevel(player.getInventory().getBoots(), update)};
+    }
+
     public double getEliteDefense(boolean update) {
         double defense = helmet.getEliteDefense(player.getInventory().getHelmet(), update) +
                 chestplate.getEliteDefense(player.getInventory().getChestplate(), update) +

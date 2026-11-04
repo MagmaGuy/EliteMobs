@@ -4,7 +4,6 @@ import com.magmaguy.elitemobs.EliteMobs;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.api.utils.EliteItemManager;
 import com.magmaguy.elitemobs.combatsystem.*;
-import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
 import com.magmaguy.elitemobs.dungeons.EliteMobsWorld;
@@ -48,12 +47,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.Tag;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -88,17 +87,58 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
         LivingEntity target = eliteEntity.getLivingEntity();
         if (target == null || !target.isValid()) return;
 
-        EntityDamageByEntityEvent syntheticEvent = new EntityDamageByEntityEvent(
+        applySyntheticHit(eliteEntity, target, new EntityDamageByEntityEvent(
                 projectile,
                 target,
                 EntityDamageEvent.DamageCause.PROJECTILE,
                 DamageSource.builder(DamageType.MOB_ATTACK).build(),
-                rawDamage);
+                rawDamage));
+    }
+
+    /** The one Thorns event EliteMobs lets through; every other Thorns event on an elite is vanilla's and is cancelled. */
+    private static EntityDamageByEntityEvent pendingThornsHit = null;
+
+    /**
+     * Hits the elite back with the player's Thorns. {@link EliteThorns} decides when this happens.
+     * <p>
+     * The damage goes straight to the elite's health, like a modeled projectile hit, so the elite's damage
+     * cooldown cannot swallow it. The event still runs through {@link #onEliteMobAttacked}, which computes the
+     * Thorns formula, credits the player and applies boss modifiers.
+     */
+    public static void applyThornsHit(Player player, EliteEntity eliteEntity) {
+        if (player == null || eliteEntity == null) return;
+        LivingEntity target = eliteEntity.getLivingEntity();
+        if (target == null || !target.isValid()) return;
+
+        EntityDamageByEntityEvent thornsEvent = new EntityDamageByEntityEvent(
+                player,
+                target,
+                EntityDamageEvent.DamageCause.THORNS,
+                DamageSource.builder(DamageType.THORNS).withCausingEntity(player).withDirectEntity(player).build(),
+                0D);
+        EntityDamageByEntityEvent previous = pendingThornsHit;
+        pendingThornsHit = thornsEvent;
+        double appliedDamage;
+        try {
+            appliedDamage = applySyntheticHit(eliteEntity, target, thornsEvent);
+        } finally {
+            pendingThornsHit = previous;
+        }
+        if (appliedDamage <= 0D) return;
+        target.getWorld().playSound(target.getLocation(), Sound.ENCHANT_THORNS_HIT, 1F, 1F);
+        if (!target.isDead()) target.playHurtAnimation(0F);
+    }
+
+    /**
+     * Fires a damage event EliteMobs built itself, lets EliteMobs and other listeners modify it, then applies
+     * the final damage to the elite's health. Returns the damage applied, or 0 if nothing landed.
+     */
+    private static double applySyntheticHit(EliteEntity eliteEntity, LivingEntity target, EntityDamageByEntityEvent syntheticEvent) {
         new EventCaller(syntheticEvent);
-        if (syntheticEvent.isCancelled()) return;
+        if (syntheticEvent.isCancelled()) return 0D;
 
         double finalDamage = Math.max(0D, syntheticEvent.getDamage());
-        if (finalDamage <= 0D || !eliteEntity.isValid() || target.isDead()) return;
+        if (finalDamage <= 0D || !eliteEntity.isValid() || target.isDead()) return 0D;
 
         double newHealth = target.getHealth() - finalDamage;
         target.setLastDamageCause(syntheticEvent);
@@ -108,25 +148,13 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
         } else {
             eliteEntity.setHealth(newHealth);
         }
+        return finalDamage;
     }
 
-    /**
-     * Gets the total elite thorns enchantment level across all armor pieces.
-     * Only counts levels above vanilla max (elite-only portion).
-     */
-    private static int getEliteThornsLevel(Player player) {
-        if (!ItemSettingsConfig.isUseEliteEnchantments()) return 0;
+    /** Thorns levels summed across the four armor pieces; every level counts, like Sharpness. */
+    private static int getThornsLevel(Player player) {
         ElitePlayerInventory elitePlayerInventory = ElitePlayerInventory.getPlayer(player);
-        int thornsLevel = 0;
-        if (elitePlayerInventory.helmet.thornsLevel > Enchantment.THORNS.getMaxLevel())
-            thornsLevel += elitePlayerInventory.helmet.thornsLevel - Enchantment.THORNS.getMaxLevel();
-        if (elitePlayerInventory.chestplate.thornsLevel > Enchantment.THORNS.getMaxLevel())
-            thornsLevel += elitePlayerInventory.chestplate.thornsLevel - Enchantment.THORNS.getMaxLevel();
-        if (elitePlayerInventory.leggings.thornsLevel > Enchantment.THORNS.getMaxLevel())
-            thornsLevel += elitePlayerInventory.leggings.thornsLevel - Enchantment.THORNS.getMaxLevel();
-        if (elitePlayerInventory.boots.thornsLevel > Enchantment.THORNS.getMaxLevel())
-            thornsLevel += elitePlayerInventory.boots.thornsLevel - Enchantment.THORNS.getMaxLevel();
-        return thornsLevel;
+        return elitePlayerInventory == null ? 0 : EliteThorns.totalLevel(elitePlayerInventory.getArmorThornsLevels(false));
     }
 
     /**
@@ -563,24 +591,24 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
     /**
      * Calculates thorns damage using the formula approach.
      * <p>
-     * Thorns damage is a percentage of base damage per elite thorns level
-     * (only levels above vanilla max count). This replaces the old flat
-     * {@code level * 2.5D} approach, which didn't scale with mob level.
+     * Thorns damage is a percentage of base damage per Thorns level, at the same 2.5% per level as
+     * Sharpness. Every level counts, summed across the four armor pieces, and it applies once per proc.
      * <p>
-     * Formula: {@code baseDamage × thornsLevel × THORNS_PERCENT_PER_LEVEL}
+     * Formula: {@code baseDamage × thornsLevel × DAMAGE_ENCHANTMENT_PERCENT_PER_LEVEL}
      * <p>
-     * At level 3 elite thorns: {@code baseDamage × 3 × 0.02 = 6%} of base damage.
+     * Thorns III on all four pieces: {@code baseDamage × 12 × 0.025 = 30%} of base damage;
+     * Thorns X on all four: 100%.
      *
      * @param player      The player whose armor thorns are being evaluated
      * @param eliteEntity The elite mob taking thorns damage
-     * @return The thorns damage amount, or 0 if no elite thorns
+     * @return The thorns damage amount, or 0 without Thorns
      */
     private static double calculateThornsDamage(Player player, EliteEntity eliteEntity) {
-        int thornsLevel = getEliteThornsLevel(player);
+        int thornsLevel = getThornsLevel(player);
         if (thornsLevel <= 0) return 0;
 
         double baseDamage = NaturalEliteCombatTweak.getTweakedBaseDamageToElite(eliteEntity, eliteEntity.getLevel());
-        return baseDamage * thornsLevel * WeaponOffenseCalculator.THORNS_PERCENT_PER_LEVEL;
+        return baseDamage * thornsLevel * EliteItemManager.DAMAGE_ENCHANTMENT_PERCENT_PER_LEVEL;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -713,11 +741,16 @@ public final class EliteMobDamagedByPlayerEventFilter implements Listener {
             // Custom/bypass damage: use raw event damage, no formula
             damage = event.getOriginalDamage(EntityDamageEvent.DamageModifier.BASE);
         } else if (event.getCause().equals(EntityDamageEvent.DamageCause.THORNS)) {
+            // EliteThorns owns Thorns against elites; vanilla's per-piece Thorns events would stack.
+            if (event != pendingThornsHit) {
+                event.setCancelled(true);
+                return;
+            }
             if (eliteEntity.isScaledCombat()) {
                 int simulatedLevel = getPlayerWeaponSkillLevel(player);
                 if (simulatedLevel <= 0) simulatedLevel = 1;
                 double baseDamage = NaturalEliteCombatTweak.getTweakedBaseDamageToElite(eliteEntity, simulatedLevel);
-                double thornsDamage = baseDamage * getEliteThornsLevel(player) * WeaponOffenseCalculator.THORNS_PERCENT_PER_LEVEL;
+                double thornsDamage = baseDamage * getThornsLevel(player) * EliteItemManager.DAMAGE_ENCHANTMENT_PERCENT_PER_LEVEL;
                 double simulatedMobHP = NaturalEliteCombatTweak.getTweakedMobHealthForLevel(
                         eliteEntity, simulatedLevel, eliteEntity.getHealthMultiplier());
                 double actualBossMaxHP = eliteEntity.getMaxHealth();

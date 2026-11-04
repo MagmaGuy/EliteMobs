@@ -141,7 +141,7 @@ import java.util.Set;
  *     → Branch by cause:
  *       ├─ !validPlayer        → raw vanilla damage (NPC plugins)
  *       ├─ bypass              → raw event damage (custom powers)
- *       ├─ THORNS              → calculateThornsDamage()
+ *       ├─ THORNS (EliteThorns) → calculateThornsDamage(); vanilla Thorns events are cancelled
  *       ├─ ENTITY_ATTACK  ─┐
  *       ├─ SWEEP_ATTACK    ├──→ playerToEliteDamageFormula()
  *       ├─ PROJECTILE      ─┘
@@ -214,7 +214,9 @@ import java.util.Set;
  *
  * <h2>Special Cases</h2>
  * <ul>
- *   <li><b>Thorns</b>: Formula-based ({@code baseDamage × thornsLevel × 0.02}), not flat damage.</li>
+ *   <li><b>Thorns</b>: Formula-based ({@code baseDamage × thornsLevel × 0.025}), every level summed across
+ *       the armor. {@link com.magmaguy.elitemobs.combatsystem.EliteThorns} decides when it goes off and the damage
+ *       goes straight to health, so vanilla's per-piece rolls and the elite's damage cooldown do not apply.</li>
  *   <li><b>Sweep</b>: Secondary targets take 25% of primary damage.</li>
  *   <li><b>NPC plugins</b>: Non-valid players use raw vanilla event damage (bypass formula).</li>
  *   <li><b>Custom/bypass damage</b>: Boss powers that set bypass=true use raw event damage.</li>
@@ -223,7 +225,7 @@ import java.util.Set;
  * </ul>
  *
  * @see PlayerDamagedByEliteMobEvent The defensive (elite → player) mirror of this event
- * @see WeaponOffenseCalculator Weapon adjustment curve and sweep/thorns constants
+ * @see WeaponOffenseCalculator Weapon adjustment curve and sweep constants
  * @see ArmorDefenseCalculator The defensive gear curve that this weapon curve mirrors
  * @see LevelScaling#calculateBaseDamageToElite Base damage calculation
  * @see LevelScaling#calculateOffensiveSkillAdjustment Skill adjustment calculation

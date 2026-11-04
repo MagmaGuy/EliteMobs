@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.api;
 import com.magmaguy.elitemobs.collateralminecraftchanges.PlayerDeathMessageByEliteMob;
 import com.magmaguy.elitemobs.combatsystem.ArmorDefenseCalculator;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
+import com.magmaguy.elitemobs.combatsystem.EliteThorns;
 import com.magmaguy.elitemobs.combatsystem.LevelScaling;
 import com.magmaguy.elitemobs.combatsystem.PotionCombatModifierCalculator;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
@@ -51,7 +52,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -577,9 +580,20 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
             }
         }
 
+        /** Elite hits that can set off Thorns, held until MONITOR confirms nothing cancelled them. */
+        private static final Map<EntityDamageByEntityEvent, EliteEntity> PENDING_THORNS_TRIGGERS = new IdentityHashMap<>();
+
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void triggerThorns(EntityDamageByEntityEvent event) {
+            EliteEntity eliteEntity = PENDING_THORNS_TRIGGERS.remove(event);
+            if (eliteEntity == null || event.isCancelled() || !(event.getEntity() instanceof Player player)) return;
+            EliteThorns.onEliteHitPlayer(player, eliteEntity);
+        }
+
         @EventHandler
         public void onEliteDamagePlayer(EntityDamageByEntityEvent event) {
             CombatDamageContext.DamageOverride damageOverride = CombatDamageContext.consumeEliteToPlayer();
+            boolean powerDamage = !CombatDamageContext.isUnflagged(damageOverride);
             boolean bypass = damageOverride.bypass();
             double specialMultiplier = damageOverride.specialMultiplier();
 
@@ -727,6 +741,13 @@ public class PlayerDamagedByEliteMobEvent extends EliteDamageEvent {
                         -Math.min(player.getAbsorptionAmount(), Math.max(0D, newDamage)));
 
             PlayerDeathMessageByEliteMob.recordHit(event, eliteEntity);
+
+            // Thorns answers the hits vanilla Thorns reacts to, melee and projectiles, not power damage.
+            boolean meleeHit = projectile == null && event.getDamager() instanceof LivingEntity
+                    && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK;
+            boolean projectileHit = projectile != null && event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE;
+            if (!powerDamage && newDamage > 0D && (meleeHit || projectileHit))
+                PENDING_THORNS_TRIGGERS.put(event, eliteEntity);
 
         }
 

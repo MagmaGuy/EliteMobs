@@ -186,6 +186,11 @@ public final class CombatDamageContext {
         return consume(ELITE_TO_PLAYER);
     }
 
+    /** True when the consumed damage carried no power flag, so it came from an ordinary attack. */
+    public static boolean isUnflagged(DamageOverride override) {
+        return override == DEFAULT_OVERRIDE;
+    }
+
     private static <T> Deque<T> stackForPush(ThreadLocal<Deque<T>> owner) {
         Deque<T> stack = owner.get();
         if (stack == null) {

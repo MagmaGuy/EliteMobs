@@ -241,6 +241,11 @@ public class PlayerItem {
         return this.damageUndeadLevel;
     }
 
+    public int getThornsLevel(ItemStack itemStack, boolean update) {
+        if (update) fullUpdate(itemStack);
+        return this.thornsLevel;
+    }
+
     public double getCritChance(ItemStack itemStack, boolean update) {
         if (update) fullUpdate(itemStack);
         return this.critChance;

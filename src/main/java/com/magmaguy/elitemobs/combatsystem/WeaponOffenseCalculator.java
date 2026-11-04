@@ -183,14 +183,6 @@ public class WeaponOffenseCalculator {
     public static final double SWEEP_DAMAGE_FRACTION = 0.25;
 
     /**
-     * Percentage of base damage per thorns enchantment level.
-     * <p>
-     * Thorns damage is now formula-based rather than flat.
-     * At level 3: {@code baseDamage * 3 * 0.02 = 6%} of base damage.
-     */
-    public static final double THORNS_PERCENT_PER_LEVEL = 0.02;
-
-    /**
      * Burst-heavy melee families no longer receive the full
      * {@code referenceSpeed / weaponSpeed} compensation. Dungeon feedback showed that
      * axes, maces, and tridents convert slow-weapon burst into practical kills more
