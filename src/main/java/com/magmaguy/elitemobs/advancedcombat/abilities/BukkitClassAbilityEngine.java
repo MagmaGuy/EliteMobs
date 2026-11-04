@@ -1480,7 +1480,8 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                     landing.getX() + Math.cos(angle) * radius, landing.getY() + .3D,
                     landing.getZ() + Math.sin(angle) * radius, 1, 0D, 0D, 0D, 0D);
         }
-        landing.getWorld().spawnParticle(Particle.FLASH, landing.clone().add(0D, .5D, 0D), 1);
+        // FLASH would read better but needs Color data on 1.21.9+ and none before, so it throws on one side.
+        landing.getWorld().spawnParticle(Particle.END_ROD, landing.clone().add(0D, .5D, 0D), 14, .15D, .15D, .15D, .12D);
         landing.getWorld().playSound(landing, Sound.ENTITY_ARROW_HIT_PLAYER, 1F, .8F);
     }
 
