@@ -8,6 +8,7 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.menus.premade.RepairMenuConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.items.ItemConsumables;
+import com.magmaguy.elitemobs.items.ItemDisplayNames;
 import com.magmaguy.elitemobs.items.ItemDurability;
 import com.magmaguy.magmacore.util.ItemStackGenerator;
 import com.magmaguy.magmacore.util.Logger;
@@ -110,11 +111,6 @@ public class RepairMenu extends EliteMenu {
                 .replace("$currentAmount", EconomyHandler.formatCurrency(balance));
     }
 
-    private static String itemName(ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
-        return meta != null && meta.hasDisplayName() ? meta.getDisplayName() : item.getType().name();
-    }
-
     private static void give(Player player, ItemStack item) {
         player.getInventory().addItem(item).values()
                 .forEach(leftOver -> player.getWorld().dropItem(player.getLocation(), leftOver));
@@ -180,7 +176,7 @@ public class RepairMenu extends EliteMenu {
             }
             if (!paid) {
                 player.sendMessage(fillCost(ItemSettingsConfig.getRepairInsufficientFundsMessage(), cost, balance(player))
-                        .replace("$itemName", itemName(original)));
+                        .replace("$itemName", ItemDisplayNames.of(original)));
                 if (inventories.contains(repairInventory) && player.getOpenInventory().getTopInventory() == repairInventory
                         && repairInventory.getItem(layout.item()) == null) {
                     repairInventory.setItem(layout.item(), original);
@@ -191,7 +187,7 @@ public class RepairMenu extends EliteMenu {
             give(player, repaired(original));
             if (cost > 0)
                 player.sendMessage(fillCost(ItemSettingsConfig.getRepairPaidMessage(), cost, balance(player))
-                        .replace("$itemName", itemName(original)));
+                        .replace("$itemName", ItemDisplayNames.of(original)));
         } finally {
             repairing.remove(repairInventory);
         }

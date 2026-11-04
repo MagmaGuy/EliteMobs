@@ -190,7 +190,7 @@ public class ItemSettingsConfig extends ConfigurationFile {
                         "The following are valid placeholders:",
                         "$itemLevel - shows the item level",
                         "$prestigeLevel - shows the prestige level",
-                        "$itemMaterial - shows the base material of the item, like Diamond Sword. Useful when resource pack skins hide the material. Uses the server-side English name",
+                        "$itemMaterial - shows the base material of the item, like Diamond Sword. Useful when resource pack skins hide the material. Uses the English name, or its translation from the language file",
                         "$itemMaxDurability - shows the maximum durability of the item. Lines with this placeholder are skipped for items without durability and unbreakable items",
                         "$weaponOrArmorStats - shows the elite DPS or elite armor stats, depending on the item",
                         "$soulbindInfo - shows who, if anyone, the item is soulbound to",

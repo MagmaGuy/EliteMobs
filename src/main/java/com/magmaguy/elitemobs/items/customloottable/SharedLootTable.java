@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.CommandMessagesConfig;
 import com.magmaguy.elitemobs.config.InitializeConfig;
 import com.magmaguy.elitemobs.config.PartyConfig;
 import com.magmaguy.elitemobs.items.EliteItemLore;
+import com.magmaguy.elitemobs.items.ItemDisplayNames;
 import com.magmaguy.elitemobs.items.LootItemPolicy;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.menus.LootMenu;
@@ -290,9 +291,7 @@ public class SharedLootTable {
             var dropped = winner.getWorld().dropItemNaturally(winner.getLocation(), leftover);
             dropped.setOwner(winner.getUniqueId());
         });
-        String itemName = item.hasItemMeta() && item.getItemMeta().hasDisplayName()
-                ? item.getItemMeta().getDisplayName()
-                : item.getType().toString().replace('_', ' ');
+        String itemName = ItemDisplayNames.of(item);
         String winnerMessage = ChatColorConverter.convert(CommandMessagesConfig.getLootWinnerMessage()
                 .replace("$player", winner.getDisplayName())
                 .replace("$item", itemName));
@@ -372,7 +371,7 @@ public class SharedLootTable {
             activeParticipants(null).forEach(participant -> participant.sendMessage(ChatColorConverter.convert(
                     (need ? CommandMessagesConfig.getLootNeedMessage() : CommandMessagesConfig.getLootGreedMessage())
                             .replace("$player", player.getDisplayName())
-                            .replace("$item", displayName(entry.itemStack())))));
+                            .replace("$item", ItemDisplayNames.of(entry.itemStack())))));
         }
 
         public void addNeed(ItemStack itemStack) {
@@ -390,12 +389,6 @@ public class SharedLootTable {
                     .filter(entry -> entry.itemStack().isSimilar(itemStack))
                     .findFirst()
                     .ifPresent(entry -> setNeed(entry, false));
-        }
-
-        private String displayName(ItemStack itemStack) {
-            return itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName()
-                    ? itemStack.getItemMeta().getDisplayName()
-                    : itemStack.getType().toString().replace('_', ' ');
         }
     }
 

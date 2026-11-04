@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.instanced.MatchInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance;
 import com.magmaguy.elitemobs.instanced.dungeons.DifficultyResolver;
+import com.magmaguy.elitemobs.items.ItemDisplayNames;
 import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import com.magmaguy.elitemobs.mobconstructor.custombosses.CustomBossEntity;
@@ -179,9 +180,7 @@ public class EliteCustomLootEntry extends CustomLootEntry implements Serializabl
             stored += deliver(player, stack);
             // Overflow is awarded on the ground even when nothing fits in the inventory.
             delivered = true;
-            if (name == null && stack.getItemMeta() != null)
-                name = stack.getItemMeta().hasDisplayName() ? stack.getItemMeta().getDisplayName()
-                        : stack.getType().toString().replace("_", " ");
+            if (name == null && stack.getItemMeta() != null) name = ItemDisplayNames.of(stack);
         }
         if (name != null && stored > 0)
             player.sendMessage(ItemSettingsConfig.getDirectDropCustomLootMessage().replace("$itemName", stored + "x " + name));

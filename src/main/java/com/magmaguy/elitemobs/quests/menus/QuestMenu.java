@@ -2,6 +2,7 @@ package com.magmaguy.elitemobs.quests.menus;
 
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.items.ItemDisplayNames;
 import com.magmaguy.elitemobs.items.customloottable.CurrencyCustomLootEntry;
 import com.magmaguy.elitemobs.items.customloottable.EliteCustomLootEntry;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
@@ -158,10 +159,8 @@ public class QuestMenu {
         String name;
         if (entry instanceof CurrencyCustomLootEntry currency)
             name = currency.getCurrencyAmount() + " " + EconomySettingsConfig.getCurrencyName();
-        else if (item != null) {
-            var meta = item.getItemMeta();
-            name = meta != null && meta.hasDisplayName() ? meta.getDisplayName() : item.getType().toString().replace('_', ' ');
-        } else if (entry instanceof EliteCustomLootEntry custom) name = custom.getFilename();
+        else if (item != null) name = ItemDisplayNames.of(item);
+        else if (entry instanceof EliteCustomLootEntry custom) name = custom.getFilename();
         else name = "?";
         String template = quest instanceof CustomQuest ? CustomQuestMenuConfig.getRewardsDefaultSummaryLine()
                 : DynamicQuestMenuConfig.getRewardsDefaultSummaryLine();

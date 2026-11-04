@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.items.customloottable;
 
 import com.magmaguy.elitemobs.config.ItemSettingsConfig;
+import com.magmaguy.elitemobs.items.ItemDisplayNames;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -39,6 +40,7 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
         } catch (IllegalArgumentException failure) {
             throw new IllegalArgumentException("invalid material " + value, failure);
         }
+        ItemDisplayNames.register(material);
     }
 
     public ItemStack generateItemStack() {
@@ -66,10 +68,7 @@ public class VanillaCustomLootEntry extends CustomLootEntry implements Serializa
             ItemStack itemStack = generateItemStack();
             var overflow = player.getInventory().addItem(itemStack);
             overflow.values().forEach(leftover -> player.getWorld().dropItem(player.getLocation(), leftover));
-            if (name == null && itemStack.getItemMeta() != null) {
-                if (itemStack.getItemMeta().hasDisplayName()) name = itemStack.getItemMeta().getDisplayName();
-                else name = itemStack.getType().toString().replace("_", " ");
-            }
+            if (name == null && itemStack.getItemMeta() != null) name = ItemDisplayNames.of(itemStack);
         }
         if (name != null)
             player.sendMessage(ItemSettingsConfig.getDirectDropMinecraftLootMessage().replace("$itemName", getAmount() + "x " + name));

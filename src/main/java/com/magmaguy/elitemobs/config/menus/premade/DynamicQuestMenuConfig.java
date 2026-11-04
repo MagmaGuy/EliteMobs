@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.config.menus.premade;
 import com.magmaguy.elitemobs.config.ConfigurationEngine;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
 import com.magmaguy.elitemobs.config.menus.MenusConfigFields;
+import com.magmaguy.elitemobs.items.ItemDisplayNames;
 import com.magmaguy.elitemobs.items.customloottable.*;
 import com.magmaguy.elitemobs.quests.objectives.Objective;
 import com.magmaguy.elitemobs.quests.rewards.QuestReward;
@@ -78,20 +79,12 @@ public class DynamicQuestMenuConfig extends MenusConfigFields {
                 itemStack = ((EliteCustomLootEntry) customLootEntry).generateItemStack(questReward.getRewardLevel(), Bukkit.getPlayer(questReward.getPlayerUUID()), null);
             else if (customLootEntry instanceof ItemStackCustomLootEntry)
                 itemStack = ((ItemStackCustomLootEntry) customLootEntry).generateItemStack();
-            if (itemStack != null) {
-                textComponent.add(new TextComponent(rewardsDefaultSummaryLine
-                        .replace("$amount", customLootEntry.getAmount() + "")
-                        .replace("$rewardName", itemStack.getItemMeta().getDisplayName())
-                        .replace("$chance", (int) (customLootEntry.getChance() * 100) + "")));
-                continue;
-            }
-
-            if (customLootEntry instanceof VanillaCustomLootEntry)
+            else if (customLootEntry instanceof VanillaCustomLootEntry)
                 itemStack = ((VanillaCustomLootEntry) customLootEntry).generateItemStack();
             if (itemStack != null) {
                 textComponent.add(new TextComponent(rewardsDefaultSummaryLine
                         .replace("$amount", customLootEntry.getAmount() + "")
-                        .replace("$rewardName", itemStack.getType().toString().replace("_", " "))
+                        .replace("$rewardName", ItemDisplayNames.of(itemStack))
                         .replace("$chance", (int) (customLootEntry.getChance() * 100) + "")));
                 continue;
             }
