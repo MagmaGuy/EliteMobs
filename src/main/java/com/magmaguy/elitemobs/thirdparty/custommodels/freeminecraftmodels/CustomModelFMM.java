@@ -107,16 +107,25 @@ public class CustomModelFMM implements CustomModelInterface {
 
     @Override
     public void shoot() {
-        if (dynamicEntity == null) return;
-        if (dynamicEntity.hasAnimation("attack_ranged")) dynamicEntity.playAnimation("attack_ranged", false, false);
-        else if (dynamicEntity.hasAnimation("attack")) dynamicEntity.playAnimation("attack", false, false);
+        playFirst("attack.ranged", "attack_ranged", "attack");
     }
 
     @Override
     public void melee() {
+        playFirst("attack.melee", "attack_melee", "attack");
+    }
+
+    /**
+     * Plays the first of these the model has. The underscore names are the older spelling, asked for by name so models
+     * made for them still attack on FreeMinecraftModels releases that predate the dotted names.
+     */
+    private void playFirst(String... names) {
         if (dynamicEntity == null) return;
-        if (dynamicEntity.hasAnimation("attack_melee")) dynamicEntity.playAnimation("attack_melee", false, false);
-        else if (dynamicEntity.hasAnimation("attack")) dynamicEntity.playAnimation("attack", false, false);
+        for (String name : names)
+            if (dynamicEntity.hasAnimation(name)) {
+                dynamicEntity.playAnimation(name, false, false);
+                return;
+            }
     }
 
     @Override

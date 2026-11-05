@@ -93,19 +93,23 @@ public class CustomModelMEG implements CustomModelInterface {
     }
 
     public void shoot() {
-        if (activeModel == null) return;
-        if (modelBlueprint.getAnimations().containsKey("attack_ranged"))
-            activeModel.getAnimationHandler().playAnimation("attack_ranged", .1, .1, 1, true);
-        else
-            activeModel.getAnimationHandler().playAnimation("attack", .1, .1, 1, true);
+        playFirst("attack.ranged", "attack_ranged");
     }
 
     public void melee() {
+        playFirst("attack.melee", "attack_melee");
+    }
+
+    /** Plays the first of these the model has, or else its attack; the underscore names are the older spelling. */
+    private void playFirst(String... names) {
         if (activeModel == null) return;
-        if (modelBlueprint.getAnimations().containsKey("attack_melee"))
-            activeModel.getAnimationHandler().playAnimation("attack_melee", .1, .1, 1, true);
-        else
-            activeModel.getAnimationHandler().playAnimation("attack", .1, .1, 1, true);
+        String chosen = "attack";
+        for (String name : names)
+            if (modelBlueprint.getAnimations().containsKey(name)) {
+                chosen = name;
+                break;
+            }
+        activeModel.getAnimationHandler().playAnimation(chosen, .1, .1, 1, true);
     }
 
     public void playAnimationByName(String string) {
