@@ -1,6 +1,7 @@
 package com.magmaguy.elitemobs.thirdparty.placeholderapi;
 
 import com.magmaguy.elitemobs.MetadataHandler;
+import com.magmaguy.elitemobs.advancedcombat.AdvancedCombatModule;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.parties.Party;
 import com.magmaguy.elitemobs.parties.PartyMemberDisplay;
@@ -16,6 +17,7 @@ import com.magmaguy.elitemobs.skills.SkillXPCalculator;
 import com.magmaguy.magmacore.util.ChatColorConverter;
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -138,6 +140,8 @@ public class Placeholders extends PlaceholderExpansion {
             return questPlaceholder(player, identifier);
         if (identifier.startsWith("party_"))
             return partyPlaceholder(player, identifier);
+        if (identifier.startsWith("class_"))
+            return classPlaceholder(player, identifier);
 
         switch (identifier) {
             case "player_combat_tier":
@@ -298,6 +302,24 @@ public class Placeholders extends PlaceholderExpansion {
                     ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
             case "online" -> state == null ? "" : state.online()
                     ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
+            default -> null;
+        };
+    }
+
+    /**
+     * Class placeholders describe the player's active Advanced Combat class, the same one the overhead label
+     * names, including a class locked for an instance run. They read the progression cache, so they are safe from
+     * asynchronous scoreboards. Without a class, while progression loads, or with Advanced Combat off, they are
+     * empty.
+     */
+    private static String classPlaceholder(Player player, String identifier) {
+        AdvancedCombatModule.ClassIdentity identity = AdvancedCombatModule.activeClassIdentity(player.getUniqueId());
+        return switch (identifier) {
+            case "class_selected" -> identity != null ? PlaceholderAPIPlugin.booleanTrue() : PlaceholderAPIPlugin.booleanFalse();
+            case "class_id" -> identity == null ? "" : identity.id();
+            case "class_name" -> identity == null ? "" : ChatColor.stripColor(ChatColorConverter.convert(identity.name()));
+            case "class_level" -> identity == null ? "" : "" + identity.level();
+            case "class_label" -> identity == null ? "" : ChatColorConverter.convert(identity.label());
             default -> null;
         };
     }

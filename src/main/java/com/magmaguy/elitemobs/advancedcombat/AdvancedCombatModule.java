@@ -268,6 +268,18 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
 
     public record AbilityResourceSnapshot(String abilityId, double cost, boolean affordable) { }
 
+    /**
+     * The active class as the overhead label shows it, including a class locked for an instance run, or null
+     * without a class, while progression loads, or when Advanced Combat is not running. Safe off the main thread.
+     */
+    public static ClassIdentity activeClassIdentity(UUID playerId) {
+        AdvancedCombatModule module = instance;
+        return module == null ? null : module.classIdentity(playerId);
+    }
+
+    /** {@code label} keeps its {@code &} colour codes; {@code name} is the plain class display name. */
+    public record ClassIdentity(String id, String name, int level, String label) { }
+
     /** Active form, including the selection locked for an instance run. */
     public static Optional<FormProgressSnapshot> classProgressSnapshot(UUID playerId) {
         return instance == null ? Optional.empty() : instance.progression.activeSnapshot(playerId).map(ActiveProfileSnapshot::activeForm);
@@ -732,13 +744,19 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
     }
 
     private Optional<String> classLabel(UUID playerId) {
-        return progression.activeSnapshot(playerId).flatMap(snapshot -> {
-            ActiveLineageSnapshot active = snapshot.activeLineage();
-            if (active == null) return Optional.empty();
-            ClassFormDefinition form = catalog.require(active.activeFormId());
-            return Optional.of(ClassIdentityLabelFormatter.format(
-                    form.displayName(), active.activeEffectiveLevel()));
-        });
+        return Optional.ofNullable(classIdentity(playerId)).map(ClassIdentity::label);
+    }
+
+    /** One source for the overhead label and the class placeholders, so the two cannot disagree. */
+    private ClassIdentity classIdentity(UUID playerId) {
+        ActiveLineageSnapshot active = progression.activeSnapshot(playerId)
+                .map(ActiveProfileSnapshot::activeLineage)
+                .orElse(null);
+        if (active == null) return null;
+        ClassFormDefinition form = catalog.require(active.activeFormId());
+        int level = active.activeEffectiveLevel();
+        return new ClassIdentity(form.id(), form.displayName(), level,
+                ClassIdentityLabelFormatter.format(form.displayName(), level));
     }
 
     private String renderHud(Player player) {
