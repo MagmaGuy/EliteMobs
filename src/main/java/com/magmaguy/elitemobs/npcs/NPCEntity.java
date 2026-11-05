@@ -69,6 +69,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     private String locationString;
     @Getter
     private CustomModel customModel = null;
+    private boolean customModelMovementSynced = false;
     private final List<ScriptInstance> scriptInstances = new ArrayList<>();
     private ScriptableNPC scriptableNPC;
 
@@ -375,9 +376,19 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
         customModel = CustomModel.generateCustomModel(livingEntity, getNPCsConfigFields().getCustomModel(), ChatColorConverter.convert(getNPCsConfigFields().getName()),
                 (player, modeledEntity) -> NPCInteractions.handleNPCInteraction(player, this),
                 (player, modeledEntity) -> NPCInteractions.handleNPCInteraction(player, this));
+        customModelMovementSynced = getNPCsConfigFields().isSyncMovement() || getNPCsConfigFields().getPatrolRoute() != null;
         if (customModel != null)
-            customModel.setSyncMovement(
-                    getNPCsConfigFields().isSyncMovement() || getNPCsConfigFields().getPatrolRoute() != null);
+            customModel.setSyncMovement(customModelMovementSynced);
+    }
+
+    /**
+     * Whether this NPC wears a FreeMinecraftModels model that ignores the villager's movement. Java clients keep
+     * such a model at its spawn facing, but Bedrock clients draw the villager's own yaw, so turning the villager
+     * would turn the model for Bedrock players only. ModelEngine does not implement unsynced movement.
+     */
+    public boolean hasFrozenCustomModel() {
+        return customModel != null && !customModelMovementSynced
+                && CustomModel.getModelPlugin() == CustomModel.ModelPlugin.FREE_MINECRAFT_MODELS;
     }
 
     /**
@@ -425,6 +436,7 @@ public class NPCEntity implements PersistentObject, PersistentMovingEntity {
     }
 
     public void enablePatrolMovementSync() {
+        customModelMovementSynced = true;
         if (customModel != null) customModel.setSyncMovement(true);
     }
 

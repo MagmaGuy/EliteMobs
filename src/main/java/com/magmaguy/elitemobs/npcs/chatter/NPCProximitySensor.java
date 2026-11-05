@@ -83,6 +83,8 @@ public class NPCProximitySensor implements Listener {
                     Location npcLocation = villager.getLocation();
                     boolean patrolOwnsFacing = npcEntity.getNPCsConfigFields().isPatrolFaceNearbyPlayers()
                             && PatrolService.hasConfiguredPatrol(npcEntity);
+                    // A frozen model stays put on Java; turning its villager would turn it on Bedrock alone.
+                    boolean facePlayers = !patrolOwnsFacing && !npcEntity.hasFrozenCustomModel();
                     Vector facingDirection = null;
                     for (Entity entity : villager.getNearbyEntities(scanRadius, scanRadius, scanRadius)) {
                         if (!(entity instanceof Player player)) continue;
@@ -97,7 +99,7 @@ public class NPCProximitySensor implements Listener {
                         // Distant markers do not trigger greetings, proximity scripts or NPC facing.
                         if (activationRadius <= 0 || distanceSquared > activationRadiusSquared) continue;
                         Vector direction = playerLocation.toVector().subtract(npcLocation.toVector());
-                        if (!patrolOwnsFacing && direction.lengthSquared() > 0) {
+                        if (facePlayers && direction.lengthSquared() > 0) {
                             facingDirection = direction;
                         }
                         detections.put(new NPCProximityKey(npcEntity.getUuid(), player.getUniqueId()), new ProximityDetection(npcEntity, player));
