@@ -89,6 +89,101 @@ public final class BukkitClassAbilityPresentation {
             world.spawnParticle(Particle.NOTE, origin.clone().add(0D, 2.2D, 0D), 3, .6D, .2D, .6D, 1D);
         }
 
+        /** True when this cast is a flame or frost zone, which draws its field for its whole life. */
+        public boolean drawsElementalField() {
+            return spec.family() == AbilityFamily.ZONE
+                    && (plan.theme() == AbilityPresentationTheme.FLAME
+                    || plan.theme() == AbilityPresentationTheme.FROST);
+        }
+
+        /**
+         * One ambient frame of a lingering flame or frost zone, drawn every few ticks while the zone
+         * lasts so players can see where it burns or freezes. Flame fields run fire along a turning
+         * edge and lick flames across the ground. Frost fields swirl snow inward and pack the frozen
+         * core, when coreRadius is above zero, with heavier snow.
+         */
+        public void zoneAmbient(Location origin, double radius, double coreRadius, int frame) {
+            if (!drawsElementalField() || origin == null || origin.getWorld() == null) return;
+            World world = origin.getWorld();
+            double edge = Math.max(1D, radius);
+            var random = java.util.concurrent.ThreadLocalRandom.current();
+            if (plan.theme() == AbilityPresentationTheme.FLAME) {
+                for (int point = 0; point < 18; point++) {
+                    double angle = Math.PI * 2D * point / 18D + frame * .12D;
+                    world.spawnParticle(Particle.FLAME,
+                            origin.getX() + Math.cos(angle) * edge, origin.getY() + .15D,
+                            origin.getZ() + Math.sin(angle) * edge, 1, 0D, .05D, 0D, .01D);
+                }
+                for (int lick = 0; lick < 10; lick++) {
+                    double distance = edge * Math.sqrt(random.nextDouble());
+                    double angle = random.nextDouble(Math.PI * 2D);
+                    world.spawnParticle(Particle.FLAME,
+                            origin.getX() + Math.cos(angle) * distance, origin.getY() + .1D,
+                            origin.getZ() + Math.sin(angle) * distance, 0, 0D, 1D, 0D, .06D);
+                }
+                world.spawnParticle(Particle.SMOKE, origin.clone().add(0D, .4D, 0D), 4,
+                        edge * .45D, .2D, edge * .45D, .01D);
+                if (frame % 2 == 0)
+                    world.spawnParticle(Particle.LAVA, origin.clone().add(0D, .2D, 0D), 2,
+                            edge * .4D, 0D, edge * .4D, 0D);
+                if (frame % 5 == 0) world.playSound(origin, Sound.BLOCK_FIRE_AMBIENT, .9F, .8F);
+                return;
+            }
+            for (int arm = 0; arm < 3; arm++) {
+                for (int step = 0; step < 6; step++) {
+                    double distance = edge * (6 - step) / 6D;
+                    double angle = frame * .3D + arm * Math.PI * 2D / 3D + step * .45D;
+                    world.spawnParticle(Particle.SNOWFLAKE,
+                            origin.getX() + Math.cos(angle) * distance, origin.getY() + .25D + step * .12D,
+                            origin.getZ() + Math.sin(angle) * distance, 1, 0D, 0D, 0D, 0D);
+                }
+            }
+            for (int point = 0; point < 14; point++) {
+                double angle = Math.PI * 2D * point / 14D - frame * .08D;
+                world.spawnParticle(Particle.SNOWFLAKE,
+                        origin.getX() + Math.cos(angle) * edge, origin.getY() + .2D,
+                        origin.getZ() + Math.sin(angle) * edge, 1, 0D, 0D, 0D, 0D);
+            }
+            if (coreRadius > 0D) {
+                for (int point = 0; point < 10; point++) {
+                    double angle = Math.PI * 2D * point / 10D + frame * .2D;
+                    world.spawnParticle(Particle.ITEM_SNOWBALL,
+                            origin.getX() + Math.cos(angle) * coreRadius, origin.getY() + .3D,
+                            origin.getZ() + Math.sin(angle) * coreRadius, 1, 0D, 0D, 0D, 0D);
+                }
+                world.spawnParticle(Particle.SNOWFLAKE, origin.clone().add(0D, .6D, 0D), 8,
+                        coreRadius * .5D, .4D, coreRadius * .5D, .01D);
+            }
+            if (frame % 6 == 0) world.playSound(origin, Sound.BLOCK_POWDER_SNOW_STEP, .8F, .7F);
+        }
+
+        /** The beat of each damage pulse of a flame or frost zone: a ring at its edge and a sound. */
+        public void zonePulse(Location origin, double radius, double coreRadius) {
+            if (!drawsElementalField() || origin == null || origin.getWorld() == null) return;
+            World world = origin.getWorld();
+            double edge = Math.max(1D, radius);
+            boolean flame = plan.theme() == AbilityPresentationTheme.FLAME;
+            Particle ring = flame ? Particle.FLAME : Particle.SNOWFLAKE;
+            for (int point = 0; point < 32; point++) {
+                double angle = Math.PI * 2D * point / 32D;
+                double x = Math.cos(angle);
+                double z = Math.sin(angle);
+                world.spawnParticle(ring,
+                        origin.getX() + x * edge, origin.getY() + .2D, origin.getZ() + z * edge,
+                        0, x, .15D, z, .08D);
+            }
+            if (flame) {
+                world.spawnParticle(Particle.LAVA, origin.clone().add(0D, .3D, 0D), 4,
+                        edge * .35D, 0D, edge * .35D, 0D);
+                world.playSound(origin, Sound.ITEM_FIRECHARGE_USE, .7F, .75F);
+                return;
+            }
+            if (coreRadius > 0D)
+                world.spawnParticle(Particle.ITEM_SNOWBALL, origin.clone().add(0D, .5D, 0D), 16,
+                        coreRadius * .5D, .3D, coreRadius * .5D, .05D);
+            world.playSound(origin, Sound.BLOCK_GLASS_BREAK, .45F, 1.6F);
+        }
+
         /**
          * Renders physical movement or a completed transfer. Blink uses the actual accepted
          * destination. The flourish is visual only and never changes player velocity or position.

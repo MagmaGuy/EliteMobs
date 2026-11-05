@@ -40,6 +40,12 @@ final class AbilityEffects {
     private static final double MAXIMUM_MISSING_HEALTH_PROTECTION = .30D;
     private static final int MISSING_HEALTH_PROTECTION_TICKS = 100;
     private static final int MINOR_DEBUFF_TICKS = 60;
+    /** Night Vision flickers on the client in its last 10s, so it always outlasts that window. */
+    private static final int NIGHT_VISION_MINIMUM_TICKS = 400;
+    /** Foes this close to the centre of a {@link AbilityMechanic#FROZEN_CORE} zone are nearly frozen. */
+    static final double FROZEN_CORE_RADIUS = 2D;
+    /** Slowness V instead of the zone's usual Slowness III. */
+    private static final int FROZEN_CORE_SLOW_AMPLIFIER = 4;
     private static final double MINOR_WEAKEN_MULTIPLIER = .92D;
     private static final List<AbilityEffect> MINOR_DEBUFFS = List.of(
             AbilityEffect.SLOW, AbilityEffect.WEAKEN, AbilityEffect.GLOW, AbilityEffect.BURN);
@@ -233,7 +239,9 @@ final class AbilityEffects {
             AbilityTuning enemyTuning = payload.tuning();
             int enemyLevelDuration = payload.levelDuration();
             int enemyControlDuration = payload.controlDuration();
-            EliteControlEffectPlan slowPlan = payload.slowPlan();
+            EliteControlEffectPlan slowPlan = inFrozenCore(spec, enemy, selection.origin())
+                    ? EliteControlEffectPlan.slow(FROZEN_CORE_SLOW_AMPLIFIER, enemyLevelDuration, mechanicModifiers)
+                    : payload.slowPlan();
             double displacement = payload.displacement();
             double hitAmount = 0D;
 
@@ -506,15 +514,18 @@ final class AbilityEffects {
                         ignored -> { });
             }
             for (AbilityEffect effect : List.of(AbilityEffect.HASTE, AbilityEffect.RESISTANCE,
-                    AbilityEffect.SLOW_FALLING, AbilityEffect.JUMP_BOOST)) {
+                    AbilityEffect.SLOW_FALLING, AbilityEffect.JUMP_BOOST, AbilityEffect.NIGHT_VISION)) {
                 if (!effects.contains(effect)) continue;
                 PotionEffectType type = switch (effect) {
                     case HASTE -> PotionEffectType.HASTE;
                     case RESISTANCE -> PotionEffectType.RESISTANCE;
                     case SLOW_FALLING -> PotionEffectType.SLOW_FALLING;
+                    case NIGHT_VISION -> PotionEffectType.NIGHT_VISION;
                     default -> PotionEffectType.JUMP_BOOST;
                 };
-                int duration = Math.max(20, effectDuration);
+                int duration = effect == AbilityEffect.NIGHT_VISION
+                        ? Math.max(NIGHT_VISION_MINIMUM_TICKS, effectDuration)
+                        : Math.max(20, effectDuration);
                 supported |= applyPotion(caster, ally, spec, effect,
                         AbilityRuntimeObservation.Kind.MODIFIER_APPLIED,
                         new PotionEffect(type, duration, 0, false, true, true), ignored -> { });
@@ -788,7 +799,17 @@ final class AbilityEffects {
                 || effects.contains(AbilityEffect.STRENGTH)
                 || effects.contains(AbilityEffect.SELF_PROTECT)
                 || effects.contains(AbilityEffect.SLOW_FALLING)
-                || effects.contains(AbilityEffect.JUMP_BOOST);
+                || effects.contains(AbilityEffect.JUMP_BOOST)
+                || effects.contains(AbilityEffect.NIGHT_VISION);
+    }
+
+    private static boolean inFrozenCore(FixedAbilitySpec spec, LivingEntity enemy, org.bukkit.Location center) {
+        if (!spec.executionTraits().mechanics().contains(AbilityMechanic.FROZEN_CORE)
+                || center == null || center.getWorld() == null
+                || !center.getWorld().equals(enemy.getWorld())) return false;
+        double dx = enemy.getLocation().getX() - center.getX();
+        double dz = enemy.getLocation().getZ() - center.getZ();
+        return dx * dx + dz * dz <= FROZEN_CORE_RADIUS * FROZEN_CORE_RADIUS;
     }
 
     private static double heal(Player target, double amount) {

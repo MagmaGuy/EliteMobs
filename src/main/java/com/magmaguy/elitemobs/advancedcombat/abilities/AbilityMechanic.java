@@ -67,5 +67,11 @@ public enum AbilityMechanic {
     /** Every delivery also applies one random minor debuff. */
     RANDOM_MINOR_DEBUFF,
     /** Ordinary foes receive the spec's {@link OrdinaryFoeVariant} instead of the main payload. */
-    ORDINARY_FOE_VARIANT
+    ORDINARY_FOE_VARIANT,
+    /** An instant split into {@code repetitions} quick strikes that share its damage evenly. */
+    RAPID_STRIKES,
+    /** Foes near the centre of a slowing zone are slowed much harder than at its edge. */
+    FROZEN_CORE,
+    /** A death guard that leaves a ward where it was cast and returns its target there when it triggers. */
+    WARD_ANCHOR
 }

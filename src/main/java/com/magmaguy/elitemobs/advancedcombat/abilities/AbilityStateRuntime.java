@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.api.EliteMobDamagedByPlayerEvent;
 import com.magmaguy.elitemobs.api.PlayerDamagedByEliteMobEvent;
 import com.magmaguy.elitemobs.combatsystem.CombatDamageContext;
 import com.magmaguy.elitemobs.advancedcombat.ClassAbilityEligibility;
+import com.magmaguy.elitemobs.presentation.actionbar.ActionBarCompositor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -17,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -66,12 +68,15 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
             PotionEffectType.HUNGER,
             PotionEffectType.UNLUCK);
     private static final long RECENT_ATTACKER_TICKS = 160L;
+    /** After a death guard fires, further fatal hits are refused for this long so a same-instant hit can't kill. */
+    private static final long REFUSAL_GRACE_TICKS = 10L;
     private final ClassAbilityDamage damage;
     private final Plugin plugin;
     private final AbilitySemantics semantics;
     private final FixedAbilityRegistry registry;
     private final Map<UUID, List<RedirectLink>> redirectsByTarget = new HashMap<>();
     private final Map<UUID, DeathGuard> deathGuards = new HashMap<>();
+    private final Map<UUID, Long> refusalGrace = new HashMap<>();
     private final Map<UUID, TriggeredBarrier> triggeredBarriers = new HashMap<>();
     private final Map<UUID, TriggeredProtection> triggeredProtections = new HashMap<>();
     private final Map<UUID, ShareLink> sharesByMember = new HashMap<>();
@@ -252,8 +257,12 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                                 * mechanicModifiers.shieldStrengthMultiplier(),
                         mechanics.contains(AbilityMechanic.WARD_BREAK_SIGNAL),
                         Math.max(20, Math.min(200, durationTicks)),
-                        expires, spec.id());
-                deathGuards.put(target.getUniqueId(), guard);
+                        expires, spec.id(),
+                        mechanics.contains(AbilityMechanic.WARD_ANCHOR)
+                                ? WardAnchor.place(target.getLocation()) : null);
+                DeathGuard replaced = deathGuards.put(target.getUniqueId(), guard);
+                if (replaced != null) replaced.discardWard();
+                startGuardCountdown(target.getUniqueId(), guard);
                 double projectedRecovery = maximumHealth(target)
                         * (guard.healingFraction() + guard.shieldFraction());
                 observeStateArmed(caster, target, spec, AbilityMechanic.DEATH_GUARD,
@@ -472,7 +481,8 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
         UUID targetId = target.getUniqueId();
         long sourceGeneration = lifecycleGeneration(sourceId);
         long targetGeneration = lifecycleGeneration(targetId);
-        // The ancestor fades in first so its cast, and the echoed heal, still land 30 ticks later.
+        // The spirit arrives first and gathers beside the ally, so its cast, and the echoed heal,
+        // still land 30 ticks after the original heal.
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (!delayedAllyStillValid(sourceId, sourceGeneration,
                     target, targetId, targetGeneration, 24D)) return;
@@ -487,7 +497,7 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                             sourceId, targetId, pending.abilityId(), healed, 0, AbilityEffect.HEAL);
                 }
             });
-        }, 30L - AbilityStateSpectacle.GHOST_FADE_IN_TICKS);
+        }, Math.max(1L, 30L - 1L - AbilityStateSpectacle.SPIRIT_GATHER_TICKS));
     }
 
     private FixedAbilitySpec retaliationAbility(Player player) {
@@ -627,44 +637,126 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                         new AbilityContribution(0, 0, prevented, 0, 0, 1, 0));
         }
 
-        DeathGuard guard = liveGuard(target.getUniqueId(), now);
-        if (guard != null && damage >= target.getHealth() + target.getAbsorptionAmount() - .01D) {
-            deathGuards.remove(target.getUniqueId());
-            observeStateConsumed(guard.sourceId(), target.getUniqueId(),
-                    guard.abilityId(), damage, AbilityMechanic.DEATH_GUARD);
-            if (guard.emitWardBroken())
-                semantics.signal(target, AbilityRuntimeSignal.WARD_BROKEN, guard.wardBrokenTicks());
-            double survivableDamage = AbilityStateMath.deathGuardDamageCeiling(
-                    target.getHealth(), target.getAbsorptionAmount());
-            double prevented = Math.max(0D, damage - survivableDamage);
-            damage = Math.min(damage, survivableDamage);
-            UUID targetId = target.getUniqueId();
-            long sourceGeneration = lifecycleGeneration(guard.sourceId());
-            long targetGeneration = lifecycleGeneration(targetId);
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                if (!delayedAllyStillValid(guard.sourceId(), sourceGeneration,
-                        target, targetId, targetGeneration, 24D)) return;
-                double healed = heal(target, maximumHealth(target) * guard.healingFraction());
-                double shield = maximumHealth(target) * guard.shieldFraction();
-                applyAbsorption(target, shield, 80);
-                AbilityStateSpectacle.deathRefused(plugin, target);
-                Player source = Bukkit.getPlayer(guard.sourceId());
-                if (source != null) {
-                    semantics.recordContribution(source, guard.abilityId(),
-                            new AbilityContribution(0, healed, prevented, 0, 0, 1, 0));
-                    if (healed > 0D)
-                        observeEffect(AbilityRuntimeObservation.Kind.HEAL,
-                                guard.sourceId(), targetId, guard.abilityId(),
-                                healed, 0, AbilityEffect.HEAL);
-                    if (shield > 0D)
-                        observeEffect(AbilityRuntimeObservation.Kind.SHIELD,
-                                guard.sourceId(), targetId, guard.abilityId(),
-                                shield, 80, AbilityEffect.SHIELD);
-                }
-            });
-        }
-
+        // Death guards answer the final damage of every source in onFatalDamage, not only Elites.
         event.setDamage(Math.max(0D, damage));
+    }
+
+    /**
+     * Refuses one fatal hit from any source while a death guard is armed: Elite hits, fall
+     * damage, fire, the void, other players. It runs at HIGHEST so the damage it compares
+     * against health is the final amount after armor, absorption and the Elite damage
+     * pipeline. The fatal hit is cancelled, the guard's heal and shield land on the next tick,
+     * and a short grace stops a second hit in the same instant from killing anyway. A ward
+     * anchored guard also returns its target to the ward. Admin kills still go through.
+     */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onFatalDamage(EntityDamageEvent event) {
+        if (closed || !(event.getEntity() instanceof Player target)) return;
+        if (event.getFinalDamage() < target.getHealth()) return;
+        String cause = event.getCause().name();
+        if (cause.equals("KILL") || cause.equals("SUICIDE")) return;
+        UUID targetId = target.getUniqueId();
+        long now = System.nanoTime();
+        Long graceEnds = refusalGrace.get(targetId);
+        if (graceEnds != null) {
+            if (graceEnds > now) {
+                event.setCancelled(true);
+                return;
+            }
+            refusalGrace.remove(targetId);
+        }
+        DeathGuard guard = liveGuard(targetId, now);
+        if (guard == null || !ClassAbilityEligibility.isEligible(target)) return;
+        deathGuards.remove(targetId, guard);
+        double prevented = event.getFinalDamage();
+        event.setCancelled(true);
+        refusalGrace.put(targetId, now + REFUSAL_GRACE_TICKS * 50_000_000L);
+        observeStateConsumed(guard.sourceId(), targetId, guard.abilityId(), prevented,
+                AbilityMechanic.DEATH_GUARD);
+        if (guard.emitWardBroken())
+            semantics.signal(target, AbilityRuntimeSignal.WARD_BROKEN, guard.wardBrokenTicks());
+        long sourceGeneration = lifecycleGeneration(guard.sourceId());
+        long targetGeneration = lifecycleGeneration(targetId);
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            boolean valid = delayedAllyStillValid(guard.sourceId(), sourceGeneration,
+                    target, targetId, targetGeneration, 24D);
+            Location ward = valid ? safeWardReturn(target, guard.ward()) : null;
+            guard.discardWard();
+            if (!valid) return;
+            if (ward != null) {
+                target.setFallDistance(0F);
+                target.setFireTicks(0);
+                target.teleport(ward, PlayerTeleportEvent.TeleportCause.PLUGIN);
+            }
+            double healed = heal(target, maximumHealth(target) * guard.healingFraction());
+            double shield = maximumHealth(target) * guard.shieldFraction();
+            applyAbsorption(target, shield, 80);
+            AbilityStateSpectacle.deathRefused(plugin, target);
+            ActionBarCompositor.show(target, ActionBarCompositor.Source.ABILITY_STATE,
+                    ward != null ? "&dDeath refused! &fYour ward pulled you back."
+                            : "&dDeath refused!", 50L);
+            Player source = Bukkit.getPlayer(guard.sourceId());
+            if (source != null) {
+                semantics.recordContribution(source, guard.abilityId(),
+                        new AbilityContribution(0, healed, prevented, 0, 0, 1, 0));
+                if (healed > 0D)
+                    observeEffect(AbilityRuntimeObservation.Kind.HEAL,
+                            guard.sourceId(), targetId, guard.abilityId(),
+                            healed, 0, AbilityEffect.HEAL);
+                if (shield > 0D)
+                    observeEffect(AbilityRuntimeObservation.Kind.SHIELD,
+                            guard.sourceId(), targetId, guard.abilityId(),
+                            shield, 80, AbilityEffect.SHIELD);
+            }
+        });
+    }
+
+    /** The ward's spot when its target can stand there now, otherwise null to refuse in place. */
+    private static Location safeWardReturn(Player target, WardAnchor ward) {
+        if (ward == null) return null;
+        Location spot = ward.location();
+        if (spot.getWorld() == null || !spot.getWorld().equals(target.getWorld())
+                || !spot.getWorld().isChunkLoaded(spot.getBlockX() >> 4, spot.getBlockZ() >> 4)) return null;
+        if (!spot.getBlock().isPassable() || !spot.clone().add(0D, 1D, 0D).getBlock().isPassable()) return null;
+        Location destination = spot.clone();
+        destination.setYaw(target.getLocation().getYaw());
+        destination.setPitch(target.getLocation().getPitch());
+        return destination;
+    }
+
+    /**
+     * Shows a death guard's remaining time on its target's action bar, and keeps the ward of a
+     * ward anchored guard glowing, until the guard fires, fades or is replaced. A guard that
+     * fades unused says so, so players know the window closed.
+     */
+    private void startGuardCountdown(UUID targetId, DeathGuard guard) {
+        String label = guard.ward() != null ? "Phylactery ward" : "Death guard";
+        new org.bukkit.scheduler.BukkitRunnable() {
+            @Override
+            public void run() {
+                if (closed || deathGuards.get(targetId) != guard) {
+                    cancel();
+                    return;
+                }
+                Player target = Bukkit.getPlayer(targetId);
+                long now = System.nanoTime();
+                if (target == null || !target.isOnline() || guard.expiresAtNanos() <= now) {
+                    deathGuards.remove(targetId, guard);
+                    guard.discardWard();
+                    if (target != null && target.isOnline()) {
+                        ActionBarCompositor.show(target, ActionBarCompositor.Source.ABILITY_STATE,
+                                "&7" + label + " faded", 40L);
+                        target.playSound(target.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, .5F, 1.4F);
+                    }
+                    cancel();
+                    return;
+                }
+                long seconds = Math.max(1L, (guard.expiresAtNanos() - now + 999_999_999L) / 1_000_000_000L);
+                ActionBarCompositor.show(target, ActionBarCompositor.Source.ABILITY_STATE,
+                        "&5" + label + " &f" + seconds + "s", 15L);
+                if (guard.ward() != null) guard.ward().pulse();
+            }
+        }.runTaskTimer(plugin, 0L, 10L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -782,10 +874,20 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
                     });
                 }, redirectsByTarget::clear)
                 .bind(AbilityStateOwnership.Bucket.DEATH_GUARDS,
-                        sourceId -> deathGuards.entrySet().removeIf(entry ->
-                                entry.getKey().equals(sourceId)
-                                        || entry.getValue().sourceId().equals(sourceId)),
-                        deathGuards::clear)
+                        sourceId -> {
+                            refusalGrace.remove(sourceId);
+                            deathGuards.entrySet().removeIf(entry -> {
+                                if (!entry.getKey().equals(sourceId)
+                                        && !entry.getValue().sourceId().equals(sourceId)) return false;
+                                entry.getValue().discardWard();
+                                return true;
+                            });
+                        },
+                        () -> {
+                            refusalGrace.clear();
+                            deathGuards.values().forEach(DeathGuard::discardWard);
+                            deathGuards.clear();
+                        })
                 .bind(AbilityStateOwnership.Bucket.TRIGGERED_BARRIERS,
                         sourceId -> triggeredBarriers.entrySet().removeIf(entry ->
                                 entry.getKey().equals(sourceId)
@@ -858,6 +960,12 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
         statuses.remove(sourceId);
         statuses.values().forEach(targets -> targets.remove(sourceId));
         statuses.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+    }
+
+    /** Ancestral spirits are Allays, which would otherwise take the item a player clicks them with. */
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onSpiritInteract(org.bukkit.event.player.PlayerInteractEntityEvent event) {
+        if (AbilityStateSpectacle.isSpirit(event.getRightClicked())) event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -988,6 +1096,7 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
         DeathGuard guard = deathGuards.get(targetId);
         if (guard != null && guard.expiresAtNanos() <= now) {
             deathGuards.remove(targetId);
+            guard.discardWard();
             return null;
         }
         return guard;
@@ -1207,6 +1316,7 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
         closed = true;
         HandlerList.unregisterAll(this);
         stateOwnership.clearAll();
+        AbilityStateSpectacle.dismissAll();
     }
 
     private record RedirectLink(UUID sourceId, double fraction, double efficiency,
@@ -1223,7 +1333,55 @@ final class AbilityStateRuntime implements Listener, AutoCloseable {
 
     private record DeathGuard(UUID sourceId, double healingFraction, double shieldFraction,
                               boolean emitWardBroken, int wardBrokenTicks,
-                              long expiresAtNanos, String abilityId) {
+                              long expiresAtNanos, String abilityId, WardAnchor ward) {
+        void discardWard() {
+            if (ward != null) ward.discard();
+        }
+    }
+
+    /**
+     * The block a ward anchored death guard leaves where it was cast. It is a glowing display
+     * entity, so mobs and explosions can't break it and nobody can stand on it. It never saves
+     * with the chunk, and the guard removes it when it fires, fades or is cleared.
+     */
+    private record WardAnchor(Location location, org.bukkit.entity.BlockDisplay display) {
+        private WardAnchor {
+            location = location.clone();
+        }
+
+        static WardAnchor place(Location feet) {
+            if (feet.getWorld() == null) return null;
+            org.bukkit.entity.BlockDisplay display = feet.getWorld().spawn(
+                    feet.clone().add(0D, .15D, 0D), org.bukkit.entity.BlockDisplay.class, entity -> {
+                        com.magmaguy.elitemobs.entitytracker.EntityTracker.registerVisualEffects(entity);
+                        entity.setPersistent(false);
+                        entity.setRotation(0F, 0F);
+                        entity.setBlock(org.bukkit.Material.CRYING_OBSIDIAN.createBlockData());
+                        entity.setTransformation(new org.bukkit.util.Transformation(
+                                new org.joml.Vector3f(-.25F, 0F, -.25F),
+                                new org.joml.AxisAngle4f(),
+                                new org.joml.Vector3f(.5F, .5F, .5F),
+                                new org.joml.AxisAngle4f()));
+                        entity.setBrightness(new org.bukkit.entity.Display.Brightness(15, 15));
+                        entity.setGlowColorOverride(org.bukkit.Color.fromRGB(0xA040FF));
+                        entity.setGlowing(true);
+                    });
+            Location center = feet.clone().add(0D, .4D, 0D);
+            feet.getWorld().spawnParticle(Particle.SOUL, center, 16, .3D, .3D, .3D, .03D);
+            feet.getWorld().playSound(feet, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, .8F, .8F);
+            return new WardAnchor(feet, display);
+        }
+
+        void pulse() {
+            if (!display.isValid() || location.getWorld() == null) return;
+            Location center = location.clone().add(0D, .4D, 0D);
+            location.getWorld().spawnParticle(Particle.SOUL, center, 2, .2D, .25D, .2D, .01D);
+            location.getWorld().spawnParticle(Particle.WITCH, center, 3, .3D, .3D, .3D, 0D);
+        }
+
+        void discard() {
+            if (display.isValid()) display.remove();
+        }
     }
 
     private record TriggeredBarrier(UUID sourceId, double healingFraction,

@@ -506,7 +506,7 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
         AbilityResult result = abilityEngine.execute(player, lineage, slot, active.activeEffectiveLevel());
         if (!result.successful()) {
             observeFailedCast(player, abilitySpec);
-            sendFeedback(player, failureMessage(abilityName(lineage, slot), result.failureReason()));
+            sendFeedback(player, failureMessage(abilityName(lineage, slot), result.failureReason(), abilitySpec));
             return result;
         }
         if (!resources.trySpend(player, abilityCost))
@@ -1050,13 +1050,18 @@ public final class AdvancedCombatModule implements Listener, ClassAbilityInput, 
                 ChatColorConverter.convert(message));
     }
 
-    private static String failureMessage(String abilityName, AbilityFailureReason reason) {
+    private static String failureMessage(String abilityName, AbilityFailureReason reason, FixedAbilitySpec spec) {
+        double reach = spec.tuning().range() > 0D ? spec.tuning().range() : spec.tuning().radius();
+        String within = reach > 0D ? " within " + Math.round(reach) + " blocks" : " in range";
         return switch (reason) {
             case NO_VALID_TARGET -> "&c" + abilityName + " needs a valid target.";
             case NO_CORPSE -> "&cAim at a recent Elite corpse.";
             case PATH_BLOCKED -> "&c" + abilityName + " is blocked by terrain.";
             case UNSAFE_DESTINATION -> "&c" + abilityName + " could not find safe footing.";
-            case NOT_MOVING -> "&c" + abilityName + " only works while you are moving.";
+            case NOT_MOVING -> "&c" + abilityName + " only works while you are sprinting.";
+            case NO_ELITE_TARGET -> "&c" + abilityName + " needs an Elite" + within + ". Class skills don't hit vanilla mobs.";
+            case NO_LARGE_TARGET -> "&c" + abilityName + " needs a large foe or boss" + within + ".";
+            case NO_BOSS_TARGET -> "&c" + abilityName + " needs a boss" + within + ".";
             case NO_LOW_HEALTH_ALLY -> "&c" + abilityName + " needs you or an ally below 35% health.";
             case NO_WOUNDED_TARGET -> "&c" + abilityName + " needs a foe below half health.";
             case ENGINE_CLOSED, WRONG_THREAD, ABILITY_NOT_REGISTERED -> "&c" + abilityName

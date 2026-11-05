@@ -159,10 +159,10 @@ public final class ActiveAbilityBalanceAnalyzer {
 
     private static boolean levelScaledEffect(AbilityEffect effect) {
         return switch (effect) {
-            // Cleanse is immediate and binary; chill and enlarge use fixed strengths and
-            // durations. Every other non-payload effect is backed by a level-scaled duration,
-            // displacement, modifier, or state amount at runtime.
-            case CLEANSE, CHILL, ENLARGE -> false;
+            // Cleanse is immediate and binary; chill, enlarge and night vision use fixed
+            // strengths and durations. Every other non-payload effect is backed by a level-scaled
+            // duration, displacement, modifier, or state amount at runtime.
+            case CLEANSE, CHILL, ENLARGE, NIGHT_VISION -> false;
             default -> true;
         };
     }
@@ -304,6 +304,8 @@ public final class ActiveAbilityBalanceAnalyzer {
             case ENLARGE -> .2D;
             case BLEED -> 0D;
             case SLOW_FALLING, JUMP_BOOST -> .15D * durationFactor;
+            // A quality-of-life buff: it never changes damage taken or dealt.
+            case NIGHT_VISION -> .1D;
         };
     }
 
@@ -338,6 +340,12 @@ public final class ActiveAbilityBalanceAnalyzer {
             case MISSING_HEALTH_PROTECTION, RANDOM_MINOR_DEBUFF -> .3D;
             // The ordinary-foe payload is scored separately in the target scenarios.
             case ORDINARY_FOE_VARIANT -> 0D;
+            // The strikes split the damage already counted through repetitions.
+            case RAPID_STRIKES -> 0D;
+            // Only foes caught near the centre feel the harder slow.
+            case FROZEN_CORE -> .15D;
+            // Returning to the ward is an escape, but it can also pull the owner back into danger.
+            case WARD_ANCHOR -> .1D;
         };
     }
 

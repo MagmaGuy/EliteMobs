@@ -46,6 +46,11 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
     private static final double LEAP_VERTICAL_VELOCITY = .9D;
     private static final int LEAP_LANDING_TIMEOUT_TICKS = 80;
     private static final double PROJECTILE_BLOCKS_PER_TICK = 2.5D;
+    /** A quarter second between bolts of one volley, so each lands and sounds as its own shot. */
+    private static final long VOLLEY_SPACING_TICKS = 5L;
+    private static final double VOLLEY_SPREAD = .25D;
+    /** Ticks between the strikes of a rapid-strikes instant. */
+    private static final long RAPID_STRIKE_SPACING_TICKS = 4L;
 
     private final Plugin plugin;
     private final FixedAbilityRegistry registry;
@@ -197,6 +202,12 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             launchEffectChain(player, spec, selection, effectiveLevel, presentation);
             return AbilityResult.scheduled(spec.id(), AbilityContribution.NONE);
         }
+        if (spec.executionTraits().mechanics().contains(AbilityMechanic.RAPID_STRIKES)) {
+            AbilityContribution first = applyAndPresent(presentation, player, spec, selection, effectiveLevel);
+            presentRapidStrike(player, 0);
+            launchRapidStrikes(player, spec, effectiveLevel, presentation);
+            return AbilityResult.scheduled(spec.id(), first);
+        }
         AbilityContribution initial = applyAndPresent(
                 presentation, player, spec, selection, effectiveLevel);
         if (spec.executionTraits().mechanics().contains(AbilityMechanic.MISSING_HEALTH_SCALING)) {
@@ -266,6 +277,65 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             }
         }.runTaskTimer(plugin, 1L, 3L);
         track(caster.getUniqueId(), task);
+    }
+
+    /**
+     * The strikes after the first of a rapid-strikes instant. Each one re-selects its targets, so a
+     * foe that steps into the arc mid-combo gets hit and one that leaves it is spared.
+     */
+    private void launchRapidStrikes(
+            Player caster,
+            FixedAbilitySpec spec,
+            int effectiveLevel,
+            BukkitClassAbilityPresentation.Session presentation) {
+        int strikes = Math.max(1, spec.tuning().repetitions());
+        if (strikes <= 1) return;
+        long casterLifecycleToken = states.lifecycleToken(caster);
+        BukkitTask task = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
+            private int struck = 1;
+
+            @Override
+            protected void tick() {
+                if (!currentCast(caster, casterLifecycleToken) || struck >= strikes) {
+                    BukkitClassAbilityEngine.this.cancelTracked(caster.getUniqueId(), this);
+                    return;
+                }
+                AbilityTargeting.TargetSelection current = targeting.select(caster, spec);
+                if (!current.enemies().isEmpty()) {
+                    AbilityContribution contribution = applyAndPresent(
+                            presentation, caster, spec, current, effectiveLevel);
+                    if (contribution.isMeaningful())
+                        semantics.recordContribution(caster, spec.id(), contribution);
+                }
+                presentRapidStrike(caster, struck);
+                struck++;
+            }
+        }.runTaskTimer(plugin, RAPID_STRIKE_SPACING_TICKS, RAPID_STRIKE_SPACING_TICKS);
+        track(caster.getUniqueId(), task);
+    }
+
+    /** One slash arc in front of the caster; strikes alternate their tilt and climb in pitch. */
+    private static void presentRapidStrike(Player caster, int index) {
+        Vector forward = caster.getEyeLocation().getDirection().setY(0D);
+        if (forward.lengthSquared() < 1.0E-6D) forward = new Vector(0D, 0D, 1D);
+        forward.normalize();
+        Vector side = new Vector(-forward.getZ(), 0D, forward.getX());
+        Location center = caster.getLocation().add(0D, caster.getHeight() * .6D, 0D);
+        double tilt = index % 2 == 0 ? .45D : -.45D;
+        for (int point = 0; point <= 10; point++) {
+            double sweep = -1D + point / 5D;
+            double angle = sweep * Math.PI / 3D;
+            Vector offset = forward.clone().multiply(Math.cos(angle) * 2.2D)
+                    .add(side.clone().multiply(Math.sin(angle) * 2.2D))
+                    .add(new Vector(0D, sweep * tilt, 0D));
+            caster.getWorld().spawnParticle(Particle.ENCHANTED_HIT, center.clone().add(offset),
+                    2, .03D, .03D, .03D, 0D);
+        }
+        Location front = center.clone().add(forward.clone().multiply(1.8D));
+        caster.getWorld().spawnParticle(Particle.SWEEP_ATTACK, front, 1, 0D, 0D, 0D, 0D);
+        caster.getWorld().spawnParticle(Particle.END_ROD, front, 4, .25D, .2D, .25D, .02D);
+        caster.getWorld().playSound(caster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP,
+                .9F, 1.1F + index * .15F);
     }
 
     private boolean isCurrentChainAlly(Player caster, Player candidate, long lifecycleToken) {
@@ -353,11 +423,9 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                     new AbilityTargeting.TargetSelection(pierced, selection.allies(), selection.origin()),
                     effectiveLevel, windUp, presentation);
         } else if (spec.target() == AbilityTarget.AIMED_ENEMY && spec.tuning().projectileCount() > 1) {
-            LivingEntity target = selection.enemies().get(0);
-            for (int index = 0; index < spec.tuning().projectileCount(); index++)
-                launchProjectile(player, spec, target,
-                        new AbilityTargeting.TargetSelection(List.of(target), selection.allies(), target.getLocation()),
-                        effectiveLevel, windUp + index * 2L, presentation);
+            launchTrackingVolley(player, spec, selection.enemies().get(0), effectiveLevel, windUp, presentation);
+            player.getWorld().spawnParticle(Particle.CRIT, player.getEyeLocation(), 6, .3, .3, .3, .35);
+            return AbilityResult.scheduled(spec.id(), AbilityContribution.NONE);
         } else {
             List<LivingEntity> targets = selection.enemies().stream()
                     .limit(spec.tuning().projectileCount())
@@ -423,6 +491,11 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 presentation, player, spec, initialSelection, effectiveLevel);
         boolean followsCaster = spec.executionTraits().mechanics().contains(AbilityMechanic.FOLLOW_CASTER_FIELD);
         if (followsCaster) presentation.fieldPulse(origin, 0);
+        double coreRadius = spec.executionTraits().mechanics().contains(AbilityMechanic.FROZEN_CORE)
+                ? AbilityEffects.FROZEN_CORE_RADIUS : 0D;
+        presentation.zonePulse(origin, spec.tuning().radius(), coreRadius);
+        if (presentation.drawsElementalField())
+            launchElementalField(player, spec, origin, totalDuration, coreRadius, followsCaster, presentation);
         if (spec.tuning().repetitions() <= 1) return AbilityResult.success(spec.id(), initial);
 
         int period = Math.max(1, totalDuration / spec.tuning().repetitions());
@@ -450,11 +523,40 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                             spec.tuning().radius() * .45D, .25D,
                             spec.tuning().radius() * .45D, .02D);
                 if (followsCaster) presentation.fieldPulse(pulseOrigin, repetitions);
+                presentation.zonePulse(pulseOrigin, spec.tuning().radius(), coreRadius);
                 repetitions++;
             }
         }.runTaskTimer(plugin, period, period);
         track(player.getUniqueId(), task);
         return AbilityResult.scheduled(spec.id(), initial);
+    }
+
+    /** Draws a flame or frost zone every four ticks for as long as it lasts. */
+    private void launchElementalField(
+            Player caster,
+            FixedAbilitySpec spec,
+            Location origin,
+            int durationTicks,
+            double coreRadius,
+            boolean followsCaster,
+            BukkitClassAbilityPresentation.Session presentation) {
+        long casterLifecycleToken = states.lifecycleToken(caster);
+        int frames = Math.max(1, durationTicks / 4);
+        BukkitTask task = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
+            private int frame;
+
+            @Override
+            protected void tick() {
+                if (!currentCast(caster, casterLifecycleToken) || frame >= frames) {
+                    BukkitClassAbilityEngine.this.cancelTracked(caster.getUniqueId(), this);
+                    return;
+                }
+                presentation.zoneAmbient(followsCaster ? caster.getLocation() : origin,
+                        spec.tuning().radius(), coreRadius, frame);
+                frame++;
+            }
+        }.runTaskTimer(plugin, 2L, 4L);
+        track(caster.getUniqueId(), task);
     }
 
     private void launchExpandingPulses(
@@ -692,10 +794,14 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
             int effectiveLevel,
             long delayTicks,
             BukkitClassAbilityPresentation.Session presentation) {
+        if (spec.target() == AbilityTarget.AIMED_ENEMY && spec.tuning().projectileCount() > 1) {
+            launchTrackingVolley(player, spec, null, effectiveLevel, delayTicks, presentation);
+            player.getWorld().spawnParticle(Particle.CRIT, player.getEyeLocation(), 6, .3, .3, .3, .35);
+            return AbilityResult.scheduled(spec.id(), AbilityContribution.NONE);
+        }
         long casterLifecycleToken = states.lifecycleToken(player);
         Location castOrigin = player.getEyeLocation().clone();
-        Location destination = castOrigin.clone().add(
-                castOrigin.getDirection().normalize().multiply(Math.max(4D, spec.tuning().range())));
+        Location destination = lookDestination(player, spec);
         int projectiles = Math.max(1, spec.tuning().projectileCount());
         for (int index = 0; index < projectiles; index++) {
             BukkitTask launch = new TrackedAbilityTask(player.getUniqueId(), spec.id()) {
@@ -722,6 +828,116 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
                 Math.max(4, projectiles * 3), .3, .3, .3, .35);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, .8F, 1.15F);
         return AbilityResult.scheduled(spec.id(), AbilityContribution.NONE);
+    }
+
+    private static Location lookDestination(Player player, FixedAbilitySpec spec) {
+        Location eye = player.getEyeLocation();
+        return eye.clone().add(eye.getDirection().normalize().multiply(Math.max(4D, spec.tuning().range())));
+    }
+
+    /**
+     * Fires a multi-bolt volley at one aimed enemy as separate shots. Each bolt leaves
+     * {@link #VOLLEY_SPACING_TICKS} after the previous one with its own sound, and aims at where the
+     * target is now, with a little spread. Bolts carry no vanilla knockback, so the target stays on the
+     * line of the bolts still in flight. If the target dies, leaves range or hides behind a wall,
+     * the remaining bolts keep flying at its last seen position. A volley cast with no target
+     * follows the caster's current aim instead.
+     */
+    private void launchTrackingVolley(
+            Player caster,
+            FixedAbilitySpec spec,
+            LivingEntity target,
+            int effectiveLevel,
+            long delayTicks,
+            BukkitClassAbilityPresentation.Session presentation) {
+        long casterLifecycleToken = states.lifecycleToken(caster);
+        int bolts = Math.max(1, spec.tuning().projectileCount());
+        BukkitTask task = new TrackedAbilityTask(caster.getUniqueId(), spec.id()) {
+            private int fired;
+            private Location lastAim = target == null ? null : volleyAim(target);
+
+            @Override
+            protected void tick() {
+                if (!currentCast(caster, casterLifecycleToken) || fired >= bolts) {
+                    BukkitClassAbilityEngine.this.cancelTracked(caster.getUniqueId(), this);
+                    return;
+                }
+                if (target == null) lastAim = lookDestination(caster, spec);
+                else if (volleyTargetAimable(caster, spec, target)) lastAim = volleyAim(target);
+                Location destination = lastAim.clone();
+                if (fired > 0) {
+                    var random = java.util.concurrent.ThreadLocalRandom.current();
+                    destination.add(
+                            random.nextDouble(-VOLLEY_SPREAD, VOLLEY_SPREAD),
+                            random.nextDouble(-VOLLEY_SPREAD, VOLLEY_SPREAD),
+                            random.nextDouble(-VOLLEY_SPREAD, VOLLEY_SPREAD));
+                }
+                Location castOrigin = caster.getEyeLocation().clone();
+                if (caster.getWorld().equals(destination.getWorld())) {
+                    Location[] previous = {castOrigin};
+                    projectileCarriers.launch(
+                            caster,
+                            destination,
+                            spec.tuning().range(),
+                            PROJECTILE_BLOCKS_PER_TICK,
+                            (projectile, hitEntity) -> withoutVanillaKnockback(spec, hitEntity,
+                                    () -> impactPhysicalProjectile(
+                                            caster, projectile, spec, hitEntity, castOrigin,
+                                            casterLifecycleToken, effectiveLevel, presentation)),
+                            (point, progress) -> {
+                                renderVolleyBolt(spec, previous[0], point, progress);
+                                previous[0] = point.clone();
+                            });
+                    caster.getWorld().playSound(caster.getLocation(), Sound.ITEM_CROSSBOW_SHOOT,
+                            .8F, 1.05F + fired * .08F);
+                }
+                fired++;
+            }
+        }.runTaskTimer(plugin, Math.max(1L, delayTicks), VOLLEY_SPACING_TICKS);
+        track(caster.getUniqueId(), task);
+    }
+
+    /**
+     * Runs one volley bolt's impact without the vanilla knockback its carrier arrow brings as the damage
+     * source. That knockback pushes the target about 2.5 blocks back and 1 block up per bolt, so the bolts
+     * already in flight pass over or beside it. A spec that lists its own displacement keeps it.
+     */
+    private static void withoutVanillaKnockback(FixedAbilitySpec spec, LivingEntity target, Runnable impact) {
+        if (target == null || spec.effects().contains(AbilityEffect.KNOCKBACK)
+                || spec.effects().contains(AbilityEffect.PULL) || spec.effects().contains(AbilityEffect.LAUNCH)) {
+            impact.run();
+            return;
+        }
+        org.bukkit.util.Vector before = target.getVelocity();
+        try {
+            impact.run();
+        } finally {
+            if (target.isValid() && !target.isDead()) target.setVelocity(before);
+        }
+    }
+
+    private static Location volleyAim(LivingEntity target) {
+        return target.getLocation().add(0D, target.getHeight() * .55D, 0D);
+    }
+
+    private boolean volleyTargetAimable(Player caster, FixedAbilitySpec spec, LivingEntity target) {
+        if (!target.isValid() || target.isDead() || !target.getWorld().equals(caster.getWorld())) return false;
+        Location aim = volleyAim(target);
+        double range = Math.max(1D, spec.tuning().range());
+        return aim.distanceSquared(caster.getEyeLocation()) <= range * range
+                && semantics.canTargetEnemy(caster, target, spec)
+                && clearSegment(caster.getEyeLocation(), aim);
+    }
+
+    /** Fills the gap the bolt crossed this tick so each bolt reads as one bright streak. */
+    private static void renderVolleyBolt(FixedAbilitySpec spec, Location from, Location to, double progress) {
+        if (from.getWorld() == null || !from.getWorld().equals(to.getWorld())) {
+            renderProjectile(spec, to, progress);
+            return;
+        }
+        for (int step = 1; step <= 4; step++)
+            to.getWorld().spawnParticle(Particle.CRIT, lerp(from, to, step / 4D), 1, 0D, 0D, 0D, 0D);
+        renderProjectile(spec, to, progress);
     }
 
     private void launchProjectile(
@@ -1457,7 +1673,19 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
         Set<AbilityMechanic> mechanics = spec.executionTraits().mechanics();
         if (mechanics.contains(AbilityMechanic.WOUNDED_TARGETS_ONLY)) return AbilityFailureReason.NO_WOUNDED_TARGET;
         if (mechanics.contains(AbilityMechanic.LOW_HEALTH_ALLY_ONLY)) return AbilityFailureReason.NO_LOW_HEALTH_ALLY;
+        if (mechanics.contains(AbilityMechanic.BOSS_ONLY)) return AbilityFailureReason.NO_BOSS_TARGET;
+        if (mechanics.contains(AbilityMechanic.LARGE_OR_BOSS_ONLY)) return AbilityFailureReason.NO_LARGE_TARGET;
+        // Advanced Combat skills only hit EliteMobs mobs, so a vanilla mob in front of you is no target.
+        if (hasEnemyEffect(spec)) return AbilityFailureReason.NO_ELITE_TARGET;
         return AbilityFailureReason.NO_VALID_TARGET;
+    }
+
+    private static boolean hasEnemyEffect(FixedAbilitySpec spec) {
+        return spec.declaredEffects().stream().anyMatch(effect -> switch (effect) {
+            case DAMAGE, KNOCKBACK, PULL, LAUNCH, SLOW, WEAKEN, GLOW, PARTY_DAMAGE_MARK, TAUNT, INTERRUPT, FEAR, ROOT, BURN,
+                    CHILL, SHRINK, ENLARGE, BLEED -> true;
+            default -> false;
+        });
     }
 
     /** An instant aimed at a spot fires a visible shot there, then pulses once across its radius. */
@@ -1486,14 +1714,10 @@ public final class BukkitClassAbilityEngine implements ClassAbilityEngine {
     }
 
     private static boolean hasApplicableTarget(FixedAbilitySpec spec, AbilityTargeting.TargetSelection selection) {
-        boolean enemyEffect = spec.declaredEffects().stream().anyMatch(effect -> switch (effect) {
-            case DAMAGE, KNOCKBACK, PULL, LAUNCH, SLOW, WEAKEN, GLOW, PARTY_DAMAGE_MARK, TAUNT, INTERRUPT, FEAR, ROOT, BURN,
-                    CHILL, SHRINK, ENLARGE, BLEED -> true;
-            default -> false;
-        });
+        boolean enemyEffect = hasEnemyEffect(spec);
         boolean allyEffect = spec.declaredEffects().stream().anyMatch(effect -> switch (effect) {
             case HEAL, SHIELD, CLEANSE, SELF_PROTECT, ALLY_PROTECT, SPEED, HASTE, RESISTANCE, STRENGTH,
-                    SPELL_STRENGTH, SELF_VULNERABLE, SLOW_FALLING, JUMP_BOOST -> true;
+                    SPELL_STRENGTH, SELF_VULNERABLE, SLOW_FALLING, JUMP_BOOST, NIGHT_VISION -> true;
             default -> false;
         });
         return (enemyEffect && !selection.enemies().isEmpty())

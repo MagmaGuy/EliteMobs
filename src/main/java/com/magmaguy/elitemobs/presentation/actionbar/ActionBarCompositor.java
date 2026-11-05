@@ -52,6 +52,11 @@ public final class ActionBarCompositor implements Listener {
         AFFINITY_WARNING(350, 200, Encoding.LEGACY),
         COMBAT_TRANSITION(300, 60, Encoding.LEGACY),
         SKILL_FEEDBACK(300, 60, Encoding.LEGACY),
+        /**
+         * Countdown of an armed ability state, such as a death guard. It sits under cast feedback,
+         * so a fresh cast message covers it briefly and the countdown resumes afterwards.
+         */
+        ABILITY_STATE(250, 30, Encoding.LEGACY),
         LOOT(200, 60, Encoding.LEGACY),
         ECONOMY(200, 60, Encoding.LEGACY),
         CLASS_HUD(100, -1L, Encoding.LEGACY),

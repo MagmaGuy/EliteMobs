@@ -77,6 +77,8 @@ public final class ClassMinionManager implements Listener, AutoCloseable {
     private static final double CORPSE_ELIGIBILITY_RANGE_SQUARED = 32D * 32D;
     private static final double CORPSE_TARGET_RANGE = 24D;
     private static final double OWNER_MAX_DISTANCE_SQUARED = 40D * 40D;
+    /** A support servant this far behind its owner is brought back to their side. */
+    private static final double SUPPORT_CATCH_UP_DISTANCE_SQUARED = 20D * 20D;
     private static final double AUTONOMOUS_TARGET_RANGE_SQUARED = 16D * 16D;
     private static final int AUTONOMOUS_TARGET_TICKS = 30;
     private static final int RETALIATION_TICKS = 8 * 20;
@@ -144,6 +146,10 @@ public final class ClassMinionManager implements Listener, AutoCloseable {
             if (selectedCorpse == null) return SummonResult.failure(Status.NO_CORPSE);
             aimedLocation = selectedCorpse.location();
         }
+
+        // A guardian heals the allies around it, so it arrives at its owner's side instead of
+        // wherever they were looking, which could be the open sky or the far side of a room.
+        if (theme.supportRole()) aimedLocation = guardianAnchor(owner);
 
         AbyssalGateManager.GateHandle gate = null;
         if (theme == ClassMinionTheme.NETHER) {
@@ -323,16 +329,19 @@ public final class ClassMinionManager implements Listener, AutoCloseable {
         LivingEntity attacker = source(event.getDamager());
         if (attacker == null || attacker instanceof Player || isMinion(attacker)) return;
 
+        // Support servants have no attack. A target would only pull them off their owner.
         MinionInstance struckMinion = minionsByEntity.get(event.getEntity().getUniqueId());
         if (struckMinion != null) {
-            struckMinion.control().commandTarget(attacker, RETALIATION_TICKS);
+            if (!struckMinion.theme().supportRole())
+                struckMinion.control().commandTarget(attacker, RETALIATION_TICKS);
             return;
         }
         if (event.getEntity() instanceof Player owner) {
             ClassMinionRoster<MinionInstance> roster = rosters.get(owner.getUniqueId());
             if (roster == null) return;
             for (MinionInstance minion : roster.entries()) {
-                minion.control().commandTarget(attacker, RETALIATION_TICKS);
+                if (!minion.theme().supportRole())
+                    minion.control().commandTarget(attacker, RETALIATION_TICKS);
             }
         }
     }
@@ -512,8 +521,16 @@ public final class ClassMinionManager implements Listener, AutoCloseable {
             if (now >= minion.expiresAtTick()
                     || owner == null || !owner.isOnline() || owner.isDead()
                     || body == null || !body.isValid() || body.isDead()
-                    || !body.getWorld().equals(owner.getWorld())
-                    || body.getLocation().distanceSquared(owner.getLocation()) > OWNER_MAX_DISTANCE_SQUARED) {
+                    || !body.getWorld().equals(owner.getWorld())) {
+                removeMinion(minion, RemovalReason.OTHER);
+                continue;
+            }
+            double ownerDistanceSquared = body.getLocation().distanceSquared(owner.getLocation());
+            if (minion.theme().supportRole() && ownerDistanceSquared > SUPPORT_CATCH_UP_DISTANCE_SQUARED) {
+                catchUp(body, owner);
+                ownerDistanceSquared = body.getLocation().distanceSquared(owner.getLocation());
+            }
+            if (ownerDistanceSquared > OWNER_MAX_DISTANCE_SQUARED) {
                 removeMinion(minion, RemovalReason.OTHER);
                 continue;
             }
@@ -523,10 +540,11 @@ public final class ClassMinionManager implements Listener, AutoCloseable {
                 removeMinion(minion, RemovalReason.OTHER);
                 continue;
             }
-            if (acquireTargets && minion.control().target(body).isEmpty()) {
+            if (acquireTargets && !minion.theme().supportRole() && minion.control().target(body).isEmpty()) {
                 nearestEliteTarget(owner, body).ifPresent(
                         target -> minion.control().commandTarget(target, AUTONOMOUS_TARGET_TICKS));
             }
+            if (minion.spec().id().equals("lich.signature") && now % 4L < TICK_PERIOD) emitDeathCoilSmoke(body);
         }
     }
 
@@ -665,6 +683,50 @@ public final class ClassMinionManager implements Listener, AutoCloseable {
             owner.setHealth(Math.min(maximum, owner.getHealth() + event.getAmount()));
         }
         return Math.max(0D, owner.getHealth() - before);
+    }
+
+    /** Just ahead of the owner and a block up; findSpawn searches around this for open space. */
+    private static Location guardianAnchor(Player owner) {
+        Location base = owner.getLocation();
+        Vector facing = base.getDirection().setY(0D);
+        if (facing.lengthSquared() < 1.0E-6D) facing = new Vector(0D, 0D, 1D);
+        return base.clone().add(facing.normalize().multiply(1.5D)).add(0D, 1D, 0D);
+    }
+
+    /**
+     * Brings a support servant that fell behind back to its owner: behind them and above their
+     * head when there is room, otherwise onto their own spot.
+     */
+    private static void catchUp(LivingEntity body, Player owner) {
+        Location base = owner.getLocation();
+        Vector facing = base.getDirection().setY(0D);
+        if (facing.lengthSquared() < 1.0E-6D) facing = new Vector(0D, 0D, 1D);
+        facing.normalize();
+        List<Location> candidates = List.of(
+                base.clone().add(facing.clone().multiply(-1.5D)).add(0D, 1.2D, 0D),
+                base.clone().add(0D, 2.2D, 0D),
+                base.clone());
+        Location destination = candidates.stream()
+                .filter(spot -> spot.getBlock().isPassable()
+                        && spot.clone().add(0D, 1D, 0D).getBlock().isPassable())
+                .findFirst()
+                .orElse(base.clone());
+        Location departure = body.getLocation();
+        departure.getWorld().spawnParticle(Particle.SOUL, departure.clone().add(0D, .5D, 0D),
+                10, .3D, .3D, .3D, .03D);
+        body.teleport(destination);
+        destination.getWorld().spawnParticle(Particle.SOUL, destination.clone().add(0D, .5D, 0D),
+                10, .3D, .3D, .3D, .03D);
+        destination.getWorld().playSound(destination, Sound.ENTITY_ALLAY_ITEM_THROWN, .6F, .8F);
+    }
+
+    /** Death Coil's undead trail dark smoke and a few lost souls while they fight. */
+    private static void emitDeathCoilSmoke(LivingEntity body) {
+        Location center = body.getLocation().add(0D, body.getHeight() * .6D, 0D);
+        body.getWorld().spawnParticle(Particle.LARGE_SMOKE, center, 3, .25D, .4D, .25D, .01D);
+        body.getWorld().spawnParticle(Particle.SMOKE, center, 4, .3D, .5D, .3D, .02D);
+        if (Math.floorMod(body.getTicksLived(), 12) < 4)
+            body.getWorld().spawnParticle(Particle.SOUL, center, 1, .2D, .3D, .2D, .02D);
     }
 
     private Optional<Location> findSpawn(

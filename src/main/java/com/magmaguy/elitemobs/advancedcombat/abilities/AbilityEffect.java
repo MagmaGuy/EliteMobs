@@ -35,5 +35,7 @@ public enum AbilityEffect {
     /** Damage over time after the hit, worth a fixed share of the hit's damage. */
     BLEED,
     SLOW_FALLING,
-    JUMP_BOOST
+    JUMP_BOOST,
+    /** Night Vision long enough that the client's end-of-effect flicker never shows mid-fight. */
+    NIGHT_VISION
 }

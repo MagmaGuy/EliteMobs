@@ -68,6 +68,12 @@ public final class ClassAbilityActivationFeedback {
         boolean missingHealthScaling = spec.executionTraits().mechanics()
                 .contains(AbilityMechanic.MISSING_HEALTH_SCALING);
 
+        // A death guard's whole point is the death it refuses, so that leads the receipt.
+        if (spec.executionTraits().mechanics().contains(AbilityMechanic.DEATH_GUARD))
+            outcomes.add((spec.executionTraits().mechanics().contains(AbilityMechanic.WARD_ANCHOR)
+                    ? "ward pulls you back from one death" : "refuses one death")
+                    + duration(Math.max(20, levelDuration), " for "));
+        boolean rapidStrikes = spec.executionTraits().mechanics().contains(AbilityMechanic.RAPID_STRIKES);
         if (spec.family() == AbilityFamily.SUMMON) {
             outcomes.add("summon" + duration(tuning.durationTicks(), " for "));
         } else if (spec.effects().contains(AbilityEffect.DAMAGE) && tuning.damageMultiplier() > 0D) {
@@ -79,13 +85,16 @@ public final class ClassAbilityActivationFeedback {
                     .contains(AbilityMechanic.PROJECTILE_BOMBARDMENT)) {
                 damage = deliveries + " arrows at "
                         + number(tuning.damageMultiplier() * levelScale) + "x damage";
+            } else if (rapidStrikes) {
+                damage = deliveries + " strikes at "
+                        + number(tuning.damageMultiplier() * levelScale) + "x damage";
             } else {
                 damage = deliveries > 1
                         ? deliveries + " hits at "
                         + number(tuning.damageMultiplier() * levelScale) + "x damage"
                         : number(tuning.damageMultiplier() * levelScale) + "x damage";
             }
-            if (tuning.repetitions() > 1) damage += duration(tuning.durationTicks(), " over ");
+            if (tuning.repetitions() > 1 && !rapidStrikes) damage += duration(tuning.durationTicks(), " over ");
             outcomes.add(damage);
         }
         if (spec.effects().contains(AbilityEffect.HEAL) && tuning.healingFraction() > 0D) {
@@ -169,6 +178,8 @@ public final class ClassAbilityActivationFeedback {
         if (slowFalling || jumpBoost)
             outcomes.add((slowFalling && jumpBoost ? "Slow Falling + Jump Boost"
                     : slowFalling ? "Slow Falling" : "Jump Boost") + duration(levelDuration, " for "));
+        if (spec.effects().contains(AbilityEffect.NIGHT_VISION))
+            outcomes.add("Night Vision" + duration(Math.max(400, levelDuration), " for "));
         if (spec.effects().contains(AbilityEffect.BURN)) {
             int burnDuration = Math.max(20, Math.min(200, levelDuration));
             outcomes.add("burn" + duration(burnDuration, " for "));

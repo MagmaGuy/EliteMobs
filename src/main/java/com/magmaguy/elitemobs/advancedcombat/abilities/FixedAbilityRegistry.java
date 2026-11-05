@@ -221,8 +221,10 @@ public final class FixedAbilityRegistry {
         mechanics(specs, "battlemage.signature", AbilityMechanic.CASTER_ONLY_SUPPORT);
         mechanics(specs, "necromancer.signature", AbilityMechanic.REQUIRES_CORPSE);
         mechanics(specs, "spiritbinder.utility", AbilityMechanic.DAMAGE_SHARE);
+        mechanics(specs, "spellblade.signature", AbilityMechanic.RAPID_STRIKES);
+        mechanics(specs, "cryomancer.signature", AbilityMechanic.FROZEN_CORE);
         mechanics(specs, "lich.utility", AbilityMechanic.DEATH_GUARD,
-                AbilityMechanic.WARD_BREAK_SIGNAL);
+                AbilityMechanic.WARD_BREAK_SIGNAL, AbilityMechanic.WARD_ANCHOR);
         cost(specs, "necromancer.signature", 45D);
         cost(specs, "lich.signature", 55D);
         cost(specs, "plaguebringer.signature", 50D);
@@ -279,7 +281,7 @@ public final class FixedAbilityRegistry {
         instant(specs, "bloodrager.signature", AbilitySlot.SIGNATURE, AbilityTarget.SELF, tune(0, 0, 0, 0, 1.22, 0, 0, 100, 1, 1), AbilityEffect.STRENGTH, AbilityEffect.SPEED);
         instant(specs, "reaver.signature", AbilitySlot.SIGNATURE, AbilityTarget.FORWARD_ENEMIES, tune(1.35, 0, 0, .7, 1, 9, 5, 60, 1, 1), AbilityEffect.DAMAGE, AbilityEffect.LIFESTEAL, AbilityEffect.KNOCKBACK);
         instant(specs, "bloodstorm.signature", AbilitySlot.SIGNATURE, AbilityTarget.NEARBY_ENEMIES, tune(.55, 0, 0, .7, 1, 0, 7, 60, 1, 1), AbilityEffect.DAMAGE, AbilityEffect.LIFESTEAL, AbilityEffect.KNOCKBACK);
-        instant(specs, "deathless.signature", AbilitySlot.SIGNATURE, AbilityTarget.SELF, support(.1, .22, 0, 0, 100), AbilityEffect.HEAL, AbilityEffect.SHIELD, AbilityEffect.SELF_PROTECT);
+        instant(specs, "deathless.signature", AbilitySlot.SIGNATURE, AbilityTarget.SELF, support(.1, .22, 0, 0, 200), AbilityEffect.HEAL, AbilityEffect.SHIELD, AbilityEffect.SELF_PROTECT);
         instant(specs, "slayer.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_ENEMY, combat(2.0, 8, 0, 30), AbilityEffect.DAMAGE);
         instant(specs, "headsman.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_ENEMY, combat(3.2, 9, 0, 30), AbilityEffect.DAMAGE, AbilityEffect.WEAKEN);
         weaken(specs, "headsman.signature", .85D);
@@ -370,7 +372,7 @@ public final class FixedAbilityRegistry {
         instant(specs, "seraph.signature", AbilitySlot.SIGNATURE, AbilityTarget.NEARBY_ALLIES, support(.17, .03, 0, 18, 30), AbilityEffect.HEAL, AbilityEffect.SHIELD);
         instant(specs, "shaman.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_ALLY, support(.15, 0, 20, 0, 80), AbilityEffect.HEAL);
         instant(specs, "lifewarden.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_ALLY, support(.14, .08, 22, 0, 100), AbilityEffect.HEAL, AbilityEffect.SHIELD);
-        zone(specs, "grovekeeper.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_LOCATION, tune(0, .055, .015, 0, 1, 18, 8, 120, 6, 1), AbilityEffect.HEAL, AbilityEffect.SHIELD);
+        zone(specs, "grovekeeper.signature", AbilitySlot.SIGNATURE, AbilityTarget.AIMED_LOCATION, tune(0, .055, .015, 0, 1, 18, 8, 120, 6, 1), AbilityEffect.HEAL, AbilityEffect.SHIELD, AbilityEffect.NIGHT_VISION);
         zone(specs, "shepherd.signature", AbilitySlot.SIGNATURE, AbilityTarget.MIXED_NEARBY, tune(0, .045, .01, 0, 1, 0, 12, 120, 6, 1), AbilityEffect.HEAL, AbilityEffect.SHIELD);
         instant(specs, "spiritcaller.signature", AbilitySlot.SIGNATURE, AbilityTarget.SELF,
                 tune(0, 0, 0, 0, 1, 0, 0, 45, 1, 1), AbilityEffect.HEAL);
@@ -410,7 +412,7 @@ public final class FixedAbilityRegistry {
         instant(specs, "battlemage.signature", AbilitySlot.SIGNATURE, AbilityTarget.MIXED_NEARBY,
                 tune(1.45, 0, .05, 0, 1, 0, 6, 50, 1, 1), AbilityEffect.DAMAGE, AbilityEffect.SHIELD, AbilityEffect.SELF_PROTECT);
         instant(specs, "spellblade.signature", AbilitySlot.SIGNATURE, AbilityTarget.FORWARD_ENEMIES,
-                tune(2.2, 0, 0, 0, 1, 11, 5, 35, 1, 1), AbilityEffect.DAMAGE, AbilityEffect.INTERRUPT);
+                tune(2.2D / 3D, 0, 0, 0, 1, 11, 5, 35, 3, 1), AbilityEffect.DAMAGE, AbilityEffect.INTERRUPT);
         instant(specs, "arcane_knight.signature", AbilitySlot.SIGNATURE, AbilityTarget.NEARBY_ENEMIES,
                 combat(1.35, 0, 8, 70), AbilityEffect.DAMAGE, AbilityEffect.INTERRUPT, AbilityEffect.WEAKEN);
         weaken(specs, "arcane_knight.signature", .85D);
@@ -461,7 +463,7 @@ public final class FixedAbilityRegistry {
                 combat(0, 0, 10, 100), AbilityEffect.SLOW, AbilityEffect.WEAKEN);
         weaken(specs, "necromancer.utility", .85D);
         instant(specs, "lich.utility", AbilitySlot.UTILITY, AbilityTarget.SELF,
-                support(.04, .22, 0, 0, 100), AbilityEffect.HEAL, AbilityEffect.SHIELD, AbilityEffect.SELF_PROTECT);
+                support(.04, .22, 0, 0, 240), AbilityEffect.HEAL, AbilityEffect.SHIELD, AbilityEffect.SELF_PROTECT);
         instant(specs, "plaguebringer.utility", AbilitySlot.UTILITY, AbilityTarget.NEARBY_ENEMIES,
                 combat(0, 0, 12, 120), AbilityEffect.SLOW, AbilityEffect.WEAKEN);
         weaken(specs, "plaguebringer.utility", .82D);

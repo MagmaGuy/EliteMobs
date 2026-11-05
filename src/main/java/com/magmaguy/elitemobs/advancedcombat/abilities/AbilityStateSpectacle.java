@@ -5,77 +5,122 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Allay;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import com.magmaguy.elitemobs.entitytracker.EntityTracker;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /** Visual and sound moments for stateful mechanics. Presentation only; never changes gameplay. */
 final class AbilityStateSpectacle {
-    /** Ticks the ancestral ghost takes to fade in before it casts. */
-    static final int GHOST_FADE_IN_TICKS = 10;
-    private static final int GHOST_FADE_OUT_TICKS = 8;
-    private static final Particle.DustOptions GHOST_BODY =
-            new Particle.DustOptions(Color.fromRGB(176, 232, 255), .85F);
+    /** Ticks the ancestral spirit hovers beside its ally before it casts the echoed heal. */
+    static final int SPIRIT_GATHER_TICKS = 26;
+    private static final int SPIRIT_LINGER_TICKS = 14;
     private static final Particle.DustOptions GHOST_GLOW =
             new Particle.DustOptions(Color.fromRGB(235, 250, 255), 1.1F);
+    private static final Set<Entity> SPIRITS = new HashSet<>();
 
     private AbilityStateSpectacle() {
     }
 
     /**
-     * Raises a translucent ancestor beside the healed ally. It fades in, lifts its arms and sends
-     * a beam of light into the ally exactly when {@code onCast} runs, then dissolves.
+     * Calls an ancestral spirit, an Allay, to the healed ally's side. It follows the ally while it
+     * gathers, sends a beam of light into them exactly when {@code onCast} runs, lingers a moment
+     * and dissolves. The spirit has no AI, can't be hurt or handed items and never saves with the
+     * chunk.
      */
     static void ancestralEcho(Plugin plugin, Player target, Runnable onCast) {
-        Location anchor = target.getLocation();
-        Vector facing = anchor.getDirection().setY(0);
-        if (facing.lengthSquared() < 1.0E-6D) facing = new Vector(0, 0, 1);
-        facing.normalize();
-        Vector side = new Vector(-facing.getZ(), 0, facing.getX());
-        Location ghost = anchor.clone().add(side.multiply(1.4D)).add(facing.clone().multiply(-.4D));
-        Vector towardTarget = anchor.toVector().subtract(ghost.toVector()).setY(0);
-        if (towardTarget.lengthSquared() < 1.0E-6D) towardTarget = facing.clone();
-        Vector forward = towardTarget.normalize();
-        if (ghost.getWorld() == null) {
-            onCast.run();
-            return;
-        }
-        ghost.getWorld().playSound(ghost, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, .8F, .6F);
-        ghost.getWorld().playSound(ghost, Sound.BLOCK_BEACON_AMBIENT, .7F, 1.8F);
+        World world = target.getWorld();
+        Location start = spiritSpot(target, 0);
+        Allay spirit = world.spawn(start, Allay.class, entity -> {
+            EntityTracker.registerVisualEffects(entity);
+            entity.setPersistent(false);
+            entity.setAI(false);
+            entity.setSilent(true);
+            entity.setInvulnerable(true);
+            entity.setGravity(false);
+            entity.setCollidable(false);
+            entity.setCanPickupItems(false);
+            entity.setGlowing(true);
+        });
+        SPIRITS.add(spirit);
+        world.spawnParticle(Particle.SOUL, start.clone().add(0D, .3D, 0D), 14, .3D, .3D, .3D, .03D);
+        world.playSound(start, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, .9F, .6F);
+        world.playSound(start, Sound.BLOCK_BEACON_AMBIENT, .7F, 1.8F);
         new BukkitRunnable() {
             private int tick;
+            private boolean cast;
 
             @Override
             public void run() {
-                if (!target.isOnline() || target.isDead() || ghost.getWorld() == null) {
-                    if (tick <= GHOST_FADE_IN_TICKS) onCast.run();
+                if (!target.isOnline() || target.isDead() || !spirit.isValid()
+                        || !spirit.getWorld().equals(target.getWorld())) {
+                    if (!cast) onCast.run();
+                    dismiss(spirit);
                     cancel();
                     return;
                 }
-                if (tick < GHOST_FADE_IN_TICKS) {
-                    silhouette(ghost, forward, false, (tick + 1D) / GHOST_FADE_IN_TICKS);
-                } else if (tick == GHOST_FADE_IN_TICKS) {
-                    silhouette(ghost, forward, true, 1D);
-                    beam(ghost.clone().add(forward.clone().multiply(.35D)).add(0D, 1.75D, 0D),
+                Location spot = spiritSpot(target, tick);
+                spirit.teleport(spot);
+                if (tick < SPIRIT_GATHER_TICKS) {
+                    if (tick % 3 == 0)
+                        spirit.getWorld().spawnParticle(Particle.END_ROD, spot.clone().add(0D, .3D, 0D),
+                                1, .15D, .15D, .15D, .01D);
+                } else if (tick == SPIRIT_GATHER_TICKS) {
+                    cast = true;
+                    beam(spot.clone().add(0D, .35D, 0D),
                             target.getLocation().add(0D, target.getHeight() * .6D, 0D));
-                    World world = ghost.getWorld();
-                    world.playSound(ghost, Sound.ENTITY_EVOKER_CAST_SPELL, .8F, 1.5F);
-                    world.playSound(target.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1F, 1.2F);
-                    world.playSound(target.getLocation(), Sound.ENTITY_ALLAY_ITEM_GIVEN, .8F, 1.1F);
+                    World current = spirit.getWorld();
+                    current.playSound(spot, Sound.ENTITY_ALLAY_ITEM_THROWN, 1F, 1.3F);
+                    current.playSound(target.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1F, 1.2F);
+                    current.playSound(target.getLocation(), Sound.ENTITY_ALLAY_ITEM_GIVEN, .8F, 1.1F);
                     onCast.run();
-                } else if (tick <= GHOST_FADE_IN_TICKS + GHOST_FADE_OUT_TICKS) {
-                    double fade = 1D - (tick - GHOST_FADE_IN_TICKS) / (double) (GHOST_FADE_OUT_TICKS + 1);
-                    silhouette(ghost.clone().add(0D, (1D - fade) * .5D, 0D), forward, true, fade);
-                } else {
-                    ghost.getWorld().spawnParticle(Particle.SOUL, ghost.clone().add(0D, 1.2D, 0D),
-                            8, .25D, .5D, .25D, .02D);
+                } else if (tick > SPIRIT_GATHER_TICKS + SPIRIT_LINGER_TICKS) {
+                    spirit.getWorld().spawnParticle(Particle.SOUL, spot.clone().add(0D, .3D, 0D),
+                            10, .25D, .3D, .25D, .02D);
+                    spirit.getWorld().playSound(spot, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, .6F, 1.6F);
+                    dismiss(spirit);
                     cancel();
                     return;
                 }
                 tick++;
             }
-        }.runTaskTimer(plugin, 0L, 1L);
+        }.runTaskTimer(plugin, 1L, 1L);
+    }
+
+    /** Beside and slightly ahead of the ally at shoulder height, facing them, with a gentle bob. */
+    private static Location spiritSpot(Player target, int tick) {
+        Location anchor = target.getLocation();
+        Vector facing = anchor.getDirection().setY(0);
+        if (facing.lengthSquared() < 1.0E-6D) facing = new Vector(0, 0, 1);
+        facing.normalize();
+        Vector side = new Vector(-facing.getZ(), 0, facing.getX());
+        Location spot = anchor.clone().add(side.multiply(1.1D)).add(facing.clone().multiply(.3D))
+                .add(0D, 1.1D + Math.sin(tick * .25D) * .08D, 0D);
+        Vector toward = anchor.toVector().subtract(spot.toVector()).setY(0);
+        spot.setDirection(toward.lengthSquared() < 1.0E-6D ? facing : toward);
+        spot.setPitch(0F);
+        return spot;
+    }
+
+    static boolean isSpirit(Entity entity) {
+        return SPIRITS.contains(entity);
+    }
+
+    /** Removes every spirit still on screen; the runtime calls this when it closes. */
+    static void dismissAll() {
+        for (Entity spirit : List.copyOf(SPIRITS)) dismiss(spirit);
+    }
+
+    private static void dismiss(Entity spirit) {
+        SPIRITS.remove(spirit);
+        if (spirit.isValid()) spirit.remove();
     }
 
     /** Layered sound and light when a fatal hit is refused. */
@@ -114,49 +159,6 @@ final class AbilityStateSpectacle {
                 }
             }
         }.runTaskTimer(plugin, 4L, 4L);
-    }
-
-    private static void silhouette(Location feet, Vector forward, boolean armsRaised, double density) {
-        World world = feet.getWorld();
-        if (world == null) return;
-        Vector side = new Vector(-forward.getZ(), 0, forward.getX());
-        // Head ring
-        for (int index = 0; index < 10; index++) {
-            if (Math.random() > density) continue;
-            double angle = Math.PI * 2D * index / 10D;
-            Location point = feet.clone().add(0D, 1.72D, 0D)
-                    .add(side.clone().multiply(Math.cos(angle) * .22D))
-                    .add(0D, Math.sin(angle) * .22D, 0D);
-            world.spawnParticle(Particle.DUST, point, 1, 0D, 0D, 0D, 0D, GHOST_GLOW);
-        }
-        // Torso and legs
-        line(world, feet.clone().add(0D, 1.45D, 0D), feet.clone().add(0D, .8D, 0D), 6, density, GHOST_BODY);
-        line(world, feet.clone().add(0D, .8D, 0D),
-                feet.clone().add(side.clone().multiply(.18D)).add(0D, .05D, 0D), 5, density, GHOST_BODY);
-        line(world, feet.clone().add(0D, .8D, 0D),
-                feet.clone().add(side.clone().multiply(-.18D)).add(0D, .05D, 0D), 5, density, GHOST_BODY);
-        // Arms: hanging while it gathers, raised toward the ally when it casts.
-        Location shoulders = feet.clone().add(0D, 1.4D, 0D);
-        for (int sign = -1; sign <= 1; sign += 2) {
-            Location shoulder = shoulders.clone().add(side.clone().multiply(.28D * sign));
-            Location hand = armsRaised
-                    ? shoulder.clone().add(forward.clone().multiply(.45D)).add(0D, .45D, 0D)
-                    .add(side.clone().multiply(-.1D * sign))
-                    : shoulder.clone().add(side.clone().multiply(.08D * sign)).add(0D, -.6D, 0D);
-            line(world, shoulder, hand, 4, density, GHOST_BODY);
-        }
-        if (Math.random() < density * .5D)
-            world.spawnParticle(Particle.SOUL, feet.clone().add(0D, 1D, 0D), 1, .2D, .5D, .2D, .01D);
-    }
-
-    private static void line(World world, Location from, Location to, int points, double density,
-                             Particle.DustOptions dust) {
-        Vector step = to.toVector().subtract(from.toVector()).multiply(1D / Math.max(1, points));
-        for (int index = 0; index <= points; index++) {
-            if (Math.random() > density) continue;
-            world.spawnParticle(Particle.DUST, from.clone().add(step.clone().multiply(index)),
-                    1, 0D, 0D, 0D, 0D, dust);
-        }
     }
 
     private static void beam(Location from, Location to) {

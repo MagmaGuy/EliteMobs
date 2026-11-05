@@ -74,7 +74,7 @@ public final class ClassAbilityPresentationPlanner {
     private static boolean isBuff(AbilityEffect effect) {
         return switch (effect) {
             case SHIELD, CLEANSE, SELF_PROTECT, ALLY_PROTECT, SPEED, HASTE, RESISTANCE, STRENGTH,
-                    SPELL_STRENGTH, SELF_VULNERABLE, SLOW_FALLING, JUMP_BOOST -> true;
+                    SPELL_STRENGTH, SELF_VULNERABLE, SLOW_FALLING, JUMP_BOOST, NIGHT_VISION -> true;
             default -> false;
         };
     }

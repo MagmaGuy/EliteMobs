@@ -29,10 +29,12 @@ final class ClassMinionMindProgramFactory {
         MindProgram.Builder builder = MindProgram.builder(
                 new NamespacedKey(plugin, "class_minion/" + theme.name().toLowerCase()).toString(),
                 1L);
-        if (!theme.supportRole()) builder.behavior(new CombatBehavior(state));
+        boolean fights = !theme.supportRole();
+        if (fights) builder.behavior(new CombatBehavior(state));
+        // A support servant has no combat behavior, so a target must never stop it following.
         return builder
-                .behavior(new FollowOwnerBehavior(state))
-                .behavior(new LocalWanderBehavior(state))
+                .behavior(new FollowOwnerBehavior(state, fights))
+                .behavior(new LocalWanderBehavior(state, fights))
                 .build();
     }
 
@@ -97,9 +99,11 @@ final class ClassMinionMindProgramFactory {
     private static final class FollowOwnerBehavior implements MindBehavior {
         private static final Set<MindControl> CONTROLS = EnumSet.of(MindControl.MOVE, MindControl.LOOK);
         private final ClassMinionControlState state;
+        private final boolean fights;
 
-        private FollowOwnerBehavior(ClassMinionControlState state) {
+        private FollowOwnerBehavior(ClassMinionControlState state, boolean fights) {
             this.state = state;
+            this.fights = fights;
         }
 
         @Override
@@ -119,7 +123,7 @@ final class ClassMinionMindProgramFactory {
 
         @Override
         public boolean canStart(MindContext context) {
-            boolean combat = state.target(context.entity()).isPresent();
+            boolean combat = fights && state.target(context.entity()).isPresent();
             return MinionBehaviorPolicy.choose(combat, state.ownerDistance(context.entity()), false)
                     == MinionBehaviorPolicy.Intent.FOLLOW;
         }
@@ -149,9 +153,11 @@ final class ClassMinionMindProgramFactory {
         private long nextWanderTick;
         private long stopAtTick;
         private Location destination;
+        private final boolean fights;
 
-        private LocalWanderBehavior(ClassMinionControlState state) {
+        private LocalWanderBehavior(ClassMinionControlState state, boolean fights) {
             this.state = state;
+            this.fights = fights;
         }
 
         @Override
@@ -171,7 +177,7 @@ final class ClassMinionMindProgramFactory {
 
         @Override
         public boolean canStart(MindContext context) {
-            boolean combat = state.target(context.entity()).isPresent();
+            boolean combat = fights && state.target(context.entity()).isPresent();
             boolean ready = context.gameTick() >= nextWanderTick;
             return state.owner().isPresent()
                     && MinionBehaviorPolicy.choose(combat, state.ownerDistance(context.entity()), ready)
@@ -181,7 +187,7 @@ final class ClassMinionMindProgramFactory {
         @Override
         public boolean canContinue(MindContext context) {
             if (destination == null || context.gameTick() >= stopAtTick) return false;
-            if (state.target(context.entity()).isPresent()) return false;
+            if (fights && state.target(context.entity()).isPresent()) return false;
             if (state.ownerDistance(context.entity()) > MinionBehaviorPolicy.SETTLED_RADIUS + 2D) return false;
             return context.perception().navigation().consecutiveStuckTicks() < 20;
         }
