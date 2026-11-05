@@ -1,5 +1,6 @@
 package com.magmaguy.elitemobs.menus;
 
+import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.advancedcombat.weapons.AdvancedMagicWeaponItems;
 import com.magmaguy.elitemobs.config.DefaultConfig;
 import com.magmaguy.elitemobs.config.SkillsConfig;
@@ -291,8 +292,21 @@ public class SkillBonusMenu {
             else if (slot == SkillBonusMenuConfig.getWandsSlot()) selectedType = SkillType.WANDS;
 
             if (selectedType != null) {
-                openSkillSelectMenu(player, selectedType);
+                SkillType skillType = selectedType;
+                openNextTick(player, event, () -> openSkillSelectMenu(player, skillType));
             }
+        }
+
+        /**
+         * Bukkit forbids opening an inventory inside its click event, so the next menu opens one tick later and
+         * only while the player still looks at the menu they clicked.
+         */
+        private static void openNextTick(Player player, InventoryClickEvent event, Runnable openMenu) {
+            Inventory clickedMenu = event.getView().getTopInventory();
+            Bukkit.getScheduler().runTask(MetadataHandler.PLUGIN, () -> {
+                if (!player.isOnline() || player.getOpenInventory().getTopInventory() != clickedMenu) return;
+                openMenu.run();
+            });
         }
 
         private void handleSkillSelectClick(Player player, InventoryClickEvent event) {
@@ -303,7 +317,7 @@ public class SkillBonusMenu {
 
             // Handle back button
             if (slot == SkillBonusMenuConfig.getBackSlot()) {
-                openWeaponSelectMenu(player);
+                openNextTick(player, event, () -> openWeaponSelectMenu(player));
                 return;
             }
 
@@ -359,7 +373,7 @@ public class SkillBonusMenu {
             }
 
             // Refresh menu
-            openSkillSelectMenu(player, skillType);
+            openNextTick(player, event, () -> openSkillSelectMenu(player, skillType));
         }
 
         @EventHandler
