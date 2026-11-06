@@ -75,7 +75,7 @@ public class EliteScrollMenuConfig extends MenusConfigFields {
                                 "&2Elite items have elite dps or elite defense which applies",
                                 "&2to elite mobs.",
                                 "&2To convert a non-elite item into an elite item, place",
-                                "&2your non-elite item below, as well as a Elite Scroll!"))),
+                                "&2your non-elite item below, as well as an Elite Scroll!"))),
                 fileConfiguration);
         infoButton = ItemStackSerializer.deserialize("infoButton", fileConfiguration, file);
         CustomModelAdder.addCustomModel(infoButton, CustomModelsConfig.goldenQuestionMark);
