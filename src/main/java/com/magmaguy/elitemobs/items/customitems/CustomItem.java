@@ -192,10 +192,29 @@ public class CustomItem {
 
     /**
      * Initializes all config items on startup. Needs to run after the config initialization as it relies on those values.
+     * <p>
+     * FreeMinecraftModels can reload its content at any time, for example when another plugin imports models
+     * while the server starts. Items are only built from a capture taken while FMM is not reloading, and a build
+     * that a reload overtakes is discarded and built again once FMM has finished.
      */
     public static void initializeCustomItems(BooleanSupplier cancelled) {
         List<CustomItemsConfigFields> configs = List.copyOf(CustomItemsConfig.getCustomItems().values());
-        ItemConstructionContext construction = prepareConstruction(configs, cancelled);
+        while (true) {
+            awaitModels(cancelled);
+            ItemConstructionContext construction = captureWhileModelsReady(configs, cancelled);
+            // FMM started reloading between the wait and the capture.
+            if (construction == null) continue;
+            buildCustomItems(configs, construction, cancelled);
+            String stale = staleModels(construction, cancelled);
+            if (stale == null) return;
+            Logger.info("FreeMinecraftModels reloaded its content while EliteMobs was building custom items ("
+                    + stale + "); building them again.");
+            clearItemRegistries();
+        }
+    }
+
+    private static void buildCustomItems(List<CustomItemsConfigFields> configs, ItemConstructionContext construction,
+                                         BooleanSupplier cancelled) {
         for (CustomItemsConfigFields config : configs) {
             if (cancelled.getAsBoolean()) throw new CancellationException("Item construction cancelled");
             try {
@@ -207,7 +226,68 @@ public class CustomItem {
         }
         if (com.magmaguy.elitemobs.config.AdvancedCombatSystemConfig.isEnabled())
             com.magmaguy.elitemobs.advancedcombat.weapons.AdvancedMagicWeaponItems.register(construction);
-        onServerThread(construction::requireCurrent, cancelled);
+    }
+
+    /** Waits on the initialization worker until FMM is not initializing or reloading its content. */
+    private static void awaitModels(BooleanSupplier cancelled) {
+        boolean announced = false;
+        while (!ItemConstructionContext.modelsReady()) {
+            if (cancelled.getAsBoolean() || com.magmaguy.elitemobs.MetadataHandler.shutdownRequested)
+                throw new CancellationException("Item construction cancelled");
+            if (!announced) {
+                Logger.info("Waiting for FreeMinecraftModels to finish loading its content before building custom items...");
+                announced = true;
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException interrupted) {
+                Thread.currentThread().interrupt();
+                throw new CancellationException("Item construction worker was interrupted");
+            }
+        }
+    }
+
+    /** Null when FMM began reloading before the capture ran on the server thread. */
+    private static ItemConstructionContext captureWhileModelsReady(Collection<CustomItemsConfigFields> configs,
+                                                                   BooleanSupplier cancelled) {
+        var result = new java.util.concurrent.atomic.AtomicReference<ItemConstructionContext>();
+        onServerThread(() -> {
+            if (ItemConstructionContext.modelsReady()) result.set(ItemConstructionContext.capture(configs));
+        }, cancelled);
+        return result.get();
+    }
+
+    /**
+     * Null when the build can be published. Otherwise the reason an FMM reload made it stale; any other change
+     * to the captured dependencies still fails initialization.
+     */
+    private static String staleModels(ItemConstructionContext construction, BooleanSupplier cancelled) {
+        var reason = new java.util.concurrent.atomic.AtomicReference<String>();
+        onServerThread(() -> {
+            if (!ItemConstructionContext.modelsReady()) {
+                reason.set("a reload is in progress");
+                return;
+            }
+            try {
+                construction.requireCurrent();
+            } catch (ConcurrentModificationException stale) {
+                if (!construction.modelsChanged()) throw stale;
+                reason.set(stale.getMessage());
+            }
+        }, cancelled);
+        return reason.get();
+    }
+
+    /** Forgets everything a stale build registered, returning the registries to their empty startup state. */
+    private static void clearItemRegistries() {
+        customItems.clear();
+        customItemStackList.clear();
+        customItemStackShopList.clear();
+        weighedFixedItems.clear();
+        tieredLoot.clear();
+        fixedItems.clear();
+        scalableItems.clear();
+        limitedItems.clear();
     }
 
     private static ItemConstructionContext prepareConstruction(Collection<CustomItemsConfigFields> configs,

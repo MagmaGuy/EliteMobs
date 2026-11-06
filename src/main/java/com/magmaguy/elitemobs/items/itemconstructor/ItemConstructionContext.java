@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.skills.SkillType;
 import com.magmaguy.freeminecraftmodels.api.ItemConstructionSnapshot;
 import com.magmaguy.freeminecraftmodels.api.magic.MagicWeaponKind;
 import com.magmaguy.magmacore.enchantments.EnchantmentItems;
+import com.magmaguy.magmacore.initialization.PluginInitializationManager;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -67,5 +68,25 @@ public final class ItemConstructionContext {
         if (modelsEnabled != Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels"))
             throw new ConcurrentModificationException("FMM availability changed during item construction");
         if (models != null) models.requireCurrent();
+    }
+
+    /**
+     * True unless FMM is initializing or reloading its content. FMM starts a reload on the server thread and
+     * reports it there at once, so a server-thread capture made while this holds sees a complete catalog.
+     */
+    public static boolean modelsReady() {
+        return PluginInitializationManager.isPluginReady("FreeMinecraftModels");
+    }
+
+    /** True when FMM was enabled, disabled or reloaded since this capture. Every FMM reload replaces its catalog. */
+    public boolean modelsChanged() {
+        if (modelsEnabled != Bukkit.getPluginManager().isPluginEnabled("FreeMinecraftModels")) return true;
+        if (models == null) return false;
+        try {
+            models.requireCurrent();
+            return false;
+        } catch (ConcurrentModificationException changed) {
+            return true;
+        }
     }
 }
