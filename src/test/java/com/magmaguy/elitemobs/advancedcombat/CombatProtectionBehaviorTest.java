@@ -267,7 +267,8 @@ class CombatProtectionBehaviorTest extends CombatBehaviorFixture {
     }
 
     @ParameterizedTest
-    @CsvSource({"deathless,SIGNATURE,3.964,false", "deathless,SIGNATURE,3.964,true",
+    // Refuse Death heals 10% of maximum health (Frost's review raised it from 8%), scaled by level.
+    @CsvSource({"deathless,SIGNATURE,4.455,false", "deathless,SIGNATURE,4.455,true",
             "lich,UTILITY,2.982,false", "lich,UTILITY,2.982,true"})
     void deathGuardTriggersOnceAndCannotHealAfterClassChange(
             String form, AbilitySlot slot, double recoveredHealth, boolean changeClassBeforeRecovery) {
@@ -277,12 +278,14 @@ class CombatProtectionBehaviorTest extends CombatBehaviorFixture {
             for (int hit = 0; hit < 5; hit++) incomingDamage();
         }
         assertTrue(module.useAbility(player, slot).successful());
-        assertEquals(7.545D, incomingDamage(), 0.000001, "A nonfatal hit must not consume the guard");
+        assertEquals(7.545D, incomingDamage(), 0.000001, "The guard must not change ordinary Elite damage");
         player.setHealth(2D);
         player.removePotionEffect(PotionEffectType.ABSORPTION);
-        player.setAbsorptionAmount(2D);
 
-        assertEquals(3D, incomingDamage(), 0.000001, "The guard must count absorption when capping this custom event");
+        // The guard answers the final damage of any source, not the Elite damage event.
+        assertFalse(refused(1D), "A nonfatal hit must not consume the guard");
+        assertTrue(refused(10D), "The guard must refuse a fatal hit");
+        assertTrue(refused(10D), "The refusal grace must also stop a second fatal hit in the same instant");
         assertEquals(2D, player.getHealth(), "Recovery is scheduled after damage processing");
         if (changeClassBeforeRecovery) assertTrue(module.selectForm(player, "spellcaster").accepted());
         MockBukkit.getMock().getScheduler().performOneTick();
@@ -293,7 +296,16 @@ class CombatProtectionBehaviorTest extends CombatBehaviorFixture {
         } else {
             assertEquals(recoveredHealth, player.getHealth(), 0.000001);
             assertEquals(1, player.getPotionEffect(PotionEffectType.ABSORPTION).getAmplifier());
-            assertEquals(7.545D, incomingDamage(), 0.000001, "The consumed guard must not cap another hit");
+            assertEquals(7.545D, incomingDamage(), 0.000001, "The consumed guard must not change another hit");
         }
+    }
+
+    /** Fires a fall hit of {@code damage} at the player and returns whether it was refused. */
+    @SuppressWarnings("removal")
+    private boolean refused(double damage) {
+        var hit = new org.bukkit.event.entity.EntityDamageEvent(player,
+                org.bukkit.event.entity.EntityDamageEvent.DamageCause.FALL, damage);
+        Bukkit.getPluginManager().callEvent(hit);
+        return hit.isCancelled();
     }
 }

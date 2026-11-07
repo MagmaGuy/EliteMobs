@@ -64,9 +64,10 @@ class CombatPassiveIntegrationTest extends CombatBehaviorFixture {
         }
     }
 
+    // Hierophant's Benediction heals 125% in the inner ring of its radius, where its caster stands.
     @ParameterizedTest
-    @CsvSource({"priest,31,SIGNATURE,false,11.336802,9.5", "hierophant,61,SIGNATURE,false,13.381253,9.25",
-            "hierophant,61,SIGNATURE,true,13.839487,9.25", "spiritcaller,61,UTILITY,false,9.1406984,9.45"})
+    @CsvSource({"priest,31,SIGNATURE,false,11.336802,9.5", "hierophant,61,SIGNATURE,false,14.72656625,9.25",
+            "hierophant,61,SIGNATURE,true,15.29935875,9.25", "spiritcaller,61,UTILITY,false,9.1406984,9.45"})
     void healingPassiveChangesRealRecoveryInItsPartyContext(
             String form, int level, AbilitySlot slot, boolean grouped,
             double healedHealth, double outgoing) throws Exception {

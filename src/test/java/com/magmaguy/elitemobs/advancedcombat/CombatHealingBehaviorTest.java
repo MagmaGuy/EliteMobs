@@ -11,8 +11,10 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CombatHealingBehaviorTest extends CombatBehaviorFixture {
+    // Hierophant's Benediction heals by ring (125% / 100% / 75% of its radius); the party stands 1 block away,
+    // in the inner ring, so each member gets 1.25 x 4.61.
     @ParameterizedTest
-    @CsvSource({"priest,31,3.017,false", "hierophant,61,4.61,true"})
+    @CsvSource({"priest,31,3.017,false", "hierophant,61,5.7625,true"})
     void partyHealSelectsItsRecipientsAndExcludesOutsiders(
             String form, int level, double healing, boolean healsCaster) throws Exception {
         assertTrue(module.setClassLevelForAdministration(player, form, level).applied());

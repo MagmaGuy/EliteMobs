@@ -42,6 +42,7 @@ abstract class CombatBehaviorFixture {
     @BeforeEach
     final void openCombat() {
         var server = MockBukkit.mock();
+        server.addWorld(CombatTestEntities.world("world"));
         previousPlugin = MetadataHandler.PLUGIN;
         MetadataHandler.PLUGIN = MockBukkit.loadWith(PluginMock.class, new java.io.ByteArrayInputStream("""
                 name: CombatBehaviorTest
